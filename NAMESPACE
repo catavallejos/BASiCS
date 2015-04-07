@@ -1,0 +1,4 @@
+useDynLib(BASiCS)
+exportPattern("^[^\\.]") 
+importFrom(Rcpp, evalCpp)
+
