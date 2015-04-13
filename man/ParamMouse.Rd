@@ -38,9 +38,6 @@ List of 8 elements
  \code{GeneIDs}   : Identifyiers of the analysed genes, i.e. those genes that have (on average) at least 1 count across the 41 analysed cells (vector of names with length 7941, including 7895 intrinsinc genes and 46 spike-in genes).
  
 }
-\details{
-%%  ~~ If necessary, more details than the __description__ above ~~
-}
 \source{
 \href{http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE46980}{Series GSE46980 (File: GSE46980_CombinedMoleculeCounts.tab.gz)}
 }

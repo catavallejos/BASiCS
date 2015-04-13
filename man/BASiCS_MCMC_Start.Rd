@@ -6,48 +6,38 @@
 BASiCS_MCMC_Start(Data, ...)
 }
 \arguments{
-\item{Data}{List containing 3 elements:
-\describe{
-  \item{\code{Counts}}{Matrix of raw expression counts. Dimensions: \code{n} columns (cells) and \code{q} rows (genes). Spike-in genes located at the last \code{q-q.bio} rows.}
-  \item{\code{Tech}}{Spike-in genes indicator. If \code{F} the gene is biological; otherwise the gene is spike-in. Length: \code{q} (genes).}
-  \item{\code{SpikeInput}}{Input number of mRNA molecules of each spike-in gene that are added to each cell (in the same order as they appear in \code{Counts})}
-}}
+\item{Data}{A \code{\link[BASiCS]{BASiCS_Data-class}} object.}
 
 \item{...}{Optional arguments (lower bounds for starting values of adaptive proposal variances, log-scale):
 \describe{
- \item{\code{ls.mu0}}{Related to gene-specific expression levels}
- \item{\code{ls.delta0}}{Related to gene-specific biological cell-to-cell heterogeneity hyper-parameters}
- \item{\code{ls.kappa0}}{Related to cell-specific mRNA content normalising constants (logit-scale)}
- \item{\code{ls.nu0}}{Related to cell-specific random effects (technical noise)}
- \item{\code{ls.theta0}}{Related to technical variability hyper-parameter}
+ \item{\code{ls.mu0}}{Related to gene-specific expression levels \eqn{\mu[i]}.}
+ \item{\code{ls.delta0}}{Related to gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.}
+ \item{\code{ls.kappa0}}{Related to cell-specific mRNA content normalising constants (logit-scale) \eqn{\kappa[j]}}
+ \item{\code{ls.nu0}}{Related to cell-specific random effects (technical noise) \eqn{\nu[j]}.}
+ \item{\code{ls.theta0}}{Related to technical variability hyper-parameter \eqn{\theta}.}
 }}
 }
 \value{
 A list containing starting values for all model parameters and the corresponding variances of the adaptive proposals (log-scale).
 }
 \description{
-Auxiliary function that creates starting values for BASiCS_MCMC.
+Auxiliary function that creates starting values for \code{\link[BASiCS]{BASiCS_MCMC}}.
 }
 \details{
 Typically, this function will not be directly called. It is internally used by \code{\link[BASiCS]{BASiCS_MCMC}}.
 }
 \examples{
-# Simulating a smaller dataset that can be used for illustration purposes
-# Include 100 biological genes and 46 spike-in genes in 41 cells
-data(ParamMouseShort)
-attach(ParamMouseShort)
-DataSimShort = BASiCS_Sim(mu = MuShort, delta = DeltaShort, phi = PhiShort, s = SShort, theta = ThetaShort)
-detach(ParamMouseShort)
+Data = makeExampleBASiCS_Data()
 
 # Creating starting values for BASiCS_MCMC
-MCMC_Start <- BASiCS_MCMC_Start(Data = DataSimShort)
+MCMC_Start <- BASiCS_MCMC_Start(Data)
 
 # Creating starting values for BASiCS_MCMC
-# With user-defined lower bounds for adaptive proposal variances
-MCMC_Start2 <- BASiCS_MCMC_Start(Data = DataSimShort, ls.mu0 = -6)
+# With user-defined lower bounds for adaptive proposal variances of gene-specific expression rates
+MCMC_Start2 <- BASiCS_MCMC_Start(Data, ls.mu0 = -6)
 }
 \author{
-Catalina A. Vallejos (catalina.vallejos 'at' mrc-bsu.cam.ac.uk)
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.

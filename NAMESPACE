@@ -1,4 +1,12 @@
 useDynLib(BASiCS)
-exportPattern("^[^\\.]") 
+exportPattern("^[^\\Hidden]") 
+import( BiocGenerics )
 importFrom(Rcpp, evalCpp)
+importFrom(coda, HPDinterval)
+importFrom(methods, Summary)
 
+exportClasses( "BASiCS_Data" )
+
+exportMethods(counts, 
+              displayTechIndicator, 
+              displaySpikeInput)

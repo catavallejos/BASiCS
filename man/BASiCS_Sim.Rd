@@ -6,54 +6,36 @@
 BASiCS_Sim(mu, delta, phi, s, theta)
 }
 \arguments{
-\item{mu}{Gene-specific expression levels, defined as true input molecules in case of technical genes
+\item{mu}{Gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes
 (vector of length \code{q}, technical genes located at the end of the vector, all elements must be positive numbers)}
 
-\item{delta}{Gene-specific biological cell-to-cell heterogeneity hyper-parameters, biological genes only
+\item{delta}{Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
 (vector of length \code{q.bio}, all elements must be positive numbers)}
 
-\item{phi}{Cell-specific mRNA content normalising constants
+\item{phi}{Cell-specific mRNA content normalising constants \eqn{\phi[j]}
 (vector of length \code{n}, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
 
-\item{s}{Cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants
+\item{s}{Cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
 (vector of length \code{n}, all elements must be positive numbers)}
 
-\item{theta}{Technical variability hyper-parameter (must be positive)}
+\item{theta}{Technical variability hyper-parameter \eqn{\theta} (must be positive)}
 }
 \value{
-\code{BASiCS_Sim} returns a list with 3 elements:
-
- \code{Counts} Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
-First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.
-
- \code{Tech} Vector of length \code{q}. If \code{F} the gene is biological; otherwise the gene is spike-in.
-
- \code{SpikeInput} Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.
+\code{BASiCS_Sim} returns an object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
 }
 \description{
 \code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS.
 This function is used in order to illustrate the performance of the \code{BASiCS} library.
 }
 \examples{
-# Loading estimated parameters for Mouse ESC dataset analysed in Vallejos et al (2015).
-data(ParamMouse)
-attach(ParamMouse)
-DataSimLong = BASiCS_Sim(mu = Mu, delta = Delta, phi = Phi, s = S, theta = Theta)
-names(DataSimLong)
-dim(DataSimLong$Counts)
-table(DataSimLong$Tech)
-length(DataSimLong$SpikeInput)
-detach(ParamMouse)
-
-# Simulating a smaller dataset that can be used for illustration purposes
-# Include 100 biological genes and 46 spike-in genes in 41 cells
 data(ParamMouseShort)
 attach(ParamMouseShort)
-DataSimShort = BASiCS_Sim(mu = MuShort, delta = DeltaShort, phi = PhiShort, s = SShort, theta = ThetaShort)
-names(DataSimShort)
-dim(DataSimShort$Counts)
-table(DataSimShort$Tech)
-length(DataSimShort$SpikeInput)
+Data = BASiCS_Sim(MuShort, DeltaShort, PhiShort, SShort, ThetaShort)
+head(counts(Data))
+dim(counts(Data, type="biological"))
+dim(counts(Data, type="technical"))
+displayTechIndicator(Data)
+displaySpikeInput(Data)
 detach(ParamMouseShort)
 }
 \author{

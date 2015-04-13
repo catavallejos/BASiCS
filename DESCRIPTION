@@ -1,13 +1,19 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.0
+Version: 0.1
 Date: 2015-04-06
 Author: Catalina Vallejos
 Maintainer: Catalina Vallejos <catalina.vallejos@mrc-bsu.cam.ac.uk>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
+Depends:
+    BiocGenerics
 Imports:
     Rcpp (>= 0.11.3),
-    testit
-LinkingTo: Rcpp
+    methods,
+    coda
+Suggests:
+    knitr
+LinkingTo: Rcpp, RcppArmadillo
+VignetteBuilder: knitr
