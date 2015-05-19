@@ -313,11 +313,19 @@ arma::mat muUpdate(
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message
     ind.elem(find_nonfinite(log_aux)).zeros();
-    if(size(find_nonfinite(log_aux),0)>0) {Rcpp::Rcout << "Debug mu" << size(find_nonfinite(log_aux),0) << std::endl;} 
+    if(size(find_nonfinite(log_aux),0)>0) 
+    {
+      Rcpp::Rcout << "Something went wrong when updating mu" << size(find_nonfinite(log_aux),0) << std::endl;
+      Rcpp::stop("Please consider additional filter of the input dataset.");
+    }
     // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
     // DEBUG: Print warning message
     ind.elem(find_nonfinite(aux)).zeros();
-    if(size(find_nonfinite(aux),0)>0) {Rcpp::Rcout << "Debug mu" << size(find_nonfinite(aux),0) << std::endl;}
+    if(size(find_nonfinite(aux),0)>0) 
+    {
+      Rcpp::Rcout << "Something went wrong when updating mu" << size(find_nonfinite(aux),0) << std::endl;
+      Rcpp::stop("Please consider additional filter of the input dataset.");
+    }
 
     // CREATING OUTPUT VARIABLE
     arma::vec mu = ind % aux + (1 - ind) % mu0;
@@ -378,7 +386,11 @@ arma::mat deltaUpdate(
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message
     ind.elem(find_nonfinite(log_aux)).zeros();
-    if(size(find_nonfinite(log_aux),0)>0) {Rcpp::Rcout << size(find_nonfinite(log_aux),0) << std::endl;}
+    if(size(find_nonfinite(log_aux),0)>0)
+    {
+      Rcpp::Rcout << "Something went wrong when updating delta" << size(find_nonfinite(log_aux),0) << std::endl;
+      Rcpp::stop("Please consider additional filter of the input dataset.");
+    }
 
     // CREATING OUTPUT VARIABLE
     arma::vec delta = ind % exp(y) + (1 - ind) % delta0;
@@ -439,7 +451,11 @@ arma::mat kappaUpdate(
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message
     ind.elem(find_nonfinite(log_aux)).zeros();
-    if(size(find_nonfinite(log_aux),0)>0) {Rcpp::Rcout << size(find_nonfinite(log_aux),0) << std::endl;}
+    if(size(find_nonfinite(log_aux),0)>0)
+    {
+      Rcpp::Rcout << "Something went wrong when updating kappa" << size(find_nonfinite(log_aux),0) << std::endl;
+      Rcpp::stop("Please consider additional filter of the input dataset.");
+    }
 
     // CREATING OUTPUT VARIABLE
     arma::vec kappa = ind % y + (1 - ind) % kappa0;
@@ -490,7 +506,11 @@ arma::vec sUpdate(
           {
             aux(j) = Rcpp::as<double>(Rgig(1,p,a(j),b));
             /* DEBUG: break in case of undefined values */
-            if(R_IsNA(aux(j))) {Rcpp::Rcout << "NA issue" << j << a(j) << std::endl; break;}
+            if(R_IsNA(aux(j))) 
+            {
+              Rcpp::Rcout << "Something went wrong when updating s" << j << std::endl;
+              Rcpp::stop("Please consider additional filter of the input dataset.");
+            }
           }
       else if(!(a(j)<0) & (p>0)) {aux(j) = Rcpp::as<double>(Rgig(1,p,a(j),b));}
       else{aux(j)=s0_arma(j);}         
@@ -551,6 +571,11 @@ arma::mat nuUpdate(
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message    
     ind.elem(find_nonfinite(log_aux)).zeros();
+    if(size(find_nonfinite(log_aux),0)>0)
+    {
+      Rcpp::Rcout << "Something went wrong when updating nu" << size(find_nonfinite(log_aux),0) << std::endl;
+      Rcpp::stop("Please consider additional filter of the input dataset.");
+    }
     if(size(find_nonfinite(log_aux),0)>0) {Rcpp::Rcout << size(find_nonfinite(log_aux),0) << std::endl;}
 
     // CREATING OUTPUT VARIABLE        
@@ -629,7 +654,8 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   NumericVector sumByGeneAll, // Sum of expression counts by gene (all genes)
   NumericVector sumByGeneBio,
   int StoreAdapt, 
-  int EndAdapt) // Sum of expression counts by gene (biological genes only)
+  int EndAdapt,
+  int PrintProgress) 
 {
 
 // NUMBER OF CELLS, GENES AND STORED DRAWS
@@ -684,6 +710,8 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   
   // START OF MCMC LOOP
   for (i=0; i<N; i++) {
+    
+    Rcpp::checkUserInterrupt();
     
     if(i==burn)
     {
@@ -757,7 +785,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if(i%(2*thin)==0)
+    if(i%(2*thin) == 0 & PrintProgress == 1)
     {
         Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
         Rcpp::Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;

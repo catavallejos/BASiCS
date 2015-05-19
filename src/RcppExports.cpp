@@ -7,45 +7,42 @@
 using namespace Rcpp;
 
 // HiddenBASiCS_MCMCcpp
-Rcpp::List HiddenBASiCS_MCMCcpp(int N, int thin, int burn, NumericMatrix Counts, NumericVector mu0, NumericVector delta0, NumericVector kappa0, NumericVector s0, NumericVector nu0, double theta0, double adelta, double bdelta, double s2kappa, double as, double bs, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSkappa0, NumericVector LSnu0, double LStheta0, NumericVector sumByCellAll, NumericVector sumByCellBio, NumericVector sumByGeneAll, NumericVector sumByGeneBio, int StoreAdapt, int EndAdapt);
-RcppExport SEXP BASiCS_HiddenBASiCS_MCMCcpp(SEXP NSEXP, SEXP thinSEXP, SEXP burnSEXP, SEXP CountsSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP kappa0SEXP, SEXP s0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2kappaSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSkappa0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByCellBioSEXP, SEXP sumByGeneAllSEXP, SEXP sumByGeneBioSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP) {
+Rcpp::List HiddenBASiCS_MCMCcpp(int N, int thin, int burn, NumericMatrix Counts, NumericVector mu0, NumericVector delta0, NumericVector kappa0, NumericVector s0, NumericVector nu0, double theta0, double adelta, double bdelta, double s2kappa, double as, double bs, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSkappa0, NumericVector LSnu0, double LStheta0, NumericVector sumByCellAll, NumericVector sumByCellBio, NumericVector sumByGeneAll, NumericVector sumByGeneBio, int StoreAdapt, int EndAdapt, int PrintProgress);
+RcppExport SEXP BASiCS_HiddenBASiCS_MCMCcpp(SEXP NSEXP, SEXP thinSEXP, SEXP burnSEXP, SEXP CountsSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP kappa0SEXP, SEXP s0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2kappaSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSkappa0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByCellBioSEXP, SEXP sumByGeneAllSEXP, SEXP sumByGeneBioSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< int >::type N(NSEXP );
-        Rcpp::traits::input_parameter< int >::type thin(thinSEXP );
-        Rcpp::traits::input_parameter< int >::type burn(burnSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type Counts(CountsSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type mu0(mu0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type delta0(delta0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type kappa0(kappa0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type s0(s0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type nu0(nu0SEXP );
-        Rcpp::traits::input_parameter< double >::type theta0(theta0SEXP );
-        Rcpp::traits::input_parameter< double >::type adelta(adeltaSEXP );
-        Rcpp::traits::input_parameter< double >::type bdelta(bdeltaSEXP );
-        Rcpp::traits::input_parameter< double >::type s2kappa(s2kappaSEXP );
-        Rcpp::traits::input_parameter< double >::type as(asSEXP );
-        Rcpp::traits::input_parameter< double >::type bs(bsSEXP );
-        Rcpp::traits::input_parameter< double >::type atheta(athetaSEXP );
-        Rcpp::traits::input_parameter< double >::type btheta(bthetaSEXP );
-        Rcpp::traits::input_parameter< double >::type ar(arSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type LSmu0(LSmu0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type LSdelta0(LSdelta0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type LSkappa0(LSkappa0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type LSnu0(LSnu0SEXP );
-        Rcpp::traits::input_parameter< double >::type LStheta0(LStheta0SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type sumByCellAll(sumByCellAllSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type sumByCellBio(sumByCellBioSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type sumByGeneAll(sumByGeneAllSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type sumByGeneBio(sumByGeneBioSEXP );
-        Rcpp::traits::input_parameter< int >::type StoreAdapt(StoreAdaptSEXP );
-        Rcpp::traits::input_parameter< int >::type EndAdapt(EndAdaptSEXP );
-        Rcpp::List __result = HiddenBASiCS_MCMCcpp(N, thin, burn, Counts, mu0, delta0, kappa0, s0, nu0, theta0, adelta, bdelta, s2kappa, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSkappa0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
+    Rcpp::traits::input_parameter< int >::type burn(burnSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type delta0(delta0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type kappa0(kappa0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type s0(s0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nu0(nu0SEXP);
+    Rcpp::traits::input_parameter< double >::type theta0(theta0SEXP);
+    Rcpp::traits::input_parameter< double >::type adelta(adeltaSEXP);
+    Rcpp::traits::input_parameter< double >::type bdelta(bdeltaSEXP);
+    Rcpp::traits::input_parameter< double >::type s2kappa(s2kappaSEXP);
+    Rcpp::traits::input_parameter< double >::type as(asSEXP);
+    Rcpp::traits::input_parameter< double >::type bs(bsSEXP);
+    Rcpp::traits::input_parameter< double >::type atheta(athetaSEXP);
+    Rcpp::traits::input_parameter< double >::type btheta(bthetaSEXP);
+    Rcpp::traits::input_parameter< double >::type ar(arSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type LSmu0(LSmu0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type LSdelta0(LSdelta0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type LSkappa0(LSkappa0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type LSnu0(LSnu0SEXP);
+    Rcpp::traits::input_parameter< double >::type LStheta0(LStheta0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sumByCellAll(sumByCellAllSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sumByCellBio(sumByCellBioSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sumByGeneAll(sumByGeneAllSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sumByGeneBio(sumByGeneBioSEXP);
+    Rcpp::traits::input_parameter< int >::type StoreAdapt(StoreAdaptSEXP);
+    Rcpp::traits::input_parameter< int >::type EndAdapt(EndAdaptSEXP);
+    Rcpp::traits::input_parameter< int >::type PrintProgress(PrintProgressSEXP);
+    __result = Rcpp::wrap(HiddenBASiCS_MCMCcpp(N, thin, burn, Counts, mu0, delta0, kappa0, s0, nu0, theta0, adelta, bdelta, s2kappa, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSkappa0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress));
+    return __result;
 END_RCPP
 }

@@ -1,12 +1,40 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
-import( BiocGenerics )
 importFrom(Rcpp, evalCpp)
 importFrom(coda, HPDinterval)
 importFrom(methods, Summary)
+importMethodsFrom(BiocGenerics, counts, 
+              displayTechIndicator, 
+              displaySpikeInput)
 
-exportClasses( "BASiCS_Data" )
+exportClasses( "BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary")
 
 exportMethods(counts, 
               displayTechIndicator, 
-              displaySpikeInput)
+              displaySpikeInput,
+              Summary,
+              plot)
+
+export(BASiCS_Filter,
+       newBASiCS_Data,
+       newBASiCS_Chain,
+       BASiCS_Sim,
+       makeExampleBASiCS_Data,
+       BASiCS_MCMC,
+       displayChainMu,
+       displayChainDelta,
+       displayChainPhi,
+       displayChainS,
+       displayChainNu,
+       displayChainTheta,
+       displaySummaryMu,
+       displaySummaryDelta,
+       displaySummaryPhi,
+       displaySummaryS,
+       displaySummaryNu,
+       displaySummaryTheta,
+       BASiCS_VarianceDecomp,
+       BASiCS_DetectHVG,
+       BASiCS_DetectLVG,
+       BASiCS_VarThresholdSearchHVG,
+       BASiCS_VarThresholdSearchLVG)

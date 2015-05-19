@@ -1,3 +1,118 @@
+#' @title Filter for input datasets
+#' 
+#' @description \code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria.
+#' 
+#' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts. 
+#' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
+#' @param Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
+#' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes. 
+#' @param MinTotalCountsPerCell Minimum value of total expression counts required per cell (biological and technical)
+#' @param MinTotalCountsPerGene Minimum value of total expression counts required per transcript (biological and technical)
+#' @param MinCellsWithExpression Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript.
+#' @param MinAvCountsPerCellsWithExpression Minimum average number of counts per cells where expression is detected. Criteria applied to each transcript.
+#' 
+#' @return A list of 2 elements
+#' \describe{
+#' \item{\code{Counts}}{Filtered matrix of expression counts}
+#' \item{\code{Tech}}{Filtered vector of spike-in indicators}
+#' \item{\code{SpikeInput}}{Filtered vector of spike-in genes input molecules}
+#' \item{\code{IncludeGenes}}{Inclusion indicators for transcripts}
+#' \item{\code{IncludeCells}}{Inclusion indicators for cells}
+#' }
+#' 
+#' @examples
+#' 
+#' Counts = matrix(rpois(50*10, 2), ncol = 10)
+#' Tech = c(rep(FALSE,40),rep(TRUE,10))
+#' SpikeInput = rgamma(10,1,1)
+#' Filter = BASiCS_Filter(Counts, Tech, SpikeInput)
+#' 
+#' FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, Filter$SpikeInput)
+#' 
+#' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+BASiCS_Filter <- function(Counts, Tech, SpikeInput, 
+                          MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
+                          MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
+{
+  q = length(Tech)
+  q.bio = q - sum(SpikeInput)
+  n = ncol(Counts)
+  
+  CellIndex = 1:n
+  GeneIndex = 1:q
+  
+  # Remove cells with zero counts in either biological or technical genes
+  IncludeCells = ifelse(apply(Counts[!Tech,],2,sum)>0 & apply(Counts[Tech,],2,sum)>0, T, F)
+  if(sum(IncludeCells) == 0) stop('All cells have zero biological or technical counts (across all transcripts) \n')
+  IncludeCells = ifelse(apply(Counts,2,sum) >= MinTotalCountsPerCell, IncludeCells, F)
+  Counts1 = Counts[,IncludeCells]
+  
+  # Remove transcripts with zero counts across all cells
+  IncludeBio = ifelse(apply(Counts1[!Tech,],1,sum) >= MinTotalCountsPerGene, T, F)
+  IncludeTech = ifelse(apply(Counts1[Tech,],1,sum) >= MinTotalCountsPerGene, T, F)
+  
+  # Remove transcripts expressed in less than 'MinExpressedCells' cells
+  NonZero <- I(Counts1>0)
+  IncludeBio = ifelse(apply(NonZero[!Tech,], 1, sum) >= MinCellsWithExpression, IncludeBio, F)
+  IncludeTech = ifelse(apply(NonZero[Tech,], 1, sum) >= MinCellsWithExpression, IncludeTech, F)
+  
+  # Remove transcripts with low counts in the cells where they are expressed  
+  IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum)/apply(NonZero[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression, IncludeBio, F)
+  IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum)/apply(NonZero[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression, IncludeTech, F)
+    
+  list("Counts" = Counts1[c(IncludeBio,IncludeTech),], "Tech" = Tech[c(IncludeBio,IncludeTech)],
+       "SpikeInput" = SpikeInput[IncludeTech],
+       "IncludeGenes" = c(IncludeBio,IncludeTech), "IncludeCells" = IncludeCells)
+}
+
+#' @title Creates a BASiCS_Data object from a matrix of expression counts and experimental information about spike-in genes
+#' 
+#' @description \code{BASiCS_Sim} creates a \code{\link[BASiCS]{BASiCS_Data-class}} object from 
+#' a matrix of expression counts and experimental information about spike-in genes.
+#' 
+#' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts. 
+#' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
+#' @param Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
+#' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes. 
+#' 
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
+#' 
+#' @examples
+#' 
+#' set.seed(1)
+#' Counts = matrix(rpois(10*5, 1), ncol = 5)
+#' Tech = c(rep(FALSE,7),rep(TRUE,3))
+#' set.seed(2)
+#' SpikeInput = rgamma(3,1,1)
+#' Data = newBASiCS_Data(Counts, Tech, SpikeInput)
+#' 
+#' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+newBASiCS_Data <- function(Counts, Tech, SpikeInput)
+{
+  Data <- new("BASiCS_Data", Counts = Counts, Tech = Tech, SpikeInput = SpikeInput)
+  show(Data)
+  cat('\n')
+  cat('NOTICE: BASiCS requires a pre-filtered dataset \n')
+  cat('    - You must remove poor quality cells before creating the BASiCS data object \n')
+  cat('    - We recommend to pre-filter very lowly expressed transcripts before creating the object. \n')
+  cat('      Inclusion criteria may vary for each data. For example, remove transcripts \n')
+  cat('          - with very low total counts across of all samples \n')
+  cat('          - that are only expressed in few cells \n')
+  cat('            (by default genes expressed in only 1 cell are not accepted) \n')
+  cat('          - with very low total counts across the samples where the transcript is expressed \n')
+  cat('\n')
+  cat(' BASiCS_Filter can be used for this purpose ')
+  return(Data)  
+}
+
 #' @title Simulates expression counts according to the model implemented in BASiCS 
 #' 
 #' @description \code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS. 
@@ -13,19 +128,26 @@
 #' (vector of length \code{n}, all elements must be positive numbers)
 #' @param theta Technical variability hyper-parameter \eqn{\theta} (must be positive)
 #' 
-#' @return \code{BASiCS_Sim} returns an object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS.
 #'  
 #' @examples
 #' 
-#' data(ParamMouseShort)
-#' attach(ParamMouseShort)
-#' Data = BASiCS_Sim(MuShort, DeltaShort, PhiShort, SShort, ThetaShort)
+#' # Simulated parameter values for 10 genes 
+#' # (7 biogical and 5 spike-in) measured in 5 cells
+#' Mu =  c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19, 1010.72, 7.90, 31.59)
+#' Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)
+#' Phi = c(1.00, 1.06, 1.09, 1.05, 0.80)
+#' S = c(0.38, 0.40, 0.38, 0.39, 0.34)
+#' Theta = 0.39
+#' 
+#' Data = BASiCS_Sim(Mu, Delta, Phi, S, Theta)
 #' head(counts(Data))
 #' dim(counts(Data, type="biological"))
 #' dim(counts(Data, type="technical"))
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data)
-#' detach(ParamMouseShort)
+#' 
+#' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
@@ -47,7 +169,7 @@ BASiCS_Sim<-function(
   # Arguments checking
   if(!(is.vector(mu) & is.numeric(mu) & all(mu>0))) stop("Invalid argument value for 'mu'.")
   if(!(is.vector(delta) & is.numeric(delta) & all(delta>=0))) stop("Invalid argument value for 'delta'.")
-  if(!(is.vector(phi) & is.numeric(phi) & all(phi>0) & sum(phi)==n)) stop("Invalid argument value for 'phi'.")
+  if(!(is.vector(phi) & is.numeric(phi) & all(phi>0) & all.equal(sum(phi),n))) stop("Invalid argument value for 'phi'.")
   if(!(is.vector(s) & is.numeric(s) & all(s>0) & length(s)==n)) stop("Invalid argument value for 's'.")
   if(!(is.numeric(theta) & length(theta)==1 & theta>=0)) stop("Invalid argument value for 'theta'.")
    
@@ -72,18 +194,21 @@ BASiCS_Sim<-function(
     # Technical genes
     else {Counts.sim[i,]<-rpois(n,lambda=nu*mu[i])}
   }  
-
-  Data <- new("BASiCS_Data", Counts = Counts.sim, Tech=ifelse(1:q > q.bio, T, F), SpikeInput=mu[(q.bio+1):q])
+  
+  Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = mu[(q.bio+1):q])
 
   return(Data)
 }
 
+#' @name makeExampleBASiCS_Data
+#' 
 #' @title Create a simple example of a BASiCS_Data object with random data
 #' 
 #' @description A simple \code{\link[BASiCS]{BASiCS_Data-class}} object is generated by simulating a dataset from the
-#' model in BASiCS (Vallejos et al 2015). This is used for the examples in the paper.
+#' model in BASiCS (Vallejos et al 2015). This is used for the examples in the package and the vignette. 
 #' 
-#' @return The simulated dataset contains 100 biological genes and 46 spike-in genes, in 41 cells. 
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS. 
+#' It contains 120 genes (100 biological and 20 spike-in) and 10 cells. 
 #' 
 #' @examples 
 #' Data = makeExampleBASiCS_Data()
@@ -94,47 +219,90 @@ BASiCS_Sim<-function(
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.  
 makeExampleBASiCS_Data <- function()
 {
-  data(ParamMouseShort, envir = environment(), package = "BASiCS")
-  InputPar = get("ParamMouseShort", envir = environment())
-  Data = BASiCS_Sim(InputPar$MuShort, InputPar$DeltaShort, InputPar$PhiShort, 
-                    InputPar$SShort, InputPar$ThetaShort)
+  Mu =  c( 8.36,  10.65,   4.88,   6.29,  21.72,  12.93,  30.19,  83.92,   3.89,   6.34,  
+          57.87,  12.45,   8.08,   7.31,  15.56,  15.91,  12.24,  15.96,  19.14,   4.20,   
+           6.75,  27.74,   8.88,  21.21,  19.89,   7.14,  11.09,   7.19,  20.64,  73.90,   
+           9.05,   6.13,  16.40,   6.08,  17.89,   6.98,  10.25,  14.05,   8.14,   5.67,   
+           6.95,  11.16,  11.83,   7.56, 159.05,  16.41,   4.58,  15.46,  10.96,  25.05,  
+          18.54,   8.50,   4.05,   5.37,   4.63,   4.08,   3.75,   5.02,  27.74,  10.28,   
+           3.91,  13.10,   8.23,   3.64,  80.77,  20.36,   3.47,  20.12,  13.29,   7.92,  
+          25.51, 173.01,  27.71,   4.89,  33.10,   3.42,   6.19,   4.29,   5.19,   8.36,  
+          10.27,   6.86,   5.72,  37.25,   3.82,  23.97,   5.80,  14.30,  29.07,   5.30,   
+           7.47,   8.44,   4.24,  16.15,  23.39, 120.22,   8.92,  97.15,   9.75,  10.07, 
+        1010.72,   7.90,  31.59,  63.17,   1.97, 252.68,  31.59,  31.59,  31.59,  63.17, 
+        4042.89,4042.89,   3.95, 126.34, 252.68,   7.90,  15.79, 126.34,   3.95,  15.79)
+  Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85, 0.27, 0.53, 1.31, 
+            0.26, 0.81, 0.72, 0.70, 0.96, 0.58, 1.15, 0.82, 0.25, 5.32, 
+            1.13, 0.31, 0.66, 0.27, 0.76, 1.39, 1.18, 1.57, 0.55, 0.17, 
+            1.40, 1.47, 0.57, 2.55, 0.62, 0.77, 1.47, 0.91, 1.53, 2.89, 
+            1.43, 0.77, 1.37, 0.57, 0.15, 0.33, 3.99, 0.47, 0.87, 0.86,
+            0.97, 1.25, 2.20, 2.19, 1.26, 1.89, 1.70, 1.89, 0.69, 1.63, 
+            2.83, 0.29, 1.21, 2.06, 0.20, 0.34, 0.71, 0.61, 0.71, 1.20, 
+            0.88, 0.17, 0.25, 1.48, 0.31, 2.49, 2.75, 1.43, 2.65, 1.97,
+            0.84, 0.81, 2.75, 0.53, 2.23, 0.45, 1.87, 0.74, 0.53, 0.58, 
+            0.94, 0.72, 2.61, 1.56, 0.37, 0.07, 0.90, 0.12, 0.76, 1.45)
+  Phi = c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
+  S = c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
+  Theta = 0.5
+  
+  q = length(Mu); q.bio = length(Delta); n = length(Phi)
+  
+  # Matrix where simulated counts will be stored
+  Counts.sim<-matrix(0,ncol=n,nrow=q)
+  # Matrix where gene-cell specific simulated random effects will be stored 
+  Rho<-matrix(1,ncol=n,nrow=q.bio)
+  # Simulated cell-specific random effects
+  if(Theta>0) {set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(S*Theta))}
+  else {Nu<-S}
+  # Simulated counts data
+  for(i in 1:q)
+  {
+    # Biological genes
+    if(i<=q.bio)
+    {
+      if(Delta[i]>0){set.seed(i); Rho[i,]<-rgamma(n,shape=1/Delta[i],rate=1/Delta[i])}
+      set.seed(i+10000); Counts.sim[i,]<-rpois(n,lambda=Phi*Nu*Rho[i,]*Mu[i])
+    }
+    # Technical genes
+    else {set.seed(i+20000); Counts.sim[i,]<-rpois(n,lambda=Nu*Mu[i])}
+  }  
+  
+  Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = Mu[(q.bio+1):q])
   
   return(Data)  
 }
   
-#' @title Starting values for BASiCS_MCMC
-#' 
-#' @description Auxiliary function that creates starting values for \code{\link[BASiCS]{BASiCS_MCMC}}. 
-#' 
-#' @details Typically, this function will not be directly called. It is internally used by \code{\link[BASiCS]{BASiCS_MCMC}}.
-#' 
-#' @param Data A \code{\link[BASiCS]{BASiCS_Data-class}} object.
-#' @param ... Optional arguments (lower bounds for starting values of adaptive proposal variances, log-scale):
-#' \describe{
-#'  \item{\code{ls.mu0}}{Related to gene-specific expression levels \eqn{\mu[i]}.}
-#'  \item{\code{ls.delta0}}{Related to gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.}
-#'  \item{\code{ls.kappa0}}{Related to cell-specific mRNA content normalising constants (logit-scale) \eqn{\kappa[j]}}
-#'  \item{\code{ls.nu0}}{Related to cell-specific random effects (technical noise) \eqn{\nu[j]}.}
-#'  \item{\code{ls.theta0}}{Related to technical variability hyper-parameter \eqn{\theta}.}
-#' }
-#' 
-#' @return A list containing starting values for all model parameters and the corresponding variances of the adaptive proposals (log-scale).
-#' 
-#' @examples
-#'
-#' Data = makeExampleBASiCS_Data()
-#' 
-#' # Creating starting values for BASiCS_MCMC
-#' MCMC_Start <- BASiCS_MCMC_Start(Data)
-#' 
-#' # Creating starting values for BASiCS_MCMC 
-#' # With user-defined lower bounds for adaptive proposal variances of gene-specific expression rates
-#' MCMC_Start2 <- BASiCS_MCMC_Start(Data, ls.mu0 = -6)
-#' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
-#' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-BASiCS_MCMC_Start<-function(
+# ' @title Starting values for BASiCS_MCMC
+# ' 
+# ' @description Auxiliary function that creates starting values for \code{\link[BASiCS]{BASiCS_MCMC}}. 
+# ' 
+# ' @details Typically, this function will not be directly called. It is internally used by \code{\link[BASiCS]{BASiCS_MCMC}}.
+# ' 
+# ' @param Data A \code{\link[BASiCS]{BASiCS_Data-class}} object.
+# ' @param ... Optional arguments (lower bounds for starting values of adaptive proposal variances, log-scale):
+# ' \describe{
+# '  \item{\code{ls.mu0}}{Related to gene-specific expression levels \eqn{\mu[i]}.}
+# '  \item{\code{ls.delta0}}{Related to gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.}
+# '  \item{\code{ls.kappa0}}{Related to cell-specific mRNA content normalising constants (logit-scale) \eqn{\kappa[j]}}
+# '  \item{\code{ls.nu0}}{Related to cell-specific random effects (technical noise) \eqn{\nu[j]}.}
+# '  \item{\code{ls.theta0}}{Related to technical variability hyper-parameter \eqn{\theta}.}
+# ' }
+# ' 
+# ' @return A list containing starting values for all model parameters and the corresponding variances of the adaptive proposals (log-scale).
+# ' 
+# ' @examples
+# '
+# ' Data = makeExampleBASiCS_Data()
+# ' 
+# ' # Creating starting values for BASiCS_MCMC
+# ' MCMC_Start <- BASiCS_MCMC_Start(Data)
+# ' 
+# ' # Creating starting values for BASiCS_MCMC 
+# ' # With user-defined lower bounds for adaptive proposal variances of gene-specific expression rates
+# ' MCMC_Start2 <- BASiCS_MCMC_Start(Data, ls.mu0 = -6)
+# ' 
+# ' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+HiddenBASiCS_MCMC_Start<-function(
   Data,
   ...)
 {
@@ -189,7 +357,9 @@ BASiCS_MCMC_Start<-function(
 #' @param N Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}. 
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
 #' @param Burn Burn-in period for the MCMC sampler. Use \code{Burn>=1}, \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.
-#' @param PriorParam List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers. 
+#' @param ... Optional parameters.
+#' \describe{
+#' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers. 
 #' \describe{
 #'   \item{\code{a.delta}}{Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}. 
 #'   Default: \code{a.delta = 1}.}
@@ -197,41 +367,96 @@ BASiCS_MCMC_Start<-function(
 #'   Default: \code{b.delta = 1}.}
 #'   \item{\code{s2.kappa}}{Variance hyper-parameter for the Normal(0,\code{s2.kappa}) prior that is shared by all cell-specific mRNA content normalising constants \eqn{\kappa[j]} (logit scale).
 #'   Default: \code{s2.kappa = 1}.}
-#'   \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{\s[j]}.
+#'   \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s[j]}.
 #'   Default: \code{a.s = 1}.}
-#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{\s[j]}.
+#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s[j]}.
 #'   Default: \code{b.s = 1}.}
 #'   \item{\code{a.theta}}{Shape hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
 #'   Default: \code{a.theta = 1}.}
 #'   \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
 #'   Default: \code{b.theta = 1}.}
+#' }}
+#' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{ar = 0.44}}.
+#' 
+#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. Use \code{stopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
+#' 
+#' \item{\code{StoreChains}}{If \code{StoreChains = T}, MCMC chains of each parameter are stored in separate .txt files. (\code{RunName} argument used for file names). Default: \code{StoreChains = F}.} 
+#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = T}, trajectory of adaptive proposal variances (log scale) for each parameter are stored in separate .txt files. (\code{RunName} argument used for file names). Default: \code{StoreAdapt = F}.}
+#' \item{\code{StoreDir}}{Directory where MCMC chain will be stored (only required if \code{Store = T}). Default: \code{StoreDir = getwd()}.}
+#' \item{\code{RunName}}{Run-name to be used when storing chains and/or adaptive proposal variances in .txt files.} 
+#' \item{\code{PrintProgress}}{If \code{PrintProgress = T}, intermediate output is displayed in the console. }
 #' }
-#' @param AR Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{ar = 0.44}.
-#' @param StopAdapt Iteration at which adaptive proposals are not longer adapted. Use \code{stopAdapt>=1}. Default: \code{stopAdapt = burn}.
-#' @param StoreChains If \code{StoreChains = T}, MCMC chains of each parameter are stored in separate .txt files. (\code{RunName} argument used for file names). Default: \code{StoreChains = F}. 
-#' @param StoreAdapt If \code{StoreAdapt = T}, trajectory of adaptive proposal variances (log scale) for each parameter 
-#' are stored in separate .txt files. (\code{RunName} argument used for file names). Default: \code{StoreAdapt = F}. 
-#' @param StoreDir Directory where MCMC chain will be stored (only required if \code{Store = T}). Default: \code{StoreDir = getwd()}. 
-#' @param RunName Run-name to be used when storing chains and/or adaptive proposal variances in .txt files. 
 #' 
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}. 
 #' 
 #' @examples
 #' 
+#' # Built-in simulated dataset
 #' Data = makeExampleBASiCS_Data()
 #' 
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs required to reach convergence
-#' Result <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+#' MCMC_Output <- BASiCS_MCMC(Data, N = 40000, Thin = 20, Burn = 20000, PrintProgress = FALSE)
+#' head(displayChainMu(MCMC_Output))
+#' head(displayChainDelta(MCMC_Output))
+#' head(displayChainPhi(MCMC_Output))
+#' head(displayChainS(MCMC_Output))
+#' head(displayChainNu(MCMC_Output))
+#' head(displayChainTheta(MCMC_Output))
 #' 
-#' Summary(Result)
+#' # Traceplots
+#' plot(MCMC_Output, Param = "mu", Gene = 1)
+#' plot(MCMC_Output, Param = "delta", Gene = 1)
+#' plot(MCMC_Output, Param = "phi", Cell = 1)
+#' plot(MCMC_Output, Param = "s", Cell = 1)
+#' plot(MCMC_Output, Param = "nu", Cell = 1)
+#' plot(MCMC_Output, Param = "theta")
 #' 
-#' plot(Result, Param = "mu", Column = 1)
-#' plot(Result, Param = "delta", Column = 1)
-#' plot(Result, Param = "phi", Column = 1)
-#' plot(Result, Param = "s", Column = 1)
-#' plot(Result, Param = "nu", Column = 1)
-#' plot(Result, Param = "theta")
+#' # Calculating posterior medians and 95% HPD intervals
+#' MCMC_Summary <- Summary(MCMC_Output)
+#' head(displaySummaryMu(MCMC_Summary))
+#' head(displaySummaryDelta(MCMC_Summary))
+#' head(displaySummaryPhi(MCMC_Summary))
+#' head(displaySummaryS(MCMC_Summary))
+#' head(displaySummaryNu(MCMC_Summary))
+#' head(displaySummaryTheta(MCMC_Summary))
+#' 
+#' # Graphical display of posterior medians and 95% HPD intervals
+#' plot(MCMC_Summary, Param = "mu", main = "All genes")
+#' plot(MCMC_Summary, Param = "mu", Genes = 1:10, main = "First 10 genes")
+#' plot(MCMC_Summary, Param = "delta", main = "All genes")
+#' plot(MCMC_Summary, Param = "delta", Genes = c(2,5,10,50,100), main = "5 customized genes")
+#' plot(MCMC_Summary, Param = "phi", main = "All cells")
+#' plot(MCMC_Summary, Param = "phi", Cells = 1:5, main = "First 5 cells")
+#' plot(MCMC_Summary, Param = "s", main = "All cells")
+#' plot(MCMC_Summary, Param = "s", Cells = 1:5, main = "First 5 cells")
+#' plot(MCMC_Summary, Param = "nu", main = "All cells")
+#' plot(MCMC_Summary, Param = "nu", Cells = 1:5, main = "First 5 cells")
+#' plot(MCMC_Summary, Param = "theta")
+#' 
+#' # To constrast posterior medians of cell-specific parameters
+#' plot(MCMC_Summary, Param = "phi", Param2 = "s")
+#' plot(MCMC_Summary, Param = "phi", Param2 = "nu")
+#' plot(MCMC_Summary, Param = "s", Param2 = "nu")
+#' 
+#' # To constrast posterior medians of gene-specific parameters
+#' plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
+#' 
+#' # Highly and lowly variable genes detection
+#' DetectHVG <- BASiCS_DetectHVG(MCMC_Output, VarThreshold = 0.70, Plot = TRUE)
+#' table(DetectHVG$HVG)
+#' DetectLVG <- BASiCS_DetectLVG(MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
+#' table(DetectLVG$LVG)
+#' 
+#' plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
+#' points(DetectHVG$Mu[DetectHVG$HVG], DetectHVG$Delta[DetectHVG$HVG], 
+#'        pch = 16, col = "red", cex = 1.5)
+#' points(DetectLVG$Mu[DetectLVG$LVG], DetectLVG$Delta[DetectLVG$LVG], 
+#'        pch = 16, col = "blue", cex = 1.5)
+#' 
+#' # If variance thresholds are not fixed
+#' BASiCS_VarThresholdSearchHVG(MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
+#' BASiCS_VarThresholdSearchLVG(MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
@@ -241,17 +466,21 @@ BASiCS_MCMC<- function(
   N, 
   Thin, 
   Burn,  
-  PriorParam = list(a.delta = 1, b.delta = 1, s2.kappa = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1),
-  AR = 0.44, 
-  StopAdapt = Burn, 
-  StoreChains = F, 
-  StoreAdapt = F,
-  StoreDir = getwd(),
-  RunName="") # To be used within the .txt file names
+  ...)
 {
-  print("Start")
   
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
+  
+  args <- list(...)
+  if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
+  else { PriorParam = list(a.delta = 1, b.delta = 1, s2.kappa = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
+  AR = ifelse("AR" %in% names(args),args$AR, 0.44)
+  StopAdapt = ifelse("StopAdapt" %in% names(args),args$StopAdapt, Burn)
+  StoreChains = ifelse("StoreChains" %in% names(args),args$StoreChains, F)
+  StoreAdapt = ifelse("StoreAdapt" %in% names(args),args$StoreAdapt, F)
+  StoreDir = ifelse("StoreDir" %in% names(args),args$StoreDir, getwd())  
+  RunName = ifelse("RunName" %in% names(args),args$RunName, "")
+  PrintProgress = ifelse("PrintProgress" %in% names(args),args$PrintProgress, TRUE)
   
   if(!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) stop("Invalid parameter values.")
   if(!(N%%Thin==0 & N>=max(4,Thin))) stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
@@ -282,7 +511,7 @@ BASiCS_MCMC<- function(
   sum.bygene.bio<-apply(Data@Counts[1:q.bio,],2,sum)
   
   # GENERATING STARTING VALUES 
-  Start=BASiCS_MCMC_Start(Data)
+  Start=HiddenBASiCS_MCMC_Start(Data)
   # Starting values for MCMC chains
   mu0=as.vector(Start$mu0); delta0=as.vector(Start$delta0)
   kappa0=as.vector(Start$kappa0); s0=as.vector(Start$s0)
@@ -308,7 +537,7 @@ BASiCS_MCMC<- function(
                                           AR,
                                           ls.mu0, ls.delta0, ls.kappa0, ls.nu0, ls.theta0,
                                           sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-                                          StoreAdaptNumber,StopAdapt))
+                                          StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress)))
   cat("--------------------------------------------------------------------"); cat("\n")
   cat("MCMC running time"); cat("\n")
   cat("--------------------------------------------------------------------"); cat("\n")
@@ -339,30 +568,747 @@ BASiCS_MCMC<- function(
     setwd(OldDir)
   }
     
-#  if(StoreAdapt)
-#  {
-#    setwd(StoreDir)
-#    
-#    cat("--------------------------------------------------------------------"); cat("\n")
-#    cat("Storing trajectories of adaptive proposal variances (log-scale) as .txt files in"); cat("\n")
-#    cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
-#    cat("--------------------------------------------------------------------"); cat("\n")
-#      
-#    write.table(Chain$ls.mu,paste0("chain_ls.mu_",RunName,".txt"),col.names=F,row.names=F)
-#    write.table(Chain$ls.delta,paste0("chain_ls.delta_",RunName,".txt"),col.names=F,row.names=F)      
-#    write.table(Chain$ls.kappa,paste0("chain_ls.kappa_",RunName,".txt"),col.names=F,row.names=F)
-#    write.table(Chain$ls.nu,paste0("chain_ls.nu_",RunName,".txt"),col.names=F,row.names=F)
-#    write.table(Chain$ls.theta,paste0("chain_ls.theta_",RunName,".txt"),col.names=F,row.names=F)
-#    
-#    setwd(OldDir)
-#  }
+  if(StoreAdapt)
+  {
+    setwd(StoreDir)
+    
+    cat("--------------------------------------------------------------------"); cat("\n")
+    cat("Storing trajectories of adaptive proposal variances (log-scale) as .txt files in"); cat("\n")
+    cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
+    cat("--------------------------------------------------------------------"); cat("\n")
+      
+    write.table(Chain$ls.mu,paste0("chain_ls.mu_",RunName,".txt"),col.names=F,row.names=F)
+    write.table(Chain$ls.delta,paste0("chain_ls.delta_",RunName,".txt"),col.names=F,row.names=F)      
+    write.table(Chain$ls.kappa,paste0("chain_ls.kappa_",RunName,".txt"),col.names=F,row.names=F)
+    write.table(Chain$ls.nu,paste0("chain_ls.nu_",RunName,".txt"),col.names=F,row.names=F)
+    write.table(Chain$ls.theta,paste0("chain_ls.theta_",RunName,".txt"),col.names=F,row.names=F)
+    
+    setwd(OldDir)
+  }
   
-
-  ChainClass <- new("BASiCS_Chain", mu = Chain$mu, delta = Chain$delta, phi = Chain$phi, s = Chain$s, nu = Chain$nu, theta = Chain$theta)
   cat("--------------------------------------------------------------------"); cat("\n")
   cat("Output"); cat("\n")
   cat("--------------------------------------------------------------------"); cat("\n")
-  show(ChainClass)
+  
+  ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi, s = Chain$s, nu = Chain$nu, theta = Chain$theta)
   
   return(ChainClass)
+}
+
+#' @title Creates a BASiCS_Chain object from pre-computed MCMC chains
+#' 
+#' @description \code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain-class}} object from pre-computed MCMC chains.
+#' 
+#' @param mu MCMC chain for gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes 
+#' (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)
+#' @param delta MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
+#' (matrix with \code{q.bio} columns, all elements must be positive numbers)
+#' @param phi MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi[j]}
+#' (matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})
+#' @param s MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+#' (matrix with \code{n} columns, all elements must be positive numbers)
+#' @param nu MCMC chain for cell-specific random effects \eqn{\nu[j]}
+#' (matrix with \code{n} columns, all elements must be positive numbers)
+#' @param theta MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive) 
+#' 
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}. 
+#' 
+#' @examples
+#' 
+#' # Data = makeExampleBASiCS_Data()
+#' # MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, 
+#' #                StoreChains = TRUE, StoreDir = getwd(), RunName = "Test")
+#' 
+#' # ChainMu = as.matrix(read.table("chain_mu_Test.txt"))
+#' # ChainDelta = as.matrix(read.table("chain_delta_Test.txt"))
+#' # ChainPhi = as.matrix(read.table("chain_phi_Test.txt"))
+#' # ChainS = as.matrix(read.table("chain_s_Test.txt"))
+#' # ChainNu = as.matrix(read.table("chain_nu_Test.txt"))#
+#' # ChainTheta = read.table("chain_theta_Test.txt")[,1]
+#' 
+#' # MCMC_Output_Load <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta, 
+#' #   phi = ChainPhi, s = ChainS, nu = ChainNu, theta = ChainTheta)
+#' 
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta)
+{
+  Chain <- new("BASiCS_Chain", mu = mu, delta = delta, phi = phi, s = s, nu = nu, theta = theta)
+  show(Chain)
+  return(Chain)  
+}
+
+
+##########################################################################################
+# Post-processing functions based on a BASiCS_Chain object ###############################
+##########################################################################################
+
+#' @name displayChainMu 
+#' @aliases displayChainMu displayChainMu,BASiCS_Chain-accessors
+#' 
+#' @title Accessors for the slots of a BASiCS_Chain object
+#' 
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @return 
+#' \describe{
+#' \item{\code{displayChainMu}}{The \code{mu} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
+#' \item{\code{displayChainDelta}}{The \code{delta} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
+#' \item{\code{displayChainPhi}}{The \code{phi} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
+#' \item{\code{displayChainS}}{The \code{s} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
+#' \item{\code{displayChainNu}}{The \code{nu} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
+#' \item{\code{displayChainTheta}}{The \code{theta} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
+#' }
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#'   
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' 
+#' @rdname BASiCS_Chain-accessors
+displayChainMu <- function(object)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  return(object@mu)
+}
+
+#' @name displayChainDelta 
+#' @aliases displayChainDelta displayChainDelta,BASiCS_Chain-accessors
+#' @rdname BASiCS_Chain-accessors
+displayChainDelta <- function(object)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  return(object@delta)
+}
+
+#' @name displayChainPhi 
+#' @aliases displayChainPhi displayChainPhi,BASiCS_Chain-accessors
+#' @rdname BASiCS_Chain-accessors
+displayChainPhi <- function(object)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  return(object@phi)
+}
+
+#' @name displayChainS 
+#' @aliases displayChainS displayChainS,BASiCS_Chain-accessors
+#' @rdname BASiCS_Chain-accessors
+displayChainS <- function(object)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  return(object@s)
+}
+
+#' @name displayChainNu
+#' @aliases displayChainNu displayChainNu,BASiCS_Chain-accessors
+#' @rdname BASiCS_Chain-accessors
+displayChainNu <- function(object)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  return(object@nu)
+}
+
+#' @name displayChainTheta
+#' @aliases displayChainTheta displayChainTheta,BASiCS_Chain-accessors
+#' @rdname BASiCS_Chain-accessors
+displayChainTheta <- function(object)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  return(object@theta)
+}
+
+##########################################################################################
+# Post-processing functions based on a BASiCS_Summary object ###############################
+##########################################################################################
+
+#' @name displaySummaryMu 
+#' @aliases displaySummaryMu displaySummaryMu,BASiCS_Summary-accessors
+#' 
+#' @title Accessors for the slots of a BASiCS_Summary object
+#' 
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' 
+#' @return 
+#' \describe{
+#' \item{\code{displaySummaryMu}}{The \code{mu} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
+#' \item{\code{displaySummaryDelta}}{The \code{delta} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
+#' \item{\code{displaySummaryPhi}}{The \code{phi} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
+#' \item{\code{displaySummaryS}}{The \code{s} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
+#' \item{\code{displaySummaryNu}}{The \code{nu} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
+#' \item{\code{displaySummaryTheta}}{The \code{theta} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
+#' }
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#' 
+#'   
+#' @seealso \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' 
+#' @rdname BASiCS_Summary-accessors
+displaySummaryMu <- function(object)
+{
+  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
+  
+  return(object@mu)
+}
+
+#' @name displaySummaryDelta 
+#' @aliases displaySummaryDelta displaySummaryDelta,BASiCS_Summary-accessors
+#' @rdname BASiCS_Summary-accessors
+displaySummaryDelta <- function(object)
+{
+  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
+  
+  return(object@delta)
+}
+
+#' @name displaySummaryPhi 
+#' @aliases displaySummaryPhi displaySummaryPhi,BASiCS_Summary-accessors
+#' @rdname BASiCS_Summary-accessors
+displaySummaryPhi <- function(object)
+{
+  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
+  
+  return(object@phi)
+}
+
+#' @name displaySummaryS 
+#' @aliases displaySummaryS displaySummaryS,BASiCS_Summary-accessors
+#' @rdname BASiCS_Summary-accessors
+displaySummaryS <- function(object)
+{
+  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
+  
+  return(object@s)
+}
+
+#' @name displaySummaryNu
+#' @aliases displaySummaryNu displaySummaryNu,BASiCS_Summary-accessors
+#' @rdname BASiCS_Summary-accessors
+displaySummaryNu <- function(object)
+{
+  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
+  
+  return(object@nu)
+}
+
+#' @name displaySummaryTheta
+#' @aliases displaySummaryTheta displaySummaryTheta,BASiCS_Summary-accessors
+#' @rdname BASiCS_Summary-accessors
+displaySummaryTheta <- function(object)
+{
+  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
+  
+  return(object@theta)
+}
+
+##########################################################################################
+# Highly variable genes detection based on a BASiCS_Chain object #########################
+##########################################################################################
+
+HiddenVarDecomp <- function(object)
+{
+  
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  
+  N=length(object@theta); q.bio=ncol(object@delta)
+    
+  # To store technical variance component
+  TechVar=matrix(0,ncol=q.bio,nrow=N) 
+  # To store biological cell-to-cell heterogeneity components
+  BioVar=matrix(0,ncol=q.bio,nrow=N) 
+  
+  for(m in 1:N)
+  {   
+    Var.aux=1/(median(object@phi[m,]*object@s[m,])*object@mu[m,1:q.bio])+object@delta[m,]*(object@theta[m]+1)
+    TechVar[m,]=object@theta[m]/(Var.aux+object@theta[m])
+    BioVar[m,]=(object@delta[m,]*(object@theta[m]+1))/(Var.aux+object@theta[m])   
+  } 
+  
+  list("TechVar"=TechVar,"BioVar"=BioVar)
+}
+
+HiddenTailProbUp<-function(chain,threshold){return(sum(chain>threshold)/length(chain))}
+HiddenTailProbLow<-function(chain,threshold){return(sum(chain<threshold)/length(chain))}
+
+HiddenProbHVG<-function(
+  VarThreshold, # Variance contribution threshold for HVG/LVG detection. Value must be between 0 and 1.
+  VarDecomp) # Output of the variance decomposition obtained using BASiCS_Variance
+{  
+  return(apply(VarDecomp$BioVar,2,HiddenTailProbUp,threshold=VarThreshold))
+}
+
+HiddenProbLVG<-function(
+  VarThreshold, # Variance contribution threshold for HVG/LVG detection. Value must be between 0 and 1.
+  VarDecomp) # Output of the variance decomposition obtained using BASiCS_Variance
+{  
+  return(apply(VarDecomp$BioVar,2,HiddenTailProbLow,threshold=VarThreshold))
+}
+
+HiddenEFDR<-function(
+  EviThreshold, # Evidence threshold (it must be contained in (0,1))
+  VarThreshold, # Variance contribution threshold choosen by the user (it must be contained in (0,1))
+  Prob) # Output of the variance decomposition obtained using BASiCS_Variance
+{  
+  return(sum((1-Prob)*I(Prob>EviThreshold))/sum(I(Prob>EviThreshold)))
+}
+
+HiddenEFNR<-function(
+  EviThreshold, # Evidence threshold (it must be contained in (0,1))
+  VarThreshold, # Variance contribution threshold choosen by the user (it must be contained in (0,1))
+  Prob) # Output of the variance decomposition obtained using BASiCS_Variance  
+{
+  return(sum(Prob*I(EviThreshold>=Prob))/sum(I(EviThreshold>=Prob)))
+}
+
+#' @name BASiCS_VarianceDecomp
+#' @aliases BASiCS_VarianceDecomp
+#' 
+#' @title Decomposition of gene expression variability according to BASiCS
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "BioVar", "TechVar", "ShotNoise")}.
+#' 
+#' @return A matrix with 4 columns
+#' \describe{
+#' \item{\code{GeneIndex}}{Gene index (as in input dataset)}
+#' \item{\code{BioVar}}{Percentage of variance explained by a biological cell-to-cell heterogeneity component}
+#' \item{\code{TechVar}}{Percentage of variance explained by the technical cell-to-cell heterogeneity component}
+#' \item{\code{ShotNoise}}{Percentage of variance explained by the shot noise component (baseline)}
+#' }
+#'  
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#' 
+#' @details See vignette
+#' 
+#' 
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}} 
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' 
+#' @rdname BASiCS_VarianceDecomp
+BASiCS_VarianceDecomp <- function(object, OrderVariable = "BioVar")
+{  
+  if(!(OrderVariable %in% c("GeneIndex", "BioVar", "TechVar", "ShotNoise"))) stop("Invalid 'OrderVariable' value.")
+  
+  VarDecomp = HiddenVarDecomp(object)
+  BioVar = apply(VarDecomp$BioVar, 2, median)
+  TechVar = apply(VarDecomp$TechVar, 2, median)
+  GeneIndex = 1:length(BioVar)
+  
+  out = cbind(GeneIndex, BioVar, TechVar, 1-BioVar-TechVar)
+  colnames(out) = c("GeneIndex", "BioVar", "Tech", "ShotNoise")
+  if(OrderVariable == "GeneIndex") orderVar = GeneIndex
+  if(OrderVariable == "BioVar") orderVar = BioVar
+  if(OrderVariable == "TechVar") orderVar = TechVar
+  if(OrderVariable == "ShotNoise") orderVar = 1-BioVar-TechVar
+  out = out[order(orderVar, decreasing = TRUE),]
+  
+  return(out)
+}
+
+#' @name BASiCS_DetectHVG
+#' @aliases BASiCS_DetectHVG BASiCS_DetectHVG_LVG
+#' 
+#' @title Detection method for highly and lowly variable genes
+#' 
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param VarThreshold Variance contribution threshold (must be a positive value, between 0 and 1)
+#' @param EviThreshold Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)
+#' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.
+#' @param Plot If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.
+#' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
+#' 
+#' @return \code{BASiCS_DetectHVG} returns a list of 4 elements:
+#' \describe{
+#' \item{\code{Table}}{Matrix whose columns contain}
+#'    \describe{
+#'    \item{\code{GeneIndex}}{Gene index (as in input dataset)}
+#'    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
+#'    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
+#'    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }
+#'    \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, probability of being highly variable according to the given thresholds.}
+#'    \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, indicator of being detected as highly variable according to the given thresholds. }
+#'    }
+#' \item{\code{EviThreshold}}{Evidence threshold.}
+#' \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
+#' \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+#' }
+#' \code{BASiCS_DetectLVG} produces a similar output, replacing the element \code{HVG} by \code{LVG}, an indicator of a gene being detected as lowly variable according to the given thresholds.  
+#'  
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#' 
+#' @details See vignette
+#' 
+#' 
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}} 
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' 
+#' @rdname BASiCS_DetectHVG_LVG
+BASiCS_DetectHVG <- function(object,
+                             VarThreshold,
+                             EviThreshold = NULL,
+                             OrderVariable = "Prob",
+                             Plot = FALSE, 
+                             ...)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")    
+  if(VarThreshold<0 | VarThreshold>1 | !is.finite(VarThreshold)) stop("Variance contribution thresholds for HVG/LVG detection must be contained in (0,1)")
+  if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert T or F for Plot parameter")
+  if(!is.null(EviThreshold))
+  {
+    if(EviThreshold<0 | EviThreshold>1 | !is.finite(EviThreshold)) 
+      stop("Evidence thresholds for HVG and LVG detection must be contained in (0,1) \n For automatic threshold search use EviThreshold = NULL.")    
+  }
+  if(!(OrderVariable %in% c("GeneIndex", "Mu", "Delta", "Sigma", "Prob"))) stop("Invalid 'OrderVariable' value")
+  Search = F
+  if(is.null(EviThreshold)) Search = T
+
+  
+  VarDecomp <- HiddenVarDecomp(object)
+  Prob <- HiddenProbHVG(VarThreshold = VarThreshold, VarDecomp = VarDecomp)
+  
+  if(length(EviThreshold) == 0)
+  {
+    EviThresholds <- seq(0.5,0.9995,by=0.0005)
+
+    EFDR <- sapply(EviThresholds, HiddenEFDR, VarThreshold = VarThreshold, Prob = Prob)
+    EFNR <- sapply(EviThresholds, HiddenEFNR, VarThreshold = VarThreshold, Prob = Prob)
+    
+    above<-EFDR>EFNR
+    optimal<-which(diff(above)!=0)
+    EviThreshold = EviThresholds[optimal]
+    if(length(optimal)>0){OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])}
+    else 
+    {
+      print("It is not possible to find an optimal evidence threshold for the given variance contribution threshold. \n")
+      optimal <- round(median(which(abs(EFDR - EFNR) == min(abs(EFDR - EFNR), na.rm = T))))
+      if(length(optimal)>0)
+      {
+        print("Returned value is such that the difference between EFDR and EFNR is minimised.")
+        OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])
+      }
+      else
+      {
+        cat("Numerical issues when computing EFDR and EFNR. Please try a different variance contribution threshold")
+        OptThreshold <- rep("Not found",3) 
+      }
+    }  
+  }
+  else
+  {
+     EFDR = HiddenEFDR(EviThreshold, VarThreshold, Prob)
+     EFNR = HiddenEFNR(EviThreshold, VarThreshold, Prob)
+     OptThreshold <- c(EviThreshold, EFDR, EFNR)
+  } 
+  
+  Sigma <- apply(VarDecomp$BioVar, 2, median)
+  Mu <- apply(object@mu[,1:length(Sigma)], 2, median)
+  Delta <- apply(object@delta, 2, median)
+  if(OptThreshold[1] == "Not found") {HVG = rep("Not found", length(Sigma))}
+  else{ HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE) }
+    
+  qbio = length(Sigma)
+  
+  if(Plot)
+  {    
+    args <- list(...)
+    
+    if(Search)
+    {      
+      par(ask=T)
+      
+      plot(EviThresholds, EFDR, type = "l", lty = 1, bty = "n", ylab = "Error rate", xlab = "Evidence threshold", ylim = c(0,1))
+      lines(EviThresholds, EFNR, lty = 2)      
+      legend('topleft', c("EFDR", "EFNR"), lty = 1:2, bty = "n")
+    }
+    
+    if("ylim" %in% names(args)) {ylim = args$ylim} else{ylim = c(0, 1)}
+    if("xlim" %in% names(args)) {xlim = args$xlim} else{xlim = c(min(Mu),max(Mu))}
+    cex = ifelse("cex" %in% names(args),args$cex, 1.5)
+    pch = ifelse("pch" %in% names(args),args$pch, 16)
+    col = ifelse("col" %in% names(args),args$col, 8)
+    bty = ifelse("bty" %in% names(args),args$bty, "n")
+    cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
+    cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
+    cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1) 
+    xlab = ifelse("xlab" %in% names(args),args$xlab, expression(mu[i]))
+    ylab = ifelse("ylab" %in% names(args),args$ylab, "HVG probability")
+    main = ifelse("main" %in% names(args),args$main, "") 
+    
+    plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex,
+                    bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
+                    xlab = xlab, ylab = ylab, main = main)
+    abline(h = OptThreshold[1], lty = 2, col = "black")
+    points(Mu[HVG], Prob[HVG], pch = pch, col = "red", cex = cex)
+    
+    par(ask=F)
+  }
+  
+  cat(paste(sum(HVG), " genes classified as highly variable using: \n"))
+  cat(paste("- Variance contribution threshold = ", round(100*VarThreshold,2), "% \n"))    
+  cat(paste("- Evidence threshold = ", OptThreshold[1], "\n"))
+  cat(paste("- EFDR = ", round(100*OptThreshold[2],2), "% \n"))  
+  cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))  
+  
+  GeneIndex = 1:length(Mu)
+  Table = cbind(GeneIndex, Mu, Delta, Sigma, Prob, HVG)
+  colnames(Table) = c("GeneIndex", "mu", "delta", "Sigma", "Prob", "HVG")
+  
+  if(OrderVariable == "GeneIndex") orderVar = GeneIndex
+  if(OrderVariable == "Mu") orderVar = Mu
+  if(OrderVariable == "Delta") orderVar = Delta
+  if(OrderVariable == "Sigma") orderVar = Sigma
+  if(OrderVariable == "Prob") orderVar = Prob
+  Table = Table[order(orderVar, decreasing = TRUE),]
+  
+  list("Table" = Table, 
+       "EviThreshold" = OptThreshold[1], "EFDR" = OptThreshold[2], "EFNR" = OptThreshold[3])
+}
+
+#' @name BASiCS_DetectLVG
+#' @aliases BASiCS_DetectLVG BASiCS_DetectHVG_LVG
+#' @rdname BASiCS_DetectHVG_LVG
+BASiCS_DetectLVG <- function(object,
+                             VarThreshold,
+                             EviThreshold = NULL,
+                             OrderVariable = "Prob",
+                             Plot = FALSE, 
+                             ...)
+{
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")    
+  if(VarThreshold<0 | VarThreshold>1 | !is.finite(VarThreshold)) stop("Variance contribution thresholds for HVG/LVG detection must be contained in (0,1)")
+  if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert T or F for Plot parameter")
+  if(!is.null(EviThreshold))
+  {
+    if(EviThreshold<0 | EviThreshold>1 | !is.finite(EviThreshold)) 
+      stop("Evidence thresholds for HVG and LVG detection must be contained in (0,1) \n For automatic threshold search use EviThreshold = NULL.")    
+  }
+  if(!(OrderVariable %in% c("GeneIndex", "Mu", "Delta", "Sigma", "Prob"))) stop("Invalid 'OrderVariable' value")
+  Search = F
+  if(is.null(EviThreshold)) Search = T
+  
+  VarDecomp <- HiddenVarDecomp(object)
+  Prob <- HiddenProbLVG(VarThreshold = VarThreshold, VarDecomp = VarDecomp)
+  
+  if(length(EviThreshold) == 0)
+  {
+    EviThresholds <- seq(0.5,0.9995,by=0.0005)
+    EFDR <- sapply(EviThresholds, HiddenEFDR, VarThreshold = VarThreshold, Prob = Prob)
+    EFNR <- sapply(EviThresholds, HiddenEFNR, VarThreshold = VarThreshold, Prob = Prob)
+    
+    above<-EFDR>EFNR
+    optimal<-which(diff(above)!=0)
+    EviThreshold = EviThresholds[optimal]
+    if(length(optimal)>0){OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])}
+    else 
+    {
+      print("It is not possible to find an optimal evidence threshold for the given variance contribution threshold. \n")
+      optimal <- round(median(which(abs(EFDR - EFNR) == min(abs(EFDR - EFNR), na.rm = T))))
+      if(length(optimal)>0)
+      {
+        print("Returned value is such that the difference between EFDR and EFNR is minimised.")
+        OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])
+      }
+      else
+      {
+        cat("Numerical issues when computing EFDR and EFNR. Please try a different variance contribution threshold")
+        OptThreshold <- rep("Not found",3) 
+      }
+    } 
+  }
+  else
+  {
+    EFDR = HiddenEFDR(EviThreshold, VarThreshold, Prob)
+    EFNR = HiddenEFNR(EviThreshold, VarThreshold, Prob)
+    OptThreshold <- c(EviThreshold, EFDR, EFNR)
+  }
+  
+  Sigma <- apply(VarDecomp$BioVar, 2, median)
+  Mu <- apply(object@mu[,1:length(Sigma)], 2, median)
+  Delta <- apply(object@delta, 2, median)
+  if(OptThreshold[1] == "Not found") {LVG = rep("Not found", length(Sigma))}
+  else{ LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE) }
+  
+  qbio = length(Sigma)
+  
+  if(Plot)
+  {    
+    args <- list(...)
+        
+    if(Search)
+    {
+      par(ask=T)
+      
+      plot(EviThresholds, EFDR, type = "l", lty = 1, bty = "n", ylab = "Error rate", xlab = "Evidence threshold", ylim = c(0,1))
+      lines(EviThresholds, EFNR, lty = 2)      
+      legend('topleft', c("EFDR", "EFNR"), lty = 1:2, bty = "n")
+    }
+    
+    if("ylim" %in% names(args)) {ylim = args$ylim} else{ylim = c(0, 1)}
+    if("xlim" %in% names(args)) {xlim = args$xlim} else{xlim = c(min(Mu),max(Mu))}
+    cex = ifelse("cex" %in% names(args),args$cex, 1.5)
+    pch = ifelse("pch" %in% names(args),args$pch, 16)
+    col = ifelse("col" %in% names(args),args$col, 8)
+    bty = ifelse("bty" %in% names(args),args$bty, "n")
+    cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
+    cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
+    cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1) 
+    xlab = ifelse("xlab" %in% names(args),args$xlab, expression(mu[i]))
+    ylab = ifelse("ylab" %in% names(args),args$ylab, "LVG probability")
+    main = ifelse("main" %in% names(args),args$main, "") 
+    
+    plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex, 
+         bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
+         xlab = xlab, ylab = ylab, main = main)
+    abline(h = OptThreshold[1], lty = 2, col = "black")
+    points(Mu[LVG], Prob[LVG], pch = pch, col = "red", cex = cex)
+    
+    par(ask=F)
+    
+  }
+  
+  cat(paste(sum(LVG), " genes classified as lowly variable using: \n"))
+  cat(paste("- Variance contribution threshold = ", round(100*VarThreshold,2), "% \n"))    
+  cat(paste("- Evidence threshold = ", OptThreshold[1], "\n"))
+  cat(paste("- EFDR = ", round(100*OptThreshold[2],2), "% \n"))  
+  cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n")) 
+   
+  GeneIndex = 1:length(Mu)
+  Table = cbind(GeneIndex, Mu, Delta, Sigma, Prob, LVG)
+  colnames(Table) = c("GeneIndex", "mu", "delta", "Sigma", "Prob", "LVG")
+  
+  if(OrderVariable == "GeneIndex") orderVar = GeneIndex
+  if(OrderVariable == "Mu") orderVar = Mu
+  if(OrderVariable == "Delta") orderVar = Delta
+  if(OrderVariable == "Sigma") orderVar = Sigma
+  if(OrderVariable == "Prob") orderVar = Prob
+  Table = Table[order(orderVar, decreasing = TRUE),]
+  
+  list("Table" = Table, 
+       "EviThreshold" = OptThreshold[1], "EFDR" = OptThreshold[2], "EFNR" = OptThreshold[3])
+}
+
+
+#' @name BASiCS_VarThresholdSearchHVG
+#' @aliases BASiCS_VarThresholdSearchHVG BASiCS_VarThresholdSearchHVG_LVG
+#' 
+#' @title Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
+#' 
+#' @title Detection method for highly and lowly variable genes using a grid of variance contribution thresholds. 
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param VarThresholdsGrid Grid of values for the variance contribution threshold (they must be contained in (0,1))
+#' @param PrintProgress If \code{PrintProgress = TRUE}, partial output is printed in the console.
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#' 
+#' @details See vignette
+#' 
+#' @return 
+#' \describe{
+#' \item{\code{BASiCS_VarThresholdSearchHVG}}{A table displaying the results of highly variable genes detecting for different variance contribution thresholds.}
+#' \item{\code{BASiCS_VarThresholdSearchLVG}}{A table displaying the results of lowly variable genes detecting for different variance contribution thresholds.oo}
+#' }
+#' 
+#'    
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}} 
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @rdname BASiCS_VarThresholdSearchHVG_LVG
+BASiCS_VarThresholdSearchHVG=function(
+  object, 
+  VarThresholdsGrid, # 
+  PrintProgress = FALSE)
+{
+  
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")    
+  if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
+    stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")    
+  
+  Table=matrix(0,nrow=length(VarThresholdsGrid),ncol=5)
+  colnames(Table)=c("Var. Threshold (%)","EFDR (%)", "EFNR (%)","Optimal evidence thres.","# Detected genes")
+  
+  for(i in 1:length(VarThresholdsGrid))
+  {
+    VarThreshold=VarThresholdsGrid[i]
+    
+    if(PrintProgress) {print(paste0("Evaluating variance contribution threshold = ",100*VarThreshold," % ...")); cat("\n")}
+    
+    DetectHVG <- BASiCS_DetectHVG(object, VarThreshold = VarThreshold)
+    
+    Table[i,]=c(100*VarThreshold, round(100*DetectHVG$EFDR,2),round(100*DetectHVG$EFNR,2), DetectHVG$EviThreshold,sum(as.numeric(DetectHVG$Table[,5])))
+  }
+  return(Table)
+}
+
+#' @name BASiCS_VarThresholdSearchLVG
+#' @aliases BASiCS_VarThresholdSearchLVG BASiCS_VarThresholdSearchHVG_LVG
+#' @rdname BASiCS_VarThresholdSearchHVG_LVG
+BASiCS_VarThresholdSearchLVG=function(
+  object, 
+  VarThresholdsGrid, # Range of values for the variance contribution threshold (they must be contained in (0,1))
+  PrintProgress = FALSE)
+{
+  
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")    
+  if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
+    stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")    
+  
+  Table=matrix(0,nrow=length(VarThresholdsGrid),ncol=5)
+  colnames(Table)=c("Var. Threshold (%)","EFDR (%)", "EFNR (%)","Optimal evidence thres.","# Detected genes")
+  
+  for(i in 1:length(VarThresholdsGrid))
+  {
+    VarThreshold=VarThresholdsGrid[i]
+    
+    if(PrintProgress) {print(paste0("Evaluating variance contribution threshold = ",100*VarThreshold," % ...")); cat("\n")}
+    
+    DetectLVG <- BASiCS_DetectLVG(object, VarThreshold = VarThreshold)
+    
+    Table[i,]=c(100*VarThreshold, round(100*DetectLVG$EFDR,2),round(100*DetectLVG$EFNR,2), DetectLVG$EviThreshold,sum(as.numeric(DetectLVG$Table[,5])))
+    
+  }
+  return(Table)
 }
