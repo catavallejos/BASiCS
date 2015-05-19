@@ -11,25 +11,24 @@ sequencing experiments in the format required by BASiCS (see Vallejos et al 2015
 \section{Slots}{
 
 \describe{
-\item{\code{Counts}}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
+\item{\code{Counts}}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the raw expression counts.
 First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.}
 
 \item{\code{Tech}}{Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.}
 
-\item{\code{SpikeInput}}{Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.}
+\item{\code{SpikeInput}}{Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes (amount per cell).}
 }}
 \examples{
-CountsAux = matrix(rpois(10*5, 1), ncol = 5)
-TechAux = c(rep(FALSE,7),rep(TRUE,3))
-SpikeInputAux = rgamma(3,1,1)
-Data = new('BASiCS_Data', Counts = CountsAux, Tech = TechAux, SpikeInput = SpikeInputAux)
+Counts = matrix(rpois(10*5, 1), ncol = 5)
+Tech = c(rep(FALSE,7),rep(TRUE,3))
+SpikeInput = rgamma(3,1,1)
+Data = newBASiCS_Data(Counts, Tech, SpikeInput)
+
 head(counts(Data))
 dim(counts(Data, type="biological"))
 dim(counts(Data, type="technical"))
 displayTechIndicator(Data)
 displaySpikeInput(Data)
-
-# For usage, see documentation of functions: BASiCS_Sim, BASiCS_MCMC_Start, BASiCS_MCMC.
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
@@ -38,6 +37,6 @@ Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
-\code{\link[BASiCS]{makeExampleBASiCS_Data}}, \code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC_Start}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
+\code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
 }
 

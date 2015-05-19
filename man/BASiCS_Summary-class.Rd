@@ -5,6 +5,29 @@
 \alias{BASiCS_Summary-class}
 \title{The BASiCS_Summary class}
 \description{
-This class contains valid values for BASiCS model parameters (see Vallejos et al, 2015)
+Container of a summary of a \code{\link[BASiCS]{BASiCS_Chain-class}} object.
+In each slot, first column contains posterior medians, second column contains the lower limits of an high posterior
+density interval and third column contains the upper limits of high posterior density intervals.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{mu}}{Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific expression levels \eqn{\mu[i]}.}
+
+\item{\code{delta}}{Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only}
+
+\item{\code{phi}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific mRNA content normalising constants \eqn{\phi[j]}}
+
+\item{\code{s}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}}
+
+\item{\code{nu}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu[j]}}
+
+\item{\code{theta}}{Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)}
+}}
+\examples{
+# A BASiCS_Summary object created by the Summary method.
+Data = makeExampleBASiCS_Data()
+MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+MCMC_Summary <- Summary(MCMC_Output)
 }
 

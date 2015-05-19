@@ -8,7 +8,6 @@
 \alias{displaySpikeInput,BASiCS_Data-method}
 \alias{displayTechIndicator}
 \alias{displayTechIndicator,BASiCS_Data-method}
-\alias{show}
 \alias{show,BASiCS_Data-method}
 \title{S4 methods for BASiCS_Data objects}
 \usage{
@@ -23,16 +22,16 @@
 \arguments{
 \item{object}{A \code{BASiCS_Data} object.}
 
-\item{type}{Only required for \code{counts} method. A string indicating which genes are returned. If \code{all}, returns expression counts for all genes.
-If \code{biological}, returns expression counts for biological genes only. If \code{technical}, returns expression
-counts for technical (spike-in) genes only.}
+\item{type}{Only required for \code{counts} method. A string indicating which genes are returned.}
 }
 \value{
 \describe{
 \item{\code{show}}{Prints a summary of the properties of \code{object}.}
 
-\item{\code{counts}}{If \code{type = "all"}, returns the \code{Counts} slot of \code{object}.
-If \code{type = "biological"} or \code{type = "spike-in"}, only biological or technical (spike-in) counts are returned, respectively.}
+\item{\code{counts}}{\describe{
+ \item{\code{if(type = "all")}}{Returns the \code{Counts} slot of \code{object}.}
+ \item{\code{if(type = "biological")}}{Returns the \code{Counts} slot of \code{object}, biological genes only.}
+ \item{\code{if(type = "technical")}}{Returns the \code{Counts} slot of \code{object}, tehcnical genes only.}}}
 
 \item{\code{displayTechIndicator}}{Returns \code{Tech} slot of \code{object}.}
 
@@ -51,7 +50,13 @@ dim(counts(Data, type="technical"))
 displayTechIndicator(Data)
 displaySpikeInput(Data)
 }
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}
+\references{
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+}
 \seealso{
-\code{\link[BASiCS]{BASiCS_Data-class}}, \code{\link[BASiCS]{BASiCS_MCMC_Start}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
+\code{\link[BASiCS]{BASiCS_Data-class}}
 }
 

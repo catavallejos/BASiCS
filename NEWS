@@ -1,0 +1,22 @@
+version 0.1: (2015-04-20)
+
+- Original release
+
+version 0.1.1: (2015-04-21)
+
+- Improved documentation
+
+version 0.1.2: (2015-04-23)
+
+- In 'BASiCS_Sim': change 'sum(phi)==n' by 'all.equal(sum(phi),n)'
+
+version 0.1.3: (2015-05-18)
+
+- In 'plotBASiCSDispVsExp': 'log="xy"' argument added
+- In class 'BASiCS_Data': internal checks added (pre-filter of samples and transcripts)
+- In 'BASiCS_MCMC' c++ code: Rcpp::checkUserInterrupt() added for fast user-requested interruption of MCMC sampler
+- S4 method 'plot' for 'BASiCS_Chain' signature: argument 'Column' replaced by 'Gene' and 'Cell'
+- Replacement of 'plotBASiCSNormPhi' and 'plotBASiCSNormS' by S4 method 'plot' ('BASiCS_Summary' signature)
+- S4 method 'plot' for 'BASiCS_Summary' signature: does not include plots for all model parameters
+- S4 method 'plot' for 'BASiCS_Summary' signature: does not include scatterplots of gene-specific and cell-specific model parameters (replacing 'plotBASiCSExpVsDisp')
+- 'BASiCS_VarianceDecomp' has been made visible to users (former 'HiddenVarDecomp' function) and output does now allow gene annotation. 

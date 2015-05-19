@@ -5,12 +5,12 @@
 \alias{Summary,BASiCS_Chain-method}
 \title{'Summary' method for BASiCS_Chain objects}
 \usage{
-\S4method{Summary}{BASiCS_Chain}(x, prob = 0.95, ..., na.rm = FALSE)
+\S4method{Summary}{BASiCS_Chain}(x, prob = 0.95)
 }
 \arguments{
-\item{x}{object A \code{BASiCS_Chain} object.}
+\item{x}{A \code{BASiCS_Chain} object.}
 
-\item{prob}{\code{prob} argument for function \code{\link[coda]{HPDinterval}}}
+\item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}} function.}
 }
 \value{
 An object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.
@@ -18,9 +18,13 @@ An object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.
 \description{
 For each of the BASiCS parameters (see Vallejos et al 2015),
 \code{Summary} returns the corresponding postior medians and limits of the high posterior
-density interval (probabilty equal to \code{prob}. )
+density interval with probabilty equal to \code{prob}.
 }
 \examples{
+Data = makeExampleBASiCS_Data()
+MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
+MCMC_Summary <- Summary(MCMC_Output)
+
 # See documentation of function BASiCS_MCMC
 }
 \author{

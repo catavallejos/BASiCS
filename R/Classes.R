@@ -6,28 +6,27 @@
 #' @description Container of expression counts from single-cell 
 #' sequencing experiments in the format required by BASiCS (see Vallejos et al 2015).
 #' 
-#' @slot Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts. 
+#' @slot Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the raw expression counts. 
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
 #' @slot Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
-#' @slot SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes. 
+#' @slot SpikeInput Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes (amount per cell). 
 #' 
 #' @examples
 #'
-#' CountsAux = matrix(rpois(10*5, 1), ncol = 5)
-#' TechAux = c(rep(FALSE,7),rep(TRUE,3))
-#' SpikeInputAux = rgamma(3,1,1)
-#' Data = new('BASiCS_Data', Counts = CountsAux, Tech = TechAux, SpikeInput = SpikeInputAux)
+#' Counts = matrix(rpois(10*5, 1), ncol = 5)
+#' Tech = c(rep(FALSE,7),rep(TRUE,3))
+#' SpikeInput = rgamma(3,1,1)
+#' Data = newBASiCS_Data(Counts, Tech, SpikeInput)
+#' 
 #' head(counts(Data))
 #' dim(counts(Data, type="biological"))
 #' dim(counts(Data, type="technical"))
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data)
 #' 
-#' # For usage, see documentation of functions: BASiCS_Sim, BASiCS_MCMC_Start, BASiCS_MCMC.
-#' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
-#' @seealso \code{\link[BASiCS]{makeExampleBASiCS_Data}}, \code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC_Start}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
+#' @seealso \code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
 #' 
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 setClass("BASiCS_Data",
@@ -41,6 +40,8 @@ setClass("BASiCS_Data",
            if(!(is.numeric(object@Counts) & all(object@Counts>=0) & 
                   sum(!is.finite(object@Counts))==0 )) errors <- c(errors, "Invalid value for Counts")
            
+           if(sum(object@Counts %% 1) > 0) errors <- c(errors, "Invalid value for Counts (entries must be positive integers)")          
+           
            if(!(is.logical(object@Tech))) errors <- c(errors, "Invalid value for Tech")
            
            if(!(is.numeric(object@SpikeInput) & all(object@SpikeInput>0) & 
@@ -50,16 +51,30 @@ setClass("BASiCS_Data",
            q.bio = q - length(object@SpikeInput)
            n = ncol(object@Counts)
            
-           if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) errors <- c(errors, "Argument's dimensions are not compatible.")
+           if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
+             errors <- c(errors, "Argument's dimensions are not compatible.")
            
-           if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
-                        
+           if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
+             errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
+           
+           if(sum(apply(object@Counts[ object@Tech,],2,sum) == 0) > 0) 
+             errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes. Please remove them before creating the BASiCS_Data object.")
+           
+           if(sum(apply(object@Counts[!object@Tech,],2,sum) == 0) > 0) 
+             errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the BASiCS_Data object.")
+           
+           if(sum(apply(object@Counts,1,sum) == 0) > 0) 
+             errors <- c(errors, "Some genes have zero counts across all cells. Please remove them before creating the BASiCS_Data object.")
+
+           if(sum(apply(object@Counts,1,sum) > 0) == 1) 
+             errors <- c(errors, "Some genes have non-zero counts only in 1 cell. Please remove them before creating the BASiCS_Data object.")
+           
            if (length(errors) == 0) TRUE else errors
          }
 )
 
 #' @name BASiCS_Chain-class
-#' @aliases BASiCS_Chain,BASiCS_Chain-class
+#' @aliases BASiCS_Chain BASiCS_Chain,BASiCS_Chain-class
 #' 
 #' @title The BASiCS_Chain class
 #' 
@@ -82,8 +97,7 @@ setClass("BASiCS_Data",
 #' 
 #' # A BASiCS_Chain object created by the BASiCS_MCMC function.
 #' Data = makeExampleBASiCS_Data()
-#' Result <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
-#' Result
+#' MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
@@ -120,13 +134,28 @@ setClass("BASiCS_Chain",
          )
 
 
-# Redefine this class. For each slot, it will contain posterior medians and HPD95% limits for the corresponding parameter. 
 #' @name BASiCS_Summary-class
 #' @aliases BASiCS_Summary,BASiCS_Summary-class
 #' 
 #' @title The BASiCS_Summary class
 #' 
-#' @description This class contains valid values for BASiCS model parameters (see Vallejos et al, 2015)
+#' @slot mu Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific expression levels \eqn{\mu[i]}.
+#' @slot delta Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
+#' @slot phi Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific mRNA content normalising constants \eqn{\phi[j]}
+#' @slot s Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+#' @slot nu Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu[j]}
+#' @slot theta Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)
+#' 
+#' @examples
+#' 
+#' # A BASiCS_Summary object created by the Summary method.
+#' Data = makeExampleBASiCS_Data()
+#' MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+#' MCMC_Summary <- Summary(MCMC_Output)
+#' 
+#' @description Container of a summary of a \code{\link[BASiCS]{BASiCS_Chain-class}} object.  
+#' In each slot, first column contains posterior medians, second column contains the lower limits of an high posterior
+#' density interval and third column contains the upper limits of high posterior density intervals.
 setClass("BASiCS_Summary",
          representation = representation(
            mu = "matrix",
@@ -136,8 +165,9 @@ setClass("BASiCS_Summary",
            nu = "matrix",
            theta = "matrix"),
          validity = function(object){
-           
-#           if(!is.list(object@PostMedian) | !is.list(object@HPD_UpLimit) | !is.list(object@HPD_LowLimit)) stop("Invalid slots")  
-           TRUE 
+            if(sum(!is.finite(object@mu))>0 | sum(!is.finite(object@delta))>0 | 
+              sum(!is.finite(object@phi))>0 | sum(!is.finite(object@s))>0 |
+              sum(!is.finite(object@nu))>0 | sum(!is.finite(object@theta))>0) stop("Invalid slots") 
+            else {TRUE} 
          }
 )
