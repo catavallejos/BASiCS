@@ -60,6 +60,7 @@ A graphical representation of the BASiCS model is displayed below, based on the 
 
 ***
 
+<<<<<<< HEAD
 # Installation
 
 BASiCS can be installed directly from Github. 
@@ -86,8 +87,10 @@ library(BASiCS)
 
 [^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
 
+=======
 # Using BASiCS
 
+>>>>>>> d01682b943d8ad3b1a3519791d683197417891f3
 ##  The input dataset
 
 The input dataset for BASiCS must contain the following 3 elements:
