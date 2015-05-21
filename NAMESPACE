@@ -37,4 +37,5 @@ export(BASiCS_Filter,
        BASiCS_DetectHVG,
        BASiCS_DetectLVG,
        BASiCS_VarThresholdSearchHVG,
-       BASiCS_VarThresholdSearchLVG)
+       BASiCS_VarThresholdSearchLVG,
+       BASiCS_DenoisedRates)

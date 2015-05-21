@@ -18,7 +18,7 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
 }
 \description{
-\code{BASiCS_Sim} creates a \code{\link[BASiCS]{BASiCS_Data-class}} object from
+\code{newBASiCS_Data} creates a \code{\link[BASiCS]{BASiCS_Data-class}} object from
 a matrix of expression counts and experimental information about spike-in genes.
 }
 \examples{

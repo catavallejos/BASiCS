@@ -327,6 +327,18 @@ points(DetectLVG$Table[DetectLVG$Table[,6]==1,2], DetectLVG$Table[DetectLVG$Tabl
        pch = 16, col = "blue", cex = 1)
 ```
 
+## Normalisation and removal of technical variation
+
+After performing the analysis, the user might want to produce a matrix of normalised and denoised expression counts for which the effect of technical variation is removed. For this purpose, we implemented the function `BASiCS_DenoisedCounts`
+
+```{r DenoisedCounts}
+DenoisedCounts = BASiCS_DenoisedCounts(Data = Data, Chain = MCMC_Output)
+```
+
+```{r DenoisedRates}
+DenoisedRates = BASiCS_DenoisedRates(Data = Data, Chain = MCMC_Output)
+```
+
 ### Session information
 ```{r SessionInfo}
 sessionInfo()
