@@ -364,7 +364,7 @@ setMethod("plot",
                 plot(Columns, object[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)
                 for(Column in Columns) 
                 {
-                  segments(x0 = Column, y0 = object[Column,2], y1 = object[Column,3], col = col)
+                  segments(x0 = Column, y0 = object[Column,2], y1 = object[Column,3], col = col, ...)
                   segments(x0 = Column-2/length(Columns), y0 = object[Column,2], x1 = Column+2/length(Columns), col = col, ...)
                   segments(x0 = Column-2/length(Columns), y0 = object[Column,3], x1 = Column+2/length(Columns), col = col, ...)
                 }

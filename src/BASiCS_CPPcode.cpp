@@ -576,7 +576,6 @@ arma::mat nuUpdate(
       Rcpp::Rcout << "Something went wrong when updating nu" << size(find_nonfinite(log_aux),0) << std::endl;
       Rcpp::stop("Please consider additional filter of the input dataset.");
     }
-    if(size(find_nonfinite(log_aux),0)>0) {Rcpp::Rcout << size(find_nonfinite(log_aux),0) << std::endl;}
 
     // CREATING OUTPUT VARIABLE        
     arma::vec nu = ind % exp(y) + (1 - ind) % nu0;
