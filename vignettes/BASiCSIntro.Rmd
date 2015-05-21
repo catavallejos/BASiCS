@@ -329,6 +329,7 @@ points(DetectLVG$Table[DetectLVG$Table[,6]==1,2], DetectLVG$Table[DetectLVG$Tabl
 
 ## Normalisation and removal of technical variation
 
+<<<<<<< HEAD
 After performing the analysis, the user might want to produce a matrix of normalised and denoised expression counts for which the effect of technical variation is removed. For this purpose, we implemented the function `BASiCS_DenoisedCounts`. For each gene $i$ and cell $j$ this function returns
 
 $$ x^*_{ij} = \frac{ x_{ij} } {\hat{\phi}_j \hat{\nu}_j}, $$
