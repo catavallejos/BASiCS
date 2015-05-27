@@ -1,8 +1,8 @@
 ##########################################################################
 # New generic functions
 ##########################################################################
-setGeneric("displaySpikeInput", function(object){})
-setGeneric("displayTechIndicator", function(object){})
+setGeneric("displaySpikeInput", function(object, ...){})
+setGeneric("displayTechIndicator", function(object, ...){})
 
 ##########################################################################
 # Methods for BASiCS_Data objects

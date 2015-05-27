@@ -3,11 +3,9 @@ exportPattern("^[^\\Hidden]")
 importFrom(Rcpp, evalCpp)
 importFrom(coda, HPDinterval)
 importFrom(methods, Summary)
-importMethodsFrom(BiocGenerics, counts, 
-              displayTechIndicator, 
-              displaySpikeInput)
+importMethodsFrom(BiocGenerics, counts)
 
-exportClasses( "BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary")
+exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary")
 
 exportMethods(counts, 
               displayTechIndicator, 

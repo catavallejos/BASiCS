@@ -109,7 +109,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInput)
   cat('            (by default genes expressed in only 1 cell are not accepted) \n')
   cat('          - with very low total counts across the samples where the transcript is expressed \n')
   cat('\n')
-  cat(' BASiCS_Filter can be used for this purpose ')
+  cat(' BASiCS_Filter can be used for this purpose \n')
   return(Data)  
 }
 
