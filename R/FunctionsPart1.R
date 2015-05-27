@@ -1276,7 +1276,7 @@ BASiCS_VarThresholdSearchHVG=function(
     
     DetectHVG <- BASiCS_DetectHVG(object, VarThreshold = VarThreshold)
     
-    Table[i,]=c(100*VarThreshold, round(100*DetectHVG$EFDR,2),round(100*DetectHVG$EFNR,2), DetectHVG$EviThreshold,sum(as.numeric(DetectHVG$Table[,5])))
+    Table[i,]=c(100*VarThreshold, round(100*DetectHVG$EFDR,2),round(100*DetectHVG$EFNR,2), DetectHVG$EviThreshold,sum(as.numeric(DetectHVG$Table[,6])))
   }
   return(Table)
 }
@@ -1305,7 +1305,7 @@ BASiCS_VarThresholdSearchLVG=function(
     
     DetectLVG <- BASiCS_DetectLVG(object, VarThreshold = VarThreshold)
     
-    Table[i,]=c(100*VarThreshold, round(100*DetectLVG$EFDR,2),round(100*DetectLVG$EFNR,2), DetectLVG$EviThreshold,sum(as.numeric(DetectLVG$Table[,5])))
+    Table[i,]=c(100*VarThreshold, round(100*DetectLVG$EFDR,2),round(100*DetectLVG$EFNR,2), DetectLVG$EviThreshold,sum(as.numeric(DetectLVG$Table[,6])))
     
   }
   return(Table)
