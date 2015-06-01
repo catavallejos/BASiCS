@@ -3,6 +3,8 @@
 ##########################################################################
 setGeneric("displaySpikeInput", function(object, ...){})
 setGeneric("displayTechIndicator", function(object, ...){})
+setGeneric("displayChainBASiCS", function(object, ...){})
+setGeneric("displaySummaryBASiCS", function(object, ...){})
 
 ##########################################################################
 # Methods for BASiCS_Data objects
@@ -243,6 +245,47 @@ setMethod("plot",
               plot(object[,Column], type="l", xlab = xlab, ylab = ylab, ...)
             }
           })
+ 
+
+#' @name displayChainBASiCS-BASiCS_Chain-method
+#' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_Chain-method
+#' 
+#' @docType methods
+#' @rdname displayChainBASiCS-BASiCS_Chain-method
+#' 
+#' @title Accessors for the slots of a BASiCS_Chain object
+#' 
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Param Name of the slot to be used for the accessed. Possible values: \code{mu, delta, phi, s, nu, theta}
+#' 
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#'   
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+setMethod("displayChainBASiCS",
+          signature = "BASiCS_Chain",
+          definition = function(object, 
+                                Param = "mu"){
+            
+            if(!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) stop("'Param' argument is invalid")
+            
+            if(Param == "mu") {return(object@mu)}  
+            if(Param == "delta") {return(object@delta)}  
+            if(Param == "phi") {return(object@phi)}  
+            if(Param == "s") {return(object@s)}  
+            if(Param == "nu") {return(object@nu)}
+            if(Param == "theta") {return(object@theta)} 
+          })
 
 ##########################################################################
 # Methods for BASiCS_Summary objects
@@ -443,3 +486,43 @@ setMethod("plot",
             }
             })
 
+
+#' @name displaySummaryBASiCS-BASiCS_Summary-method
+#' @aliases displaySummaryBASiCS displaySummaryBASiCS,BASiCS_Summary-method
+#' 
+#' @docType methods
+#' @rdname displaySummaryBASiCS-BASiCS_Summary-method
+#' 
+#' @title Accessors for the slots of a BASiCS_Summary object
+#' 
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' @param Param Name of the slot to be used for the accessed. Possible values: \code{mu, delta, phi, s, nu, theta}
+#'  
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_MCMC)
+#'   
+#' @seealso \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+setMethod("displaySummaryBASiCS",
+          signature = "BASiCS_Summary",
+          definition = function(object, 
+                                Param = "mu"){
+            
+            if(!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) stop("'Param' argument is invalid")
+            
+            if(Param == "mu") {return(object@mu)}  
+            if(Param == "delta") {return(object@delta)}  
+            if(Param == "phi") {return(object@phi)}  
+            if(Param == "s") {return(object@s)}  
+            if(Param == "nu") {return(object@nu)}   
+            if(Param == "theta") {return(object@theta)}
+          })

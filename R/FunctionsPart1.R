@@ -397,12 +397,12 @@ HiddenBASiCS_MCMC_Start<-function(
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs required to reach convergence
 #' MCMC_Output <- BASiCS_MCMC(Data, N = 40000, Thin = 20, Burn = 20000, PrintProgress = FALSE)
-#' head(displayChainMu(MCMC_Output))
-#' head(displayChainDelta(MCMC_Output))
-#' head(displayChainPhi(MCMC_Output))
-#' head(displayChainS(MCMC_Output))
-#' head(displayChainNu(MCMC_Output))
-#' head(displayChainTheta(MCMC_Output))
+#' head(displayChainBASiCS(MCMC_Output, Param = "mu"))
+#' head(displayChainBASiCS(MCMC_Output, Param = "delta"))
+#' head(displayChainBASiCS(MCMC_Output, Param = "phi"))
+#' head(displayChainBASiCS(MCMC_Output, Param = "s"))
+#' head(displayChainBASiCS(MCMC_Output, Param = "nu"))
+#' head(displayChainBASiCS(MCMC_Output, Param = "theta"))
 #' 
 #' # Traceplots
 #' plot(MCMC_Output, Param = "mu", Gene = 1)
@@ -414,12 +414,12 @@ HiddenBASiCS_MCMC_Start<-function(
 #' 
 #' # Calculating posterior medians and 95% HPD intervals
 #' MCMC_Summary <- Summary(MCMC_Output)
-#' head(displaySummaryMu(MCMC_Summary))
-#' head(displaySummaryDelta(MCMC_Summary))
-#' head(displaySummaryPhi(MCMC_Summary))
-#' head(displaySummaryS(MCMC_Summary))
-#' head(displaySummaryNu(MCMC_Summary))
-#' head(displaySummaryTheta(MCMC_Summary))
+#' head(displaySummaryBASiCS(MCMC_Summary, Param = "mu"))
+#' head(displaySummaryBASiCS(MCMC_Summary, Param = "delta"))
+#' head(displaySummaryBASiCS(MCMC_Summary, Param = "phi"))
+#' head(displaySummaryBASiCS(MCMC_Summary, Param = "s"))
+#' head(displaySummaryBASiCS(MCMC_Summary, Param = "nu"))
+#' head(displaySummaryBASiCS(MCMC_Summary, Param = "theta"))
 #' 
 #' # Graphical display of posterior medians and 95% HPD intervals
 #' plot(MCMC_Summary, Param = "mu", main = "All genes")
@@ -641,192 +641,6 @@ newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta)
   return(Chain)  
 }
 
-
-##########################################################################################
-# Post-processing functions based on a BASiCS_Chain object ###############################
-##########################################################################################
-
-#' @name displayChainMu 
-#' @aliases displayChainMu displayChainMu,BASiCS_Chain-accessors
-#' 
-#' @title Accessors for the slots of a BASiCS_Chain object
-#' 
-#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain-class}}
-#' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
-#' 
-#' @return 
-#' \describe{
-#' \item{\code{displayChainMu}}{The \code{mu} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
-#' \item{\code{displayChainDelta}}{The \code{delta} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
-#' \item{\code{displayChainPhi}}{The \code{phi} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
-#' \item{\code{displayChainS}}{The \code{s} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
-#' \item{\code{displayChainNu}}{The \code{nu} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
-#' \item{\code{displayChainTheta}}{The \code{theta} slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.} 
-#' }
-#' 
-#' @examples
-#' 
-#' # See
-#' help(BASiCS_MCMC)
-#'   
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
-#' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
-#' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-#' 
-#' @rdname BASiCS_Chain-accessors
-displayChainMu <- function(object)
-{
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  
-  return(object@mu)
-}
-
-#' @name displayChainDelta 
-#' @aliases displayChainDelta displayChainDelta,BASiCS_Chain-accessors
-#' @rdname BASiCS_Chain-accessors
-displayChainDelta <- function(object)
-{
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  
-  return(object@delta)
-}
-
-#' @name displayChainPhi 
-#' @aliases displayChainPhi displayChainPhi,BASiCS_Chain-accessors
-#' @rdname BASiCS_Chain-accessors
-displayChainPhi <- function(object)
-{
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  
-  return(object@phi)
-}
-
-#' @name displayChainS 
-#' @aliases displayChainS displayChainS,BASiCS_Chain-accessors
-#' @rdname BASiCS_Chain-accessors
-displayChainS <- function(object)
-{
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  
-  return(object@s)
-}
-
-#' @name displayChainNu
-#' @aliases displayChainNu displayChainNu,BASiCS_Chain-accessors
-#' @rdname BASiCS_Chain-accessors
-displayChainNu <- function(object)
-{
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  
-  return(object@nu)
-}
-
-#' @name displayChainTheta
-#' @aliases displayChainTheta displayChainTheta,BASiCS_Chain-accessors
-#' @rdname BASiCS_Chain-accessors
-displayChainTheta <- function(object)
-{
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  
-  return(object@theta)
-}
-
-##########################################################################################
-# Post-processing functions based on a BASiCS_Summary object ###############################
-##########################################################################################
-
-#' @name displaySummaryMu 
-#' @aliases displaySummaryMu displaySummaryMu,BASiCS_Summary-accessors
-#' 
-#' @title Accessors for the slots of a BASiCS_Summary object
-#' 
-#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary-class}}
-#' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
-#' 
-#' @return 
-#' \describe{
-#' \item{\code{displaySummaryMu}}{The \code{mu} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
-#' \item{\code{displaySummaryDelta}}{The \code{delta} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
-#' \item{\code{displaySummaryPhi}}{The \code{phi} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
-#' \item{\code{displaySummaryS}}{The \code{s} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
-#' \item{\code{displaySummaryNu}}{The \code{nu} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
-#' \item{\code{displaySummaryTheta}}{The \code{theta} slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.} 
-#' }
-#' 
-#' @examples
-#' 
-#' # See
-#' help(BASiCS_MCMC)
-#' 
-#'   
-#' @seealso \code{\link[BASiCS]{BASiCS_Summary-class}}
-#' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
-#' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-#' 
-#' @rdname BASiCS_Summary-accessors
-displaySummaryMu <- function(object)
-{
-  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
-  
-  return(object@mu)
-}
-
-#' @name displaySummaryDelta 
-#' @aliases displaySummaryDelta displaySummaryDelta,BASiCS_Summary-accessors
-#' @rdname BASiCS_Summary-accessors
-displaySummaryDelta <- function(object)
-{
-  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
-  
-  return(object@delta)
-}
-
-#' @name displaySummaryPhi 
-#' @aliases displaySummaryPhi displaySummaryPhi,BASiCS_Summary-accessors
-#' @rdname BASiCS_Summary-accessors
-displaySummaryPhi <- function(object)
-{
-  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
-  
-  return(object@phi)
-}
-
-#' @name displaySummaryS 
-#' @aliases displaySummaryS displaySummaryS,BASiCS_Summary-accessors
-#' @rdname BASiCS_Summary-accessors
-displaySummaryS <- function(object)
-{
-  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
-  
-  return(object@s)
-}
-
-#' @name displaySummaryNu
-#' @aliases displaySummaryNu displaySummaryNu,BASiCS_Summary-accessors
-#' @rdname BASiCS_Summary-accessors
-displaySummaryNu <- function(object)
-{
-  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
-  
-  return(object@nu)
-}
-
-#' @name displaySummaryTheta
-#' @aliases displaySummaryTheta displaySummaryTheta,BASiCS_Summary-accessors
-#' @rdname BASiCS_Summary-accessors
-displaySummaryTheta <- function(object)
-{
-  if(!is(object,"BASiCS_Summary")) stop("'object' is not a BASiCS_Summary class object.")
-  
-  return(object@theta)
-}
-
 ##########################################################################################
 # Highly variable genes detection based on a BASiCS_Chain object #########################
 ##########################################################################################
@@ -1043,7 +857,11 @@ BASiCS_DetectHVG <- function(object,
   Mu <- apply(object@mu[,1:length(Sigma)], 2, median)
   Delta <- apply(object@delta, 2, median)
   if(OptThreshold[1] == "Not found") {HVG = rep("Not found", length(Sigma))}
-  else{ HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE) }
+  else
+  { 
+    HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE);  
+    HVG <- ifelse(Prob >= 0.5, HVG, FALSE); 
+  }
     
   qbio = length(Sigma)
   
@@ -1165,7 +983,11 @@ BASiCS_DetectLVG <- function(object,
   Mu <- apply(object@mu[,1:length(Sigma)], 2, median)
   Delta <- apply(object@delta, 2, median)
   if(OptThreshold[1] == "Not found") {LVG = rep("Not found", length(Sigma))}
-  else{ LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE) }
+  else
+  { 
+    LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE) 
+    LVG <- ifelse(Prob >= 0.5, LVG, FALSE); 
+  }
   
   qbio = length(Sigma)
   

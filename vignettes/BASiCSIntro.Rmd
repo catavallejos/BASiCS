@@ -201,18 +201,18 @@ For other optional parameters see `?BASiCS_MCMC`.
 To access the slots of `MCMC_Output` use:
 
 ```{r AccessChains}
-dim(displayChainMu(MCMC_Output))
-dim(displayChainDelta(MCMC_Output))
-dim(displayChainPhi(MCMC_Output))
-dim(displayChainS(MCMC_Output))
-dim(displayChainNu(MCMC_Output))
-length(displayChainTheta(MCMC_Output))
+dim(displayChainBASiCS(MCMC_Output, Param = "mu"))
+dim(displayChainBASiCS(MCMC_Output, Param = "delta"))
+dim(displayChainBASiCS(MCMC_Output, Param = "phi"))
+dim(displayChainBASiCS(MCMC_Output, Param = "s"))
+dim(displayChainBASiCS(MCMC_Output, Param = "nu"))
+length(displayChainBASiCS(MCMC_Output, Param = "theta"))
 ```
 
 To assess convergence of the chain, the convergence diagnostics provided by the package `coda` can be used. Additionally, a visual inspection is provided by traceplots, for example:
 
 ```{r Traceplots, fig.width = 5}
-plot(MCMC_Output, Param = "mu", Gene = 1)
+plot(MCMC_Output, Param = "mu", Gene = 1, log = "y")
 plot(MCMC_Output, Param = "delta", Gene = 1)
 plot(MCMC_Output, Param = "phi", Cell = 1)
 plot(MCMC_Output, Param = "s", Cell= 1)
@@ -226,12 +226,12 @@ To summarize the results, the function `Summary` calculates posterior medians an
 
 ```{r Summary}
 MCMC_Summary <- Summary(MCMC_Output)
-head(displaySummaryMu(MCMC_Summary))
-head(displaySummaryDelta(MCMC_Summary))
-head(displaySummaryPhi(MCMC_Summary))
-head(displaySummaryS(MCMC_Summary))
-head(displaySummaryNu(MCMC_Summary))
-head(displaySummaryTheta(MCMC_Summary))
+head(displaySummaryBASiCS(MCMC_Summary, Param = "mu"))
+head(displaySummaryBASiCS(MCMC_Summary, Param = "delta"))
+head(displaySummaryBASiCS(MCMC_Summary, Param = "phi"))
+head(displaySummaryBASiCS(MCMC_Summary, Param = "s"))
+head(displaySummaryBASiCS(MCMC_Summary, Param = "nu"))
+head(displaySummaryBASiCS(MCMC_Summary, Param = "theta"))
 ```
 
 The following figures display posterior medians and the corresponding HPD 95% intervals for the normalising constants. The first figure, allows the assessment of cell-to-cell heterogeneity regarding to mRNA content. The second figure, displays possible evidence of cell-to-cell differeces in capture efficiency (and/or amplification biases). 
