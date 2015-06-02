@@ -907,12 +907,12 @@ BASiCS_DetectHVG <- function(object,
   cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))  
   
   GeneIndex = 1:length(Mu)
-  Table = data.frame(cbind("GeneIndex" = GeneIndex,
+  Table = cbind.data.frame("GeneIndex" = GeneIndex,
                            "mu" = Mu,
                            "delta" = Delta,
                            "Sigma" = Sigma,
                            "Prob" = Prob,
-                           "HVG" = HVG))
+                           "HVG" = HVG, stringsAsFactors = FALSE)
   
   if(OrderVariable == "GeneIndex") orderVar = GeneIndex
   if(OrderVariable == "Mu") orderVar = Mu
@@ -1038,12 +1038,12 @@ BASiCS_DetectLVG <- function(object,
   cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n")) 
    
   GeneIndex = 1:length(Mu)
-  Table = data.frame(cbind("GeneIndex" = GeneIndex,
+  Table = cbind.data.frame("GeneIndex" = GeneIndex,
                            "mu" = Mu,
                            "delta" = Delta,
                            "Sigma" = Sigma,
                            "Prob" = Prob,
-                           "LVG" = LVG))
+                           "LVG" = LVG, stringsAsFactors = FALSE)
   
   if(OrderVariable == "GeneIndex") orderVar = GeneIndex
   if(OrderVariable == "Mu") orderVar = Mu
