@@ -23,8 +23,8 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
   Default: \code{a.delta = 1}.}
   \item{\code{b.delta}}{Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
   Default: \code{b.delta = 1}.}
-  \item{\code{s2.kappa}}{Variance hyper-parameter for the Normal(0,\code{s2.kappa}) prior that is shared by all cell-specific mRNA content normalising constants \eqn{\kappa[j]} (logit scale).
-  Default: \code{s2.kappa = 1}.}
+  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) cell-specific mRNA content normalising constants \eqn{\phi[j] / n}.
+  Default: \code{p.phi = rep(1, n)}.}
   \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s[j]}.
   Default: \code{a.s = 1}.}
   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s[j]}.

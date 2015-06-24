@@ -241,8 +241,10 @@ makeExampleBASiCS_Data <- function()
             0.88, 0.17, 0.25, 1.48, 0.31, 2.49, 2.75, 1.43, 2.65, 1.97,
             0.84, 0.81, 2.75, 0.53, 2.23, 0.45, 1.87, 0.74, 0.53, 0.58, 
             0.94, 0.72, 2.61, 1.56, 0.37, 0.07, 0.90, 0.12, 0.76, 1.45)
-  Phi = c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
-  S = c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
+  Phi = c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97,
+          1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
+  S = c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37,
+        0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
   Theta = 0.5
   
   q = length(Mu); q.bio = length(Delta); n = length(Phi)
@@ -271,50 +273,20 @@ makeExampleBASiCS_Data <- function()
   
   return(Data)  
 }
-  
-# ' @title Starting values for BASiCS_MCMC
-# ' 
-# ' @description Auxiliary function that creates starting values for \code{\link[BASiCS]{BASiCS_MCMC}}. 
-# ' 
-# ' @details Typically, this function will not be directly called. It is internally used by \code{\link[BASiCS]{BASiCS_MCMC}}.
-# ' 
-# ' @param Data A \code{\link[BASiCS]{BASiCS_Data-class}} object.
-# ' @param ... Optional arguments (lower bounds for starting values of adaptive proposal variances, log-scale):
-# ' \describe{
-# '  \item{\code{ls.mu0}}{Related to gene-specific expression levels \eqn{\mu[i]}.}
-# '  \item{\code{ls.delta0}}{Related to gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.}
-# '  \item{\code{ls.kappa0}}{Related to cell-specific mRNA content normalising constants (logit-scale) \eqn{\kappa[j]}}
-# '  \item{\code{ls.nu0}}{Related to cell-specific random effects (technical noise) \eqn{\nu[j]}.}
-# '  \item{\code{ls.theta0}}{Related to technical variability hyper-parameter \eqn{\theta}.}
-# ' }
-# ' 
-# ' @return A list containing starting values for all model parameters and the corresponding variances of the adaptive proposals (log-scale).
-# ' 
-# ' @examples
-# '
-# ' Data = makeExampleBASiCS_Data()
-# ' 
-# ' # Creating starting values for BASiCS_MCMC
-# ' MCMC_Start <- BASiCS_MCMC_Start(Data)
-# ' 
-# ' # Creating starting values for BASiCS_MCMC 
-# ' # With user-defined lower bounds for adaptive proposal variances of gene-specific expression rates
-# ' MCMC_Start2 <- BASiCS_MCMC_Start(Data, ls.mu0 = -6)
-# ' 
-# ' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+
 HiddenBASiCS_MCMC_Start<-function(
   Data,
   ...)
 {
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
-   
+  
   # Number of instrinsic genes
   q.bio<-sum(Data@Tech==F)
   # Number of cells
   n <- dim(Data@Counts)[2]
   
   # Initialize phi as a vector of ones
-  kappa0 = rep(0, times = n)
+  phi0 = rep(1, times = n)
   # Initialize s as the empirical capture efficiency rates
   s0=colSums(Data@Counts[Data@Tech,])/sum(Data@SpikeInput); nu0=s0 
   # Initialize mu using average 'normalised counts' across cells 
@@ -334,19 +306,19 @@ HiddenBASiCS_MCMC_Start<-function(
   args <- list(...)
   ls.mu0 = ifelse("ls.mu0" %in% names(args),args$ls.mu0,-4)
   ls.delta0 = ifelse("ls.delta0" %in% names(args),args$ls.delta0,-3)
-  ls.kappa0 = ifelse("ls.kappa0" %in% names(args),args$ls.kappa0,-8)
+  ls.phi0 = ifelse("ls.phi0" %in% names(args),args$ls.phi0,0)
   ls.nu0 = ifelse("ls.nu0" %in% names(args),args$ls.nu0,-10)
   ls.theta0 = ifelse("ls.theta0" %in% names(args),args$ls.theta0,-6)
   
   # Starting values for the proposal variances
   ls.mu0 =  pmax(2 * log (0.02 * abs(log(mu0))),ls.mu0)
   ls.delta0 =  pmax(2 * log (0.02 * abs(log(delta0))),ls.delta0)
-  ls.kappa0 =  pmax(2 * log (0.02 * abs(kappa0)),ls.kappa0)
+  ls.phi0 = ifelse(n<200, pmax(2*log(n),ls.phi0), 11) # 6
   ls.nu0 =  pmax(2 * log (0.02 * abs(log(nu0))),ls.nu0)
   ls.theta0 =  pmax(2 * log (0.02 * abs(log(theta0))),ls.theta0)
   
-  return(list("mu0"=mu0,"delta0"=delta0,"kappa0"=kappa0,"s0"=s0,"nu0"=nu0,"theta0"=theta0,
-              "ls.mu0"=ls.mu0,"ls.delta0"=ls.delta0,"ls.kappa0"=ls.kappa0,"ls.nu0"=ls.nu0,"ls.theta0"=ls.theta0))
+  return(list("mu0"=mu0, "delta0"=delta0, "phi0"=phi0, "s0"=s0, "nu0"=nu0, "theta0"=theta0,
+              "ls.mu0"=ls.mu0, "ls.delta0"=ls.delta0, "ls.phi0"=ls.phi0, "ls.nu0"=ls.nu0, "ls.theta0"=ls.theta0))
 }
 
 #' @title BASiCS MCMC sampler
@@ -365,8 +337,8 @@ HiddenBASiCS_MCMC_Start<-function(
 #'   Default: \code{a.delta = 1}.}
 #'   \item{\code{b.delta}}{Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
 #'   Default: \code{b.delta = 1}.}
-#'   \item{\code{s2.kappa}}{Variance hyper-parameter for the Normal(0,\code{s2.kappa}) prior that is shared by all cell-specific mRNA content normalising constants \eqn{\kappa[j]} (logit scale).
-#'   Default: \code{s2.kappa = 1}.}
+#'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) cell-specific mRNA content normalising constants \eqn{\phi[j] / n}.
+#'   Default: \code{p.phi = rep(1, n)}.}
 #'   \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s[j]}.
 #'   Default: \code{a.s = 1}.}
 #'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s[j]}.
@@ -461,7 +433,7 @@ HiddenBASiCS_MCMC_Start<-function(
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-BASiCS_MCMC<- function(
+BASiCS_MCMC <- function(
   Data, 
   N, 
   Thin, 
@@ -471,9 +443,12 @@ BASiCS_MCMC<- function(
   
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
   
+  # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
+  q=length(Data@Tech); q.bio=length(Data@Tech[!Data@Tech]); n=dim(Data@Counts)[2]
+  
   args <- list(...)
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
-  else { PriorParam = list(a.delta = 1, b.delta = 1, s2.kappa = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
+  else { PriorParam = list(a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
   AR = ifelse("AR" %in% names(args),args$AR, 0.44)
   StopAdapt = ifelse("StopAdapt" %in% names(args),args$StopAdapt, Burn)
   StoreChains = ifelse("StoreChains" %in% names(args),args$StoreChains, F)
@@ -486,14 +461,14 @@ BASiCS_MCMC<- function(
   if(!(N%%Thin==0 & N>=max(4,Thin))) stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
   if(!(Thin%%1==0 & Thin>=2)) stop("Please use an integer value for Thin (Thin>=2).") 
   if(!(Burn%%Thin==0 & Burn<N & Burn>=1)) stop("Please use an integer value for Burn. It must also be lower than N and a multiple of thin (Burn>=1).")
-   
+  
   if(!(PriorParam$a.delta>0  & length(PriorParam$a.delta) == 1 &
-       PriorParam$b.delta>0  & length(PriorParam$b.delta) == 1 &
-       PriorParam$s2.kappa>0 & length(PriorParam$s2.kappa) == 1 &
-       PriorParam$a.s>0      & length(PriorParam$a.s) == 1 &
-       PriorParam$b.s>0      & length(PriorParam$b.s) == 1 &
-       PriorParam$a.theta>0  & length(PriorParam$a.theta) == 1 &
-       PriorParam$b.theta>0) & length(PriorParam$b.theta) == 1) stop("Invalid prior hyper-parameter values.")
+         PriorParam$b.delta>0  & length(PriorParam$b.delta) == 1 &
+         all(PriorParam$p.phi>0) & length(PriorParam$p.phi) == n &
+         PriorParam$a.s>0      & length(PriorParam$a.s) == 1 &
+         PriorParam$b.s>0      & length(PriorParam$b.s) == 1 &
+         PriorParam$a.theta>0  & length(PriorParam$a.theta) == 1 &
+         PriorParam$b.theta>0) & length(PriorParam$b.theta) == 1) stop("Invalid prior hyper-parameter values.")
   
   if(!(AR>0 & AR<1 & length(AR) == 1)) stop("Invalid AR value. Recommended value: AR = 0.44.")
   if(!(StopAdapt>0)) stop("Invalid StopAdapt value.")
@@ -501,9 +476,8 @@ BASiCS_MCMC<- function(
   if(!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) stop("Invalid StoreAdapt value.")
   if(!(file.info(StoreDir)["isdir"])) stop("Invalid StoreDir value.")
   
-  # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
-  q=length(Data@Tech); q.bio=length(Data@Tech[!Data@Tech]); n=dim(Data@Counts)[2]
 
+  
   # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
   sum.bycell.all<-apply(Data@Counts,1,sum)
   sum.bycell.bio<-apply(Data@Counts[1:q.bio,],1,sum)
@@ -514,41 +488,38 @@ BASiCS_MCMC<- function(
   Start=HiddenBASiCS_MCMC_Start(Data)
   # Starting values for MCMC chains
   mu0=as.vector(Start$mu0); delta0=as.vector(Start$delta0)
-  kappa0=as.vector(Start$kappa0); s0=as.vector(Start$s0)
+  phi0=as.vector(Start$phi0); s0=as.vector(Start$s0)
   nu0=as.vector(Start$nu0); theta0=as.numeric(Start$theta0)
   # Starting values for adaptive proposal variances
   ls.mu0=as.vector(Start$ls.mu0); ls.delta0=as.vector(Start$ls.delta0)
-  ls.kappa0=as.numeric(Start$ls.kappa0) 
+  ls.phi0=as.numeric(Start$ls.phi0) 
   ls.nu0=as.vector(Start$ls.nu0); ls.theta0=as.numeric(Start$ls.theta0)
   
   StoreAdaptNumber = as.numeric(StoreAdapt)
- 
+  
   # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
   Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(
-                                          N,
-                                          Thin,
-                                          Burn,
-                                          as.matrix(Data@Counts),
-                                          mu0, delta0, kappa0, s0, nu0, theta0,
-                                          PriorParam$a.delta, PriorParam$b.delta,
-                                          PriorParam$s2.kappa,
-                                          PriorParam$a.s, PriorParam$b.s,
-                                          PriorParam$a.theta, PriorParam$b.theta,
-                                          AR,
-                                          ls.mu0, ls.delta0, ls.kappa0, ls.nu0, ls.theta0,
-                                          sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-                                          StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress)))
+    N,
+    Thin,
+    Burn,
+    as.matrix(Data@Counts),
+    mu0, delta0, phi0, s0, nu0, theta0,
+    PriorParam$a.delta, PriorParam$b.delta,
+    PriorParam$p.phi,
+    PriorParam$a.s, PriorParam$b.s,
+    PriorParam$a.theta, PriorParam$b.theta,
+    AR,
+    ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
+    sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
+    StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress)))
   cat("--------------------------------------------------------------------"); cat("\n")
   cat("MCMC running time"); cat("\n")
   cat("--------------------------------------------------------------------"); cat("\n")
   print(Time)
   cat("\n")
   
-  Chain$phi <- as.matrix(n * exp(Chain$kappa)/apply(exp(Chain$kappa),1,sum))
-  Chain$kappa <- NULL
-  
   OldDir = getwd()
-    
+  
   if(StoreChains)
   {   
     setwd(StoreDir)
@@ -567,7 +538,7 @@ BASiCS_MCMC<- function(
     
     setwd(OldDir)
   }
-    
+  
   if(StoreAdapt)
   {
     setwd(StoreDir)
@@ -576,10 +547,10 @@ BASiCS_MCMC<- function(
     cat("Storing trajectories of adaptive proposal variances (log-scale) as .txt files in"); cat("\n")
     cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
     cat("--------------------------------------------------------------------"); cat("\n")
-      
+    
     write.table(Chain$ls.mu,paste0("chain_ls.mu_",RunName,".txt"),col.names=F,row.names=F)
     write.table(Chain$ls.delta,paste0("chain_ls.delta_",RunName,".txt"),col.names=F,row.names=F)      
-    write.table(Chain$ls.kappa,paste0("chain_ls.kappa_",RunName,".txt"),col.names=F,row.names=F)
+    write.table(Chain$ls.phi,paste0("chain_ls.phi_",RunName,".txt"),col.names=F,row.names=F)
     write.table(Chain$ls.nu,paste0("chain_ls.nu_",RunName,".txt"),col.names=F,row.names=F)
     write.table(Chain$ls.theta,paste0("chain_ls.theta_",RunName,".txt"),col.names=F,row.names=F)
     
