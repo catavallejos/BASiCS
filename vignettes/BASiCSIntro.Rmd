@@ -136,23 +136,19 @@ length(displaySpikeInput(Data))
 
 ## Fitting the BASiCS model
 
-The BASiCS model is fitted using a Bayesian approach by means of an Adaptive Metropolis within Gibbs Sampling algorithm[^RobertsRosenthal2009]. In order to ensure the identifiability restriction $\sum_{j=1}^n \phi_j = n$, the sampler is implemented in terms of $\kappa_1, \ldots \kappa_n$ (instead of $\phi_1, \ldots, \phi_n$) using the following re-parameterization:
-
-$$\phi_{j} = n \frac{\,e^{\kappa_j}}{\sum_{j=1} \,e^{\kappa_j}}, j=1,\ldots,n \hspace{1cm} \kappa_1=0$$
-
-We assume prior independence between all model parameters, using a flat *non informative* prior for the normalised expression rates $\mu_1,\ldots,\mu_{q_0}$ and proper *informative* prior distributions for all other model parameters. The adopted prior is given by
+The BASiCS model is fitted using a Bayesian approach by means of an Adaptive Metropolis within Gibbs Sampling algorithm[^RobertsRosenthal2009]. We assume prior independence between all model parameters (except within the $\phi_j$'s, for which its total sum is constrained), using a flat *non informative* prior for the normalised expression rates $\mu_1,\ldots,\mu_{q_0}$ and proper *informative* prior distributions for all other model parameters. The adopted prior is given by
 
 * $\pi(\mu_i) \propto \mu_i^{-1}$ for $i=1, \ldots, q_0$,
 
 * $\delta_i \sim \mbox{Gamma}(a_{\delta},b_{\delta})$ for $i=1, \ldots, q_0$,
 
-* $\kappa_j \sim \mbox{Normal}(0,\sigma^2_\kappa)$ for $j=2, \ldots, n$,
+* $n^{-1} \phi = n^{-1} (\phi_1, \ldots, \phi_n)'  \sim \mbox{Dirichlet}(p)$ with $p = (p_1,\ldots,p_n)'$ and each $p_j>0$,
 
 * $s_j \sim \mbox{Gamma}(a_s,b_s)$,
 
 * $\theta \sim \mbox{Gamma}(a_{\theta},b_{\theta})$, 
 
-for fixed hyper-parameter values $a_{\delta}, b_{\delta}$, $s^2_{\kappa}, a_s, b_s, a_{\theta}$ and $b_{\theta}$[^Prior]. As a default option, the sampler assumes all these hyper-parameters are equal to 1. However, the user can modify this option. 
+for fixed hyper-parameter values $a_{\delta}, b_{\delta}$, $p, a_s, b_s, a_{\theta}$ and $b_{\theta}$[^Prior]. As a default option, the sampler assumes all these hyper-parameters are equal to 1 (in case of $p$, we use $p_1 = p_2 = \cdots = p_n = 1$). However, the user can modify this option. 
 
 [^Prior]: The analysis of simulated and real datasets suggested that the choice of these hyper-parameters does not have major consequences in posterior inference.
 
