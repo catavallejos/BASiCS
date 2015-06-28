@@ -40,3 +40,4 @@ version 0.1.6: (2015-06-01)
 version 0.2.0: (2015-06-24)
 - New parametrization for mRNA content size factors $\phi_j$ that improves mixing of the MCMC algorithm (using adaptive Dirichlet proposals)
 - Updated vignette
+
