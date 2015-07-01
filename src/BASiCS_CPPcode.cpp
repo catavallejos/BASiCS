@@ -245,9 +245,9 @@ arma::mat lgamma_cpp(arma::mat const& x)
  * NumericMatrix x: matrix to which the logarithm of the Gamma function will be applied element-wise
  */
   arma::mat output = x;
-  for (int i=0; i<arma::size(x,0); i++)
+  for (unsigned int i=0; i<arma::size(x,0); i++)
   {
-    for(int j=0; j<arma::size(x,1); j++)
+    for(unsigned int j=0; j<arma::size(x,1); j++)
     {
       output(i,j) = R::lgammafn(x(i,j));
     }
@@ -555,7 +555,7 @@ arma::vec rDirichlet(
   arma::vec alpha)
 {
   arma::vec aux = arma::ones(alpha.size());
-  int i;
+  unsigned int i;
   for(i=0; i<alpha.size(); i++)
   {
     aux(i) = Rcpp::as<double>(rgamma(1,alpha(i),1));   
@@ -803,7 +803,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     }
         
     // STORAGE OF DRAWS
-    if(i%thin==0 & i>=burn)
+    if((i%thin==0) & (i>=burn))
     {      
       mu.row(i/thin - burn/thin) = muAux.col(0).t(); 
       delta.row(i/thin - burn/thin) = deltaAux.col(0).t(); 
@@ -823,7 +823,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if(i%(2*thin) == 0 & PrintProgress == 1)
+    if((i%(2*thin) == 0) & (PrintProgress == 1))
     {
         Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
         Rcpp::Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
