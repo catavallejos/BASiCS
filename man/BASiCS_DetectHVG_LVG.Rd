@@ -21,7 +21,7 @@ BASiCS_DetectLVG(object, VarThreshold, EviThreshold = NULL,
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
 
-\item{GeneNames}{Vector of characters containing gene names.}
+\item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
 
 \item{Plot}{If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.}
 

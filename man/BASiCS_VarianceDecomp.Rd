@@ -9,14 +9,14 @@ BASiCS_VarianceDecomp(object, GeneNames = NULL, OrderVariable = "BioVar")
 \arguments{
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
-\item{GeneNames}{Vector of characters containing gene names.}
+\item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "BioVar", "TechVar", "ShotNoise")}.}
 }
 \value{
 A matrix with 4 columns
 \describe{
-\item{\code{GeneIndex}}{Gene index (as in input dataset)}
+\item{\code{GeneName}}{Gene name (as indicated by user)}
 \item{\code{BioVar}}{Percentage of variance explained by a biological cell-to-cell heterogeneity component}
 \item{\code{TechVar}}{Percentage of variance explained by the technical cell-to-cell heterogeneity component}
 \item{\code{ShotNoise}}{Percentage of variance explained by the shot noise component (baseline)}
