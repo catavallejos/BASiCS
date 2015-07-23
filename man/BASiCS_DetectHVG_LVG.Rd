@@ -7,10 +7,10 @@
 \title{Detection method for highly and lowly variable genes}
 \usage{
 BASiCS_DetectHVG(object, VarThreshold, EviThreshold = NULL,
-  OrderVariable = "Prob", Plot = FALSE, ...)
+  OrderVariable = "Prob", GeneNames = NULL, Plot = FALSE, ...)
 
 BASiCS_DetectLVG(object, VarThreshold, EviThreshold = NULL,
-  OrderVariable = "Prob", Plot = FALSE, ...)
+  OrderVariable = "Prob", GeneNames = NULL, Plot = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
@@ -20,6 +20,8 @@ BASiCS_DetectLVG(object, VarThreshold, EviThreshold = NULL,
 \item{EviThreshold}{Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)}
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
+
+\item{GeneNames}{Vector of characters containing gene names.}
 
 \item{Plot}{If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.}
 

@@ -4,10 +4,12 @@
 \alias{BASiCS_VarianceDecomp}
 \title{Decomposition of gene expression variability according to BASiCS}
 \usage{
-BASiCS_VarianceDecomp(object, OrderVariable = "BioVar")
+BASiCS_VarianceDecomp(object, GeneNames = NULL, OrderVariable = "BioVar")
 }
 \arguments{
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+
+\item{GeneNames}{Vector of characters containing gene names.}
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "BioVar", "TechVar", "ShotNoise")}.}
 }

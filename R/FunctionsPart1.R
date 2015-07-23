@@ -677,11 +677,12 @@ HiddenEFNR<-function(
 #' @title Decomposition of gene expression variability according to BASiCS
 #' 
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param GeneNames Vector of characters containing gene names (must be in the same order as in the Counts matrix).
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "BioVar", "TechVar", "ShotNoise")}.
 #' 
 #' @return A matrix with 4 columns
 #' \describe{
-#' \item{\code{GeneIndex}}{Gene index (as in input dataset)}
+#' \item{\code{GeneName}}{Gene name (as indicated by user)}
 #' \item{\code{BioVar}}{Percentage of variance explained by a biological cell-to-cell heterogeneity component}
 #' \item{\code{TechVar}}{Percentage of variance explained by the technical cell-to-cell heterogeneity component}
 #' \item{\code{ShotNoise}}{Percentage of variance explained by the shot noise component (baseline)}
@@ -702,18 +703,23 @@ HiddenEFNR<-function(
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 #' 
 #' @rdname BASiCS_VarianceDecomp
-BASiCS_VarianceDecomp <- function(object, OrderVariable = "BioVar")
+BASiCS_VarianceDecomp <- function(object, 
+                                  GeneNames = NULL,
+                                  OrderVariable = "BioVar")
 {  
-  if(!(OrderVariable %in% c("GeneIndex", "BioVar", "TechVar", "ShotNoise"))) stop("Invalid 'OrderVariable' value.")
+  if(!(OrderVariable %in% c("GeneNames", "BioVar", "TechVar", "ShotNoise"))) stop("Invalid 'OrderVariable' value.")
   
   VarDecomp = HiddenVarDecomp(object)
   BioVar = apply(VarDecomp$BioVar, 2, median)
   TechVar = apply(VarDecomp$TechVar, 2, median)
-  GeneIndex = 1:length(BioVar)
   
-  out = cbind(GeneIndex, BioVar, TechVar, 1-BioVar-TechVar)
-  colnames(out) = c("GeneIndex", "BioVar", "Tech", "ShotNoise")
-  if(OrderVariable == "GeneIndex") orderVar = GeneIndex
+  qbio = length(BioVar)
+  Genes = 1:qbio
+  if(is.null(GeneNames)) {GeneNames = paste("Gene", Genes)}
+    
+  out = cbind(GeneNames, BioVar, TechVar, 1-BioVar-TechVar)
+  colnames(out) = c("GeneNames", "BioVar", "Tech", "ShotNoise")
+  if(OrderVariable == "GeneNames") orderVar = GeneNames
   if(OrderVariable == "BioVar") orderVar = BioVar
   if(OrderVariable == "TechVar") orderVar = TechVar
   if(OrderVariable == "ShotNoise") orderVar = 1-BioVar-TechVar
@@ -733,6 +739,7 @@ BASiCS_VarianceDecomp <- function(object, OrderVariable = "BioVar")
 #' @param EviThreshold Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.
 #' @param Plot If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.
+#' @param GeneNames Vector of characters containing gene names (must be in the same order as in the Counts matrix).
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @return \code{BASiCS_DetectHVG} returns a list of 4 elements:
@@ -771,6 +778,7 @@ BASiCS_DetectHVG <- function(object,
                              VarThreshold,
                              EviThreshold = NULL,
                              OrderVariable = "Prob",
+                             GeneNames = NULL,
                              Plot = FALSE, 
                              ...)
 {
@@ -782,10 +790,9 @@ BASiCS_DetectHVG <- function(object,
     if(EviThreshold<0 | EviThreshold>1 | !is.finite(EviThreshold)) 
       stop("Evidence thresholds for HVG and LVG detection must be contained in (0,1) \n For automatic threshold search use EviThreshold = NULL.")    
   }
-  if(!(OrderVariable %in% c("GeneIndex", "Mu", "Delta", "Sigma", "Prob"))) stop("Invalid 'OrderVariable' value")
+  if(!(OrderVariable %in% c("GeneNames", "Mu", "Delta", "Sigma", "Prob"))) stop("Invalid 'OrderVariable' value")
   Search = F
   if(is.null(EviThreshold)) Search = T
-
   
   VarDecomp <- HiddenVarDecomp(object)
   Prob <- HiddenProbHVG(VarThreshold = VarThreshold, VarDecomp = VarDecomp)
@@ -835,6 +842,8 @@ BASiCS_DetectHVG <- function(object,
   }
     
   qbio = length(Sigma)
+  Genes = 1:qbio
+  if(is.null(GeneNames)) {GeneNames = paste("Gene", Genes)}
   
   if(Plot)
   {    
@@ -878,14 +887,14 @@ BASiCS_DetectHVG <- function(object,
   cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))  
   
   GeneIndex = 1:length(Mu)
-  Table = cbind.data.frame("GeneIndex" = GeneIndex,
+  Table = cbind.data.frame("GeneNames" = GeneNames,
                            "mu" = Mu,
                            "delta" = Delta,
                            "Sigma" = Sigma,
                            "Prob" = Prob,
                            "HVG" = HVG, stringsAsFactors = FALSE)
   
-  if(OrderVariable == "GeneIndex") orderVar = GeneIndex
+  if(OrderVariable == "GeneNames") orderVar = GeneNames
   if(OrderVariable == "Mu") orderVar = Mu
   if(OrderVariable == "Delta") orderVar = Delta
   if(OrderVariable == "Sigma") orderVar = Sigma
@@ -903,6 +912,7 @@ BASiCS_DetectLVG <- function(object,
                              VarThreshold,
                              EviThreshold = NULL,
                              OrderVariable = "Prob",
+                             GeneNames = NULL,
                              Plot = FALSE, 
                              ...)
 {
@@ -965,6 +975,8 @@ BASiCS_DetectLVG <- function(object,
   }
   
   qbio = length(Sigma)
+  Genes = 1:qbio
+  if(is.null(GeneNames)) {GeneNames = paste("Gene", Genes)}
   
   if(Plot)
   {    
@@ -1009,14 +1021,14 @@ BASiCS_DetectLVG <- function(object,
   cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n")) 
    
   GeneIndex = 1:length(Mu)
-  Table = cbind.data.frame("GeneIndex" = GeneIndex,
+  Table = cbind.data.frame("GeneNames" = GeneNames,
                            "mu" = Mu,
                            "delta" = Delta,
                            "Sigma" = Sigma,
                            "Prob" = Prob,
                            "LVG" = LVG, stringsAsFactors = FALSE)
   
-  if(OrderVariable == "GeneIndex") orderVar = GeneIndex
+  if(OrderVariable == "GeneNames") orderVar = GeneNames
   if(OrderVariable == "Mu") orderVar = Mu
   if(OrderVariable == "Delta") orderVar = Delta
   if(OrderVariable == "Sigma") orderVar = Sigma

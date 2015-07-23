@@ -41,3 +41,6 @@ version 0.2.0: (2015-06-24)
 - New parametrization for mRNA content size factors $\phi_j$ that improves mixing of the MCMC algorithm (using adaptive Dirichlet proposals)
 - Updated vignette
 
+version 0.2.1: (2015-07-23)
+- Argument 'GeneNames' has been added to functions 'BASiCS_VarianceDecomp', 'BASiCS_DetectHVG', 'BASiCS_DetectLVG' so that users can specify gene labels or names that will be used for these functions's output. 
+
