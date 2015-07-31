@@ -8,7 +8,7 @@
 \title{'plot' method for BASiCS_Chain objects}
 \usage{
 \S4method{plot}{BASiCS_Chain}(x, Param = "mu", Gene = NULL, Cell = NULL,
-  ylab = "", xlab = "", ...)
+  Batch = 1, ylab = "", xlab = "", ...)
 }
 \arguments{
 \item{x}{A \code{BASiCS_Chain} object.}
@@ -18,6 +18,8 @@
 \item{Gene}{Specifies which gene is requested. Required only if \code{Param = "mu"} or \code{"delta"}}
 
 \item{Cell}{Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}}
+
+\item{Batch}{Specifies which batch is requested. Required only if \code{Param = "theta"}}
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 

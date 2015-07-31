@@ -4,7 +4,7 @@
 \alias{newBASiCS_Data}
 \title{Creates a BASiCS_Data object from a matrix of expression counts and experimental information about spike-in genes}
 \usage{
-newBASiCS_Data(Counts, Tech, SpikeInput)
+newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo = NULL)
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
@@ -13,6 +13,8 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 \item{Tech}{Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.}
 
 \item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.}
+
+\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information.}
 }
 \value{
 An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.

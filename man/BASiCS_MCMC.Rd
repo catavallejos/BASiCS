@@ -56,8 +56,8 @@ MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datas
 Data = makeExampleBASiCS_Data()
 
 # Only a short run of the MCMC algorithm for illustration purposes
-# Longer runs required to reach convergence
-MCMC_Output <- BASiCS_MCMC(Data, N = 40000, Thin = 20, Burn = 20000, PrintProgress = FALSE)
+# Longer runs migth be required to reach convergence
+MCMC_Output <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, PrintProgress = FALSE)
 head(displayChainBASiCS(MCMC_Output, Param = "mu"))
 head(displayChainBASiCS(MCMC_Output, Param = "delta"))
 head(displayChainBASiCS(MCMC_Output, Param = "phi"))
@@ -71,7 +71,7 @@ plot(MCMC_Output, Param = "delta", Gene = 1)
 plot(MCMC_Output, Param = "phi", Cell = 1)
 plot(MCMC_Output, Param = "s", Cell = 1)
 plot(MCMC_Output, Param = "nu", Cell = 1)
-plot(MCMC_Output, Param = "theta")
+plot(MCMC_Output, Param = "theta", Batch = 1)
 
 # Calculating posterior medians and 95\% HPD intervals
 MCMC_Summary <- Summary(MCMC_Output)
@@ -104,20 +104,18 @@ plot(MCMC_Summary, Param = "s", Param2 = "nu")
 plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
 
 # Highly and lowly variable genes detection
-DetectHVG <- BASiCS_DetectHVG(MCMC_Output, VarThreshold = 0.70, Plot = TRUE)
-table(DetectHVG$HVG)
-DetectLVG <- BASiCS_DetectLVG(MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
-table(DetectLVG$LVG)
+#DetectHVG <- BASiCS_DetectHVG(Data, MCMC_Output, VarThreshold = 0.70, Plot = TRUE)
+#DetectLVG <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
 
-plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
-points(DetectHVG$Mu[DetectHVG$HVG], DetectHVG$Delta[DetectHVG$HVG],
-       pch = 16, col = "red", cex = 1.5)
-points(DetectLVG$Mu[DetectLVG$LVG], DetectLVG$Delta[DetectLVG$LVG],
-       pch = 16, col = "blue", cex = 1.5)
+#plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
+#points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3],
+#       pch = 16, col = "red", cex = 1)
+#points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3],
+#       pch = 16, col = "blue", cex = 1)
 
 # If variance thresholds are not fixed
-BASiCS_VarThresholdSearchHVG(MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
-BASiCS_VarThresholdSearchLVG(MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
+#BASiCS_VarThresholdSearchHVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
+#BASiCS_VarThresholdSearchLVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}

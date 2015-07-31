@@ -6,13 +6,15 @@
 \alias{BASiCS_DetectLVG}
 \title{Detection method for highly and lowly variable genes}
 \usage{
-BASiCS_DetectHVG(object, VarThreshold, EviThreshold = NULL,
+BASiCS_DetectHVG(Data, object, VarThreshold, EviThreshold = NULL,
   OrderVariable = "Prob", GeneNames = NULL, Plot = FALSE, ...)
 
-BASiCS_DetectLVG(object, VarThreshold, EviThreshold = NULL,
+BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
   OrderVariable = "Prob", GeneNames = NULL, Plot = FALSE, ...)
 }
 \arguments{
+\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
+
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
 \item{VarThreshold}{Variance contribution threshold (must be a positive value, between 0 and 1)}
@@ -32,7 +34,7 @@ BASiCS_DetectLVG(object, VarThreshold, EviThreshold = NULL,
 \describe{
 \item{\code{Table}}{Matrix whose columns contain}
    \describe{
-   \item{\code{GeneIndex}}{Gene index (as in input dataset)}
+   \item{\code{GeneNames}}{Gene names (if names are provided by the user, otherwise returns 'Gene 1', 'Gene 2', etc.)}
    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }

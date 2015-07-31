@@ -18,6 +18,8 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 \item{\code{Tech}}{Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.}
 
 \item{\code{SpikeInput}}{Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes (amount per cell).}
+
+\item{\code{BatchInfo}}{Vector of lenght \code{n} containing batch indicators.}
 }}
 \examples{
 Counts = matrix(rpois(10*5, 1), ncol = 5)
@@ -30,6 +32,7 @@ dim(counts(Data, type="biological"))
 dim(counts(Data, type="technical"))
 displayTechIndicator(Data)
 displaySpikeInput(Data)
+displayBatchInfo(Data)
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}

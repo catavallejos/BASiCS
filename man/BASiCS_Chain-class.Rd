@@ -28,7 +28,8 @@ by the function \code{\link[BASiCS]{BASiCS_MCMC}}.
 \item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu[j]}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
-\item{\code{theta}}{MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)}
+\item{\code{theta}}{MCMC chain for technical variability hyper-parameter(s) \eqn{\theta} (matrix, all elements must be positive, each colum
+represents 1 batch)}
 }}
 \examples{
 # A BASiCS_Chain object created by the BASiCS_MCMC function.

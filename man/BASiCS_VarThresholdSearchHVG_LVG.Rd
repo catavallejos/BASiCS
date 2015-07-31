@@ -6,11 +6,15 @@
 \alias{BASiCS_VarThresholdSearchLVG}
 \title{Detection method for highly and lowly variable genes using a grid of variance contribution thresholds}
 \usage{
-BASiCS_VarThresholdSearchHVG(object, VarThresholdsGrid, PrintProgress = FALSE)
+BASiCS_VarThresholdSearchHVG(Data, object, VarThresholdsGrid,
+  PrintProgress = FALSE)
 
-BASiCS_VarThresholdSearchLVG(object, VarThresholdsGrid, PrintProgress = FALSE)
+BASiCS_VarThresholdSearchLVG(Data, object, VarThresholdsGrid,
+  PrintProgress = FALSE)
 }
 \arguments{
+\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
+
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
 \item{VarThresholdsGrid}{Grid of values for the variance contribution threshold (they must be contained in (0,1))}

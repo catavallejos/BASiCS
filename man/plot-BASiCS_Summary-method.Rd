@@ -7,8 +7,8 @@
 \title{'plot' method for BASiCS_Summary objects}
 \usage{
 \S4method{plot}{BASiCS_Summary}(x, Param = "mu", Param2 = NULL,
-  Genes = NULL, Cells = NULL, xlab = "", ylab = "", xlim = "",
-  ylim = "", pch = 16, col = "blue", bty = "n", ...)
+  Genes = NULL, Cells = NULL, Batches = NULL, xlab = "", ylab = "",
+  xlim = "", ylim = "", pch = 16, col = "blue", bty = "n", ...)
 }
 \arguments{
 \item{x}{A \code{BASiCS_Summary} object.}
@@ -20,6 +20,8 @@
 \item{Genes}{Specifies which genes are requested. Required only if \code{Param = "mu"} or \code{"delta"}}
 
 \item{Cells}{Specifies which cells are requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}}
+
+\item{Batches}{Specifies which batches are requested. Required only if \code{Param = "theta"}}
 
 \item{xlab}{As in \code{\link[graphics]{par}}.}
 

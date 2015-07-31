@@ -23,7 +23,7 @@ density interval and third column contains the upper limits of high posterior de
 
 \item{\code{nu}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu[j]}}
 
-\item{\code{theta}}{Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)}
+\item{\code{theta}}{Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (each row represents one batch)}
 }}
 \examples{
 # A BASiCS_Summary object created by the Summary method.

@@ -5,7 +5,7 @@
 \alias{DenoisedRates}
 \title{Calculates normalised and denoised expression rates}
 \usage{
-BASiCS_DenoisedRates(Data, Chain, PrintProgress = F)
+BASiCS_DenoisedRates(Data, Chain, PrintProgress = F, Propensities = T)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
@@ -13,6 +13,8 @@ BASiCS_DenoisedRates(Data, Chain, PrintProgress = F)
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
 \item{PrintProgress}{If \code{T}, partial progress information is printed in the console.}
+
+\item{Propensities}{If \code{T}, returns underlying expression propensitites \eqn{\rho[ij]}. Otherwise, denoised rates \eqn{\mu[i] \rho[ij]} are returned.}
 }
 \value{
 A matrix of normalised and denoised expression counts.

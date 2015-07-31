@@ -10,6 +10,7 @@
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
 #' @slot Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
 #' @slot SpikeInput Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes (amount per cell). 
+#' @slot BatchInfo Vector of lenght \code{n} containing batch indicators. 
 #' 
 #' @examples
 #'
@@ -23,6 +24,7 @@
 #' dim(counts(Data, type="technical"))
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data)
+#' displayBatchInfo(Data)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
@@ -33,7 +35,8 @@ setClass("BASiCS_Data",
          representation = representation(
            Counts = "matrix",
            Tech = "vector",
-           SpikeInput = "vector"),
+           SpikeInput = "vector",
+           BatchInfo = "vector"),
          validity = function(object){
            errors <- character()
            
@@ -65,9 +68,12 @@ setClass("BASiCS_Data",
            
            if(sum(apply(object@Counts,1,sum) == 0) > 0) 
              errors <- c(errors, "Some genes have zero counts across all cells. Please remove them before creating the BASiCS_Data object.")
-
+           
            if(sum(apply(object@Counts,1,sum) > 0) == 1) 
              errors <- c(errors, "Some genes have non-zero counts only in 1 cell. Please remove them before creating the BASiCS_Data object.")
+           
+           if(length(object@BatchInfo) != n) 
+             errors <- c(errors, "BatchInfo slot is not compatible with the number of cells contained in Counts slot.")
            
            if (length(errors) == 0) TRUE else errors
          }
@@ -91,7 +97,8 @@ setClass("BASiCS_Data",
 #' (matrix with \code{n} columns, all elements must be positive numbers)
 #' @slot nu MCMC chain for cell-specific random effects \eqn{\nu[j]}
 #' (matrix with \code{n} columns, all elements must be positive numbers)
-#' @slot theta MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)
+#' @slot theta MCMC chain for technical variability hyper-parameter(s) \eqn{\theta} (matrix, all elements must be positive, each colum 
+#' represents 1 batch)
 #'   
 #' @examples
 #' 
@@ -109,7 +116,7 @@ setClass("BASiCS_Chain",
            phi = "matrix",
            s = "matrix",
            nu = "matrix",
-           theta = "vector"),
+           theta = "matrix"),
          validity = function(object){
            errors <- character()
            
@@ -120,18 +127,18 @@ setClass("BASiCS_Chain",
            N = nrow(object@mu)
            n = ncol(object@phi)
            if(nrow(object@delta) != N |
-              nrow(object@phi) != N | nrow(object@s) != N |
-              nrow(object@nu) != N | length(object@theta) != N |
-              ncol(object@mu) <= ncol(object@delta) |
-              ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}
+                nrow(object@phi) != N | nrow(object@s) != N |
+                nrow(object@nu) != N | nrow(object@theta) != N |
+                ncol(object@mu) <= ncol(object@delta) |
+                ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}
            
            if(sum(!is.finite(object@mu)) + sum(!is.finite(object@delta)) +
-              sum(!is.finite(object@phi)) + sum(!is.finite(object@s)) +
-              sum(!is.finite(object@nu)) + sum(!is.finite(object@theta))) {errors <-c(errors,"One or more of the slots contains NAs or Infinite values")}
-                    
+                sum(!is.finite(object@phi)) + sum(!is.finite(object@s)) +
+                sum(!is.finite(object@nu)) + sum(!is.finite(object@theta))) {errors <-c(errors,"One or more of the slots contains NAs or Infinite values")}
+           
            if (length(errors) == 0) TRUE else errors
          }
-         )
+)
 
 
 #' @name BASiCS_Summary-class
@@ -144,7 +151,7 @@ setClass("BASiCS_Chain",
 #' @slot phi Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific mRNA content normalising constants \eqn{\phi[j]}
 #' @slot s Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
 #' @slot nu Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu[j]}
-#' @slot theta Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)
+#' @slot theta Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (each row represents one batch)
 #' 
 #' @examples
 #' 
@@ -165,9 +172,9 @@ setClass("BASiCS_Summary",
            nu = "matrix",
            theta = "matrix"),
          validity = function(object){
-            if(sum(!is.finite(object@mu))>0 | sum(!is.finite(object@delta))>0 | 
-              sum(!is.finite(object@phi))>0 | sum(!is.finite(object@s))>0 |
-              sum(!is.finite(object@nu))>0 | sum(!is.finite(object@theta))>0) stop("Invalid slots") 
-            else {TRUE} 
+           if(sum(!is.finite(object@mu))>0 | sum(!is.finite(object@delta))>0 | 
+                sum(!is.finite(object@phi))>0 | sum(!is.finite(object@s))>0 |
+                sum(!is.finite(object@nu))>0 | sum(!is.finite(object@theta))>0) stop("Invalid slots") 
+           else {TRUE} 
          }
 )

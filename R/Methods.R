@@ -3,6 +3,7 @@
 ##########################################################################
 setGeneric("displaySpikeInput", function(object, ...){})
 setGeneric("displayTechIndicator", function(object, ...){})
+setGeneric("displayBatchInfo", function(object, ...){})
 setGeneric("displayChainBASiCS", function(object, ...){})
 setGeneric("displaySummaryBASiCS", function(object, ...){})
 
@@ -32,6 +33,8 @@ setGeneric("displaySummaryBASiCS", function(object, ...){})
 #' \item{\code{displayTechIndicator}}{Returns \code{Tech} slot of \code{object}.}
 #' 
 #' \item{\code{displaySpikeInput}}{Returns \code{SpikeInput} slot of \code{object}.}
+#' 
+#' \item{\code{displayBatchInfo}}{Returns \code{BatchInfo} slot of \code{object}.}
 #' }
 #' 
 #' @examples
@@ -43,6 +46,7 @@ setGeneric("displaySummaryBASiCS", function(object, ...){})
 #' dim(counts(Data, type="technical"))
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data)
+#' displayBatchInfo(Data)
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
 #'  
@@ -57,9 +61,12 @@ setMethod("show",
             q = nrow(object@Counts)
             n = ncol(object@Counts)
             q.bio = nrow(object@Counts) - length(object@SpikeInput)
+            nBatch = length(unique(object@BatchInfo))
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-            cat(" Elements (slots): Counts, Tech and SpikeInput.\n")
+            cat(" Elements (slots): Counts, Tech, SpikeInput and BatchInfo.\n")
+            if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
+            else {cat(paste0(" The data contains ",nBatch," batches.\n"))}
           })
 
 #' @name BASiCS_Data-methods
@@ -82,7 +89,7 @@ setMethod("counts",
 setMethod("displaySpikeInput",
           signature = "BASiCS_Data",
           definition = function(object){
-                  return(object@SpikeInput)
+            return(object@SpikeInput)
           })
 
 #' @name BASiCS_Data-methods
@@ -92,6 +99,15 @@ setMethod("displayTechIndicator",
           signature = "BASiCS_Data",
           definition = function(object){
             return(object@Tech)
+          })
+
+#' @name BASiCS_Data-methods
+#' @aliases displayBatchInfo displayBatchInfo,BASiCS_Data-method
+#' @rdname BASiCS_Data-methods
+setMethod("displayBatchInfo",
+          signature = "BASiCS_Data",
+          definition = function(object){
+            return(object@BatchInfo)
           })
 
 ##########################################################################
@@ -126,9 +142,14 @@ setMethod("show",
             q = ncol(object@mu)
             q.bio = ncol(object@delta)
             n = ncol(object@phi)
+            nBatch = ncol(object@theta)
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" ", N," MCMC samples.\n", sep = "")
-            cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+            if(nBatch > 1)
+            {
+              cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (",nBatch," batches). \n", sep="")
+            }
+            else{cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (1 batch). \n", sep="")}
             cat(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
           })
 
@@ -169,7 +190,7 @@ setMethod("Summary",
             Phi = apply(x@phi,2,median)
             S = apply(x@s,2,median)
             Nu = apply(x@nu,2,median)
-            Theta = median(x@theta)
+            Theta = apply(x@theta,2,median)
             
             HPDMu = coda::HPDinterval(coda::mcmc(x@mu), prob=prob)
             HPDDelta = coda::HPDinterval(coda::mcmc(x@delta), prob=prob)
@@ -200,6 +221,7 @@ setMethod("Summary",
 #' @param Param Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}
 #' @param Gene Specifies which gene is requested. Required only if \code{Param = "mu"} or \code{"delta"} 
 #' @param Cell Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}
+#' @param Batch Specifies which batch is requested. Required only if \code{Param = "theta"}
 #' @param ylab As in \code{\link[graphics]{par}}. 
 #' @param xlab As in \code{\link[graphics]{par}}. 
 #' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
@@ -218,34 +240,29 @@ setMethod("plot",
                                 Param = "mu",
                                 Gene = NULL,
                                 Cell = NULL, 
+                                Batch = 1,
                                 ylab = "",
                                 xlab = "",
                                 ...
-                                ){
+          ){
             
             if(!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) stop("'Param' argument is invalid")
             if(Param %in% c("mu", "delta") & is.null(Gene))  stop("'Gene' value is required")
             if(Param %in% c("phi", "s", "nu") & is.null(Cell))  stop("'Cell' value is required")
+            if(Param %in% c("theta") & is.null(Batch))  stop("'Batch' value is required")
             
             xlab = ifelse(xlab == "", "Iteration", xlab)
             
-            if(Param == "theta") 
-            {
-                ylab = ifelse(ylab == "", expression(theta), ylab)
-                plot(x@theta, type="l", ylab = ylab, xlab = xlab, ...)
-            }
-            else
-            {
-              if(Param == "mu") {object = x@mu; Column = Gene; if(ylab == "") ylab = bquote(mu[.(Column)])}
-              if(Param == "delta") {object = x@delta; Column = Gene; if(ylab == "") ylab = bquote(delta[.(Column)])}
-              if(Param == "phi") {object = x@phi; Column = Cell; if(ylab == "") ylab = bquote(phi[.(Column)])}
-              if(Param == "s") {object = x@s; Column = Cell; ylab = if(ylab == "") ylab = bquote(s[.(Column)])}
-              if(Param == "nu") {object = x@nu; Column = Cell; ylab = if(ylab == "") ylab = bquote(nu[.(Column)])} 
-                
-              plot(object[,Column], type="l", xlab = xlab, ylab = ylab, ...)
-            }
+            if(Param == "mu") {object = x@mu; Column = Gene; if(ylab == "") ylab = bquote(mu[.(Column)])}
+            if(Param == "delta") {object = x@delta; Column = Gene; if(ylab == "") ylab = bquote(delta[.(Column)])}
+            if(Param == "phi") {object = x@phi; Column = Cell; if(ylab == "") ylab = bquote(phi[.(Column)])}
+            if(Param == "s") {object = x@s; Column = Cell; ylab = if(ylab == "") ylab = bquote(s[.(Column)])}
+            if(Param == "nu") {object = x@nu; Column = Cell; ylab = if(ylab == "") ylab = bquote(nu[.(Column)])} 
+            if(Param == "theta") {object = x@theta; Column = Batch; ylab = if(ylab == "") ylab = bquote(theta[.(Column)])} 
+            
+            plot(object[,Column], type="l", xlab = xlab, ylab = ylab, ...)
           })
- 
+
 
 #' @name displayChainBASiCS-BASiCS_Chain-method
 #' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_Chain-method
@@ -319,9 +336,14 @@ setMethod("show",
             q = nrow(object@mu)
             q.bio = nrow(object@delta)
             n = nrow(object@phi)
+            nBatch = nrow(object@theta)
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" Contains posterior medians and limits of HPD 95% interval for BASiCS parameters.\n")
-            cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+            if(nBatch > 1)
+            {
+              cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (",nBatch," batches). \n", sep="")
+            }
+            else{cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (1 batch). \n", sep="")}
             cat(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
           })
 
@@ -339,6 +361,7 @@ setMethod("show",
 #' @param Param2 Name of the second slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu} (combinations between gene-specific and cell-specific parameters are not admitted)
 #' @param Genes Specifies which genes are requested. Required only if \code{Param = "mu"} or \code{"delta"} 
 #' @param Cells Specifies which cells are requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}
+#' @param Batches Specifies which batches are requested. Required only if \code{Param = "theta"}
 #' @param xlab As in \code{\link[graphics]{par}}. 
 #' @param ylab As in \code{\link[graphics]{par}}.
 #' @param xlim As in \code{\link[graphics]{par}}.  
@@ -363,6 +386,7 @@ setMethod("plot",
                                 Param2 = NULL,
                                 Genes = NULL,
                                 Cells = NULL, 
+                                Batches = NULL,
                                 xlab = "",
                                 ylab = "",
                                 xlim = "",
@@ -378,39 +402,30 @@ setMethod("plot",
             q = nrow(x@mu)
             q.bio = nrow(x@delta)
             n = nrow(x@phi)
+            nBatch = nrow(x@theta)
             
             if(is.null(Genes)) {Genes = 1:q.bio}
             if(is.null(Cells)) {Cells = 1:n}
+            if(is.null(Batches)) {Batches = 1:nBatch}
             
             if(is.null(Param2))
             {           
-              if(Param == "theta") 
-              {              
-                ylab = ifelse(ylab == "", expression(theta), ylab)
-                if(ylim == "") {ylim = c(x@theta[2],x@theta[3])}
-             
-                plot(1, x@theta[1], xlab = xlab, ylab = ylab, xlim = c(0,2), ylim = ylim, pch = pch, col = col, bty = bty, ...)
-                segments(x0 = 1, y0 = x@theta[2], y1 = x@theta[3], col = col, ...)
-                segments(x0 = 0.9, y0 = x@theta[2], x1 = 1.1, col = col, ...)
-                segments(x0 = 0.9, y0 = x@theta[3], x1 = 1.1, col = col, ...)
-              }           
-              else
+              if(Param == "mu") {object = x@mu; Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = "Gene"}
+              if(Param == "delta") {object = x@delta; Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = "Gene"}
+              if(Param == "phi") {object = x@phi; Columns = Cells; if(ylab == "") ylab = expression(phi[j]); if(xlab == "") xlab = "Cell"}
+              if(Param == "s") {object = x@s; Columns = Cells; ylab = if(ylab == "") ylab = expression(s[j]); if(xlab == "") xlab = "Cell"}
+              if(Param == "nu") {object = x@nu; Columns = Cells; ylab = if(ylab == "") ylab = expression(nu[j]); if(xlab == "") xlab = "Cell"} 
+              if(Param == "theta") {object = x@theta; Columns = Batches; ylab = if(ylab == "") ylab = expression(theta[b]); if(xlab == "") xlab = "Batch"}
+              
+              if(ylim == "") {ylim = c(min(object[Columns,2]),max(object[Columns,3]))}
+              
+              plot(Columns, object[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)
+              for(Column in Columns) 
               {
-                if(Param == "mu") {object = x@mu; Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = "Gene"}
-                if(Param == "delta") {object = x@delta; Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = "Gene"}
-                if(Param == "phi") {object = x@phi; Columns = Cells; if(ylab == "") ylab = expression(phi[j]); if(xlab == "") xlab = "Cell"}
-                if(Param == "s") {object = x@s; Columns = Cells; ylab = if(ylab == "") ylab = expression(s[j]); if(xlab == "") xlab = "Cell"}
-                if(Param == "nu") {object = x@nu; Columns = Cells; ylab = if(ylab == "") ylab = expression(nu[j]); if(xlab == "") xlab = "Cell"} 
-              
-                if(ylim == "") {ylim = c(min(object[Columns,2]),max(object[Columns,3]))}
-              
-                plot(Columns, object[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)
-                for(Column in Columns) 
-                {
-                  segments(x0 = Column, y0 = object[Column,2], y1 = object[Column,3], col = col, ...)
-                  segments(x0 = Column-2/length(Columns), y0 = object[Column,2], x1 = Column+2/length(Columns), col = col, ...)
-                  segments(x0 = Column-2/length(Columns), y0 = object[Column,3], x1 = Column+2/length(Columns), col = col, ...)
-                }
+                BarLength = ifelse(length(Columns) <=10, 0.1, 2/length(Columns))
+                segments(x0 = Column, y0 = object[Column,2], y1 = object[Column,3], col = col, ...)
+                segments(x0 = Column - BarLength, y0 = object[Column,2], x1 = Column + BarLength, col = col, ...)
+                segments(x0 = Column - BarLength, y0 = object[Column,3], x1 = Column + BarLength, col = col, ...)
               }
             }
             
@@ -483,7 +498,7 @@ setMethod("plot",
               
               if(ValidCombination == F) {stop("Invalid combination for Param and Param2 \n - 
                                               Combinations between gene-specific and cell-specific parameters are not admitted")}
-            }
+              }
             })
 
 

@@ -106,7 +106,12 @@ Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
 Tech = c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
 SpikeInput = rgamma(10,1,1)
+
+# No batch effect
 DataExample = newBASiCS_Data(Counts, Tech, SpikeInput)
+
+# With batch effect
+DataExample = newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo = rep(c(1,2), each = 5)) 
 ```
 
 Some datasets require filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering 
@@ -121,7 +126,8 @@ FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, Filter$SpikeInput)
 For illustration purposes, the BASiCS package includes a built-in simulated dataset:
 
 ```{r ExampleData}
-Data = makeExampleBASiCS_Data()
+Data = makeExampleBASiCS_Data(WithBatch = FALSE)
+# Use WithBatch = TRUE for an example with batch effects
 ```
 
 Once a `BASiCS_Data` object has been created, we can access its elements using the functions `counts`, `displayTechIndicator` or `displaySpikeInput`. For example: 
@@ -202,7 +208,7 @@ dim(displayChainBASiCS(MCMC_Output, Param = "delta"))
 dim(displayChainBASiCS(MCMC_Output, Param = "phi"))
 dim(displayChainBASiCS(MCMC_Output, Param = "s"))
 dim(displayChainBASiCS(MCMC_Output, Param = "nu"))
-length(displayChainBASiCS(MCMC_Output, Param = "theta"))
+length(displayChainBASiCS(MCMC_Output, Param = "theta")) # use 'dim' instead of 'length' if more than 1 batch is being analysed
 ```
 
 To assess convergence of the chain, the convergence diagnostics provided by the package `coda` can be used. Additionally, a visual inspection is provided by traceplots, for example:
@@ -213,7 +219,7 @@ plot(MCMC_Output, Param = "delta", Gene = 1)
 plot(MCMC_Output, Param = "phi", Cell = 1)
 plot(MCMC_Output, Param = "s", Cell= 1)
 plot(MCMC_Output, Param = "nu", Cell = 1)
-plot(MCMC_Output, Param = "theta")
+plot(MCMC_Output, Param = "theta", Batch = 1)
 ```
 
 ## Summarizing the model fit
@@ -272,7 +278,7 @@ where $I_i = 1$ if $1 \leq i \leq q_0$ and $I_{i}=0$ otherwise. As $\mbox{E}(X_{
 
 The following code return the fraction of total variability related to each of these three components. This produces a natural ranking of the genes in terms of biological cell-to-cell variance contributions. 
 ```{r VarDecomp, fig.width = 5, fig.height=4}
-VarDecomp = BASiCS_VarianceDecomp(MCMC_Output)
+VarDecomp = BASiCS_VarianceDecomp(Data, MCMC_Output)
 head(VarDecomp)
 ```
 
@@ -295,32 +301,32 @@ for a given variance contribution threshold $\gamma_{_L}$ and an evidence thresh
 The functions `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can be used to detect HVG and LVG for given variance contribution thresholds $\gamma_{_H}$ and $\gamma_{_L}$. As a default option, BASiCS searches optimal evidence thresholds $\alpha_{_H}$ and $\alpha_{_L}$ such that the *expected false discovery rate* (EFDR) and *expected false negative rate* (EFNR) coincide. This optimization is not always possible (specially for highly heterogeneous datasets, containing distinct sub-populations of cells). In those cases, `BASiCS_DetectHVG` and `BASiCS_DetectLVG` choose the evidence thresholds $\alpha_{_H}$ and $\alpha_{_L}$ such that the difference between EFDR and EFNR is minimised. For example, if $\gamma_{_H}=0.90$ and $\gamma_{_L}=0.20$:
 
 ```{r DetectionDefault, fig.width = 5, fig.height=4}
-DetectHVG <- BASiCS_DetectHVG(MCMC_Output, VarThreshold = 0.70, Plot = TRUE)
-DetectLVG <- BASiCS_DetectLVG(MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
+DetectHVG <- BASiCS_DetectHVG(Data, MCMC_Output, VarThreshold = 0.70, Plot = TRUE, GeneNames = paste("GeneName", 1:100))
+DetectLVG <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
 ```
 
 The user can also specify specific evidence thresholds $\alpha_{_H}$ and $\alpha_{_L}$. 
 
 ```{r DetectionFix, fig.width = 5, fig.height=4}
-DetectHVGFixAlpha <- BASiCS_DetectHVG(MCMC_Output, VarThreshold = 0.7, Plot = T, EviThreshold = 0.8)
-DetectLVGFixAlpha <- BASiCS_DetectLVG(MCMC_Output, VarThreshold = 0.4, Plot = T, EviThreshold = 0.8)
+DetectHVGFixAlpha <- BASiCS_DetectHVG(Data, MCMC_Output, VarThreshold = 0.7, Plot = T, EviThreshold = 0.8)
+DetectLVGFixAlpha <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.4, Plot = T, EviThreshold = 0.8)
 ```
 
 Alternatively, if the user does not know a pre-defined variance contribution threshold, *optimal* values can be defined as those for which EFDR and EFNR coincide and are equal to a pre-specified level. The functions `BASiCS_VarThresholdSearchHVG` and `BASiCS_VarThresholdSearchLVG` search of optimal evidence thresholds using a grid of variance contribution thresholds. 
 
 ```{r DetectionGrid, fig.width = 5, fig.height=4}
-BASiCS_VarThresholdSearchHVG(MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
-BASiCS_VarThresholdSearchLVG(MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
+BASiCS_VarThresholdSearchHVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
+BASiCS_VarThresholdSearchLVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
 ```
 
 Finally, a graphical display for the detection of HVG and LVG is:
 
 ```{r DetectionPlots, fig.width = 5, fig.height=4}
 plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
-points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3], 
-       pch = 16, col = "red", cex = 1)
-points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3], 
-       pch = 16, col = "blue", cex = 1)
+#points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3], 
+#       pch = 16, col = "red", cex = 1)
+#points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3], 
+#       pch = 16, col = "blue", cex = 1)
 ```
 
 ## Normalisation and removal of technical variation
@@ -342,7 +348,7 @@ $$ \Lambda_{ij} = \hat{\mu_i} \hat{\rho}_{ij},  $$
 where $\hat{\mu_i}$ represents the posterior median of $\mu_j$ and $\hat{\rho}_{ij}$ is given by its posterior mean (Monte Carlo estimate based on the MCMC sample of all model parameters).
 
 ```{r DenoisedRates}
-DenoisedRates = BASiCS_DenoisedRates(Data = Data, Chain = MCMC_Output)
+DenoisedRates = BASiCS_DenoisedRates(Data = Data, Chain = MCMC_Output, Propensities = TRUE)
 ```
 
 ### Session information
