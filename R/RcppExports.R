@@ -5,3 +5,7 @@ HiddenBASiCS_MCMCcpp <- function(N, thin, burn, Counts, mu0, delta0, phi0, s0, n
     .Call('BASiCS_HiddenBASiCS_MCMCcpp', PACKAGE = 'BASiCS', N, thin, burn, Counts, mu0, delta0, phi0, s0, nu0, theta0, adelta, bdelta, p_Phi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress)
 }
 
+HiddenBASiCS_MCMCcppBatch <- function(N, thin, burn, Counts, BatchDesign, mu0, delta0, phi0, s0, nu0, theta0, adelta, bdelta, p_Phi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress) {
+    .Call('BASiCS_HiddenBASiCS_MCMCcppBatch', PACKAGE = 'BASiCS', N, thin, burn, Counts, BatchDesign, mu0, delta0, phi0, s0, nu0, theta0, adelta, bdelta, p_Phi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress)
+}
+

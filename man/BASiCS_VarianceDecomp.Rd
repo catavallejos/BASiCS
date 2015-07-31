@@ -4,23 +4,31 @@
 \alias{BASiCS_VarianceDecomp}
 \title{Decomposition of gene expression variability according to BASiCS}
 \usage{
-BASiCS_VarianceDecomp(object, GeneNames = NULL, OrderVariable = "BioVar")
+BASiCS_VarianceDecomp(Data, object, GeneNames = NULL,
+  OrderVariable = "BioVarGlobal", Plot = TRUE, ...)
 }
 \arguments{
+\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
+
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
 \item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
 
-\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "BioVar", "TechVar", "ShotNoise")}.}
+\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.}
+
+\item{Plot}{If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated}
+
+\item{...}{Other arguments to be passed to \code{\link[graphics]{barplot}}}
 }
 \value{
-A matrix with 4 columns
+A \code{\link[base]{data.frame}} whose first 4 columns correspond to
 \describe{
 \item{\code{GeneName}}{Gene name (as indicated by user)}
-\item{\code{BioVar}}{Percentage of variance explained by a biological cell-to-cell heterogeneity component}
-\item{\code{TechVar}}{Percentage of variance explained by the technical cell-to-cell heterogeneity component}
-\item{\code{ShotNoise}}{Percentage of variance explained by the shot noise component (baseline)}
+\item{\code{BioVarGlobal}}{Percentage of variance explained by a biological cell-to-cell heterogeneity component (overall across all cells)}
+\item{\code{TechVarGlobal}}{Percentage of variance explained by the technical cell-to-cell heterogeneity component (overall across all cells)}
+\item{\code{ShotNoiseGlobal}}{Percentage of variance explained by the shot noise component (baseline, overall across all cells)}
 }
+If more than 1 batch of cells are being analysed, the remaining columns contain the corresponding variance decomposition calculated within each batch.
 }
 \description{
 Decomposition of gene expression variability according to BASiCS

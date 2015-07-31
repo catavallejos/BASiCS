@@ -44,3 +44,7 @@ version 0.2.0: (2015-06-24)
 version 0.2.1: (2015-07-23)
 - Argument 'GeneNames' has been added to functions 'BASiCS_VarianceDecomp', 'BASiCS_DetectHVG', 'BASiCS_DetectLVG' so that users can specify gene labels or names that will be used for these functions's output. 
 
+version 0.3.0: (2015-07-31)
+- New slot BacthInfo in 'BASiCS_Data' class
+- Batch-speficic technical variability parameters are allowed
+- 'BASiCS_VarianceDecomp' modified to accommodate batch membership (including graphical output)

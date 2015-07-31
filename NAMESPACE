@@ -10,6 +10,7 @@ exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary")
 exportMethods(counts, 
               displayTechIndicator, 
               displaySpikeInput,
+              displayBatchInfo,
               Summary,
               plot,
               displayChainBASiCS,

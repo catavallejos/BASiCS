@@ -5,6 +5,8 @@
 \alias{BASiCS_Data-methods}
 \alias{counts}
 \alias{counts,BASiCS_Data-method}
+\alias{displayBatchInfo}
+\alias{displayBatchInfo,BASiCS_Data-method}
 \alias{displaySpikeInput}
 \alias{displaySpikeInput,BASiCS_Data-method}
 \alias{displayTechIndicator}
@@ -19,6 +21,8 @@
 \S4method{displaySpikeInput}{BASiCS_Data}(object)
 
 \S4method{displayTechIndicator}{BASiCS_Data}(object)
+
+\S4method{displayBatchInfo}{BASiCS_Data}(object)
 }
 \arguments{
 \item{object}{A \code{BASiCS_Data} object.}
@@ -37,6 +41,8 @@
 \item{\code{displayTechIndicator}}{Returns \code{Tech} slot of \code{object}.}
 
 \item{\code{displaySpikeInput}}{Returns \code{SpikeInput} slot of \code{object}.}
+
+\item{\code{displayBatchInfo}}{Returns \code{BatchInfo} slot of \code{object}.}
 }
 }
 \description{
@@ -50,6 +56,7 @@ dim(counts(Data, type="biological"))
 dim(counts(Data, type="technical"))
 displayTechIndicator(Data)
 displaySpikeInput(Data)
+displayBatchInfo(Data)
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
