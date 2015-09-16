@@ -5,7 +5,8 @@
 \alias{DenoisedRates}
 \title{Calculates normalised and denoised expression rates}
 \usage{
-BASiCS_DenoisedRates(Data, Chain, PrintProgress = F, Propensities = T)
+BASiCS_DenoisedRates(Data, Chain, PrintProgress = FALSE,
+  Propensities = FALSE)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}

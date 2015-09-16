@@ -288,6 +288,7 @@ arma::mat muUpdate(
   arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
   arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
   arma::vec const& sum_bycell_bio, /* Sum of expression counts by cell (biological genes only) */
+  double const& s2_mu,
   int const& q,
   int const& q_bio)
 {
@@ -306,7 +307,8 @@ arma::mat muUpdate(
     arma::mat num = UpdateAux_muTrick(exp(y-logmu), mu0(span(0, q_bio - 1)), delta, phi, nu );
     num /= UpdateAux_muTrick(arma::ones(q_bio), mu0(span(0, q_bio - 1)), delta, phi, nu );
     m %= log(num);   
-    arma::vec log_aux = (y - logmu) % sum_bycell_bio - sum(m, 1);   
+    arma::vec log_aux = (y - logmu) % sum_bycell_bio - sum(m, 1); 
+    log_aux -= (0.5/s2_mu) * (pow(y,2) - pow(logmu,2));
     arma::umat ind = log(u) < log_aux;
     ind = join_cols(ind, arma::uvec(q - q_bio, arma::fill::zeros));
     arma::vec aux = join_cols(exp(y), arma::vec(q - q_bio, arma::fill::zeros));
@@ -351,7 +353,7 @@ arma::mat UpdateAux_deltaTrick(
  */
 arma::mat deltaUpdate(
   arma::vec const& delta0, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-  arma::mat const& prop_var,  /* Current value of the proposal variances for $\delta=(\delta_1,...,\delta_{q_0})'$ */
+  arma::vec const& prop_var,  /* Current value of the proposal variances for $\delta=(\delta_1,...,\delta_{q_0})'$ */
   arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
   arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
   arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
@@ -662,6 +664,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   NumericVector s0, // Starting value of $s=(s_1,...,s_n)$'$ 
   NumericVector nu0, // Starting value of $\nu=(\nu_1,...,\nu_n)$'$   
   double theta0, // Starting value of $\theta$ 
+  double s2mu,
   double adelta, // Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
   double bdelta, // Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
   NumericVector p_Phi, // Dirichlet hyper-parameter for $\phi / n$ 
@@ -763,7 +766,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR    
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                     phiAux, nuAux.col(0), sumByCellBio_arma, q, qbio);     
+                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF S
@@ -867,7 +870,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   Rcpp::Rcout << " " << std::endl;
   Rcpp::Rcout << "Minimum acceptance rate among delta[i]'s: " << min(deltaAccept/(N-burn)) << std::endl;
   Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << mean(deltaAccept/(N-burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << max(deltaAccept/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Maximum acceptance rate among delta[i]'s: " << max(deltaAccept/(N-burn)) << std::endl;
   Rcpp::Rcout << " " << std::endl;
   Rcpp::Rcout << "Acceptance rate for phi (joint): " << phiAccept/(N-burn) << std::endl;
   Rcpp::Rcout << " " << std::endl;
@@ -1075,6 +1078,7 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
   NumericVector s0, // Starting value of $s=(s_1,...,s_n)$'$ 
   NumericVector nu0, // Starting value of $\nu=(\nu_1,...,\nu_n)$'$   
   double theta0, // Starting value of $\theta$ 
+  double s2mu, 
   double adelta, // Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
   double bdelta, // Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
   NumericVector p_Phi, // Dirichlet hyper-parameter for $\phi / n$ 
@@ -1184,7 +1188,7 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR    
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                     phiAux, nuAux.col(0), sumByCellBio_arma, q, qbio);     
+                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF S

@@ -19,6 +19,9 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 
 \item{\code{SpikeInput}}{Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes (amount per cell).}
 
+\item{\code{GeneNames}}{Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)},
+with numbering order as in the input dataset.}
+
 \item{\code{BatchInfo}}{Vector of lenght \code{n} containing batch indicators.}
 }}
 \examples{

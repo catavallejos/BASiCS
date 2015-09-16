@@ -4,21 +4,21 @@
 \alias{BASiCS_VarianceDecomp}
 \title{Decomposition of gene expression variability according to BASiCS}
 \usage{
-BASiCS_VarianceDecomp(Data, object, GeneNames = NULL,
-  OrderVariable = "BioVarGlobal", Plot = TRUE, ...)
+BASiCS_VarianceDecomp(Data, object, OrderVariable = "BioVarGlobal",
+  Plot = TRUE, ...)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
 
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
-\item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
-
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.}
 
 \item{Plot}{If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated}
 
 \item{...}{Other arguments to be passed to \code{\link[graphics]{barplot}}}
+
+\item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
 }
 \value{
 A \code{\link[base]{data.frame}} whose first 4 columns correspond to

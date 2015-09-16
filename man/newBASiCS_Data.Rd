@@ -4,15 +4,16 @@
 \alias{newBASiCS_Data}
 \title{Creates a BASiCS_Data object from a matrix of expression counts and experimental information about spike-in genes}
 \usage{
-newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo = NULL)
+newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 }
 \arguments{
-\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
-First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.}
+\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements contain the expression counts to be analyses
+(including biological and technical spike-in genes). Gene names must be stored as `rownames(Counts)`.}
 
-\item{Tech}{Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.}
+\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.}
 
-\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.}
+\item{SpikeInfo}{\code{data.frame} whose first and second columns contain the gene names assigned to the spike-in genes
+(they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.}
 
 \item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information.}
 }
@@ -26,10 +27,11 @@ a matrix of expression counts and experimental information about spike-in genes.
 \examples{
 set.seed(1)
 Counts = matrix(rpois(10*5, 1), ncol = 5)
-Tech = c(rep(FALSE,7),rep(TRUE,3))
+rownames(Counts) <- paste0("Gene",1:10)
+Tech = c(rep(FALSE,7), rep(TRUE,3))
 set.seed(2)
-SpikeInput = rgamma(3,1,1)
-Data = newBASiCS_Data(Counts, Tech, SpikeInput)
+SpikeInfo = data.frame(paste0("Gene",8:10), rgamma(3,1,1))
+Data = newBASiCS_Data(Counts, Tech, SpikeInfo)
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}

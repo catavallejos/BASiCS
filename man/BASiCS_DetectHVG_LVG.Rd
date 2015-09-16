@@ -7,10 +7,10 @@
 \title{Detection method for highly and lowly variable genes}
 \usage{
 BASiCS_DetectHVG(Data, object, VarThreshold, EviThreshold = NULL,
-  OrderVariable = "Prob", GeneNames = NULL, Plot = FALSE, ...)
+  OrderVariable = "Prob", Plot = FALSE, ...)
 
 BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
-  OrderVariable = "Prob", GeneNames = NULL, Plot = FALSE, ...)
+  OrderVariable = "Prob", Plot = FALSE, ...)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
@@ -23,18 +23,17 @@ BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
 
-\item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
-
 \item{Plot}{If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
+
+\item{GeneNames}{Vector of characters containing gene names (must be in the same order as in the Counts matrix).}
 }
 \value{
 \code{BASiCS_DetectHVG} returns a list of 4 elements:
 \describe{
 \item{\code{Table}}{Matrix whose columns contain}
    \describe{
-   \item{\code{GeneNames}}{Gene names (if names are provided by the user, otherwise returns 'Gene 1', 'Gene 2', etc.)}
    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }

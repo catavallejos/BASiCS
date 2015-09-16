@@ -10,6 +10,8 @@
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
 #' @slot Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
 #' @slot SpikeInput Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes (amount per cell). 
+#' @slot GeneNames Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)}, 
+#' with numbering order as in the input dataset. 
 #' @slot BatchInfo Vector of lenght \code{n} containing batch indicators. 
 #' 
 #' @examples
@@ -35,7 +37,8 @@ setClass("BASiCS_Data",
          representation = representation(
            Counts = "matrix",
            Tech = "vector",
-           SpikeInput = "vector",
+           SpikeInput = "vector", 
+           GeneNames = "vector", 
            BatchInfo = "vector"),
          validity = function(object){
            errors <- character()
@@ -53,9 +56,12 @@ setClass("BASiCS_Data",
            q = nrow(object@Counts)
            q.bio = q - length(object@SpikeInput)
            n = ncol(object@Counts)
-           
+          
            if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
              errors <- c(errors, "Argument's dimensions are not compatible.")
+           
+           if(length(object@GeneNames) != q)
+             errors <- c(errors, "Incorrect length of the vector stored in the GeneNames slot.")
            
            if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
              errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
@@ -129,7 +135,7 @@ setClass("BASiCS_Chain",
            if(nrow(object@delta) != N |
                 nrow(object@phi) != N | nrow(object@s) != N |
                 nrow(object@nu) != N | nrow(object@theta) != N |
-                ncol(object@mu) <= ncol(object@delta) |
+                ncol(object@mu) != ncol(object@delta) |
                 ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}
            
            if(sum(!is.finite(object@mu)) + sum(!is.finite(object@delta)) +

@@ -7,6 +7,8 @@
 \alias{counts,BASiCS_Data-method}
 \alias{displayBatchInfo}
 \alias{displayBatchInfo,BASiCS_Data-method}
+\alias{displayGeneNames}
+\alias{displayGeneNames,BASiCS_Data-method}
 \alias{displaySpikeInput}
 \alias{displaySpikeInput,BASiCS_Data-method}
 \alias{displayTechIndicator}
@@ -21,6 +23,8 @@
 \S4method{displaySpikeInput}{BASiCS_Data}(object)
 
 \S4method{displayTechIndicator}{BASiCS_Data}(object)
+
+\S4method{displayGeneNames}{BASiCS_Data}(object)
 
 \S4method{displayBatchInfo}{BASiCS_Data}(object)
 }
@@ -42,6 +46,8 @@
 
 \item{\code{displaySpikeInput}}{Returns \code{SpikeInput} slot of \code{object}.}
 
+\item{\code{displayGeneNames}}{Returns \code{GeneNames} slot of \code{object}.}
+
 \item{\code{displayBatchInfo}}{Returns \code{BatchInfo} slot of \code{object}.}
 }
 }
@@ -56,6 +62,7 @@ dim(counts(Data, type="biological"))
 dim(counts(Data, type="technical"))
 displayTechIndicator(Data)
 displaySpikeInput(Data)
+displayGeneNames(Data)
 displayBatchInfo(Data)
 }
 \author{
