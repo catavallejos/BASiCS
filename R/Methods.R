@@ -3,6 +3,7 @@
 ##########################################################################
 setGeneric("displaySpikeInput", function(object, ...){})
 setGeneric("displayTechIndicator", function(object, ...){})
+setGeneric("displayGeneNames", function(object, ...){})
 setGeneric("displayBatchInfo", function(object, ...){})
 setGeneric("displayChainBASiCS", function(object, ...){})
 setGeneric("displaySummaryBASiCS", function(object, ...){})
@@ -34,6 +35,8 @@ setGeneric("displaySummaryBASiCS", function(object, ...){})
 #' 
 #' \item{\code{displaySpikeInput}}{Returns \code{SpikeInput} slot of \code{object}.}
 #' 
+#' \item{\code{displayGeneNames}}{Returns \code{GeneNames} slot of \code{object}.}
+#' 
 #' \item{\code{displayBatchInfo}}{Returns \code{BatchInfo} slot of \code{object}.}
 #' }
 #' 
@@ -46,6 +49,7 @@ setGeneric("displaySummaryBASiCS", function(object, ...){})
 #' dim(counts(Data, type="technical"))
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data)
+#' displayGeneNames(Data)
 #' displayBatchInfo(Data)
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
@@ -64,7 +68,7 @@ setMethod("show",
             nBatch = length(unique(object@BatchInfo))
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-            cat(" Elements (slots): Counts, Tech, SpikeInput and BatchInfo.\n")
+            cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
             if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
             else {cat(paste0(" The data contains ",nBatch," batches.\n"))}
           })
@@ -99,6 +103,15 @@ setMethod("displayTechIndicator",
           signature = "BASiCS_Data",
           definition = function(object){
             return(object@Tech)
+          })
+
+#' @name BASiCS_Data-methods
+#' @aliases displayGeneNames displayGeneNames,BASiCS_Data-method
+#' @rdname BASiCS_Data-methods
+setMethod("displayGeneNames",
+          signature = "BASiCS_Data",
+          definition = function(object){
+            return(object@GeneNames)
           })
 
 #' @name BASiCS_Data-methods

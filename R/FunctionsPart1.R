@@ -77,7 +77,10 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput,
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts. 
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
 #' @param Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
-#' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes. 
+#' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes 
+#' (in the same order as they appear in the \code{Counts} matrix)
+#' @param GeneNames Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)}, 
+#' with numbering order as in the input dataset. 
 #' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. 
 #' 
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
@@ -86,7 +89,7 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput,
 #' 
 #' set.seed(1)
 #' Counts = matrix(rpois(10*5, 1), ncol = 5)
-#' Tech = c(rep(FALSE,7),rep(TRUE,3))
+#' Tech = c(rep(FALSE,7), rep(TRUE,3))
 #' set.seed(2)
 #' SpikeInput = rgamma(3,1,1)
 #' Data = newBASiCS_Data(Counts, Tech, SpikeInput)
@@ -96,18 +99,20 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput,
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-newBASiCS_Data <- function(Counts, Tech, SpikeInput, BatchInfo = NULL)
+newBASiCS_Data <- function(Counts, Tech, SpikeInput, GeneNames = NULL, BatchInfo = NULL)
 {
+  if(is.null(GeneNames)) {GeneNames = paste("Gene", 1:nrow(Counts))}
   if(is.null(BatchInfo)) {BatchInfo = rep(1, times = ncol(Counts))}
-  Data <- new("BASiCS_Data", Counts = Counts, Tech = Tech, SpikeInput = SpikeInput, BatchInfo = BatchInfo)
+  Data <- new("BASiCS_Data", Counts = Counts, Tech = Tech, SpikeInput = SpikeInput, 
+                             GeneNames = GeneNames, BatchInfo = BatchInfo)
   show(Data)
   cat('\n')
   cat('NOTICE: BASiCS requires a pre-filtered dataset \n')
   cat('    - You must remove poor quality cells before creating the BASiCS data object \n')
   cat('    - We recommend to pre-filter very lowly expressed transcripts before creating the object. \n')
   cat('      Inclusion criteria may vary for each data. For example, remove transcripts \n')
-  cat('          - with very low total counts across of all samples \n')
-  cat('          - that are only expressed in few cells \n')
+  cat('          - with very low total counts across of all of the samples \n')
+  cat('          - that are only expressed in a few cells \n')
   cat('            (by default genes expressed in only 1 cell are not accepted) \n')
   cat('          - with very low total counts across the samples where the transcript is expressed \n')
   cat('\n')
@@ -315,7 +320,7 @@ HiddenBASiCS_MCMC_Start<-function(
   # Initialize mu using average 'normalised counts' across cells 
   # (correcting by empirical capture efficiency rates)
   # and true input values for spike-in genes
-  nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / s0 )
+  nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / phi0 )
   meansBio <- rowMeans( nCountsBio )
   mu0<-c(meansBio,Data@SpikeInput)
   
@@ -356,6 +361,8 @@ HiddenBASiCS_MCMC_Start<-function(
 #' \describe{
 #' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers. 
 #' \describe{
+#'   \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu[i]}. 
+#'   Default: \code{s2.mu = 1}.}
 #'   \item{\code{a.delta}}{Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}. 
 #'   Default: \code{a.delta = 1}.}
 #'   \item{\code{b.delta}}{Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
@@ -373,13 +380,14 @@ HiddenBASiCS_MCMC_Start<-function(
 #' }}
 #' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{ar = 0.44}}.
 #' 
-#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. Use \code{stopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
+#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
 #' 
-#' \item{\code{StoreChains}}{If \code{StoreChains = T}, MCMC chains of each parameter are stored in separate .txt files. (\code{RunName} argument used for file names). Default: \code{StoreChains = F}.} 
-#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = T}, trajectory of adaptive proposal variances (log scale) for each parameter are stored in separate .txt files. (\code{RunName} argument used for file names). Default: \code{StoreAdapt = F}.}
-#' \item{\code{StoreDir}}{Directory where MCMC chain will be stored (only required if \code{Store = T}). Default: \code{StoreDir = getwd()}.}
-#' \item{\code{RunName}}{Run-name to be used when storing chains and/or adaptive proposal variances in .txt files.} 
-#' \item{\code{PrintProgress}}{If \code{PrintProgress = T}, intermediate output is displayed in the console. }
+#' \item{\code{StoreChains}}{If \code{StoreChains = T}, the slots of the generated \code{BASiCS_Chain} object are stored in separate .txt files. Each row of the output file containing an interation (\code{RunName} argument used to index file names). Default: \code{StoreChains = F}.} 
+#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = T}, trajectory of adaptive proposal variances (in log-scale) for each parameter are stored in separate .txt files. Each row of the output file containing an interation (\code{RunName} argument used to index file names). Default: \code{StoreAdapt = F}.}
+#' \item{\code{StoreDir}}{Directory where output files are stored. Only required if \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
+#' \item{\code{RunName}}{String used to index `.txt` files storing chains and/or adaptive proposal variances.}
+#' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
+#' 
 #' }
 #' 
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}. 
@@ -469,7 +477,7 @@ BASiCS_MCMC <- function(
   
   args <- list(...)
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
-  else { PriorParam = list(a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
+  else { PriorParam = list(s2.mu = 1, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
   AR = ifelse("AR" %in% names(args),args$AR, 0.44)
   StopAdapt = ifelse("StopAdapt" %in% names(args),args$StopAdapt, Burn)
   StoreChains = ifelse("StoreChains" %in% names(args),args$StoreChains, F)
@@ -483,7 +491,8 @@ BASiCS_MCMC <- function(
   if(!(Thin%%1==0 & Thin>=2)) stop("Please use an integer value for Thin (Thin>=2).") 
   if(!(Burn%%Thin==0 & Burn<N & Burn>=1)) stop("Please use an integer value for Burn. It must also be lower than N and a multiple of thin (Burn>=1).")
   
-  if(!(PriorParam$a.delta>0  & length(PriorParam$a.delta) == 1 &
+  if(!(PriorParam$s2.mu>0  & length(PriorParam$s2.mu) == 1 &
+        PriorParam$a.delta>0  & length(PriorParam$a.delta) == 1 &
          PriorParam$b.delta>0  & length(PriorParam$b.delta) == 1 &
          all(PriorParam$p.phi>0) & length(PriorParam$p.phi) == n &
          PriorParam$a.s>0      & length(PriorParam$a.s) == 1 &
@@ -529,6 +538,7 @@ BASiCS_MCMC <- function(
       as.matrix(Data@Counts),
       BatchDesign,
       mu0, delta0, phi0, s0, nu0, theta0,
+      PriorParam$s2.mu,
       PriorParam$a.delta, PriorParam$b.delta,
       PriorParam$p.phi,
       PriorParam$a.s, PriorParam$b.s,
@@ -547,6 +557,7 @@ BASiCS_MCMC <- function(
       Burn,
       as.matrix(Data@Counts),
       mu0, delta0, phi0, s0, nu0, theta0,
+      PriorParam$s2.mu,
       PriorParam$a.delta, PriorParam$b.delta,
       PriorParam$p.phi,
       PriorParam$a.s, PriorParam$b.s,
@@ -781,7 +792,6 @@ HiddenEFNR<-function(
 #' @rdname BASiCS_VarianceDecomp
 BASiCS_VarianceDecomp <- function(Data,
                                   object, 
-                                  GeneNames = NULL,
                                   OrderVariable = "BioVarGlobal",
                                   Plot = TRUE,
                                   ...)
@@ -801,7 +811,7 @@ BASiCS_VarianceDecomp <- function(Data,
   ShotNoiseGlobal = 1-BioVarGlobal-TechVarGlobal
   
   Genes = 1:q.bio
-  if(is.null(GeneNames)) {GeneNames = paste("Gene", Genes)}
+  GeneNames = Data@GeneNames[!Data@Tech]
 
   if(nBatch > 1)
   {
@@ -849,8 +859,8 @@ BASiCS_VarianceDecomp <- function(Data,
     ylab = ifelse("ylab" %in% names(args),args$ylab, "% of variance")
     beside = ifelse("beside" %in% names(args),args$beside, FALSE)
     if("col" %in% names(args)) {col = args$col} else{col = c("lightblue", "mistyrose", "lightcyan")}
-    if("legend" %in% names(args)) {legend = args$legend} else{legend = c("Biological", "Technical", "Baseline")}
-    if("args.legend" %in% names(args)) {args.legend = args$args.legend} else{args.legend = list(x = "bottomright")}
+    if("legend" %in% names(args)) {legend = args$legend} else{legend = c("Biological", "Technical", "Shot noise")}
+    if("args.legend" %in% names(args)) {args.legend = args$args.legend} else{args.legend = list(x = "bottomright", bg = "white")}
     if("names.arg" %in% names(args)) {names.arg = args$names.arg} 
     else
     {
@@ -858,7 +868,7 @@ BASiCS_VarianceDecomp <- function(Data,
       else {names.arg = c("Overall")}
     }
     
-    outmat = matrix(apply(out[,-c(1:2)], 2, mean), nrow = 3, byrow = FALSE)
+    outmat = 100 * matrix(apply(out[,-c(1:2)], 2, mean), nrow = 3, byrow = FALSE)
     barplot(outmat, 
             beside = beside, main = main, ylab = ylab, 
             col = col, legend = legend,
@@ -985,7 +995,7 @@ BASiCS_DetectHVG <- function(Data,
     
   qbio = length(Sigma)
   Genes = 1:qbio
-  if(is.null(GeneNames)) {GeneNames = paste("Gene", Genes)}
+  GeneNames = Data@GeneNames[!Data@Tech]
   
   if(Plot)
   {    
@@ -1120,7 +1130,7 @@ BASiCS_DetectLVG <- function(Data,
   
   qbio = length(Sigma)
   Genes = 1:qbio
-  if(is.null(GeneNames)) {GeneNames = paste("Gene", Genes)}
+  GeneNames = Data@GeneNames[!Data@Tech]
   
   if(Plot)
   {    
@@ -1303,8 +1313,8 @@ BASiCS_VarThresholdSearchLVG=function(
 BASiCS_DenoisedRates=function(
   Data, 
   Chain,
-  PrintProgress = F,
-  Propensities = T)
+  PrintProgress = FALSE,
+  Propensities = FALSE)
 {
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.") 
   if(!is(Chain,"BASiCS_Chain")) stop("'Chain' is not a BASiCS_Chain class object.") 
@@ -1312,7 +1322,8 @@ BASiCS_DenoisedRates=function(
   N=dim(Chain@delta)[1]; q.bio=dim(Chain@delta)[2]; n=dim(Chain@phi)[2]
   
   print(paste("This calculation requires a loop across the",N, "MCMC iterations")); 
-  print("You might need to be patient ... "); cat("\n")
+  print("Please be patient ... "); cat("\n")
+  print("To see a progress report use PrintProgress = TRUE"); cat("\n")
   
   rho=matrix(0,ncol=n,nrow=q.bio)
   for(m in 1:N)

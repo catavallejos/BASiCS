@@ -48,3 +48,7 @@ version 0.3.0: (2015-07-31)
 - New slot BacthInfo in 'BASiCS_Data' class
 - Batch-speficic technical variability parameters are allowed
 - 'BASiCS_VarianceDecomp' modified to accommodate batch membership (including graphical output)
+
+version 0.3.1: (2015-09-16)
+- New slot GeneNames in 'BASiCS_Data' class
+- Minor changes to some functions' output to use the new GeneNames slot of 'BASiCS_Data' class
