@@ -16,4 +16,7 @@ RootDocument: vignettes/BASiCS.tex
 BuildType: Package
 PackageUseDevtools: Yes
 PackageInstallArgs: --no-multiarch --with-keep.source
+<<<<<<< HEAD
 PackageRoxygenize: rd
+=======
+>>>>>>> 41c69e3bb174e5cfd1622f0bb54b4f8a6e883f08

@@ -53,3 +53,4 @@ version 0.3.1: (2015-09-17)
 - New slot GeneNames in 'BASiCS_Data' class
 - Changes in the constructor `newBASiCS_Data` to allow easier construction of `BASiCS_Data` objects
 - Minor changes to some functions' output to use the new GeneNames slot of 'BASiCS_Data' class
+
