@@ -45,7 +45,7 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
 \item{\code{StoreDir}}{Directory where output files are stored. Only required if \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
 \item{\code{RunName}}{String used to index `.txt` files storing chains and/or adaptive proposal variances.}
 \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
-
+\item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \code{phi}.}
 }}
 }
 \value{

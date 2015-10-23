@@ -403,7 +403,7 @@ HiddenBASiCS_MCMC_Start<-function(
 #' \item{\code{StoreDir}}{Directory where output files are stored. Only required if \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
 #' \item{\code{RunName}}{String used to index `.txt` files storing chains and/or adaptive proposal variances.}
 #' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
-#' 
+#' \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \code{phi}.}
 #' }
 #' 
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}. 
@@ -528,6 +528,8 @@ BASiCS_MCMC <- function(
   sum.bygene.all<-apply(Data@Counts,2,sum)
   sum.bygene.bio<-apply(Data@Counts[1:q.bio,],2,sum)
   
+  ls.phi0 = ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
+  
   # GENERATING STARTING VALUES 
   Start=HiddenBASiCS_MCMC_Start(Data)
   # Starting values for MCMC chains
@@ -536,7 +538,7 @@ BASiCS_MCMC <- function(
   nu0=as.vector(Start$nu0); theta0=as.numeric(Start$theta0)
   # Starting values for adaptive proposal variances
   ls.mu0=as.vector(Start$ls.mu0); ls.delta0=as.vector(Start$ls.delta0)
-  ls.phi0=as.numeric(Start$ls.phi0) 
+#  ls.phi0=as.numeric(Start$ls.phi0) 
   ls.nu0=as.vector(Start$ls.nu0); ls.theta0=as.numeric(Start$ls.theta0)
   
   StoreAdaptNumber = as.numeric(StoreAdapt)
@@ -590,7 +592,7 @@ BASiCS_MCMC <- function(
   colnames(Chain$phi) = paste0("Cell",1:n)
   colnames(Chain$s) = paste0("Cell",1:n)
   colnames(Chain$nu) = paste0("Cell",1:n)
-  colnames(Chain$theta) = paste0("Bacth",nBatch)
+  colnames(Chain$theta) = paste0("Batch",1:nBatch)
   
   cat("--------------------------------------------------------------------"); cat("\n")
   cat("MCMC running time"); cat("\n")
@@ -631,9 +633,9 @@ BASiCS_MCMC <- function(
     colnames(Chain$ls.mu) = Data@GeneNames[!Data@Tech]
     colnames(Chain$ls.delta) = Data@GeneNames[!Data@Tech]
     colnames(Chain$ls.phi) = "AllCells"
-    colnames(Chain$s) = paste0("Cell",1:n)
-    colnames(Chain$nu) = paste0("Cell",1:n)
-    colnames(Chain$theta) = paste0("Bacth",nBatch)
+    colnames(Chain$ls.s) = paste0("Cell",1:n)
+    colnames(Chain$ls.nu) = paste0("Cell",1:n)
+    colnames(Chain$ls.theta) = paste0("Batch",1:nBatch)
     
     write.table(Chain$ls.mu,paste0("chain_ls.mu_",RunName,".txt"),col.names=T,row.names=F)
     write.table(Chain$ls.delta,paste0("chain_ls.delta_",RunName,".txt"),col.names=T,row.names=F)      

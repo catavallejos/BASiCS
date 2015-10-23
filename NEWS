@@ -54,3 +54,6 @@ version 0.3.1: (2015-09-17)
 - Changes in the constructor `newBASiCS_Data` to allow easier construction of `BASiCS_Data` objects
 - Minor changes to some functions' output to use the new GeneNames slot of 'BASiCS_Data' class
 
+version 0.3.2: (2015-10-23)
+- Minor changes to the output of `BASiCS_MCMC` function (colnames of the elements related to the parameter $\theta$)
+- Addition of extra optional parameter `ls.phi0` to `BASiCS_MCMC` function. This is helpful on situations where the default value led to slow mixing to the chains related to the normalising constants $\phi_j$'s. 
