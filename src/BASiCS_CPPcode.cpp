@@ -225,6 +225,74 @@ NumericVector Rgig(const int n, const double lambda, const double chi, const dou
   return(samps);
 }
 
+/* Random sample generator from a Generalized Inverse Gaussian distribution (modified version of rgig.c using Rcpp classes)*/
+double RgigDouble(const double lambda, const double chi, const double psi)
+{
+  double samps;
+  /* special case which is basically a gamma distribution */
+  if((chi < ZTOL) & (lambda > 0.0)) {
+    samps = R::rgamma(lambda, 2.0/psi);
+    return samps;
+  }
+
+  /* special cases which is basically an inverse gamma distribution */
+  if((psi < ZTOL) & (lambda < 0.0)) { 
+    samps = 1.0/R::rgamma(0.0-lambda, 2.0/chi);
+    return samps;
+  }
+
+  /* special case which is basically an inverse gaussian distribution */
+  if(lambda == -0.5) {
+    double alpha;
+    alpha = sqrt(chi/psi);
+    samps = rinvgauss(alpha, chi);
+    return samps;
+  }  
+
+  /*
+   * begin general purpose rgig code, which was basically 
+   * translated from the R function rgig in the ghyp package v_1.5.2
+   */
+
+  double alpha, beta, beta2, m, m1, lm1, lm12, upper, yM, yP, a, b, c, R1, R2, Y;
+  int need;
+
+  alpha = sqrt(chi/psi);
+  beta2 = psi*chi;
+  beta = sqrt(psi*chi);
+  lm1 = lambda - 1.0;
+  lm12 = lm1*lm1;
+  m = (lm1 + sqrt(lm12 + beta2))/beta;
+  m1 = m + 1.0/m;
+    
+  upper = m;
+  while (gig_y_gfn(upper, m, beta, lambda) <= 0) { upper *= 2.0; }
+
+  yM = zeroin_gig(0.0, m, gig_y_gfn, ZTOL, m, beta, lambda);
+  yP = zeroin_gig(m, upper, gig_y_gfn, ZTOL, m, beta, lambda);
+  
+  a = (yP - m) * pow(yP/m, 0.5 * lm1);
+  a *=  exp(-0.25 * beta * (yP + 1.0/yP - m1));
+  b = (yM - m) * pow(yM/m, 0.5 * lm1);
+  b *= exp(-0.25 * beta * (yM + 1/yM - m1));
+  c = -0.25 * beta * m1 + 0.5 * lm1 * log(m);
+
+    need = 1;
+    while (need) {
+      R1 = unif_rand();
+      R2 = unif_rand();
+
+      Y = m + a * R2/R1 + b * (1.0 - R2)/R1;
+      if (Y > 0.0) {
+    if (-log(R1) >= - 0.5 * lm1 * log(Y) + 0.25 * beta * (Y + 1.0/Y) + c) {
+      need = 0;
+	  }
+      }
+    }
+    samps = Y*alpha;
+  return(samps);
+}
+
 /* Auxiliary function that converts Rcpp::NumericVector elements into arma::vec elements */
 arma::vec as_arma(
   NumericVector& x) /* Vector to be converted into an arma::vec class */
@@ -264,19 +332,6 @@ double log_sum_exp_cpp(arma::vec const& x_arma)
   return log(sum(exp(x_arma - offset))) + offset; 
 }
 
-/* Auxiliary function required for some of the Metropolis-Hastings updates of mu */
-arma::mat UpdateAux_muTrick(
-  arma::vec const& aux1mu, /* Auxiliary variable (function of the current and proposed value of mu) */
-  arma::vec const& mu_bio, /* Current value of $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
-  arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-  arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-  arma::vec const& nu) /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-{
-  arma::mat x = ((phi % nu) * aux1mu.t()).t();
-  x.each_col() += 1 / (mu_bio % delta);
-  return x;
-}
-
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
  */
@@ -290,62 +345,59 @@ arma::mat muUpdate(
   arma::vec const& sum_bycell_bio, /* Sum of expression counts by cell (biological genes only) */
   double const& s2_mu,
   int const& q,
-  int const& q_bio)
+  int const& q_bio,
+  int const& n)
 {
     using arma::span;
 
     // CREATING VARIABLES WHERE TO STORE DRAWS
-    arma::vec logmu = log(mu0(span(0, q_bio - 1)));
+    arma::vec mu = arma::ones(q); mu(span(q_bio, q-1)) = mu0(span(q_bio, q-1));
+    arma::vec ind = arma::zeros(q);
 
     // PROPOSAL STEP    
-    arma::vec y = arma::randn(q_bio) % sqrt(prop_var(span(0,q_bio - 1))) + logmu;
+    arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var(span(0,q_bio - 1))) + log(mu0(span(0, q_bio - 1))));
     arma::vec u = arma::randu(q_bio);
     
     // ACCEPT/REJECT STEP
-    arma::mat m = Counts.rows(0, q_bio - 1);
-    m.each_col() += 1 / delta;
-    arma::mat num = UpdateAux_muTrick(exp(y-logmu), mu0(span(0, q_bio - 1)), delta, phi, nu );
-    num /= UpdateAux_muTrick(arma::ones(q_bio), mu0(span(0, q_bio - 1)), delta, phi, nu );
-    m %= log(num);   
-    arma::vec log_aux = (y - logmu) % sum_bycell_bio - sum(m, 1); 
-    log_aux -= (0.5/s2_mu) * (pow(y,2) - pow(logmu,2));
-    arma::umat ind = log(u) < log_aux;
-    ind = join_cols(ind, arma::uvec(q - q_bio, arma::fill::zeros));
-    arma::vec aux = join_cols(exp(y), arma::vec(q - q_bio, arma::fill::zeros));
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Print warning message
-    ind.elem(find_nonfinite(log_aux)).zeros();
-    if(size(find_nonfinite(log_aux),0)>0) 
+    arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio - 1)))) % sum_bycell_bio; 
+    
+    // Loop to replace matrix operations, through genes and cells
+    for (int i=0; i < q_bio; i++)
     {
-      Rcpp::Rcout << "Something went wrong when updating mu" << size(find_nonfinite(log_aux),0) << std::endl;
-      Rcpp::stop("Please consider additional filter of the input dataset.");
+      for (int j=0; j < n; j++) 
+      {
+        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
+                      log( ( phi(j)*nu(j)*y(i)+(1/delta(i)) ) / ( phi(j)*nu(j)*mu0(i)+(1/delta(i)) ));
+      }
     }
-    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
-    // DEBUG: Print warning message
-    ind.elem(find_nonfinite(aux)).zeros();
-    if(size(find_nonfinite(aux),0)>0) 
-    {
-      Rcpp::Rcout << "Something went wrong when updating mu" << size(find_nonfinite(aux),0) << std::endl;
-      Rcpp::stop("Please consider additional filter of the input dataset.");
-    }
+    
+    log_aux -= (0.5/s2_mu) * (pow(log(y),2) - pow(log(mu0(span(0, q_bio - 1))),2));
 
-    // CREATING OUTPUT VARIABLE
-    arma::vec mu = ind % aux + (1 - ind) % mu0;
+    // CREATING OUTPUT VARIABLE & DEBUG
+    for (int i=0; i < q_bio; i++)
+    {
+      if(arma::is_finite(log_aux(i)))
+      {
+        if(log(u(i)) < log_aux(i))
+        {
+          // DEBUG: Reject very small values to avoid numerical issues
+          if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; mu(i) = y(i);}
+          else{ind(i) = 0; mu(i) = mu0(i);}            
+        }
+        else{ind(i) = 0; mu(i) = mu0(i);}
+      }      
+      // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+      // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
+      else
+      {
+        ind(i) = 0; mu(i) = mu0(i);
+        Rcpp::Rcout << "Something went wrong when updating mu " << i+1 << std::endl;
+        Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+      }
+    }
     
     // OUTPUT
-    return join_rows(mu, arma::conv_to<arma::mat>::from(ind));
-}
-
-/* Auxiliary function required for some of the Metropolis-Hastings updates of mu */
-arma::mat UpdateAux_deltaTrick(
-  arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-  arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-  arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-  arma::vec const& nu) /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-{
-  arma::mat x = ((phi % nu) * mu.t()).t();
-  x.each_col() += 1 / delta;
-  return x;
+    return join_rows(mu, ind);
 }
 
 /* Metropolis-Hastings updates of mu 
@@ -366,39 +418,57 @@ arma::mat deltaUpdate(
     using arma::span;
     
     // CREATING VARIABLES WHERE TO STORE DRAWS
-    arma::vec logdelta = log(delta0);
+    arma::vec delta = arma::zeros(q_bio); 
+    arma::vec ind = arma::zeros(q_bio);
 
     // PROPOSAL STEP
-    arma::vec y = arma::randn(q_bio) % sqrt(prop_var) + logdelta;
+    arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(delta0));
     arma::vec u = arma::randu(q_bio);
+        
+    // ACCEPT/REJECT STEP 
+    arma::vec log_aux = - n * (lgamma_cpp(1/y)-lgamma_cpp(1/delta0));
     
-    // ACCEPT/REJECT STEP
-    arma::vec log_aux = (y - logdelta) * a_delta - n * (logdelta/delta0) % ((y/logdelta) % exp(-y+logdelta) - 1);    
-    arma::mat m1 = Counts.rows(0, q_bio - 1);
-    m1.each_col() += exp(-y);
-    arma::mat m2 = Counts.rows(0, q_bio - 1);
-    m2.each_col() += 1/delta0;
-    log_aux += sum(lgamma_cpp(m1)-lgamma_cpp(m2),1) - n*(lgamma_cpp(exp(-y))-lgamma_cpp(1/delta0));
-    arma::mat num = UpdateAux_deltaTrick(mu(span(0, q_bio - 1)), exp(y), phi, nu);
-    arma::mat den = UpdateAux_deltaTrick(mu(span(0, q_bio - 1)), delta0, phi, nu);
-    m1 %= log(num);
-    m2 %= log(den);
-    log_aux -= sum(m1-m2,1) + b_delta* delta0 % (exp(y-logdelta)-1);
-    arma::umat ind = log(u) < log_aux;
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Print warning message
-    ind.elem(find_nonfinite(log_aux)).zeros();
-    if(size(find_nonfinite(log_aux),0)>0)
+    // Loop to replace matrix operations, through genes and cells
+    for (int i=0; i < q_bio; i++)
     {
-      Rcpp::Rcout << "Something went wrong when updating delta" << size(find_nonfinite(log_aux),0) << std::endl;
-      Rcpp::stop("Please consider additional filter of the input dataset.");
+      for (int j=0; j < n; j++) 
+      {
+          log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
+          log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( phi(j)*nu(j)*mu(i)+(1/y(i)) );
+          log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( phi(j)*nu(j)*mu(i)+(1/delta0(i)) );
+      }
     }
-
-    // CREATING OUTPUT VARIABLE
-    arma::vec delta = ind % exp(y) + (1 - ind) % delta0;
+    
+    // +1 should appear because we update log(delta) not delta. However, it cancels out with the prior. 
+    log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
+    // Component related to the prior
+    log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0); 
+    
+    // CREATING OUTPUT VARIABLE & DEBUG
+    for (int i=0; i < q_bio; i++)
+    {
+      if(arma::is_finite(log_aux(i)))
+      {
+        if(log(u(i)) < log_aux(i))
+        {
+          // DEBUG: Reject very small values to avoid numerical issues
+          if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; delta(i) = y(i);}
+          else{ind(i) = 0; delta(i) = delta0(i);}            
+        }
+        else{ind(i) = 0; delta(i) = delta0(i);}
+      }      
+      // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+      // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
+      else
+      {
+        ind(i) = 0; delta(i) = delta0(i);
+        Rcpp::Rcout << "Something went wrong when updating delta " << i+1 << std::endl;
+        Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+      }
+    }
     
     // OUTPUT
-    return join_rows(delta, arma::conv_to<arma::mat>::from(ind));
+    return join_rows(delta, ind);
 }
 
 /* Draws for cell-specific normalising constants s[j]
@@ -406,17 +476,13 @@ arma::mat deltaUpdate(
  * Updates are implemented simulateaneously for all cells, significantly reducing the computational burden.
  */
 arma::vec sUpdate(
-  arma::vec const& s0_arma, /* Current value of $s=(s_1,...,s_n)$' */
-  arma::vec const& nu_arma, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
+  arma::vec const& s0, /* Current value of $s=(s_1,...,s_n)$' */
+  arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
   double const& theta, /* Current value of $\theta$ */
   double const& as, /* Shape hyper-parameter of the Gamma($a_s$,$b_s$) prior assigned to each $s_j$ */
   double const& bs, /* Rate hyper-parameter of the Gamma($a_s$,$b_s$) prior assigned to each $s_j$ */
   int const& n)
-{
-   // Allowing the use of rgig within C++ code (transform arma::vec elements into NumericVector elements)
-   NumericVector s0 = wrap(s0_arma);
-   NumericVector nu = wrap(nu_arma);
-   
+{   
    // Creating a vector where draws will be stored
    arma::vec aux = arma::zeros(n);
    
@@ -426,29 +492,25 @@ arma::vec sUpdate(
    
    // GIG draws
    /* DEBUG: return original value of s0 if input values are not within the appropriate range (to avoid problems related to numerical innacuracy) */
-   if(!R_IsNA(p)) 
-   {
-     // Calculating parameter to the passed as input to the Rgig function (specific to each cell)
-      NumericVector a = 2*nu/theta;      
-      int j;
-      for (j=0; j<n; j++) 
+   if(!R_IsNA(p))  
+   {     
+      for (int j=0; j<n; j++) 
       {
-          if(!R_IsNA(a(j)) & (a(j)>0)) 
-          {
-            aux(j) = Rcpp::as<double>(Rgig(1,p,a(j),b));
-            /* DEBUG: break in case of undefined values */
-            if(R_IsNA(aux(j))) 
-            {
-              Rcpp::Rcout << "Something went wrong when updating s" << j << std::endl;
-              Rcpp::stop("Please consider additional filter of the input dataset.");
-            }
-          }
-      else if(!(a(j)<0) & (p>0)) {aux(j) = Rcpp::as<double>(Rgig(1,p,a(j),b));}
-      else{aux(j)=s0_arma(j);}         
+        if(nu(j) > 0) 
+        {
+          aux(j) = RgigDouble(p,2*nu(j)/theta,b);
+        }
+        /* DEBUG: break in case of undefined values */
+        else
+        {
+          aux(j) = s0(j);
+          Rcpp::Rcout << "Something went wrong when updating s" << j << std::endl;
+          Rcpp::stop("Please consider additional filter of the input dataset.");         
+        }               
       }
       return aux;     
    }
-  else return s0_arma;
+  else return s0;
 }
 
 /* Auxiliary function required for some of the Metropolis-Hastings updates of nu */
@@ -470,6 +532,7 @@ arma::mat nuUpdate(
   arma::vec const& nu0, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
   arma::vec const& prop_var, /* Current value of the proposal variances for $\nu=(\nu_1,...,\nu_n)'$ */
   arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
+  double const& SumSpikeInput,
   arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
   arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */  
   arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
@@ -483,36 +546,52 @@ arma::mat nuUpdate(
     using arma::span;
     
     // CREATING VARIABLES WHERE TO STORE DRAWS
-    arma::vec lognu = log(nu0);
+    arma::vec nu = arma::zeros(n); 
+    arma::vec ind = arma::zeros(n);
 
     // PROPOSAL STEP    
-    arma::vec y = arma::randn(n) % sqrt(prop_var) + lognu;
+    arma::vec y = exp(arma::randn(n) % sqrt(prop_var) + log(nu0));
     arma::vec u = arma::randu(n);
-       
+    
     // ACCEPT/REJECT STEP
-    arma::vec log_aux = (y - lognu) % (sum_bygene_all + 1/theta);
-    log_aux -= nu0 % (exp(y-lognu)-1)  % (sum(mu(span(q_bio,q -1))) + (1/(theta*s)));    
-    arma::mat m = Counts.rows(0, q_bio - 1);
-    m.each_col() += 1 / delta;   
-    arma::mat num = UpdateAux_nuTrick(exp(y), mu(span(0, q_bio - 1)), delta,phi);
-    num /= UpdateAux_nuTrick(nu0,    mu(span(0, q_bio - 1)), delta,phi);
-    m %= log(num);
-    log_aux -= sum(m, 0).t();
-    arma::umat ind = log(u) < log_aux;
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Print warning message    
-    ind.elem(find_nonfinite(log_aux)).zeros();
-    if(size(find_nonfinite(log_aux),0)>0)
+    arma::vec log_aux = arma::zeros(n);
+
+    // Loop to replace matrix operations, through genes and cells
+    for (int j=0; j < n; j++) 
     {
-      Rcpp::Rcout << "Something went wrong when updating nu" << size(find_nonfinite(log_aux),0) << std::endl;
-      Rcpp::stop("Please consider additional filter of the input dataset.");
+      for (int i=0; i < q_bio; i++) 
+      {
+        log_aux(j) -= ( Counts(i,j) + (1/delta(i)) ) *  
+                      log( ( phi(j)*y(j)*mu(i)+(1/delta(i)) ) / ( phi(j)*nu0(j)*mu(i)+(1/delta(i)) ));
+      } 
+      log_aux(j) += (log(y(j)) - log(nu0(j))) * (sum_bygene_all(j) + 1/theta) - ( y(j)-nu0(j) )  * (SumSpikeInput + (1/(theta*s(j))));
     }
 
-    // CREATING OUTPUT VARIABLE        
-    arma::vec nu = ind % exp(y) + (1 - ind) % nu0;
+    // CREATING OUTPUT VARIABLE & DEBUG
+    for (int j=0; j < n; j++)
+    {
+      if(arma::is_finite(log_aux(j)))
+      {
+        if(log(u(j)) < log_aux(j))
+        {
+          // DEBUG: Reject very small values to avoid numerical issues
+          if(arma::is_finite(y(j)) & (y(j) > 1e-5)) {ind(j) = 1; nu(j) = y(j);}
+          else{ind(j) = 0; nu(j) = nu0(j);}            
+        }
+        else{ind(j) = 0; nu(j) = nu0(j);}
+      }      
+      // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+      // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
+      else
+      {
+        ind(j) = 0; nu(j) = nu0(j);
+        Rcpp::Rcout << "Something went wrong when updating nu " << j+1 << std::endl;
+        Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+      }
+    }
    
     // OUTPUT
-    return join_rows(nu, arma::conv_to<arma::mat>::from(ind));
+    return join_rows(nu, ind);
 }
 
 /* Metropolis-Hastings updates of theta 
@@ -609,25 +688,26 @@ Rcpp::List phiUpdate(
      all(y > 0) &
      all(phi0 > 0)) 
   {
-    arma::mat m = Counts.rows(0, q_bio - 1);
-    m.each_col() += 1/delta;
-    arma::mat log_num = UpdateAux_phiTrick(arma::ones(q_bio), 
-                                           delta % mu(span(0, q_bio - 1)), 
-                                           y % nu);
-    arma::mat log_den = UpdateAux_phiTrick(arma::ones(q_bio), 
-                                           delta % mu(span(0, q_bio - 1)), 
-                                           phi0 % nu);  
-    m %= (log_num - log_den);
-  
-    double log_aux1 = sum( (sum_bygene_bio + p_phi) % (log(y) - log(phi0))) - sum(sum(m, 0));
-    double log_aux2 = prop_var * sum(y % log(phi0) - phi0 % log(y));
-    double log_aux3 = as<double>(wrap(sum(lgamma_cpp(prop_var * y) - lgamma_cpp(prop_var * phi0))));
-    double log_aux = log_aux1 + log_aux2 - log_aux3;
+    double log_aux = sum( (sum_bygene_bio + p_phi) % (log(y) - log(phi0)));
+    
+    // Loop to replace matrix operations, through genes and cells
+    for (int j=0; j < n; j++) 
+    {
+      for (int i=0; i < q_bio; i++) 
+      {
+        log_aux -= ( Counts(i,j) + (1/delta(i)) ) *  
+                    log( (y(j)*nu(j)*mu(i)+(1/delta(i)) ) / ( phi0(j)*nu(j)*mu(i)+(1/delta(i)) ));
+      } 
+    }
 
+    log_aux += prop_var * sum(y % log(phi0) - phi0 % log(y));
+    log_aux -= as<double>(wrap(sum(lgamma_cpp(prop_var * y) - lgamma_cpp(prop_var * phi0))));    
+    
     if(!R_IsNA(log_aux))
-    { 
-      ind = log(u) < log_aux;
-      phi = ind * y + (1-ind) * phi0;
+    {
+        if(log(u) < log_aux) {ind = 1;}
+        else {ind = 0;}
+        phi = ind * y + (1-ind) * phi0;
     }
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message
@@ -693,6 +773,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec sumByCellAll_arma = as_arma(sumByCellAll); arma::vec sumByCellBio_arma = as_arma(sumByCellBio);
   arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
   arma::mat Counts_arma = as_arma(Counts);
+  arma::vec mu0_arma = as_arma(mu0);
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux,q); 
   arma::mat delta = arma::zeros(Naux,qbio); 
@@ -722,7 +803,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec nuAccept = arma::zeros(n); arma::vec PnuAux = arma::zeros(n);
   double thetaAccept=0; double PthetaAux=0;
   // INITIALIZATION OF VALUES FOR MCMC RUN
-  arma::mat muAux = arma::zeros(q,2); muAux.col(0)=as_arma(mu0); arma::vec LSmuAux = as_arma(LSmu0);
+  arma::mat muAux = arma::zeros(q,2); muAux.col(0)=mu0_arma; arma::vec LSmuAux = as_arma(LSmu0);
   arma::mat deltaAux = arma::zeros(qbio,2); deltaAux.col(0)=as_arma(delta0); arma::vec LSdeltaAux = as_arma(LSdelta0); 
   arma::vec phiAux = as_arma(phi0); double LSphiAux = LSphi0; Rcpp::List phiAuxList;
   arma::vec sAux = as_arma(s0); 
@@ -733,6 +814,8 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   double PphiAux0 = 0; 
   arma::vec PnuAux0 = arma::zeros(n); double PthetaAux0=0;
   
+  double SumSpikeInput = sum(mu0_arma(arma::span(qbio,q -1)));
+    
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES (RE-INITIALIZE EVERY 50 ITERATIONS)
   int Ibatch = 0; int i;
   
@@ -766,7 +849,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR    
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio);     
+                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF S
@@ -778,7 +861,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);}    
     
     // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdate(nuAux.col(0), exp(LSnuAux), Counts_arma, 
+    nuAux = nuUpdate(nuAux.col(0), exp(LSnuAux), Counts_arma, SumSpikeInput,
                      muAux.col(0), deltaAux.col(0), phiAux, sAux, thetaAux(0), sumByGeneAll_arma, q, qbio, n); 
     PnuAux += nuAux.col(1); if(i>=burn) {nuAccept += nuAux.col(1);}
 
@@ -1188,7 +1271,7 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR    
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio);     
+                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF S
