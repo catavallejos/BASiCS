@@ -85,13 +85,27 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput,
 #' 
 #' @examples
 #' 
+#' 
+#' # Expression counts
 #' set.seed(1)
-#' Counts = matrix(rpois(10*5, 1), ncol = 5)
-#' rownames(Counts) <- paste0("Gene",1:10)
-#' Tech = c(rep(FALSE,7), rep(TRUE,3))
+#' Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+#' rownames(Counts) <- paste("Gene", 1:nrow(Counts))
+#' 
+#' # Technical information 
+#' Tech = c(rep(FALSE,40),rep(TRUE,10))
+#' 
+#' # Spikes input number of molecules 
 #' set.seed(2)
-#' SpikeInfo = data.frame(paste0("Gene",8:10), rgamma(3,1,1))
-#' Data = newBASiCS_Data(Counts, Tech, SpikeInfo)
+#' SpikeInput <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
+#' 
+#' # Creating a BASiCS_Data object (no batch effect)
+#' DataExample = newBASiCS_Data(Counts, Tech, SpikeInput)
+#' 
+#' # Creating a BASiCS_Data object (with batch effect)
+#' BatchInfo = c(rep(1, 5), rep(2, 5))
+#' DataExample = newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo)
+#' 
+#' # Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
 #' 
@@ -323,6 +337,7 @@ HiddenBASiCS_MCMC_Start<-function(
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
   
   # Number of instrinsic genes
+  q <- length(Data@Tech)
   q.bio<-sum(Data@Tech==F)
   # Number of cells
   n <- dim(Data@Counts)[2]
@@ -338,10 +353,10 @@ HiddenBASiCS_MCMC_Start<-function(
   # and true input values for spike-in genes
   nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / phi0 )
   meansBio <- rowMeans( nCountsBio )
-  mu0<-c(meansBio,Data@SpikeInput)
+  mu0<-c(meansBio + 1,Data@SpikeInput)
   
   # Random stating value for delta
-  delta0=rgamma(q.bio,1,1)
+  delta0 = rgamma(q.bio,1,1) + 1
   
   # Random stating value for theta (within typically observed range)
   theta0=runif(1, min = 0.2, max = 1)
@@ -349,14 +364,16 @@ HiddenBASiCS_MCMC_Start<-function(
   # If given, load default values for adaptive proposal variances
   args <- list(...)
   ls.mu0 = ifelse("ls.mu0" %in% names(args),args$ls.mu0,-4)
-  ls.delta0 = ifelse("ls.delta0" %in% names(args),args$ls.delta0,-3)
+  ls.delta0 = ifelse("ls.delta0" %in% names(args),args$ls.delta0,-2)
   ls.phi0 = ifelse("ls.phi0" %in% names(args),args$ls.phi0,11)
   ls.nu0 = ifelse("ls.nu0" %in% names(args),args$ls.nu0,-10)
-  ls.theta0 = ifelse("ls.theta0" %in% names(args),args$ls.theta0,-6)
+  ls.theta0 = ifelse("ls.theta0" %in% names(args),args$ls.theta0,-4)
   
   # Starting values for the proposal variances
-  ls.mu0 =  pmax(2 * log (0.02 * abs(log(mu0))),ls.mu0)
-  ls.delta0 =  pmax(2 * log (0.02 * abs(log(delta0))),ls.delta0)
+#  ls.mu0 =  pmax(2 * log (0.02 * abs(log(mu0))),ls.mu0)
+#  ls.delta0 =  pmax(2 * log (0.02 * abs(log(delta0))),ls.delta0)
+  ls.mu0 = rep(ls.mu0, q)
+  ls.delta0 = rep(ls.delta0, q.bio)
   ls.phi0 = ifelse(n<200, pmax(2*log(n),ls.phi0), 11) # 6
   ls.nu0 =  pmax(2 * log (0.02 * abs(log(nu0))),ls.nu0)
   ls.theta0 =  pmax(2 * log (0.02 * abs(log(theta0))),ls.theta0)
