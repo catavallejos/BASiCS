@@ -73,10 +73,10 @@ setClass("BASiCS_Data",
              errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the BASiCS_Data object.")
            
            if(sum(apply(object@Counts,1,sum) == 0) > 0) 
-             errors <- c(errors, "Some genes have zero counts across all cells. Please remove them before creating the BASiCS_Data object.")
+             warning("Some genes have zero counts across all cells. Unless running a differential expression analysis, please remove those genes. Otherwise, the BASiCS_Data object is still a valid object. However, due to the lack of counts, posterior estimates for mu[i] and delta[i] associated to those genes will be driven by the prior. In such case, you must specify `PriorDelta = 'log-normal' in BASiCS_MCMC function. ")
            
-           if(sum(apply(object@Counts,1,sum) > 0) == 1) 
-             errors <- c(errors, "Some genes have non-zero counts only in 1 cell. Please remove them before creating the BASiCS_Data object.")
+#           if(sum(apply(object@Counts,1,sum) > 0) == 1) 
+#             errors <- c(errors, "Some genes have non-zero counts only in 1 cell. Please remove them before creating the BASiCS_Data object.")
            
            if(length(object@BatchInfo) != n) 
              errors <- c(errors, "BatchInfo slot is not compatible with the number of cells contained in Counts slot.")

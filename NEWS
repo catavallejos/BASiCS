@@ -62,4 +62,9 @@ version 0.3.3: (2015-11-05)
 - Same method as before but improved performance of C++ code
 
 version 0.3.4: (2015-11-11)
-- Fix of example code of 'newBASiCS_Data' function. Thanks to Simon Andrews for pointing out this issue. 
+- Fix of example code of 'newBASiCS_Data' function. Thanks to Simon Andrews for pointing out this issue.
+
+version 0.3.5: (2015-11-27)
+- Optional argument `PriorDelta` added to `BASiCS_MCMC` function, to allow optional use of `gamma` or `log-normal` priors for delta. 
+- In `BASiCS_MCMC` function, change of default value of `s2.mu` to 0.5. Allows better shrinkage in situations where a gene has zero counts across all cells.
+- In `BASiCS_Data` class. Count matrices where a gene has zero counts across all cells are now allowed. However, a warning is returned in such case. Only use such matrices when running differential expression results. 

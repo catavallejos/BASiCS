@@ -413,7 +413,9 @@ arma::mat deltaUpdate(
   double const& a_delta, /* Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ */
   double const& b_delta, /* Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ */
   int const& q_bio,
-  int const& n)
+  int const& n,
+  double const& s2_delta,
+  double const& prior_delta)
 {
     using arma::span;
     
@@ -442,7 +444,8 @@ arma::mat deltaUpdate(
     // +1 should appear because we update log(delta) not delta. However, it cancels out with the prior. 
     log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
     // Component related to the prior
-    log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0); 
+    if(prior_delta == 1) {log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0);}
+    else {log_aux -= (0.5/s2_delta) * (pow(log(y),2) - pow(log(delta0),2));}
     
     // CREATING OUTPUT VARIABLE & DEBUG
     for (int i=0; i < q_bio; i++)
@@ -631,6 +634,37 @@ arma::vec thetaUpdate(
     return output;
 }
 
+/*Uniform sample from a discrete range*/
+double rUnifDisc(arma::vec const& range, double const& rangeSize)
+{
+  double u = as<double>(wrap(arma::randu(1)));
+  double out;
+  
+  arma::vec probs = arma::ones(rangeSize);
+  probs = cumsum(probs) / rangeSize;
+  if(u <= probs(0)) {out = range(0);}
+  else
+  {
+    for(int i=1; i < rangeSize; i++)
+    {
+      if(u <= probs(i) & u > probs(i-1)) {out = range(i);}
+    } 
+  } 
+  return out;
+}
+
+/*Uniform sample from a discrete range, multiple draws*/
+arma::vec rUnifDiscMult(int const& ndraws, arma::vec const& range, double const& rangeSize)
+{
+  arma::vec out = arma::zeros(ndraws);
+
+  for(int i=0; i < ndraws; i++)
+  {
+    out(i) = rUnifDisc(range, rangeSize);
+  } 
+  return out;
+}
+
 /*Dirichlet sampler*/
 arma::vec rDirichlet(
   arma::vec alpha)
@@ -730,6 +764,8 @@ Rcpp::List phiUpdate(
 }
 
 
+
+
 /* MCMC sampler 
  */
 // [[Rcpp::export]]
@@ -764,7 +800,9 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   NumericVector sumByGeneBio,
   int StoreAdapt, 
   int EndAdapt,
-  int PrintProgress) 
+  int PrintProgress,
+  double s2_delta, 
+  double prior_delta) 
 {
 
 // NUMBER OF CELLS, GENES AND STORED DRAWS
@@ -815,6 +853,14 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec PnuAux0 = arma::zeros(n); double PthetaAux0=0;
   
   double SumSpikeInput = sum(mu0_arma(arma::span(qbio,q -1)));
+  
+
+  
+  NumericVector LSphiValuesNV = NumericVector::create(1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000);
+  arma::vec LSphiValues = as_arma(LSphiValuesNV);
+  NumericVector LSthetaValuesNV = NumericVector::create(-7, -6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2);
+  arma::vec LSthetaValues = as_arma(LSthetaValuesNV);
+                                                          
     
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES (RE-INITIALIZE EVERY 50 ITERATIONS)
   int Ibatch = 0; int i;
@@ -838,16 +884,19 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     Ibatch++; 
     
     // UPDATE OF PHI: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+//    LSphiAux = rUnifDisc(LSphiValues, LSphiValuesNV.size());    
     phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts_arma, muAux.col(0), deltaAux.col(0),
                            nuAux.col(0), p_Phi, sumByGeneBio_arma, qbio, n); 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); if(i>=burn) {phiAccept += Rcpp::as<double>(phiAuxList["ind"]);}
 
     // UPDATE OF THETA: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+//    LSthetaAux = rUnifDisc(LSthetaValues, LSthetaValuesNV.size());  
     thetaAux = thetaUpdate(thetaAux(0), exp(LSthetaAux), sAux, nuAux.col(0), atheta, btheta, n);
     PthetaAux += thetaAux(1); if(i>=burn) {thetaAccept += thetaAux(1);}
     
-    // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR    
+    // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR       
+//    LSmuAux = rUnifDiscMult(q, LSthetaValues, LSthetaValuesNV.size());
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
                      phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
@@ -856,8 +905,9 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     sAux = sUpdate(sAux, nuAux.col(0), thetaAux(0), as, bs, n); 
     
     // UPDATE OF DELTA: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+//    LSdeltaAux = rUnifDiscMult(qbio, LSthetaValues, LSthetaValuesNV.size());
     deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, muAux.col(0), 
-                           nuAux.col(0), phiAux, adelta, bdelta, qbio, n);  
+                           nuAux.col(0), phiAux, adelta, bdelta, qbio, n, s2_delta, prior_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);}    
     
     // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
@@ -872,15 +922,22 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       if(Ibatch==50)
       {
         PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
-        LSmuAux=LSmuAux+PmuAux*std::min(0.01,1/sqrt(i)); 
+//        LSmuAux=LSmuAux+PmuAux*std::min(0.03,1/sqrt(i)); 
+        LSmuAux=LSmuAux+PmuAux*0.1;
         PdeltaAux=PdeltaAux/50; PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
-        LSdeltaAux=LSdeltaAux+PdeltaAux*std::min(0.01,1/sqrt(i));                 
+//        LSdeltaAux=LSdeltaAux+PdeltaAux*std::min(0.03,1/sqrt(i));
+        LSdeltaAux=LSdeltaAux+PdeltaAux*0.1;
+//        if(i < 1000) {LSdeltaAux=LSdeltaAux+PdeltaAux*0.5;}     
+//        else {LSdeltaAux=LSdeltaAux+PdeltaAux*std::min(0.01,1/sqrt(i));}  
         PphiAux=PphiAux/50; PphiAux = -1+2*(PphiAux>ar); 
-        LSphiAux=LSphiAux - PphiAux*std::min(0.01,1/sqrt(i));  
+        LSphiAux=LSphiAux - PphiAux*0.1;  
+//        LSphiAux=LSphiAux - PphiAux*std::min(0.03,1/sqrt(i));  
         PnuAux=PnuAux/50; PnuAux = -1+2*arma::conv_to<arma::mat>::from(PnuAux>ar);
-        LSnuAux=LSnuAux+PnuAux*std::min(0.01,1/sqrt(i)); 
+//        LSnuAux=LSnuAux+PnuAux*std::min(0.03,1/sqrt(i)); 
+        LSnuAux=LSnuAux+PnuAux*0.1;
         PthetaAux=PthetaAux/50; PthetaAux = -1+2*(PthetaAux>ar); 
-        LSthetaAux=LSthetaAux+PthetaAux*std::min(0.01,1/sqrt(i));
+//        LSthetaAux=LSthetaAux+PthetaAux*std::min(0.03,1/sqrt(i));
+        LSthetaAux=LSthetaAux+PthetaAux*0.1;
       
         Ibatch = 0; 
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
@@ -1181,7 +1238,9 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
   NumericVector sumByGeneBio,
   int StoreAdapt, 
   int EndAdapt,
-  int PrintProgress) 
+  int PrintProgress,
+  double s2_delta, 
+  double prior_delta) 
 {
 
   // NUMBER OF CELLS, GENES AND STORED DRAWS
@@ -1279,7 +1338,7 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
     
     // UPDATE OF DELTA: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
-                           muAux.col(0), nuAux.col(0), phiAux, adelta, bdelta, qbio, n);  
+                           muAux.col(0), nuAux.col(0), phiAux, adelta, bdelta, qbio, n, s2_delta, prior_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);} 
     
     // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR

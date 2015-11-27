@@ -25,13 +25,26 @@ An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
 a matrix of expression counts and experimental information about spike-in genes.
 }
 \examples{
+# Expression counts
 set.seed(1)
-Counts = matrix(rpois(10*5, 1), ncol = 5)
-rownames(Counts) <- paste0("Gene",1:10)
-Tech = c(rep(FALSE,7), rep(TRUE,3))
+Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+rownames(Counts) <- paste("Gene", 1:nrow(Counts))
+
+# Technical information
+Tech = c(rep(FALSE,40),rep(TRUE,10))
+
+# Spikes input number of molecules
 set.seed(2)
-SpikeInfo = data.frame(paste0("Gene",8:10), rgamma(3,1,1))
-Data = newBASiCS_Data(Counts, Tech, SpikeInfo)
+SpikeInput <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
+
+# Creating a BASiCS_Data object (no batch effect)
+DataExample = newBASiCS_Data(Counts, Tech, SpikeInput)
+
+# Creating a BASiCS_Data object (with batch effect)
+BatchInfo = c(rep(1, 5), rep(2, 5))
+DataExample = newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo)
+
+# Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}

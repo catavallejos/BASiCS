@@ -20,10 +20,10 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
 \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers.
 \describe{
   \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu[i]}.
-  Default: \code{s2.mu = 1}.}
-  \item{\code{a.delta}}{Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
+  Default: \code{s2.mu = 0.5}.}
+  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
   Default: \code{a.delta = 1}.}
-  \item{\code{b.delta}}{Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
+  \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
   Default: \code{b.delta = 1}.}
   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) cell-specific mRNA content normalising constants \eqn{\phi[j] / n}.
   Default: \code{p.phi = rep(1, n)}.}
@@ -35,6 +35,8 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
   Default: \code{a.theta = 1}.}
   \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
   Default: \code{b.theta = 1}.}
+  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior that is shared by all gene-specific expression rate parameters \eqn{\delta[i]}.
+  Default: \code{s2.delta = 0.5}. }
 }}
 \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{ar = 0.44}}.
 
@@ -46,6 +48,7 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
 \item{\code{RunName}}{String used to index `.txt` files storing chains and/or adaptive proposal variances.}
 \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
 \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \code{phi}.}
+\item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}
 }}
 }
 \value{

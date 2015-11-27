@@ -395,10 +395,10 @@ HiddenBASiCS_MCMC_Start<-function(
 #' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers. 
 #' \describe{
 #'   \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu[i]}. 
-#'   Default: \code{s2.mu = 1}.}
-#'   \item{\code{a.delta}}{Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}. 
+#'   Default: \code{s2.mu = 0.5}.}
+#'   \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}. 
 #'   Default: \code{a.delta = 1}.}
-#'   \item{\code{b.delta}}{Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
+#'   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
 #'   Default: \code{b.delta = 1}.}
 #'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) cell-specific mRNA content normalising constants \eqn{\phi[j] / n}.
 #'   Default: \code{p.phi = rep(1, n)}.}
@@ -410,6 +410,8 @@ HiddenBASiCS_MCMC_Start<-function(
 #'   Default: \code{a.theta = 1}.}
 #'   \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
 #'   Default: \code{b.theta = 1}.}
+#'   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior that is shared by all gene-specific expression rate parameters \eqn{\delta[i]}. 
+#'   Default: \code{s2.delta = 0.5}. }
 #' }}
 #' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{ar = 0.44}}.
 #' 
@@ -421,6 +423,7 @@ HiddenBASiCS_MCMC_Start<-function(
 #' \item{\code{RunName}}{String used to index `.txt` files storing chains and/or adaptive proposal variances.}
 #' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
 #' \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \code{phi}.}
+#' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}
 #' }
 #' 
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}. 
@@ -510,7 +513,7 @@ BASiCS_MCMC <- function(
   
   args <- list(...)
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
-  else { PriorParam = list(s2.mu = 1, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
+  else { PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
   AR = ifelse("AR" %in% names(args),args$AR, 0.44)
   StopAdapt = ifelse("StopAdapt" %in% names(args),args$StopAdapt, Burn)
   StoreChains = ifelse("StoreChains" %in% names(args),args$StoreChains, F)
@@ -518,6 +521,7 @@ BASiCS_MCMC <- function(
   StoreDir = ifelse("StoreDir" %in% names(args),args$StoreDir, getwd())  
   RunName = ifelse("RunName" %in% names(args),args$RunName, "")
   PrintProgress = ifelse("PrintProgress" %in% names(args),args$PrintProgress, TRUE)
+  PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "gamma")
   
   if(!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) stop("Invalid parameter values.")
   if(!(N%%Thin==0 & N>=max(4,Thin))) stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
@@ -538,6 +542,9 @@ BASiCS_MCMC <- function(
   if(!(is.logical(StoreChains) & length(StoreChains) == 1)) stop("Invalid StoreChains value.")
   if(!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) stop("Invalid StoreAdapt value.")
   if(!(file.info(StoreDir)["isdir"])) stop("Invalid StoreDir value.")
+  if(!(PriorDelta %in% c("gamma","log-normal"))) stop("Invalid PriorDelta value.")
+  
+  PriorDeltaNum = ifelse(PriorDelta == "gamma", 1, 2)
   
   # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
   sum.bycell.all<-apply(Data@Counts,1,sum)
@@ -581,7 +588,8 @@ BASiCS_MCMC <- function(
       AR,
       ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
       sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-      StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress)))  
+      StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
+      PriorParam$s2.delta, PriorDeltaNum))
   }
   else
   {
@@ -600,7 +608,8 @@ BASiCS_MCMC <- function(
       AR,
       ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
       sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-      StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress)))   
+      StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
+      PriorParam$s2.delta, PriorDeltaNum))  
   }
   
   Chain$mu = Chain$mu[,1:q.bio]
