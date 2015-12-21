@@ -5,7 +5,8 @@ importFrom(coda, HPDinterval)
 importFrom(methods, Summary)
 importMethodsFrom(BiocGenerics, counts)
 
-exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary")
+exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary",
+              "BASiCS_DV_Data", "BASiCS_DV_Chain" , "BASiCS_DV_Summary")
 
 exportMethods(counts, 
               displayTechIndicator, 
@@ -28,4 +29,8 @@ export(BASiCS_Filter,
        BASiCS_DetectLVG,
        BASiCS_VarThresholdSearchHVG,
        BASiCS_VarThresholdSearchLVG,
-       BASiCS_DenoisedRates)
+       BASiCS_DenoisedRates,
+       newBASiCS_DV_Data,
+       makeExampleBASiCS_DV_Data,
+       newBASiCS_DV_Chain,
+       BASiCS_DV_TestDE)

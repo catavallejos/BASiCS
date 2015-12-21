@@ -553,3 +553,740 @@ setMethod("displaySummaryBASiCS",
             if(Param == "nu") {return(object@nu)}   
             if(Param == "theta") {return(object@theta)}
           })
+
+
+##########################################################################
+# Methods for BASiCS_DV_Data objects
+##########################################################################
+
+#' @name BASiCS_DV_Data-methods
+#' @aliases show,BASiCS_DV_Data-method
+#' 
+#' @title S4 methods for BASiCS_DV_Data objects
+#' 
+#' @description S4 methods for \code{\link[BASiCSDV]{BASiCS_DV_Data-class}} objects.  
+#' 
+#' @param object A \code{BASiCS_DV_Data} object.
+#' @param type Only required for \code{counts} method. A string indicating which genes must be returned. Valid values: \code{"all", "biological"} and \code{"technical"}
+#' @param samples A string indicating which samples must be returned. Valid values: \code{"test"} and \code{"reference"}. 
+#' 
+#' @return 
+#' \describe{
+#' \item{\code{show}}{Prints a summary of the properties of \code{object}.}
+#' 
+#' \item{\code{counts}}{\describe{
+#'  \item{\code{if(type = "all")}}{Returns the \code{CountsTest} or \code{CountsRef} slot 
+#'  of \code{object} (depending on the value of \code{sample}).}
+#'  \item{\code{if(type = "biological")}}{Returns the \code{CountsTest} or \code{CountsRef} slot of \code{object}
+#'  (depending on the value of \code{sample}), biological genes only.}
+#'  \item{\code{if(type = "technical")}}{Returns the \code{CountsTest} or \code{CountsRef} slot of \code{object}
+#'  (depending on the value of \code{sample}), tehcnical genes only.}
+#'  \item{\code{if(samples == "test")}}{Returns counts in the test sample.}
+#'  \item{\code{if(samples == "reference")}}{Returns counts in the reference sample.}
+#'  }}
+#' 
+#' \item{\code{displayTechIndicator}}{Returns \code{Tech} slot of \code{object}.}
+#' 
+#' \item{\code{displaySpikeInput}}{\describe{
+#' \item{\code{if(samples == "test")}}{Returns \code{SpikeInputTest} slot of \code{object}.}
+#' \item{\code{if(samples == "reference")}}{Returns \code{SpikeInputRef} slot of \code{object}.}}}}
+#' 
+#' @examples
+#' 
+#' Data = makeExampleBASiCS_DV_Data()
+#' show(Data)
+#' head(counts(Data, samples = "test"))
+#' dim(counts(Data, type="biological", samples = "test"))
+#' dim(counts(Data, type="technical", samples = "reference"))
+#' displayTechIndicator(Data)
+#' displaySpikeInput(Data, samples = "test")
+#' 
+#' @seealso \code{\link[BASiCSDV]{BASiCS_DV_Data-class}}
+#'  
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @rdname BASiCS_DV_Data-methods
+setMethod("show",
+          signature = "BASiCS_DV_Data",
+          definition = function(object){
+            q = nrow(object@CountsTest)
+            q.bio = nrow(object@CountsTest) - length(object@SpikeInputTest)
+            nTest = ncol(object@CountsTest)
+            nRef = ncol(object@CountsRef)
+            n = nTest + nRef
+            cat("An object of class ", class(object), "\n", sep = "")
+            cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+            cat("        - ", nTest, " cells in the test sample \n", sep = "")
+            cat("        - ", nRef, " cells in the reference sample \n", sep = "")
+            cat(" Elements (slots): CountsTest, CountsRef, Tech, SpikeInputTest and SpikeInputRef.\n")
+          })
+
+#' @name BASiCS_DV_Data-methods
+#' @aliases counts counts,BASiCS_DV_Data-method
+#' @rdname BASiCS_DV_Data-methods
+setMethod("counts",
+          signature = "BASiCS_DV_Data",
+          definition = function(object, type = "all", samples = "test"){
+            
+            if(!(type %in% c("all", "biological", "technical"))) stop("Invalid option for argument 'type'.")
+            if(!(samples %in% c("test", "reference"))) stop("Invalid option for argument 'samples'.")
+            
+            if(samples == "test")
+            {
+              cat("Samples in the test group \n")
+              if(type == "all") return(object@CountsTest)
+              if(type == "biological") return(object@CountsTest[!object@Tech,])
+              if(type == "technical") return(object@CountsTest[object@Tech,])              
+            }
+            
+            if(samples == "reference")
+            {
+              cat("Samples in the reference group \n")
+              if(type == "all") return(object@CountsRef)
+              if(type == "biological") return(object@CountsRef[!object@Tech,])
+              if(type == "technical") return(object@CountsRef[object@Tech,])              
+            }
+          })
+
+#' @name BASiCS_DV_Data-methods
+#' @aliases displaySpikeInput displaySpikeInput,BASiCS_DV_Data-method
+#' @rdname BASiCS_DV_Data-methods
+setMethod("displaySpikeInput",
+          signature = "BASiCS_DV_Data",
+          definition = function(object, samples = "test"){
+            
+            if(!(samples %in% c("test", "reference"))) stop("Invalid option for argument 'samples'.")
+            
+            if(samples == "test")
+            {
+              cat("Test group \n")
+              return(object@SpikeInputTest)
+            }
+            
+            if(samples == "reference")
+            {
+              cat("Reference group \n")
+              return(object@SpikeInputRef)
+            }           
+          })
+
+#' @name BASiCS_DV_Data-methods
+#' @aliases displayTechIndicator displayTechIndicator,BASiCS_DV_Data-method
+#' @rdname BASiCS_DV_Data-methods
+setMethod("displayTechIndicator",
+          signature = "BASiCS_DV_Data",
+          definition = function(object){
+            return(object@Tech)
+          })
+
+
+##########################################################################
+# Methods for BASiCS_D_Chain objects
+##########################################################################
+
+#' @name BASiCS_DV_Chain-methods
+#' @aliases show,BASiCS_DV_Chain-method
+#' 
+#' @title 'show' method for BASiCS_DV_Chain objects
+#' 
+#' @description 'show' method for \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}} objects.
+#' 
+#' @param object A \code{BASiCS_DV_Chain} object.
+#' 
+#' @return Prints a summary of the properties of \code{object}.
+#' 
+#' @examples
+#' 
+#' Data = makeExampleBASiCS_DV_Data()
+#' #MCMC_Output <- BASiCS_DV_MCMC(Data, N = 50, Thin = 2, Burn = 2)
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @rdname BASiCS_D_Chain-methods
+setMethod("show",
+          signature = "BASiCS_DV_Chain",
+          definition = function(object){
+            N = nrow(object@muTest)
+            q.bio = ncol(object@muTest)
+            n = ncol(object@phi)
+            cat("An object of class ", class(object), "\n", sep = "")
+            cat(" ", N," MCMC samples.\n", sep = "")
+            cat(" Dataset contains ", q.bio, " biological genes and ", n, " cells (in total across both samples).\n", sep="")
+            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest and thetaRef.\n")
+          })
+
+
+#' @name plot-BASiCS_DV_Chain-method
+#' @aliases plot plot,BASiCS_DV_Chain-method
+#' 
+#' @docType methods
+#' @rdname plot-BASiCS_DV_Chain-method
+#' 
+#' @title 'plot' method for BASiCS_DV_Chain objects
+#' 
+#' @param x A \code{BASiCS_DV_Chain} object.
+#' @param Param Name of the slot to be used for the plot. Possible values: \code{muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef}
+#' @param Gene Specifies which gene is requested. Required only if \code{Param = "muTest"}, \code{Param = "muRef"}, \code{"deltaTest"} or \code{"deltaRef"}
+#' @param Cell Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}
+#' @param ylab As in \code{\link[graphics]{par}}. 
+#' @param xlab As in \code{\link[graphics]{par}}. 
+#' @param main As in \code{\link[graphics]{par}}. 
+#' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_DV_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+setMethod("plot",
+          signature = "BASiCS_DV_Chain",
+          definition = function(x, 
+                                Param = "muTest",
+                                Gene = NULL,
+                                Cell = NULL, 
+                                ylab = "",
+                                xlab = "",
+                                main = "",
+                                ...
+          ){
+            
+            if(!(Param %in% c("muTest", "muRef", 
+                              "deltaTest", "deltaRef", 
+                              "phi", "s", "nu", 
+                              "thetaTest", "thetaRef"))) stop("'Param' argument is invalid")
+            if(Param %in% c("muTest", "muRef", "deltaTest", "deltaRef") & is.null(Gene))  stop("'Gene' value is required")
+            if(Param %in% c("phi", "s", "nu") & is.null(Cell))  stop("'Cell' value is required")
+            
+            xlab = ifelse(xlab == "", "Iteration", xlab)
+            
+            if(Param == "thetaTest") 
+            {
+              ylab = ifelse(ylab == "", expression(theta[test]), ylab)
+              if(main == "") main = "Test group"
+              plot(x@thetaTest, type="l", ylab = ylab, xlab = xlab, main = main, ...)
+            }
+            if(Param == "thetaRef") 
+            {
+              ylab = ifelse(ylab == "", expression(theta[ref]), ylab)
+              if(main == "") main = "Reference group"
+              plot(x@thetaRef, type="l", ylab = ylab, xlab = xlab, main = main, ...)
+            }
+            if(Param %in% c("muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu"))
+            {
+              if(Param == "muTest")    {object = x@muTest; Column = Gene; if(ylab == "") ylab = bquote(mu[.(Column)]); if(main == "") main = "Test group"}
+              if(Param == "muRef")     {object = x@muRef; Column = Gene; if(ylab == "") ylab = bquote(tau[.(Column)]); if(main == "") main = "Reference group"}
+              if(Param == "deltaTest") {object = x@deltaTest; Column = Gene; if(ylab == "") ylab = bquote(delta[.(Column)]); if(main == "") main = "Test group"}
+              if(Param == "deltaRef")  {object = x@deltaRef; Column = Gene; if(ylab == "") ylab = bquote(omega[.(Column)]); if(main == "") main = "Reference group"}
+              if(Param == "phi")       {object = x@phi; Column = Cell; if(ylab == "") ylab = bquote(phi[.(Column)])}
+              if(Param == "s")         {object = x@s; Column = Cell; ylab = if(ylab == "") ylab = bquote(s[.(Column)])}
+              if(Param == "nu")        {object = x@nu; Column = Cell; ylab = if(ylab == "") ylab = bquote(nu[.(Column)])} 
+              
+              plot(object[,Column], type="l", xlab = xlab, ylab = ylab, main = main, ...)
+            }
+          })
+
+#' @name Summary
+#' @aliases Summary Summary,BASiCS_DV_Chain-method
+#' 
+#' @docType methods
+#' @rdname Summary-BASiCS_DV_Chain-method
+#' 
+#' @title 'Summary' method for BASiCS_DV_Chain objects
+#' 
+#' @description For each of the BASiCS parameters, 
+#' \code{Summary} returns the corresponding postior medians and limits of the high posterior
+#' density interval with probabilty equal to \code{prob}.
+#' 
+#' @param x A \code{BASiCS_DV_Chain} object.
+#' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}} function. 
+#' 
+#' @return An object of class \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}. 
+#' 
+#' @examples 
+#' 
+#' # See help(BASiCS_DV_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+setMethod("Summary",
+          signature = "BASiCS_DV_Chain",
+          definition = function(x, prob = 0.95){
+            
+            MuTest = apply(x@muTest,2,median)
+            MuRef = apply(x@muRef,2,median)
+            DeltaTest = apply(x@deltaTest,2,median)
+            DeltaRef = apply(x@deltaRef,2,median)
+            Phi = apply(x@phi,2,median)
+            S = apply(x@s,2,median)
+            Nu = apply(x@nu,2,median)
+            ThetaTest = median(x@thetaTest)
+            ThetaRef = median(x@thetaRef)
+            
+            HPDMuTest = coda::HPDinterval(coda::mcmc(x@muTest), prob=prob)
+            HPDMuRef = coda::HPDinterval(coda::mcmc(x@muRef), prob=prob)
+            HPDDeltaTest = coda::HPDinterval(coda::mcmc(x@deltaTest), prob=prob)
+            HPDDeltaRef = coda::HPDinterval(coda::mcmc(x@deltaRef), prob=prob)
+            HPDPhi = coda::HPDinterval(coda::mcmc(x@phi), prob=prob)
+            HPDS = coda::HPDinterval(coda::mcmc(x@s), prob=prob)
+            HPDNu = coda::HPDinterval(coda::mcmc(x@nu), prob=prob)
+            HPDThetaTest = coda::HPDinterval(coda::mcmc(x@thetaTest), prob=prob)
+            HPDThetaRef = coda::HPDinterval(coda::mcmc(x@thetaRef), prob=prob)
+            
+            Output <- new("BASiCS_DV_Summary", 
+                          muTest = cbind(MuTest, HPDMuTest),
+                          muRef = cbind(MuRef, HPDMuRef),
+                          deltaTest = cbind(DeltaTest, HPDDeltaTest),
+                          deltaRef = cbind(DeltaRef, HPDDeltaRef),
+                          phi = cbind(Phi, HPDPhi),
+                          s = cbind(S, HPDS),
+                          nu = cbind(Nu, HPDNu),
+                          thetaTest = cbind(ThetaTest, HPDThetaTest),
+                          thetaRef = cbind(ThetaRef, HPDThetaRef))
+            show(Output)
+            return(Output)
+          })
+
+
+#' @name displayChainBASiCS-BASiCS_DV_Chain-method
+#' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_DV_Chain-method
+#' 
+#' @docType methods
+#' @rdname displayChainBASiCS-BASiCS_DV_Chain-method
+#' 
+#' @title Accessors for the slots of a BASiCS_DV_Chain object
+#' 
+#' @description Accessors for the slots of a \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' 
+#' @param object an object of class \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' @param Param Name of the slot to be used for the accessed. 
+#' Possible values: \code{muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef}
+#' 
+#' @return The requested slot of an object of class \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_DV_MCMC)
+#'   
+#' @seealso \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+setMethod("displayChainBASiCS",
+          signature = "BASiCS_DV_Chain",
+          definition = function(object, 
+                                Param = "muTest"){
+            
+            if(!(Param %in% c("muTest", "muRef", "deltaTest", "deltaRef", 
+                              "phi", "s", "nu", 
+                              "thetaTest", "thetaRef"))) stop("'Param' argument is invalid")
+            
+            if(Param == "muTest") {return(object@muTest)}  
+            if(Param == "muRef") {return(object@muRef)} 
+            if(Param == "deltaTest") {return(object@deltaTest)} 
+            if(Param == "deltaRef") {return(object@deltaRef)}
+            if(Param == "phi") {return(object@phi)}  
+            if(Param == "s") {return(object@s)}  
+            if(Param == "nu") {return(object@nu)}
+            if(Param == "thetaTest") {return(object@thetaTest)} 
+            if(Param == "thetaRef") {return(object@thetaRef)} 
+          })
+
+##########################################################################
+# Methods for BASiCS_DV_Summary objects
+##########################################################################
+
+#' @name BASiCS_DV_Summary-methods
+#' @aliases show,BASiCS_DV_Summary-method
+#' 
+#' @title 'show' method for BASiCS_DV_Summary objects
+#' 
+#' @description 'show' method for \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}} objects.
+#' 
+#' @param object A \code{BASiCS_DV_Summary} object.
+#' 
+#' @return Prints a summary of the properties of \code{object}.
+#' 
+#' @examples
+#' 
+#' # see help(BASiCS_DV_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' 
+#' @rdname BASiCS_DV_Summary-methods
+setMethod("show",
+          signature = "BASiCS_DV_Summary",
+          definition = function(object){
+            q.bio = nrow(object@muTest)
+            q = nrow(object@deltaTest)
+            n = nrow(object@phi)
+            cat("An object of class ", class(object), "\n", sep = "")
+            cat(" Contains posterior medians and limits of HPD 95% interval for BASiCSD parameters.\n")
+            cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest and thetaRef.\n")
+          })
+
+#' @name plot-BASiCS_DV_Summary-method
+#' @aliases plot,BASiCS_DV_Summary-method
+#' 
+#' @docType methods
+#' @rdname plot-BASiCS_DV_Summary-method
+#' 
+#' @title 'plot' method for BASiCS_DV_Summary objects
+#' 
+#' @param x A \code{BASiCS_DV_Summary} object.
+#' @param Param Name of the slot to be used for the plot. 
+#' Possible values: \code{"muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu", "thetaTest", "thetaRef"}
+#' @param Param2 Name of the second slot to be used for the plot. 
+#' Possible values: \code{"muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu"} 
+#' (combinations between gene-specific and cell-specific parameters are not allowed)
+#' @param Genes Specifies which genes are requested. 
+#' Required only if \code{Param = "muTest", "muRef", "deltaTest"} or \code{"deltaRef"} 
+#' @param Cells Specifies which cells are requested. 
+#' Required only if \code{Param = "phi", "s"} or \code{"nu"}
+#' @param xlab As in \code{\link[graphics]{par}}. 
+#' @param ylab As in \code{\link[graphics]{par}}.
+#' @param xlim As in \code{\link[graphics]{par}}.  
+#' @param ylim As in \code{\link[graphics]{par}}. 
+#' @param main As in \code{\link[graphics]{par}}. 
+#' @param pch As in \code{\link[graphics]{par}}. 
+#' @param col As in \code{\link[graphics]{par}}. 
+#' @param bty As in \code{\link[graphics]{par}}. 
+#' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_DV_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+setMethod("plot",
+          signature = "BASiCS_DV_Summary",
+          definition = function(x, 
+                                Param = "muTest",
+                                Param2 = NULL,
+                                Genes = NULL,
+                                Cells = NULL, 
+                                xlab = "",
+                                ylab = "",
+                                xlim = "",
+                                ylim = "",
+                                main = "",
+                                pch = 16, 
+                                col = "blue",
+                                bty = "n",
+                                ...
+          ){
+            
+            if(!(Param %in% c("muTest", "muRef", 
+                              "deltaTest", "deltaRef", 
+                              "phi", "s", "nu", 
+                              "thetaTest", "thetaRef"))) stop("'Param' argument is invalid")
+            
+            q.bio = nrow(x@muTest)
+            n = nrow(x@phi)
+            
+            if(is.null(Genes)) {Genes = 1:q.bio}
+            if(is.null(Cells)) {Cells = 1:n}
+            
+            if(is.null(Param2))
+            {           
+              if(Param %in% c("thetaTest","thetaRef") ) 
+              {  
+                if(Param == "thetaTest") 
+                {
+                  ylab = ifelse(ylab == "", expression(theta[test]), ylab)
+                  main = ifelse(main == "", "Test group", main)
+                  if(ylim == "") {ylim = c(x@thetaTest[2],x@thetaTest[3])}
+                  
+                  plot(1, x@thetaTest[1], xlab = xlab, ylab = ylab, xlim = c(0,2), 
+                       ylim = ylim, pch = pch, col = col, bty = bty, main = main, ...)
+                  segments(x0 = 1, y0 = x@thetaTest[2], y1 = x@thetaTest[3], col = col, ...)
+                  segments(x0 = 0.9, y0 = x@thetaTest[2], x1 = 1.1, col = col)
+                  segments(x0 = 0.9, y0 = x@thetaTest[3], x1 = 1.1, col = col)                                    
+                }
+                if(Param == "thetaRef") 
+                {
+                  ylab = ifelse(ylab == "", expression(theta[ref]), ylab)
+                  main = ifelse(main == "", "Reference group", main)
+                  if(ylim == "") {ylim = c(x@thetaRef[2],x@thetaRef[3])}
+                  
+                  plot(1, x@thetaRef[1], xlab = xlab, ylab = ylab, xlim = c(0,2), 
+                       ylim = ylim, pch = pch, col = col, bty = bty, main = main, ...)
+                  segments(x0 = 1, y0 = x@thetaRef[2], y1 = x@thetaRef[3], col = col)
+                  segments(x0 = 0.9, y0 = x@thetaRef[2], x1 = 1.1, col = col)
+                  segments(x0 = 0.9, y0 = x@thetaRef[3], x1 = 1.1, col = col)                                    
+                }
+              }           
+              else
+              {
+                if(Param == "muTest") {object = x@muTest; Columns = Genes; 
+                                       if(ylab == "") ylab = expression(mu[i]); 
+                                       if(xlab == "") xlab = "Gene"; 
+                                       main = ifelse(main == "", "Test group", main)}
+                if(Param == "muRef") {object = x@muRef; Columns = Genes; 
+                                      if(ylab == "") ylab = expression(mu[i]); 
+                                      if(xlab == "") xlab = "Gene"; 
+                                      main = ifelse(main == "", "Reference group", main)}
+                if(Param == "deltaTest") {object = x@deltaTest; Columns = Genes; 
+                                          if(ylab == "") ylab = expression(delta[i]); 
+                                          if(xlab == "") xlab = "Gene";
+                                          main = ifelse(main == "", "Test group", main)}
+                if(Param == "deltaRef") {object = x@deltaRef; Columns = Genes; 
+                                         if(ylab == "") ylab = expression(delta[i]); 
+                                         if(xlab == "") xlab = "Gene"; 
+                                         main = ifelse(main == "", "Reference group", main)}
+                if(Param == "phi") {object = x@phi; Columns = Cells; 
+                                    if(ylab == "") ylab = expression(phi[j]); 
+                                    if(xlab == "") xlab = "Cell"}
+                if(Param == "s") {object = x@s; Columns = Cells; 
+                                  ylab = if(ylab == "") ylab = expression(s[j]); 
+                                  if(xlab == "") xlab = "Cell"}
+                if(Param == "nu") {object = x@nu; Columns = Cells; 
+                                   ylab = if(ylab == "") ylab = expression(nu[j]); 
+                                   if(xlab == "") xlab = "Cell"} 
+                
+                if(ylim == "") {ylim = c(min(object[Columns,2]),max(object[Columns,3]))}
+                
+                plot(Columns, object[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main,...)
+                for(Column in Columns) 
+                {
+                  segments(x0 = Column, y0 = object[Column,2], y1 = object[Column,3], col = col)
+                  segments(x0 = Column-2/length(Columns), y0 = object[Column,2], x1 = Column+2/length(Columns), col = col)
+                  segments(x0 = Column-2/length(Columns), y0 = object[Column,3], x1 = Column+2/length(Columns), col = col)
+                }
+              }
+            }
+            
+            else{
+              ValidCombination = F
+              if(Param == "muTest" & Param2 == "deltaTest")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(mu[i])
+                if(ylim == "") {ylim = c(min(x@deltaTest[Columns,1]),max(x@deltaTest[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@muTest[Columns,1]),max(x@muTest[Columns,1]))}
+                main = ifelse(main == "", "Test group", main)
+                plot(x@muTest[Columns,1], x@deltaTest[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)
+              }
+              if(Param == "deltaTest" & Param2 == "muTest")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = expression(delta[i])
+                if(ylim == "") {ylim = c(min(x@muTest[Columns,1]),max(x@muTest[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@deltaTest[Columns,1]),max(x@deltaTest[Columns,1]))}
+                main = ifelse(main == "", "Test group", main)
+                plot(x@deltaTest[Columns,1], x@muTest[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main,...)
+              }
+              
+              if(Param == "muTest" & Param2 == "muRef")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = expression(mu[i])
+                if(xlim == "") {xlim = c(min(x@muTest[Columns,1]),max(x@muTest[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@muRef[Columns,1]),max(x@muRef[Columns,1]))}
+                main = ifelse(main == "", "Test vs reference group", main)
+                plot(x@muTest[Columns,1], x@muRef[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "muRef" & Param2 == "muTest")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = expression(mu[i])
+                if(ylim == "") {ylim = c(min(x@muTest[Columns,1]),max(x@muTest[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@muRef[Columns,1]),max(x@muRef[Columns,1]))}
+                main = ifelse(main == "", "Reference vs test group", main)
+                plot(x@muRef[Columns,1], x@muTest[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)
+              }
+              
+              if(Param == "deltaTest" & Param2 == "muRef")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = expression(delta[i])
+                if(xlim == "") {xlim = c(min(x@deltaTest[Columns,1]),max(x@deltaTest[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@muRef[Columns,1]),max(x@muRef[Columns,1]))}
+                main = ifelse(main == "", "Test vs reference group", main)
+                plot(x@deltaTest[Columns,1], x@muRef[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "muRef" & Param2 == "deltaTest")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(mu[i])
+                if(ylim == "") {ylim = c(min(x@deltaTest[Columns,1]),max(x@deltaTest[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@muRef[Columns,1]),max(x@muRef[Columns,1]))}
+                main = ifelse(main == "", "Reference vs test group", main)
+                plot(x@muRef[Columns,1], x@deltaTest[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)
+              }
+              
+              if(Param == "muTest" & Param2 == "deltaRef")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(mu[i])
+                if(xlim == "") {xlim = c(min(x@muTest[Columns,1]),max(x@muTest[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@deltaRef[Columns,1]),max(x@deltaRef[Columns,1]))}
+                main = ifelse(main == "", "Test vs reference group", main)
+                plot(x@muTest[Columns,1], x@deltaRef[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "deltaRef" & Param2 == "muTest")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = expression(delta[i])
+                if(ylim == "") {ylim = c(min(x@muTest[Columns,1]),max(x@muTest[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@deltaRef[Columns,1]),max(x@deltaRef[Columns,1]))}
+                main = ifelse(main == "", "Reference vs test group", main)
+                plot(x@deltaRef[Columns,1], x@muTest[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)
+              }
+              
+              if(Param == "deltaRef" & Param2 == "muRef")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(mu[i]); if(xlab == "") xlab = expression(delta[i])
+                if(xlim == "") {xlim = c(min(x@deltaRef[Columns,1]),max(x@deltaRef[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@muRef[Columns,1]),max(x@muRef[Columns,1]))}
+                main = ifelse(main == "", "Reference group", main)
+                plot(x@deltaRef[Columns,1], x@muRef[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "muRef" & Param2 == "deltaRef")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(mu[i])
+                if(ylim == "") {ylim = c(min(x@deltaRef[Columns,1]),max(x@deltaRef[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@muRef[Columns,1]),max(x@muRef[Columns,1]))}
+                main = ifelse(main == "", "Reference group", main)
+                plot(x@muRef[Columns,1], x@deltaRef[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)
+              }
+              
+              if(Param == "deltaRef" & Param2 == "deltaTest")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(delta[i])
+                if(xlim == "") {xlim = c(min(x@deltaRef[Columns,1]),max(x@deltaRef[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@deltaTest[Columns,1]),max(x@deltaTest[Columns,1]))}
+                main = ifelse(main == "", "Reference vs test group", main)
+                plot(x@deltaRef[Columns,1], x@deltaTest[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "deltaTest" & Param2 == "deltaRef")
+              {
+                ValidCombination = T
+                Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(delta[i])
+                if(ylim == "") {ylim = c(min(x@deltaRef[Columns,1]),max(x@deltaRef[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@deltaTest[Columns,1]),max(x@deltaTest[Columns,1]))}
+                main = ifelse(main == "", "Test vs reference group", main)
+                plot(x@deltaTest[Columns,1], x@deltaRef[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)
+              }
+              
+              if(Param == "phi" & Param2 == "s")
+              {
+                ValidCombination = T
+                Columns = Cells; if(ylab == "") ylab = expression(s[i]); if(xlab == "") xlab = expression(phi[i])
+                if(xlim == "") {xlim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
+                plot(x@phi[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "s" & Param2 == "phi")
+              {
+                ValidCombination = T
+                Columns = Cells; if(ylab == "") ylab = expression(phi[i]); if(xlab == "") xlab = expression(s[i])
+                if(ylim == "") {ylim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
+                plot(x@s[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "phi" & Param2 == "nu")
+              {
+                ValidCombination = T
+                Columns = Cells; if(ylab == "") ylab = expression(nu[i]); if(xlab == "") xlab = expression(phi[i])
+                if(xlim == "") {xlim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
+                plot(x@phi[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "nu" & Param2 == "phi")
+              {
+                ValidCombination = T
+                Columns = Cells; if(ylab == "") ylab = expression(phi[i]); if(xlab == "") xlab = expression(nu[i])
+                if(ylim == "") {ylim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
+                plot(x@nu[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "s" & Param2 == "nu")
+              {
+                ValidCombination = T
+                Columns = Cells; if(ylab == "") ylab = expression(nu[i]); if(xlab == "") xlab = expression(s[i])
+                if(xlim == "") {xlim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
+                if(ylim == "") {ylim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
+                plot(x@s[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              if(Param == "nu" & Param2 == "s")
+              {
+                ValidCombination = T
+                Columns = Cells; if(ylab == "") ylab = expression(s[i]); if(xlab == "") xlab = expression(nu[i])
+                if(ylim == "") {ylim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
+                if(xlim == "") {xlim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
+                plot(x@nu[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, 
+                     pch = pch, col = col, bty = bty, main = main, ...)                
+              }
+              
+              if(ValidCombination == F) {stop("Invalid combination for Param and Param2 \n - 
+                                              Combinations between gene-specific and cell-specific parameters are not admitted")}
+              }
+            })
+
+#' @name displaySummaryBASiCS-BASiCS_DV_Summary-method
+#' @aliases displaySummaryBASiCS displaySummaryBASiCS,BASiCS_DV_Summary-method
+#' 
+#' @docType methods
+#' @rdname displaySummaryBASiCS-BASiCS_DV_Summary-method
+#' 
+#' @title Accessors for the slots of a BASiCS_D_Summary object
+#' 
+#' @description Accessors for the slots of a \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' 
+#' @param object an object of class \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' @param Param Name of the slot to be used for the accessed. 
+#' Possible values: \code{"muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu", "thetaTest", "thetaRef"}
+#'  
+#' @return The requested slot of an object of class \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' 
+#' @examples
+#' 
+#' # See
+#' help(BASiCS_DV_MCMC)
+#'   
+#' @seealso \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' 
+#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+setMethod("displaySummaryBASiCS",
+          signature = "BASiCS_DV_Summary",
+          definition = function(object, 
+                                Param = "muTest"){
+            
+            if(!(Param %in% c("muTest", "muRef", 
+                              "deltaTest", "deltaRef", 
+                              "phi", "s", "nu", 
+                              "thetaTest", "thetaRef"))) stop("'Param' argument is invalid")
+            
+            if(Param == "muTest") {return(object@muTest)}  
+            if(Param == "muRef") {return(object@muRef)}  
+            if(Param == "deltaTest") {return(object@deltaTest)}  
+            if(Param == "deltaRef") {return(object@deltaRef)}
+            if(Param == "phi") {return(object@phi)}  
+            if(Param == "s") {return(object@s)}  
+            if(Param == "nu") {return(object@nu)}
+            if(Param == "thetaTest") {return(object@thetaTest)} 
+            if(Param == "thetaRef") {return(object@thetaRef)} 
+          })
+

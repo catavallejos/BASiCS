@@ -68,3 +68,6 @@ version 0.3.5: (2015-11-27)
 - Optional argument `PriorDelta` added to `BASiCS_MCMC` function, to allow optional use of `gamma` or `log-normal` priors for delta. 
 - In `BASiCS_MCMC` function, change of default value of `s2.mu` to 0.5. Allows better shrinkage in situations where a gene has zero counts across all cells.
 - In `BASiCS_Data` class. Count matrices where a gene has zero counts across all cells are now allowed. However, a warning is returned in such case. Only use such matrices when running differential expression results. 
+
+version 0.4.0: (2015-12-21)
+- Preliminary functions for differential expression analyses (mean and over-dispersion) have been added. 
