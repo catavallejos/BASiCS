@@ -49,6 +49,8 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
 \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
 \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \code{phi}.}
 \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}
+\item{\code{Start}}{In general, we do not advise to specify this argument. Default options have been tuned to facilitate convergence. It can be used to set user defined starting points for the MCMC algorithm. If used, it must be a list containing the following elements: \code{mu0},
+\code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0}, \code{ls.theta0}}
 }}
 }
 \value{
