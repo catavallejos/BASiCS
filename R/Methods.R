@@ -229,6 +229,8 @@ setMethod("Summary",
 #' 
 #' @title 'plot' method for BASiCS_Chain objects
 #' 
+#' @description 'plot' method for BASiCS_Chain objects
+#' 
 #' @param x A \code{BASiCS_Chain} object.
 #' @param Param Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}
 #' @param Gene Specifies which gene is requested. Required only if \code{Param = "mu"} or \code{"delta"} 
@@ -367,6 +369,8 @@ setMethod("show",
 #' @rdname plot-BASiCS_Summary-method
 #' 
 #' @title 'plot' method for BASiCS_Summary objects
+#' 
+#' @description 'plot' method for BASiCS_Summary objects
 #' 
 #' @param x A \code{BASiCS_Summary} object.
 #' @param Param Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}
@@ -564,7 +568,7 @@ setMethod("displaySummaryBASiCS",
 #' 
 #' @title S4 methods for BASiCS_DV_Data objects
 #' 
-#' @description S4 methods for \code{\link[BASiCSDV]{BASiCS_DV_Data-class}} objects.  
+#' @description S4 methods for \code{\link[BASiCS]{BASiCS_DV_Data-class}} objects.  
 #' 
 #' @param object A \code{BASiCS_DV_Data} object.
 #' @param type Only required for \code{counts} method. A string indicating which genes must be returned. Valid values: \code{"all", "biological"} and \code{"technical"}
@@ -601,7 +605,7 @@ setMethod("displaySummaryBASiCS",
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data, samples = "test")
 #' 
-#' @seealso \code{\link[BASiCSDV]{BASiCS_DV_Data-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_DV_Data-class}}
 #'  
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
@@ -689,7 +693,7 @@ setMethod("displayTechIndicator",
 #' 
 #' @title 'show' method for BASiCS_DV_Chain objects
 #' 
-#' @description 'show' method for \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}} objects.
+#' @description 'show' method for \code{\link[BASiCS]{BASiCS_DV_Chain-class}} objects.
 #' 
 #' @param object A \code{BASiCS_DV_Chain} object.
 #' 
@@ -722,6 +726,8 @@ setMethod("show",
 #' @rdname plot-BASiCS_DV_Chain-method
 #' 
 #' @title 'plot' method for BASiCS_DV_Chain objects
+#' 
+#' @description  'plot' method for BASiCS_DV_Chain objects
 #' 
 #' @param x A \code{BASiCS_DV_Chain} object.
 #' @param Param Name of the slot to be used for the plot. Possible values: \code{muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef}
@@ -800,7 +806,7 @@ setMethod("plot",
 #' @param x A \code{BASiCS_DV_Chain} object.
 #' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}} function. 
 #' 
-#' @return An object of class \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}. 
+#' @return An object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}. 
 #' 
 #' @examples 
 #' 
@@ -854,20 +860,20 @@ setMethod("Summary",
 #' 
 #' @title Accessors for the slots of a BASiCS_DV_Chain object
 #' 
-#' @description Accessors for the slots of a \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
 #' 
-#' @param object an object of class \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
 #' @param Param Name of the slot to be used for the accessed. 
 #' Possible values: \code{muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef}
 #' 
-#' @return The requested slot of an object of class \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
 #' 
 #' @examples
 #' 
 #' # See
 #' help(BASiCS_DV_MCMC)
 #'   
-#' @seealso \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("displayChainBASiCS",
@@ -899,7 +905,7 @@ setMethod("displayChainBASiCS",
 #' 
 #' @title 'show' method for BASiCS_DV_Summary objects
 #' 
-#' @description 'show' method for \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}} objects.
+#' @description 'show' method for \code{\link[BASiCS]{BASiCS_DV_Summary-class}} objects.
 #' 
 #' @param object A \code{BASiCS_DV_Summary} object.
 #' 
@@ -931,6 +937,8 @@ setMethod("show",
 #' @rdname plot-BASiCS_DV_Summary-method
 #' 
 #' @title 'plot' method for BASiCS_DV_Summary objects
+#' 
+#' @description 'plot' method for BASiCS_DV_Summary objects
 #' 
 #' @param x A \code{BASiCS_DV_Summary} object.
 #' @param Param Name of the slot to be used for the plot. 
@@ -1253,20 +1261,20 @@ setMethod("plot",
 #' 
 #' @title Accessors for the slots of a BASiCS_D_Summary object
 #' 
-#' @description Accessors for the slots of a \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
 #' 
-#' @param object an object of class \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
 #' @param Param Name of the slot to be used for the accessed. 
 #' Possible values: \code{"muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu", "thetaTest", "thetaRef"}
 #'  
-#' @return The requested slot of an object of class \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
 #' 
 #' @examples
 #' 
 #' # See
 #' help(BASiCS_DV_MCMC)
 #'   
-#' @seealso \code{\link[BASiCSDV]{BASiCS_DV_Summary-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("displaySummaryBASiCS",

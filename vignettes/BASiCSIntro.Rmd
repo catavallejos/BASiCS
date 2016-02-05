@@ -103,15 +103,17 @@ These elements must be stored into an object of class `BASiCS_Data`. For example
 ```{r ExampleDataTest}
 set.seed(1)
 Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
 Tech = c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
 SpikeInput = rgamma(10,1,1)
+SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeInput)
 
 # No batch effect
-DataExample = newBASiCS_Data(Counts, Tech, SpikeInput)
+DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo)
 
 # With batch effect
-DataExample = newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo = rep(c(1,2), each = 5)) 
+DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = rep(c(1,2), each = 5)) 
 ```
 
 Some datasets require filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering 
@@ -120,7 +122,9 @@ Some datasets require filtering before performing the analysis. This is in order
 Filter = BASiCS_Filter(Counts, Tech, SpikeInput, 
                        MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
                        MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
-FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, Filter$SpikeInput)
+SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID %in% 
+                              names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
+FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 ```
 
 For illustration purposes, the BASiCS package includes a built-in simulated dataset:

@@ -243,9 +243,11 @@ HiddenEFNRDV<-function(
 #' 
 #' @title Detection of genes with changes in expression
 #' 
+#' @description Function to assess changes in expression (mean and over-dispersion)
+#' 
 #' @param Data an object of class \code{\link[BASiCS]{BASiCS_DV_Data-class}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
-#' @param GeneNames to be removed. This will be an slot of Data
+#' @param GeneNames Vector containing gene names to be used in results table (argument to be removed as 'GeneNames' will be an slot of `BASiCS_DV_Data` object)
 #' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)
 #' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number)
 #' @param EviThresholdM Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)
@@ -254,6 +256,9 @@ HiddenEFNRDV<-function(
 #' @param GroupLabelRef Label assigned to reference group. Default: \code{GroupLabelRef = "Ref"}
 #' @param GroupLabelTest Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}
 #' @param Plot If \code{Plot = T}, error rates control rates and volcano plots are generated.  
+#' @param OffSet Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step. 
+#' @param EFDR_M Target for expected false discovery rate related to the comparison of means (default = 0.05)
+#' @param EFDR_D Target for expected false discovery rate related to the comparison of dispersions (default = 0.05)
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @return \code{BASiCS_DV_TestDE} returns a list of 4 elements:
@@ -324,8 +329,8 @@ BASiCS_DV_TestDE <- function(Data,
   if(OffSet)
   {
     # With offset correction
-    ChainMuRefOffSet = MCMC_Output@muRef / rowSums(MCMC_Output@muRef)
-    ChainMuTestOffSet = MCMC_Output@muTest / rowSums(MCMC_Output@muTest)
+    ChainMuRefOffSet = object@muRef / rowSums(object@muRef)
+    ChainMuTestOffSet = object@muTest / rowSums(object@muTest)
     MedianMuRefOffSet = apply(ChainMuRefOffSet, 2, median)
     MedianMuTestOffSet = apply(ChainMuTestOffSet, 2, median)
     
@@ -504,35 +509,35 @@ BASiCS_DV_TestDE <- function(Data,
   {    
     args <- list(...)
     
-    if(Search)
-    {      
-      par(ask=T)
-      
-      plot(EviThresholds, EFDR, type = "l", lty = 1, bty = "n", ylab = "Error rate", xlab = "Evidence threshold", ylim = c(0,1))
-      lines(EviThresholds, EFNR, lty = 2)      
-      legend('topleft', c("EFDR", "EFNR"), lty = 1:2, bty = "n")
-    }
+#    if(Search)
+#    {      
+#      par(ask=T)
+#      
+#      plot(EviThresholds, EFDR, type = "l", lty = 1, bty = "n", ylab = "Error rate", xlab = "Evidence threshold", ylim = c(0,1))
+#      lines(EviThresholds, EFNR, lty = 2)      
+#      legend('topleft', c("EFDR", "EFNR"), lty = 1:2, bty = "n")
+#    }
     
-    if("ylim" %in% names(args)) {ylim = args$ylim} else{ylim = c(0, 1)}
-    if("xlim" %in% names(args)) {xlim = args$xlim} else{xlim = c(min(Mu),max(Mu))}
-    cex = ifelse("cex" %in% names(args),args$cex, 1.5)
-    pch = ifelse("pch" %in% names(args),args$pch, 16)
-    col = ifelse("col" %in% names(args),args$col, 8)
-    bty = ifelse("bty" %in% names(args),args$bty, "n")
-    cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
-    cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
-    cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1) 
-    xlab = ifelse("xlab" %in% names(args),args$xlab, expression(mu[i]))
-    ylab = ifelse("ylab" %in% names(args),args$ylab, "HVG probability")
-    main = ifelse("main" %in% names(args),args$main, "") 
+#    if("ylim" %in% names(args)) {ylim = args$ylim} else{ylim = c(0, 1)}
+#    if("xlim" %in% names(args)) {xlim = args$xlim} else{xlim = c(min(Mu),max(Mu))}
+#    cex = ifelse("cex" %in% names(args),args$cex, 1.5)
+#    pch = ifelse("pch" %in% names(args),args$pch, 16)
+#    col = ifelse("col" %in% names(args),args$col, 8)
+#    bty = ifelse("bty" %in% names(args),args$bty, "n")
+#    cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
+#    cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
+#    cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1) 
+#    xlab = ifelse("xlab" %in% names(args),args$xlab, expression(mu[i]))
+#    ylab = ifelse("ylab" %in% names(args),args$ylab, "HVG probability")
+#    main = ifelse("main" %in% names(args),args$main, "") 
     
-    plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex,
-         bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
-         xlab = xlab, ylab = ylab, main = main)
-    abline(h = OptThreshold[1], lty = 2, col = "black")
-    points(Mu[HVG], Prob[HVG], pch = pch, col = "red", cex = cex)
+#    plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex,
+#         bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
+#         xlab = xlab, ylab = ylab, main = main)
+#    abline(h = OptThreshold[1], lty = 2, col = "black")
+#    points(Mu[HVG], Prob[HVG], pch = pch, col = "red", cex = cex)
     
-    par(ask=F)
+#    par(ask=F)
   }
   
   list("Table" = FullList, 

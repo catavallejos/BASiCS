@@ -22,12 +22,20 @@
 #' 
 #' @examples
 #' 
-#' Counts = matrix(rpois(50*10, 2), ncol = 10)
+#' set.seed(1)
+#' Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+#' rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
 #' Tech = c(rep(FALSE,40),rep(TRUE,10))
+#' set.seed(2)
 #' SpikeInput = rgamma(10,1,1)
-#' Filter = BASiCS_Filter(Counts, Tech, SpikeInput)
+#' SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeInput)
 #' 
-#' FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, Filter$SpikeInput)
+#' Filter = BASiCS_Filter(Counts, Tech, SpikeInput, 
+#'                        MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
+#'                        MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
+#' SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID %in% 
+#'          names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
+#' FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
 #' 
@@ -89,21 +97,21 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput,
 #' # Expression counts
 #' set.seed(1)
 #' Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
-#' rownames(Counts) <- paste("Gene", 1:nrow(Counts))
+#' rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
 #' 
 #' # Technical information 
 #' Tech = c(rep(FALSE,40),rep(TRUE,10))
 #' 
 #' # Spikes input number of molecules 
 #' set.seed(2)
-#' SpikeInput <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
+#' SpikeInfo <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
 #' 
 #' # Creating a BASiCS_Data object (no batch effect)
-#' DataExample = newBASiCS_Data(Counts, Tech, SpikeInput)
+#' DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo)
 #' 
 #' # Creating a BASiCS_Data object (with batch effect)
 #' BatchInfo = c(rep(1, 5), rep(2, 5))
-#' DataExample = newBASiCS_Data(Counts, Tech, SpikeInput, BatchInfo)
+#' DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
 #' 
 #' # Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 #' 
@@ -821,9 +829,10 @@ HiddenEFNR<-function(
 #' 
 #' @title Decomposition of gene expression variability according to BASiCS
 #' 
+#' @description Function to decompose total variability of gene expression into biological and technical components. 
+#' 
 #' @param Data an object of class \code{\link[BASiCS]{BASiCS_Data-class}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
-#' @param GeneNames Vector of characters containing gene names (must be in the same order as in the Counts matrix).
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated
 #' @param ... Other arguments to be passed to \code{\link[graphics]{barplot}}
@@ -947,13 +956,14 @@ BASiCS_VarianceDecomp <- function(Data,
 #' 
 #' @title Detection method for highly and lowly variable genes
 #' 
+#' @description Functions to detect highly and lowly variable genes
+#' 
 #' @param Data an object of class \code{\link[BASiCS]{BASiCS_Data-class}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param VarThreshold Variance contribution threshold (must be a positive value, between 0 and 1)
 #' @param EviThreshold Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.
 #' @param Plot If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.
-#' @param GeneNames Vector of characters containing gene names (must be in the same order as in the Counts matrix).
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @return \code{BASiCS_DetectHVG} returns a list of 4 elements:
@@ -1260,6 +1270,8 @@ BASiCS_DetectLVG <- function(Data,
 #' @aliases BASiCS_VarThresholdSearchHVG BASiCS_VarThresholdSearchHVG_LVG
 #' 
 #' @title Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
+#' 
+#' @description Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
 #' 
 #' @param Data an object of class \code{\link[BASiCS]{BASiCS_Data-class}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}

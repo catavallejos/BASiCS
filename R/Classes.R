@@ -16,10 +16,20 @@
 #' 
 #' @examples
 #'
-#' Counts = matrix(rpois(10*5, 1), ncol = 5)
-#' Tech = c(rep(FALSE,7),rep(TRUE,3))
-#' SpikeInput = rgamma(3,1,1)
-#' Data = newBASiCS_Data(Counts, Tech, SpikeInput)
+#' # Expression counts
+#' set.seed(1)
+#' Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+#' rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
+#' 
+#' # Technical information 
+#' Tech = c(rep(FALSE,40),rep(TRUE,10))
+#' 
+#' # Spikes input number of molecules 
+#' set.seed(2)
+#' SpikeInfo <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
+#' 
+#' # Creating a BASiCS_Data object (no batch effect)
+#' Data = newBASiCS_Data(Counts, Tech, SpikeInfo)
 #' 
 #' head(counts(Data))
 #' dim(counts(Data, type="biological"))
