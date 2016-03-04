@@ -7,6 +7,7 @@ setGeneric("displayGeneNames", function(object, ...){})
 setGeneric("displayBatchInfo", function(object, ...){})
 setGeneric("displayChainBASiCS", function(object, ...){})
 setGeneric("displaySummaryBASiCS", function(object, ...){})
+#setGeneric("displayOffsetBASiCS", function(object, ...){})
 
 ##########################################################################
 # Methods for BASiCS_Data objects
@@ -560,17 +561,17 @@ setMethod("displaySummaryBASiCS",
 
 
 ##########################################################################
-# Methods for BASiCS_DV_Data objects
+# Methods for BASiCS_D_Data objects
 ##########################################################################
 
-#' @name BASiCS_DV_Data-methods
-#' @aliases show,BASiCS_DV_Data-method
+#' @name BASiCS_D_Data-methods
+#' @aliases show,BASiCS_D_Data-method
 #' 
-#' @title S4 methods for BASiCS_DV_Data objects
+#' @title S4 methods for BASiCS_D_Data objects
 #' 
-#' @description S4 methods for \code{\link[BASiCS]{BASiCS_DV_Data-class}} objects.  
+#' @description S4 methods for \code{\link[BASiCS]{BASiCS_D_Data-class}} objects.  
 #' 
-#' @param object A \code{BASiCS_DV_Data} object.
+#' @param object A \code{BASiCS_D_Data} object.
 #' @param type Only required for \code{counts} method. A string indicating which genes must be returned. Valid values: \code{"all", "biological"} and \code{"technical"}
 #' @param samples A string indicating which samples must be returned. Valid values: \code{"test"} and \code{"reference"}. 
 #' 
@@ -595,9 +596,10 @@ setMethod("displaySummaryBASiCS",
 #' \item{\code{if(samples == "test")}}{Returns \code{SpikeInputTest} slot of \code{object}.}
 #' \item{\code{if(samples == "reference")}}{Returns \code{SpikeInputRef} slot of \code{object}.}}}}
 #' 
+#' 
 #' @examples
 #' 
-#' Data = makeExampleBASiCS_DV_Data()
+#' Data = makeExampleBASiCS_D_Data()
 #' show(Data)
 #' head(counts(Data, samples = "test"))
 #' dim(counts(Data, type="biological", samples = "test"))
@@ -605,13 +607,13 @@ setMethod("displaySummaryBASiCS",
 #' displayTechIndicator(Data)
 #' displaySpikeInput(Data, samples = "test")
 #' 
-#' @seealso \code{\link[BASiCS]{BASiCS_DV_Data-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_D_Data-class}}
 #'  
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
-#' @rdname BASiCS_DV_Data-methods
+#' @rdname BASiCS_D_Data-methods
 setMethod("show",
-          signature = "BASiCS_DV_Data",
+          signature = "BASiCS_D_Data",
           definition = function(object){
             q = nrow(object@CountsTest)
             q.bio = nrow(object@CountsTest) - length(object@SpikeInputTest)
@@ -622,14 +624,14 @@ setMethod("show",
             cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
             cat("        - ", nTest, " cells in the test sample \n", sep = "")
             cat("        - ", nRef, " cells in the reference sample \n", sep = "")
-            cat(" Elements (slots): CountsTest, CountsRef, Tech, SpikeInputTest and SpikeInputRef.\n")
+            cat(" Elements (slots): CountsTest, CountsRef, Tech, SpikeInputTest, SpikeInputRef and GeneNames.\n")
           })
 
-#' @name BASiCS_DV_Data-methods
-#' @aliases counts counts,BASiCS_DV_Data-method
-#' @rdname BASiCS_DV_Data-methods
+#' @name BASiCS_D_Data-methods
+#' @aliases counts counts,BASiCS_D_Data-method
+#' @rdname BASiCS_D_Data-methods
 setMethod("counts",
-          signature = "BASiCS_DV_Data",
+          signature = "BASiCS_D_Data",
           definition = function(object, type = "all", samples = "test"){
             
             if(!(type %in% c("all", "biological", "technical"))) stop("Invalid option for argument 'type'.")
@@ -652,11 +654,11 @@ setMethod("counts",
             }
           })
 
-#' @name BASiCS_DV_Data-methods
-#' @aliases displaySpikeInput displaySpikeInput,BASiCS_DV_Data-method
-#' @rdname BASiCS_DV_Data-methods
+#' @name BASiCS_D_Data-methods
+#' @aliases displaySpikeInput displaySpikeInput,BASiCS_D_Data-method
+#' @rdname BASiCS_D_Data-methods
 setMethod("displaySpikeInput",
-          signature = "BASiCS_DV_Data",
+          signature = "BASiCS_D_Data",
           definition = function(object, samples = "test"){
             
             if(!(samples %in% c("test", "reference"))) stop("Invalid option for argument 'samples'.")
@@ -674,11 +676,11 @@ setMethod("displaySpikeInput",
             }           
           })
 
-#' @name BASiCS_DV_Data-methods
-#' @aliases displayTechIndicator displayTechIndicator,BASiCS_DV_Data-method
-#' @rdname BASiCS_DV_Data-methods
+#' @name BASiCS_D_Data-methods
+#' @aliases displayTechIndicator displayTechIndicator,BASiCS_D_Data-method
+#' @rdname BASiCS_D_Data-methods
 setMethod("displayTechIndicator",
-          signature = "BASiCS_DV_Data",
+          signature = "BASiCS_D_Data",
           definition = function(object){
             return(object@Tech)
           })
@@ -688,26 +690,26 @@ setMethod("displayTechIndicator",
 # Methods for BASiCS_D_Chain objects
 ##########################################################################
 
-#' @name BASiCS_DV_Chain-methods
-#' @aliases show,BASiCS_DV_Chain-method
+#' @name BASiCS_D_Chain-methods
+#' @aliases show,BASiCS_D_Chain-method
 #' 
-#' @title 'show' method for BASiCS_DV_Chain objects
+#' @title 'show' method for BASiCS_D_Chain objects
 #' 
-#' @description 'show' method for \code{\link[BASiCS]{BASiCS_DV_Chain-class}} objects.
+#' @description 'show' method for \code{\link[BASiCS]{BASiCS_D_Chain-class}} objects.
 #' 
-#' @param object A \code{BASiCS_DV_Chain} object.
+#' @param object A \code{BASiCS_D_Chain} object.
 #' 
 #' @return Prints a summary of the properties of \code{object}.
 #' 
 #' @examples
 #' 
-#' Data = makeExampleBASiCS_DV_Data()
-#' #MCMC_Output <- BASiCS_DV_MCMC(Data, N = 50, Thin = 2, Burn = 2)
+#' Data = makeExampleBASiCS_D_Data()
+#' #MCMC_Output <- BASiCS_D_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' @rdname BASiCS_D_Chain-methods
 setMethod("show",
-          signature = "BASiCS_DV_Chain",
+          signature = "BASiCS_D_Chain",
           definition = function(object){
             N = nrow(object@muTest)
             q.bio = ncol(object@muTest)
@@ -715,21 +717,22 @@ setMethod("show",
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" ", N," MCMC samples.\n", sep = "")
             cat(" Dataset contains ", q.bio, " biological genes and ", n, " cells (in total across both samples).\n", sep="")
-            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest and thetaRef.\n")
+            cat(" Offset = ", object@offset, ".\n", sep = "")
+            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest, thetaRef and offset.\n")
+            
           })
 
-
-#' @name plot-BASiCS_DV_Chain-method
-#' @aliases plot plot,BASiCS_DV_Chain-method
+#' @name plot-BASiCS_D_Chain-method
+#' @aliases plot plot,BASiCS_D_Chain-method
 #' 
 #' @docType methods
-#' @rdname plot-BASiCS_DV_Chain-method
+#' @rdname plot-BASiCS_D_Chain-method
 #' 
-#' @title 'plot' method for BASiCS_DV_Chain objects
+#' @title 'plot' method for BASiCS_D_Chain objects
 #' 
-#' @description  'plot' method for BASiCS_DV_Chain objects
+#' @description  'plot' method for BASiCS_D_Chain objects
 #' 
-#' @param x A \code{BASiCS_DV_Chain} object.
+#' @param x A \code{BASiCS_D_Chain} object.
 #' @param Param Name of the slot to be used for the plot. Possible values: \code{muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef}
 #' @param Gene Specifies which gene is requested. Required only if \code{Param = "muTest"}, \code{Param = "muRef"}, \code{"deltaTest"} or \code{"deltaRef"}
 #' @param Cell Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}
@@ -741,11 +744,11 @@ setMethod("show",
 #' @examples
 #' 
 #' # See
-#' help(BASiCS_DV_MCMC)
+#' help(BASiCS_D_MCMC)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("plot",
-          signature = "BASiCS_DV_Chain",
+          signature = "BASiCS_D_Chain",
           definition = function(x, 
                                 Param = "muTest",
                                 Gene = NULL,
@@ -792,29 +795,29 @@ setMethod("plot",
           })
 
 #' @name Summary
-#' @aliases Summary Summary,BASiCS_DV_Chain-method
+#' @aliases Summary Summary,BASiCS_D_Chain-method
 #' 
 #' @docType methods
-#' @rdname Summary-BASiCS_DV_Chain-method
+#' @rdname Summary-BASiCS_D_Chain-method
 #' 
-#' @title 'Summary' method for BASiCS_DV_Chain objects
+#' @title 'Summary' method for BASiCS_D_Chain objects
 #' 
 #' @description For each of the BASiCS parameters, 
 #' \code{Summary} returns the corresponding postior medians and limits of the high posterior
 #' density interval with probabilty equal to \code{prob}.
 #' 
-#' @param x A \code{BASiCS_DV_Chain} object.
+#' @param x A \code{BASiCS_D_Chain} object.
 #' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}} function. 
 #' 
-#' @return An object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}. 
+#' @return An object of class \code{\link[BASiCS]{BASiCS_D_Summary-class}}. 
 #' 
 #' @examples 
 #' 
-#' # See help(BASiCS_DV_MCMC)
+#' # See help(BASiCS_D_MCMC)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("Summary",
-          signature = "BASiCS_DV_Chain",
+          signature = "BASiCS_D_Chain",
           definition = function(x, prob = 0.95){
             
             MuTest = apply(x@muTest,2,median)
@@ -837,7 +840,7 @@ setMethod("Summary",
             HPDThetaTest = coda::HPDinterval(coda::mcmc(x@thetaTest), prob=prob)
             HPDThetaRef = coda::HPDinterval(coda::mcmc(x@thetaRef), prob=prob)
             
-            Output <- new("BASiCS_DV_Summary", 
+            Output <- new("BASiCS_D_Summary", 
                           muTest = cbind(MuTest, HPDMuTest),
                           muRef = cbind(MuRef, HPDMuRef),
                           deltaTest = cbind(DeltaTest, HPDDeltaTest),
@@ -852,32 +855,32 @@ setMethod("Summary",
           })
 
 
-#' @name displayChainBASiCS-BASiCS_DV_Chain-method
-#' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_DV_Chain-method
+#' @name displayChainBASiCS-BASiCS_D_Chain-method
+#' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_D_Chain-method
 #' 
 #' @docType methods
-#' @rdname displayChainBASiCS-BASiCS_DV_Chain-method
+#' @rdname displayChainBASiCS-BASiCS_D_Chain-method
 #' 
-#' @title Accessors for the slots of a BASiCS_DV_Chain object
+#' @title Accessors for the slots of a BASiCS_D_Chain object
 #' 
-#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 #' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 #' @param Param Name of the slot to be used for the accessed. 
 #' Possible values: \code{muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef}
 #' 
-#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 #' 
 #' @examples
 #' 
 #' # See
-#' help(BASiCS_DV_MCMC)
+#' help(BASiCS_D_MCMC)
 #'   
-#' @seealso \code{\link[BASiCS]{BASiCS_DV_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("displayChainBASiCS",
-          signature = "BASiCS_DV_Chain",
+          signature = "BASiCS_D_Chain",
           definition = function(object, 
                                 Param = "muTest"){
             
@@ -897,29 +900,29 @@ setMethod("displayChainBASiCS",
           })
 
 ##########################################################################
-# Methods for BASiCS_DV_Summary objects
+# Methods for BASiCS_D_Summary objects
 ##########################################################################
 
-#' @name BASiCS_DV_Summary-methods
-#' @aliases show,BASiCS_DV_Summary-method
+#' @name BASiCS_D_Summary-methods
+#' @aliases show,BASiCS_D_Summary-method
 #' 
-#' @title 'show' method for BASiCS_DV_Summary objects
+#' @title 'show' method for BASiCS_D_Summary objects
 #' 
-#' @description 'show' method for \code{\link[BASiCS]{BASiCS_DV_Summary-class}} objects.
+#' @description 'show' method for \code{\link[BASiCS]{BASiCS_D_Summary-class}} objects.
 #' 
-#' @param object A \code{BASiCS_DV_Summary} object.
+#' @param object A \code{BASiCS_D_Summary} object.
 #' 
 #' @return Prints a summary of the properties of \code{object}.
 #' 
 #' @examples
 #' 
-#' # see help(BASiCS_DV_MCMC)
+#' # see help(BASiCS_D_MCMC)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
-#' @rdname BASiCS_DV_Summary-methods
+#' @rdname BASiCS_D_Summary-methods
 setMethod("show",
-          signature = "BASiCS_DV_Summary",
+          signature = "BASiCS_D_Summary",
           definition = function(object){
             q.bio = nrow(object@muTest)
             q = nrow(object@deltaTest)
@@ -927,20 +930,22 @@ setMethod("show",
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" Contains posterior medians and limits of HPD 95% interval for BASiCSD parameters.\n")
             cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest and thetaRef.\n")
+            cat(" Offset = ", object@offset, ".\n", sep = "")
+            cat(" HPD interval probability = ", object@probHPD, ".\n", sep = "")
+            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest, thetaRef, offset and probHPD.\n")
           })
 
-#' @name plot-BASiCS_DV_Summary-method
-#' @aliases plot,BASiCS_DV_Summary-method
+#' @name plot-BASiCS_D_Summary-method
+#' @aliases plot,BASiCS_D_Summary-method
 #' 
 #' @docType methods
-#' @rdname plot-BASiCS_DV_Summary-method
+#' @rdname plot-BASiCS_D_Summary-method
 #' 
-#' @title 'plot' method for BASiCS_DV_Summary objects
+#' @title 'plot' method for BASiCS_D_Summary objects
 #' 
-#' @description 'plot' method for BASiCS_DV_Summary objects
+#' @description 'plot' method for BASiCS_D_Summary objects
 #' 
-#' @param x A \code{BASiCS_DV_Summary} object.
+#' @param x A \code{BASiCS_D_Summary} object.
 #' @param Param Name of the slot to be used for the plot. 
 #' Possible values: \code{"muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu", "thetaTest", "thetaRef"}
 #' @param Param2 Name of the second slot to be used for the plot. 
@@ -963,11 +968,11 @@ setMethod("show",
 #' @examples
 #' 
 #' # See
-#' help(BASiCS_DV_MCMC)
+#' help(BASiCS_D_MCMC)
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("plot",
-          signature = "BASiCS_DV_Summary",
+          signature = "BASiCS_D_Summary",
           definition = function(x, 
                                 Param = "muTest",
                                 Param2 = NULL,
@@ -1253,32 +1258,32 @@ setMethod("plot",
               }
             })
 
-#' @name displaySummaryBASiCS-BASiCS_DV_Summary-method
-#' @aliases displaySummaryBASiCS displaySummaryBASiCS,BASiCS_DV_Summary-method
+#' @name displaySummaryBASiCS-BASiCS_D_Summary-method
+#' @aliases displaySummaryBASiCS displaySummaryBASiCS,BASiCS_D_Summary-method
 #' 
 #' @docType methods
-#' @rdname displaySummaryBASiCS-BASiCS_DV_Summary-method
+#' @rdname displaySummaryBASiCS-BASiCS_D_Summary-method
 #' 
 #' @title Accessors for the slots of a BASiCS_D_Summary object
 #' 
-#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_D_Summary-class}}
 #' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_D_Summary-class}}
 #' @param Param Name of the slot to be used for the accessed. 
 #' Possible values: \code{"muTest", "muRef", "deltaTest", "deltaRef", "phi", "s", "nu", "thetaTest", "thetaRef"}
 #'  
-#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_D_Summary-class}}
 #' 
 #' @examples
 #' 
 #' # See
-#' help(BASiCS_DV_MCMC)
+#' help(BASiCS_D_MCMC)
 #'   
-#' @seealso \code{\link[BASiCS]{BASiCS_DV_Summary-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_D_Summary-class}}
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 setMethod("displaySummaryBASiCS",
-          signature = "BASiCS_DV_Summary",
+          signature = "BASiCS_D_Summary",
           definition = function(object, 
                                 Param = "muTest"){
             

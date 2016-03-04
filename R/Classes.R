@@ -42,7 +42,7 @@
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setClass("BASiCS_Data",
          representation = representation(
            Counts = "matrix",
@@ -124,7 +124,7 @@ setClass("BASiCS_Data",
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setClass("BASiCS_Chain",
          representation = representation(
            mu = "matrix",
@@ -195,14 +195,14 @@ setClass("BASiCS_Summary",
          }
 )
 
-#' @name BASiCS_DV_Data-class
-#' @aliases BASiCS_DV_Data,BASiCS_DV_Data-class
+#' @name BASiCS_D_Data-class
+#' @aliases BASiCS_D_Data,BASiCS_D_Data-class
 #' 
-#' @title The BASiCS_DV_Data class 
+#' @title The BASiCS_D_Data class 
 #' 
 #' @description Container of expression counts from single-cell 
 #' sequencing experiments in the format required to perform the differential
-#' expression and differential variability tests using BASiCS_DV.
+#' expression and differential over-dispersion tests using \code{BASiCS}.
 #' 
 #' @slot CountsTest Matrix of dimensions \code{q} times \code{n_test} whose elements corresponds to the raw expression counts in the test sample. 
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes. 
@@ -211,34 +211,24 @@ setClass("BASiCS_Summary",
 #' @slot Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
 #' @slot SpikeInputTest Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the test sample (amount per cell). 
 #' @slot SpikeInputRef Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the reference sample (amount per cell). 
+#' @slot GeneNames Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)}, 
+#' with numbering order as in the input dataset. 
 #' 
 #' @examples
 #'
-#' CountsTest = matrix(rpois(100*5, 2), ncol = 5)
-#' CountsRef = matrix(rpois(100*5, 2), ncol = 5)
-#' Tech = c(rep(FALSE,80),rep(TRUE,20))
-#' SpikeInputTest = rgamma(20,1,1)
-#' SpikeInputRef = rgamma(20,1,1)
-#' Data = newBASiCS_DV_Data(CountsTest, CountsRef, Tech, SpikeInputTest, SpikeInputRef)
-#' 
-#' #head(counts(Data))
-#' #dim(counts(Data, sample = "test", type="biological"))
-#' #dim(counts(Data, sample = "reference", type="technical"))
-#' #displayTechIndicator(Data)
-#' #displaySpikeInput(Data)
+#' # See vignette
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #' 
-# ' # @seealso \code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
-#' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-setClass("BASiCS_DV_Data",
+#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+setClass("BASiCS_D_Data",
          representation = representation(
            CountsTest = "matrix",
            CountsRef = "matrix",
            Tech = "vector",
            SpikeInputTest = "vector",
-           SpikeInputRef = "vector"),
+           SpikeInputRef = "vector",
+           GeneNames = "vector"),
          validity = function(object){
            errors <- character()
            
@@ -269,6 +259,9 @@ setClass("BASiCS_DV_Data",
            if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
              errors <- c(errors, "Argument's dimensions are not compatible.")
            
+           if(length(object@GeneNames) != q)
+             errors <- c(errors, "Incorrect length of the vector stored in the GeneNames slot.")
+           
            if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
              errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
            
@@ -293,13 +286,14 @@ setClass("BASiCS_DV_Data",
 
 
 
-#' @name BASiCS_DV_Chain-class
-#' @aliases BASiCS_DV_Chain BASiCS_DV_Chain,BASiCS_DV_Chain-class
+#' @name BASiCS_D_Chain-class
+#' @aliases BASiCS_D_Chain BASiCS_D_Chain,BASiCS_D_Chain-class
 #' 
-#' @title The BASiCS_DV_Chain class
+#' @title The BASiCS_D_Chain class
 #' 
-#' @description Container of an MCMC sample of the BASiCSDV' model parameters as generated
-#' by the function \code{\link[BASiCSDV]{BASiCS_DV_MCMC}}. 
+#' @description Container of an MCMC sample of the BASiCS model parameters when comparing 2 populations of cells. 
+#' For each population, these are independently generated by the function \code{\link[BASiCS]{BASiCS_MCMC}} and 
+#' afterwards combined through the function \code{\link[BASiCS]{CombineBASiCS_Chain}} . 
 #' 
 #' @slot muTest MCMC chain for gene-specific expression levels \eqn{\mu[i]} in test group, defined as true input molecules in case of technical genes 
 #' (matrix with \code{q.bio} columns, all elements must be positive numbers)
@@ -317,15 +311,14 @@ setClass("BASiCS_DV_Data",
 #' (matrix with \code{n} columns, all elements must be positive numbers)
 #' @slot thetaTest MCMC chain for technical variability hyper-parameter \eqn{\theta[test]} in the test sample (vector, all elements must be positive)
 #' @slot thetaRef MCMC chain for technical variability hyper-parameter \eqn{\theta[ref]} in the reference sample (vector, all elements must be positive)
+#' @slot offset Offset value to capture global changes in mRNA content. Default value = 1 (when no offset correction has been performed)
 #'   
 #' @examples
 #' 
-#' # A BASiCS_Chain object created by the BASiCS_MCMC function.
-#' Data = makeExampleBASiCS_DV_Data()
-#'# MCMC_Output <- BASiCS_DV_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+#' # See vignette
 #' 
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
-setClass("BASiCS_DV_Chain",
+setClass("BASiCS_D_Chain",
          representation = representation(
            muTest = "matrix",
            muRef = "matrix",
@@ -335,68 +328,72 @@ setClass("BASiCS_DV_Chain",
            s = "matrix",
            nu = "matrix",
            thetaTest = "vector",
-           thetaRef = "vector"),
+           thetaRef = "vector",
+           offset = "numeric"),
          validity = function(object){
            errors <- character()
            
            if(length(object@muTest)==0 | length(object@muRef)==0 | 
-                length(object@deltaTest)==0 | length(object@deltaRef)==0 | 
-                length(object@phi)==0 | length(object@s)==0 | length(object@nu)==0 | 
-                length(object@thetaTest)==0 | length(object@thetaRef)==0) {errors <-c(errors,"One or more slots are missing"); stop(errors)}   
+              length(object@deltaTest)==0 | length(object@deltaRef)==0 | 
+              length(object@phi)==0 | length(object@s)==0 | length(object@nu)==0 | 
+              length(object@thetaTest)==0 | length(object@thetaRef)==0 | 
+              is.null(offset)) {errors <-c(errors,"One or more slots are missing"); stop(errors)}   
            
            N = nrow(object@muTest)
            q.bio = ncol(object@muTest)
            n = ncol(object@phi)
            if(nrow(object@muRef) != N | 
-                nrow(object@deltaTest) != N | nrow(object@deltaRef) != N |
-                nrow(object@phi) != N | nrow(object@s) != N |
-                nrow(object@nu) != N | length(object@thetaTest) != N | length(object@thetaRef) != N |
-                ncol(object@muRef) != q.bio | 
-                ncol(object@deltaTest) != q.bio | ncol(object@deltaRef) != q.bio |
-                ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}
+              nrow(object@deltaTest) != N | nrow(object@deltaRef) != N |
+              nrow(object@phi) != N | nrow(object@s) != N |
+              nrow(object@nu) != N | length(object@thetaTest) != N | length(object@thetaRef) != N |
+              ncol(object@muRef) != q.bio | 
+              ncol(object@deltaTest) != q.bio | ncol(object@deltaRef) != q.bio |
+              ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}
            
            if(sum(!is.finite(object@muTest)) + sum(!is.finite(object@muRef)) + 
-                sum(!is.finite(object@deltaTest)) + sum(!is.finite(object@deltaRef)) +
-                sum(!is.finite(object@phi)) + sum(!is.finite(object@s)) + sum(!is.finite(object@nu)) + 
-                sum(!is.finite(object@thetaTest)) + 
-                sum(!is.finite(object@thetaRef)) > 0) {errors <-c(errors,"One or more of the slots contains NAs or Infinite values")}
+              sum(!is.finite(object@deltaTest)) + sum(!is.finite(object@deltaRef)) +
+              sum(!is.finite(object@phi)) + sum(!is.finite(object@s)) + sum(!is.finite(object@nu)) + 
+              sum(!is.finite(object@thetaTest)) + 
+              sum(!is.finite(object@thetaRef)) +
+              !is.finite(object@offset) > 0) {errors <-c(errors,"One or more of the slots contains NAs or Infinite values")}
            
            if (length(errors) == 0) TRUE else errors
          }
 )
 
-#' @name BASiCS_DV_Summary-class
-#' @aliases BASiCS_DV_Summary,BASiCS_DV_Summary-class
+#' @name BASiCS_D_Summary-class
+#' @aliases BASiCS_D_Summary,BASiCS_D_Summary-class
 #' 
-#' @title The BASiCS_DV_Summary class
+#' @title The BASiCS_D_Summary class contains posterior medians and the limits of 
+#' the highest posterior density (HPD) interval for all BASiCS model parameters
 #' 
 #' @slot muTest Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of gene-specific expression levels \eqn{\mu[i]} in test group.
+#' limits of HPD interval for gene-specific expression levels \eqn{\mu[i]} in test group.
 #' @slot muRef Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of gene-specific expression levels \eqn{\mu[i]} in reference group.
+#' limits of HPD interval for gene-specific expression levels \eqn{\mu[i]} in reference group.
 #' @slot deltaTest Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]} in test group
+#' limits of HPD interval for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]} in test group
 #' @slot deltaRef Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]} in reference group
+#' limits of HPD interval for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]} in reference group
 #' @slot phi Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of cell-specific mRNA content normalising constants \eqn{\phi[j]}
+#' limits of HPD interval for cell-specific mRNA content normalising constants \eqn{\phi[j]}
 #' @slot s Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
-#' @slot nu Posterior medians (first column), lower (second column) and upper (third column) 
-#' limits of cell-specific random effects \eqn{\nu[j]}
+#' limits of HPD interval for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+#' @slot of HPD interval for Posterior medians (first column), lower (second column) and upper (third column) 
+#' limits of HPD interval for cell-specific random effects \eqn{\nu[j]}
 #' @slot thetaTest Posterior median (first column), lower (second column) and upper (third column) 
-#' limits of technical variability hyper-parameter \eqn{\theta[test]} for test sample (vector, all elements must be positive)
+#' limits of HPD interval for technical variability hyper-parameter \eqn{\theta[test]} for test sample (vector, all elements must be positive)
 #' @slot thetaRef Posterior median (first column), lower (second column) and upper (third column) 
-#' limits of technical variability hyper-parameter \eqn{\theta[ref]} for reference sample (vector, all elements must be positive)
+#' limits of HPD interval for technical variability hyper-parameter \eqn{\theta[ref]} for reference sample (vector, all elements must be positive)
+#' @slot offset Offset value to capture global changes in mRNA content. Default value = 1 (when no offset correction has been performed)
+#' @slot probHPD Posterior probability contained in the HPD interval. Must be a value between 0 and 1. 
 #'  
 #' @examples
 #' 
-#' # see help(BASiCS_DV_MCMC)
+#' # see help(BASiCS_D_MCMC)
 #' 
-#' @description Container of a summary of a \code{\link[BASiCSDV]{BASiCS_DV_Chain-class}} object.  
-#' In each slot, first column contains posterior medians, second column contains the lower limits of an high posterior
-#' density interval and third column contains the upper limits of high posterior density intervals.
-setClass("BASiCS_DV_Summary",
+#' @description Container of a summary of a \code{\link[BASiCSDV]{BASiCS_D_Chain-class}} object.  
+setClass("BASiCS_D_Summary",
          representation = representation(
            muTest = "matrix",
            muRef = "matrix",
@@ -406,13 +403,17 @@ setClass("BASiCS_DV_Summary",
            s = "matrix",
            nu = "matrix",
            thetaTest = "matrix",
-           thetaRef = "matrix"),
+           thetaRef = "matrix",
+           offset = "numeric",
+           probHPD = "numeric"),
          validity = function(object){
            if(sum(!is.finite(object@muTest))>0 | sum(!is.finite(object@muRef))>0 | 
                 sum(!is.finite(object@deltaTest))>0 | sum(!is.finite(object@deltaRef))>0 | 
                 sum(!is.finite(object@phi))>0 | sum(!is.finite(object@s))>0 |
                 sum(!is.finite(object@nu))>0 | 
-                sum(!is.finite(object@thetaTest))>0 | sum(!is.finite(object@thetaRef))>0) stop("Invalid slots") 
+                sum(!is.finite(object@thetaTest))>0 | sum(!is.finite(object@thetaRef))>0 |
+                is.null(offset) | is.na(offset) | !is.finite(offset) |
+                is.null(probHPD) | is.na(probHPD) | !is.finite(probHPD) | probHPD < 0 | probHPD > 1) stop("Invalid slots") 
            else {TRUE} 
          }
 )

@@ -3,18 +3,18 @@
 \docType{methods}
 \name{Summary}
 \alias{Summary}
-\alias{Summary,BASiCS_DV_Chain-method}
-\title{'Summary' method for BASiCS_DV_Chain objects}
+\alias{Summary,BASiCS_D_Chain-method}
+\title{'Summary' method for BASiCS_D_Chain objects}
 \usage{
-\S4method{Summary}{BASiCS_DV_Chain}(x, prob = 0.95)
+\S4method{Summary}{BASiCS_D_Chain}(x, prob = 0.95)
 }
 \arguments{
-\item{x}{A \code{BASiCS_DV_Chain} object.}
+\item{x}{A \code{BASiCS_D_Chain} object.}
 
 \item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}} function.}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_DV_Summary-class}}.
+An object of class \code{\link[BASiCS]{BASiCS_D_Summary-class}}.
 }
 \description{
 For each of the BASiCS parameters, 
@@ -23,7 +23,7 @@ density interval with probabilty equal to \code{prob}.
 }
 \examples{
 
-# See help(BASiCS_DV_MCMC)
+# See help(BASiCS_D_MCMC)
 
 }
 \author{

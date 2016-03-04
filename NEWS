@@ -78,3 +78,15 @@ version 0.4.1: (2016-02-05)
 - Updated documentation of 'BASiCS_DetectHVG' and 'BASiCS_VarianceDecomp' function (removing 'GeneNames' argument)
 - Updated documentation for 'BASiCS_DV_TestDE' function. 
 - Missing @description sections added to several .Rd files. 
+
+version 0.5.0: (2016-03-03)
+- Extended package description to include comparisons between pre-specified populations of cells
+- `BASiCS_DV_Data`, `BASiCS_DV_Chain` and `BASiCS_DV_Summary` classes replaced by `BASiCS_D_Data`, `BASiCS_D_Chain` and `BASiCS_D_Summary` classes, respectively.
+- Slot 'offset' added to `BASiCS_D_Chain` and `BASiCS_D_Summary` classes.
+- Slot 'probHPD' added to `BASiCS_D_Summary` class. 
+- Creation of `CombineBASiCS_Data` function to combine 2 independent `BASiCS_Data` objects into one `BASiCS_D_Data` object.
+- Offset value added to the input of `show` method for `BASiCS_D_Chain` and `BASiCS_D_Summary` classes. 
+- Creation of `CombineBASiCS_Chain` function to combine 2 independent `BASiCS_Chain` objects into one `BASiCS_D_Chain` object.
+- 'GeneNames' slot added to `BASiCS_Data` class
+
+

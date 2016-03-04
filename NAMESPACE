@@ -6,7 +6,7 @@ importFrom(methods, Summary)
 importMethodsFrom(BiocGenerics, counts)
 
 exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary",
-              "BASiCS_DV_Data", "BASiCS_DV_Chain" , "BASiCS_DV_Summary")
+              "BASiCS_D_Data", "BASiCS_D_Chain" , "BASiCS_D_Summary")
 
 exportMethods(counts, 
               displayTechIndicator, 
@@ -30,7 +30,9 @@ export(BASiCS_Filter,
        BASiCS_VarThresholdSearchHVG,
        BASiCS_VarThresholdSearchLVG,
        BASiCS_DenoisedRates,
-       newBASiCS_DV_Data,
-       makeExampleBASiCS_DV_Data,
-       newBASiCS_DV_Chain,
-       BASiCS_DV_TestDE)
+       newBASiCS_D_Data,
+       CombineBASiCS_Data,
+       makeExampleBASiCS_D_Data,
+       newBASiCS_D_Chain,
+       CombineBASiCS_Chain,
+       BASiCS_D_TestDE)

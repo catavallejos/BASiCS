@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 0.4.1
-Date: 2016-02-05
+Version: 0.5.0
+Date: 2016-03-03
 Author: Catalina A. Vallejos
 Maintainer: Catalina A. Vallejos <catalina.vallejos@mrc-bsu.cam.ac.uk>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
@@ -21,7 +21,13 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
     population of cells under study. This is formalized by means of tail
     posterior probabilities associated to high (or low) biological cell-to-cell
     variance contributions, quantities that can be easily interpreted by
-    applied users.
+    applied users. Additionally, BASiCS has now been extended to compare gene 
+    expression patterns between pre-specified populations of cells. Unlike traditional
+    differential expression tools, BASiCS quantifies changes in expression that lie
+    beyond comparisons of means, also allowing the study of changes in cell-to-cell 
+    heterogeneity. The latter are quantified via a biological over-dispersion 
+    parameter that measures residual over-dispersion (with respect to Poisson sampling)
+    after normalisation and the removal of technical variation. 
 License: GPL (>= 2)
 Depends:
     R (>= 3.1.0)
