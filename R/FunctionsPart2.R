@@ -454,6 +454,11 @@ BASiCS_D_TestDE <- function(Data,
     #      optimal <- which(EFDR - )
     #      }
     EviThresholdM = OptThresholdM[1]
+    if(is.na(EviThresholdM)) 
+    { 
+      cat("EFDR calibration failed. Probability threshold automatically set equal to 0.95 \n")
+      EviThresholdM = 0.95
+    }
   }
   else
   {
@@ -502,6 +507,11 @@ BASiCS_D_TestDE <- function(Data,
     #        }
     #      } 
     EviThresholdD = OptThresholdD[1]
+    if(is.na(EviThresholdD)) 
+    { 
+      cat("EFDR calibration failed. Probability threshold automatically set equal to 0.95 \n")
+      EviThresholdD = 0.95
+    }
   }
   else
   {

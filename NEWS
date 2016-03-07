@@ -89,4 +89,5 @@ version 0.5.0: (2016-03-03)
 - Creation of `CombineBASiCS_Chain` function to combine 2 independent `BASiCS_Chain` objects into one `BASiCS_D_Chain` object.
 - 'GeneNames' slot added to `BASiCS_Data` class
 
-
+version 0.5.1: (2016-03-07)
+- In function `BASiCS_D_TestDE`. Probability threshold set to 0.95 when EFDR fails to calibrate (simulations under the null)
