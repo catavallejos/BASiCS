@@ -456,8 +456,8 @@ BASiCS_D_TestDE <- function(Data,
     EviThresholdM = OptThresholdM[1]
     if(is.na(EviThresholdM)) 
     { 
-      cat("EFDR calibration failed. Probability threshold automatically set equal to 0.95 \n")
-      EviThresholdM = 0.95
+      cat("EFDR calibration failed. Probability threshold automatically set equal to 0.90 \n")
+      EviThresholdM = 0.90
     }
   }
   else
@@ -509,8 +509,8 @@ BASiCS_D_TestDE <- function(Data,
     EviThresholdD = OptThresholdD[1]
     if(is.na(EviThresholdD)) 
     { 
-      cat("EFDR calibration failed. Probability threshold automatically set equal to 0.95 \n")
-      EviThresholdD = 0.95
+      cat("EFDR calibration failed. Probability threshold automatically set equal to 0.90 \n")
+      EviThresholdD = 0.90
     }
   }
   else
