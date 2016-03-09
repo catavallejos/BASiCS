@@ -30,9 +30,16 @@ newBASiCS_D_Data <- function(CountsTest,
                               Tech, 
                               SpikeInputTest, 
                               SpikeInputRef,
-                              GeneNames){
+                              BatchInfoTest = NULL,
+                              BatchInfoRef = NULL,
+                              GeneNames)
+{
+  if (is.null(BatchInfoTest)) { BatchInfoTest = rep(1, times = ncol(CountsTest))}
+  if (is.null(BatchInfoRef)) { BatchInfoRef = rep(1, times = ncol(CountsRef))}
+  
   Data <- new("BASiCS_D_Data", CountsTest = CountsTest, CountsRef = CountsRef, Tech = Tech, 
-              SpikeInputTest = SpikeInputTest, SpikeInputRef = SpikeInputRef, GeneNames = GeneNames)
+              SpikeInputTest = SpikeInputTest, SpikeInputRef = SpikeInputRef, 
+              BatchInfoTest = BatchInfoTest, BatchInfoRef = BatchInfoRef, GeneNames = GeneNames)
 #  show(Data)
   cat('\n')
   cat('NOTICE: BASiCS requires a pre-filtered dataset \n')
@@ -76,6 +83,8 @@ CombineBASiCS_Data <- function(DataTest, DataRef)
                             Tech = DataTest@Tech,
                             SpikeInputTest = DataTest@SpikeInput,
                             SpikeInputRef = DataRef@SpikeInput,
+                            BatchInfoTest = DataTest@BatchInfo, 
+                            BatchInfoRef = DataRef@BatchInfo,
                             GeneNames = DataTest@GeneNames)
   show(Data)
   
@@ -179,7 +188,8 @@ makeExampleBASiCS_D_Data <- function()
                            CountsRef = Counts.sim[,(n_test+1):n], 
                            Tech = ifelse(1:q > q.bio, T, F), 
                            SpikeInputTest = mu[(q.bio+1):q], 
-                           SpikeInputRef = mu[(q.bio+1):q])    
+                           SpikeInputRef = mu[(q.bio+1):q],
+                           GeneNames = paste0("Gene",1:q))    
   return(Data)  
 }
 

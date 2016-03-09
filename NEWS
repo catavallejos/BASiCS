@@ -91,3 +91,15 @@ version 0.5.0: (2016-03-03)
 
 version 0.5.1: (2016-03-07)
 - In function `BASiCS_D_TestDE`. Probability threshold set to 0.95 when EFDR fails to calibrate (simulations under the null)
+
+version 0.5.2: (2016-03-07)
+- In function `BASiCS_D_TestDE`. Probability threshold set to 0.90 when EFDR fails to calibrate (simulations under the null)
+- Fixed version number in description file.
+
+version 0.5.3: (2016-03-09)
+- Slots `BatchInfoTest` and `BatchInfoRef` added to `BASiCS_D_Data` class.
+- `newBASiCS_D_Data` function modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
+- `CombineBASiCS_Data` function modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
+- `show` method for `BASiCS_D_Data` class modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
+- `GeneNames` argument missing in `makeExampleBASiCS_D_Data` has been added. 
+- Slots `thetaTest` and `thetaRef` of `BASiCS_D_Chain` objects modified to accept matrices (necessary to allow multiple batches).

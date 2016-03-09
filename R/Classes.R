@@ -211,6 +211,8 @@ setClass("BASiCS_Summary",
 #' @slot Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
 #' @slot SpikeInputTest Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the test sample (amount per cell). 
 #' @slot SpikeInputRef Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the reference sample (amount per cell). 
+#' @slot BatchInfoTest To include batch information in test group (vector of \code{n_test} elements)
+#' @slot BatchInfoRef To include batch information in test group (vector of \code{n_ref} elements)
 #' @slot GeneNames Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)}, 
 #' with numbering order as in the input dataset. 
 #' 
@@ -228,6 +230,8 @@ setClass("BASiCS_D_Data",
            Tech = "vector",
            SpikeInputTest = "vector",
            SpikeInputRef = "vector",
+           BatchInfoTest = "vector",
+           BatchInfoRef = "vector",
            GeneNames = "vector"),
          validity = function(object){
            errors <- character()
@@ -279,6 +283,12 @@ setClass("BASiCS_D_Data",
            
            if(sum(apply(Counts,1,sum) > 0) == 1) 
              errors <- c(errors, "Some genes have non-zero counts only in 1 cell. Please remove them before creating the BASiCS_D_Data object.")
+
+           if(length(object@BatchInfoTest) != nTest) 
+             errors <- c(errors, "BatchInfoTest slot is not compatible with the number of cells contained in CountsTest slot.")
+           
+           if(length(object@BatchInfoRef) != nRef) 
+             errors <- c(errors, "BatchInfoTest slot is not compatible with the number of cells contained in CountsRef slot.")
            
            if (length(errors) == 0) TRUE else errors
          }
@@ -327,8 +337,8 @@ setClass("BASiCS_D_Chain",
            phi = "matrix",
            s = "matrix",
            nu = "matrix",
-           thetaTest = "vector",
-           thetaRef = "vector",
+           thetaTest = "matrix",
+           thetaRef = "matrix",
            offset = "numeric"),
          validity = function(object){
            errors <- character()
@@ -345,7 +355,7 @@ setClass("BASiCS_D_Chain",
            if(nrow(object@muRef) != N | 
               nrow(object@deltaTest) != N | nrow(object@deltaRef) != N |
               nrow(object@phi) != N | nrow(object@s) != N |
-              nrow(object@nu) != N | length(object@thetaTest) != N | length(object@thetaRef) != N |
+              nrow(object@nu) != N | nrow(object@thetaTest) != N | nrow(object@thetaRef) != N |
               ncol(object@muRef) != q.bio | 
               ncol(object@deltaTest) != q.bio | ncol(object@deltaRef) != q.bio |
               ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}

@@ -622,9 +622,9 @@ setMethod("show",
             n = nTest + nRef
             cat("An object of class ", class(object), "\n", sep = "")
             cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-            cat("        - ", nTest, " cells in the test sample \n", sep = "")
-            cat("        - ", nRef, " cells in the reference sample \n", sep = "")
-            cat(" Elements (slots): CountsTest, CountsRef, Tech, SpikeInputTest, SpikeInputRef and GeneNames.\n")
+            cat("        - ", nTest, " cells in the test sample, with", length(unique(object@BatchInfoTest)), "batch(es) \n", sep = "")
+            cat("        - ", nRef, " cells in the reference sample, with", length(unique(object@BatchInfoRef)), "batch(es) \n", sep = "")
+            cat(" Elements (slots): CountsTest, CountsRef, Tech, SpikeInputTest, SpikeInputRef, BatchInfoTest, BatchInfoRef and GeneNames.\n")
           })
 
 #' @name BASiCS_D_Data-methods
