@@ -402,7 +402,7 @@ setClass("BASiCS_D_Chain",
 #' 
 #' # see help(BASiCS_D_MCMC)
 #' 
-#' @description Container of a summary of a \code{\link[BASiCSDV]{BASiCS_D_Chain-class}} object.  
+#' @description Container of a summary of a \code{\link[BASiCS]{BASiCS_D_Chain-class}} object.  
 setClass("BASiCS_D_Summary",
          representation = representation(
            muTest = "matrix",

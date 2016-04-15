@@ -5,7 +5,7 @@
 \title{Creates a BASiCS_D_Data object from expression counts matrices and experimental information about spike-in genes}
 \usage{
 newBASiCS_D_Data(CountsTest, CountsRef, Tech, SpikeInputTest, SpikeInputRef,
-  GeneNames)
+  BatchInfoTest = NULL, BatchInfoRef = NULL, GeneNames)
 }
 \arguments{
 \item{CountsTest}{Matrix of dimensions \code{q} times \code{n_test} whose elements corresponds to the raw expression counts in the test sample. 
@@ -19,6 +19,12 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 \item{SpikeInputTest}{Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the test sample (amount per cell).}
 
 \item{SpikeInputRef}{Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the reference sample (amount per cell).}
+
+\item{BatchInfoTest}{Vector of length \code{n_test} indicating experimental batches for test group.}
+
+\item{BatchInfoRef}{Vector of length \code{n_ref} indicating experimental batches for test group.}
+
+\item{GeneNames}{Vector of gene ids.}
 }
 \value{
 An object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}.
@@ -29,12 +35,7 @@ expression counts matrices and experimental information about spike-in genes.
 }
 \examples{
 
-CountsTest = matrix(rpois(100*5, 2), ncol = 5)
-CountsRef = matrix(rpois(100*5, 2), ncol = 5)
-Tech = c(rep(FALSE,80),rep(TRUE,20))
-SpikeInputTest = rgamma(20,1,1)
-SpikeInputRef = rgamma(20,1,1)
-Data = newBASiCS_D_Data(CountsTest, CountsRef, Tech, SpikeInputTest, SpikeInputRef)
+# Rather than using this function, we recomend to use 'CombineBASiCS_Data'
 
 }
 \author{

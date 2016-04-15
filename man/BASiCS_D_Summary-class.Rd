@@ -7,7 +7,7 @@
 \title{The BASiCS_D_Summary class contains posterior medians and the limits of 
 the highest posterior density (HPD) interval for all BASiCS model parameters}
 \description{
-Container of a summary of a \code{\link[BASiCSDV]{BASiCS_D_Chain-class}} object.
+Container of a summary of a \code{\link[BASiCS]{BASiCS_D_Chain-class}} object.
 }
 \section{Slots}{
 

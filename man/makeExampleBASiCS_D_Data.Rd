@@ -7,7 +7,7 @@
 makeExampleBASiCS_D_Data()
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}, simulated from the model implemented in BASiCSDV. 
+An object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}, simulated from the model implemented in BASiCS (for 2 populations of cells). 
 It contains 120 genes (100 biological and 20 spike-in) and 20 cells (10 in each sample).
 }
 \description{

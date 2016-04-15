@@ -103,3 +103,7 @@ version 0.5.3: (2016-03-09)
 - `show` method for `BASiCS_D_Data` class modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
 - `GeneNames` argument missing in `makeExampleBASiCS_D_Data` has been added. 
 - Slots `thetaTest` and `thetaRef` of `BASiCS_D_Chain` objects modified to accept matrices (necessary to allow multiple batches).
+
+version 0.5.4: (2016-04-15)
+- Minor fixes to the documentation files
+- Argument `GenesSelect` was added to function `BASiCS_D_TestDE` to allow user-defined lists of genes to be included in the comparison between cell types. 

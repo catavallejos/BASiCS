@@ -25,6 +25,10 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 
 \item{\code{SpikeInputRef}}{Vector of length \code{q-q.bio} whose elements indicate the input number of molecules for the spike-in genes in the reference sample (amount per cell).}
 
+\item{\code{BatchInfoTest}}{To include batch information in test group (vector of \code{n_test} elements)}
+
+\item{\code{BatchInfoRef}}{To include batch information in test group (vector of \code{n_ref} elements)}
+
 \item{\code{GeneNames}}{Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)}, 
 with numbering order as in the input dataset.}
 }}
