@@ -8,7 +8,7 @@ BASiCS_D_TestDE(Data, object, GeneNames, EpsilonM = 0.1, EpsilonD = 0.1,
   EviThresholdM = NULL, EviThresholdD = NULL,
   OrderVariable = "ProbDiffExp", GroupLabelRef = "Ref",
   GroupLabelTest = "Test", Plot = FALSE, OffSet = FALSE, EFDR_M = 0.05,
-  EFDR_D = 0.05, ...)
+  EFDR_D = 0.05, GenesSelect = NULL, ...)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}}
@@ -38,6 +38,8 @@ BASiCS_D_TestDE(Data, object, GeneNames, EpsilonM = 0.1, EpsilonD = 0.1,
 \item{EFDR_M}{Target for expected false discovery rate related to the comparison of means (default = 0.05)}
 
 \item{EFDR_D}{Target for expected false discovery rate related to the comparison of dispersions (default = 0.05)}
+
+\item{GenesSelect}{Optional argument to provide a user-defined list of genes to be considered for the comparison (default = NULL). When used, this argument must be a vector of 'TRUE' (include gene) / 'FALSE' (exclude gene) indicator, with the same length as the number of intrinsic genes and following the same order as how genes are displayed in the table of counts.  This argument is necessary in order to have a meaningful EFDR calibration when the user decides to exclude some genes from the comparison.}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
 }
