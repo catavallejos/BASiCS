@@ -107,3 +107,6 @@ version 0.5.3: (2016-03-09)
 version 0.5.4: (2016-04-15)
 - Minor fixes to the documentation files
 - Argument `GenesSelect` was added to function `BASiCS_D_TestDE` to allow user-defined lists of genes to be included in the comparison between cell types. 
+
+version 0.5.5: (2016-04-18)
+- Small fix when checking the validity of a `BASiCS_D_Data` object. Thanks to Nils Eling. 

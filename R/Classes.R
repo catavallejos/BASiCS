@@ -279,7 +279,7 @@ setClass("BASiCS_D_Data",
              errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the BASiCS_D_Data object.")
            
            if(sum(apply(Counts,1,sum) == 0) > 0) 
-             errors <- c(errors, "Some genes have zero counts across all cells. Please remove them before creating the BASiCS_D_Data object.")
+             warning("Some genes have zero counts across all cells. You might want to remove them before creating the BASiCS_D_Data object. Otherwise, you should not meaningfully interpret the results obtained for those genes.")
            
            if(sum(apply(Counts,1,sum) > 0) == 1) 
              errors <- c(errors, "Some genes have non-zero counts only in 1 cell. Please remove them before creating the BASiCS_D_Data object.")
