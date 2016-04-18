@@ -110,3 +110,4 @@ version 0.5.4: (2016-04-15)
 
 version 0.5.5: (2016-04-18)
 - Small fix when checking the validity of a `BASiCS_D_Data` object. Thanks to Nils Eling. 
+- Fixed issue with documentation files. 
