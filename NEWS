@@ -113,4 +113,7 @@ version 0.5.5: (2016-04-18)
 - Fixed issue with documentation files. 
 
 version 0.5.6: (2016-04-19)
-- Fixed message in `BASiCS_D_Test` function. This does not affect functionality. Only the message that is printed in the console. 
+- Fixed message in `BASiCS_D_Test` function. This does not affect functionality. Only the message that is printed in the console.
+
+version 0.5.7: (2016-04-27)
+- Welcome message added
