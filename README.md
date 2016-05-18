@@ -7,22 +7,35 @@ Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hiera
 
 ## Installation
 
-Get the released version from CRAN:
-
-```R
-install.packages("BASiCS")
-```
-
-Or install the development version from GitHub:
+BASiCS will be submitted to BioConductor. In the meantime, the development version can be install from GitHub:
 
 ```R
 # install.packages("devtools")
-# source("https://bioconductor.org/biocLite.R")
-# biocLite("BiocGenerics")
 devtools::install_github("catavallejos/BASiCS")
 ```
 
-## Quick start
+This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and repeat the installation. 
+
+```{r dependencies}
+#library(devtools)
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("BiocGenerics")
+#install.packages("Rcpp")
+```
+
+After a successful installation, the BASiCS library can be loaded using[^footnoteInstall] 
+
+```{r load_packages}
+library(BASiCS)
+```
+
+[^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
+
+## How to use BASiCS?
+
+- To detect highly and lowly variable genes within a populations of cells: please refer to the <a href="https://github.com/catavallejos/BASiCS/blob/master/vignettes/BASiCSIntro.Rmd">BASiCS vignette</a>
+
+- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a>
 
 TODO: a quick start for BASiCS. Like vignette("some-stuff")
 
@@ -56,6 +69,11 @@ on the generated file.
 
 Catalina A. Vallejos <catalina.vallejos@mrc-bsu.cam.ac.uk>
 
+## Collaborators
+
+- <a href="https://github.com/horta"> Danilo Horta </a>
+
 ## References
 
-- [BASiCS: Bayesian Analysis of Single-Cell Sequencing Data](http://www.ncbi.nlm.nih.gov/pubmed/26107944)
+- <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). BASiCS: Bayesian Analysis of Single-Cell Sequencing Data </a>
+- <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Beyond comparisons of means: understanding changes in gene expression at the single cell level</a>
