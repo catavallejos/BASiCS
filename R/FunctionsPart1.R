@@ -325,14 +325,20 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE)
   
   if(!WithBatch)
   {
-    Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInfo = SpikeInfo)  
+    Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q), BatchInfo = rep(1,20))  
   }
   else
   {
-    Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), 
-                          SpikeInfo = SpikeInfo, BatchInfo = c(rep(1,10), rep(2,10)))
+    Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q), 
+               BatchInfo = c(rep(1,10), rep(2,10)))
   }
   
+  nBatch = length(unique(Data@BatchInfo))
+  cat("An object of class ", class(Data), "\n", sep = "")
+  cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+  cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
+  if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
+  else {cat(paste0(" The data contains ",nBatch," batches.\n"))}
   
   return(Data)  
 }

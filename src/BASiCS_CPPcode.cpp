@@ -11,6 +11,29 @@
 
 using namespace Rcpp;
 
+//#include <mach/mach_time.h>
+//#define ORWL_NANO (+1.0E-9)
+//#define ORWL_GIGA UINT64_C(1000000000)
+
+//static double orwl_timebase = 0.0;
+//static uint64_t orwl_timestart = 0;
+
+//struct timespec orwl_gettime(void) {
+  // be more careful in a multithreaded environement
+//  if (!orwl_timestart) {
+//    mach_timebase_info_data_t tb = { 0 };
+//    mach_timebase_info(&tb);
+//    orwl_timebase = tb.numer;
+//    orwl_timebase /= tb.denom;
+//    orwl_timestart = mach_absolute_time();
+//  }
+//  struct timespec t;
+//  double diff = (mach_absolute_time() - orwl_timestart) * orwl_timebase;
+//  t.tv_sec = diff * ORWL_NANO;
+//  t.tv_nsec = diff - (t.tv_sec * ORWL_GIGA);
+//  return t;
+//}
+
 #define ZTOL sqrt(DOUBLE_EPS)
 
 /* 
@@ -50,13 +73,13 @@ double rinvgauss(const double mu, const double lambda)
  */
   double u, y, x1, mu2, l2;
 
-  y = norm_rand();
+  y = norm_rand(); /// ******
   y *= y;
   mu2 = mu * mu;
   l2 = 2.0*lambda;
   x1 = mu + mu2*y/l2 - (mu/l2)* sqrt(4.0*mu*lambda*y + mu2*y*y);
 
-  u = unif_rand();
+  u = unif_rand(); // ******
   if(u <= mu/(mu + x1)) return x1;
   else return mu2/x1;
 }
@@ -323,6 +346,20 @@ arma::mat lgamma_cpp(arma::mat const& x)
   return output;
 }
 
+/* Auxiliary function: logarithm of a Gamma function applied element-wise to an arma::mat element */
+arma::vec lgamma_cpp_vec(arma::vec const& x) 
+{
+/*
+ * NumericMatrix x: matrix to which the logarithm of the Gamma function will be applied element-wise
+ */
+  arma::vec output = x;
+  for (unsigned int i=0; i < output.size(); i++)
+  {
+      output(i) = R::lgammafn(x(i));
+  }
+  return output;
+}
+
 /* Auxiliary function: to avoid numerical overflows/underflows when computing a sum of exponentiated values */
 double log_sum_exp_cpp(arma::vec const& x_arma) 
 {
@@ -346,21 +383,19 @@ arma::mat muUpdate(
   double const& s2_mu,
   int const& q,
   int const& q_bio,
-  int const& n)
+  int const& n,
+  arma::vec & mu,
+  arma::vec & ind)
 {
     using arma::span;
-
-    // CREATING VARIABLES WHERE TO STORE DRAWS
-    arma::vec mu = arma::ones(q); mu(span(q_bio, q-1)) = mu0(span(q_bio, q-1));
-    arma::vec ind = arma::zeros(q);
-
+    
     // PROPOSAL STEP    
     arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var(span(0,q_bio - 1))) + log(mu0(span(0, q_bio - 1))));
     arma::vec u = arma::randu(q_bio);
     
     // ACCEPT/REJECT STEP
     arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio - 1)))) % sum_bycell_bio; 
-    
+
     // Loop to replace matrix operations, through genes and cells
     for (int i=0; i < q_bio; i++)
     {
@@ -711,10 +746,10 @@ Rcpp::List phiUpdate(
     
   // PROPOSAL STEP
   arma::vec y = n * rDirichlet(prop_var * phi0); 
-  double u = as<double>(wrap(arma::randu(1)));;
+  double u = R::runif(0,1);
   
   arma::vec phi; 
-  bool ind;
+  int ind;
     
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  
   if(all(prop_var * y < 2.5327372760800758e+305)  & 
@@ -723,7 +758,7 @@ Rcpp::List phiUpdate(
      all(phi0 > 0)) 
   {
     double log_aux = sum( (sum_bygene_bio + p_phi) % (log(y) - log(phi0)));
-    
+        
     // Loop to replace matrix operations, through genes and cells
     for (int j=0; j < n; j++) 
     {
@@ -733,9 +768,8 @@ Rcpp::List phiUpdate(
                     log( (y(j)*nu(j)*mu(i)+(1/delta(i)) ) / ( phi0(j)*nu(j)*mu(i)+(1/delta(i)) ));
       } 
     }
-
     log_aux += prop_var * sum(y % log(phi0) - phi0 % log(y));
-    log_aux -= as<double>(wrap(sum(lgamma_cpp(prop_var * y) - lgamma_cpp(prop_var * phi0))));    
+    log_aux -= sum(lgamma_cpp_vec(prop_var * y) - lgamma_cpp_vec(prop_var * phi0));    
     
     if(!R_IsNA(log_aux))
     {
@@ -760,7 +794,7 @@ Rcpp::List phiUpdate(
   }      
   return(Rcpp::List::create(
          Rcpp::Named("phi")=phi,
-         Rcpp::Named("ind")=Rcpp::as<double>(wrap(ind)))); 
+         Rcpp::Named("ind")=ind)); 
 }
 
 
@@ -860,10 +894,18 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec LSphiValues = as_arma(LSphiValuesNV);
   NumericVector LSthetaValuesNV = NumericVector::create(-7, -6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2);
   arma::vec LSthetaValues = as_arma(LSthetaValuesNV);
+  
+  
+  
                                                           
     
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES (RE-INITIALIZE EVERY 50 ITERATIONS)
   int Ibatch = 0; int i;
+  
+  // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
+  arma::vec muUpdateAux = arma::ones(q); muUpdateAux(arma::span(qbio, q-1)) = mu0_arma(arma::span(qbio, q-1));
+  arma::vec indQ = arma::zeros(q);
+  
   
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;  
   Rcpp::Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
@@ -898,8 +940,12 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR       
 //    LSmuAux = rUnifDiscMult(q, LSthetaValues, LSthetaValuesNV.size());
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n);     
+                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n,
+                     muUpdateAux, indQ);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
+    
+    
+
     
     // UPDATE OF S
     sAux = sUpdate(sAux, nuAux.col(0), thetaAux(0), as, bs, n); 
@@ -1068,22 +1114,23 @@ arma::vec sUpdateBatch(
   int const& n)
 {
    // Allowing the use of rgig within C++ code (transform arma::vec elements into NumericVector elements)
-   NumericVector s0 = wrap(s0_arma);
-   NumericVector nu = wrap(nu_arma);
-   NumericVector thetaBatch = wrap(BatchDesign * theta); 
+//   NumericVector s0 = wrap(s0_arma);
+//   NumericVector nu = wrap(nu_arma);
+   arma::vec thetaBatch = BatchDesign * theta; 
    
    // Creating a vector where draws will be stored
    arma::vec aux = arma::zeros(n);
    
    // Calculating parameters to the passed as input to the Rgig function (common for all cells)
-   NumericVector p = as - 1 / thetaBatch; 
+   arma::vec p = as - 1 / thetaBatch; 
    double b = 2 * bs;
    
    // GIG draws
    /* DEBUG: return original value of s0 if input values are not within the appropriate range (to avoid problems related to numerical innacuracy) */
 
    // Calculating parameter to the passed as input to the Rgig function (specific to each cell)
-   NumericVector a = 2 * nu / thetaBatch;      
+//   NumericVector a = 2 * nu / thetaBatch;     
+   arma::vec a = 2 * nu_arma / thetaBatch;
    int j;
    for (j=0; j<n; j++) 
    {
@@ -1114,6 +1161,7 @@ arma::mat nuUpdateBatch(
   arma::vec const& nu0, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
   arma::vec const& prop_var, /* Current value of the proposal variances for $\nu=(\nu_1,...,\nu_n)'$ */
   arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
+  double const& SumSpikeInput,
   arma::mat const& BatchDesign, 
   arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
   arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */  
@@ -1136,8 +1184,25 @@ arma::mat nuUpdateBatch(
     arma::vec u = arma::randu(n);
        
     // ACCEPT/REJECT STEP
+    
+// CODE CRUSHES WHEN USING THIS LOOP, CHECK WHY
+//    arma::vec log_aux = arma::zeros(n);
+    
+    // Loop to replace matrix operations, through genes and cells
+//    for (int j=0; j < n; j++) 
+//    {
+//      for (int i=0; i < q_bio; i++) 
+//      {
+//        log_aux(j) -= ( Counts(i,j) + (1/delta(i)) ) *  
+//                      log( ( phi(j)*exp(y(j))*mu(i)+(1/delta(i)) ) / ( phi(j)*nu0(j)*mu(i)+(1/delta(i)) ));
+//      } 
+//      log_aux(j) += (y(j) - lognu(j)) * (sum_bygene_all(j) + 1/thetaBatch(j)); // - ( y(j)-nu0(j) )  * (SumSpikeInput + (1/(thetaBatch(j)*s(j))));
+//      log_aux(j) -= nu0(j) * (exp(y(j)-lognu(j))-1)  * (SumSpikeInput + (1/(thetaBatch(j) * s(j))));
+//    }
+
+    
     arma::vec log_aux = (y - lognu) % (sum_bygene_all + 1/thetaBatch);
-    log_aux -= nu0 % (exp(y-lognu)-1)  % (sum(mu(span(q_bio,q -1))) + (1/(thetaBatch % s)));    
+    log_aux -= nu0 % (exp(y-lognu)-1)  % (SumSpikeInput + (1/(thetaBatch % s)));   
     arma::mat m = Counts.rows(0, q_bio - 1);
     m.each_col() += 1 / delta;   
     arma::mat num = UpdateAux_nuTrick(exp(y), mu(span(0, q_bio - 1)), delta,phi);
@@ -1251,6 +1316,10 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
   arma::vec sumByCellAll_arma = as_arma(sumByCellAll); arma::vec sumByCellBio_arma = as_arma(sumByCellBio);
   arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
   arma::mat Counts_arma = as_arma(Counts); arma::mat BatchDesign_arma = as_arma(BatchDesign);
+  arma::vec mu0_arma = as_arma(mu0);
+  
+  double SumSpikeInput = sum(mu0_arma(arma::span(qbio,q -1)));
+  
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux, q); 
   arma::mat delta = arma::zeros(Naux, qbio); 
@@ -1299,6 +1368,10 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES (RE-INITIALIZE EVERY 50 ITERATIONS)
   int Ibatch = 0; int i;
   
+  // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
+  arma::vec muUpdateAux = arma::ones(q); muUpdateAux(arma::span(qbio, q-1)) = mu0_arma(arma::span(qbio, q-1));
+  arma::vec indQ = arma::zeros(q);
+  
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;  
   Rcpp::Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
@@ -1317,35 +1390,55 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
     
     Ibatch++; 
     
+//    struct timespec time0_1 = orwl_gettime();
     // UPDATE OF PHI: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts_arma, muAux.col(0), deltaAux.col(0),
                            nuAux.col(0), p_Phi, sumByGeneBio_arma, qbio,n); 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); if(i>=burn) {phiAccept += Rcpp::as<double>(phiAuxList["ind"]);}
+//    struct timespec time1_1 = orwl_gettime();    
+//    Rcpp::Rcout << "Time phi: " << (time1_1.tv_nsec - time0_1.tv_nsec) / ((float)(n)) << std::endl;
 
+//    struct timespec time0_2 = orwl_gettime();
     // UPDATE OF THETA: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), BatchDesign_arma,
                                 sAux, nuAux.col(0), atheta, btheta, n, nBatch);
     PthetaAux += thetaAux.col(1); if(i>=burn) {thetaAccept += thetaAux.col(1);}
+//    struct timespec time1_2 = orwl_gettime();    
+//    Rcpp::Rcout << "Time theta: "  <<  (time1_2.tv_nsec - time0_2.tv_nsec) / ((float)(nBatch)) << std::endl;
     
-    // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR    
+//    struct timespec time0_3 = orwl_gettime();
+    // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n);     
+                     phiAux, nuAux.col(0), sumByCellBio_arma, s2mu, q, qbio, n,
+                     muUpdateAux, indQ);     
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
+//    struct timespec time1_3 = orwl_gettime();    
+//    Rcpp::Rcout << "Time mu: "  <<  (time1_3.tv_nsec - time0_3.tv_nsec) / ((float)(qbio)) << std::endl;
     
+//    struct timespec time0_4 = orwl_gettime();
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaAux.col(0), as, bs, BatchDesign_arma, n);  
+//    struct timespec time1_4 = orwl_gettime();    
+//    Rcpp::Rcout << "Time s: "  <<  (time1_4.tv_nsec - time0_4.tv_nsec) / ((float)(n)) << std::endl;
     
+//    struct timespec time0_5 = orwl_gettime();
     // UPDATE OF DELTA: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
                            muAux.col(0), nuAux.col(0), phiAux, adelta, bdelta, qbio, n, s2_delta, prior_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);} 
+//    struct timespec time1_5 = orwl_gettime();    
+//    Rcpp::Rcout << "Time delta: "  << (time1_5.tv_nsec - time0_5.tv_nsec) / ((float)(qbio)) << std::endl;
     
+//    struct timespec time0_6 = orwl_gettime();
     // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts_arma, BatchDesign_arma,
+    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts_arma, SumSpikeInput,
+                     BatchDesign_arma,
                      muAux.col(0), deltaAux.col(0),
                      phiAux, sAux, thetaAux.col(0), sumByGeneAll_arma, q, qbio, n); 
     PnuAux += nuAux.col(1); if(i>=burn) {nuAccept += nuAux.col(1);}
+//    struct timespec time1_6 = orwl_gettime();    
+//    Rcpp::Rcout << "Time nu: " <<  (time1_6.tv_nsec - time0_6.tv_nsec) / ((float)(n)) << std::endl;
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt)
