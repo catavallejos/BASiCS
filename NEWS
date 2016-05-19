@@ -121,3 +121,8 @@ version 0.5.7: (2016-04-27)
 version 0.5.8: (2016-05-18) 
 - After profiling of c++ functions, minor edits to improve memory usage. These do not affect user interface
 - Small change in funtion 'makeExampleBASiCS_Data' to avoid 'NOTICE' message
+
+version 0.5.9: (2016-05-19)
+- Dependency to 'scran' added
+- 'HiddenBASiCS_MCMC_Start' modified to use 'scran' estimates as starting values. This allows faster convergence.
+- Updated 'README.md' file to build and access vignette during installation 

@@ -351,23 +351,35 @@ HiddenBASiCS_MCMC_Start<-function(
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
   
   # Number of instrinsic genes
-  q <- length(Data@Tech)
-  q.bio<-sum(Data@Tech==F)
+  q <- length(displayTechIndicator(Data))
+  q.bio<-sum(!displayTechIndicator(Data))
   # Number of cells
-  n <- dim(Data@Counts)[2]
+  n <- dim(counts(Data))[2]
   
   # Initialize phi as a vector of ones
-#  phi0 = rep(1, times = n)
   phi0 = colSums(Data@Counts[!Data@Tech,])
   phi0 = n * phi0 / sum(phi0)
   # Initialize s as the empirical capture efficiency rates
-  s0 = colSums(Data@Counts[Data@Tech,]) / sum(Data@SpikeInput); nu0=s0 
+  s0 = colSums(counts(Data, type = "technical")) / sum(displaySpikeInput(Data)); nu0=s0 
+  # Initialize phi * s as the 'scran' estimates
+  sce <- newSCESet(countData=data.frame(counts(Data)))
+  isSpike(sce) <- displayTechIndicator(Data)
+  sizes.aux = c(20, 40, 60, 80, 100)
+  if(n < 200) {sizes.aux = c(20, 40, 60, 80)}
+  if(n < 160) {sizes.aux = c(20, 40, 60)}
+  if(n < 120) {sizes.aux = c(20, 40)}
+  if(n < 80) {sizes.aux = c(20)}
+  if(n < 40) {sizes.aux = c(10)}
+  sce <- computeSumFactors(sce, sizes = sizes.aux)
+  size_scran = sizeFactors(sce)
+  phi0 = sizeFactors(sce) / s0
+  phi0 = n * phi0 / sum(phi0) 
+
   # Initialize mu using average 'normalised counts' across cells 
-  # (correcting by empirical capture efficiency rates)
-  # and true input values for spike-in genes
-  nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / phi0 )
+  # and true input values for spike-in genes  
+  nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / (phi0*s0) )
   meansBio <- rowMeans( nCountsBio )
-  mu0<-c(meansBio + 1,Data@SpikeInput)
+  mu0<-c(meansBio + 1,Data@SpikeInput) # +1 to avoid zeros as starting values
   
   # Random stating value for delta
   delta0 = rgamma(q.bio,1,1) + 1

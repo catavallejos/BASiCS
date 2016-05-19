@@ -11,7 +11,7 @@ BASiCS will be submitted to BioConductor. In the meantime, the development versi
 
 ```R
 # install.packages("devtools")
-devtools::install_github("catavallejos/BASiCS")
+devtools::install_github("catavallejos/BASiCS", build_vignettes = TRUE)
 ```
 
 This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and repeat the installation. 
@@ -33,7 +33,11 @@ library(BASiCS)
 
 ## How to use BASiCS?
 
-- To detect highly and lowly variable genes within a populations of cells: please refer to the <a href="https://github.com/catavallejos/BASiCS/blob/master/vignettes/BASiCSIntro.Rmd">BASiCS vignette</a>
+- To detect highly and lowly variable genes within a populations of cells: please refer to the vignette
+
+```R
+vignette('BASiCSIntro')
+```
 
 - To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a>
 

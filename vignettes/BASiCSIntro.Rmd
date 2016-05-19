@@ -66,7 +66,7 @@ BASiCS can be installed directly from Github.
 
 ```{r install, include=FALSE}
 #library(devtools)
-#install_github('catavallejos/BASiCS')
+#install_github('catavallejos/BASiCS', build_vignettes = TRUE)
 ```
 
 This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and re-install. 
