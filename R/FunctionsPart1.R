@@ -362,17 +362,17 @@ HiddenBASiCS_MCMC_Start<-function(
   # Initialize s as the empirical capture efficiency rates
   s0 = colSums(counts(Data, type = "technical")) / sum(displaySpikeInput(Data)); nu0=s0 
   # Initialize phi * s as the 'scran' estimates
-  sce <- newSCESet(countData=data.frame(counts(Data)))
-  isSpike(sce) <- displayTechIndicator(Data)
+#  sce <- newSCESet(countData=data.frame(counts(Data)))
+#  isSpike(sce) <- displayTechIndicator(Data)
   sizes.aux = c(20, 40, 60, 80, 100)
   if(n < 200) {sizes.aux = c(20, 40, 60, 80)}
   if(n < 160) {sizes.aux = c(20, 40, 60)}
   if(n < 120) {sizes.aux = c(20, 40)}
   if(n < 80) {sizes.aux = c(20)}
   if(n < 40) {sizes.aux = c(10)}
-  sce <- computeSumFactors(sce, sizes = sizes.aux)
-  size_scran = sizeFactors(sce)
-  phi0 = sizeFactors(sce) / s0
+  size_scran <- computeSumFactors(counts(Data, type = "biological"), sizes = sizes.aux)
+#  size_scran = sizeFactors(sce)
+  phi0 = size_scran / s0
   phi0 = n * phi0 / sum(phi0) 
 
   # Initialize mu using average 'normalised counts' across cells 

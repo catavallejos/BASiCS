@@ -126,3 +126,6 @@ version 0.5.9: (2016-05-19)
 - Dependency to 'scran' added
 - 'HiddenBASiCS_MCMC_Start' modified to use 'scran' estimates as starting values. This allows faster convergence.
 - Updated 'README.md' file to build and access vignette during installation 
+
+version 0.5.10: (2016-05-20)
+- Updated bug in 'HiddenBASiCS_MCMC_Start' function (thanks to Joanna Dreux for noticing this issue)
