@@ -129,3 +129,6 @@ version 0.5.9: (2016-05-19)
 
 version 0.5.10: (2016-05-20)
 - Updated bug in 'HiddenBASiCS_MCMC_Start' function (thanks to Joanna Dreux for noticing this issue)
+
+version 0.5.11: (2016-05-24)
+- 'importMethodsFrom(scran, computeSumFactors)' added to NAMESPACE

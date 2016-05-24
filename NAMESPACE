@@ -4,6 +4,7 @@ importFrom(Rcpp, evalCpp)
 importFrom(coda, HPDinterval)
 importFrom(methods, Summary)
 importMethodsFrom(BiocGenerics, counts)
+importMethodsFrom(scran, computeSumFactors)
 
 exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary",
               "BASiCS_D_Data", "BASiCS_D_Chain" , "BASiCS_D_Summary")
