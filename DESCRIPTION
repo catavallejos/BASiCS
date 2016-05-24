@@ -29,16 +29,17 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
     parameter that measures residual over-dispersion (with respect to Poisson sampling)
     after normalisation and the removal of technical variation. 
 License: GPL (>= 2)
-Depends:
+Depends: 
     R (>= 3.1.0)
-Imports:
+Imports: 
     BiocGenerics,
     Rcpp (>= 0.11.3),
     methods,
     coda,
     scran
-Suggests:
-    knitr
+Suggests: 
+    knitr,
+    testthat
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
