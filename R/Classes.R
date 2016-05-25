@@ -67,20 +67,38 @@ setClass("BASiCS_Data",
            q.bio = q - length(object@SpikeInput)
            n = ncol(object@Counts)
           
-           if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
+           # Checks valid for datasets with spikes only
+           if(length(object@SpikeInput) > 1)
+           {
+             if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
+             errors <- c(errors, "Argument's dimensions are not compatible.")
+             
+             if(sum(apply(object@Counts[ object@Tech,],2,sum) == 0) > 0) 
+               errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes. Please remove them before creating the BASiCS_Data object.")
+             
+             if(sum(apply(object@Counts[!object@Tech,],2,sum) == 0) > 0) 
+               errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the BASiCS_Data object.")
+
+             if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
+               errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
+             
+           }
+           # Checks valid for datasets with no spikes only
+           else
+           {
+             if(sum(apply(object@Counts,2,sum) == 0) > 0) 
+               errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the BASiCS_Data object.")
+             
+             if(length(unique(object@BatchInfo)) == 1)
+               errors <- c(errors, "If spike-in genes are not available, BASiCS requires the data to contain at least 2 batches of cells (for the same population)")
+           }
+           
+           # Checks valid for any data
+           if(length(object@Tech) != q)
              errors <- c(errors, "Argument's dimensions are not compatible.")
            
            if(length(object@GeneNames) != q)
              errors <- c(errors, "Incorrect length of the vector stored in the GeneNames slot.")
-           
-           if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
-             errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
-           
-           if(sum(apply(object@Counts[ object@Tech,],2,sum) == 0) > 0) 
-             errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes. Please remove them before creating the BASiCS_Data object.")
-           
-           if(sum(apply(object@Counts[!object@Tech,],2,sum) == 0) > 0) 
-             errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the BASiCS_Data object.")
            
            if(sum(apply(object@Counts,1,sum) == 0) > 0) 
              warning("Some genes have zero counts across all cells. Unless running a differential expression analysis, please remove those genes. Otherwise, the BASiCS_Data object is still a valid object. However, due to the lack of counts, posterior estimates for mu[i] and delta[i] associated to those genes will be driven by the prior. In such case, you must specify `PriorDelta = 'log-normal' in BASiCS_MCMC function. ")

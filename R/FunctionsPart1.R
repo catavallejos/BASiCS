@@ -1,5 +1,3 @@
-library(scran)
-
 #' @title Filter for input datasets
 #'
 #' @description \code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria.
@@ -252,6 +250,7 @@ BASiCS_Sim<-function(
 #' model in BASiCS (Vallejos et al 2015). This is used for the examples in the package and the vignette.
 #'
 #' @param WithBatch If true, 2 batches are generated (each of them containing 10 cells)
+#' @param WithSpikes If true, the simulated dataset contains 20 spike-in genes
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS.
 #' It contains 120 genes (100 biological and 20 spike-in) and 20 cells.
@@ -263,7 +262,7 @@ BASiCS_Sim<-function(
 #' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-makeExampleBASiCS_Data <- function(WithBatch = FALSE)
+makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE)
 {
   Mu =  c( 8.36,  10.65,   4.88,   6.29,  21.72,  12.93,  30.19,  83.92,   3.89,   6.34,
            57.87,  12.45,   8.08,   7.31,  15.56,  15.91,  12.24,  15.96,  19.14,   4.20,
@@ -302,45 +301,70 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE)
     Theta = ifelse(1:n <= 10, Theta1, Theta2)
   }
 
-  # Matrix where simulated counts will be stored
-  Counts.sim<-matrix(0,ncol=n,nrow=q)
-  # Matrix where gene-cell specific simulated random effects will be stored
-  Rho<-matrix(1,ncol=n,nrow=q.bio)
-  # Simulated cell-specific random effects
-  if(all(Theta>0)) {set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(S*Theta))}
-  else {Nu<-S}
-  # Simulated counts data
-  for(i in 1:q)
+  if(WithSpikes)
   {
-    # Biological genes
-    if(i<=q.bio)
+    # Matrix where simulated counts will be stored
+    Counts.sim<-matrix(0,ncol=n,nrow=q)
+    # Matrix where gene-cell specific simulated random effects will be stored
+    Rho<-matrix(1,ncol=n,nrow=q.bio)
+    # Simulated cell-specific random effects
+    if(all(Theta>0)) {set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(S*Theta))}
+    else {Nu<-S}
+    # Simulated counts data
+    for(i in 1:q)
     {
-      if(Delta[i]>0){set.seed(i); Rho[i,]<-rgamma(n,shape=1/Delta[i],rate=1/Delta[i])}
-      set.seed(i+10000); Counts.sim[i,]<-rpois(n,lambda=Phi*Nu*Rho[i,]*Mu[i])
+      # Biological genes
+      if(i<=q.bio)
+      {
+        if(Delta[i]>0){set.seed(i); Rho[i,]<-rgamma(n,shape=1/Delta[i],rate=1/Delta[i])}
+        set.seed(i+10000); Counts.sim[i,]<-rpois(n,lambda=Phi*Nu*Rho[i,]*Mu[i])
+      }
+      # Technical genes
+      else {set.seed(i+20000); Counts.sim[i,]<-rpois(n,lambda=Nu*Mu[i])}
     }
-    # Technical genes
-    else {set.seed(i+20000); Counts.sim[i,]<-rpois(n,lambda=Nu*Mu[i])}
-  }
+    rownames(Counts.sim) <- paste0("Gene", 1:q)
+    SpikeInfo = data.frame(paste0("Gene", (q.bio+1):q), Mu[(q.bio+1):q])
+    
+    if(!WithBatch)
+    {
+      Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q), BatchInfo = rep(1,20))
+    }
+    else
+    {
+      Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q),
+                 BatchInfo = c(rep(1,10), rep(2,10)))
+    }
 
-  rownames(Counts.sim) <- paste0("Gene", 1:q)
-  SpikeInfo = data.frame(paste0("Gene", (q.bio+1):q), Mu[(q.bio+1):q])
-
-  if(!WithBatch)
-  {
-    Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q), BatchInfo = rep(1,20))
   }
   else
   {
-    Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q),
+    # Matrix where simulated counts will be stored
+    Counts.sim<-matrix(0,ncol=n,nrow=q.bio)
+    # Matrix where gene-cell specific simulated random effects will be stored
+    Rho<-matrix(1,ncol=n,nrow=q.bio)
+    # Simulated cell-specific random effects
+    if(all(Theta>0)) {set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(Phi*Theta))}
+    else {Nu<-Phi}
+    # Simulated counts data
+    for(i in 1:q.bio)
+    {
+      if(Delta[i]>0){set.seed(i); Rho[i,]<-rgamma(n,shape=1/Delta[i],rate=1/Delta[i])}
+      set.seed(i+10000); Counts.sim[i,]<-rpois(n,lambda=Nu*Rho[i,]*Mu[i])
+    }
+    rownames(Counts.sim) <- paste0("Gene", 1:q.bio)
+    
+    Data = new("BASiCS_Data", Counts = Counts.sim, Tech = rep(FALSE, q.bio), SpikeInput = 1, 
+               GeneNames = paste0("Gene", 1:q.bio),
                BatchInfo = c(rep(1,10), rep(2,10)))
+ 
   }
-
-  nBatch = length(unique(Data@BatchInfo))
-  cat("An object of class ", class(Data), "\n", sep = "")
-  cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-  cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
-  if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
-  else {cat(paste0(" The data contains ",nBatch," batches.\n"))}
+  
+#  nBatch = length(unique(Data@BatchInfo))
+#  cat("An object of class ", class(Data), "\n", sep = "")
+#  cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+#  cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
+#  if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
+#  else {cat(paste0(" The data contains ",nBatch," batches.\n"))} 
 
   return(Data)
 }
@@ -357,31 +381,46 @@ HiddenBASiCS_MCMC_Start<-function(
   q.bio<-sum(!displayTechIndicator(Data))
   # Number of cells
   n <- dim(counts(Data))[2]
-
-  # Initialize phi as a vector of ones
-  phi0 = colSums(Data@Counts[!Data@Tech,])
-  phi0 = n * phi0 / sum(phi0)
-  # Initialize s as the empirical capture efficiency rates
-  s0 = colSums(counts(Data, type = "technical")) / sum(displaySpikeInput(Data)); nu0=s0
-  # Initialize phi * s as the 'scran' estimates
-#  sce <- newSCESet(countData=data.frame(counts(Data)))
-#  isSpike(sce) <- displayTechIndicator(Data)
+  
+  # Initialize normalization as the 'scran' estimates
   sizes.aux = c(20, 40, 60, 80, 100)
   if(n < 200) {sizes.aux = c(20, 40, 60, 80)}
   if(n < 160) {sizes.aux = c(20, 40, 60)}
   if(n < 120) {sizes.aux = c(20, 40)}
   if(n < 80) {sizes.aux = c(20)}
   if(n < 40) {sizes.aux = c(10)}
-  size_scran <- computeSumFactors(counts(Data, type = "biological"), sizes = sizes.aux)
-#  size_scran = sizeFactors(sce)
-  phi0 = size_scran / s0
-  phi0 = n * phi0 / sum(phi0)
+  size_scran <- scran::computeSumFactors(counts(Data, type = "biological"), sizes = sizes.aux)
 
-  # Initialize mu using average 'normalised counts' across cells
-  # and true input values for spike-in genes
-  nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / (phi0*s0) )
-  meansBio <- rowMeans( nCountsBio )
-  mu0<-c(meansBio + 1,Data@SpikeInput) # +1 to avoid zeros as starting values
+  if(length(Data@SpikeInput) > 1)
+  {
+    # Initialize s as the empirical capture efficiency rates
+    s0 = colSums(counts(Data, type = "technical")) / sum(displaySpikeInput(Data)); nu0=s0
+    phi0 = size_scran / s0
+    phi0 = n * phi0 / sum(phi0)   
+    
+    # Initialize mu using average 'normalised counts' across cells
+    # and true input values for spike-in genes
+    nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / (phi0*s0) )
+    meansBio <- rowMeans( nCountsBio )
+    mu0<-c(meansBio + 1,Data@SpikeInput) # +1 to avoid zeros as starting values
+  }
+  else
+  {
+    phi0 = size_scran
+    phi0 = n * phi0 / sum(phi0); 
+    for(B in unique(displayBatchInfo(Data)))
+    {
+      aux = displayBatchInfo(Data) == B
+      phi0[aux] = sum(aux) * phi0[aux] / sum(phi0[aux])
+    }
+    
+    nu0=phi0; s0 = NULL   
+    
+    # Initialize mu using average 'normalised counts' across cells
+    nCountsBio <- t( t(Data@Counts) / phi0 )
+    meansBio <- rowMeans( nCountsBio )
+    mu0 <- meansBio + 1 # +1 to avoid zeros as starting values    
+  }
 
   # Random stating value for delta
   delta0 = rgamma(q.bio,1,1) + 1
@@ -400,7 +439,8 @@ HiddenBASiCS_MCMC_Start<-function(
   # Starting values for the proposal variances
 #  ls.mu0 =  pmax(2 * log (0.02 * abs(log(mu0))),ls.mu0)
 #  ls.delta0 =  pmax(2 * log (0.02 * abs(log(delta0))),ls.delta0)
-  ls.mu0 = rep(ls.mu0, q)
+  if(length(Data@SpikeInput) > 1) {ls.mu0 = rep(ls.mu0, q)}
+  else{ls.mu0 = rep(ls.mu0, q.bio)}
   ls.delta0 = rep(ls.delta0, q.bio)
   ls.phi0 = ifelse(n<200, pmax(2*log(n),ls.phi0), 11) # 6
   ls.nu0 =  pmax(2 * log (0.02 * abs(log(nu0))),ls.nu0)
@@ -539,7 +579,7 @@ BASiCS_MCMC <- function(
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
 
   # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
-  q=length(Data@Tech); q.bio=length(Data@Tech[!Data@Tech]); n=dim(Data@Counts)[2]
+  q=length(Data@Tech); q.bio=sum(!Data@Tech); n=dim(Data@Counts)[2]
 
   args <- list(...)
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
@@ -599,46 +639,75 @@ BASiCS_MCMC <- function(
   StoreAdaptNumber = as.numeric(StoreAdapt)
   nBatch = length(unique(Data@BatchInfo))
 
-  if(nBatch > 1)
+  # If spikes are available
+  if(length(Data@SpikeInput) > 1)
   {
+    if(nBatch > 1)
+    {
+      BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
+      
+      # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
+      Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(
+        N,
+        Thin,
+        Burn,
+        as.matrix(Data@Counts),
+        BatchDesign,
+        mu0, delta0, phi0, s0, nu0, theta0,
+        PriorParam$s2.mu,
+        PriorParam$a.delta, PriorParam$b.delta,
+        PriorParam$p.phi,
+        PriorParam$a.s, PriorParam$b.s,
+        PriorParam$a.theta, PriorParam$b.theta,
+        AR,
+        ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
+        sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
+        StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
+        PriorParam$s2.delta, PriorDeltaNum))
+    }
+    else
+    {
+      # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
+      Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(
+        N,
+        Thin,
+        Burn,
+        as.matrix(Data@Counts),
+        mu0, delta0, phi0, s0, nu0, theta0,
+        PriorParam$s2.mu,
+        PriorParam$a.delta, PriorParam$b.delta,
+        PriorParam$p.phi,
+        PriorParam$a.s, PriorParam$b.s,
+        PriorParam$a.theta, PriorParam$b.theta,
+        AR,
+        ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
+        sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
+        StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
+        PriorParam$s2.delta, PriorDeltaNum))
+    }  
+  }
+  # If spikes are not available
+  else
+  {
+    cat('Code for no-spike case is not ready to be used \n')
+    
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
-
+    
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-    Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(
+    Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
       N,
       Thin,
       Burn,
       as.matrix(Data@Counts),
       BatchDesign,
-      mu0, delta0, phi0, s0, nu0, theta0,
+      mu0, delta0, phi0, nu0, theta0,
       PriorParam$s2.mu,
       PriorParam$a.delta, PriorParam$b.delta,
       PriorParam$p.phi,
-      PriorParam$a.s, PriorParam$b.s,
       PriorParam$a.theta, PriorParam$b.theta,
       AR,
       ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
-      sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-      StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
-      PriorParam$s2.delta, PriorDeltaNum))
-  }
-  else
-  {
-    # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-    Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(
-      N,
-      Thin,
-      Burn,
-      as.matrix(Data@Counts),
-      mu0, delta0, phi0, s0, nu0, theta0,
-      PriorParam$s2.mu,
-      PriorParam$a.delta, PriorParam$b.delta,
-      PriorParam$p.phi,
-      PriorParam$a.s, PriorParam$b.s,
-      PriorParam$a.theta, PriorParam$b.theta,
-      AR,
-      ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
-      sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
+      sum.bycell.all, sum.bygene.all, 
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum))
   }
@@ -647,7 +716,7 @@ BASiCS_MCMC <- function(
   colnames(Chain$mu) = Data@GeneNames[!Data@Tech]
   colnames(Chain$delta) = Data@GeneNames[!Data@Tech]
   colnames(Chain$phi) = paste0("Cell",1:n)
-  colnames(Chain$s) = paste0("Cell",1:n)
+  if(length(Data@SpikeInput) > 1) {colnames(Chain$s) = paste0("Cell",1:n)}
   colnames(Chain$nu) = paste0("Cell",1:n)
   colnames(Chain$theta) = paste0("Batch",1:nBatch)
 
@@ -671,7 +740,7 @@ BASiCS_MCMC <- function(
     write.table(Chain$mu[,1:q.bio],paste0("chain_mu_",RunName,".txt"),col.names=T,row.names=F)
     write.table(Chain$delta,paste0("chain_delta_",RunName,".txt"),col.names=T,row.names=F)
     write.table(Chain$phi,paste0("chain_phi_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$s,paste0("chain_s_",RunName,".txt"),col.names=T,row.names=F)
+    if(length(Data@SpikeInput) > 1){write.table(Chain$s,paste0("chain_s_",RunName,".txt"),col.names=T,row.names=F)}
     write.table(Chain$nu,paste0("chain_nu_",RunName,".txt"),col.names=T,row.names=F)
     write.table(Chain$theta,paste0("chain_theta_",RunName,".txt"),col.names=T,row.names=F)
 
@@ -690,7 +759,6 @@ BASiCS_MCMC <- function(
     colnames(Chain$ls.mu) = Data@GeneNames[!Data@Tech]
     colnames(Chain$ls.delta) = Data@GeneNames[!Data@Tech]
     colnames(Chain$ls.phi) = "AllCells"
-    colnames(Chain$ls.s) = paste0("Cell",1:n)
     colnames(Chain$ls.nu) = paste0("Cell",1:n)
     colnames(Chain$ls.theta) = paste0("Batch",1:nBatch)
 
@@ -706,6 +774,8 @@ BASiCS_MCMC <- function(
   cat("--------------------------------------------------------------------"); cat("\n")
   cat("Output"); cat("\n")
   cat("--------------------------------------------------------------------"); cat("\n")
+
+  if(length(Data@SpikeInput) == 1) {Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))}
 
   ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi,
                                 s = Chain$s, nu = Chain$nu, theta = Chain$theta)

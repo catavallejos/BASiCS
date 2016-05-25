@@ -132,3 +132,12 @@ version 0.5.10: (2016-05-20)
 
 version 0.5.11: (2016-05-24)
 - 'importMethodsFrom(scran, computeSumFactors)' added to NAMESPACE
+
+version 0.6.1: (2016-05-25)
+- Argument 'WithSpikes' added to 'makeExampleBASiCS_Data', generating an example data with no spikes
+- Modifications to validity checks of 'BASiCS_Data' class to allow no spikes case (SpikeInput = 1)
+- 'show' methods for 'BASiCS_Data' class modified to deal with no spike case
+- Checks for 'BASiCS_Data' object modified to require: either spikes or batches
+- 'BASiCS_MCMC' modified for no spikes case (if/else statement only, not yet functional)
+- 'HiddenBASiCS_MCMC_Start' modified for no spikes case
+- Function 'HiddenBASiCS_MCMCcppNoSpikes' added. Update for 'phi' is pending. 

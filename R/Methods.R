@@ -65,13 +65,25 @@ setMethod("show",
           definition = function(object){
             q = nrow(object@Counts)
             n = ncol(object@Counts)
-            q.bio = nrow(object@Counts) - length(object@SpikeInput)
-            nBatch = length(unique(object@BatchInfo))
-            cat("An object of class ", class(object), "\n", sep = "")
-            cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-            cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
-            if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
-            else {cat(paste0(" The data contains ",nBatch," batches.\n"))}
+            if(length(object@SpikeInput) > 1)
+            {
+              q.bio = nrow(object@Counts) - length(object@SpikeInput)
+              nBatch = length(unique(object@BatchInfo))
+              cat("An object of class ", class(object), "\n", sep = "")
+              cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+              cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
+              if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
+              else {cat(paste0(" The data contains ",nBatch," batches.\n"))}
+            }
+            else
+            {
+              nBatch = length(unique(object@BatchInfo))
+              cat("An object of class ", class(object), "\n", sep = "")
+              cat(" Dataset contains ", q, " genes (no spikes) and ", n, " cells.\n", sep="")
+              cat(" Elements (slots): Counts, Tech, SpikeInput, GeneNames and BatchInfo.\n")
+              if(nBatch == 1) {cat(paste0(" The data contains ",nBatch," batch.\n"))}
+              else {cat(paste0(" The data contains ",nBatch," batches.\n"))}              
+            }
           })
 
 #' @name BASiCS_Data-methods
