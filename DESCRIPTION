@@ -21,13 +21,13 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
     population of cells under study. This is formalized by means of tail
     posterior probabilities associated to high (or low) biological cell-to-cell
     variance contributions, quantities that can be easily interpreted by
-    applied users. Additionally, BASiCS has now been extended to compare gene 
+    applied users. Additionally, BASiCS has now been extended to compare gene
     expression patterns between pre-specified populations of cells. Unlike traditional
     differential expression tools, BASiCS quantifies changes in expression that lie
-    beyond comparisons of means, also allowing the study of changes in cell-to-cell 
-    heterogeneity. The latter are quantified via a biological over-dispersion 
+    beyond comparisons of means, also allowing the study of changes in cell-to-cell
+    heterogeneity. The latter are quantified via a biological over-dispersion
     parameter that measures residual over-dispersion (with respect to Poisson sampling)
-    after normalisation and the removal of technical variation. 
+    after normalisation and the removal of technical variation.
 License: GPL (>= 2)
 Depends:
     R (>= 3.1.0)
@@ -38,7 +38,8 @@ Imports:
     coda,
     scran
 Suggests:
-    knitr
+    knitr,
+    testthat
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
