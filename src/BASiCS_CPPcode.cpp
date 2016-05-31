@@ -846,6 +846,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
   arma::mat Counts_arma = as_arma(Counts);
   arma::vec mu0_arma = as_arma(mu0);
+  arma::vec phi0_arma = as_arma(phi0);
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux,q); 
   arma::mat delta = arma::zeros(Naux,qbio); 
@@ -877,7 +878,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   // INITIALIZATION OF VALUES FOR MCMC RUN
   arma::mat muAux = arma::zeros(q,2); muAux.col(0)=mu0_arma; arma::vec LSmuAux = as_arma(LSmu0);
   arma::mat deltaAux = arma::zeros(qbio,2); deltaAux.col(0)=as_arma(delta0); arma::vec LSdeltaAux = as_arma(LSdelta0); 
-  arma::vec phiAux = as_arma(phi0); double LSphiAux = LSphi0; Rcpp::List phiAuxList;
+  arma::vec phiAux = phi0_arma; double LSphiAux = LSphi0; Rcpp::List phiAuxList;
   arma::vec sAux = as_arma(s0); 
   arma::mat nuAux = arma::zeros(n,2); nuAux.col(0)=as_arma(nu0); arma::vec LSnuAux = as_arma(LSnu0);
   arma::vec thetaAux = arma::zeros(2); thetaAux(0) = theta0; double LSthetaAux = LStheta0;  
@@ -1317,6 +1318,7 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
   arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
   arma::mat Counts_arma = as_arma(Counts); arma::mat BatchDesign_arma = as_arma(BatchDesign);
   arma::vec mu0_arma = as_arma(mu0);
+  arma::vec  phi0_arma = as_arma(phi0);
   
   double SumSpikeInput = sum(mu0_arma(arma::span(qbio,q -1)));
   
@@ -1351,7 +1353,7 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
   // INITIALIZATION OF VALUES FOR MCMC RUN
   arma::mat muAux = arma::zeros(q,2); muAux.col(0)=as_arma(mu0); arma::vec LSmuAux = as_arma(LSmu0);
   arma::mat deltaAux = arma::zeros(qbio,2); deltaAux.col(0)=as_arma(delta0); arma::vec LSdeltaAux = as_arma(LSdelta0); 
-  arma::vec phiAux = as_arma(phi0); double LSphiAux = LSphi0; Rcpp::List phiAuxList;
+  arma::vec phiAux = phi0_arma; double LSphiAux = LSphi0; Rcpp::List phiAuxList;
   arma::vec sAux = as_arma(s0); 
   arma::mat nuAux = arma::zeros(n,2); nuAux.col(0)=as_arma(nu0); arma::vec LSnuAux = as_arma(LSnu0);
   arma::mat thetaAux = arma::zeros(nBatch, 2); thetaAux.col(0) = theta0 * arma::ones(nBatch); 
@@ -1447,15 +1449,20 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
       if(Ibatch==50)
       {
         PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
-        LSmuAux=LSmuAux+PmuAux*std::min(0.01,1/sqrt(i)); 
+        LSmuAux=LSmuAux+PmuAux*0.1;
+        //LSmuAux=LSmuAux+PmuAux*std::min(0.01,1/sqrt(i));
         PdeltaAux=PdeltaAux/50; PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
-        LSdeltaAux=LSdeltaAux+PdeltaAux*std::min(0.01,1/sqrt(i));                 
-        PphiAux=PphiAux/50; PphiAux = -1+2*(PphiAux>ar); 
-        LSphiAux=LSphiAux - PphiAux*std::min(0.01,1/sqrt(i));  
+        LSdeltaAux=LSdeltaAux+PdeltaAux*0.1;
+        //LSdeltaAux=LSdeltaAux+PdeltaAux*std::min(0.01,1/sqrt(i));
+        PphiAux=PphiAux/50; PphiAux = -1+2*(PphiAux>ar);
+        LSphiAux=LSphiAux - PphiAux*0.1;
+        //LSphiAux=LSphiAux - PphiAux*std::min(0.01,1/sqrt(i));
         PnuAux=PnuAux/50; PnuAux = -1+2*arma::conv_to<arma::mat>::from(PnuAux>ar);
-        LSnuAux=LSnuAux+PnuAux*std::min(0.01,1/sqrt(i)); 
+        LSnuAux=LSnuAux+PnuAux*0.1;
+        //LSnuAux=LSnuAux+PnuAux*std::min(0.01,1/sqrt(i));
         PthetaAux=PthetaAux/50; PthetaAux = -1+2*arma::conv_to<arma::mat>::from(PthetaAux>ar); 
-        LSthetaAux= LSthetaAux + PthetaAux*std::min(0.01,1/sqrt(i));
+        LSthetaAux=LSthetaAux+PthetaAux*0.1;
+        //LSthetaAux= LSthetaAux + PthetaAux*std::min(0.01,1/sqrt(i));
                 
         Ibatch = 0; 
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
@@ -1726,7 +1733,12 @@ arma::mat nuUpdateNoSpikes(
   arma::vec const& theta, /* Current value of $\theta$' */
   arma::vec const& sum_bygene_all, /* Sum of expression counts by gene (all genes) */
   int const& q_bio,
-  int const& n)
+  int const& n,
+  arma::vec const& BatchInfo,
+  arma::vec const& BatchIds,
+  int const& nBatch,
+  arma::vec const& BatchSizes,
+  arma::vec const& BatchOffSet)
 {
   using arma::span;
   
@@ -1777,8 +1789,110 @@ arma::mat nuUpdateNoSpikes(
   // CREATING OUTPUT VARIABLE        
   arma::vec nu = ind % exp(y) + (1 - ind) % nu0;
   
+  // QUICK FIX FOR OFFSET ISSUE (NO FORMAL JUSTIFICATION)
+  for (int k=0; k < nBatch; k++)
+  {
+    nu.elem(find(BatchInfo == BatchIds(k))) = BatchSizes(k) * BatchOffSet(k) * nu.elem(find(BatchInfo == BatchIds(k))) / sum(nu.elem(find(BatchInfo == BatchIds(k))));
+  }
+  
   // OUTPUT
   return join_rows(nu, arma::conv_to<arma::mat>::from(ind));
+}
+
+/* Metropolis-Hastings updates of phi 
+ * Joint updates using Dirichlet proposals
+ */
+Rcpp::List phiUpdateNoSpikes(
+    arma::vec const& phi0, // Current value of $\phi=(\phi_1,...,\phi_n)'$
+    arma::vec const& prop_var, // Current value of the proposal precision
+    arma::vec const& nu, // Current value of $\nu=(\nu_1,...,\nu_n)'$
+    arma::vec const& theta, 
+    arma::vec const& p_phi, // Dirichlet hyper-parameter of the prior for $\phi / n$
+    int const& n, // Total number of cells 
+    arma::vec const& BatchInfo,
+    arma::vec const& BatchIds,
+    int const& nBatch,
+    arma::vec const& BatchSizes,
+    arma::vec const& BatchOffSet)
+{
+  using arma::span;
+  using arma::pow;
+ 
+  arma::vec phi = arma::ones(n);
+  arma::vec y; 
+  double u;
+  arma::vec log_aux = arma::ones(nBatch);
+  arma::vec ind = arma::zeros(nBatch);
+  
+  // LOOP OVER BATCHES
+  for (int k=0; k < nBatch; k++)
+  {
+    // PROPOSAL STEP
+    y = BatchOffSet(k) * BatchSizes(k) * rDirichlet(prop_var(k) * phi0.elem(find(BatchInfo == BatchIds(k))));
+    u = R::runif(0,1);
+    
+//    Rcpp::Rcout << "Proposal"  << std::endl;
+//    Rcpp::Rcout << y << std::endl;
+//    Rcpp::Rcout << "Old value"  << std::endl;
+//    Rcpp::Rcout << phi0.elem(find(BatchInfo == BatchIds(k))) << std::endl;
+    
+    // ACCEPTANCE STEP 
+    log_aux(k) = prop_var(k) * sum(y % log(phi0.elem(find(BatchInfo == BatchIds(k)))) - phi0.elem(find(BatchInfo == BatchIds(k))) % log(y));
+    log_aux(k) += sum((p_phi.elem(find(BatchInfo == BatchIds(k))) - 1/theta(k)) % (log(y) - log(phi0.elem(find(BatchInfo == BatchIds(k))))));
+    log_aux(k) -= (1/theta(k)) * sum(nu.elem(find(BatchInfo == BatchIds(k))) % ( (1/y) - (1/phi0.elem(find(BatchInfo == BatchIds(k)))) ) );
+    log_aux(k) -= sum(lgamma_cpp_vec(prop_var(k) * y) - lgamma_cpp_vec(prop_var(k) * phi0.elem(find(BatchInfo == BatchIds(k)))));
+    
+    if(log(u) < log_aux(k)) {ind(k) = 1;}
+    else {ind(k) = 0;}
+    phi.elem(find(BatchInfo == BatchIds(k))) = ind(k) * y + (1-ind(k)) * phi0.elem(find(BatchInfo == BatchIds(k)));
+  }
+  
+//  Rcpp::Rcout << "Sampling phi"  << std::endl;
+//  Rcpp::Rcout << phi << std::endl;
+  // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  
+//  if(all(prop_var * y < 2.5327372760800758e+305)  & 
+//     all(prop_var * phi0 < 2.5327372760800758e+305) &
+//     all(y > 0) &
+//     all(phi0 > 0)) 
+//  {
+//    double log_aux = sum( (sum_bygene_all + p_phi) % (log(y) - log(phi0)));
+    
+    // Loop to replace matrix operations, through genes and cells
+//    for (int j=0; j < n; j++) 
+//    {
+//      for (int i=0; i < q_bio; i++) 
+//      {
+//        log_aux -= ( Counts(i,j) + (1/delta(i)) ) *  
+//          log( (y(j)*nu(j)*mu(i)+(1/delta(i)) ) / ( phi0(j)*nu(j)*mu(i)+(1/delta(i)) ));
+//      } 
+//    }
+//    log_aux += prop_var * sum(y % log(phi0) - phi0 % log(y));
+//    log_aux -= sum(lgamma_cpp_vec(prop_var * y) - lgamma_cpp_vec(prop_var * phi0));    
+    
+//    if(!R_IsNA(log_aux))
+//    {
+//      if(log(u) < log_aux) {ind = 1;}
+//      else {ind = 0;}
+//      phi = ind * y + (1-ind) * phi0;
+//    }
+    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+    // DEBUG: Print warning message
+//    else
+//    {
+//      Rcpp::Rcout << "Something went wrong when updating phi" << std::endl;
+//      Rcpp::stop("Please consider additional filter of the input dataset."); 
+//      ind = 0;
+//      phi = phi0;
+//    }     
+//  }
+//  else
+//  {
+//    ind = 0;
+//    phi = phi0;     
+//  }      
+  return(Rcpp::List::create(
+      Rcpp::Named("phi")=phi,
+      Rcpp::Named("ind")=ind)); 
 }
 
 /* MCMC sampler 
@@ -1804,7 +1918,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double ar, // Optimal acceptance rate for adaptive Metropolis-Hastings updates
     NumericVector LSmu0, // Starting value of adaptive proposal variance of $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
     NumericVector LSdelta0, // Starting value of adaptive proposal variance of $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
-    double LSphi0, // Starting value of adaptive proposal precision of $\phi=(\phi_1,...,\phi_n)'$ (log-scale)
+    NumericVector LSphi0, // Starting value of adaptive proposal precision of $\phi=(\phi_1,...,\phi_n)'$ (log-scale)
     NumericVector LSnu0, // Starting value of adaptive proposal variance of $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
     double LStheta0, // Starting value of adaptive proposal variance of $\theta$ (log-scale)  
     NumericVector sumByCellAll, // Sum of expression counts by cell (all genes)
@@ -1813,7 +1927,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     int EndAdapt,
     int PrintProgress,
     double s2_delta, 
-    double prior_delta) 
+    double prior_delta,
+    NumericVector BatchInfo,
+    NumericVector BatchIds,
+    NumericVector BatchSizes,
+    NumericVector BatchOffSet) 
 {
   
   // NUMBER OF CELLS, GENES AND STORED DRAWS
@@ -1824,7 +1942,12 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
   arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
   arma::mat Counts_arma = as_arma(Counts); arma::mat BatchDesign_arma = as_arma(BatchDesign);
+  arma::vec BatchInfo_arma = as_arma(BatchInfo);
+  arma::vec BatchIds_arma = as_arma(BatchIds);
+  arma::vec BatchSizes_arma = as_arma(BatchSizes);
+  arma::vec BatchOffSet_arma = as_arma(BatchOffSet);
   arma::vec mu0_arma = as_arma(mu0);
+  arma::vec phi0_arma = as_arma(phi0);
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux, qbio); 
@@ -1834,7 +1957,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::mat theta = arma::zeros(Naux, nBatch); 
   arma::mat LSmu;
   arma::mat LSdelta;
-  arma::vec LSphi;
+  arma::mat LSphi;
   arma::mat LSnu;
   arma::mat LStheta; 
   
@@ -1843,26 +1966,26 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   {
     LSmu = arma::zeros(Naux, qbio); 
     LSdelta = arma::zeros(Naux, qbio); 
-    LSphi = arma::ones(Naux);   
+    LSphi = arma::ones(Naux, nBatch);   
     LSnu = arma::zeros(Naux, n); 
     LStheta = arma::zeros(Naux, nBatch);   
   }
   // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
   arma::vec muAccept = arma::zeros(qbio); arma::vec PmuAux = arma::zeros(qbio);
   arma::vec deltaAccept = arma::zeros(qbio); arma::vec PdeltaAux = arma::zeros(qbio);
-  double phiAccept = 0; double PphiAux = 0;
+  arma::vec phiAccept = arma::zeros(nBatch);  arma::vec PphiAux = arma::zeros(nBatch);
   arma::vec nuAccept = arma::zeros(n); arma::vec PnuAux = arma::zeros(n);
   arma::vec thetaAccept = arma::zeros(nBatch); arma::vec PthetaAux = arma::zeros(nBatch);
   // INITIALIZATION OF VALUES FOR MCMC RUN
   arma::mat muAux = arma::zeros(qbio,2); muAux.col(0)=as_arma(mu0); arma::vec LSmuAux = as_arma(LSmu0);
   arma::mat deltaAux = arma::zeros(qbio,2); deltaAux.col(0)=as_arma(delta0); arma::vec LSdeltaAux = as_arma(LSdelta0); 
-  arma::vec phiAux = as_arma(phi0); double LSphiAux = LSphi0; Rcpp::List phiAuxList;
+  arma::vec phiAux = phi0_arma; arma::vec LSphiAux = LSphi0; Rcpp::List phiAuxList;
   arma::mat nuAux = arma::zeros(n,2); nuAux.col(0)=as_arma(nu0); arma::vec LSnuAux = as_arma(LSnu0);
   arma::mat thetaAux = arma::zeros(nBatch, 2); thetaAux.col(0) = theta0 * arma::ones(nBatch); 
   arma::vec LSthetaAux = LStheta0 * arma::ones(nBatch);  
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = arma::zeros(qbio); arma::vec PdeltaAux0 = arma::zeros(qbio);
-  double PphiAux0 = 0; 
+  arma::vec PphiAux0 = arma::zeros(nBatch); 
   arma::vec PnuAux0 = arma::zeros(n); arma::vec PthetaAux0 = arma::ones(nBatch);
   
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES (RE-INITIALIZE EVERY 50 ITERATIONS)
@@ -1892,10 +2015,12 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     //    struct timespec time0_1 = orwl_gettime();
     // UPDATE OF PHI: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-//    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts_arma, muAux.col(0), deltaAux.col(0),
-//                           nuAux.col(0), p_Phi, sumByGeneBio_arma, qbio,n); 
-//    phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
-//    PphiAux += Rcpp::as<double>(phiAuxList["ind"]); if(i>=burn) {phiAccept += Rcpp::as<double>(phiAuxList["ind"]);}
+    phiAuxList = phiUpdateNoSpikes(phiAux, exp(LSphiAux), 
+                           nuAux.col(0), thetaAux.col(0), 
+                           p_Phi, n,
+                           BatchInfo_arma, BatchIds_arma, nBatch, BatchSizes_arma, BatchOffSet_arma); 
+    phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
+    PphiAux += as<arma::vec>(phiAuxList["ind"]); if(i>=burn) {phiAccept += as<arma::vec>(phiAuxList["ind"]);}
     //    struct timespec time1_1 = orwl_gettime();    
     //    Rcpp::Rcout << "Time phi: " << (time1_1.tv_nsec - time0_1.tv_nsec) / ((float)(n)) << std::endl;
     
@@ -1929,7 +2054,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     nuAux = nuUpdateNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
                             BatchDesign_arma,
                             muAux.col(0), deltaAux.col(0),
-                            phiAux, thetaAux.col(0), sumByGeneAll_arma, qbio, n); 
+                            phiAux, thetaAux.col(0), sumByGeneAll_arma, qbio, n,
+                            BatchInfo_arma, BatchIds_arma, nBatch,
+                            BatchSizes_arma, BatchOffSet_arma); 
     PnuAux += nuAux.col(1); if(i>=burn) {nuAccept += nuAux.col(1);}
     //    struct timespec time1_6 = orwl_gettime();    
     //    Rcpp::Rcout << "Time nu: " <<  (time1_6.tv_nsec - time0_6.tv_nsec) / ((float)(n)) << std::endl;
@@ -1941,15 +2068,15 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       if(Ibatch==50)
       {
         PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
-        LSmuAux=LSmuAux+PmuAux*std::min(0.01,1/sqrt(i)); 
+        LSmuAux=LSmuAux+PmuAux*0.1; 
         PdeltaAux=PdeltaAux/50; PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
-        LSdeltaAux=LSdeltaAux+PdeltaAux*std::min(0.01,1/sqrt(i));                 
-        PphiAux=PphiAux/50; PphiAux = -1+2*(PphiAux>ar); 
-        LSphiAux=LSphiAux - PphiAux*std::min(0.01,1/sqrt(i));  
+        LSdeltaAux=LSdeltaAux+PdeltaAux*0.1;                
+        PphiAux=PphiAux/50; PphiAux = -1+2*arma::conv_to<arma::mat>::from(PphiAux>ar);//-1+2*(PphiAux(0)>ar); 
+        LSphiAux = LSphiAux - PphiAux*0.1;  
         PnuAux=PnuAux/50; PnuAux = -1+2*arma::conv_to<arma::mat>::from(PnuAux>ar);
-        LSnuAux=LSnuAux+PnuAux*std::min(0.01,1/sqrt(i)); 
+        LSnuAux=LSnuAux+PnuAux*0.1; 
         PthetaAux=PthetaAux/50; PthetaAux = -1+2*arma::conv_to<arma::mat>::from(PthetaAux>ar); 
-        LSthetaAux= LSthetaAux + PthetaAux*std::min(0.01,1/sqrt(i));
+        LSthetaAux= LSthetaAux + PthetaAux*0.1;
         
         Ibatch = 0; 
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
@@ -1972,7 +2099,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       {
         LSmu.row(i/thin - burn/thin) = LSmuAux.t();
         LSdelta.row(i/thin - burn/thin) = LSdeltaAux.t();
-        LSphi(i/thin - burn/thin) = LSphiAux;
+        LSphi.row(i/thin - burn/thin) = LSphiAux.t();
         LSnu.row(i/thin - burn/thin) = LSnuAux.t();
         LStheta.row(i/thin - burn/thin) = LSthetaAux.t(); 
       }

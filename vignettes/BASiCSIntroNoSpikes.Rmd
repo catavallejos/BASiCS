@@ -52,7 +52,7 @@ library(BASiCS)
 For illustration purposes, the BASiCS package includes a built-in simulated dataset:
 
 ```{r ExampleData}
-DataExample = makeExampleBASiCS_Data(WithSpikes = FALSE)
+Data = makeExampleBASiCS_Data(WithSpikes = FALSE)
 ```
 
 Which was generated using the following simulated parameters
@@ -81,8 +81,8 @@ Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85, 0.27, 0.53, 1.31,
 Phi = c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97,
           1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
 Theta1 = 0.5; Theta2 = 0.75;
-Theta = ifelse(1:n <= 10, Theta1, Theta2)
-set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(Phi*Theta))
+Theta = ifelse(1:20 <= 10, Theta1, Theta2)
+set.seed(1000); Nu<-rgamma(20,shape=1/Theta,rate=1/(Phi*Theta))
 ```
 
 ## Fitting the BASiCS model
@@ -90,17 +90,33 @@ set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(Phi*Theta))
 ```{r MCMC}
 # The required number of iterations to reach convergence varies for different datasets
 Start = BASiCS:::HiddenBASiCS_MCMC_Start(Data)
-Start$mu0 <- Mu
-Start$delta0 <- Delta
+#Start$mu0 <- Mu
+#Start$delta0 <- Delta
 #Start$phi0 <- Phi
-Start$theta0 <- (Theta1 + Theta2)/2
-MCMC_Output <- BASiCS_MCMC(Data, N = 100000, Thin = 10, Burn = 50000, PrintProgress = FALSE, Start = Start)
+#Start$theta0 <- (Theta1 + Theta2)/2
+MCMC_Output <- BASiCS_MCMC(Data, N = 100000, Thin = 50, Burn = 50000, 
+                           PrintProgress = TRUE, Start = Start)
 MCMC_Summary <- Summary(MCMC_Output)
+Offset = mean(MCMC_Summary@nu[,1]); Offset
 
-plot(MCMC_Output, Param = "mu", Gene = 1)
-plot(MCMC_Output, Param = "nu", Cell = 1)
-plot(MCMC_Output, Param = "theta", Batch = 1) # Super over-estimated
-plot(MCMC_Output, Param = "theta", Batch = 2) # Super over-estimated
+MCMC_Output1 <- MCMC_Output
+#MCMC_Output1@mu <- MCMC_Output@mu * Offset
+#MCMC_Output1@nu <- MCMC_Output@nu / Offset
+
+MCMC_Summary <- Summary(MCMC_Output1)
+
+# Modify adaptive steps for faster adapt
+
+plot(MCMC_Output1, Param = "mu", Gene = 1)
+abline(h = Mu[1], col = "red")
+plot(MCMC_Output1, Param = "nu", Cell = 1)
+abline(h = Nu[1], col = "red")
+plot(MCMC_Output1, Param = "phi", Cell = 1)
+abline(h = Phi[1], col = "red")
+plot(MCMC_Output1, Param = "theta", Batch = 1) # Super over-estimated
+abline(h = Theta[1], col = "red")
+plot(MCMC_Output1, Param = "theta", Batch = 2) # Super over-estimated
+abline(h = Theta[2], col = "red")
 
 plot(MCMC_Summary, Param = "mu", log = "y")
 points(Mu, pch = 16, col = "red")
@@ -164,97 +180,3 @@ plot(MCMC_Summary, Param = "phi", Param2 = "nu")
 plot(MCMC_Summary, Param = "s", Param2 = "nu")
 ```
 
-To display posterior medians of $\delta_i$ (the parameters controlling the strength of the biological cell-to-cell expression heterogeneity of a gene $i$ across the population of cells under study) againts overall gene-specific expression levels $\mu_i$ use:
-```{r DispVsExp, fig.width = 5, fig.height = 4}
-plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
-```
-
-
-
-## Highly and lowly variable genes detection
-
-To detect highly and lowly variable genes, BASiCS employes a variance decomposition strategy based on the marginal distribution of the expression counts of gene $i$ in cell $j$ (after integrating out the random effects $\nu_j$'s and $\rho_{ij}$'s). This is given by:
-
-$$ \mbox{Var}(X_{ij}|\mu_i,\delta_i, \phi_j, s_j, \theta) =  \phi_j^{I_i} s_j \mu_i+ \theta \left[\phi_j^{I_i} s_j \mu_i\right]^2+\mbox{I}_{i} \delta_i(\theta+1) \left[\phi_j^{I_i} s_j \mu_i\right]^2, $$
-
-where $I_i = 1$ if $1 \leq i \leq q_0$ and $I_{i}=0$ otherwise. As $\mbox{E}(X_{ij}|\mu_i,\delta_i, \phi_j, s_j, \theta) = \phi_j^{I_i} s_j \mu_i$, the first term in the variance decomposition above is the baseline variance or *shot noise* --- based on a Poisson($\phi_j^{I_i} s_j \mu_i$) model. The second component represents the variance inflation due to unexplained technical variability and the final term is linked to biological cell-to-cell heterogeneity. 
-
-The following code return the fraction of total variability related to each of these three components. This produces a natural ranking of the genes in terms of biological cell-to-cell variance contributions. 
-```{r VarDecomp, fig.width = 5, fig.height=4}
-VarDecomp = BASiCS_VarianceDecomp(Data, MCMC_Output)
-head(VarDecomp)
-```
-
-Intuitively, highly variable genes (HVG) are those for which a large fraction of the total expression variability is explained by a biological cell-to-cell heterogeneity component. Here, we characterise highly variable genes as those for which 
-
-$$ \sigma_{i} \equiv \frac{\delta_i (\theta+1)  }{[(\phi s)^* \mu_i ]^{-1} + \theta + \delta_i   (\theta+1) } > \gamma_{_H}, \hspace{0.2cm} \mbox{where} \hspace{0.2cm} (\phi s)^* =\underset{j \in \{1,\ldots,n\}}{\mathrm{median}} \left\{ \phi_j s_j \right\},$$ 
-
-i.e. when the proportion of the total variability of the expression counts of gene $i$ in a reference cell (derived from the variance decomposition above), replacing $\phi_j s_j$ by $(\phi s)^*$ in order to represent a *typical cell* within the analysed sample) that is explained by biological cell-to-cell heterogeneity exceeds a **variance contribution threshold** $\gamma_{_H}$. In other words, we characterise as HVG those whose biological cell-to-cell heterogeneity component explains $\gamma_{_H}\times 100\%$ of the total variability (in a typical cell). Similarly, lowly variable genes (LVG) will be caracterised by low values of $\sigma_i$ (below certain threshold $\gamma_{_L}$).
-
-BASiCS quantifies the evidence in favour of a gene being highly variable in terms of the upper tail posterior probabilities (associated to high biological cell-to-cell heterogeneity components) and labels as HVG those genes such that (for a given **evidence threshold** $\alpha_{_H}$)  
-
-$$\pi^H_{ i  } (\gamma_{_H})= \mbox{P} \left(\sigma_{i} > \gamma_{_H} | \{x_{ij}: i=1,\ldots,q, j=1,\ldots,n\} \right) > \alpha_{_H}, $$ 
-
-i.e. when such evidence is strong. Analogously, lowly variable genes (LVG) would be those for which 
-
-$$\pi^L_{i } (\gamma_{_L}) = \mbox{P} \left(\sigma_{i} < \gamma_{_L} | \{x_{ij}: i=1,\ldots,q, j=1,\ldots,n\} \right) > \alpha_{_L}, $$ 
-
-for a given variance contribution threshold $\gamma_{_L}$ and an evidence threshold $\alpha_{_L}$.
-
-The functions `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can be used to detect HVG and LVG for given variance contribution thresholds $\gamma_{_H}$ and $\gamma_{_L}$. As a default option, BASiCS searches optimal evidence thresholds $\alpha_{_H}$ and $\alpha_{_L}$ such that the *expected false discovery rate* (EFDR) and *expected false negative rate* (EFNR) coincide. This optimization is not always possible (specially for highly heterogeneous datasets, containing distinct sub-populations of cells). In those cases, `BASiCS_DetectHVG` and `BASiCS_DetectLVG` choose the evidence thresholds $\alpha_{_H}$ and $\alpha_{_L}$ such that the difference between EFDR and EFNR is minimised. For example, if $\gamma_{_H}=0.90$ and $\gamma_{_L}=0.20$:
-
-```{r DetectionDefault, fig.width = 5, fig.height=4}
-DetectHVG <- BASiCS_DetectHVG(Data, MCMC_Output, VarThreshold = 0.70, Plot = TRUE, GeneNames = paste("GeneName", 1:100))
-DetectLVG <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
-```
-
-The user can also specify specific evidence thresholds $\alpha_{_H}$ and $\alpha_{_L}$. 
-
-```{r DetectionFix, fig.width = 5, fig.height=4}
-DetectHVGFixAlpha <- BASiCS_DetectHVG(Data, MCMC_Output, VarThreshold = 0.7, Plot = T, EviThreshold = 0.8)
-DetectLVGFixAlpha <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.4, Plot = T, EviThreshold = 0.8)
-```
-
-Alternatively, if the user does not know a pre-defined variance contribution threshold, *optimal* values can be defined as those for which EFDR and EFNR coincide and are equal to a pre-specified level. The functions `BASiCS_VarThresholdSearchHVG` and `BASiCS_VarThresholdSearchLVG` search of optimal evidence thresholds using a grid of variance contribution thresholds. 
-
-```{r DetectionGrid, fig.width = 5, fig.height=4}
-BASiCS_VarThresholdSearchHVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
-BASiCS_VarThresholdSearchLVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
-```
-
-Finally, a graphical display for the detection of HVG and LVG is:
-
-```{r DetectionPlots, fig.width = 5, fig.height=4}
-plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
-#points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3], 
-#       pch = 16, col = "red", cex = 1)
-#points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3], 
-#       pch = 16, col = "blue", cex = 1)
-```
-
-## Normalisation and removal of technical variation
-
-After performing the analysis, the user might want to produce a matrix of normalised and denoised expression counts for which the effect of technical variation is removed. For this purpose, we implemented the function `BASiCS_DenoisedCounts`. For each gene $i$ and cell $j$ this function returns
-
-$$ x^*_{ij} = \frac{ x_{ij} } {\hat{\phi}_j \hat{\nu}_j}, $$
-
-where $x_{ij}$ is the observed expression count of gene $i$ in cell $j$, $\hat{\phi}_j$ denotes the posterior median of $\phi_j$ and $\hat{\nu}_j$ is the posterior median of $\nu_j$.
-
-```{r DenoisedCounts}
-DenoisedCounts = BASiCS_DenoisedCounts(Data = Data, Chain = MCMC_Output)
-```
-
-Alternativelly, the user can compute the normalised and denoised expression rates underlying the expression of all genes across cells using `BASiCS_DenoisedRates`. The output of this function is given by 
-
-$$ \Lambda_{ij} = \hat{\mu_i} \hat{\rho}_{ij},  $$
-
-where $\hat{\mu_i}$ represents the posterior median of $\mu_j$ and $\hat{\rho}_{ij}$ is given by its posterior mean (Monte Carlo estimate based on the MCMC sample of all model parameters).
-
-```{r DenoisedRates}
-DenoisedRates = BASiCS_DenoisedRates(Data = Data, Chain = MCMC_Output, Propensities = TRUE)
-```
-
-### Session information
-```{r SessionInfo}
-sessionInfo()
-```

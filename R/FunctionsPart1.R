@@ -689,9 +689,20 @@ BASiCS_MCMC <- function(
   # If spikes are not available
   else
   {
-    cat('Code for no-spike case is not ready to be used \n')
+    cat("--------------------------------------------------------------------"); cat("\n")
+    cat('IMPORTANT: this part of the code is under development. Do not use yet. \n')
+    cat("--------------------------------------------------------------------"); cat("\n")
     
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
+    BatchSizes = table(Data@BatchInfo)
+    BatchIds = as.numeric(names(BatchSizes))
+    BatchOffSet = rep(1, times = nBatch)
+    for(k in 2:nBatch)
+    {
+      BatchOffSet[k] = median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[k]])) / 
+                          median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[1]]))
+    }
+    
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
@@ -706,10 +717,11 @@ BASiCS_MCMC <- function(
       PriorParam$p.phi,
       PriorParam$a.theta, PriorParam$b.theta,
       AR,
-      ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
+      ls.mu0, ls.delta0, rep(ls.phi0, nBatch), ls.nu0, ls.theta0,
       sum.bycell.all, sum.bygene.all, 
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
-      PriorParam$s2.delta, PriorDeltaNum))
+      PriorParam$s2.delta, PriorDeltaNum, 
+      Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet))
   }
 
   Chain$mu = Chain$mu[,1:q.bio]

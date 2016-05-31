@@ -141,3 +141,11 @@ version 0.6.1: (2016-05-25)
 - 'BASiCS_MCMC' modified for no spikes case (if/else statement only, not yet functional)
 - 'HiddenBASiCS_MCMC_Start' modified for no spikes case
 - Function 'HiddenBASiCS_MCMCcppNoSpikes' added. Update for 'phi' is pending. 
+- Small vignette file for no spikes case added
+
+version 0.6.2: (2016-05-31)
+- Template for 'phiUpdateNoSpikes' has been added. 
+- Minor change in 'phiUpdate' for all 'HiddenBASiCS_MCMCcpp' functions (to avoid re-writing phi0)
+- Faster adaptation steps for 'HiddenBASiCS_MCMCcppBatch' 'HiddenBASiCS_MCMCcppNoSpikes'
+- 'HiddenBASiCS_MCMCcppNoSpikes' completed for testing stage (not ready for users)
+
