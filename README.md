@@ -7,7 +7,7 @@ Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hiera
 
 ## Installation
 
-BASiCS will be submitted to BioConductor. In the meantime, the development version can be install from GitHub:
+BASiCS will be submitted to BioConductor. In the meantime, the development version can be installed from GitHub:
 
 ```R
 # install.packages("devtools")
@@ -20,6 +20,7 @@ This installation might fail if some of the dependency libraries are not yet ins
 #library(devtools)
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("BiocGenerics")
+#biocLite("scran")
 #install.packages("Rcpp")
 ```
 
