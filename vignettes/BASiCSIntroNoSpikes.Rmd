@@ -94,7 +94,7 @@ Start = BASiCS:::HiddenBASiCS_MCMC_Start(Data)
 #Start$delta0 <- Delta
 #Start$phi0 <- Phi
 #Start$theta0 <- (Theta1 + Theta2)/2
-MCMC_Output <- BASiCS_MCMC(Data, N = 100000, Thin = 50, Burn = 50000, 
+MCMC_Output <- BASiCS_MCMC(Data, N = 10000, Thin = 50, Burn = 5000, 
                            PrintProgress = TRUE, Start = Start)
 MCMC_Summary <- Summary(MCMC_Output)
 Offset = mean(MCMC_Summary@nu[,1]); Offset

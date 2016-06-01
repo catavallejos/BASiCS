@@ -151,3 +151,6 @@ version 0.6.2: (2016-05-31)
 
 version 0.6.3: (2016-05-31)
 - Small update in wellcome message. 
+
+version 0.6.4: (2016-05-01)
+- Safety checks added to 'phiUpdateNoSpikes' 

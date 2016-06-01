@@ -1835,16 +1835,37 @@ Rcpp::List phiUpdateNoSpikes(
 //    Rcpp::Rcout << y << std::endl;
 //    Rcpp::Rcout << "Old value"  << std::endl;
 //    Rcpp::Rcout << phi0.elem(find(BatchInfo == BatchIds(k))) << std::endl;
-    
-    // ACCEPTANCE STEP 
-    log_aux(k) = prop_var(k) * sum(y % log(phi0.elem(find(BatchInfo == BatchIds(k)))) - phi0.elem(find(BatchInfo == BatchIds(k))) % log(y));
-    log_aux(k) += sum((p_phi.elem(find(BatchInfo == BatchIds(k))) - 1/theta(k)) % (log(y) - log(phi0.elem(find(BatchInfo == BatchIds(k))))));
-    log_aux(k) -= (1/theta(k)) * sum(nu.elem(find(BatchInfo == BatchIds(k))) % ( (1/y) - (1/phi0.elem(find(BatchInfo == BatchIds(k)))) ) );
-    log_aux(k) -= sum(lgamma_cpp_vec(prop_var(k) * y) - lgamma_cpp_vec(prop_var(k) * phi0.elem(find(BatchInfo == BatchIds(k)))));
-    
-    if(log(u) < log_aux(k)) {ind(k) = 1;}
-    else {ind(k) = 0;}
-    phi.elem(find(BatchInfo == BatchIds(k))) = ind(k) * y + (1-ind(k)) * phi0.elem(find(BatchInfo == BatchIds(k)));
+   if(all(prop_var(k) * y < 2.5327372760800758e+305)  & 
+      all(prop_var(k) *  phi0.elem(find(BatchInfo == BatchIds(k))) < 2.5327372760800758e+305) &
+      all(y > 0) &
+      all( phi0.elem(find(BatchInfo == BatchIds(k))) > 0)) 
+   {
+     // ACCEPTANCE STEP 
+     log_aux(k) = prop_var(k) * sum(y % log(phi0.elem(find(BatchInfo == BatchIds(k)))) - phi0.elem(find(BatchInfo == BatchIds(k))) % log(y));
+     log_aux(k) += sum((p_phi.elem(find(BatchInfo == BatchIds(k))) - 1/theta(k)) % (log(y) - log(phi0.elem(find(BatchInfo == BatchIds(k))))));
+     log_aux(k) -= (1/theta(k)) * sum(nu.elem(find(BatchInfo == BatchIds(k))) % ( (1/y) - (1/phi0.elem(find(BatchInfo == BatchIds(k)))) ) );
+     log_aux(k) -= sum(lgamma_cpp_vec(prop_var(k) * y) - lgamma_cpp_vec(prop_var(k) * phi0.elem(find(BatchInfo == BatchIds(k)))));
+
+     if(!R_IsNA(log_aux(k)))
+     {
+       if(log(u) < log_aux(k)) {ind(k) = 1;}
+       else {ind(k) = 0;}
+     }
+     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+     // DEBUG: Print warning message
+     else
+     {
+        Rcpp::Rcout << "Something went wrong when updating phi" << std::endl;
+        Rcpp::stop("Please consider additional filter of the input dataset."); 
+        ind(k) = 0;
+     }      
+   }
+   else
+   {
+     ind(k) = 0;
+   }
+   
+   phi.elem(find(BatchInfo == BatchIds(k))) = ind(k) * y + (1-ind(k)) * phi0.elem(find(BatchInfo == BatchIds(k)));
   }
   
 //  Rcpp::Rcout << "Sampling phi"  << std::endl;
