@@ -1838,7 +1838,7 @@ Rcpp::List phiUpdateNoSpikes(
    if(all(prop_var(k) * y < 2.5327372760800758e+305)  & 
       all(prop_var(k) *  phi0.elem(find(BatchInfo == BatchIds(k))) < 2.5327372760800758e+305) &
       all(y > 0) &
-      all( phi0.elem(find(BatchInfo == BatchIds(k))) > 0)) 
+      all( phi0.elem(find(BatchInfo == BatchIds(k))) > 0 )) 
    {
      // ACCEPTANCE STEP 
      log_aux(k) = prop_var(k) * sum(y % log(phi0.elem(find(BatchInfo == BatchIds(k)))) - phi0.elem(find(BatchInfo == BatchIds(k))) % log(y));

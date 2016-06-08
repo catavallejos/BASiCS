@@ -94,8 +94,8 @@ Start = BASiCS:::HiddenBASiCS_MCMC_Start(Data)
 #Start$delta0 <- Delta
 #Start$phi0 <- Phi
 #Start$theta0 <- (Theta1 + Theta2)/2
-MCMC_Output <- BASiCS_MCMC(Data, N = 10000, Thin = 50, Burn = 5000, 
-                           PrintProgress = TRUE, Start = Start)
+MCMC_Output <- BASiCS_MCMC(Data, N = 20000, Thin = 10, Burn = 5000, 
+                           PrintProgress = FALSE, Start = Start)
 MCMC_Summary <- Summary(MCMC_Output)
 Offset = mean(MCMC_Summary@nu[,1]); Offset
 
@@ -104,20 +104,25 @@ MCMC_Output1 <- MCMC_Output
 #MCMC_Output1@nu <- MCMC_Output@nu / Offset
 
 MCMC_Summary <- Summary(MCMC_Output1)
+```
 
-# Modify adaptive steps for faster adapt
 
+```{r Traceplots, fig.width = 8, fig.height=5, message=FALSE, warning=FALSE}
 plot(MCMC_Output1, Param = "mu", Gene = 1)
 abline(h = Mu[1], col = "red")
+plot(MCMC_Output1, Param = "delta", Gene = 1)
+abline(h = Delta[1], col = "red")
 plot(MCMC_Output1, Param = "nu", Cell = 1)
 abline(h = Nu[1], col = "red")
 plot(MCMC_Output1, Param = "phi", Cell = 1)
 abline(h = Phi[1], col = "red")
-plot(MCMC_Output1, Param = "theta", Batch = 1) # Super over-estimated
+plot(MCMC_Output1, Param = "theta", Batch = 1) 
 abline(h = Theta[1], col = "red")
-plot(MCMC_Output1, Param = "theta", Batch = 2) # Super over-estimated
+plot(MCMC_Output1, Param = "theta", Batch = 2) 
 abline(h = Theta[2], col = "red")
+```
 
+```{r HPDplots, fig.width=8, fig.height=5, message=FALSE, warning=FALSE}
 plot(MCMC_Summary, Param = "mu", log = "y")
 points(Mu, pch = 16, col = "red")
 plot(MCMC_Summary, Param = "delta")
@@ -128,55 +133,5 @@ plot(MCMC_Summary, Param = "nu")
 points(Nu, pch = 16, col = "red")
 plot(MCMC_Summary, Param = "theta")
 points(c(Theta1, Theta2), pch = 16, col = "red")
-```
-
-To assess convergence of the chain, the convergence diagnostics provided by the package `coda` can be used. Additionally, a visual inspection is provided by traceplots, for example:
-
-```{r Traceplots, fig.width = 5}
-plot(MCMC_Output, Param = "mu", Gene = 1, log = "y")
-plot(MCMC_Output, Param = "delta", Gene = 1)
-plot(MCMC_Output, Param = "phi", Cell = 1)
-plot(MCMC_Output, Param = "s", Cell= 1)
-plot(MCMC_Output, Param = "nu", Cell = 1)
-plot(MCMC_Output, Param = "theta", Batch = 1)
-```
-
-## Summarizing the model fit
-
-To summarize the results, the function `Summary` calculates posterior medians and the High Posterior Density (HPD) intervals for each model parameter. As a default option, HPD intervals contain 0.95 probability. 
-
-```{r Summary}
-MCMC_Summary <- Summary(MCMC_Output)
-head(displaySummaryBASiCS(MCMC_Summary, Param = "mu"))
-head(displaySummaryBASiCS(MCMC_Summary, Param = "delta"))
-head(displaySummaryBASiCS(MCMC_Summary, Param = "phi"))
-head(displaySummaryBASiCS(MCMC_Summary, Param = "s"))
-head(displaySummaryBASiCS(MCMC_Summary, Param = "nu"))
-head(displaySummaryBASiCS(MCMC_Summary, Param = "theta"))
-```
-
-The following figures display posterior medians and the corresponding HPD 95% intervals for the normalising constants. The first figure, allows the assessment of cell-to-cell heterogeneity regarding to mRNA content. The second figure, displays possible evidence of cell-to-cell differeces in capture efficiency (and/or amplification biases). 
-```{r Normalisation, fig.width = 5, fig.height = 4}
-plot(MCMC_Summary, Param = "phi")
-plot(MCMC_Summary, Param = "s")
-```
-
-It is also possible to generate similar plots for other model parameters
-```{r OtherHPD, fig.width = 5, fig.height = 4}
-plot(MCMC_Summary, Param = "mu", main = "All genes")
-plot(MCMC_Summary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-plot(MCMC_Summary, Param = "delta", main = "All genes")
-plot(MCMC_Summary, Param = "delta", Genes = c(2,5,10,50,100), main = "5 customized genes")
-plot(MCMC_Summary, Param = "nu", main = "All cells")
-plot(MCMC_Summary, Param = "nu", Cells = 1:5, main = "First 5 cells")
-plot(MCMC_Summary, Param = "theta")
-```
-
-To contrasts posterior medians of cell-specific parameters use
-
-```{r OtherConstrasts, fig.width = 5, fig.height = 4}
-plot(MCMC_Summary, Param = "phi", Param2 = "s")
-plot(MCMC_Summary, Param = "phi", Param2 = "nu")
-plot(MCMC_Summary, Param = "s", Param2 = "nu")
 ```
 

@@ -2,7 +2,7 @@ Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
 Version: 0.6.4
-Date: : 2016-05-01
+Date: : 2016-06-01
 Author: Catalina A. Vallejos
 Maintainer: Catalina A. Vallejos <catalina.vallejos@mrc-bsu.cam.ac.uk>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
