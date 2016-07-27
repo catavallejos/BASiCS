@@ -343,6 +343,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE)
     # Matrix where gene-cell specific simulated random effects will be stored
     Rho<-matrix(1,ncol=n,nrow=q.bio)
     # Simulated cell-specific random effects
+    Phi[1:10] = 2 * Phi[1:10]
     if(all(Theta>0)) {set.seed(1000); Nu<-rgamma(n,shape=1/Theta,rate=1/(Phi*Theta))}
     else {Nu<-Phi}
     # Simulated counts data
@@ -583,7 +584,7 @@ BASiCS_MCMC <- function(
 
   args <- list(...)
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
-  else { PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
+  else { PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
   AR = ifelse("AR" %in% names(args),args$AR, 0.44)
   StopAdapt = ifelse("StopAdapt" %in% names(args),args$StopAdapt, Burn)
   StoreChains = ifelse("StoreChains" %in% names(args),args$StoreChains, F)
@@ -690,7 +691,7 @@ BASiCS_MCMC <- function(
   else
   {
     cat("--------------------------------------------------------------------"); cat("\n")
-    cat('IMPORTANT: this part of the code is under development. Do not use yet. \n')
+    cat('IMPORTANT: this part of the code is under development. DO NOT USE. \n')
     cat("--------------------------------------------------------------------"); cat("\n")
     
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
@@ -702,7 +703,13 @@ BASiCS_MCMC <- function(
       BatchOffSet[k] = median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[k]])) / 
                           median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[1]]))
     }
-    
+    # Constrain for gene-specific expression rates
+    Constrain = mean(log(mu0))
+
+    # Covariance matrix for the prior of mu (and its Cholesky decomposition)
+    CovMu = diag(q.bio-1) - rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) / q.bio
+    CholCovMu = chol(CovMu)
+    InvCovMu = solve(CovMu)
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
@@ -714,15 +721,18 @@ BASiCS_MCMC <- function(
       mu0, delta0, phi0, nu0, theta0,
       PriorParam$s2.mu,
       PriorParam$a.delta, PriorParam$b.delta,
-      PriorParam$p.phi,
+      PriorParam$p.phi, PriorParam$a.phi, PriorParam$b.phi,
       PriorParam$a.theta, PriorParam$b.theta,
       AR,
       ls.mu0, ls.delta0, rep(ls.phi0, nBatch), ls.nu0, ls.theta0,
       sum.bycell.all, sum.bygene.all, 
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
-      Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet))
+      Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
+      Constrain, CholCovMu, InvCovMu))
   }
+  
+#  print(rowMeans(log(Chain$mu[,1:q.bio])))
 
   Chain$mu = Chain$mu[,1:q.bio]
   colnames(Chain$mu) = Data@GeneNames[!Data@Tech]

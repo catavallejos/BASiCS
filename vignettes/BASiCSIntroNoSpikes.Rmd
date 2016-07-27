@@ -80,6 +80,7 @@ Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85, 0.27, 0.53, 1.31,
             0.94, 0.72, 2.61, 1.56, 0.37, 0.07, 0.90, 0.12, 0.76, 1.45)
 Phi = c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97,
           1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
+Phi[1:10] = 2 * Phi[1:10]
 Theta1 = 0.5; Theta2 = 0.75;
 Theta = ifelse(1:20 <= 10, Theta1, Theta2)
 set.seed(1000); Nu<-rgamma(20,shape=1/Theta,rate=1/(Phi*Theta))
@@ -90,12 +91,11 @@ set.seed(1000); Nu<-rgamma(20,shape=1/Theta,rate=1/(Phi*Theta))
 ```{r MCMC}
 # The required number of iterations to reach convergence varies for different datasets
 Start = BASiCS:::HiddenBASiCS_MCMC_Start(Data)
-#Start$mu0 <- Mu
 #Start$delta0 <- Delta
 #Start$phi0 <- Phi
 #Start$theta0 <- (Theta1 + Theta2)/2
-MCMC_Output <- BASiCS_MCMC(Data, N = 20000, Thin = 10, Burn = 5000, 
-                           PrintProgress = FALSE, Start = Start)
+MCMC_Output <- BASiCS_MCMC(Data, N = 50000, Thin = 20, Burn = 25000, 
+                           PrintProgress = FALSE) #Start = Start
 MCMC_Summary <- Summary(MCMC_Output)
 Offset = mean(MCMC_Summary@nu[,1]); Offset
 
@@ -110,6 +110,10 @@ MCMC_Summary <- Summary(MCMC_Output1)
 ```{r Traceplots, fig.width = 8, fig.height=5, message=FALSE, warning=FALSE}
 plot(MCMC_Output1, Param = "mu", Gene = 1)
 abline(h = Mu[1], col = "red")
+plot(MCMC_Output1, Param = "mu", Gene = 10)
+abline(h = Mu[10], col = "red")
+plot(MCMC_Output1, Param = "mu", Gene = 100)
+abline(h = Mu[100], col = "red")
 plot(MCMC_Output1, Param = "delta", Gene = 1)
 abline(h = Delta[1], col = "red")
 plot(MCMC_Output1, Param = "nu", Cell = 1)
@@ -117,20 +121,28 @@ abline(h = Nu[1], col = "red")
 plot(MCMC_Output1, Param = "phi", Cell = 1)
 abline(h = Phi[1], col = "red")
 plot(MCMC_Output1, Param = "theta", Batch = 1) 
-abline(h = Theta[1], col = "red")
+abline(h = Theta1, col = "red")
 plot(MCMC_Output1, Param = "theta", Batch = 2) 
-abline(h = Theta[2], col = "red")
+abline(h = Theta2, col = "red")
 ```
 
 ```{r HPDplots, fig.width=8, fig.height=5, message=FALSE, warning=FALSE}
 plot(MCMC_Summary, Param = "mu", log = "y")
 points(Mu, pch = 16, col = "red")
+plot(Mu, MCMC_Summary@mu[,1], log = "xy", pch = 16, col = 8, bty = "n")
+abline(a = 0, b = 1)
 plot(MCMC_Summary, Param = "delta")
 points(Delta, pch = 16, col = "red")
+plot(Delta, MCMC_Summary@delta[,1], log = "xy", pch = 16, col = 8, bty = "n")
+abline(a = 0, b = 1)
 plot(MCMC_Summary, Param = "phi")
 points(Phi, pch = 16, col = "red")
+plot(Phi, MCMC_Summary@phi[,1], pch = 16, col = 8, bty = "n")
+abline(a = 0, b = 1)
 plot(MCMC_Summary, Param = "nu")
 points(Nu, pch = 16, col = "red")
+plot(Nu, MCMC_Summary@nu[,1], pch = 16, col = 8, bty = "n")
+abline(a = 0, b = 1)
 plot(MCMC_Summary, Param = "theta")
 points(c(Theta1, Theta2), pch = 16, col = "red")
 ```

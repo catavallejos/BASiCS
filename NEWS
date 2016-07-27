@@ -154,3 +154,9 @@ version 0.6.3: (2016-05-31)
 
 version 0.6.4: (2016-06-01)
 - Safety checks added to 'phiUpdateNoSpikes' 
+
+version 0.6.5: (2016-06-8)
+- Modified identifiability constrains for no spikes case.
+
+version 0.6.6: (2016-07-27)
+- First working version of no spikes case (constrained mu's)
