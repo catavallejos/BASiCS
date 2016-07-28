@@ -7,7 +7,7 @@
 \alias{plot-BASiCS_D_Chain-method}
 \title{'plot' method for BASiCS_D_Chain objects}
 \usage{
-\S4method{plot}{BASiCS_D_Chain}(x, Param = "muTest", Gene = NULL,
+\S4method{plot}{BASiCS_D_Chain,ANY}(x, Param = "muTest", Gene = NULL,
   Cell = NULL, ylab = "", xlab = "", main = "", ...)
 }
 \arguments{

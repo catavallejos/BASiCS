@@ -709,7 +709,7 @@ BASiCS_MCMC <- function(
     # Covariance matrix for the prior of mu (and its Cholesky decomposition)
     CovMu = diag(q.bio-1) - rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) / q.bio
     CholCovMu = chol(CovMu)
-    InvCovMu = solve(CovMu)
+    InvCovMu = diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) # Miller (1981)
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(

@@ -7,8 +7,8 @@
 \alias{plot-BASiCS_Chain-method}
 \title{'plot' method for BASiCS_Chain objects}
 \usage{
-\S4method{plot}{BASiCS_Chain}(x, Param = "mu", Gene = NULL, Cell = NULL,
-  Batch = 1, ylab = "", xlab = "", ...)
+\S4method{plot}{BASiCS_Chain,ANY}(x, Param = "mu", Gene = NULL,
+  Cell = NULL, Batch = 1, ylab = "", xlab = "", ...)
 }
 \arguments{
 \item{x}{A \code{BASiCS_Chain} object.}

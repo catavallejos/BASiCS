@@ -4,13 +4,15 @@
 \alias{makeExampleBASiCS_Data}
 \title{Create a simple example of a BASiCS_Data object with random data}
 \usage{
-makeExampleBASiCS_Data(WithBatch = FALSE)
+makeExampleBASiCS_Data(WithBatch = FALSE, WithSpikes = TRUE)
 }
 \arguments{
 \item{WithBatch}{If true, 2 batches are generated (each of them containing 10 cells)}
+
+\item{WithSpikes}{If true, the simulated dataset contains 20 spike-in genes}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS. 
+An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS.
 It contains 120 genes (100 biological and 20 spike-in) and 20 cells.
 }
 \description{

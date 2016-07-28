@@ -9,7 +9,7 @@ BASiCS_Filter(Counts, Tech, SpikeInput, MinTotalCountsPerCell = 2,
   MinAvCountsPerCellsWithExpression = 2)
 }
 \arguments{
-\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts. 
+\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
 First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.}
 
 \item{Tech}{Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.}
@@ -47,10 +47,10 @@ set.seed(2)
 SpikeInput = rgamma(10,1,1)
 SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeInput)
 
-Filter = BASiCS_Filter(Counts, Tech, SpikeInput, 
-                       MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
+Filter = BASiCS_Filter(Counts, Tech, SpikeInput,
+                       MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
                        MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
-SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID \%in\% 
+SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID \%in\%
          names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
 FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 

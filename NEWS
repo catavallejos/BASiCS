@@ -160,3 +160,6 @@ version 0.6.5: (2016-06-8)
 
 version 0.6.6: (2016-07-27)
 - First working version of no spikes case (constrained mu's)
+
+version 0.6.7: (2016-07-28)
+- Minor changes in the validity checks of 'BASiCS_D_Data' objects

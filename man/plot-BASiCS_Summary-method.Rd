@@ -6,7 +6,7 @@
 \alias{plot-BASiCS_Summary-method}
 \title{'plot' method for BASiCS_Summary objects}
 \usage{
-\S4method{plot}{BASiCS_Summary}(x, Param = "mu", Param2 = NULL,
+\S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,
   Genes = NULL, Cells = NULL, Batches = NULL, xlab = "", ylab = "",
   xlim = "", ylim = "", pch = 16, col = "blue", bty = "n", ...)
 }

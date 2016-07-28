@@ -7,10 +7,10 @@
 BASiCS_Sim(mu, delta, phi, s, theta)
 }
 \arguments{
-\item{mu}{Gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes 
+\item{mu}{Gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes
 (vector of length \code{q}, technical genes located at the end of the vector, all elements must be positive numbers)}
 
-\item{delta}{Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
+\item{delta}{Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
 (vector of length \code{q.bio}, all elements must be positive numbers)}
 
 \item{phi}{Cell-specific mRNA content normalising constants \eqn{\phi[j]}
@@ -25,12 +25,12 @@ BASiCS_Sim(mu, delta, phi, s, theta)
 An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS.
 }
 \description{
-\code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS. 
+\code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS.
 This function is used in order to illustrate the performance of the \code{BASiCS} library.
 }
 \examples{
 
-# Simulated parameter values for 10 genes 
+# Simulated parameter values for 10 genes
 # (7 biogical and 5 spike-in) measured in 5 cells
 Mu =  c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19, 1010.72, 7.90, 31.59)
 Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)

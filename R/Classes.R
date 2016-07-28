@@ -278,19 +278,23 @@ setClass("BASiCS_D_Data",
            nRef = ncol(object@CountsRef)
            n = nTest + nRef
            
-           if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
-             errors <- c(errors, "Argument's dimensions are not compatible.")
-           
+           # Checks to do only when spikes are available
+           if(length(object@SpikeInputTest) > 1)
+           {
+             if(!( length(object@Tech) == q & sum(!object@Tech) == q.bio )) 
+               errors <- c(errors, "Argument's dimensions are not compatible.")   
+             if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
+               errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
+             
+             if(sum(apply(object@CountsTest[ object@Tech,],2,sum) == 0) > 0) 
+               errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes in the test sample. Please remove them before creating the BASiCS_D_Data object.")
+             if(sum(apply(object@CountsRef[ object@Tech,],2,sum) == 0) > 0) 
+               errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes in the reference sample. Please remove them before creating the BASiCS_D_Data object.")
+             
+           }
+
            if(length(object@GeneNames) != q)
              errors <- c(errors, "Incorrect length of the vector stored in the GeneNames slot.")
-           
-           if(!( sum(object@Tech[1:q.bio]) == 0 & sum(object@Tech[(q.bio+1):q])==q-q.bio )) 
-             errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
-           
-           if(sum(apply(object@CountsTest[ object@Tech,],2,sum) == 0) > 0) 
-             errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes in the test sample. Please remove them before creating the BASiCS_D_Data object.")
-           if(sum(apply(object@CountsRef[ object@Tech,],2,sum) == 0) > 0) 
-             errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes in the reference sample. Please remove them before creating the BASiCS_D_Data object.")
            
            Counts = cbind(object@CountsTest,object@CountsRef)
            if(sum(apply(Counts[!object@Tech,],2,sum) == 0) > 0) 

@@ -7,12 +7,12 @@
 newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 }
 \arguments{
-\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements contain the expression counts to be analyses 
+\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements contain the expression counts to be analyses
 (including biological and technical spike-in genes). Gene names must be stored as `rownames(Counts)`.}
 
 \item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.}
 
-\item{SpikeInfo}{\code{data.frame} whose first and second columns contain the gene names assigned to the spike-in genes 
+\item{SpikeInfo}{\code{data.frame} whose first and second columns contain the gene names assigned to the spike-in genes
 (they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.}
 
 \item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information.}
@@ -21,7 +21,7 @@ newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
 }
 \description{
-\code{newBASiCS_Data} creates a \code{\link[BASiCS]{BASiCS_Data-class}} object from 
+\code{newBASiCS_Data} creates a \code{\link[BASiCS]{BASiCS_Data-class}} object from
 a matrix of expression counts and experimental information about spike-in genes.
 }
 \examples{
@@ -32,10 +32,10 @@ set.seed(1)
 Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
 rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
 
-# Technical information 
+# Technical information
 Tech = c(rep(FALSE,40),rep(TRUE,10))
 
-# Spikes input number of molecules 
+# Spikes input number of molecules
 set.seed(2)
 SpikeInfo <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
 

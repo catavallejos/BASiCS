@@ -17,11 +17,11 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
 
 \item{...}{Optional parameters.
 \describe{
-\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers. 
+\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015). All elements must be positive real numbers.
 \describe{
-  \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu[i]}. 
+  \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu[i]}.
   Default: \code{s2.mu = 0.5}.}
-  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}. 
+  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
   Default: \code{a.delta = 1}.}
   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}.
   Default: \code{b.delta = 1}.}
@@ -35,21 +35,21 @@ BASiCS_MCMC(Data, N, Thin, Burn, ...)
   Default: \code{a.theta = 1}.}
   \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
   Default: \code{b.theta = 1}.}
-  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior that is shared by all gene-specific expression rate parameters \eqn{\delta[i]}. 
+  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior that is shared by all gene-specific expression rate parameters \eqn{\delta[i]}.
   Default: \code{s2.delta = 0.5}. }
 }}
 \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{ar = 0.44}}.
 
 \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
 
-\item{\code{StoreChains}}{If \code{StoreChains = T}, the slots of the generated \code{BASiCS_Chain} object are stored in separate .txt files. Each row of the output file containing an interation (\code{RunName} argument used to index file names). Default: \code{StoreChains = F}.} 
+\item{\code{StoreChains}}{If \code{StoreChains = T}, the slots of the generated \code{BASiCS_Chain} object are stored in separate .txt files. Each row of the output file containing an interation (\code{RunName} argument used to index file names). Default: \code{StoreChains = F}.}
 \item{\code{StoreAdapt}}{If \code{StoreAdapt = T}, trajectory of adaptive proposal variances (in log-scale) for each parameter are stored in separate .txt files. Each row of the output file containing an interation (\code{RunName} argument used to index file names). Default: \code{StoreAdapt = F}.}
 \item{\code{StoreDir}}{Directory where output files are stored. Only required if \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
 \item{\code{RunName}}{String used to index `.txt` files storing chains and/or adaptive proposal variances.}
 \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
 \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \code{phi}.}
 \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}
-\item{\code{Start}}{In general, we do not advise to specify this argument. Default options have been tuned to facilitate convergence. It can be used to set user defined starting points for the MCMC algorithm. If used, it must be a list containing the following elements: \code{mu0}, 
+\item{\code{Start}}{In general, we do not advise to specify this argument. Default options have been tuned to facilitate convergence. It can be used to set user defined starting points for the MCMC algorithm. If used, it must be a list containing the following elements: \code{mu0},
 \code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0}, \code{ls.theta0}}
 }}
 }
@@ -117,9 +117,9 @@ plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
 #DetectLVG <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
 
 #plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
-#points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3], 
+#points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3],
 #       pch = 16, col = "red", cex = 1)
-#points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3], 
+#points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3],
 #       pch = 16, col = "blue", cex = 1)
 
 # If variance thresholds are not fixed

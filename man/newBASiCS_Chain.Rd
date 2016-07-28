@@ -7,10 +7,10 @@
 newBASiCS_Chain(mu, delta, phi, s, nu, theta)
 }
 \arguments{
-\item{mu}{MCMC chain for gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes 
+\item{mu}{MCMC chain for gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes
 (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)}
 
-\item{delta}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
+\item{delta}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 
 \item{phi}{MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi[j]}
@@ -33,7 +33,7 @@ An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
 \examples{
 
 # Data = makeExampleBASiCS_Data()
-# MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, 
+# MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
 #                StoreChains = TRUE, StoreDir = getwd(), RunName = "Test")
 
 # ChainMu = as.matrix(read.table("chain_mu_Test.txt"))
@@ -43,7 +43,7 @@ An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
 # ChainNu = as.matrix(read.table("chain_nu_Test.txt"))#
 # ChainTheta = read.table("chain_theta_Test.txt")[,1]
 
-# MCMC_Output_Load <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta, 
+# MCMC_Output_Load <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
 #   phi = ChainPhi, s = ChainS, nu = ChainNu, theta = ChainTheta)
 
 }
