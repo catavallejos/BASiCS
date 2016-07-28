@@ -707,9 +707,13 @@ BASiCS_MCMC <- function(
     Constrain = mean(log(mu0))
 
     # Covariance matrix for the prior of mu (and its Cholesky decomposition)
-    CovMu = diag(q.bio-1) - rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) / q.bio
+#    CovMu = diag(q.bio-1) - rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) / q.bio
+#    Aux = matrix(1, ncol = q.bio - 1, nrow = q.bio - 1)
+#    diag(Aux) = abs(log(mu0[1:(q.bio-1)]))+0.1
+#    CovMu = CovMu * Aux
+    CovMu = diag(abs(log(mu0[1:(q.bio-1)]))+0.1)
     CholCovMu = chol(CovMu)
-    InvCovMu = diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) # Miller (1981)
+    InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(

@@ -1,7 +1,7 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 0.6.7
+Version: 0.6.8
 Date: : 2016-07-28
 Author: Catalina A. Vallejos
 Maintainer: Catalina A. Vallejos <catalina.vallejos@mrc-bsu.cam.ac.uk>

@@ -8,6 +8,7 @@
 //File: matprod_arma.cpp
 //[[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
+//#include <gperftools/profiler.h>
 
 using namespace Rcpp;
 
@@ -839,6 +840,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   double prior_delta) 
 {
 
+  
 // NUMBER OF CELLS, GENES AND STORED DRAWS
   int n = Counts.ncol(); int q = Counts.nrow(); int qbio = delta0.size(); int Naux = N/thin - burn/thin;
   // TRANSFORMATION TO ARMA ELEMENTS 
@@ -915,7 +917,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   // START OF MCMC LOOP
   for (i=0; i<N; i++) {
     
-    Rcpp::checkUserInterrupt();
+//    Rcpp::checkUserInterrupt();
     
     if(i==burn)
     {
@@ -1036,6 +1038,8 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
         Rcpp::Rcout << "LStheta: " << LSthetaAux << std::endl;
     }    
   }
+  
+//  ProfilerStop();
   
   // ACCEPTANCE RATE CONSOLE OUTPUT
   Rcpp::Rcout << " " << std::endl;
@@ -1580,7 +1584,6 @@ Rcpp::List HiddenBASiCS_MCMCcppBatch(
 
 }
 
-
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
  */
@@ -1675,7 +1678,8 @@ arma::mat muUpdateNoSpikesConstrain(
 {
   using arma::span;
   
-  // PROPOSAL STEP    
+  // PROPOSAL STEP  
+  // REPLACE BY DIRICHLET PROPOSALS!!!!
   arma::vec y = arma::ones(q_bio);
   y(span(0, q_bio-2)) = exp(log(mu0(span(0, q_bio-2))) + prop_var * CholCovMu * arma::randn(q_bio - 1));
   y(q_bio-1) = exp(q_bio * Constrain - sum(log(y(span(0, q_bio-2)))));
@@ -1732,6 +1736,65 @@ arma::mat muUpdateNoSpikesConstrain(
 //    }
 //  }
   
+  // OUTPUT
+  return join_rows(mu, ind);
+}
+
+/* Metropolis-Hastings updates of mu 
+ * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
+ */
+arma::mat muUpdateNoSpikesConstrainSequential(
+    arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q_0)'$ */
+    arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
+    double const& Constrain,
+    arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
+    arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
+    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
+    arma::vec const& sum_bycell_all, /* Sum of expression counts by cell (biological genes only) */
+    double const& s2_mu,
+    int const& q_bio,
+    int const& n,
+    arma::vec & mu,
+    arma::vec & ind)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP    
+  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
+//  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))));
+  arma::vec u = arma::randu(q_bio-1);
+  // INITIALIZE MU
+  mu = mu0 + 1 - 1; 
+  
+  // ACCEPT/REJECT STEP
+  
+  // COMPUTING THE LIKELIHOOD CONTRIBUTION OF THE ACCEPTANCE RATE (NO NEED TO BE SEQUENTIAL)
+  // COMPUTING THE PRIOR CONTRIBUTION TO THE ACCEPTANCE RATE + ACCEPT REJECT (SEQUENTIAL FASHION)
+  arma::vec aux = Constrain * arma::ones(q_bio-1);
+  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2)); 
+  // ADDING MEAN FOR FIRST CANDIDATE
+//  y(0) *= exp(Constrain);
+  for (int i=0; i < q_bio - 1; i++)
+  {
+//    if(i == 1) {y(i) *= exp((q_bio * Constrain - log(mu(0))) / (q_bio - 1));}
+//    if(i > 1) {y(i) *= exp((q_bio * Constrain - sum(log(mu(span(0,i-1))))) / (q_bio - i + 2)); }
+    for (int j=0; j < n; j++) 
+    {
+      log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
+        log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu0(i)+(1/delta(i)) ));
+    }
+
+    log_aux(i) -= (s2_mu/ q_bio) * pow(log(y(i)) - 0.5 * (q_bio * Constrain - sum(log(mu(span(0,q_bio-2)))) + log(mu(i))), 2);
+    log_aux(i) += (s2_mu/ q_bio) * pow(log(mu(i)) - 0.5 * (q_bio * Constrain - sum(log(mu(span(0,q_bio-2)))) + log(mu(i))), 2);
+    
+    if(log(u(i)) < log_aux(i) & y(i) > 1e-3) {ind(i) = 1; mu(i) = y(i);}
+    else {ind(i) = 0; mu(i) = mu0(i);}
+  }
+  // FINAL GENE
+  mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+
+  Rcpp::Rcout << "y: " << y << std::endl;
+ 
   // OUTPUT
   return join_rows(mu, ind);
 }
@@ -2156,10 +2219,14 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     //    struct timespec time0_3 = orwl_gettime();
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
-    muAux = muUpdateNoSpikesConstrain(muAux.col(0), exp(LSmuAux(0)), Constrain, Counts_arma, deltaAux.col(0), 
-                                      nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-                                      muUpdateAux, indQ, CholCovMu_arma, InvCovMu_arma);
+    muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
+                                        nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
+                                        muUpdateAux, indQ);
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
+//    muAux = muUpdateNoSpikesConstrain(muAux.col(0), exp(LSmuAux(0)), Constrain, Counts_arma, deltaAux.col(0), 
+//                                      nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
+//                                      muUpdateAux, indQ, CholCovMu_arma, InvCovMu_arma);
+//    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
 //    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
 //                             nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
 //                             muUpdateAux, indQ); 
@@ -2267,11 +2334,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
   Rcpp::Rcout << " " << std::endl;
 
-  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << muAccept(0)/(N-burn) << std::endl;
+//  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << muAccept(0)/(N-burn) << std::endl;
   
-//  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << min(muAccept(arma::span(0, qbio - 1))/(N-burn)) << std::endl;
-//  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << mean(muAccept(arma::span(0, qbio - 1))/(N-burn)) << std::endl;
-//  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << max(muAccept(arma::span(0, qbio - 1))/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << min(muAccept(arma::span(0, qbio - 2))/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << mean(muAccept(arma::span(0, qbio - 2))/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << max(muAccept(arma::span(0, qbio - 2))/(N-burn)) << std::endl;
   Rcpp::Rcout << " " << std::endl;
   Rcpp::Rcout << "Minimum acceptance rate among delta[i]'s: " << min(deltaAccept/(N-burn)) << std::endl;
   Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << mean(deltaAccept/(N-burn)) << std::endl;
@@ -2317,3 +2384,4 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   }
   
 }
+
