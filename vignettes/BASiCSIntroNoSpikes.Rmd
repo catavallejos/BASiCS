@@ -91,38 +91,33 @@ set.seed(1000); Nu<-rgamma(20,shape=1/Theta,rate=1/(Phi*Theta))
 ```{r MCMC}
 # The required number of iterations to reach convergence varies for different datasets
 Start = BASiCS:::HiddenBASiCS_MCMC_Start(Data)
-#Start$delta0 <- Delta
-#Start$phi0 <- Phi
-#Start$theta0 <- (Theta1 + Theta2)/2
-MCMC_Output <- BASiCS_MCMC(Data, N = 50000, Thin = 20, Burn = 25000, 
-                           PrintProgress = FALSE) #Start = Start
+Start$delta0 <- Delta
+Start$phi0 <- Phi
+Start$theta0 <- (Theta1 + Theta2)/2
+Start$nu0 <- Nu
+PriorParam = list(s2.mu = 0.25, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = 20), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+MCMC_Output <- BASiCS_MCMC(Data, N = 80000, Thin = 20, Burn = 40000, 
+                           PrintProgress = FALSE, PriorParam = PriorParam) #Start = Start
 MCMC_Summary <- Summary(MCMC_Output)
-Offset = mean(MCMC_Summary@nu[,1]); Offset
-
-MCMC_Output1 <- MCMC_Output
-#MCMC_Output1@mu <- MCMC_Output@mu * Offset
-#MCMC_Output1@nu <- MCMC_Output@nu / Offset
-
-MCMC_Summary <- Summary(MCMC_Output1)
 ```
 
 
 ```{r Traceplots, fig.width = 8, fig.height=5, message=FALSE, warning=FALSE}
-plot(MCMC_Output1, Param = "mu", Gene = 1)
+plot(MCMC_Output, Param = "mu", Gene = 1, log = "y")
 abline(h = Mu[1], col = "red")
-plot(MCMC_Output1, Param = "mu", Gene = 10)
+plot(MCMC_Output, Param = "mu", Gene = 10, log = "y")
 abline(h = Mu[10], col = "red")
-plot(MCMC_Output1, Param = "mu", Gene = 100)
+plot(MCMC_Output, Param = "mu", Gene = 100, log = "y")
 abline(h = Mu[100], col = "red")
-plot(MCMC_Output1, Param = "delta", Gene = 1)
+plot(MCMC_Output, Param = "delta", Gene = 1)
 abline(h = Delta[1], col = "red")
-plot(MCMC_Output1, Param = "nu", Cell = 1)
+plot(MCMC_Output, Param = "nu", Cell = 1)
 abline(h = Nu[1], col = "red")
-plot(MCMC_Output1, Param = "phi", Cell = 1)
+plot(MCMC_Output, Param = "phi", Cell = 1)
 abline(h = Phi[1], col = "red")
-plot(MCMC_Output1, Param = "theta", Batch = 1) 
+plot(MCMC_Output, Param = "theta", Batch = 1) 
 abline(h = Theta1, col = "red")
-plot(MCMC_Output1, Param = "theta", Batch = 2) 
+plot(MCMC_Output, Param = "theta", Batch = 2) 
 abline(h = Theta2, col = "red")
 ```
 

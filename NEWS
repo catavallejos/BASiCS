@@ -163,3 +163,6 @@ version 0.6.6: (2016-07-27)
 
 version 0.6.7: (2016-07-28)
 - Minor changes in the validity checks of 'BASiCS_D_Data' objects
+
+version 0.6.8: (2016-07-28)
+- Sequential updates for mu in MCMC
