@@ -1668,7 +1668,7 @@ arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
  */
 arma::mat muUpdateNoSpikesConstrain(
     arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q_0)'$ */
-    double const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
+    arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
     double const& Constrain,
     arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
     arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
@@ -1680,14 +1680,19 @@ arma::mat muUpdateNoSpikesConstrain(
     arma::vec & mu,
     arma::vec & ind,
     arma::mat & CholCovMu,
-    arma::mat & InvCovMu)
+    arma::mat & InvCovMu,
+    arma::vec const& mu0_const)
 {
   using arma::span;
   
   // PROPOSAL STEP  
   // There is no problem when calculating log(mu0), starting values are all above 1. 
-  arma::vec y = exp(q_bio * Constrain * rDirichlet(prop_var * log(mu0)));
-//  arma::vec y = mu0_const % exp(rDirichlet(prop_var * log(mu0 / mu0_const)));
+//  arma::vec y = exp(q_bio * Constrain * rDirichlet(prop_var * log(mu0)));
+//  arma::vec y = mu0_const % exp(rDirichlet(prop_var * log(mu0)));
+  arma::vec y = arma::ones(q_bio);
+//  y(span(0, q_bio-2)) = exp(log(mu0(span(0, q_bio-2))) + prop_var * CholCovMu * arma::randn(q_bio - 1));
+  y(span(0, q_bio-2)) = exp(log(mu0(span(0, q_bio-2))) + sqrt(prop_var(span(0, q_bio-2))) % arma::randn(q_bio - 1));
+  y(q_bio-1) = exp(q_bio * Constrain - sum(log(y(span(0, q_bio-2)))));
   double u = R::runif(0,1);
   
   // ACCEPT/REJECT STEP
@@ -1704,15 +1709,24 @@ arma::mat muUpdateNoSpikesConstrain(
     }
   }
   // Prior contribution
-  // There is a -1 comming from the log-normal prior. It cancels out as proposing in the log-scale.
-  log_aux -= (0.5/s2_mu) * (pow(log(y),2) - pow(log(mu0),2));
-  double log_aux_sum = sum(log_aux);
+  arma::vec aux = Constrain * arma::ones(q_bio-1);
+  double log_aux_sum = sum(log_aux(span(0, q_bio-2)));
+  log_aux_sum -= as_scalar(0.5 * (log(y(span(0, q_bio-2))) - aux).t() * InvCovMu * (log(y(span(0, q_bio-2))) - aux));
+  log_aux_sum += as_scalar(0.5 * (log(mu0(span(0, q_bio-2))) - aux).t() * InvCovMu * (log(mu0(span(0, q_bio-2))) - aux));
+  
+//  // There is a -1 comming from the log-normal prior. It cancels out as proposing in the log-scale.
+//  // There is a -1 comming from the log-normal prior. It cancels out with the -1 in the Dirichlet density
+//  log_aux -= (0.5/s2_mu) * (pow(log(y),2) - pow(log(mu0),2));
+//  double log_aux_sum = sum(log_aux);
   // Proposal factor
   // There is an extra factor (q_bio * Constrain)^(-(sum(prop_var * log(y)))) / (q_bio * Constrain)^(-(sum(prop_var * log(mu0)))), it cancels out as sum(prop_var*y) = sum(prop_var*phi0)
   // There is an extra factor gamma(sum(prop_var * log(mu0))) / gamma(sum(prop_var * log(y))), it cancels out as sum(prop_var*log(y)) = sum(prop_var*log(mu0))
-  log_aux_sum += prop_var * sum(log(y) % log(log(mu0)) - log(mu0) % log(log(y)));
-  log_aux_sum -= sum(lgamma_cpp_vec(prop_var * log(y)) - lgamma_cpp_vec(prop_var * log(mu0)));  
-  
+//  log_aux_sum += prop_var * sum(log(y) % log(log(mu0)) - log(mu0) % log(log(y)));
+//  log_aux_sum -= sum(lgamma_cpp_vec(prop_var * log(y)) - lgamma_cpp_vec(prop_var * log(mu0)));  
+//  log_aux_sum += prop_var * sum((y / mu0_const) % log(mu0 / mu0_const) - (mu0 / mu0_const) % log(y / mu0_const));
+//  log_aux_sum -= sum(lgamma_cpp_vec(prop_var * y / mu0_const) - lgamma_cpp_vec(prop_var * mu0 / mu0_const));
+//  log_aux_sum += lgamma(prop_var * sum(y / mu0_const)) - lgamma(prop_var * sum(mu0 / mu0_const));
+ 
 //  arma::vec aux = Constrain * arma::ones(q_bio-1);
 //  double log_aux_sum = sum(log_aux(span(0, q_bio-2)));
 //  log_aux_sum -= as_scalar(0.5 * (log(y(span(0, q_bio-2))) - aux).t() * InvCovMu * (log(y(span(0, q_bio-2))) - aux));
@@ -1757,82 +1771,50 @@ arma::mat muUpdateNoSpikesConstrain(
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
  */
-//arma::mat muUpdateNoSpikesConstrainSequential(
-//    arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q_0)'$ */
-//    arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
-//    double const& Constrain,
-//    arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
-//    arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-//    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
-//    arma::vec const& sum_bycell_all, /* Sum of expression counts by cell (biological genes only) */
-//    double const& s2_mu,
-//    int const& q_bio,
-//    int const& n,
-//    arma::vec & mu,
-//    arma::vec & ind)
-//{
-//  using arma::span;
-//  
-//  // PROPOSAL STEP    
-////  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
-//<<<<<<< HEAD
-//  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))));
-//=======
-//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
-//  arma::vec u = arma::randu(q_bio-1);
-//  // INITIALIZE MU
-//  mu = mu0 + 1 - 1; 
+arma::mat muUpdateNoSpikesConstrainSequential(
+    arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q_0)'$ */
+    arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
+    double const& Constrain,
+    arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
+    arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
+    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
+    arma::vec const& sum_bycell_all, /* Sum of expression counts by cell (biological genes only) */
+    double const& s2_mu,
+    int const& q_bio,
+    int const& n,
+    arma::vec & mu,
+    arma::vec & ind)
+{
+  using arma::span;
   
+  // PROPOSAL STEP    
+  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
+  arma::vec u = arma::randu(q_bio-1);
+  // INITIALIZE MU
+  mu = mu0 + 1 - 1; 
+
   // ACCEPT/REJECT STEP
-  
+  arma::vec log_aux = arma::zeros(q_bio-1);
   // COMPUTING THE LIKELIHOOD CONTRIBUTION OF THE ACCEPTANCE RATE (NO NEED TO BE SEQUENTIAL)
-//<<<<<<< HEAD
-  // COMPUTING THE PRIOR CONTRIBUTION TO THE ACCEPTANCE RATE + ACCEPT REJECT (SEQUENTIAL FASHION)
-//  arma::vec aux = Constrain * arma::ones(q_bio-1);
-//  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2)); 
-  // ADDING MEAN FOR FIRST CANDIDATE
-//  y(0) *= exp(Constrain);
-//  for (int i=0; i < q_bio - 1; i++)
-//  {
-//    if(i == 1) {y(i) *= exp((q_bio * Constrain - log(mu(0))) / (q_bio - 1));}
-//    if(i > 1) {y(i) *= exp((q_bio * Constrain - sum(log(mu(span(0,i-1))))) / (q_bio - i + 2)); }
-//=======
-//  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2)); 
-//  for (int i=0; i < q_bio - 1; i++)
-//  {
-//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
-//    for (int j=0; j < n; j++) 
-//    {
-//      log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
-//        log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu0(i)+(1/delta(i)) ));
-//    }
-//<<<<<<< HEAD
-
-//=======
-//  }
-  
-  // COMPUTING THE PRIOR CONTRIBUTION TO THE ACCEPTANCE RATE + ACCEPT REJECT (SEQUENTIAL FASHION)
-//  arma::vec aux = Constrain * arma::ones(q_bio-1);
-//  for (int i=0; i < q_bio - 1; i++)
-//  {
-//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
-//    log_aux(i) -= (s2_mu/ q_bio) * pow(log(y(i)) - 0.5 * (q_bio * Constrain - sum(log(mu(span(0,q_bio-2)))) + log(mu(i))), 2);
-//    log_aux(i) += (s2_mu/ q_bio) * pow(log(mu(i)) - 0.5 * (q_bio * Constrain - sum(log(mu(span(0,q_bio-2)))) + log(mu(i))), 2);
-    
-//    if(log(u(i)) < log_aux(i) & y(i) > 1e-3) {ind(i) = 1; mu(i) = y(i);}
-//    else {ind(i) = 0; mu(i) = mu0(i);}
-//  }
+  for (int i=0; i < q_bio - 1; i++)
+  {
+    log_aux(i) += (log(y(i)) - log(mu0(i))) * sum_bycell_all(i); 
+    for (int j=0; j < n; j++) 
+    {
+       log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
+            log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu0(i)+(1/delta(i)) ));
+    }
+      // Independent priors in the meantime
+    log_aux(i) -= (0.5/s2_mu) * (pow(log(y(i)),2) - pow(log(mu0(i)),2));
+    if(log(u(i)) < log_aux(i) & y(i) > 1e-3) {ind(i) = 1; mu(i) = y(i);}
+    else{ind(i) = 0; mu(i) = mu0(i); }
+  }
   // FINAL GENE
-//  mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
-//<<<<<<< HEAD
-
-//  Rcpp::Rcout << "y: " << y << std::endl;
-//=======
-//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
- 
+  mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+    
   // OUTPUT
-//  return join_rows(mu, ind);
-//}
+  return join_rows(mu, ind);
+}
 
 /* Metropolis-Hastings updates of delta
  * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
@@ -2210,6 +2192,10 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
   arma::vec muUpdateAux = arma::ones(qbio);
   arma::vec indQ = arma::zeros(qbio);
+  // Auxiliary vectors to calculate posterior variances of mu
+  arma::vec SumMu = arma::zeros(qbio);
+  arma::vec SumMu2 = arma::zeros(qbio);
+  arma::vec PostVarMu = arma::zeros(qbio);
   
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;  
   Rcpp::Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
@@ -2254,18 +2240,27 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     //    struct timespec time0_3 = orwl_gettime();
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
-//    muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
-//                                        nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-//                                        muUpdateAux, indQ);
-//    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
-    muAux = muUpdateNoSpikesConstrain(muAux.col(0), exp(LSmuAux(0)), Constrain, Counts_arma, deltaAux.col(0), 
-                                      nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-                                      muUpdateAux, indQ, CholCovMu_arma, InvCovMu_arma);
-    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
+
+//    if(i > 5000)
+//    {
+      muAux = muUpdateNoSpikesConstrain(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
+                                        nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
+                                        muUpdateAux, indQ, CholCovMu_arma, InvCovMu_arma, mu0_arma);
+      PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}      
+//    }
+//    SumMu += log(muAux.col(0)); SumMu2 += pow(log(muAux.col(0)),2);
+// PostVarMu = (SumMu2 - (SumMu % SumMu) / (i+1)) / (i+1); 
+//    else
+//    {
+//      muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
+//                                                  nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
+//                                                  muUpdateAux, indQ);
+//      PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}    
+//    }
 //    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
 //                             nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
 //                             muUpdateAux, indQ); 
-//    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
+//    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}  
     //    struct timespec time1_3 = orwl_gettime();    
     //    Rcpp::Rcout << "Time mu: "  <<  (time1_3.tv_nsec - time0_3.tv_nsec) / ((float)(qbio)) << std::endl;
     
@@ -2295,10 +2290,18 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
       if(Ibatch==50)
       {
-//        PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
-//        LSmuAux=LSmuAux+PmuAux*0.1; 
-        PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);//
-        LSmuAux = LSmuAux - PmuAux*0.1;
+//          if(i < 5000)
+//          {
+            PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
+            LSmuAux=LSmuAux+PmuAux*0.1;            
+//          }
+//          else
+//          {
+//            LSmuAux = 2*log(2.38) + log(PostVarMu);
+//          }
+ 
+//        PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);//
+//        LSmuAux = LSmuAux - PmuAux*0.1;
         PdeltaAux=PdeltaAux/50; PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
         LSdeltaAux=LSdeltaAux+PdeltaAux*0.1;                
 //        PphiAux=PphiAux/50; PphiAux = -1+2*arma::conv_to<arma::mat>::from(PphiAux>ar);//-1+2*(PphiAux(0)>ar); 
