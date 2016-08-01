@@ -166,3 +166,6 @@ version 0.6.7: (2016-07-28)
 
 version 0.6.8: (2016-07-28)
 - Sequential updates for mu in MCMC
+
+version 0.6.9: (2016-08-01)
+- Dirichlet-based proposals for mu in MCMC

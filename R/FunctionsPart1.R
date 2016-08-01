@@ -714,6 +714,7 @@ BASiCS_MCMC <- function(
     CovMu = diag(abs(log(mu0[1:(q.bio-1)]))+0.1)
     CholCovMu = chol(CovMu)
     InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
+    ls.mu0 = rep(5, q.bio)
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(

@@ -95,15 +95,9 @@ Start$delta0 <- Delta
 Start$phi0 <- Phi
 Start$theta0 <- (Theta1 + Theta2)/2
 Start$nu0 <- Nu
-#<<<<<<< HEAD
 #PriorParam = list(s2.mu = 0.25, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = 20), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-MCMC_Output <- BASiCS_MCMC(Data, N = 20000, Thin = 2, Burn = 10000, 
+MCMC_Output <- BASiCS_MCMC(Data, N = 100000, Thin = 20, Burn = 50000, 
                            PrintProgress = TRUE) #Start = Start, PriorParam = PriorParam
-#=======
-PriorParam = list(s2.mu = 0.25, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = 20), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-MCMC_Output <- BASiCS_MCMC(Data, N = 80000, Thin = 20, Burn = 40000, 
-                           PrintProgress = FALSE, PriorParam = PriorParam) #Start = Start
-#>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
 MCMC_Summary <- Summary(MCMC_Output)
 ```
 
