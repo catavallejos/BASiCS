@@ -1760,8 +1760,11 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   using arma::span;
   
   // PROPOSAL STEP    
-  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
+//  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
+//<<<<<<< HEAD
 //  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))));
+//=======
+//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
   arma::vec u = arma::randu(q_bio-1);
   // INITIALIZE MU
   mu = mu0 + 1 - 1; 
@@ -1769,6 +1772,7 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   // ACCEPT/REJECT STEP
   
   // COMPUTING THE LIKELIHOOD CONTRIBUTION OF THE ACCEPTANCE RATE (NO NEED TO BE SEQUENTIAL)
+//<<<<<<< HEAD
   // COMPUTING THE PRIOR CONTRIBUTION TO THE ACCEPTANCE RATE + ACCEPT REJECT (SEQUENTIAL FASHION)
   arma::vec aux = Constrain * arma::ones(q_bio-1);
   arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2)); 
@@ -1778,12 +1782,26 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   {
 //    if(i == 1) {y(i) *= exp((q_bio * Constrain - log(mu(0))) / (q_bio - 1));}
 //    if(i > 1) {y(i) *= exp((q_bio * Constrain - sum(log(mu(span(0,i-1))))) / (q_bio - i + 2)); }
+//=======
+  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2)); 
+  for (int i=0; i < q_bio - 1; i++)
+  {
+//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
     for (int j=0; j < n; j++) 
     {
       log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
         log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu0(i)+(1/delta(i)) ));
     }
+//<<<<<<< HEAD
 
+//=======
+  }
+  
+  // COMPUTING THE PRIOR CONTRIBUTION TO THE ACCEPTANCE RATE + ACCEPT REJECT (SEQUENTIAL FASHION)
+  arma::vec aux = Constrain * arma::ones(q_bio-1);
+  for (int i=0; i < q_bio - 1; i++)
+  {
+//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
     log_aux(i) -= (s2_mu/ q_bio) * pow(log(y(i)) - 0.5 * (q_bio * Constrain - sum(log(mu(span(0,q_bio-2)))) + log(mu(i))), 2);
     log_aux(i) += (s2_mu/ q_bio) * pow(log(mu(i)) - 0.5 * (q_bio * Constrain - sum(log(mu(span(0,q_bio-2)))) + log(mu(i))), 2);
     
@@ -1792,8 +1810,11 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   }
   // FINAL GENE
   mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+//<<<<<<< HEAD
 
   Rcpp::Rcout << "y: " << y << std::endl;
+//=======
+//>>>>>>> 4c5c2e0c242ec6936ae7304dcc1ca9aded768e4e
  
   // OUTPUT
   return join_rows(mu, ind);
