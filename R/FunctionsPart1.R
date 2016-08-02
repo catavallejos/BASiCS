@@ -711,8 +711,8 @@ BASiCS_MCMC <- function(
 #    Aux = matrix(1, ncol = q.bio - 1, nrow = q.bio - 1)
 #    diag(Aux) = abs(log(mu0[1:(q.bio-1)]))+0.1
 #    CovMu = CovMu * Aux
-    CovMu = 2.38 * diag(abs(log(mu0[1:(q.bio-1)]))+0.1)
-    CholCovMu = chol(CovMu)
+#    CovMu = 2.38 * diag(abs(log(mu0[1:(q.bio-1)]))+0.1)
+#    CholCovMu = chol(CovMu)
     InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
 #    ls.mu0 = rep(11, q.bio)
     
@@ -734,7 +734,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, CholCovMu, InvCovMu))
+      Constrain, InvCovMu)) #, CholCovMu))
   }
   
 #  print(rowMeans(log(Chain$mu[,1:q.bio])))
