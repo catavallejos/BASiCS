@@ -165,7 +165,10 @@ version 0.6.7: (2016-07-28)
 - Minor changes in the validity checks of 'BASiCS_D_Data' objects
 
 version 0.6.8: (2016-07-28)
-- Sequential updates for mu in MCMC
+- Sequential updates for mu in MCMC (no spikes case only)
 
 version 0.6.9: (2016-08-01)
-- Dirichlet-based proposals for mu in MCMC
+- Dirichlet-based proposals for mu in MCMC (no spikes case only)
+
+version 0.7.0: (2016-08-02)
+- Sequential updates for mu in MCMC (no spikes case only)
