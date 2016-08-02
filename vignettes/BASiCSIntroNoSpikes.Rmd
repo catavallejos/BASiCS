@@ -98,7 +98,7 @@ Start = BASiCS:::HiddenBASiCS_MCMC_Start(Data)
 #Start$ls.mu0 = rep(11, times = 100)
 #Start$ls.mu0 = log(log(Start$mu0)) - 2
 #PriorParam = list(s2.mu = 0.25, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = 20), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-MCMC_Output <- BASiCS_MCMC(Data, N = 100000, Thin = 20, Burn = 50000, 
+MCMC_Output <- BASiCS_MCMC(Data, N = 40000, Thin = 20, Burn = 20000, 
                            PrintProgress = TRUE) #PriorParam = PriorParam Start = Start, 
 MCMC_Summary <- Summary(MCMC_Output)
 ```

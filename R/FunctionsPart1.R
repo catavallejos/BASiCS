@@ -715,6 +715,7 @@ BASiCS_MCMC <- function(
 #    CholCovMu = chol(CovMu)
     InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
 #    ls.mu0 = rep(11, q.bio)
+    Index = (1:q.bio) - 1
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
@@ -734,7 +735,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, InvCovMu)) #, CholCovMu))
+      Constrain, InvCovMu, Index)) #, CholCovMu))
   }
   
 #  print(rowMeans(log(Chain$mu[,1:q.bio])))
