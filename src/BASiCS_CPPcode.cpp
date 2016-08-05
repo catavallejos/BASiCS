@@ -1816,6 +1816,7 @@ arma::mat muUpdateNoSpikesConstrainSequential(
 //  Rcpp::Rcout << "mu0(0) after mu" << mu0(0) << std::endl;
   double aux;
   double aux2; 
+  double sumAux = sum(log(mu0(IndexAux)));
 
   // ACCEPT/REJECT STEP
 //  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2));
@@ -1827,31 +1828,40 @@ arma::mat muUpdateNoSpikesConstrainSequential(
 //  for (int i=0; i < q_bio - 1; i++)
   for (int i=0; i < q_bio; i++)
   {
-    for (int j=0; j < n; j++) 
+    if(i != ref)
     {
-       log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
-            log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu(i)+(1/delta(i)) ));
+      for (int j=0; j < n; j++) 
+      {
+        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
+          log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu(i)+(1/delta(i)) ));
+      }
+//      aux = 0.5 * (q_bio * Constrain - (sum(log(mu.elem(IndexAux))) - log(mu(i))));
+      aux = 0.5 * (q_bio * Constrain - (sumAux - log(mu(i))));
+      //    aux = 0.5 * (log(mu(i)) + log(mu(ref)));
+//      Rcpp::Rcout << "aux" << aux << std::endl;
+//      Rcpp::Rcout << "aux2" << aux2 << std::endl;
+      //    log_aux(i) -= (0.5 * q_bio /s2_mu) * (pow(log(y(i)) - aux,2)); 
+      //    log_aux(i) += (0.5 * q_bio /s2_mu) * (pow(log(mu0(i)) - aux,2));   
+      log_aux(i) -= (0.5 * 2 /s2_mu) * (pow(log(y(i)) - aux,2)); 
+      log_aux(i) += (0.5 * 2 /s2_mu) * (pow(log(mu0(i)) - aux,2));   
+      if(log(u(i)) < log_aux(i) & y(i) > 1e-3) 
+      {
+        ind(i) = 1; mu(i) = y(i);
+        sumAux += log(mu(i)) - log(mu0(i)); 
+      }
+      else{ind(i) = 0; mu(i) = mu0(i); }
+      // FINAL GENE
+      //    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+      //    mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
     }
-  
-    aux = 0.5 * (q_bio * Constrain - (sum(log(mu.elem(IndexAux))) - log(mu(i))));
-    aux2 = 0.5 * (log(mu(i)) + log(mu(ref)));
-//    Rcpp::Rcout << "aux" << aux << std::endl;
-//    Rcpp::Rcout << "aux2" << aux2 << std::endl;
-
-//    log_aux(i) -= (0.5 * q_bio /s2_mu) * (pow(log(y(i)) - aux,2)); 
-//    log_aux(i) += (0.5 * q_bio /s2_mu) * (pow(log(mu0(i)) - aux,2));   
-    log_aux(i) -= (0.5 * 2 /s2_mu) * (pow(log(y(i)) - aux,2)); 
-    log_aux(i) += (0.5 * 2 /s2_mu) * (pow(log(mu0(i)) - aux,2));   
-    if(log(u(i)) < log_aux(i) & y(i) > 1e-3) {ind(i) = 1; mu(i) = y(i);}
-    else{ind(i) = 0; mu(i) = mu0(i); }
-    // FINAL GENE
-//    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
-    mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
   }
   // FINAL GENE
   ind(ref) = 0;
   //    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));  
-  mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
+//  mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
+  mu(ref) = exp(q_bio * Constrain - sumAux);
+//  Rcpp::Rcout << "mu(ref): " << mu(ref) << std::endl;
+//  Rcpp::Rcout << "mu(ref) alt:" << exp(q_bio * Constrain - sumAux) << std::endl;
   
 //  Rcpp::Rcout << "mu0(0) after update" << mu0(0) << std::endl;
     

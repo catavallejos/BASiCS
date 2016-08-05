@@ -175,3 +175,6 @@ version 0.7.0: (2016-08-02)
 
 version 0.7.1: (2016-08-05)
 - Random reference in sequential updates for mu (no spikes case only)
+
+version 0.7.2: (2016-08-05)
+- Same as v 0.7.2 but more efficient
