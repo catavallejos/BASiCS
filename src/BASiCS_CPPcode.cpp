@@ -1797,14 +1797,19 @@ arma::mat muUpdateNoSpikesConstrainSequential(
     int const& q_bio,
     int const& n,
     arma::vec & mu,
-    arma::vec & ind)
+    arma::vec & ind,
+    int const& ref,
+    arma::vec const& Index)
 {
   using arma::span;
   
+  arma::uvec IndexAux = find(Index != ref);
+  
   // PROPOSAL STEP    
 //  arma::vec y = exp(SigmaAuxChol*arma::randn(q_bio-1) + log(mu0(span(0, q_bio-2))));
-  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
-  arma::vec u = arma::randu(q_bio-1);
+//  arma::vec y = exp(arma::randn(q_bio-1) % sqrt(prop_var(span(0, q_bio-2))) + log(mu0(span(0, q_bio-2))));
+  arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(mu0));
+  arma::vec u = arma::randu(q_bio);
   // INITIALIZE MU
 //  Rcpp::Rcout << "mu0(0) before mu" << mu0(0) << std::endl; 
   mu = mu0 + 1 - 1;
@@ -1813,11 +1818,14 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   double aux2; 
 
   // ACCEPT/REJECT STEP
-  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2));
+//  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio-2)))) % sum_bycell_all(span(0, q_bio-2));
+  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
+  
   // Independent prior 
 //  log_aux -= (0.5/s2_mu) * (pow(log(y),2) - pow(log(mu0(span(0, q_bio - 2))),2));
   // COMPUTING THE LIKELIHOOD CONTRIBUTION OF THE ACCEPTANCE RATE (NO NEED TO BE SEQUENTIAL)
-  for (int i=0; i < q_bio - 1; i++)
+//  for (int i=0; i < q_bio - 1; i++)
+  for (int i=0; i < q_bio; i++)
   {
     for (int j=0; j < n; j++) 
     {
@@ -1825,14 +1833,11 @@ arma::mat muUpdateNoSpikesConstrainSequential(
             log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu(i)+(1/delta(i)) ));
     }
   
-    aux = 0.5 * (q_bio * Constrain - (sum(log(mu(span(0, q_bio-2)))) - log(mu(i))));
-    aux2 = 0.5 * (log(mu(i)) + log(mu(q_bio-1)));
-//    if(i ==0) {Rcpp::Rcout << "aux: " << aux << std::endl;}
-//    if(i ==0) {Rcpp::Rcout << "aux2: " << aux2 << std::endl;}
-//    if(i == 0) {Rcpp::Rcout << "sum(log(mu)) 1: " << sum(log(mu))  << std::endl;} 
-//    if(i == 1) {Rcpp::Rcout << "sum(log(mu)) 2: " << sum(log(mu))  << std::endl;}
-//    if(i == 2) {Rcpp::Rcout << "sum(log(mu)) 3: " << sum(log(mu))  << std::endl;}
-//
+    aux = 0.5 * (q_bio * Constrain - (sum(log(mu.elem(IndexAux))) - log(mu(i))));
+    aux2 = 0.5 * (log(mu(i)) + log(mu(ref)));
+//    Rcpp::Rcout << "aux" << aux << std::endl;
+//    Rcpp::Rcout << "aux2" << aux2 << std::endl;
+
 //    log_aux(i) -= (0.5 * q_bio /s2_mu) * (pow(log(y(i)) - aux,2)); 
 //    log_aux(i) += (0.5 * q_bio /s2_mu) * (pow(log(mu0(i)) - aux,2));   
     log_aux(i) -= (0.5 * 2 /s2_mu) * (pow(log(y(i)) - aux,2)); 
@@ -1840,10 +1845,13 @@ arma::mat muUpdateNoSpikesConstrainSequential(
     if(log(u(i)) < log_aux(i) & y(i) > 1e-3) {ind(i) = 1; mu(i) = y(i);}
     else{ind(i) = 0; mu(i) = mu0(i); }
     // FINAL GENE
-    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+//    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+    mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
   }
   // FINAL GENE
-  mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));
+  ind(ref) = 0;
+  //    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));  
+  mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
   
 //  Rcpp::Rcout << "mu0(0) after update" << mu0(0) << std::endl;
     
@@ -2233,6 +2241,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec indQ = arma::zeros(qbio);
   double LSmuAuxExtra = 0;
   int ref = qbio-1;
+  arma::vec RefFreq = arma::zeros(qbio); 
 //  arma::mat D; arma::mat SigmaAux; arma::mat SigmaAuxChol;
 //  arma::mat OnesMat = arma::ones(qbio-1, qbio-1);
 //  D = diagmat(exp(LSmuAux(arma::span(0, qbio-2))));
@@ -2294,10 +2303,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //    }
 //    else
 //    {
-//      // Modify to add correlated proposals. 
+      ref = as_scalar(arma::randi( 1, arma::distr_param(0,qbio-1) )); 
+      RefFreq(ref) += 1;
       muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
                                                   nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-                                                  muUpdateAux, indQ);
+                                                  muUpdateAux, indQ, ref, Index_arma);
       PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
 //    }
 //    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
@@ -2340,8 +2350,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //        }
 //        else
 //        {
-          PmuAux=PmuAux/50; PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);//
-          LSmuAux = LSmuAux + PmuAux*0.1; 
+          PmuAux=PmuAux/(50-RefFreq); PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);//
+          LSmuAux.elem(find(Index_arma != ref)) = LSmuAux.elem(find(Index_arma != ref)) + PmuAux.elem(find(Index_arma != ref))*0.1; 
 //        }
         PdeltaAux=PdeltaAux/50; PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
         LSdeltaAux=LSdeltaAux+PdeltaAux*0.1;                
@@ -2355,7 +2365,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
         Ibatch = 0; 
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
 //        PphiAux = PphiAux0; 
-        PnuAux = PnuAux0; PthetaAux = PthetaAux0; 
+        PnuAux = PnuAux0; PthetaAux = PthetaAux0;
+        RefFreq = arma::zeros(qbio);
       }
       
     }
