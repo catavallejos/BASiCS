@@ -178,3 +178,6 @@ version 0.7.1: (2016-08-05)
 
 version 0.7.2: (2016-08-05)
 - Same as v 0.7.2 but more efficient
+
+version 0.7.3: (2016-08-08)
+- Reference set to be the gene closest to the average (no spikes case only)

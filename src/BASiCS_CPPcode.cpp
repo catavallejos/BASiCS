@@ -1860,6 +1860,7 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   //    mu(q_bio-1) = exp(q_bio * Constrain - sum(log(mu(span(0, q_bio-2)))));  
 //  mu(ref) = exp(q_bio * Constrain - sum(log(mu.elem(IndexAux))));
   mu(ref) = exp(q_bio * Constrain - sumAux);
+  Rcpp::Rcout << "sumAux: " << sumAux << std::endl;
 //  Rcpp::Rcout << "mu(ref): " << mu(ref) << std::endl;
 //  Rcpp::Rcout << "mu(ref) alt:" << exp(q_bio * Constrain - sumAux) << std::endl;
   
@@ -2180,7 +2181,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericVector BatchOffSet,
     double Constrain,
     NumericMatrix InvCovMu,
-    NumericVector Index)
+    NumericVector Index,
+    int ref)
 {
 
    //   NumericMatrix CholCovMu,
@@ -2250,7 +2252,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec muUpdateAux = arma::ones(qbio);
   arma::vec indQ = arma::zeros(qbio);
   double LSmuAuxExtra = 0;
-  int ref = qbio-1;
+//  int ref = qbio-1;
   arma::vec RefFreq = arma::zeros(qbio); 
 //  arma::mat D; arma::mat SigmaAux; arma::mat SigmaAuxChol;
 //  arma::mat OnesMat = arma::ones(qbio-1, qbio-1);
@@ -2313,7 +2315,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //    }
 //    else
 //    {
-      ref = as_scalar(arma::randi( 1, arma::distr_param(0,qbio-1) )); 
+//      ref = as_scalar(arma::randi( 1, arma::distr_param(0,qbio-1) )); 
+      Rcpp::Rcout << "ref: " << ref << std::endl;
       RefFreq(ref) += 1;
       muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
                                                   nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,

@@ -705,6 +705,7 @@ BASiCS_MCMC <- function(
     }
     # Constrain for gene-specific expression rates
     Constrain = mean(log(mu0))
+    ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1
 
     # Covariance matrix for the prior of mu (and its Cholesky decomposition)
 #    CovMu = diag(q.bio-1) - rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) / q.bio
@@ -735,7 +736,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, InvCovMu, Index)) #, CholCovMu))
+      Constrain, InvCovMu, Index, ref)) #, CholCovMu))
   }
   
 #  print(rowMeans(log(Chain$mu[,1:q.bio])))
