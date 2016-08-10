@@ -1887,12 +1887,10 @@ arma::mat muUpdateNoSpikesConstrainSequentialNonZero(
     arma::vec & mu,
     arma::vec & ind,
     int const& ref,
-    arma::vec const& ExpGene,
-    arma::vec const& NotExpGene)
+    arma::uvec const& ExpGene,
+    arma::uvec const& NotExpGene)
 {
   using arma::span;
-  
-  arma::uvec ExpGeneAux = find(ExpGene != ref);
   
   // PROPOSAL STEP    
   arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(mu0));
@@ -1901,7 +1899,7 @@ arma::mat muUpdateNoSpikesConstrainSequentialNonZero(
   mu = mu0 + 1 - 1;
   double aux;
   double iAux;
-  double sumAux = sum(log(mu0(ExpGeneAux)));
+  double sumAux = sum(log(mu0.elem(ExpGene))) - log(mu0(ref));
   
   // ACCEPT/REJECT STEP
   arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
@@ -1920,19 +1918,23 @@ arma::mat muUpdateNoSpikesConstrainSequentialNonZero(
     }
   }
   // PRIOR ADJUSTEMENT + ACCEPT/REJECT FOR GENES UNDER THE CONSTRAIN (but the reference one)
-  for (int i=0; i < ExpGeneAux.size(); i++)
+  for (int i=0; i < ExpGene.size(); i++)
   {
-    iAux = ExpGeneAux(i);
-    aux = 0.5 * (ExpGene.size() * Constrain - (sumAux - log(mu(iAux))));
-    log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
-    log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
-    // ACCEPT REJECT
-    if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
+    iAux = ExpGene(i);
+//    Rcpp::Rcout << "iAux (expressed) " << iAux << std::endl;
+    if(iAux != ref)
     {
-      ind(iAux) = 1; mu(iAux) = y(iAux);
-      sumAux += log(mu(iAux)) - log(mu0(iAux)); 
+      aux = 0.5 * (ExpGene.size() * Constrain - (sumAux - log(mu(iAux))));
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
+      // ACCEPT REJECT
+      if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
+      {
+        ind(iAux) = 1; mu(iAux) = y(iAux);
+        sumAux += log(mu(iAux)) - log(mu0(iAux)); 
+      }
+      else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
     }
-    else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }
   }
   // REFERENCE GENE
   ind(ref) = 0;
@@ -1941,6 +1943,7 @@ arma::mat muUpdateNoSpikesConstrainSequentialNonZero(
   for (int i=0; i < NotExpGene.size(); i++)
   {
     iAux = NotExpGene(i);
+//    Rcpp::Rcout << "iAux (not expressed) " << iAux << std::endl;
     log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
     // ACCEPT REJECT
     if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
@@ -2287,8 +2290,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //  arma::mat CholCovMu_arma = as_arma(CholCovMu);
   arma::mat InvCovMu_arma = as_arma(InvCovMu);
   arma::vec Index_arma = as_arma(Index);
-  arma::vec ExpGene_arma = as_arma(ExpGene);
-  arma::vec NotExpGene_arma = as_arma(NotExpGene);
+  arma::uvec ExpGene_arma = Rcpp::as<arma::uvec>(ExpGene);
+  arma::uvec NotExpGene_arma = Rcpp::as<arma::uvec>(NotExpGene);
+  
+  
+  
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux, qbio); 

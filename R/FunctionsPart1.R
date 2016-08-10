@@ -713,8 +713,8 @@ BASiCS_MCMC <- function(
     Index = (1:q.bio) - 1
 #    ExpGene = which(rowSums(counts(Data)) > 0) - 1
 #    NotExpGene = which(rowSums(counts(Data)) == 0) - 1
-    ExpGene = which(mu0 >= 2) - 1
-    NotExpGene = which(mu0 < 2) - 1
+    ExpGene = which(mu0 >= 101) - 1
+    NotExpGene = which(mu0 < 101) - 1
     
     # Constrain for gene-specific expression rates
     if(ConstrainType == 1)
@@ -724,9 +724,10 @@ BASiCS_MCMC <- function(
     }
     if(ConstrainType == 2)
     {
-      Constrain = mean(log(mu0[ExpGene]))
+      Constrain = mean(log(mu0[ExpGene+1]))
       # Might need adjustement depending on the value of constrain
-      ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1      
+      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
+      ref = ExpGene[aux.ref]      
     }
 
     
