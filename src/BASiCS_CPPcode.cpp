@@ -1870,6 +1870,89 @@ arma::mat muUpdateNoSpikesConstrainSequential(
   return join_rows(mu, ind);
 }
 
+/* Metropolis-Hastings updates of mu 
+ * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
+ */
+arma::mat muUpdateNoSpikesConstrainSequentialNonZero(
+    arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q_0)'$ */
+    arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
+    double const& Constrain,
+    arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
+    arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
+    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
+    arma::vec const& sum_bycell_all, /* Sum of expression counts by cell (biological genes only) */
+    double const& s2_mu,
+    int const& q_bio,
+    int const& n,
+    arma::vec & mu,
+    arma::vec & ind,
+    int const& ref,
+    arma::vec const& ExpGene,
+    arma::vec const& NotExpGene)
+{
+  using arma::span;
+  
+  arma::uvec ExpGeneAux = find(ExpGene != ref);
+  
+  // PROPOSAL STEP    
+  arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(mu0));
+  arma::vec u = arma::randu(q_bio);
+  // INITIALIZE MU
+  mu = mu0 + 1 - 1;
+  double aux;
+  double iAux;
+  double sumAux = sum(log(mu0(ExpGeneAux)));
+  
+  // ACCEPT/REJECT STEP
+  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
+  
+  // COMPUTING THE LIKELIHOOD CONTRIBUTION OF THE ACCEPTANCE RATE 
+  // CALCULATED IN THE SAME WAY FOR ALL GENES, BUT THE REFERENCE ONE (NO NEED TO BE SEQUENTIAL)
+  for (int i=0; i < q_bio; i++)
+  {
+    if(i != ref)
+    {
+      for (int j=0; j < n; j++) 
+      {
+        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
+          log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu(i)+(1/delta(i)) ));
+      }
+    }
+  }
+  // PRIOR ADJUSTEMENT + ACCEPT/REJECT FOR GENES UNDER THE CONSTRAIN (but the reference one)
+  for (int i=0; i < ExpGeneAux.size(); i++)
+  {
+    iAux = ExpGeneAux(i);
+    aux = 0.5 * (ExpGene.size() * Constrain - (sumAux - log(mu(iAux))));
+    log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+    log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
+    // ACCEPT REJECT
+    if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
+    {
+      ind(iAux) = 1; mu(iAux) = y(iAux);
+      sumAux += log(mu(iAux)) - log(mu0(iAux)); 
+    }
+    else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }
+  }
+  // REFERENCE GENE
+  ind(ref) = 0;
+  mu(ref) = exp(ExpGene.size() * Constrain - sumAux);
+  // PRIOR ADJUSTEMENT + ACCEPT/REJECT FOR GENES OUTSIDE THE CONSTRAIN
+  for (int i=0; i < NotExpGene.size(); i++)
+  {
+    iAux = NotExpGene(i);
+    log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
+    // ACCEPT REJECT
+    if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
+    {
+      ind(iAux) = 1; mu(iAux) = y(iAux);
+    }
+    else{ind(iAux) = 0; mu(iAux) = mu0(iAux);}
+  }
+  // OUTPUT
+  return join_rows(mu, ind);
+}
+
 /* Metropolis-Hastings updates of delta
  * Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
  */
@@ -2182,12 +2265,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double Constrain,
     NumericMatrix InvCovMu,
     NumericVector Index,
-    int ref)
+    int ref,
+    int ConstrainType, //  1: Full constrain; 2: Non-zero genes only
+    NumericVector ExpGene,
+    NumericVector NotExpGene)
 {
-
-   //   NumericMatrix CholCovMu,
-    //  ) 
-  
   // NUMBER OF CELLS, GENES AND STORED DRAWS
   int n = Counts.ncol(); int qbio = Counts.nrow(); int Naux = N/thin - burn/thin;
   int nBatch = BatchDesign.ncol();
@@ -2205,6 +2287,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //  arma::mat CholCovMu_arma = as_arma(CholCovMu);
   arma::mat InvCovMu_arma = as_arma(InvCovMu);
   arma::vec Index_arma = as_arma(Index);
+  arma::vec ExpGene_arma = as_arma(ExpGene);
+  arma::vec NotExpGene_arma = as_arma(NotExpGene);
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux, qbio); 
@@ -2303,6 +2387,26 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     //    struct timespec time0_3 = orwl_gettime();
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
+    if(ConstrainType == 1)
+    {
+      //      ref = as_scalar(arma::randi( 1, arma::distr_param(0,qbio-1) )); 
+//      Rcpp::Rcout << "ref: " << ref << std::endl;
+      RefFreq(ref) += 1;
+      muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
+                                                  nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
+                                                  muUpdateAux, indQ, ref, Index_arma);
+      PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}      
+    }
+    if(ConstrainType == 2)
+    {
+//      Rcpp::Rcout << "ref: " << ref << std::endl;
+      RefFreq(ref) += 1; 
+      muAux = muUpdateNoSpikesConstrainSequentialNonZero(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
+                                                  nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
+                                                  muUpdateAux, indQ, ref, ExpGene_arma, NotExpGene_arma);
+      PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}  
+    }
+    Rcpp::Rcout << "sum(log(muAux.col(0))): "  << sum(log(muAux.col(0)))/qbio << std::endl;
 
 //    if(i > 2000)
 //    {
@@ -2315,13 +2419,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //    }
 //    else
 //    {
-//      ref = as_scalar(arma::randi( 1, arma::distr_param(0,qbio-1) )); 
-      Rcpp::Rcout << "ref: " << ref << std::endl;
-      RefFreq(ref) += 1;
-      muAux = muUpdateNoSpikesConstrainSequential(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
-                                                  nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-                                                  muUpdateAux, indQ, ref, Index_arma);
-      PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
 //    }
 //    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
 //                             nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,

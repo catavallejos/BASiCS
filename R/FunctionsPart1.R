@@ -694,6 +694,9 @@ BASiCS_MCMC <- function(
     cat('IMPORTANT: this part of the code is under development. DO NOT USE. \n')
     cat("--------------------------------------------------------------------"); cat("\n")
     
+    # 1: Full constrain; 2: Non-zero genes only
+    ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 1)
+    
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
     BatchSizes = table(Data@BatchInfo)
     BatchIds = as.numeric(names(BatchSizes))
@@ -703,20 +706,29 @@ BASiCS_MCMC <- function(
       BatchOffSet[k] = median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[k]])) / 
                           median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[1]]))
     }
-    # Constrain for gene-specific expression rates
-    Constrain = mean(log(mu0))
-    ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1
+
 
     # Covariance matrix for the prior of mu (and its Cholesky decomposition)
-#    CovMu = diag(q.bio-1) - rep(1, q.bio-1) %*% t(rep(1, q.bio-1)) / q.bio
-#    Aux = matrix(1, ncol = q.bio - 1, nrow = q.bio - 1)
-#    diag(Aux) = abs(log(mu0[1:(q.bio-1)]))+0.1
-#    CovMu = CovMu * Aux
-#    CovMu = 2.38 * diag(abs(log(mu0[1:(q.bio-1)]))+0.1)
-#    CholCovMu = chol(CovMu)
     InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
-#    ls.mu0 = rep(11, q.bio)
     Index = (1:q.bio) - 1
+#    ExpGene = which(rowSums(counts(Data)) > 0) - 1
+#    NotExpGene = which(rowSums(counts(Data)) == 0) - 1
+    ExpGene = which(mu0 >= 2) - 1
+    NotExpGene = which(mu0 < 2) - 1
+    
+    # Constrain for gene-specific expression rates
+    if(ConstrainType == 1)
+    {
+      Constrain = mean(log(mu0))
+      ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1      
+    }
+    if(ConstrainType == 2)
+    {
+      Constrain = mean(log(mu0[ExpGene]))
+      # Might need adjustement depending on the value of constrain
+      ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1      
+    }
+
     
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
@@ -736,7 +748,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, InvCovMu, Index, ref)) #, CholCovMu))
+      Constrain, InvCovMu, Index, ref, ConstrainType, ExpGene, NotExpGene)) #, CholCovMu))
   }
   
 #  print(rowMeans(log(Chain$mu[,1:q.bio])))
