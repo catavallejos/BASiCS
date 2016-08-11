@@ -696,6 +696,7 @@ BASiCS_MCMC <- function(
     
     # 1: Full constrain; 2: Non-zero genes only
     ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 1)
+    ConstrainLimit = ifelse("ConstrainLimit" %in% names(args),args$ConstrainLimit, 1)
     
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
     BatchSizes = table(Data@BatchInfo)
@@ -713,8 +714,8 @@ BASiCS_MCMC <- function(
     Index = (1:q.bio) - 1
 #    ExpGene = which(rowSums(counts(Data)) > 0) - 1
 #    NotExpGene = which(rowSums(counts(Data)) == 0) - 1
-    ExpGene = which(mu0 >= 101) - 1
-    NotExpGene = which(mu0 < 101) - 1
+    ExpGene = which(mu0 >= ConstrainLimit + 1) - 1
+    NotExpGene = which(mu0 < ConstrainLimit + 1) - 1
     
     # Constrain for gene-specific expression rates
     if(ConstrainType == 1)
