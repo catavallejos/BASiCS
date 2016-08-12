@@ -707,13 +707,13 @@ BASiCS_MCMC <- function(
       BatchOffSet[k] = median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[k]])) / 
                           median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[1]]))
     }
-
-
     # Covariance matrix for the prior of mu (and its Cholesky decomposition)
     InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
     Index = (1:q.bio) - 1
+
 #    ExpGene = which(rowSums(counts(Data)) > 0) - 1
 #    NotExpGene = which(rowSums(counts(Data)) == 0) - 1
+
     ExpGene = which(mu0 >= ConstrainLimit + 1) - 1
     NotExpGene = which(mu0 < ConstrainLimit + 1) - 1
     
@@ -731,7 +731,6 @@ BASiCS_MCMC <- function(
       ref = ExpGene[aux.ref]      
     }
 
-    
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
       N,

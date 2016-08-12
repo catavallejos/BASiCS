@@ -1841,7 +1841,9 @@ arma::mat muUpdateNoSpikesConstrainSequential(
 //      Rcpp::Rcout << "aux" << aux << std::endl;
 //      Rcpp::Rcout << "aux2" << aux2 << std::endl;
       //    log_aux(i) -= (0.5 * q_bio /s2_mu) * (pow(log(y(i)) - aux,2)); 
-      //    log_aux(i) += (0.5 * q_bio /s2_mu) * (pow(log(mu0(i)) - aux,2));   
+      //    log_aux(i) += (0.5 * q_bio /s2_mu) * (pow(log(mu0(i)) - aux,2));
+//      log_aux(i) -= (0.5/s2_mu) * (pow(log(y(i)),2)); 
+//      log_aux(i) += (0.5/s2_mu) * (pow(log(mu0(i)),2)); 
       log_aux(i) -= (0.5 * 2 /s2_mu) * (pow(log(y(i)) - aux,2)); 
       log_aux(i) += (0.5 * 2 /s2_mu) * (pow(log(mu0(i)) - aux,2));   
       if(log(u(i)) < log_aux(i) & y(i) > 1e-3) 
@@ -2413,23 +2415,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}  
     }
     Rcpp::Rcout << "sum(log(muAux.col(0))): "  << sum(log(muAux.col(0)))/qbio << std::endl;
-
-//    if(i > 2000)
-//    {
-//      ref = as_scalar(arma::randi( 1, arma::distr_param(0,qbio-1) ));
-//      Rcpp::Rcout << "ref: " << ref << std::endl; 
-//      muAux = muUpdateNoSpikesConstrain(muAux.col(0), exp(LSmuAuxExtra + LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
-//                                        nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-//                                        muUpdateAux, indQ, InvCovMu_arma, mu0_arma, ref, Index_arma); // CholCovMu_arma,
-//      PmuAux += muAux.col(1); if(i>=burn) {muAccept(0) += muAux(0,1);}
-//    }
-//    else
-//    {
-//    }
-//    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
-//                             nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-//                             muUpdateAux, indQ); 
-//    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}  
     //    struct timespec time1_3 = orwl_gettime();    
     //    Rcpp::Rcout << "Time mu: "  <<  (time1_3.tv_nsec - time0_3.tv_nsec) / ((float)(qbio)) << std::endl;
     

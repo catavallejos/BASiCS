@@ -53,6 +53,15 @@ For illustration purposes, the BASiCS package includes a built-in simulated data
 
 ```{r ExampleData}
 Data = makeExampleBASiCS_Data(WithSpikes = FALSE)
+CountsAux <- as.matrix(rbind(Data@Counts, rowSums(Data@Counts)))
+GeneNamesAux <- c(rownames(Data@Counts), "SumGene")
+
+DataAux <- new("BASiCS_Data", 
+            Counts = CountsAux,
+            Tech = c(Data@Tech, FALSE),
+            SpikeInput = Data@SpikeInput,
+            GeneNames = GeneNamesAux,
+            BatchInfo = Data@BatchInfo)
 ```
 
 Which was generated using the following simulated parameters
@@ -130,11 +139,11 @@ abline(h = Theta2, col = "red")
 ```{r HPDplots, fig.width=8, fig.height=5, message=FALSE, warning=FALSE}
 plot(MCMC_Summary, Param = "mu", log = "y")
 points(Mu, pch = 16, col = "red")
-plot(Mu, MCMC_Summary@mu[,1], log = "xy", pch = 16, col = 8, bty = "n")
+plot(Mu, MCMC_Summary@mu[1:100,1], log = "xy", pch = 16, col = 8, bty = "n")
 abline(a = 0, b = 1)
 plot(MCMC_Summary, Param = "delta")
 points(Delta, pch = 16, col = "red")
-plot(Delta, MCMC_Summary@delta[,1], log = "xy", pch = 16, col = 8, bty = "n")
+plot(Delta, MCMC_Summary@delta[1:100,1], log = "xy", pch = 16, col = 8, bty = "n")
 abline(a = 0, b = 1)
 plot(MCMC_Summary, Param = "phi")
 points(Phi, pch = 16, col = "red")
