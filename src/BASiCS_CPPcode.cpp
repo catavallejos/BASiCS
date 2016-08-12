@@ -2405,7 +2405,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                                   muUpdateAux, indQ, ref, Index_arma);
       PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}      
     }
-    if(ConstrainType == 2)
+    if(ConstrainType == 2 | ConstrainType == 3)
     {
 //      Rcpp::Rcout << "ref: " << ref << std::endl;
       RefFreq(ref) += 1; 

@@ -697,6 +697,7 @@ BASiCS_MCMC <- function(
     # 1: Full constrain; 2: Non-zero genes only
     ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 1)
     ConstrainLimit = ifelse("ConstrainLimit" %in% names(args),args$ConstrainLimit, 1)
+    ConstrainAlpha = ifelse("ConstrainAlpha" %in% names(args),args$ConstrainAlpha, 0.05)
     
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
     BatchSizes = table(Data@BatchInfo)
@@ -714,17 +715,29 @@ BASiCS_MCMC <- function(
 #    ExpGene = which(rowSums(counts(Data)) > 0) - 1
 #    NotExpGene = which(rowSums(counts(Data)) == 0) - 1
 
-    ExpGene = which(mu0 >= ConstrainLimit + 1) - 1
-    NotExpGene = which(mu0 < ConstrainLimit + 1) - 1
-    
     # Constrain for gene-specific expression rates
     if(ConstrainType == 1)
-    {
+    { 
+      ExpGene = 1:q.bio
+      NotExpGene = 1:q.bio
       Constrain = mean(log(mu0))
       ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1      
     }
     if(ConstrainType == 2)
     {
+      ExpGene = which(mu0 >= ConstrainLimit + 1) - 1
+      NotExpGene = which(mu0 < ConstrainLimit + 1) - 1
+      Constrain = mean(log(mu0[ExpGene+1]))
+      # Might need adjustement depending on the value of constrain
+      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
+      ref = ExpGene[aux.ref]      
+    }
+    if(ConstrainType == 3)
+    {
+      LimLow = quantile(mu0, ConstrainAlpha)
+      LimHigh = quantile(mu0, 1-ConstrainAlpha)
+      ExpGene = which(mu0 >= LimLow & mu0 <= LimHigh) - 1
+      NotExpGene = which(mu0 < LimLow | mu0 > LimHigh) - 1
       Constrain = mean(log(mu0[ExpGene+1]))
       # Might need adjustement depending on the value of constrain
       aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
