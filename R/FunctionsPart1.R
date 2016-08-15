@@ -698,6 +698,7 @@ BASiCS_MCMC <- function(
     ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 1)
     ConstrainLimit = ifelse("ConstrainLimit" %in% names(args),args$ConstrainLimit, 1)
     ConstrainAlpha = ifelse("ConstrainAlpha" %in% names(args),args$ConstrainAlpha, 0.05)
+    ConstrainProb = ifelse("ConstrainProb" %in% names(args),args$ConstrainProb, 0.95)
     
     BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
     BatchSizes = table(Data@BatchInfo)
@@ -738,6 +739,16 @@ BASiCS_MCMC <- function(
       LimHigh = quantile(mu0, 1-ConstrainAlpha)
       ExpGene = which(mu0 >= LimLow & mu0 <= LimHigh) - 1
       NotExpGene = which(mu0 < LimLow | mu0 > LimHigh) - 1
+      Constrain = mean(log(mu0[ExpGene+1]))
+      # Might need adjustement depending on the value of constrain
+      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
+      ref = ExpGene[aux.ref]      
+    }
+    if(ConstrainType == 4)
+    {
+      HPD = coda::HPDinterval(coda::mcmc(mu0), prob = ConstrainProb)
+      ExpGene = which(mu0 >= HPD[1] & mu0 <= HPD[2]) - 1
+      NotExpGene = which(mu0 < HPD[1] | mu0 > HPD[2]) - 1
       Constrain = mean(log(mu0[ExpGene+1]))
       # Might need adjustement depending on the value of constrain
       aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
