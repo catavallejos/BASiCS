@@ -743,6 +743,16 @@ BASiCS_MCMC <- function(
       aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
       ref = ExpGene[aux.ref]      
     }
+    if(ConstrainType == 4)
+    {
+      HPD = coda::HPDinterval(coda::mcmc(mu0))
+      ExpGene = which(mu0 >= HPD[2] & mu0 <= HPD[1]) - 1
+      NotExpGene = which(mu0 < HPD[2] | mu0 > HPD[1]) - 1
+      Constrain = mean(log(mu0[ExpGene+1]))
+      # Might need adjustement depending on the value of constrain
+      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
+      ref = ExpGene[aux.ref]      
+    }
 
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(

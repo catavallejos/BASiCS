@@ -193,3 +193,6 @@ version 0.7.6: (2016-08-11)
 
 version 0.7.7: (2016-08-12)
 - ConstrainType = 3 implemented (no spikes case only)
+
+version 0.7.8: (2016-08-15)
+- ConstrainType = 4 implemented (no spikes case only)
