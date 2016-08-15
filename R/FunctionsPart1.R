@@ -749,6 +749,7 @@ BASiCS_MCMC <- function(
       HPD = coda::HPDinterval(coda::mcmc(mu0), prob = ConstrainProb)
       ExpGene = which(mu0 >= HPD[1] & mu0 <= HPD[2]) - 1
       NotExpGene = which(mu0 < HPD[1] | mu0 > HPD[2]) - 1
+      
       Constrain = mean(log(mu0[ExpGene+1]))
       # Might need adjustement depending on the value of constrain
       aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
