@@ -32,6 +32,17 @@ library(BASiCS)
 
 [^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
 
+### Troubleshooting
+
+If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library </a>. This can be installed in the terminal using the following command
+
+```{}
+curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
+sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
+```
+
+  
+
 ## How to use BASiCS?
 
 - To detect highly and lowly variable genes within a populations of cells: please refer to the vignette
