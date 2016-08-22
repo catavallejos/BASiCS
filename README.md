@@ -34,7 +34,7 @@ library(BASiCS)
 
 ### Troubleshooting
 
-If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library </a>. This can be installed in the terminal using the following command
+If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library. </a> This can be installed in the Mac terminal using the following command:
 
 ```{}
 curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
