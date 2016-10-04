@@ -83,7 +83,7 @@ on the generated file.
 
 ## Author
 
-Catalina A. Vallejos <catalina.vallejos@mrc-bsu.cam.ac.uk>
+Catalina A. Vallejos <cvallejos@turing.ac.uk>
 
 ## Collaborators
 
