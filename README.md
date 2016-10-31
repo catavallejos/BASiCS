@@ -41,7 +41,7 @@ curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
 sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
 
-  
+If you are not using RStudio, you might need to manually install `pandoc` in order to create the vignette provided for BASiCS
 
 ## How to use BASiCS?
 
@@ -88,6 +88,7 @@ Catalina A. Vallejos (cvallejos 'at' turing.ac.uk)
 ## Collaborators
 
 - <a href="https://github.com/horta"> Danilo Horta </a>
+- <a href="https://github.com/nilseling"> Nils Eling </a>
 
 ## References
 
