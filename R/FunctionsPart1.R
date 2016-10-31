@@ -592,7 +592,7 @@ BASiCS_MCMC <- function(
   StoreDir = ifelse("StoreDir" %in% names(args),args$StoreDir, getwd())
   RunName = ifelse("RunName" %in% names(args),args$RunName, "")
   PrintProgress = ifelse("PrintProgress" %in% names(args),args$PrintProgress, TRUE)
-  PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "gamma")
+  PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "log-normal")
 
   if(!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) stop("Invalid parameter values.")
   if(!(N%%Thin==0 & N>=max(4,Thin))) stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
@@ -600,6 +600,7 @@ BASiCS_MCMC <- function(
   if(!(Burn%%Thin==0 & Burn<N & Burn>=1)) stop("Please use an integer value for Burn. It must also be lower than N and a multiple of thin (Burn>=1).")
 
   if(!(PriorParam$s2.mu>0  & length(PriorParam$s2.mu) == 1 &
+       PriorParam$s2.delta>0  & length(PriorParam$s2.delta) == 1 &
         PriorParam$a.delta>0  & length(PriorParam$a.delta) == 1 &
          PriorParam$b.delta>0  & length(PriorParam$b.delta) == 1 &
          all(PriorParam$p.phi>0) & length(PriorParam$p.phi) == n &
@@ -634,7 +635,7 @@ BASiCS_MCMC <- function(
   nu0=as.vector(Start$nu0); theta0=as.numeric(Start$theta0)
   # Starting values for adaptive proposal variances
   ls.mu0=as.vector(Start$ls.mu0); ls.delta0=as.vector(Start$ls.delta0)
-#  ls.phi0=as.numeric(Start$ls.phi0)
+  ls.phi0=as.numeric(Start$ls.phi0)
   ls.nu0=as.vector(Start$ls.nu0); ls.theta0=as.numeric(Start$ls.theta0)
 
   StoreAdaptNumber = as.numeric(StoreAdapt)
@@ -709,12 +710,8 @@ BASiCS_MCMC <- function(
       BatchOffSet[k] = median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[k]])) / 
                           median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[1]]))
     }
-    # Covariance matrix for the prior of mu (and its Cholesky decomposition)
-    InvCovMu = (1/PriorParam$s2.mu) * (diag(q.bio-1) + rep(1, q.bio-1) %*% t(rep(1, q.bio-1))) # Miller (1981)
+    # Auxiliary vector contaning a gene index
     Index = (1:q.bio) - 1
-
-#    ExpGene = which(rowSums(counts(Data)) > 0) - 1
-#    NotExpGene = which(rowSums(counts(Data)) == 0) - 1
 
     # Constrain for gene-specific expression rates
     if(ConstrainType == 1)
@@ -766,7 +763,7 @@ BASiCS_MCMC <- function(
       mu0, delta0, phi0, nu0, theta0,
       PriorParam$s2.mu,
       PriorParam$a.delta, PriorParam$b.delta,
-      PriorParam$p.phi, PriorParam$a.phi, PriorParam$b.phi,
+      PriorParam$a.phi, PriorParam$b.phi,
       PriorParam$a.theta, PriorParam$b.theta,
       AR,
       ls.mu0, ls.delta0, rep(ls.phi0, nBatch), ls.nu0, ls.theta0,
@@ -774,7 +771,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, InvCovMu, Index, ref, ConstrainType, ExpGene, NotExpGene)) #, CholCovMu))
+      Index, ref, ConstrainType, ExpGene, NotExpGene)) #, CholCovMu))
   }
   
 #  print(rowMeans(log(Chain$mu[,1:q.bio])))

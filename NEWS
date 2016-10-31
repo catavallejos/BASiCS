@@ -196,3 +196,8 @@ version 0.7.7: (2016-08-12)
 
 version 0.7.8: (2016-08-15)
 - ConstrainType = 4 implemented (no spikes case only)
+
+version 0.7.9: (2016-10-31)
+- C++ code cleaned regarding parameter updates (no spikes case)
+- Updated email in description file and welcome message
+- 'BASiCS_MCMC' modified so that "log-normal" is the default value for PriorDelta
