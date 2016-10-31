@@ -94,8 +94,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // HiddenBASiCS_MCMCcppNoSpikes
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(int N, int thin, int burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector nu0, double theta0, double s2mu, double adelta, double bdelta, double aphi, double bphi, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSphi0, NumericVector LSnu0, double LStheta0, NumericVector sumByCellAll, NumericVector sumByGeneAll, int StoreAdapt, int EndAdapt, int PrintProgress, double s2_delta, double prior_delta, NumericVector BatchInfo, NumericVector BatchIds, NumericVector BatchSizes, NumericVector BatchOffSet, double Constrain, NumericVector Index, int RefGene, NumericVector ConstrainGene, NumericVector NotConstrainGene);
-RcppExport SEXP BASiCS_HiddenBASiCS_MCMCcppNoSpikes(SEXP NSEXP, SEXP thinSEXP, SEXP burnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP aphiSEXP, SEXP bphiSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSphi0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByGeneAllSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP s2_deltaSEXP, SEXP prior_deltaSEXP, SEXP BatchInfoSEXP, SEXP BatchIdsSEXP, SEXP BatchSizesSEXP, SEXP BatchOffSetSEXP, SEXP ConstrainSEXP, SEXP IndexSEXP, SEXP RefGeneSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP) {
+Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(int N, int thin, int burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector nu0, double theta0, double s2mu, double adelta, double bdelta, double aphi, double bphi, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSnu0, double LStheta0, NumericVector sumByCellAll, NumericVector sumByGeneAll, int StoreAdapt, int EndAdapt, int PrintProgress, double s2_delta, double prior_delta, NumericVector BatchInfo, NumericVector BatchIds, NumericVector BatchSizes, NumericVector BatchOffSet, double Constrain, NumericVector Index, int RefGene, NumericVector ConstrainGene, NumericVector NotConstrainGene);
+RcppExport SEXP BASiCS_HiddenBASiCS_MCMCcppNoSpikes(SEXP NSEXP, SEXP thinSEXP, SEXP burnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP aphiSEXP, SEXP bphiSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByGeneAllSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP s2_deltaSEXP, SEXP prior_deltaSEXP, SEXP BatchInfoSEXP, SEXP BatchIdsSEXP, SEXP BatchSizesSEXP, SEXP BatchOffSetSEXP, SEXP ConstrainSEXP, SEXP IndexSEXP, SEXP RefGeneSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -119,7 +119,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type ar(arSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type LSmu0(LSmu0SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type LSdelta0(LSdelta0SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type LSphi0(LSphi0SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type LSnu0(LSnu0SEXP);
     Rcpp::traits::input_parameter< double >::type LStheta0(LStheta0SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type sumByCellAll(sumByCellAllSEXP);
@@ -138,7 +137,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type RefGene(RefGeneSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type ConstrainGene(ConstrainGeneSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type NotConstrainGene(NotConstrainGeneSEXP);
-    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcppNoSpikes(N, thin, burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, s2_delta, prior_delta, BatchInfo, BatchIds, BatchSizes, BatchOffSet, Constrain, Index, RefGene, ConstrainGene, NotConstrainGene));
+    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcppNoSpikes(N, thin, burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, s2_delta, prior_delta, BatchInfo, BatchIds, BatchSizes, BatchOffSet, Constrain, Index, RefGene, ConstrainGene, NotConstrainGene));
     return rcpp_result_gen;
 END_RCPP
 }

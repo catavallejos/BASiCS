@@ -201,3 +201,7 @@ version 0.7.9: (2016-10-31)
 - C++ code cleaned regarding parameter updates (no spikes case)
 - Updated email in description file and welcome message
 - 'BASiCS_MCMC' modified so that "log-normal" is the default value for PriorDelta
+
+version 0.7.10: (2016-10-31)
+- Minor changes in 'BASiCS_MCMC' to have more meaningful variable names
+- Minor changes in 'BASiCS_MCMC' to make no-spikes case functional 

@@ -1830,7 +1830,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double ar, // Optimal acceptance rate for adaptive Metropolis-Hastings updates
     NumericVector LSmu0, // Starting value of adaptive proposal variance of $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
     NumericVector LSdelta0, // Starting value of adaptive proposal variance of $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
-    NumericVector LSphi0, // Starting value of adaptive proposal precision of $\phi=(\phi_1,...,\phi_n)'$ (log-scale)
     NumericVector LSnu0, // Starting value of adaptive proposal variance of $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
     double LStheta0, // Starting value of adaptive proposal variance of $\theta$ (log-scale)  
     NumericVector sumByCellAll, // Sum of expression counts by cell (all genes)

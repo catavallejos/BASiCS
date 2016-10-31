@@ -695,8 +695,10 @@ BASiCS_MCMC <- function(
     cat('IMPORTANT: this part of the code is under development. DO NOT USE. \n')
     cat("--------------------------------------------------------------------"); cat("\n")
     
+    if(PriorDelta == "gamma") stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
+    
     # 1: Full constrain; 2: Non-zero genes only
-    ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 1)
+    ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 2)
     ConstrainLimit = ifelse("ConstrainLimit" %in% names(args),args$ConstrainLimit, 1)
     ConstrainAlpha = ifelse("ConstrainAlpha" %in% names(args),args$ConstrainAlpha, 0.05)
     ConstrainProb = ifelse("ConstrainProb" %in% names(args),args$ConstrainProb, 0.95)
@@ -714,43 +716,36 @@ BASiCS_MCMC <- function(
     Index = (1:q.bio) - 1
 
     # Constrain for gene-specific expression rates
-    if(ConstrainType == 1)
-    { 
-      ExpGene = 1:q.bio
-      NotExpGene = 1:q.bio
-      Constrain = mean(log(mu0))
-      ref = which(abs(log(mu0) - Constrain) == min(abs(log(mu0) - Constrain)))[1] - 1      
-    }
     if(ConstrainType == 2)
     {
-      ExpGene = which(mu0 >= ConstrainLimit + 1) - 1
-      NotExpGene = which(mu0 < ConstrainLimit + 1) - 1
-      Constrain = mean(log(mu0[ExpGene+1]))
+      ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
+      NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
+      Constrain = mean(log(mu0[ConstrainGene+1]))
       # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
-      ref = ExpGene[aux.ref]      
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
+      RefGene = ConstrainGene[aux.ref]      
     }
     if(ConstrainType == 3)
     {
       LimLow = quantile(mu0, ConstrainAlpha)
       LimHigh = quantile(mu0, 1-ConstrainAlpha)
-      ExpGene = which(mu0 >= LimLow & mu0 <= LimHigh) - 1
-      NotExpGene = which(mu0 < LimLow | mu0 > LimHigh) - 1
-      Constrain = mean(log(mu0[ExpGene+1]))
+      ConstrainGene = which(mu0 >= LimLow & mu0 <= LimHigh) - 1
+      NotConstrainGene = which(mu0 < LimLow | mu0 > LimHigh) - 1
+      Constrain = mean(log(mu0[ConstrainGene+1]))
       # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
-      ref = ExpGene[aux.ref]      
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
+      RefGene = ConstrainGene[aux.ref]      
     }
     if(ConstrainType == 4)
     {
       HPD = coda::HPDinterval(coda::mcmc(mu0), prob = ConstrainProb)
-      ExpGene = which(mu0 >= HPD[1] & mu0 <= HPD[2]) - 1
-      NotExpGene = which(mu0 < HPD[1] | mu0 > HPD[2]) - 1
+      ConstrainGene = which(mu0 >= HPD[1] & mu0 <= HPD[2]) - 1
+      NotConstrainGene = which(mu0 < HPD[1] | mu0 > HPD[2]) - 1
       
-      Constrain = mean(log(mu0[ExpGene+1]))
+      Constrain = mean(log(mu0[ConstrainGene+1]))
       # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ExpGene+1]) - Constrain) == min(abs(log(mu0[ExpGene+1]) - Constrain)))[1]
-      ref = ExpGene[aux.ref]      
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
+      RefGene = ConstrainGene[aux.ref]      
     }
 
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
@@ -766,15 +761,14 @@ BASiCS_MCMC <- function(
       PriorParam$a.phi, PriorParam$b.phi,
       PriorParam$a.theta, PriorParam$b.theta,
       AR,
-      ls.mu0, ls.delta0, rep(ls.phi0, nBatch), ls.nu0, ls.theta0,
+      ls.mu0, ls.delta0, ls.nu0, ls.theta0,
       sum.bycell.all, sum.bygene.all, 
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Index, ref, ConstrainType, ExpGene, NotExpGene)) #, CholCovMu))
+      ConstrainType, Index, RefGene, ConstrainGene, NotConstrainGene))
   }
   
-#  print(rowMeans(log(Chain$mu[,1:q.bio])))
 
   Chain$mu = Chain$mu[,1:q.bio]
   colnames(Chain$mu) = Data@GeneNames[!Data@Tech]
