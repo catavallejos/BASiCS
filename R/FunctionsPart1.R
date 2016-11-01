@@ -597,7 +597,7 @@ BASiCS_MCMC <- function(
   StoreDir = ifelse("StoreDir" %in% names(args),args$StoreDir, getwd())
   RunName = ifelse("RunName" %in% names(args),args$RunName, "")
   PrintProgress = ifelse("PrintProgress" %in% names(args),args$PrintProgress, TRUE)
-  PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "log-normal")
+  PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "gamma")
 
   if(!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) stop("Invalid parameter values.")
   if(!(N%%Thin==0 & N>=max(4,Thin))) stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
@@ -700,7 +700,7 @@ BASiCS_MCMC <- function(
     cat('IMPORTANT: this part of the code is under development. DO NOT USE. \n')
     cat("--------------------------------------------------------------------"); cat("\n")
     
-    if(PriorDelta == "gamma") stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
+    #if(PriorDelta == "gamma") stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
     
     # 1: Full constrain; 2: Non-zero genes only
     ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 2)

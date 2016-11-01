@@ -1700,6 +1700,8 @@ arma::mat deltaUpdateNoSpikes(
   
   // PROPOSAL STEP
   arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(delta0));
+  arma::uvec yaux = y > 1e-3;
+  for (int i=0; i < q_bio; i++) {if(y(i) < 1e-3) y(i) = 1e-3;}
   arma::vec u = arma::randu(q_bio);
   
   // ACCEPT/REJECT STEP 
@@ -1708,11 +1710,14 @@ arma::mat deltaUpdateNoSpikes(
   // Loop to replace matrix operations, through genes and cells
   for (int i=0; i < q_bio; i++)
   {
-    for (int j=0; j < n; j++) 
+    if(yaux(i) == 1)
     {
-      log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
-      log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( nu(j)*mu(i)+(1/y(i)) );
-      log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
+      for (int j=0; j < n; j++) 
+      {
+        log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
+        log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( nu(j)*mu(i)+(1/y(i)) );
+        log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
+      }      
     }
   }
   
@@ -1725,12 +1730,12 @@ arma::mat deltaUpdateNoSpikes(
   // CREATING OUTPUT VARIABLE & DEBUG
   for (int i=0; i < q_bio; i++)
   {
-    if(arma::is_finite(log_aux(i)))
+    if(yaux(i) == 1)
     {
       if(log(u(i)) < log_aux(i))
       {
         // DEBUG: Reject very small values to avoid numerical issues
-        if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; delta(i) = y(i);}
+        if(arma::is_finite(y(i)) & (arma::is_finite(log_aux(i)))) {ind(i) = 1; delta(i) = y(i);}
         else{ind(i) = 0; delta(i) = delta0(i);}            
       }
       else{ind(i) = 0; delta(i) = delta0(i);}

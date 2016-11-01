@@ -211,3 +211,4 @@ version 0.7.11: (2016-10-31)
 
 version 0.7.12: (2016-11-01)
 - Change in defaul value of 'PriorDelta' (v 0.7.9) has been reverted for reproducibility issues. Message added to the start of the function so that users are aware of making the change. 
+- PriorDelta = 'gamma' is now allowed for no spikes case
