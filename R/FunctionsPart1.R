@@ -577,11 +577,6 @@ BASiCS_MCMC <- function(
   ...)
 {
 
-  cat("--------------------------------------------------------------------------- \n
-       By default, the argument PriorDelta was set equal to 'gamma'. \n
-       When performing a differential over-dispersion test between two populations, \n 
-       we recommend to change this value to PriorDelta = 'log-normal' \n
-       --------------------------------------------------------------------------- \n" )
   
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
 
@@ -589,6 +584,10 @@ BASiCS_MCMC <- function(
   q=length(Data@Tech); q.bio=sum(!Data@Tech); n=dim(Data@Counts)[2]
 
   args <- list(...)
+  
+  if(!("PriorDelta" %in% names(args))) {cat(" --------------------------------------------------------------------------- \n IMPORTANT: by default, the argument PriorDelta was set equal to 'gamma'. \n When performing a differential over-dispersion test between two populations, \n we recommend to change this value to PriorDelta = 'log-normal' \n --------------------------------------------------------------------------- \n" )}
+  
+  
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
   else { PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
   AR = ifelse("AR" %in% names(args),args$AR, 0.44)
