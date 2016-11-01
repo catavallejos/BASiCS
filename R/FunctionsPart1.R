@@ -577,6 +577,12 @@ BASiCS_MCMC <- function(
   ...)
 {
 
+  cat("--------------------------------------------------------------------------- \n
+       By default, the argument PriorDelta was set equal to 'gamma'. \n
+       When performing a differential over-dispersion test between two populations, \n 
+       we recommend to change this value to PriorDelta = 'log-normal' \n
+       --------------------------------------------------------------------------- \n" )
+  
   if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
 
   # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
@@ -714,10 +720,11 @@ BASiCS_MCMC <- function(
     }
     # Auxiliary vector contaning a gene index
     Index = (1:q.bio) - 1
-
+    # In the following '+1' is used as c++ vector indexes vectors setting '0' as its first element
     # Constrain for gene-specific expression rates
     if(ConstrainType == 2)
     {
+      # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
       ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
       NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
       Constrain = mean(log(mu0[ConstrainGene+1]))

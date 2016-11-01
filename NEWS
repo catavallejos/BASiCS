@@ -205,3 +205,9 @@ version 0.7.9: (2016-10-31)
 version 0.7.10: (2016-10-31)
 - Minor changes in 'BASiCS_MCMC' to have more meaningful variable names
 - Minor changes in 'BASiCS_MCMC' to make no-spikes case functional 
+
+version 0.7.11: (2016-10-31)
+- Comments added to clarify no spikes case in 'BASiCS_MCMC' function. 
+
+version 0.7.12: (2016-11-01)
+- Change in defaul value of 'PriorDelta' (v 0.7.9) has been reverted for reproducibility issues. Message added to the start of the function so that users are aware of making the change. 
