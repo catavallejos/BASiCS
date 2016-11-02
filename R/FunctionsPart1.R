@@ -772,7 +772,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      ConstrainType, Index, RefGene, ConstrainGene, NotConstrainGene))
+      Constrain, Index, RefGene, ConstrainGene, NotConstrainGene))
   }
   
 

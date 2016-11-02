@@ -212,3 +212,7 @@ version 0.7.11: (2016-10-31)
 version 0.7.12: (2016-11-01)
 - Change in defaul value of 'PriorDelta' (v 0.7.9) has been reverted for reproducibility issues. Message added to the start of the function so that users are aware of making the change. 
 - PriorDelta = 'gamma' is now allowed for no spikes case
+
+version 0.7.13: (2016-11-02)
+- Typo on the arguments of 'HiddenBASiCS_MCMCcppNoSpikes' function has been fixed ('Constrain' instead of 'ConstrainType')
+- Validity check '(y(i) > 1e-3)' moved later on in 'deltaUpdateNoSpikes' to avoid breaking the code when it is not really necessary!

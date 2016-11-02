@@ -1619,6 +1619,7 @@ arma::mat muUpdateNoSpikes(
   mu = mu0 + 1 - 1;
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
+  Rcpp::Rcout << "sumAux1: " << sumAux << std::endl;
   
   // ACCEPT/REJECT STEP
   
@@ -1649,7 +1650,7 @@ arma::mat muUpdateNoSpikes(
       log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
       log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
       // ACCEPT REJECT
-      if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
+      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
       {
         ind(iAux) = 1; mu(iAux) = y(iAux);
         sumAux += log(mu(iAux)) - log(mu0(iAux)); 
@@ -1657,8 +1658,14 @@ arma::mat muUpdateNoSpikes(
       else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
     }
   }
+//  Rcpp::Rcout << "sumAux2: " << sumAux << std::endl;
+//  Rcpp::Rcout << "ConstrainGene.size() * Constrain - sumAux: " << ConstrainGene.size() * Constrain - sumAux << std::endl;
+//  Rcpp::Rcout << "ConstrainGene.size(): " << ConstrainGene.size() << std::endl;
+//  Rcpp::Rcout << "Constrain: " << Constrain << std::endl;
+//  Rcpp::Rcout << "log(mu0(RefGene)): " << log(mu0(RefGene)) << std::endl;
+  
   // Step 2.2: For the reference gene 
-  ind(RefGene) = 0;
+  ind(RefGene) = 1;
   mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
   // Step 2.3: For genes that are *not* under the constrain
   for (int i=0; i < NotConstrainGene.size(); i++)
@@ -1666,7 +1673,7 @@ arma::mat muUpdateNoSpikes(
     iAux = NotConstrainGene(i);
     log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
     // ACCEPT REJECT
-    if(log(u(iAux)) < log_aux(iAux) & y(iAux) > 1e-3) 
+    if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
     {
       ind(iAux) = 1; mu(iAux) = y(iAux);
     }
@@ -1700,42 +1707,37 @@ arma::mat deltaUpdateNoSpikes(
   
   // PROPOSAL STEP
   arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(delta0));
-  arma::uvec yaux = y > 1e-3;
-  for (int i=0; i < q_bio; i++) {if(y(i) < 1e-3) y(i) = 1e-3;}
   arma::vec u = arma::randu(q_bio);
   
   // ACCEPT/REJECT STEP 
   arma::vec log_aux = - n * (lgamma_cpp(1/y)-lgamma_cpp(1/delta0));
-  
+  // +1 should appear because we update log(delta) not delta. However, it cancels out with the prior. 
+  log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
+
   // Loop to replace matrix operations, through genes and cells
   for (int i=0; i < q_bio; i++)
   {
-    if(yaux(i) == 1)
-    {
       for (int j=0; j < n; j++) 
       {
         log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
         log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( nu(j)*mu(i)+(1/y(i)) );
         log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
-      }      
-    }
+      } 
   }
   
-  // +1 should appear because we update log(delta) not delta. However, it cancels out with the prior. 
-  log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
   // Component related to the prior
   if(prior_delta == 1) {log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0);}
   else {log_aux -= (0.5/s2_delta) * (pow(log(y),2) - pow(log(delta0),2));}
-  
+
   // CREATING OUTPUT VARIABLE & DEBUG
   for (int i=0; i < q_bio; i++)
   {
-    if(yaux(i) == 1)
+    if((arma::is_finite(log_aux(i))))
     {
-      if(log(u(i)) < log_aux(i))
+      if((y(i) > 1e-3) & (log(u(i)) < log_aux(i)))
       {
         // DEBUG: Reject very small values to avoid numerical issues
-        if(arma::is_finite(y(i)) & (arma::is_finite(log_aux(i)))) {ind(i) = 1; delta(i) = y(i);}
+        if(arma::is_finite(y(i))) {ind(i) = 1; delta(i) = y(i);}
         else{ind(i) = 0; delta(i) = delta0(i);}            
       }
       else{ind(i) = 0; delta(i) = delta0(i);}
@@ -1745,6 +1747,9 @@ arma::mat deltaUpdateNoSpikes(
     else
     {
       ind(i) = 0; delta(i) = delta0(i);
+      Rcpp::Rcout << "delta0(i): " << delta0(i) << std::endl;
+      Rcpp::Rcout << "y(i): " << y(i) << std::endl;
+      Rcpp::Rcout << "mu(i): " << mu(i) << std::endl;
       Rcpp::Rcout << "Something went wrong when updating delta " << i+1 << std::endl;
       Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
     }
@@ -1938,11 +1943,13 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaAux.col(0),
                           aphi, bphi, BatchDesign_arma, n);
+//    Rcpp::Rcout << "phi" << phiAux.t() << std::endl;
     
     // UPDATE OF THETA: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), BatchDesign_arma,
                                 phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
     PthetaAux += thetaAux.col(1); if(i>=burn) {thetaAccept += thetaAux.col(1);}
+//    Rcpp::Rcout << "theta" << thetaAux.col(0).t() << std::endl;
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     RefFreq(RefGene) += 1; 
@@ -1950,11 +1957,13 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                              nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
                              muUpdateAux, indQ, RefGene, ConstrainGene_arma, NotConstrainGene_arma);
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}  
+//    Rcpp::Rcout << "mu" << muAux.col(0).t() << std::endl;
     
     // UPDATE OF DELTA: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     deltaAux = deltaUpdateNoSpikes(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
                            muAux.col(0), nuAux.col(0), adelta, bdelta, qbio, n, s2_delta, prior_delta);  
-    PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);} 
+    PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);}
+//    Rcpp::Rcout << "delta" << deltaAux.col(0).t() << std::endl;
    
     // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     nuAux = nuUpdateNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
@@ -1964,6 +1973,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                             BatchInfo_arma, BatchIds_arma, nBatch,
                             BatchSizes_arma, BatchOffSet_arma); 
     PnuAux += nuAux.col(1); if(i>=burn) {nuAccept += nuAux.col(1);}
+//    Rcpp::Rcout << "nu" << nuAux.col(0).t() << std::endl;
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt)
