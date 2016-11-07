@@ -216,3 +216,6 @@ version 0.7.12: (2016-11-01)
 version 0.7.13: (2016-11-02)
 - Typo on the arguments of 'HiddenBASiCS_MCMCcppNoSpikes' function has been fixed ('Constrain' instead of 'ConstrainType')
 - Validity check '(y(i) > 1e-3)' moved later on in 'deltaUpdateNoSpikes' to avoid breaking the code when it is not really necessary!
+
+version 0.7.14: (2016-11-03)
+- Debug message removed from 'muUpdateNoSpikes' function. 

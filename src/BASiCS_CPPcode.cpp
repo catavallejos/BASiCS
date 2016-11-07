@@ -1619,7 +1619,7 @@ arma::mat muUpdateNoSpikes(
   mu = mu0 + 1 - 1;
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
-  Rcpp::Rcout << "sumAux1: " << sumAux << std::endl;
+//  Rcpp::Rcout << "sumAux1: " << sumAux << std::endl;
   
   // ACCEPT/REJECT STEP
   
