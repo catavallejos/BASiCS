@@ -745,27 +745,11 @@ BASiCS_MCMC <- function(
     }
     if(ConstrainType == 3)
     {
-      LimLow = quantile(mu0, ConstrainAlpha)
-      LimHigh = quantile(mu0, 1-ConstrainAlpha)
-      ConstrainGene = which(mu0 >= LimLow & mu0 <= LimHigh) - 1
-      NotConstrainGene = which(mu0 < LimLow | mu0 > LimHigh) - 1
+      ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
+      NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
       Constrain = mean(log(mu0[ConstrainGene+1]))
-      # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]   
-      RefGenes = RefGene
-    }
-    if(ConstrainType == 4)
-    {
-      HPD = coda::HPDinterval(coda::mcmc(mu0), prob = ConstrainProb)
-      ConstrainGene = which(mu0 >= HPD[1] & mu0 <= HPD[2]) - 1
-      NotConstrainGene = which(mu0 < HPD[1] | mu0 > HPD[2]) - 1
-      
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-      # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref] 
-      RefGenes = RefGene
+      RefGenes = which(abs(log(mu0[ConstrainGene+1]) - Constrain) < 0.05) - 1
+      RefGene = RefGenes[1]   
     }
 
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
@@ -786,7 +770,8 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, Index, RefGene, ConstrainGene, NotConstrainGene, ConstrainType))
+      Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, 
+      ConstrainType))
   }
   
 
@@ -860,6 +845,7 @@ BASiCS_MCMC <- function(
   
   if(length(Data@SpikeInput) == 1)
   {
+    cat("\n")
     cat("--------------------------------------------------------------------"); cat("\n")
     cat(paste("BASiCS version", packageVersion("BASiCS"), ": horizontal integration (no-spikes case)")); cat("\n") 
     cat("--------------------------------------------------------------------"); cat("\n")
@@ -867,8 +853,19 @@ BASiCS_MCMC <- function(
     if(length(RefGenes) == 1) {cat(paste("Reference gene:", RefGene)); cat("\n")}
     else
     {
+      setwd(StoreDir)
+      
+      TableRef = cbind.data.frame("GeneNames" = Data@GeneNames[RefGenes+1], 
+                                  "GeneIndex" = RefGenes+1, 
+                                  "ReferenceFreq" = Chain$RefFreq[RefGenes+1],
+                                  stringsAsFactors = FALSE)
+      write.table(TableRef,paste0("TableRef_",RunName,".txt"), col.names = T, row.names = F)
+      
+      setwd(OldDir)
+      
       cat(paste("Randomly, 1 out of", length(RefGenes), "genes was left as reference at each iteration")); cat("\n")  
-      cat(paste("List of potential reference genes:", RefGenes)); cat("\n")  
+      cat(paste("List of reference genes and their associated frequencies stored as a .txt file in")); cat("\n")  
+      cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
       cat("--------------------------------------------------------------------"); cat("\n")
     }
   }

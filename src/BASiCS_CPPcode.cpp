@@ -1855,6 +1855,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double Constrain,
     NumericVector Index,
     int RefGene,
+    NumericVector RefGenes,
     NumericVector ConstrainGene,
     NumericVector NotConstrainGene,
     int ConstrainType)
@@ -1876,6 +1877,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec Index_arma = as_arma(Index);
   arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
   arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
+  arma::vec RefGenes_arma = as_arma(RefGenes);
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux, qbio); 
@@ -1920,6 +1922,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec indQ = arma::zeros(qbio);
   double LSmuAuxExtra = 0;
   arma::vec RefFreq = arma::zeros(qbio); 
+  int RefAux;
   
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;  
   Rcpp::Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
@@ -1952,7 +1955,13 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 //    Rcpp::Rcout << "theta" << thetaAux.col(0).t() << std::endl;
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
-    RefFreq(RefGene) += 1; 
+    // Additional steps required for ConstrainType = 3 (stochastic reference)
+    if(ConstrainType == 3)
+    {
+      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, RefGenes_arma.size()-1) ));
+      RefGene = RefGenes(RefAux); 
+      if(i >= burn) {RefFreq(RefGene) += 1;}
+    }
     muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
                              nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
                              muUpdateAux, indQ, RefGene, ConstrainGene_arma, NotConstrainGene_arma,
@@ -1994,7 +2003,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
         Ibatch = 0; 
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
         PnuAux = PnuAux0; PthetaAux = PthetaAux0;
-        RefFreq = arma::zeros(qbio);
       }
       
     }
@@ -2075,26 +2083,28 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
-        Rcpp::Named("mu")=mu,
-        Rcpp::Named("delta")=delta,
-        Rcpp::Named("phi")=phi,
-        Rcpp::Named("nu")=nu,
-        Rcpp::Named("theta")=theta,
-        Rcpp::Named("ls.mu")=LSmu,
-        Rcpp::Named("ls.delta")=LSdelta,
-        Rcpp::Named("ls.nu")=LSnu,
-        Rcpp::Named("ls.theta")=LStheta)); 
+        Rcpp::Named("mu") = mu,
+        Rcpp::Named("delta") = delta,
+        Rcpp::Named("phi") = phi,
+        Rcpp::Named("nu") = nu,
+        Rcpp::Named("theta") = theta,
+        Rcpp::Named("ls.mu") = LSmu,
+        Rcpp::Named("ls.delta") = LSdelta,
+        Rcpp::Named("ls.nu") = LSnu,
+        Rcpp::Named("ls.theta") = LStheta,
+        Rcpp::Named("RefFreq") = RefFreq/(N-burn))); 
   }
   
   else
   {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
-        Rcpp::Named("mu")=mu,
-        Rcpp::Named("delta")=delta,
-        Rcpp::Named("phi")=phi,
-        Rcpp::Named("nu")=nu,
-        Rcpp::Named("theta")=theta)); 
+        Rcpp::Named("mu") = mu,
+        Rcpp::Named("delta") = delta,
+        Rcpp::Named("phi") = phi,
+        Rcpp::Named("nu") = nu,
+        Rcpp::Named("theta") = theta,
+        Rcpp::Named("RefFreq") = RefFreq/(N-burn))); 
   }
   
 }
