@@ -748,7 +748,8 @@ BASiCS_MCMC <- function(
       ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
       NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
       Constrain = mean(log(mu0[ConstrainGene+1]))
-      RefGenes = which(abs(log(mu0[ConstrainGene+1]) - Constrain) < 0.05) - 1
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) < 0.05) 
+      RefGenes = ConstrainGene[aux.ref]  
       RefGene = RefGenes[1]   
     }
 

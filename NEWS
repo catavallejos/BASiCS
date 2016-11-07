@@ -227,3 +227,6 @@ version 0.7.15: (2016-11-07)
 
 version 0.7.16: (2016-11-07)
 - ConstrainType = 3 (stochastic ref) re-introduced for no-spikes case
+
+version 0.7.17: (2016-11-07)
+- Error fixed in the definition of RefGenes
