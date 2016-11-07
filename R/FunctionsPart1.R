@@ -721,6 +721,17 @@ BASiCS_MCMC <- function(
     Index = (1:q.bio) - 1
     # In the following '+1' is used as c++ vector indexes vectors setting '0' as its first element
     # Constrain for gene-specific expression rates
+    if(ConstrainType == 1)
+    {
+      # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
+      ConstrainGene = (1:q.bio) - 1
+      NotConstrainGene = 0
+      Constrain = mean(log(mu0[ConstrainGene+1]))
+      # Might need adjustement depending on the value of constrain
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
+      RefGene = ConstrainGene[aux.ref]   
+      RefGenes = RefGene
+    }
     if(ConstrainType == 2)
     {
       # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
@@ -729,7 +740,8 @@ BASiCS_MCMC <- function(
       Constrain = mean(log(mu0[ConstrainGene+1]))
       # Might need adjustement depending on the value of constrain
       aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]      
+      RefGene = ConstrainGene[aux.ref]   
+      RefGenes = RefGene
     }
     if(ConstrainType == 3)
     {
@@ -740,7 +752,8 @@ BASiCS_MCMC <- function(
       Constrain = mean(log(mu0[ConstrainGene+1]))
       # Might need adjustement depending on the value of constrain
       aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]      
+      RefGene = ConstrainGene[aux.ref]   
+      RefGenes = RefGene
     }
     if(ConstrainType == 4)
     {
@@ -751,7 +764,8 @@ BASiCS_MCMC <- function(
       Constrain = mean(log(mu0[ConstrainGene+1]))
       # Might need adjustement depending on the value of constrain
       aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]      
+      RefGene = ConstrainGene[aux.ref] 
+      RefGenes = RefGene
     }
 
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
@@ -772,7 +786,7 @@ BASiCS_MCMC <- function(
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
       Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, Index, RefGene, ConstrainGene, NotConstrainGene))
+      Constrain, Index, RefGene, ConstrainGene, NotConstrainGene, ConstrainType))
   }
   
 
@@ -843,6 +857,27 @@ BASiCS_MCMC <- function(
 
   ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi,
                                 s = Chain$s, nu = Chain$nu, theta = Chain$theta)
+  
+  if(length(Data@SpikeInput) == 1)
+  {
+    cat("--------------------------------------------------------------------"); cat("\n")
+    cat(paste("BASiCS version", packageVersion("BASiCS"), ": horizontal integration (no-spikes case)")); cat("\n") 
+    cat("--------------------------------------------------------------------"); cat("\n")
+    cat(paste("ConstrainType:", ConstrainType)); cat("\n")  
+    if(length(RefGenes) == 1) {cat(paste("Reference gene:", RefGene)); cat("\n")}
+    else
+    {
+      cat(paste("Randomly, 1 out of", length(RefGenes), "genes was left as reference at each iteration")); cat("\n")  
+      cat(paste("List of potential reference genes:", RefGenes)); cat("\n")  
+      cat("--------------------------------------------------------------------"); cat("\n")
+    }
+  }
+  else
+  {
+      cat("--------------------------------------------------------------------"); cat("\n")
+      cat(paste("BASiCS version", packageVersion("BASiCS"), ": vertical integration (spikes case)")); cat("\n") 
+      cat("--------------------------------------------------------------------"); cat("\n")
+  }
 
   return(ChainClass)
 }

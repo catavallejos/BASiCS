@@ -219,3 +219,8 @@ version 0.7.13: (2016-11-02)
 
 version 0.7.14: (2016-11-03)
 - Debug message removed from 'muUpdateNoSpikes' function. 
+
+version 0.7.15: (2016-11-07)
+- ConstrainType = 1 (untrimmed) re-introduced for no spike case (illustration purposes only)
+- RefGene removed from AR report
+- Added console report of RefGene choice

@@ -1608,7 +1608,8 @@ arma::mat muUpdateNoSpikes(
     arma::vec & ind,
     int const& RefGene,
     arma::uvec const& ConstrainGene,
-    arma::uvec const& NotConstrainGene)
+    arma::uvec const& NotConstrainGene,
+    int const& ConstrainType)
 {
   using arma::span;
   
@@ -1619,7 +1620,6 @@ arma::mat muUpdateNoSpikes(
   mu = mu0 + 1 - 1;
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
-//  Rcpp::Rcout << "sumAux1: " << sumAux << std::endl;
   
   // ACCEPT/REJECT STEP
   
@@ -1658,26 +1658,25 @@ arma::mat muUpdateNoSpikes(
       else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
     }
   }
-//  Rcpp::Rcout << "sumAux2: " << sumAux << std::endl;
-//  Rcpp::Rcout << "ConstrainGene.size() * Constrain - sumAux: " << ConstrainGene.size() * Constrain - sumAux << std::endl;
-//  Rcpp::Rcout << "ConstrainGene.size(): " << ConstrainGene.size() << std::endl;
-//  Rcpp::Rcout << "Constrain: " << Constrain << std::endl;
-//  Rcpp::Rcout << "log(mu0(RefGene)): " << log(mu0(RefGene)) << std::endl;
-  
+
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
   mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  
   // Step 2.3: For genes that are *not* under the constrain
-  for (int i=0; i < NotConstrainGene.size(); i++)
+  if(ConstrainType != 1)
   {
-    iAux = NotConstrainGene(i);
-    log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
-    // ACCEPT REJECT
-    if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
+    for (int i=0; i < NotConstrainGene.size(); i++)
     {
-      ind(iAux) = 1; mu(iAux) = y(iAux);
+      iAux = NotConstrainGene(i);
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
+      // ACCEPT REJECT
+      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
+      {
+        ind(iAux) = 1; mu(iAux) = y(iAux);
+      }
+      else{ind(iAux) = 0; mu(iAux) = mu0(iAux);}
     }
-    else{ind(iAux) = 0; mu(iAux) = mu0(iAux);}
   }
   // OUTPUT
   return join_rows(mu, ind);
@@ -1857,7 +1856,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericVector Index,
     int RefGene,
     NumericVector ConstrainGene,
-    NumericVector NotConstrainGene)
+    NumericVector NotConstrainGene,
+    int ConstrainType)
 {
   // NUMBER OF CELLS, GENES AND STORED DRAWS
   int n = Counts.ncol(); int qbio = Counts.nrow(); int Naux = N/thin - burn/thin;
@@ -1955,7 +1955,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     RefFreq(RefGene) += 1; 
     muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
                              nuAux.col(0), sumByCellAll_arma, s2mu, qbio, n,
-                             muUpdateAux, indQ, RefGene, ConstrainGene_arma, NotConstrainGene_arma);
+                             muUpdateAux, indQ, RefGene, ConstrainGene_arma, NotConstrainGene_arma,
+                             ConstrainType);
     PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}  
 //    Rcpp::Rcout << "mu" << muAux.col(0).t() << std::endl;
     
@@ -2051,11 +2052,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
   Rcpp::Rcout << " " << std::endl;
 
-  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << muAccept(0)/(N-burn) << std::endl;
-  
-  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << min(muAccept(arma::span(0, qbio - 2))/(N-burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << mean(muAccept(arma::span(0, qbio - 2))/(N-burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << max(muAccept(arma::span(0, qbio - 2))/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << min(muAccept.elem(find(Index_arma != RefGene))/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << mean(muAccept.elem(find(Index_arma != RefGene))/(N-burn)) << std::endl;
+  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << max(muAccept.elem(find(Index_arma != RefGene))/(N-burn)) << std::endl;
   
   Rcpp::Rcout << " " << std::endl;
   Rcpp::Rcout << "Minimum acceptance rate among delta[i]'s: " << min(deltaAccept/(N-burn)) << std::endl;
