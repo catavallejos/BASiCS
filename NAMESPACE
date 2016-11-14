@@ -3,6 +3,8 @@ exportPattern("^[^\\Hidden]")
 importFrom(Rcpp, evalCpp)
 importFrom(coda, HPDinterval)
 importFrom(methods, Summary)
+importFrom(testthat, context,
+           test_check)
 importMethodsFrom(BiocGenerics, counts)
 importMethodsFrom(scran, computeSumFactors)
 
@@ -25,6 +27,7 @@ export(BASiCS_Filter,
        BASiCS_Sim,
        makeExampleBASiCS_Data,
        BASiCS_MCMC,
+       BASiCS_LoadChain,
        BASiCS_VarianceDecomp,
        BASiCS_DetectHVG,
        BASiCS_DetectLVG,

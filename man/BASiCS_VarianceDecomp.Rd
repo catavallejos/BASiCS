@@ -41,7 +41,7 @@ help(BASiCS_MCMC)
 
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.

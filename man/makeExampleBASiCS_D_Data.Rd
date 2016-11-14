@@ -20,6 +20,6 @@ is(Data, "BASiCS_D_Data")
 
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }
 

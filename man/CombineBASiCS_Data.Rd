@@ -26,7 +26,7 @@ Data = CombineBASiCS_Data(DataTest, DataRef)
 
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Data-class}}

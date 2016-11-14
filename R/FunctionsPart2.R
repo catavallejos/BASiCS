@@ -22,7 +22,7 @@
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_D_Data-class}}
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 newBASiCS_D_Data <- function(CountsTest, 
                               CountsRef, 
                               Tech, 
@@ -72,7 +72,7 @@ newBASiCS_D_Data <- function(CountsTest,
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_D_Data-class}}
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 CombineBASiCS_Data <- function(DataTest, DataRef)
 {
   if(sum(DataTest@GeneNames != DataRef@GeneNames) > 0) stop("DataTest and DataRef do not contain the same genes and/or they are in a different order")
@@ -103,7 +103,7 @@ CombineBASiCS_Data <- function(DataTest, DataRef)
 #' Data = makeExampleBASiCS_D_Data()
 #' is(Data, "BASiCS_D_Data")
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 makeExampleBASiCS_D_Data <- function()
 {
   mu =  c( 8.36,  10.65,   4.88,   6.29,  12.93,   3.89,   6.34,  12.45,   8.08,   7.31,  
@@ -249,7 +249,7 @@ HiddenOffSetCorrection <- function(MCMC_Output) # BASiCS_D_Chain object
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 newBASiCS_D_Chain <- function(muTest, muRef, deltaTest, deltaRef, 
                                phi, s, nu, thetaTest, thetaRef, offset = 1)
 {
@@ -277,7 +277,7 @@ newBASiCS_D_Chain <- function(muTest, muRef, deltaTest, deltaRef,
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_D_Data-class}}
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 CombineBASiCS_Chain <- function(ChainTest, ChainRef)
 {
   Chain <- newBASiCS_D_Chain(muTest = ChainTest@mu,
@@ -369,7 +369,7 @@ HiddenEFNRDV<-function(
 #' 
 #' @seealso \code{\link[BASiCS]{BASiCS_D_Chain-class}} 
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 #' 
 #' @rdname BASiCS_D_TestDE
 BASiCS_D_TestDE <- function(Data, 

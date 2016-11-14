@@ -128,9 +128,11 @@ plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
 
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PloS Computational Biology.
+
+Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single cell level. Genome Biology.
 }
 

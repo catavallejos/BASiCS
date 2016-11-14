@@ -230,3 +230,11 @@ version 0.7.16: (2016-11-07)
 
 version 0.7.17: (2016-11-07)
 - Error fixed in the definition of RefGenes
+
+version 0.7.18: (2016-11-08)
+- Function 'BASiCS_LoadChain' added to simplify the loading of pre-computed chains
+- Imports from 'testthat' library added to NAMESPACE file
+- Small changes in 'BASiCS_D' classes to allow offset
+
+version 0.7.19: (2016-11-14)
+- RefGene information to be stored as .txt file

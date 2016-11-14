@@ -444,8 +444,9 @@ setClass("BASiCS_D_Summary",
                 sum(!is.finite(object@phi))>0 | sum(!is.finite(object@s))>0 |
                 sum(!is.finite(object@nu))>0 | 
                 sum(!is.finite(object@thetaTest))>0 | sum(!is.finite(object@thetaRef))>0 |
-                is.null(offset) | is.na(offset) | !is.finite(offset) |
-                is.null(probHPD) | is.na(probHPD) | !is.finite(probHPD) | probHPD < 0 | probHPD > 1) stop("Invalid slots") 
+                is.null(object@offset)  | !is.finite(object@offset) | is.na(object@offset) |
+                is.null(object@probHPD) | is.na(object@probHPD) | !is.finite(object@probHPD) | 
+                object@probHPD < 0 | object@probHPD > 1) stop("Invalid slots") 
            else {TRUE} 
          }
 )

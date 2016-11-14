@@ -39,7 +39,7 @@ expression counts matrices and experimental information about spike-in genes.
 
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Data-class}}

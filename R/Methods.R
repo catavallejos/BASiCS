@@ -730,7 +730,7 @@ setMethod("show",
             cat(" ", N," MCMC samples.\n", sep = "")
             cat(" Dataset contains ", q.bio, " biological genes and ", n, " cells (in total across both samples).\n", sep="")
             cat(" Offset = ", object@offset, ".\n", sep = "")
-            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest, thetaRef and offset.\n")
+            cat(" Elements (slots): muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef and offset.\n")
             
           })
 
@@ -839,8 +839,8 @@ setMethod("Summary",
             Phi = apply(x@phi,2,median)
             S = apply(x@s,2,median)
             Nu = apply(x@nu,2,median)
-            ThetaTest = median(x@thetaTest)
-            ThetaRef = median(x@thetaRef)
+            ThetaTest = apply(x@thetaTest,2,median)
+            ThetaRef = apply(x@thetaRef,2,median)
             
             HPDMuTest = coda::HPDinterval(coda::mcmc(x@muTest), prob=prob)
             HPDMuRef = coda::HPDinterval(coda::mcmc(x@muRef), prob=prob)
@@ -861,7 +861,9 @@ setMethod("Summary",
                           s = cbind(S, HPDS),
                           nu = cbind(Nu, HPDNu),
                           thetaTest = cbind(ThetaTest, HPDThetaTest),
-                          thetaRef = cbind(ThetaRef, HPDThetaRef))
+                          thetaRef = cbind(ThetaRef, HPDThetaRef),
+                          offset = x@offset,
+                          probHPD = prob)
             show(Output)
             return(Output)
           })
