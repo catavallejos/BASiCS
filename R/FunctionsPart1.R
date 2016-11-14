@@ -130,11 +130,15 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   Tech =c(Tech[!Tech], Tech[Tech])
   GeneNames <- rownames(Counts)
 
-  # Extracting spike-in input molecules in the correct order
-  if(sum(!(GeneNames[Tech] %in% SpikeInfo[,1])) > 0) stop("SpikeInfo is missing information for some of the spikes")
-  if(sum(!(SpikeInfo[,1] %in% GeneNames[Tech])) > 0) stop("SpikeInfo includes spikes that are not in the Counts matrix")
-  matching <- match(GeneNames[Tech], SpikeInfo[,1])
-  SpikeInput <- SpikeInfo[matching,2]
+  if(is.null(SpikeInfo))
+  {
+    # Extracting spike-in input molecules in the correct order
+    if(sum(!(GeneNames[Tech] %in% SpikeInfo[,1])) > 0) stop("SpikeInfo is missing information for some of the spikes")
+    if(sum(!(SpikeInfo[,1] %in% GeneNames[Tech])) > 0) stop("SpikeInfo includes spikes that are not in the Counts matrix")
+    matching <- match(GeneNames[Tech], SpikeInfo[,1])
+    SpikeInput <- SpikeInfo[matching,2]    
+  }
+  else {SpikeInput = 1}
 
   Data <- new("BASiCS_Data", Counts = Counts, Tech = Tech, SpikeInput = SpikeInput,
                              GeneNames = GeneNames, BatchInfo = BatchInfo)

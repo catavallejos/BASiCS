@@ -238,3 +238,6 @@ version 0.7.18: (2016-11-08)
 
 version 0.7.19: (2016-11-14)
 - RefGene information to be stored as .txt file
+
+version 0.7.20: (2016-11-14)
+- 'newBASiCS_Data' function modified to allow no spikes case
