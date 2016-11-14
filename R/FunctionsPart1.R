@@ -130,7 +130,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   Tech =c(Tech[!Tech], Tech[Tech])
   GeneNames <- rownames(Counts)
 
-  if(is.null(SpikeInfo))
+  if(!is.null(SpikeInfo))
   {
     # Extracting spike-in input molecules in the correct order
     if(sum(!(GeneNames[Tech] %in% SpikeInfo[,1])) > 0) stop("SpikeInfo is missing information for some of the spikes")
