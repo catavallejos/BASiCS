@@ -241,3 +241,6 @@ version 0.7.19: (2016-11-14)
 
 version 0.7.20: (2016-11-14)
 - 'newBASiCS_Data' function modified to allow no spikes case
+
+version 0.7.21: (2016-11-15)
+- 'ConstrainType' = 4, 5 added (exclude genes with capture in less than 'ConstrainLimit'100% of the cells)

@@ -757,6 +757,27 @@ BASiCS_MCMC <- function(
       RefGenes = ConstrainGene[aux.ref]  
       RefGene = RefGenes[1]   
     }
+    if(ConstrainType == 4)
+    {
+      Capture = rowMeans(Data@Counts > 0)
+      ConstrainGene = which(Capture >= ConstrainLimit) - 1
+      NotConstrainGene = which(Capture < ConstrainLimit) - 1
+      Constrain = mean(log(mu0[ConstrainGene+1]))
+      # Might need adjustement depending on the value of constrain
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
+      RefGene = ConstrainGene[aux.ref]   
+      RefGenes = RefGene
+    }
+    if(ConstrainType == 5)
+    {
+      Capture = rowMeans(Data@Counts > 0)
+      ConstrainGene = which(Capture >= ConstrainLimit) - 1
+      NotConstrainGene = which(Capture < ConstrainLimit) - 1
+      Constrain = mean(log(mu0[ConstrainGene+1]))
+      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) < 0.05) 
+      RefGenes = ConstrainGene[aux.ref]  
+      RefGene = RefGenes[1]   
+    }
 
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
