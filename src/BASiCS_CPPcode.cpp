@@ -1956,7 +1956,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // Additional steps required for ConstrainType = 3 (stochastic reference)
-    if(ConstrainType == 3)
+    if((ConstrainType == 3) | (ConstrainType == 5))
     {
       RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, RefGenes_arma.size()-1) ));
       RefGene = RefGenes(RefAux); 
