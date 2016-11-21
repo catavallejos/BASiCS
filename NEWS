@@ -247,3 +247,6 @@ version 0.7.21: (2016-11-15)
 
 version 0.7.22: (2016-11-16)
 - Fixed bug for 'ConstrainType' = 5 (affects no spike case only)
+
+version 0.7.23: (2016-11-21)
+- Cleaning-up of identifiability constrain options for the no spike case

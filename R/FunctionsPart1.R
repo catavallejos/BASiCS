@@ -726,59 +726,42 @@ BASiCS_MCMC <- function(
     Index = (1:q.bio) - 1
     # In the following '+1' is used as c++ vector indexes vectors setting '0' as its first element
     # Constrain for gene-specific expression rates
-    if(ConstrainType == 1)
+    if(ConstrainType == 1) # Full constrain
     {
       # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
       ConstrainGene = (1:q.bio) - 1
       NotConstrainGene = 0
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-      # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]   
-      RefGenes = RefGene
+      Constrain = median(log(mu0[ConstrainGene+1]))
     }
-    if(ConstrainType == 2)
+    if(ConstrainType == 2) # Trimmed constrain based on mean
     {
       # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
       ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
       NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-      # Might need adjustement depending on the value of constrain
+      Constrain = median(log(mu0[ConstrainGene+1]))
+    }
+    if(ConstrainType == 3) # Trimmed constrain based on detection
+    {
+      Detection = rowMeans(Data@Counts > 0)
+      ConstrainGene = which(Detection >= ConstrainLimit) - 1
+      NotConstrainGene = which(Detection < ConstrainLimit) - 1
+      Constrain = median(log(mu0[ConstrainGene+1] - 1))
+    }
+    
+    if(StochasticRef == TRUE)
+    {
+      aux.ref = cbind(ConstrainGene, abs(log(mu0[ConstrainGene+1]) - Constrain))
+      aux.ref = aux.ref[order(aux.ref[,2]),]
+      RefGenes = aux.ref[1:200, 1]
+      RefGene = RefGenes[1]
+    }
+    else
+    {
       aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
       RefGene = ConstrainGene[aux.ref]   
-      RefGenes = RefGene
+      RefGenes = RefGene    
     }
-    if(ConstrainType == 3)
-    {
-      ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
-      NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) < 0.05) 
-      RefGenes = ConstrainGene[aux.ref]  
-      RefGene = RefGenes[1]   
-    }
-    if(ConstrainType == 4)
-    {
-      Capture = rowMeans(Data@Counts > 0)
-      ConstrainGene = which(Capture >= ConstrainLimit) - 1
-      NotConstrainGene = which(Capture < ConstrainLimit) - 1
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-      # Might need adjustement depending on the value of constrain
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]   
-      RefGenes = RefGene
-    }
-    if(ConstrainType == 5)
-    {
-      Capture = rowMeans(Data@Counts > 0)
-      ConstrainGene = which(Capture >= ConstrainLimit) - 1
-      NotConstrainGene = which(Capture < ConstrainLimit) - 1
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) < 0.05) 
-      RefGenes = ConstrainGene[aux.ref]  
-      RefGene = RefGenes[1]   
-    }
-
+    
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
       N,

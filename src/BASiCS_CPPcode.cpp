@@ -1662,7 +1662,7 @@ arma::mat muUpdateNoSpikes(
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
   mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
-  
+
   // Step 2.3: For genes that are *not* under the constrain
   if(ConstrainType != 1)
   {
