@@ -748,6 +748,8 @@ BASiCS_MCMC <- function(
       Constrain = median(log(mu0[ConstrainGene+1] - 1))
     }
     
+    StochasticRef = ifelse("StochasticRef" %in% names(args),args$StochasticRef, FALSE)
+    
     if(StochasticRef == TRUE)
     {
       aux.ref = cbind(ConstrainGene, abs(log(mu0[ConstrainGene+1]) - Constrain))
