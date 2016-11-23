@@ -250,3 +250,6 @@ version 0.7.22: (2016-11-16)
 
 version 0.7.23: (2016-11-21)
 - Cleaning-up of identifiability constrain options for the no spike case
+
+version 0.7.24: (2016-11-23)
+- Median changed to mean when calculating identifiability constrain for the no spike case

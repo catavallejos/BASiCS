@@ -731,21 +731,21 @@ BASiCS_MCMC <- function(
       # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
       ConstrainGene = (1:q.bio) - 1
       NotConstrainGene = 0
-      Constrain = median(log(mu0[ConstrainGene+1]))
+      Constrain = mean(log(mu0[ConstrainGene+1]))
     }
     if(ConstrainType == 2) # Trimmed constrain based on mean
     {
       # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
       ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
       NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
-      Constrain = median(log(mu0[ConstrainGene+1]))
+      Constrain = mean(log(mu0[ConstrainGene+1]))
     }
     if(ConstrainType == 3) # Trimmed constrain based on detection
     {
       Detection = rowMeans(Data@Counts > 0)
       ConstrainGene = which(Detection >= ConstrainLimit) - 1
       NotConstrainGene = which(Detection < ConstrainLimit) - 1
-      Constrain = median(log(mu0[ConstrainGene+1] - 1))
+      Constrain = mean(log(mu0[ConstrainGene+1]))
     }
     
     StochasticRef = ifelse("StochasticRef" %in% names(args),args$StochasticRef, FALSE)
