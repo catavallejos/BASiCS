@@ -43,6 +43,8 @@ sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 
 If you are not using RStudio, you might need to manually install `pandoc` in order to create the vignette provided for BASiCS
 
+Additional installation issues/solutions can be found here: https://github.com/catavallejos/BASiCS/issues/9
+
 ## How to use BASiCS?
 
 - To detect highly and lowly variable genes within a populations of cells: please refer to the vignette
