@@ -327,10 +327,10 @@ Finally, a graphical display for the detection of HVG and LVG is:
 
 ```{r DetectionPlots, fig.width = 5, fig.height=4}
 plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
-#points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3], 
-#       pch = 16, col = "red", cex = 1)
-#points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3], 
-#       pch = 16, col = "blue", cex = 1)
+points(DetectHVG$Table[DetectHVG$Table$HVG==TRUE,3], DetectHVG$Table[DetectHVG$Table$HVG==TRUE,4], 
+       pch = 16, col = "red", cex = 1)
+points(DetectLVG$Table[DetectLVG$Table$LVG==TRUE,3], DetectLVG$Table[DetectLVG$Table$LVG==TRUE,4], 
+       pch = 16, col = "blue", cex = 1)
 ```
 
 ## Normalisation and removal of technical variation

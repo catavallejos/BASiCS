@@ -253,3 +253,6 @@ version 0.7.23: (2016-11-21)
 
 version 0.7.24: (2016-11-23)
 - Median changed to mean when calculating identifiability constrain for the no spike case
+
+version 0.7.25: (2017-01-11)
+- Fixed typo in vignette file 
