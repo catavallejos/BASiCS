@@ -124,6 +124,13 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
 
   if(is.null(BatchInfo)) {BatchInfo = rep(1, times = ncol(Counts))}
+  if(is.factor(BatchInfo)) {
+    BIunused <- length(levels(BatchInfo)) - length(unique(BatchInfo))
+    if(BIunused > 0){
+      message(sprintf("Dropping %i unused batch levels", BIunused))
+      BatchInfo <- droplevels(BatchInfo)
+    }
+  }
 
   # Re-ordering genes
   Counts = rbind(Counts[!Tech,], Counts[Tech,])
