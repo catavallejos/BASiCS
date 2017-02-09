@@ -256,3 +256,8 @@ version 0.7.24: (2016-11-23)
 
 version 0.7.25: (2017-01-11)
 - Fixed typo in vignette file (thanks to Dmitriy Zhukov for pointing this out)
+
+version 0.7.26: (2017-02-09)
+- Update of 'BASiCS_Filter' function to include a 'BatchInfo' argument (thanks to Dmitriy Zhukov for suggesting this)
+- Vignette file updated accordingly.
+- Update of 'newBASiCS_Data' function to prevent issues related to unused levels when the 'BatchInfo' argument is set as a 'factor' (thanks to Kevin Rue-Albrecht for pointing out this issue)
