@@ -142,15 +142,14 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
 
   if(is.null(BatchInfo)) {BatchInfo = rep(1, times = ncol(Counts))}
-  if(is.factor(BatchInfo)) 
-  {
-    if(length(levels(BatchInfo)) != length(table(BatchInfo)[table(BatchInfo)!=0]))
-    {
-      stop("'BatchInfo' was supplied as a factor. All levels of 'BatchInfo' \n
+  if(is.factor(BatchInfo)) {
+    BIunused <- length(levels(BatchInfo)) - length(unique(BatchInfo))
+    if(BIunused > 0){
+      message(sprintf("'BatchInfo' was supplied as a 'factor'. All levels of 'BatchInfo' \n
            should be represented among cells. Otherwise, 'BASiCS_MCMC' will \n
-           fail to store MCMC correctly. Please remove unused labels from 'BatchInfo' \n
-           (e.g. using 'droplevels(BatchInfo)' as input) or transform 'BatchInfo' \n
-           into a regular vector.")
+           fail to store MCMC correctly. Therefore, ", BIunused, " unused batch levels have been \n
+           removed from 'BatchInfo'. See 'help('droplevels')' for more information."))
+      BatchInfo <- droplevels(BatchInfo)
     }
   }
 
