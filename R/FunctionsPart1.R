@@ -145,10 +145,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   if(is.factor(BatchInfo)) {
     BIunused <- length(levels(BatchInfo)) - length(unique(BatchInfo))
     if(BIunused > 0){
-      message(sprintf("'BatchInfo' was supplied as a 'factor'. All levels of 'BatchInfo' \n
-           should be represented among cells. Otherwise, 'BASiCS_MCMC' will \n
-           fail to store MCMC correctly. Therefore, ", BIunused, " unused batch levels have been \n
-           removed from 'BatchInfo'. See 'help('droplevels')' for more information."))
+      message(sprintf(paste("'BatchInfo' was supplied as a 'factor'. All levels of 'BatchInfo' should be represented among cells. Otherwise, 'BASiCS_MCMC' will fail to store MCMC correctly. Therefore, ", BIunused, " unused batch levels have been removed from 'BatchInfo'. See 'help('droplevels')' for more information.")))
       BatchInfo <- droplevels(BatchInfo)
     }
   }
