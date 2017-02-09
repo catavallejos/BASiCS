@@ -6,6 +6,7 @@
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.
 #' @param Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
 #' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.
+#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information.
 #' @param MinTotalCountsPerCell Minimum value of total expression counts required per cell (biological and technical)
 #' @param MinTotalCountsPerGene Minimum value of total expression counts required per transcript (biological and technical)
 #' @param MinCellsWithExpression Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript.
@@ -16,6 +17,7 @@
 #' \item{\code{Counts}}{Filtered matrix of expression counts}
 #' \item{\code{Tech}}{Filtered vector of spike-in indicators}
 #' \item{\code{SpikeInput}}{Filtered vector of spike-in genes input molecules}
+#' \item{\code{BatchInfo}}{Filtered vector of the 'BatchInfo' argument}
 #' \item{\code{IncludeGenes}}{Inclusion indicators for transcripts}
 #' \item{\code{IncludeCells}}{Inclusion indicators for cells}
 #' }
@@ -42,7 +44,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-BASiCS_Filter <- function(Counts, Tech, SpikeInput,
+BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
                           MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
                           MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
 {
@@ -72,9 +74,25 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput,
   IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum)/apply(NonZero[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression, IncludeBio, F)
   IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum)/apply(NonZero[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression, IncludeTech, F)
 
-  list("Counts" = Counts1[c(IncludeBio,IncludeTech),], "Tech" = Tech[c(IncludeBio,IncludeTech)],
-       "SpikeInput" = SpikeInput[IncludeTech],
-       "IncludeGenes" = c(IncludeBio,IncludeTech), "IncludeCells" = IncludeCells)
+  if(!is.null(BatchInfo))
+  {
+    list("Counts" = Counts1[c(IncludeBio,IncludeTech),], 
+         "Tech" = Tech[c(IncludeBio,IncludeTech)],
+         "SpikeInput" = SpikeInput[IncludeTech], 
+         "BatchInfo" = BatchInfo[IncludeCells],
+         "IncludeGenes" = c(IncludeBio,IncludeTech), 
+         "IncludeCells" = IncludeCells)
+  }
+  else
+  {
+    list("Counts" = Counts1[c(IncludeBio,IncludeTech),], 
+         "Tech" = Tech[c(IncludeBio,IncludeTech)],
+         "SpikeInput" = SpikeInput[IncludeTech], 
+         "BatchInfo" = NULL,
+         "IncludeGenes" = c(IncludeBio,IncludeTech), 
+         "IncludeCells" = IncludeCells)    
+  }
+
 }
 
 #' @title Creates a BASiCS_Data object from a matrix of expression counts and experimental information about spike-in genes
@@ -124,6 +142,17 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
 
   if(is.null(BatchInfo)) {BatchInfo = rep(1, times = ncol(Counts))}
+  if(is.factor(BatchInfo)) 
+  {
+    if(length(levels(BatchInfo)) != length(table(BatchInfo)[table(BatchInfo)!=0]))
+    {
+      stop("'BatchInfo' was supplied as a factor. All levels of 'BatchInfo' \n
+           should be represented among cells. Otherwise, 'BASiCS_MCMC' will \n
+           fail to store MCMC correctly. Please remove unused labels from 'BatchInfo' \n
+           (e.g. using 'droplevels(BatchInfo)' as input) or transform 'BatchInfo' \n
+           into a regular vector.")
+    }
+  }
 
   # Re-ordering genes
   Counts = rbind(Counts[!Tech,], Counts[Tech,])
