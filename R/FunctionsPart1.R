@@ -71,8 +71,9 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
   IncludeTech = ifelse(apply(NonZero[Tech,], 1, sum) >= MinCellsWithExpression, IncludeTech, F)
 
   # Remove transcripts with low counts in the cells where they are expressed
-  IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum)/apply(NonZero[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression, IncludeBio, F)
-  IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum)/apply(NonZero[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression, IncludeTech, F)
+  if(min(apply(NonZero[!Tech,], 1, sum)) == 0 & MinCellsWithExpression == 0) warning("Some genes have zero counts in all cells. These should be removed before running the analysis (use 'MinCellsWithExpression' > 0).")
+  IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[!Tech,], 1, sum), IncludeBio, F)
+  IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[Tech,], 1, sum), IncludeTech, F)
 
   if(!is.null(BatchInfo))
   {

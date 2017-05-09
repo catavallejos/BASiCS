@@ -261,3 +261,6 @@ version 0.7.26: (2017-02-09)
 - Update of 'BASiCS_Filter' function to include a 'BatchInfo' argument (thanks to Dmitriy Zhukov for suggesting this)
 - Vignette file updated accordingly.
 - Update of 'newBASiCS_Data' function to prevent issues related to unused levels when the 'BatchInfo' argument is set as a 'factor' (thanks to Kevin Rue-Albrecht for pointing out this issue)
+
+version 0.7.27: (2017-05-09)
+- Bug fixed in 'BASiCS_Filter' function to stop the code crashing when there are genes with zero counts across all cells. 
