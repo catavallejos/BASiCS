@@ -10,11 +10,9 @@
 #' (they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.
 #' @param BatchInfo Vector of length \code{n} whose elements indicate batch information.
 #'
-#' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}.
+#' @return An object of class \code{\linkS4class{SummarizedExperiment}}.
 #'
 #' @examples
-#'
-#'
 #' # Expression counts
 #' set.seed(1)
 #' Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
@@ -36,26 +34,19 @@
 #'
 #' # Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
+#' @seealso \code{\linkS4class{SummarizedExperiment}}
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Catalina A. Vallejos \email{cvallejos@turing.ac.uk}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
   
   if(is.null(BatchInfo)) {BatchInfo = rep(1, times = ncol(Counts))}
-  if(is.factor(BatchInfo)) {
-    BIunused <- length(levels(BatchInfo)) - length(unique(BatchInfo))
-    if(BIunused > 0){
-      message(sprintf(paste("'BatchInfo' was supplied as a 'factor'. All levels of 'BatchInfo' should be represented among cells. Otherwise, 'BASiCS_MCMC' will fail to store MCMC correctly. Therefore, ", BIunused, " unused batch levels have been removed from 'BatchInfo'. See 'help('droplevels')' for more information.")))
-      BatchInfo <- droplevels(BatchInfo)
-    }
-  }
   
   # Re-ordering genes
-  Counts = rbind(Counts[!Tech,], Counts[Tech,])
-  Tech =c(Tech[!Tech], Tech[Tech])
+  Counts = as.matrix(rbind(Counts[!Tech,], Counts[Tech,]))
+  Tech = c(Tech[!Tech], Tech[Tech])
   GeneNames <- rownames(Counts)
   
   if(!is.null(SpikeInfo))
@@ -68,19 +59,79 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   }
   else {SpikeInput = 1}
   
-  Data <- new("BASiCS_Data", Counts = Counts, Tech = Tech, SpikeInput = SpikeInput,
-              GeneNames = GeneNames, BatchInfo = BatchInfo)
+  # Checks for creating the SummarizedExperiment class
+  errors <- character()
+  
+  if(!(is.numeric(Counts) & all(Counts>=0) & 
+       sum(!is.finite(Counts))==0 )) errors <- c(errors, "Invalid value for Counts")
+  
+  if(sum(Counts %% 1) > 0) errors <- c(errors, "Invalid value for Counts (entries must be positive integers)")          
+  
+  if(!(is.logical(Tech))) errors <- c(errors, "Invalid value for Tech")
+  
+  if(!(is.numeric(SpikeInput) & all(SpikeInput>0) & 
+       sum(!is.finite(SpikeInput))==0 )) errors <- c(errors, "Invalid value for SpikeInput.")
+  
+  q = nrow(Counts)
+  q.bio = q - length(SpikeInput)
+  n = ncol(Counts)
+  
+  # Checks valid for datasets with spikes only
+  if(length(SpikeInput) > 1)
+  {
+    if(!( length(Tech) == q & sum(!Tech) == q.bio )) 
+      errors <- c(errors, "Argument's dimensions are not compatible.")
+    
+    if(sum(apply(Counts[Tech,],2,sum) == 0) > 0) 
+      errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes. Please remove them before creating the SummarizedExperiment object.")
+    
+    if(sum(apply(Counts[!Tech,],2,sum) == 0) > 0) 
+      errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the SummarizedExperiment object.")
+    
+    if(!( sum(Tech[1:q.bio]) == 0 & sum(Tech[(q.bio+1):q])==q-q.bio )) 
+      errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
+  }
+  # Checks valid for datasets with no spikes only
+  else
+  {
+    if(sum(apply(Counts,2,sum) == 0) > 0) 
+      errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the SummarizedExperiment object.")
+    
+    if(length(unique(BatchInfo)) == 1)
+      errors <- c(errors, "If spike-in genes are not available, BASiCS requires the data to contain at least 2 batches of cells (for the same population)")
+  }
+  
+  # Checks valid for any data
+  if(length(Tech) != q)
+    errors <- c(errors, "Argument's dimensions are not compatible.")
+  
+  if(length(GeneNames) != q)
+    errors <- c(errors, "Incorrect length of the vector stored in the GeneNames slot.")
+  
+  if(sum(apply(Counts,1,sum) == 0) > 0) 
+    warning("Some genes have zero counts across all cells. Unless running a differential expression analysis, please remove those genes. Otherwise, the BASiCS_Data object is still a valid object. However, due to the lack of counts, posterior estimates for mu[i] and delta[i] associated to those genes will be driven by the prior. In such case, you must specify `PriorDelta = 'log-normal' in BASiCS_MCMC function. ")
+  
+  if(length(BatchInfo) != n) 
+    errors <- c(errors, "BatchInfo slot is not compatible with the number of cells contained in Counts slot.")
+  
+  if (length(errors) == 0) TRUE else stop(errors)
+  
+  # Create a SummarizedExperiment data object
+  Data <- SummarizedExperiment(assays = list(Counts = as.matrix(Counts)),
+                               rowData = data.frame(row.names = rownames(Counts), Tech = Tech),
+                               metadata = list(SpikeInput = SpikeInput, BatchInfo = BatchInfo))
+  
   show(Data)
-  cat('\n')
-  cat('NOTICE: BASiCS requires a pre-filtered dataset \n')
-  cat('    - You must remove poor quality cells before creating the BASiCS data object \n')
-  cat('    - We recommend to pre-filter very lowly expressed transcripts before creating the object. \n')
-  cat('      Inclusion criteria may vary for each data. For example, remove transcripts \n')
-  cat('          - with very low total counts across of all of the samples \n')
-  cat('          - that are only expressed in a few cells \n')
-  cat('            (by default genes expressed in only 1 cell are not accepted) \n')
-  cat('          - with very low total counts across the samples where the transcript is expressed \n')
-  cat('\n')
-  cat(' BASiCS_Filter can be used for this purpose \n')
+  message('\n',
+          'NOTICE: BASiCS requires a pre-filtered dataset \n',
+          '    - You must remove poor quality cells before creating the BASiCS data object \n',
+          '    - We recommend to pre-filter very lowly expressed transcripts before creating the object. \n',
+          '      Inclusion criteria may vary for each data. For example, remove transcripts \n',
+          '          - with very low total counts across of all of the samples \n',
+          '          - that are only expressed in a few cells \n',
+          '            (by default genes expressed in only 1 cell are not accepted) \n',
+          '          - with very low total counts across the samples where the transcript is expressed \n',
+          '\n',
+          ' BASiCS_Filter can be used for this purpose \n')
   return(Data)
 }
