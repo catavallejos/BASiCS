@@ -50,15 +50,13 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE)
   q = length(Mu); q.bio = length(Delta); n = length(Phi)
   
   if(!WithBatch) {Theta = 0.5}
-  else
-  {
+  else{
     # 2 batches, 10 cells each
     Theta1 = 0.5; Theta2 = 0.75;
     Theta = ifelse(1:n <= 10, Theta1, Theta2)
   }
   
-  if(WithSpikes)
-  {
+  if(WithSpikes){
     # Matrix where simulated counts will be stored
     Counts.sim<-matrix(0,ncol=n,nrow=q)
     # Matrix where gene-cell specific simulated random effects will be stored
@@ -83,11 +81,11 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE)
     
     if(!WithBatch)
     {
-      Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q), BatchInfo = rep(1,20))
+      Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, TRUE, FALSE), SpikeInfo = SpikeInfo, BatchInfo = rep(1,20))
     }
     else
     {
-      Data = new("BASiCS_Data", Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInput = SpikeInfo[,2], GeneNames = paste0("Gene", 1:q),
+      Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, TRUE, FALSE), SpikeInfo = SpikeInfo,
                  BatchInfo = c(rep(1,10), rep(2,10)))
     }
     
@@ -110,7 +108,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE)
     }
     rownames(Counts.sim) <- paste0("Gene", 1:q.bio)
     
-    Data = newBASiCS_Data(Counts = Counts.sim, Tech = rep(FALSE, q.bio), SpikeInput = 1, 
+    Data = newBASiCS_Data(Counts = Counts.sim, Tech = rep(FALSE, q.bio), SpikeInfo = 1, 
                BatchInfo = c(rep(1,10), rep(2,10)))
     
   }
