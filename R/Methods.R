@@ -1,8 +1,8 @@
 ##########################################################################
 # New generic functions
 ##########################################################################
-setGeneric("displayChainBASiCS", function(object, ...){})
-setGeneric("displaySummaryBASiCS", function(object, ...){})
+setGeneric("displayChainBASiCS", function(object, ...) standardGeneric("displayChainBASiCS"))
+setGeneric("displaySummaryBASiCS", function(object, ...) standardGeneric("displaySummaryBASiCS"))
 #setGeneric("displayOffsetBASiCS", function(object, ...){})
 
 ##########################################################################
@@ -37,14 +37,14 @@ setMethod("show",
             q.bio = ncol(object@delta)
             n = ncol(object@phi)
             nBatch = ncol(object@theta)
-            cat("An object of class ", class(object), "\n", sep = "")
-            cat(" ", N," MCMC samples.\n", sep = "")
+            message("An object of class ", class(object), "\n", sep = "")
+            message(" ", N," MCMC samples.\n", sep = "")
             if(nBatch > 1)
             {
-              cat(" Dataset contains ", q.bio, " biological genes and ", n, " cells (",nBatch," batches). \n", sep="")
+              message(" Dataset contains ", q.bio, " biological genes and ", n, " cells (",nBatch," batches). \n", sep="")
             }
-            else{cat(" Dataset contains ", q.bio, " biological genes and ", n, " cells (1 batch). \n", sep="")}
-            cat(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
+            else{message(" Dataset contains ", q.bio, " biological genes and ", n, " cells (1 batch). \n", sep="")}
+            message(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
           })
 
 #' @name Summary
@@ -233,14 +233,14 @@ setMethod("show",
             q.bio = nrow(object@delta)
             n = nrow(object@phi)
             nBatch = nrow(object@theta)
-            cat("An object of class ", class(object), "\n", sep = "")
-            cat(" Contains posterior medians and limits of HPD 95% interval for BASiCS parameters.\n")
+            message("An object of class ", class(object), "\n", sep = "")
+            message(" Contains posterior medians and limits of HPD 95% interval for BASiCS parameters.\n")
             if(nBatch > 1)
             {
-              cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (",nBatch," batches). \n", sep="")
+              message(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (",nBatch," batches). \n", sep="")
             }
-            else{cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (1 batch). \n", sep="")}
-            cat(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
+            else{message(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells (1 batch). \n", sep="")}
+            message(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
           })
 
 
@@ -468,11 +468,11 @@ setMethod("show",
             N = nrow(object@muTest)
             q.bio = ncol(object@muTest)
             n = ncol(object@phi)
-            cat("An object of class ", class(object), "\n", sep = "")
-            cat(" ", N," MCMC samples.\n", sep = "")
-            cat(" Dataset contains ", q.bio, " biological genes and ", n, " cells (in total across both samples).\n", sep="")
-            cat(" Offset = ", object@offset, ".\n", sep = "")
-            cat(" Elements (slots): muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef and offset.\n")
+            message("An object of class ", class(object), "\n", sep = "")
+            message(" ", N," MCMC samples.\n", sep = "")
+            message(" Dataset contains ", q.bio, " biological genes and ", n, " cells (in total across both samples).\n", sep="")
+            message(" Offset = ", object@offset, ".\n", sep = "")
+            message(" Elements (slots): muTest, muRef, deltaTest, deltaRef, phi, s, nu, thetaTest, thetaRef and offset.\n")
             
           })
 
@@ -683,12 +683,12 @@ setMethod("show",
             q.bio = nrow(object@muTest)
             q = nrow(object@deltaTest)
             n = nrow(object@phi)
-            cat("An object of class ", class(object), "\n", sep = "")
-            cat(" Contains posterior medians and limits of HPD 95% interval for BASiCSD parameters.\n")
-            cat(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
-            cat(" Offset = ", object@offset, ".\n", sep = "")
-            cat(" HPD interval probability = ", object@probHPD, ".\n", sep = "")
-            cat(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest, thetaRef, offset and probHPD.\n")
+            message("An object of class ", class(object), "\n", sep = "")
+            message(" Contains posterior medians and limits of HPD 95% interval for BASiCSD parameters.\n")
+            message(" Dataset contains ", q, " genes (", q.bio, " biological and ", q-q.bio, " technical) and ", n, " cells.\n", sep="")
+            message(" Offset = ", object@offset, ".\n", sep = "")
+            message(" HPD interval probability = ", object@probHPD, ".\n", sep = "")
+            message(" Elements (slots): muTest, muRef, deltaTest, omegaRef, phi, s, nu, thetaTest, thetaRef, offset and probHPD.\n")
           })
 
 #' @name plot-BASiCS_D_Summary-method
