@@ -46,9 +46,6 @@
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 #'
 #' @rdname BASiCS_DetectHVG_LVG
-
-# Change to SE class
-
 BASiCS_DetectHVG <- function(Data,
                              object,
                              VarThreshold,

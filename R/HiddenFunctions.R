@@ -1,3 +1,86 @@
+#### Helper function for the MCMC simulations
+
+HiddenBASiCS_MCMC_Start<-function(
+  Data,
+  ...)
+{
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object.")
+  
+  # Number of instrinsic genes
+  q <- length(displayTechIndicator(Data))
+  q.bio<-sum(!displayTechIndicator(Data))
+  # Number of cells
+  n <- dim(counts(Data))[2]
+  
+  # Initialize normalization as the 'scran' estimates
+  sizes.aux = c(20, 40, 60, 80, 100)
+  if(n < 200) {sizes.aux = c(20, 40, 60, 80)}
+  if(n < 160) {sizes.aux = c(20, 40, 60)}
+  if(n < 120) {sizes.aux = c(20, 40)}
+  if(n < 80) {sizes.aux = c(20)}
+  if(n < 40) {sizes.aux = c(10)}
+  size_scran <- scran::computeSumFactors(counts(Data, type = "biological"), sizes = sizes.aux)
+  
+  if(length(Data@SpikeInput) > 1)
+  {
+    # Initialize s as the empirical capture efficiency rates
+    s0 = colSums(counts(Data, type = "technical")) / sum(displaySpikeInput(Data)); nu0=s0
+    phi0 = size_scran / s0
+    phi0 = n * phi0 / sum(phi0)   
+    
+    # Initialize mu using average 'normalised counts' across cells
+    # and true input values for spike-in genes
+    nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / (phi0*s0) )
+    meansBio <- rowMeans( nCountsBio )
+    mu0<-c(meansBio + 1,Data@SpikeInput) # +1 to avoid zeros as starting values
+  }
+  else
+  {
+    phi0 = size_scran
+    phi0 = n * phi0 / sum(phi0); 
+    for(B in unique(displayBatchInfo(Data)))
+    {
+      aux = displayBatchInfo(Data) == B
+      phi0[aux] = sum(aux) * phi0[aux] / sum(phi0[aux])
+    }
+    
+    nu0=phi0; s0 = NULL   
+    
+    # Initialize mu using average 'normalised counts' across cells
+    nCountsBio <- t( t(Data@Counts) / phi0 )
+    meansBio <- rowMeans( nCountsBio )
+    mu0 <- meansBio + 1 # +1 to avoid zeros as starting values    
+  }
+  
+  # Random stating value for delta
+  delta0 = rgamma(q.bio,1,1) + 1
+  
+  # Random stating value for theta (within typically observed range)
+  theta0=runif(1, min = 0.2, max = 1)
+  
+  # If given, load default values for adaptive proposal variances
+  args <- list(...)
+  ls.mu0 = ifelse("ls.mu0" %in% names(args),args$ls.mu0,-4)
+  ls.delta0 = ifelse("ls.delta0" %in% names(args),args$ls.delta0,-2)
+  ls.phi0 = ifelse("ls.phi0" %in% names(args),args$ls.phi0,11)
+  ls.nu0 = ifelse("ls.nu0" %in% names(args),args$ls.nu0,-10)
+  ls.theta0 = ifelse("ls.theta0" %in% names(args),args$ls.theta0,-4)
+  
+  # Starting values for the proposal variances
+  #  ls.mu0 =  pmax(2 * log (0.02 * abs(log(mu0))),ls.mu0)
+  #  ls.delta0 =  pmax(2 * log (0.02 * abs(log(delta0))),ls.delta0)
+  if(length(Data@SpikeInput) > 1) {ls.mu0 = rep(ls.mu0, q)}
+  else{ls.mu0 = rep(ls.mu0, q.bio)}
+  ls.delta0 = rep(ls.delta0, q.bio)
+  ls.phi0 = ifelse(n<200, pmax(2*log(n),ls.phi0), 11) # 6
+  ls.nu0 =  pmax(2 * log (0.02 * abs(log(nu0))),ls.nu0)
+  ls.theta0 =  pmax(2 * log (0.02 * abs(log(theta0))),ls.theta0)
+  
+  return(list("mu0"=mu0, "delta0"=delta0, "phi0"=phi0, "s0"=s0, "nu0"=nu0, "theta0"=theta0,
+              "ls.mu0"=ls.mu0, "ls.delta0"=ls.delta0, "ls.phi0"=ls.phi0, "ls.nu0"=ls.nu0, "ls.theta0"=ls.theta0))
+}
+
+
 #### Helper functions for differential testing
 
 HiddenTailProbUpDV<-function(chain,threshold){return(sum(chain>threshold)/length(chain))}

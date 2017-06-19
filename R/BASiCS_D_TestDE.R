@@ -64,10 +64,6 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
 #' @rdname BASiCS_D_TestDE
-
-# Set default OffSet to TRUE + warning when Offset = FALSE
-# Change input to 2 SummarizedExperiment and 2 MCMC
-
 BASiCS_D_TestDE <- function(objectRef,
                             objectTest,
                             EpsilonM = 0.10,
@@ -106,7 +102,7 @@ BASiCS_D_TestDE <- function(objectRef,
   
   # Test compatibility of both BASiCS_Chain objects
   if(ncol(objectTest@mu) != ncol(objectRef@mu)) stop("The two BASiCS_Chain objects do not contain the same number of genes.")
-  if(!identical(colnames(objectTest@mu), colnames(objectRef@mu)) stop("The gene names of both BASiCS_Chain objects are not in the same order.")
+  if(!identical(colnames(objectTest@mu), colnames(objectRef@mu))) stop("The gene names of both BASiCS_Chain objects are not in the same order.")
   
   nTest = ncol(objectTest@nu)
   nRef = ncol(objectRef@nu)

@@ -1,88 +1,8 @@
-HiddenBASiCS_MCMC_Start<-function(
-  Data,
-  ...)
-{
-  if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
-  
-  # Number of instrinsic genes
-  q <- length(displayTechIndicator(Data))
-  q.bio<-sum(!displayTechIndicator(Data))
-  # Number of cells
-  n <- dim(counts(Data))[2]
-  
-  # Initialize normalization as the 'scran' estimates
-  sizes.aux = c(20, 40, 60, 80, 100)
-  if(n < 200) {sizes.aux = c(20, 40, 60, 80)}
-  if(n < 160) {sizes.aux = c(20, 40, 60)}
-  if(n < 120) {sizes.aux = c(20, 40)}
-  if(n < 80) {sizes.aux = c(20)}
-  if(n < 40) {sizes.aux = c(10)}
-  size_scran <- scran::computeSumFactors(counts(Data, type = "biological"), sizes = sizes.aux)
-  
-  if(length(Data@SpikeInput) > 1)
-  {
-    # Initialize s as the empirical capture efficiency rates
-    s0 = colSums(counts(Data, type = "technical")) / sum(displaySpikeInput(Data)); nu0=s0
-    phi0 = size_scran / s0
-    phi0 = n * phi0 / sum(phi0)   
-    
-    # Initialize mu using average 'normalised counts' across cells
-    # and true input values for spike-in genes
-    nCountsBio <- t( t(Data@Counts[!Data@Tech,]) / (phi0*s0) )
-    meansBio <- rowMeans( nCountsBio )
-    mu0<-c(meansBio + 1,Data@SpikeInput) # +1 to avoid zeros as starting values
-  }
-  else
-  {
-    phi0 = size_scran
-    phi0 = n * phi0 / sum(phi0); 
-    for(B in unique(displayBatchInfo(Data)))
-    {
-      aux = displayBatchInfo(Data) == B
-      phi0[aux] = sum(aux) * phi0[aux] / sum(phi0[aux])
-    }
-    
-    nu0=phi0; s0 = NULL   
-    
-    # Initialize mu using average 'normalised counts' across cells
-    nCountsBio <- t( t(Data@Counts) / phi0 )
-    meansBio <- rowMeans( nCountsBio )
-    mu0 <- meansBio + 1 # +1 to avoid zeros as starting values    
-  }
-  
-  # Random stating value for delta
-  delta0 = rgamma(q.bio,1,1) + 1
-  
-  # Random stating value for theta (within typically observed range)
-  theta0=runif(1, min = 0.2, max = 1)
-  
-  # If given, load default values for adaptive proposal variances
-  args <- list(...)
-  ls.mu0 = ifelse("ls.mu0" %in% names(args),args$ls.mu0,-4)
-  ls.delta0 = ifelse("ls.delta0" %in% names(args),args$ls.delta0,-2)
-  ls.phi0 = ifelse("ls.phi0" %in% names(args),args$ls.phi0,11)
-  ls.nu0 = ifelse("ls.nu0" %in% names(args),args$ls.nu0,-10)
-  ls.theta0 = ifelse("ls.theta0" %in% names(args),args$ls.theta0,-4)
-  
-  # Starting values for the proposal variances
-  #  ls.mu0 =  pmax(2 * log (0.02 * abs(log(mu0))),ls.mu0)
-  #  ls.delta0 =  pmax(2 * log (0.02 * abs(log(delta0))),ls.delta0)
-  if(length(Data@SpikeInput) > 1) {ls.mu0 = rep(ls.mu0, q)}
-  else{ls.mu0 = rep(ls.mu0, q.bio)}
-  ls.delta0 = rep(ls.delta0, q.bio)
-  ls.phi0 = ifelse(n<200, pmax(2*log(n),ls.phi0), 11) # 6
-  ls.nu0 =  pmax(2 * log (0.02 * abs(log(nu0))),ls.nu0)
-  ls.theta0 =  pmax(2 * log (0.02 * abs(log(theta0))),ls.theta0)
-  
-  return(list("mu0"=mu0, "delta0"=delta0, "phi0"=phi0, "s0"=s0, "nu0"=nu0, "theta0"=theta0,
-              "ls.mu0"=ls.mu0, "ls.delta0"=ls.delta0, "ls.phi0"=ls.phi0, "ls.nu0"=ls.nu0, "ls.theta0"=ls.theta0))
-}
-
 #' @title BASiCS MCMC sampler
 #'
 #' @description MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datasets using the model described in Vallejos et al (2015).
 #'
-#' @param Data A \code{\link[BASiCS]{BASiCS_Data-class}} object.
+#' @param Data A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
 #' @param N Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
 #' @param Burn Burn-in period for the MCMC sampler. Use \code{Burn>=1}, \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.
@@ -130,6 +50,7 @@ HiddenBASiCS_MCMC_Start<-function(
 #'
 #' # Built-in simulated dataset
 #' Data = makeExampleBASiCS_Data()
+#' # For real data use the newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo) function
 #'
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs migth be required to reach convergence
@@ -199,7 +120,6 @@ HiddenBASiCS_MCMC_Start<-function(
 #' @references Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single cell level. Genome Biology.
 
 # Change Data class to SE class
-# Change cat to message
 
 BASiCS_MCMC <- function(
   Data,
@@ -210,14 +130,14 @@ BASiCS_MCMC <- function(
 {
   
   
-  if(!is(Data,"BASiCS_Data")) stop("'Data' is not a BASiCS_Data class object.")
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object.")
   
   # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
-  q=length(Data@Tech); q.bio=sum(!Data@Tech); n=dim(Data@Counts)[2]
+  q=length(rowData(Data)$Tech); q.bio=sum(!rowData(Data)$Tech); n=dim(assay(Data))[2]
   
   args <- list(...)
   
-  if(!("PriorDelta" %in% names(args))) {cat(" --------------------------------------------------------------------------- \n IMPORTANT: by default, the argument PriorDelta was set equal to 'gamma'. \n When performing a differential over-dispersion test between two populations, \n we recommend to change this value to PriorDelta = 'log-normal' \n --------------------------------------------------------------------------- \n" )}
+  if(!("PriorDelta" %in% names(args))) {message(" --------------------------------------------------------------------------- \n IMPORTANT: by default, the argument PriorDelta was set equal to 'gamma'. \n When performing a differential over-dispersion test between two populations, \n we recommend to change this value to PriorDelta = 'log-normal' \n --------------------------------------------------------------------------- \n" )}
   
   
   if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
@@ -256,10 +176,10 @@ BASiCS_MCMC <- function(
   PriorDeltaNum = ifelse(PriorDelta == "gamma", 1, 2)
   
   # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
-  sum.bycell.all<-apply(Data@Counts,1,sum)
-  sum.bycell.bio<-apply(Data@Counts[1:q.bio,],1,sum)
-  sum.bygene.all<-apply(Data@Counts,2,sum)
-  sum.bygene.bio<-apply(Data@Counts[1:q.bio,],2,sum)
+  sum.bycell.all<-apply(assay(Data),1,sum)
+  sum.bycell.bio<-apply(assay(Data)[1:q.bio,],1,sum)
+  sum.bygene.all<-apply(assay(Data),2,sum)
+  sum.bygene.bio<-apply(assay(Data)[1:q.bio,],2,sum)
   
   ls.phi0 = ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
   
@@ -276,21 +196,21 @@ BASiCS_MCMC <- function(
   ls.nu0=as.vector(Start$ls.nu0); ls.theta0=as.numeric(Start$ls.theta0)
   
   StoreAdaptNumber = as.numeric(StoreAdapt)
-  nBatch = length(unique(Data@BatchInfo))
+  nBatch = length(unique(metadata(Data)$BatchInfo))
   
   # If spikes are available
-  if(length(Data@SpikeInput) > 1)
+  if(length(metadata(Data)$SpikeInput) > 1)
   {
     if(nBatch > 1)
     {
-      BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
+      BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo)-1)
       
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
       Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(
         N,
         Thin,
         Burn,
-        as.matrix(Data@Counts),
+        as.matrix(assay(Data)),
         BatchDesign,
         mu0, delta0, phi0, s0, nu0, theta0,
         PriorParam$s2.mu,
@@ -311,7 +231,7 @@ BASiCS_MCMC <- function(
         N,
         Thin,
         Burn,
-        as.matrix(Data@Counts),
+        as.matrix(assay(Data)),
         mu0, delta0, phi0, s0, nu0, theta0,
         PriorParam$s2.mu,
         PriorParam$a.delta, PriorParam$b.delta,
@@ -328,9 +248,9 @@ BASiCS_MCMC <- function(
   # If spikes are not available
   else
   {
-    cat("--------------------------------------------------------------------"); cat("\n")
-    cat('IMPORTANT: this part of the code is under development. DO NOT USE. \n')
-    cat("--------------------------------------------------------------------"); cat("\n")
+    message("--------------------------------------------------------------------", "\n",
+            'IMPORTANT: this part of the code is under development. DO NOT USE. \n',
+            "--------------------------------------------------------------------", "\n")
     
     #if(PriorDelta == "gamma") stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
     
@@ -340,14 +260,14 @@ BASiCS_MCMC <- function(
     ConstrainAlpha = ifelse("ConstrainAlpha" %in% names(args),args$ConstrainAlpha, 0.05)
     ConstrainProb = ifelse("ConstrainProb" %in% names(args),args$ConstrainProb, 0.95)
     
-    BatchDesign = model.matrix(~as.factor(Data@BatchInfo)-1)
-    BatchSizes = table(Data@BatchInfo)
+    BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo)-1)
+    BatchSizes = table(metadata(Data)$BatchInfo)
     BatchIds = as.numeric(names(BatchSizes))
     BatchOffSet = rep(1, times = nBatch)
     for(k in 2:nBatch)
     {
-      BatchOffSet[k] = median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[k]])) / 
-        median(colSums(Data@Counts[,Data@BatchInfo == BatchIds[1]]))
+      BatchOffSet[k] = median(colSums(assay(Data)[,metadata(Data)$BatchInfo == BatchIds[k]])) / 
+        median(colSums(assay(Data)[,metadata(Data)$BatchInfo == BatchIds[1]]))
     }
     # Auxiliary vector contaning a gene index
     Index = (1:q.bio) - 1
@@ -369,7 +289,7 @@ BASiCS_MCMC <- function(
     }
     if(ConstrainType == 3) # Trimmed constrain based on detection
     {
-      Detection = rowMeans(Data@Counts > 0)
+      Detection = rowMeans(assay(Data) > 0)
       ConstrainGene = which(Detection >= ConstrainLimit) - 1
       NotConstrainGene = which(Detection < ConstrainLimit) - 1
       Constrain = mean(log(mu0[ConstrainGene+1]))
@@ -396,7 +316,7 @@ BASiCS_MCMC <- function(
       N,
       Thin,
       Burn,
-      as.matrix(Data@Counts),
+      as.matrix(assay(Data)),
       BatchDesign,
       mu0, delta0, phi0, nu0, theta0,
       PriorParam$s2.mu,
@@ -408,25 +328,25 @@ BASiCS_MCMC <- function(
       sum.bycell.all, sum.bygene.all, 
       StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
       PriorParam$s2.delta, PriorDeltaNum, 
-      Data@BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
+      metadata(Data)$BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
       Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, 
       ConstrainType))
   }
   
   
   Chain$mu = Chain$mu[,1:q.bio]
-  colnames(Chain$mu) = Data@GeneNames[!Data@Tech]
-  colnames(Chain$delta) = Data@GeneNames[!Data@Tech]
+  colnames(Chain$mu) = Data@GeneNames[!rowData(Data)$Tech]
+  colnames(Chain$delta) = Data@GeneNames[!rowData(Data)$Tech]
   colnames(Chain$phi) = paste0("Cell",1:n)
-  if(length(Data@SpikeInput) > 1) {colnames(Chain$s) = paste0("Cell",1:n)}
+  if(length(metadata(Data)$SpikeInput) > 1) {colnames(Chain$s) = paste0("Cell",1:n)}
   colnames(Chain$nu) = paste0("Cell",1:n)
   colnames(Chain$theta) = paste0("Batch",1:nBatch)
   
-  cat("--------------------------------------------------------------------"); cat("\n")
-  cat("MCMC running time"); cat("\n")
-  cat("--------------------------------------------------------------------"); cat("\n")
-  print(Time)
-  cat("\n")
+  message("--------------------------------------------------------------------", "\n",
+          "MCMC running time", "\n",
+          "--------------------------------------------------------------------", "\n",
+          Time,
+          "\n")
   
   OldDir = getwd()
   
@@ -434,17 +354,17 @@ BASiCS_MCMC <- function(
   {
     setwd(StoreDir)
     
-    cat("--------------------------------------------------------------------"); cat("\n")
-    cat("Storing MCMC chains of model parameters as .txt files in"); cat("\n")
-    cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
-    cat("--------------------------------------------------------------------"); cat("\n")
+    message("--------------------------------------------------------------------", "\n",
+            "Storing MCMC chains of model parameters as .txt files in", "\n",
+            paste0("'",StoreDir,"' directory ... "), "\n",
+            "--------------------------------------------------------------------", "\n")
     
-    write.table(Chain$mu[,1:q.bio],paste0("chain_mu_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$delta,paste0("chain_delta_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$phi,paste0("chain_phi_",RunName,".txt"),col.names=T,row.names=F)
-    if(length(Data@SpikeInput) > 1){write.table(Chain$s,paste0("chain_s_",RunName,".txt"),col.names=T,row.names=F)}
-    write.table(Chain$nu,paste0("chain_nu_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$theta,paste0("chain_theta_",RunName,".txt"),col.names=T,row.names=F)
+    write.table(Chain$mu[,1:q.bio],paste0("chain_mu_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
+    write.table(Chain$delta,paste0("chain_delta_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
+    write.table(Chain$phi,paste0("chain_phi_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
+    if(length(metadata(Data)$SpikeInput) > 1){write.table(Chain$s,paste0("chain_s_",RunName,".txt"),col.names=TRUE,row.names=FALSE)}
+    write.table(Chain$nu,paste0("chain_nu_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
+    write.table(Chain$theta,paste0("chain_theta_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
     
     setwd(OldDir)
   }
@@ -453,13 +373,13 @@ BASiCS_MCMC <- function(
   {
     setwd(StoreDir)
     
-    cat("--------------------------------------------------------------------"); cat("\n")
-    cat("Storing trajectories of adaptive proposal variances (log-scale) as .txt files in"); cat("\n")
-    cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
-    cat("--------------------------------------------------------------------"); cat("\n")
+    message("--------------------------------------------------------------------", "\n",
+            "Storing trajectories of adaptive proposal variances (log-scale) as .txt files in", "\n",
+            paste0("'",StoreDir,"' directory ... "), "\n",
+            "--------------------------------------------------------------------", "\n")
     
-    colnames(Chain$ls.mu) = Data@GeneNames[!Data@Tech]
-    colnames(Chain$ls.delta) = Data@GeneNames[!Data@Tech]
+    colnames(Chain$ls.mu) = Data@GeneNames[!rowData(Data)$Tech]
+    colnames(Chain$ls.delta) = Data@GeneNames[!rowData(Data)$Tech]
     colnames(Chain$ls.phi) = "AllCells"
     colnames(Chain$ls.nu) = paste0("Cell",1:n)
     colnames(Chain$ls.theta) = paste0("Batch",1:nBatch)
@@ -473,28 +393,28 @@ BASiCS_MCMC <- function(
     setwd(OldDir)
   }
   
-  cat("--------------------------------------------------------------------"); cat("\n")
-  cat("Output"); cat("\n")
-  cat("--------------------------------------------------------------------"); cat("\n")
+  message("--------------------------------------------------------------------", "\n",
+          "Output", "\n",
+          "--------------------------------------------------------------------", "\n")
   
-  if(length(Data@SpikeInput) == 1) {Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))}
+  if(length(metadata(Data)$SpikeInput) == 1) {Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))}
   
   ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi,
                                 s = Chain$s, nu = Chain$nu, theta = Chain$theta)
   
-  if(length(Data@SpikeInput) == 1)
+  if(length(metadata(Data)$SpikeInput) == 1)
   {
-    cat("\n")
-    cat("--------------------------------------------------------------------"); cat("\n")
-    cat(paste("BASiCS version", packageVersion("BASiCS"), ": horizontal integration (no-spikes case)")); cat("\n") 
-    cat("--------------------------------------------------------------------"); cat("\n")
-    cat(paste("ConstrainType:", ConstrainType)); cat("\n")  
+    message("\n",
+            "--------------------------------------------------------------------", "\n", 
+            paste("BASiCS version", packageVersion("BASiCS"), ": horizontal integration (no-spikes case)"), "\n",
+            "--------------------------------------------------------------------", "\n",
+            paste("ConstrainType:", ConstrainType), "\n")  
     if(length(RefGenes) == 1) 
     {
-      cat(paste("Reference gene:", RefGene + 1)); cat("\n")
-      cat(paste("Information stored as a .txt file in")); cat("\n")  
-      cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
-      cat("--------------------------------------------------------------------"); cat("\n")
+      message(paste("Reference gene:", RefGene + 1), "\n",
+              paste("Information stored as a .txt file in"), "\n",
+              paste0("'",StoreDir,"' directory ... "), "\n",
+              "--------------------------------------------------------------------", "\n")
       
       setwd(StoreDir)
       
@@ -517,17 +437,17 @@ BASiCS_MCMC <- function(
       
       setwd(OldDir)
       
-      cat(paste("Randomly, 1 out of", length(RefGenes), "genes was left as reference at each iteration")); cat("\n")  
-      cat(paste("List of reference genes and their associated frequencies stored as a .txt file in")); cat("\n")  
-      cat(paste0("'",StoreDir,"' directory ... ")); cat("\n")
-      cat("--------------------------------------------------------------------"); cat("\n")
+      message(paste("Randomly, 1 out of", length(RefGenes), "genes was left as reference at each iteration"), "\n",
+              paste("List of reference genes and their associated frequencies stored as a .txt file in"), "\n",
+              paste0("'",StoreDir,"' directory ... "), "\n",
+              "--------------------------------------------------------------------", "\n")
     }
   }
   else
   {
-    cat("--------------------------------------------------------------------"); cat("\n")
-    cat(paste("BASiCS version", packageVersion("BASiCS"), ": vertical integration (spikes case)")); cat("\n") 
-    cat("--------------------------------------------------------------------"); cat("\n")
+    message("--------------------------------------------------------------------", "\n",
+            paste("BASiCS version", packageVersion("BASiCS"), ": vertical integration (spikes case)"), "\n",
+            "--------------------------------------------------------------------", "\n")
   }
   
   return(ChainClass)
