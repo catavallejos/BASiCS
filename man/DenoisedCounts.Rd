@@ -8,7 +8,7 @@
 BASiCS_DenoisedCounts(Data, Chain)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
+\item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
 
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 }
@@ -28,7 +28,7 @@ help(BASiCS_MCMC)
 
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Data-class}} \code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain-class}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

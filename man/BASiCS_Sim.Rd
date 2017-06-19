@@ -4,11 +4,14 @@
 \alias{BASiCS_Sim}
 \title{Simulates expression counts according to the model implemented in BASiCS}
 \usage{
-BASiCS_Sim(mu, delta, phi, s, theta)
+BASiCS_Sim(mu, mu_spikes, delta, phi, s, theta)
 }
 \arguments{
-\item{mu}{Gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes
-(vector of length \code{q}, technical genes located at the end of the vector, all elements must be positive numbers)}
+\item{mu}{Gene-specific expression levels \eqn{\mu[i]} for all biological genes 
+(vector of length \code{q.bio}, all elements must be positive numbers)}
+
+\item{mu_spikes}{\eqn{\mu[i]} for all technical genes defined as true input molecules (SpikeInfo)
+(vector of length \code{q-q.bio}, all elements must be positive numbers)}
 
 \item{delta}{Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
 (vector of length \code{q.bio}, all elements must be positive numbers)}
@@ -22,7 +25,7 @@ BASiCS_Sim(mu, delta, phi, s, theta)
 \item{theta}{Technical variability hyper-parameter \eqn{\theta} (must be positive)}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS.
+An object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}, simulated from the model implemented in BASiCS.
 }
 \description{
 \code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS.
@@ -31,26 +34,23 @@ This function is used in order to illustrate the performance of the \code{BASiCS
 \examples{
 
 # Simulated parameter values for 10 genes
-# (7 biogical and 5 spike-in) measured in 5 cells
-Mu =  c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19, 1010.72, 7.90, 31.59)
+# (7 biogical and 3 spike-in) measured in 5 cells
+Mu =  c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19)
+Mu_spike =  c(1010.72, 7.90, 31.59)
 Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)
 Phi = c(1.00, 1.06, 1.09, 1.05, 0.80)
 S = c(0.38, 0.40, 0.38, 0.39, 0.34)
 Theta = 0.39
 
-Data = BASiCS_Sim(Mu, Delta, Phi, S, Theta)
-head(counts(Data))
-dim(counts(Data, type="biological"))
-dim(counts(Data, type="technical"))
-displayTechIndicator(Data)
-displaySpikeInput(Data)
+Data = BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
+head(assay(Data))
+dim(assay(Data))
+metadata(Data)$SpikeInput
+rowData(Data)$Tech
 
 }
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-}
-\seealso{
-\code{\link[BASiCS]{BASiCS_Data-class}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

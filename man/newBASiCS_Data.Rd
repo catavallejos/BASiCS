@@ -54,5 +54,5 @@ Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequen
 \code{\linkS4class{SummarizedExperiment}}
 }
 \author{
-Catalina A. Vallejos \email{cvallejos@turing.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }

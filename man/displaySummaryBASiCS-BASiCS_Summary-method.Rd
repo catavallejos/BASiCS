@@ -33,5 +33,5 @@ Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequen
 \code{\link[BASiCS]{BASiCS_Summary-class}}
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }

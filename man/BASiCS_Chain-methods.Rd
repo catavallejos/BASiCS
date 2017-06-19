@@ -27,5 +27,5 @@ MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
 }

@@ -7,7 +7,7 @@
 BASiCS_MCMC(Data, N, Thin, Burn, ...)
 }
 \arguments{
-\item{Data}{A \code{\link[BASiCS]{BASiCS_Data-class}} object.}
+\item{Data}{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
 
 \item{N}{Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
 
@@ -63,6 +63,7 @@ MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datas
 
 # Built-in simulated dataset
 Data = makeExampleBASiCS_Data()
+# For real data use the newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo) function
 
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence

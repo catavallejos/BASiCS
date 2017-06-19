@@ -4,18 +4,16 @@
 \alias{BASiCS_D_TestDE}
 \title{Detection of genes with changes in expression}
 \usage{
-BASiCS_D_TestDE(Data, object, GeneNames, EpsilonM = 0.1, EpsilonD = 0.1,
+BASiCS_D_TestDE(objectRef, objectTest, EpsilonM = 0.1, EpsilonD = 0.1,
   EviThresholdM = NULL, EviThresholdD = NULL,
   OrderVariable = "ProbDiffExp", GroupLabelRef = "Ref",
-  GroupLabelTest = "Test", Plot = FALSE, OffSet = FALSE, EFDR_M = 0.05,
+  GroupLabelTest = "Test", Plot = FALSE, OffSet = TRUE, EFDR_M = 0.05,
   EFDR_D = 0.05, GenesSelect = NULL, ...)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}}
+\item{objectRef}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Reference cell population}
 
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_D_Chain-class}}}
-
-\item{GeneNames}{Vector containing gene names to be used in results table (argument to be removed as 'GeneNames' will be an slot of `BASiCS_D_Data` object)}
+\item{objectTest}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Test cell population}
 
 \item{EpsilonM}{Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)}
 
@@ -31,7 +29,7 @@ BASiCS_D_TestDE(Data, object, GeneNames, EpsilonM = 0.1, EpsilonD = 0.1,
 
 \item{GroupLabelTest}{Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}}
 
-\item{Plot}{If \code{Plot = T}, error rates control rates and volcano plots are generated.}
+\item{Plot}{If \code{Plot = TRUE}, error rates control rates and volcano plots are generated.}
 
 \item{OffSet}{Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step.}
 
@@ -48,15 +46,34 @@ BASiCS_D_TestDE(Data, object, GeneNames, EpsilonM = 0.1, EpsilonD = 0.1,
 \describe{
 \item{\code{Table}}{A \code{\link[base]{data.frame}} containing the results of the differential expression test}
    \describe{
-   \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
-   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
-   \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }
-   \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, probability of being highly variable according to the given thresholds.}
-   \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, indicator of being detected as highly variable according to the given thresholds. }
+   \item{\code{GeneNames}}{Gene name of each biological gene}
+   \item{\code{ExpOverall}}{For each biological gene, the mean expression parameter \eqn{\mu[i]} is averaged across the test and refernce cell population.}
+   \item{\code{ExpTest}}{Mean expression parameter \eqn{\mu[i]} for each biological gene in the test cell population.}
+   \item{\code{ExpRef}}{Mean expression parameter \eqn{\mu[i]} for each biological gene in the reference cell population.}
+   \item{\code{ExpFC}}{Fold change in mean expression parameters between the test and reference cell population.}
+   \item{\code{ExpLogFC}}{Log-transformed fold change in mean expression parameters.}
+   \item{\code{ProbDiffExp}}{Posterior probability for detection mean expression difference between the test and reference cell population given the supplied parameters.}
+   \item{\code{ResultDiffExp}}{Indicator if a gene is higher expressed in the test or refernce population.}
+   \item{\code{OverDispOverall}}{For each biological gene, the over-dispersion hyper-parameter \eqn{\delta[i]} is averaged across the test and refernce cell population.}
+   \item{\code{OverDispTest}}{Over-dispersion hyper-parameter \eqn{\delta[i]} for each biological gene in the test cell population.}
+   \item{\code{OverDispRef}}{Over-dispersion hyper-parameter \eqn{\delta[i]} for each biological gene in the reference cell population.}
+   \item{\code{OverDispFC}}{Fold change in over-dispersion hyper-parameters between the test and reference cell population.}
+   \item{\code{OverDispLogFC}}{Log-transformed fold change in over-dispersion hyper-parameters.}
+   \item{\code{ProbDiffOverDisp}}{Posterior probability for detection over-dispersion difference between the test and reference cell population given the supplied parameters.}
+   \item{\code{ResultDiffOverDisp}}{Indicator if a gene has a higher over-dispersion in the test or refernce population.}
    }
-\item{\code{EviThreshold}}{Evidence thresholds.}
-\item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
-\item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+ \item{\code{DiffExpSummary}}{A list containing the following information for the differential mean expression test:}
+   \describe{
+  \item{\code{EviThreshold}}{Evidence thresholds.}
+  \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
+  \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+  }
+ \item{\code{DiffOverDispSummary}}{A list containing the following information for the differential over-dispersion test:}
+   \describe{
+  \item{\code{EviThreshold}}{Evidence thresholds.}
+  \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
+  \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+  }
 }
 }
 \description{
@@ -69,9 +86,6 @@ See vignette
 
 # See vignette
 
-}
-\seealso{
-\code{\link[BASiCS]{BASiCS_D_Chain-class}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

@@ -9,13 +9,13 @@ BASiCS_DenoisedRates(Data, Chain, PrintProgress = FALSE,
   Propensities = FALSE)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
+\item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
 
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
-\item{PrintProgress}{If \code{T}, partial progress information is printed in the console.}
+\item{PrintProgress}{If \code{TRUE}, partial progress information is printed in the console.}
 
-\item{Propensities}{If \code{T}, returns underlying expression propensitites \eqn{\rho[ij]}. Otherwise, denoised rates \eqn{\mu[i] \rho[ij]} are returned.}
+\item{Propensities}{If \code{TRUE}, returns underlying expression propensitites \eqn{\rho[ij]}. Otherwise, denoised rates \eqn{\mu[i] \rho[ij]} are returned.}
 }
 \value{
 A matrix of normalised and denoised expression counts.
@@ -33,7 +33,7 @@ help(BASiCS_MCMC)
 
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Data-class}} \code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain-class}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

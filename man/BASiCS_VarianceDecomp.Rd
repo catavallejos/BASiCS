@@ -8,7 +8,7 @@ BASiCS_VarianceDecomp(Data, object, OrderVariable = "BioVarGlobal",
   Plot = TRUE, ...)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_Data-class}}}
+\item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
 
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 

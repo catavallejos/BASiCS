@@ -49,7 +49,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE, Case1 =
   S = c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37,
         0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
   
-  if(Case1 = TRUE){
+  if(Case1 == TRUE){
     Mu = c(Mu[1:50], Mu[101:120])
     Delta = Delta[1:50]
   }
