@@ -13,7 +13,7 @@
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "ProbDiffExp", "ProbDiffOverDisp")}.
 #' @param GroupLabelRef Label assigned to reference group. Default: \code{GroupLabelRef = "Ref"}
 #' @param GroupLabelTest Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}
-#' @param Plot If \code{Plot = T}, error rates control rates and volcano plots are generated.  
+#' @param Plot If \code{Plot = TRUE}, error rates control rates and volcano plots are generated.  
 #' @param OffSet Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step. 
 #' @param EFDR_M Target for expected false discovery rate related to the comparison of means (default = 0.05)
 #' @param EFDR_D Target for expected false discovery rate related to the comparison of dispersions (default = 0.05)

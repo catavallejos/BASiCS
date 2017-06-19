@@ -34,7 +34,7 @@
 #'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
 #'
-#' @author Catalina A. Vallejos \email{cvallejos@turing.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta)

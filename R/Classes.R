@@ -25,7 +25,7 @@
 #' Data = makeExampleBASiCS_Data()
 #' MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 #' 
-#' @author Catalina A. Vallejos \email{catalina.vallejos@@mrc-bsu.cam.ac.uk}
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setClass("BASiCS_Chain",
