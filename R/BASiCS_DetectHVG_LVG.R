@@ -5,7 +5,7 @@
 #'
 #' @description Functions to detect highly and lowly variable genes
 #'
-#' @param Data an object of class \code{\link[BASiCS]{BASiCS_Data-class}}
+#' @param Data an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param VarThreshold Variance contribution threshold (must be a positive value, between 0 and 1)
 #' @param EviThreshold Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)
@@ -17,6 +17,8 @@
 #' \describe{
 #' \item{\code{Table}}{Matrix whose columns contain}
 #'    \describe{
+#'    \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index in the assay(Data) counts table}
+#'    \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name in the assay(Data) counts table}
 #'    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
 #'    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
 #'    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }
@@ -55,6 +57,7 @@ BASiCS_DetectHVG <- function(Data,
                              Plot = FALSE,
                              ...)
 {
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
   if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   if(VarThreshold<0 | VarThreshold>1 | !is.finite(VarThreshold)) stop("Variance contribution thresholds for HVG/LVG detection must be contained in (0,1)")
   if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert T or F for Plot parameter")
@@ -83,16 +86,16 @@ BASiCS_DetectHVG <- function(Data,
     if(length(optimal)>0){OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])}
     else
     {
-      print("It is not possible to find an optimal evidence threshold for the given variance contribution threshold. \n")
+      message("It is not possible to find an optimal evidence threshold for the given variance contribution threshold. \n")
       optimal <- round(median(which(abs(EFDR - EFNR) == min(abs(EFDR - EFNR), na.rm = T))))
       if(length(optimal)>0)
       {
-        print("Returned value is such that the difference between EFDR and EFNR is minimised.")
+        message("Returned value is such that the difference between EFDR and EFNR is minimised.")
         OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])
       }
       else
       {
-        cat("Numerical issues when computing EFDR and EFNR. Please try a different variance contribution threshold")
+        message("Numerical issues when computing EFDR and EFNR. Please try a different variance contribution threshold")
         OptThreshold <- rep("Not found",3)
       }
     }
@@ -116,7 +119,7 @@ BASiCS_DetectHVG <- function(Data,
   
   qbio = length(Sigma)
   Genes = 1:qbio
-  GeneNames = Data@GeneNames[!Data@Tech]
+  GeneNames = rownames(assay(Data))[!rowData(Data)$Tech]
   
   if(Plot)
   {
@@ -153,17 +156,17 @@ BASiCS_DetectHVG <- function(Data,
     par(ask=F)
   }
   
-  cat(paste(sum(HVG), " genes classified as highly variable using: \n"))
-  cat(paste("- Variance contribution threshold = ", round(100*VarThreshold,2), "% \n"))
-  cat(paste("- Evidence threshold = ", OptThreshold[1], "\n"))
-  cat(paste("- EFDR = ", round(100*OptThreshold[2],2), "% \n"))
-  cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))
+  message(paste(sum(HVG), " genes classified as highly variable using: \n"),
+          paste("- Variance contribution threshold = ", round(100*VarThreshold,2), "% \n"),
+          paste("- Evidence threshold = ", OptThreshold[1], "\n"),
+          paste("- EFDR = ", round(100*OptThreshold[2],2), "% \n"),
+          paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))
   
   GeneIndex = 1:length(Mu)
   Table = cbind.data.frame("GeneIndex" = Genes,
                            "GeneNames" = GeneNames,
-                           "mu" = Mu,
-                           "delta" = Delta,
+                           "Mu" = Mu,
+                           "Delta" = Delta,
                            "Sigma" = Sigma,
                            "Prob" = Prob,
                            "HVG" = HVG, stringsAsFactors = FALSE)
@@ -190,6 +193,7 @@ BASiCS_DetectLVG <- function(Data,
                              Plot = FALSE,
                              ...)
 {
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
   if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   if(VarThreshold<0 | VarThreshold>1 | !is.finite(VarThreshold)) stop("Variance contribution thresholds for HVG/LVG detection must be contained in (0,1)")
   if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert T or F for Plot parameter")
@@ -217,16 +221,16 @@ BASiCS_DetectLVG <- function(Data,
     if(length(optimal)>0){OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])}
     else
     {
-      print("It is not possible to find an optimal evidence threshold for the given variance contribution threshold. \n")
+      message("It is not possible to find an optimal evidence threshold for the given variance contribution threshold. \n")
       optimal <- round(median(which(abs(EFDR - EFNR) == min(abs(EFDR - EFNR), na.rm = T))))
       if(length(optimal)>0)
       {
-        print("Returned value is such that the difference between EFDR and EFNR is minimised.")
+        message("Returned value is such that the difference between EFDR and EFNR is minimised.")
         OptThreshold <- c(EviThreshold, EFDR[optimal], EFNR[optimal])
       }
       else
       {
-        cat("Numerical issues when computing EFDR and EFNR. Please try a different variance contribution threshold")
+        message("Numerical issues when computing EFDR and EFNR. Please try a different variance contribution threshold")
         OptThreshold <- rep("Not found",3)
       }
     }
@@ -250,7 +254,7 @@ BASiCS_DetectLVG <- function(Data,
   
   qbio = length(Sigma)
   Genes = 1:qbio
-  GeneNames = Data@GeneNames[!Data@Tech]
+  GeneNames = rownames(assay(Data))[!rowData(Data)$Tech]
   
   if(Plot)
   {
@@ -288,11 +292,11 @@ BASiCS_DetectLVG <- function(Data,
     
   }
   
-  cat(paste(sum(LVG), " genes classified as lowly variable using: \n"))
-  cat(paste("- Variance contribution threshold = ", round(100*VarThreshold,2), "% \n"))
-  cat(paste("- Evidence threshold = ", OptThreshold[1], "\n"))
-  cat(paste("- EFDR = ", round(100*OptThreshold[2],2), "% \n"))
-  cat(paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))
+  message(paste(sum(LVG), " genes classified as lowly variable using: \n"),
+          paste("- Variance contribution threshold = ", round(100*VarThreshold,2), "% \n"),
+          paste("- Evidence threshold = ", OptThreshold[1], "\n"),
+          paste("- EFDR = ", round(100*OptThreshold[2],2), "% \n"),
+          paste("- EFNR = ", round(100*OptThreshold[3],2), "% \n"))
   
   GeneIndex = 1:length(Mu)
   Table = cbind.data.frame("GeneIndex" = Genes,
