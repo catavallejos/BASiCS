@@ -5,7 +5,7 @@
 #'
 #' @description Function to decompose total variability of gene expression into biological and technical components.
 #'
-#' @param Data an object of class \code{\link[BASiCS]{BASiCS_Data-class}}
+#' @param Data an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated
@@ -35,9 +35,6 @@
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 #'
 #' @rdname BASiCS_VarianceDecomp
-
-# Change Data class
-
 BASiCS_VarianceDecomp <- function(Data,
                                   object,
                                   OrderVariable = "BioVarGlobal",
@@ -45,9 +42,11 @@ BASiCS_VarianceDecomp <- function(Data,
                                   ...)
 {
   if(!(OrderVariable %in% c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoise"))) stop("Invalid 'OrderVariable' value.")
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   
   q.bio = ncol(object@delta)
-  UniqueBatch = unique(Data@BatchInfo)
+  UniqueBatch = unique(metadata(Data)$BatchInfo)
   nBatch = length(UniqueBatch)
   
   # Calculating variance decomposition
@@ -59,7 +58,7 @@ BASiCS_VarianceDecomp <- function(Data,
   ShotNoiseGlobal = 1-BioVarGlobal-TechVarGlobal
   
   Genes = 1:q.bio
-  GeneNames = Data@GeneNames[!Data@Tech]
+  GeneNames = rownames(assay(Data))[!rowData(Data)$Tech]
   
   if(nBatch > 1)
   {
