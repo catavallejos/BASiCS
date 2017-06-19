@@ -38,10 +38,9 @@ expression counts matrices and experimental information about spike-in genes.
 # Rather than using this function, we recomend to use 'CombineBASiCS_Data'
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Data-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

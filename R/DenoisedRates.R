@@ -23,6 +23,9 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname DenoisedRates
+
+# Change from Data to SE class
+
 BASiCS_DenoisedRates=function(
   Data,
   Chain,

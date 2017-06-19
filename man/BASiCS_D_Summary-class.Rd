@@ -2,8 +2,8 @@
 % Please edit documentation in R/Classes.R
 \docType{class}
 \name{BASiCS_D_Summary-class}
-\alias{BASiCS_D_Summary,BASiCS_D_Summary-class}
 \alias{BASiCS_D_Summary-class}
+\alias{BASiCS_D_Summary,BASiCS_D_Summary-class}
 \title{The BASiCS_D_Summary class contains posterior medians and the limits of 
 the highest posterior density (HPD) interval for all BASiCS model parameters}
 \description{
@@ -43,9 +43,9 @@ limits of HPD interval for technical variability hyper-parameter \eqn{\theta[ref
 
 \item{\code{probHPD}}{Posterior probability contained in the HPD interval. Must be a value between 0 and 1.}
 }}
+
 \examples{
 
 # see help(BASiCS_D_MCMC)
 
 }
-

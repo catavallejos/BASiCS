@@ -197,6 +197,10 @@ HiddenBASiCS_MCMC_Start<-function(
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PloS Computational Biology.
 #' @references Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single cell level. Genome Biology.
+
+# Change Data class to SE class
+# Change cat to message
+
 BASiCS_MCMC <- function(
   Data,
   N,

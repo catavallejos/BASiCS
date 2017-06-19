@@ -2,9 +2,9 @@
 % Please edit documentation in R/Classes.R
 \docType{class}
 \name{BASiCS_D_Chain-class}
+\alias{BASiCS_D_Chain-class}
 \alias{BASiCS_D_Chain}
 \alias{BASiCS_D_Chain,BASiCS_D_Chain-class}
-\alias{BASiCS_D_Chain-class}
 \title{The BASiCS_D_Chain class}
 \description{
 Container of an MCMC sample of the BASiCS model parameters when comparing 2 populations of cells. 
@@ -41,6 +41,7 @@ in test group, biological genes only (matrix with \code{q} columns, all elements
 
 \item{\code{offset}}{Offset value to capture global changes in mRNA content. Default value = 1 (when no offset correction has been performed)}
 }}
+
 \examples{
 
 # See vignette
@@ -49,4 +50,3 @@ in test group, biological genes only (matrix with \code{q} columns, all elements
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
-

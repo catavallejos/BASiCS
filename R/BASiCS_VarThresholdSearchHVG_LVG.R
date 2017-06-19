@@ -29,6 +29,9 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
+
+# Change Data class to SE class
+
 BASiCS_VarThresholdSearchHVG=function(
   Data,
   object,

@@ -21,6 +21,9 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname DenoisedCounts
+
+# Change from Data class to SE class
+
 BASiCS_DenoisedCounts=function(
   Data,
   Chain)

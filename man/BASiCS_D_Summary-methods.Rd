@@ -25,4 +25,3 @@ Prints a summary of the properties of \code{object}.
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
-

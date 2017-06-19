@@ -2,9 +2,9 @@
 % Please edit documentation in R/Classes.R
 \docType{class}
 \name{BASiCS_Chain-class}
+\alias{BASiCS_Chain-class}
 \alias{BASiCS_Chain}
 \alias{BASiCS_Chain,BASiCS_Chain-class}
-\alias{BASiCS_Chain-class}
 \title{The BASiCS_Chain class}
 \description{
 Container of an MCMC sample of the BASiCS' model parameters (see Vallejos et al, 2015) as generated
@@ -31,6 +31,7 @@ by the function \code{\link[BASiCS]{BASiCS_MCMC}}.
 \item{\code{theta}}{MCMC chain for technical variability hyper-parameter(s) \eqn{\theta} (matrix, all elements must be positive, each colum 
 represents 1 batch)}
 }}
+
 \examples{
 
 # A BASiCS_Chain object created by the BASiCS_MCMC function.
@@ -38,10 +39,9 @@ Data = makeExampleBASiCS_Data()
 MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

@@ -29,4 +29,3 @@ density interval with probabilty equal to \code{prob}.
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
-

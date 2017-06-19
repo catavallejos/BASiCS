@@ -18,6 +18,10 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+
+# output to SE class
+# add parameter to generate 2 SE objects for DE testing
+
 makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE)
 {
   Mu =  c( 8.36,  10.65,   4.88,   6.29,  21.72,  12.93,  30.19,  83.92,   3.89,   6.34,

@@ -2,9 +2,9 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{displayChainBASiCS-BASiCS_D_Chain-method}
+\alias{displayChainBASiCS-BASiCS_D_Chain-method}
 \alias{displayChainBASiCS}
 \alias{displayChainBASiCS,BASiCS_D_Chain-method}
-\alias{displayChainBASiCS-BASiCS_D_Chain-method}
 \title{Accessors for the slots of a BASiCS_D_Chain object}
 \usage{
 \S4method{displayChainBASiCS}{BASiCS_D_Chain}(object, Param = "muTest")
@@ -27,10 +27,9 @@ Accessors for the slots of a \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 help(BASiCS_D_MCMC)
   
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

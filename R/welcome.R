@@ -6,3 +6,6 @@
   msg = strwrap(msg, exdent=4, indent=4)
   packageStartupMessage(paste(msg, collapse="\n"), appendLF=TRUE)
 }
+
+# Add message describing which functions changed
+# And message describing which functions/classes were removed

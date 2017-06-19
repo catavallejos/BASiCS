@@ -37,6 +37,10 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+
+# Use the SpikeInfo from the SE class from which the Chains were generated as Spike "mus"
+# Extend tests on input
+
 BASiCS_Sim<-function(
   mu,
   delta,

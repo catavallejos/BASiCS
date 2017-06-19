@@ -2,9 +2,9 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{displaySummaryBASiCS-BASiCS_Summary-method}
+\alias{displaySummaryBASiCS-BASiCS_Summary-method}
 \alias{displaySummaryBASiCS}
 \alias{displaySummaryBASiCS,BASiCS_Summary-method}
-\alias{displaySummaryBASiCS-BASiCS_Summary-method}
 \title{Accessors for the slots of a BASiCS_Summary object}
 \usage{
 \S4method{displaySummaryBASiCS}{BASiCS_Summary}(object, Param = "mu")
@@ -26,13 +26,12 @@ Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary-class}}
 help(BASiCS_MCMC)
   
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Summary-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

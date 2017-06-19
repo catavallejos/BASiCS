@@ -23,10 +23,9 @@ based on 2 independent  \code{\link[BASiCS]{BASiCS_Chain-class}} objects
 # See vignette
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Data-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

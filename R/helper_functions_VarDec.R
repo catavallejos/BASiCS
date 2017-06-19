@@ -1,3 +1,5 @@
+# Combine all Hidden functions in one file
+
 HiddenVarDecomp <- function(Data, object)
 {
   

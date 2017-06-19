@@ -30,10 +30,9 @@ MCMC_Summary <- Summary(MCMC_Output)
 # See documentation of function BASiCS_MCMC
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

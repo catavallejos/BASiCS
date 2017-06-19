@@ -5,6 +5,7 @@ importFrom(coda, HPDinterval)
 importFrom(methods, Summary)
 importFrom(testthat, context,
            test_check)
+# Add the import class SummarizedExperiment
 importMethodsFrom(BiocGenerics, counts)
 importMethodsFrom(scran, computeSumFactors)
 

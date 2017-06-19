@@ -72,6 +72,12 @@ HiddenEFNRDV<-function(
 #' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 #' 
 #' @rdname BASiCS_D_TestDE
+
+# Set default OffSet to TRUE + warning when Offset = FALSE
+# Leave the .cl email
+# Change input to 2 SummarizedExperiment and 2 MCMC
+# Remove Data from input
+
 BASiCS_D_TestDE <- function(Data, 
                             object,
                             GeneNames,
