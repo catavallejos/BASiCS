@@ -1,36 +1,11 @@
-HiddenTailProbUpDV<-function(chain,threshold){return(sum(chain>threshold)/length(chain))}
-HiddenTailProbLowDV<-function(chain,threshold){return(sum(chain<threshold)/length(chain))}
-
-HiddenProbDE<-function(
-  chain, # MCMC chain for log-fold change parameter (in absolute value)
-  tol) # Minimum tolerance difference for log-fold change
-{  
-  return(apply(chain, 2, HiddenTailProbUpDV, threshold = tol))
-}
-
-HiddenEFDRDV<-function(
-  EviThreshold, # Evidence threshold (it must be contained in (0,1))
-  Prob) # Probability of changes in expression (for a given tolerance)
-{  
-  return(sum((1-Prob)*I(Prob > EviThreshold))/sum(I(Prob > EviThreshold)))
-}
-
-HiddenEFNRDV<-function(
-  EviThreshold, # Evidence threshold (it must be contained in (0,1))
-  Prob) # Probability of changes in expression (for a given tolerance) 
-{
-  return(sum(Prob*I(Prob <= EviThreshold))/sum(I(Prob <= EviThreshold)))
-}
-
 #' @name BASiCS_D_TestDE
 #' 
 #' @title Detection of genes with changes in expression
 #' 
 #' @description Function to assess changes in expression (mean and over-dispersion)
 #' 
-#' @param Data an object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_D_Chain-class}}
-#' @param GeneNames Vector containing gene names to be used in results table (argument to be removed as 'GeneNames' will be an slot of `BASiCS_D_Data` object)
+#' @param objectRef an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Reference cell population
+#' @param objectTest an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Test cell population
 #' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)
 #' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number)
 #' @param EviThresholdM Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)
@@ -49,15 +24,34 @@ HiddenEFNRDV<-function(
 #' \describe{
 #' \item{\code{Table}}{A \code{\link[base]{data.frame}} containing the results of the differential expression test}
 #'    \describe{
-#'    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
-#'    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
-#'    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }
-#'    \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, probability of being highly variable according to the given thresholds.}
-#'    \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, indicator of being detected as highly variable according to the given thresholds. }
+#'    \item{\code{GeneNames}}{Gene name of each biological gene}
+#'    \item{\code{ExpOverall}}{For each biological gene, the mean expression parameter \eqn{\mu[i]} is averaged across the test and refernce cell population.}
+#'    \item{\code{ExpTest}}{Mean expression parameter \eqn{\mu[i]} for each biological gene in the test cell population.}
+#'    \item{\code{ExpRef}}{Mean expression parameter \eqn{\mu[i]} for each biological gene in the reference cell population.}
+#'    \item{\code{ExpFC}}{Fold change in mean expression parameters between the test and reference cell population.}
+#'    \item{\code{ExpLogFC}}{Log-transformed fold change in mean expression parameters.}
+#'    \item{\code{ProbDiffExp}}{Posterior probability for detection mean expression difference between the test and reference cell population given the supplied parameters.}
+#'    \item{\code{ResultDiffExp}}{Indicator if a gene is higher expressed in the test or refernce population.}
+#'    \item{\code{OverDispOverall}}{For each biological gene, the over-dispersion hyper-parameter \eqn{\delta[i]} is averaged across the test and refernce cell population.}
+#'    \item{\code{OverDispTest}}{Over-dispersion hyper-parameter \eqn{\delta[i]} for each biological gene in the test cell population.}
+#'    \item{\code{OverDispRef}}{Over-dispersion hyper-parameter \eqn{\delta[i]} for each biological gene in the reference cell population.}
+#'    \item{\code{OverDispFC}}{Fold change in over-dispersion hyper-parameters between the test and reference cell population.}
+#'    \item{\code{OverDispLogFC}}{Log-transformed fold change in over-dispersion hyper-parameters.}
+#'    \item{\code{ProbDiffOverDisp}}{Posterior probability for detection over-dispersion difference between the test and reference cell population given the supplied parameters.}
+#'    \item{\code{ResultDiffOverDisp}}{Indicator if a gene has a higher over-dispersion in the test or refernce population.}
 #'    }
-#' \item{\code{EviThreshold}}{Evidence thresholds.}
-#' \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
-#' \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+#'  \item{\code{DiffExpSummary}}{A list containing the following information for the differential mean expression test:}
+#'    \describe{
+#'   \item{\code{EviThreshold}}{Evidence thresholds.}
+#'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
+#'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+#'   }
+#'  \item{\code{DiffOverDispSummary}}{A list containing the following information for the differential over-dispersion test:}
+#'    \describe{
+#'   \item{\code{EviThreshold}}{Evidence thresholds.}
+#'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
+#'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
+#'   }
 #' }
 #'  
 #' @examples
@@ -67,20 +61,15 @@ HiddenEFNRDV<-function(
 #' @details See vignette
 #' 
 #' 
-#' @seealso \code{\link[BASiCS]{BASiCS_D_Chain-class}} 
-#' 
-#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
 #' @rdname BASiCS_D_TestDE
 
 # Set default OffSet to TRUE + warning when Offset = FALSE
-# Leave the .cl email
 # Change input to 2 SummarizedExperiment and 2 MCMC
-# Remove Data from input
 
-BASiCS_D_TestDE <- function(Data, 
-                            object,
-                            GeneNames,
+BASiCS_D_TestDE <- function(objectRef,
+                            objectTest,
                             EpsilonM = 0.10,
                             EpsilonD = 0.10,
                             EviThresholdM = NULL,
@@ -89,18 +78,18 @@ BASiCS_D_TestDE <- function(Data,
                             GroupLabelRef = "Ref",
                             GroupLabelTest = "Test",
                             Plot = FALSE, 
-                            OffSet = FALSE, 
+                            OffSet = TRUE, 
                             EFDR_M = 0.05,
                             EFDR_D = 0.05,
                             GenesSelect = NULL, 
                             ...)
 {
   # Checking validity of input arguments
-  if(!is(Data,"BASiCS_D_Data")) stop("'Data' is not a 'BASiCS_D_Data' class object.")    
-  if(!is(object,"BASiCS_D_Chain")) stop("'object' is not a 'BASiCS_D_Chain' class object.")    
+  if(!is(objectRef,"BASiCS_Chain")) stop("'objectRef' is not a 'BASiCS_Chain' class object.") 
+  if(!is(objectTest,"BASiCS_Chain")) stop("'objectTest' is not a 'BASiCS_Chain' class object.") 
   if(EpsilonM < 0 | !is.finite(EpsilonM)) stop("Minimum tolerance of fold-change 'EpsilonM' must be a positive real value")
   if(EpsilonD < 0 | !is.finite(EpsilonD)) stop("Minimum tolerance of fold-change 'EpsilonD' must be a positive real value")
-  if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert T or F for Plot parameter")
+  if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert TRUE or FALSE for Plot parameter")
   if(!is.null(EviThresholdM) | !is.null(EviThresholdD))
   {
     if(EviThresholdM < 0 | EviThresholdM > 1 | !is.finite(EviThresholdM)) 
@@ -115,8 +104,12 @@ BASiCS_D_TestDE <- function(Data,
   if(!is.null(GenesSelect) & !is.logical(GenesSelect)) stop("Invalid value for 'GenesSelect'")
   # if(!is.null(GenesSelect) & (length(GenesSelect) == sum(!GenesSelect))) stop("Invalid value for 'GenesSelect'")
   
-  nTest = ncol(Data@CountsTest)
-  nRef = ncol(Data@CountsRef)
+  # Test compatibility of both BASiCS_Chain objects
+  if(ncol(objectTest@mu) != ncol(objectRef@mu)) stop("The two BASiCS_Chain objects do not contain the same number of genes.")
+  if(!identical(colnames(objectTest@mu), colnames(objectRef@mu)) stop("The gene names of both BASiCS_Chain objects are not in the same order.")
+  
+  nTest = ncol(objectTest@nu)
+  nRef = ncol(objectRef@nu)
   n = nTest + nRef
   # Changes in overall expression
   if(OffSet)
@@ -132,6 +125,7 @@ BASiCS_D_TestDE <- function(Data,
   }
   else
   {
+    message("It is recomended to perform an offset correction between the two sample cell populations.")
     ChainTau = log(object@muTest / object@muRef)
     MedianTau = apply(ChainTau, 2, median)  
   }
@@ -283,10 +277,10 @@ BASiCS_D_TestDE <- function(Data,
   
   if(!is.null(GenesSelect))
   {
-    cat("--------------------------------------------------------------------- \n")
-    cat(paste("The user excluded ", sum(!GenesSelect), " genes from the comparison. \n"))
-    cat("These genes are marked as 'ExcludedByUser' in the results table and excluded from EFDR calibration. \n")
-    cat("--------------------------------------------------------------------- \n")    
+    message("--------------------------------------------------------------------- \n",
+            paste("The user excluded ", sum(!GenesSelect), " genes from the comparison. \n"),
+            "These genes are marked as 'ExcludedByUser' in the results table and excluded from EFDR calibration. \n",
+            "--------------------------------------------------------------------- \n")    
   }
   
   nPlusTestM = sum(ResultDiffExp == paste0(GroupLabelTest,"+"))
@@ -294,25 +288,25 @@ BASiCS_D_TestDE <- function(Data,
   nPlusTestD = sum(ResultDiffOverDisp == paste0(GroupLabelTest,"+"))
   nPlusRefD = sum(ResultDiffOverDisp == paste0(GroupLabelRef,"+"))
   
-  cat("--------------------------------------------------------------------- \n")
-  cat(paste(nPlusTestM + nPlusRefM, " genes with a change on the overall expression:  \n"))
-  cat(paste("- Higher expression in ",GroupLabelTest,"group:", nPlusTestM, "\n"))
-  cat(paste("- Higher expression in ",GroupLabelRef,"group:", nPlusRefM, "\n"))
-  cat(paste("- Fold change tolerance = ", round(100*EpsilonM,2), "% \n"))    
-  cat(paste("- Evidence threshold = ", OptThresholdM[1], "\n"))
-  cat(paste("- EFDR = ", round(100*OptThresholdM[2],2), "% \n"))  
-  cat(paste("- EFNR = ", round(100*OptThresholdM[3],2), "% \n"))  
-  cat("--------------------------------------------------------------------- \n")
-  cat("\n")
-  cat("--------------------------------------------------------------------- \n")
-  cat(paste(nPlusTestD + nPlusRefD, " genes with a change on the cell-to-cell biological over dispersion:  \n"))
-  cat(paste("- Higher over dispersion in ",GroupLabelTest,"group:", nPlusTestD, "\n"))
-  cat(paste("- Higher over dispersion in ",GroupLabelRef,"group:", nPlusRefD, "\n"))
-  cat(paste("- Fold change tolerance = ", round(100*EpsilonD,2), "% \n"))    
-  cat(paste("- Evidence threshold = ", OptThresholdD[1], "\n"))
-  cat(paste("- EFDR = ", round(100*OptThresholdD[2],2), "% \n"))  
-  cat(paste("- EFNR = ", round(100*OptThresholdD[3],2), "% \n"))    
-  cat("--------------------------------------------------------------------- \n")
+  message("--------------------------------------------------------------------- \n",
+          paste(nPlusTestM + nPlusRefM, " genes with a change on the overall expression:  \n"),
+          paste("- Higher expression in ",GroupLabelTest,"group:", nPlusTestM, "\n"),
+          paste("- Higher expression in ",GroupLabelRef,"group:", nPlusRefM, "\n"),
+          paste("- Fold change tolerance = ", round(100*EpsilonM,2), "% \n"),
+          paste("- Evidence threshold = ", OptThresholdM[1], "\n"),
+          paste("- EFDR = ", round(100*OptThresholdM[2],2), "% \n"),
+          paste("- EFNR = ", round(100*OptThresholdM[3],2), "% \n"),
+          "--------------------------------------------------------------------- \n",
+          "\n",
+          "--------------------------------------------------------------------- \n",
+          paste(nPlusTestD + nPlusRefD, " genes with a change on the cell-to-cell biological over dispersion:  \n"),
+          paste("- Higher over dispersion in ",GroupLabelTest,"group:", nPlusTestD, "\n"),
+          paste("- Higher over dispersion in ",GroupLabelRef,"group:", nPlusRefD, "\n"),
+          paste("- Fold change tolerance = ", round(100*EpsilonD,2), "% \n"),
+          paste("- Evidence threshold = ", OptThresholdD[1], "\n"),
+          paste("- EFDR = ", round(100*OptThresholdD[2],2), "% \n"),
+          paste("- EFNR = ", round(100*OptThresholdD[3],2), "% \n"),
+          "--------------------------------------------------------------------- \n")
   
   if(Plot)
   {    
