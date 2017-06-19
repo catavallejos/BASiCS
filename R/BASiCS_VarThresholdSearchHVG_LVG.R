@@ -5,7 +5,7 @@
 #'
 #' @description Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
 #'
-#' @param Data an object of class \code{\link[BASiCS]{BASiCS_Data-class}}
+#' @param Data an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param VarThresholdsGrid Grid of values for the variance contribution threshold (they must be contained in (0,1))
 #' @param PrintProgress If \code{PrintProgress = TRUE}, partial output is printed in the console.
@@ -29,16 +29,13 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
-
-# Change Data class to SE class
-
 BASiCS_VarThresholdSearchHVG=function(
   Data,
   object,
   VarThresholdsGrid, #
   PrintProgress = FALSE)
 {
-  
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
   if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
     stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
