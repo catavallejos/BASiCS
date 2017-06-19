@@ -3,8 +3,10 @@
 #' @description \code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS.
 #' This function is used in order to illustrate the performance of the \code{BASiCS} library.
 #'
-#' @param mu Gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes
-#' (vector of length \code{q}, technical genes located at the end of the vector, all elements must be positive numbers)
+#' @param mu Gene-specific expression levels \eqn{\mu[i]} for all biological genes 
+#' (vector of length \code{q.bio}, all elements must be positive numbers)
+#' @param mu_spikes \eqn{\mu[i]} for all technical genes defined as true input molecules (SpikeInfo)
+#' (vector of length \code{q-q.bio}, all elements must be positive numbers)
 #' @param delta Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
 #' (vector of length \code{q.bio}, all elements must be positive numbers)
 #' @param phi Cell-specific mRNA content normalising constants \eqn{\phi[j]}
@@ -13,36 +15,31 @@
 #' (vector of length \code{n}, all elements must be positive numbers)
 #' @param theta Technical variability hyper-parameter \eqn{\theta} (must be positive)
 #'
-#' @return An object of class \code{\link[BASiCS]{BASiCS_Data-class}}, simulated from the model implemented in BASiCS.
+#' @return An object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}, simulated from the model implemented in BASiCS.
 #'
 #' @examples
 #'
 #' # Simulated parameter values for 10 genes
-#' # (7 biogical and 5 spike-in) measured in 5 cells
-#' Mu =  c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19, 1010.72, 7.90, 31.59)
+#' # (7 biogical and 3 spike-in) measured in 5 cells
+#' Mu =  c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19)
+#' Mu_spike =  c(1010.72, 7.90, 31.59)
 #' Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)
 #' Phi = c(1.00, 1.06, 1.09, 1.05, 0.80)
 #' S = c(0.38, 0.40, 0.38, 0.39, 0.34)
 #' Theta = 0.39
 #'
-#' Data = BASiCS_Sim(Mu, Delta, Phi, S, Theta)
-#' head(counts(Data))
-#' dim(counts(Data, type="biological"))
-#' dim(counts(Data, type="technical"))
-#' displayTechIndicator(Data)
-#' displaySpikeInput(Data)
-#'
-#' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
+#' Data = BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
+#' head(assay(Data))
+#' dim(assay(Data))
+#' metadata(Data)$SpikeInput
+#' rowData(Data)$Tech
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-
-# Use the SpikeInfo from the SE class from which the Chains were generated as Spike "mus"
-# Extend tests on input
-
 BASiCS_Sim<-function(
   mu,
+  mu_spikes,
   delta,
   phi,
   s,
@@ -51,18 +48,22 @@ BASiCS_Sim<-function(
   # Number of cells
   n = length(phi)
   # Total number of genes, including biological and technical ones
-  q = length(mu)
+  q = length(mu)+length(mu_spikes)
   # Number of biological genes
   q.bio = length(delta)
-  
+
   # Arguments checking
   if(!(is.vector(mu) & is.numeric(mu) & all(mu>0))) stop("Invalid argument value for 'mu'.")
+  if(!(is.vector(mu_spikes) & is.numeric(mu_spikes) & all(mu_spikes>0))) stop("Invalid argument value for 'mu_spikes'.")
   if(!(is.vector(delta) & is.numeric(delta) & all(delta>=0))) stop("Invalid argument value for 'delta'.")
   if(!(is.vector(phi) & is.numeric(phi) & all(phi>0) & all.equal(sum(phi),n))) stop("Invalid argument value for 'phi'.")
   if(!(is.vector(s) & is.numeric(s) & all(s>0) & length(s)==n)) stop("Invalid argument value for 's'.")
   if(!(is.numeric(theta) & length(theta)==1 & theta>=0)) stop("Invalid argument value for 'theta'.")
   
   if(!all(c(n,q,q.bio,q-q.bio)>0)) stop("Arguments' dimensions are not compatible")
+
+  # Merge biological and technical genes
+  mu = c(mu, mu_spikes)
   
   # Matrix where simulated counts will be stored
   Counts.sim<-matrix(0,ncol=n,nrow=q)
@@ -86,7 +87,7 @@ BASiCS_Sim<-function(
   
   rownames(Counts.sim) <- paste0("Gene", 1:q)
   SpikeInfo = data.frame(paste0("Gene", (q.bio+1):q), mu[(q.bio+1):q])
-  Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, T, F), SpikeInfo = SpikeInfo)
+  Data = newBASiCS_Data(Counts = Counts.sim, Tech = ifelse(1:q > q.bio, TRUE, FALSE), SpikeInfo = SpikeInfo)
   
   return(Data)
 }
