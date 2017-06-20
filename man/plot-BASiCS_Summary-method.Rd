@@ -3,7 +3,8 @@
 \docType{methods}
 \name{plot-BASiCS_Summary-method}
 \alias{plot-BASiCS_Summary-method}
-\alias{plot,BASiCS_Summary-method}
+\alias{plot,BASiCS_Summary-method,}
+\alias{plot,BASiCS_Summary,ANY-method}
 \title{'plot' method for BASiCS_Summary objects}
 \usage{
 \S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,

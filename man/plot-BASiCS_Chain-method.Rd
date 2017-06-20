@@ -5,6 +5,7 @@
 \alias{plot-BASiCS_Chain-method}
 \alias{plot}
 \alias{plot,BASiCS_Chain-method}
+\alias{plot,BASiCS_Chain,ANY-method}
 \title{'plot' method for BASiCS_Chain objects}
 \usage{
 \S4method{plot}{BASiCS_Chain,ANY}(x, Param = "mu", Gene = NULL,

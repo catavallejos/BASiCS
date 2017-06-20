@@ -106,7 +106,7 @@ setMethod("Summary",
           })
 
 #' @name plot-BASiCS_Chain-method
-#' @aliases plot plot,BASiCS_Chain-method
+#' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
 #' 
 #' @docType methods
 #' @rdname plot-BASiCS_Chain-method
@@ -247,7 +247,7 @@ setMethod("show",
 
 
 #' @name plot-BASiCS_Summary-method
-#' @aliases plot,BASiCS_Summary-method
+#' @aliases plot,BASiCS_Summary-method, plot,BASiCS_Summary,ANY-method
 #' 
 #' @docType methods
 #' @rdname plot-BASiCS_Summary-method

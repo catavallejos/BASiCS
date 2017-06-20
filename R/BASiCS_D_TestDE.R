@@ -83,6 +83,13 @@ BASiCS_D_TestDE <- function(objectRef,
   # Checking validity of input arguments
   if(!is(objectRef,"BASiCS_Chain")) stop("'objectRef' is not a 'BASiCS_Chain' class object.") 
   if(!is(objectTest,"BASiCS_Chain")) stop("'objectTest' is not a 'BASiCS_Chain' class object.") 
+  
+  # Test compatibility of both BASiCS_Chain objects
+  if(ncol(objectTest@mu) != ncol(objectRef@mu)) stop("The two BASiCS_Chain objects do not contain the same number of genes.")
+  if(!identical(colnames(objectTest@mu), colnames(objectRef@mu))) stop("The gene names of both BASiCS_Chain objects are not in the same order.")
+  
+  GeneNames = colnames(objectTest@mu)
+  
   if(EpsilonM < 0 | !is.finite(EpsilonM)) stop("Minimum tolerance of fold-change 'EpsilonM' must be a positive real value")
   if(EpsilonD < 0 | !is.finite(EpsilonD)) stop("Minimum tolerance of fold-change 'EpsilonD' must be a positive real value")
   if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert TRUE or FALSE for Plot parameter")
@@ -99,11 +106,7 @@ BASiCS_D_TestDE <- function(objectRef,
   if(!is.null(GenesSelect) & (length(GenesSelect) != length(GeneNames))) stop("Invalid value for 'GenesSelect'")
   if(!is.null(GenesSelect) & !is.logical(GenesSelect)) stop("Invalid value for 'GenesSelect'")
   # if(!is.null(GenesSelect) & (length(GenesSelect) == sum(!GenesSelect))) stop("Invalid value for 'GenesSelect'")
-  
-  # Test compatibility of both BASiCS_Chain objects
-  if(ncol(objectTest@mu) != ncol(objectRef@mu)) stop("The two BASiCS_Chain objects do not contain the same number of genes.")
-  if(!identical(colnames(objectTest@mu), colnames(objectRef@mu))) stop("The gene names of both BASiCS_Chain objects are not in the same order.")
-  
+
   nTest = ncol(objectTest@nu)
   nRef = ncol(objectRef@nu)
   n = nTest + nRef
@@ -111,8 +114,8 @@ BASiCS_D_TestDE <- function(objectRef,
   if(OffSet)
   {
     # With offset correction
-    ChainMuRefOffSet = object@muRef / rowSums(object@muRef)
-    ChainMuTestOffSet = object@muTest / rowSums(object@muTest)
+    ChainMuRefOffSet = objectRef@mu / rowSums(objectRef@mu)
+    ChainMuTestOffSet = objectTest@mu / rowSums(objectTest@mu)
     MedianMuRefOffSet = apply(ChainMuRefOffSet, 2, median)
     MedianMuTestOffSet = apply(ChainMuTestOffSet, 2, median)
     
@@ -122,7 +125,7 @@ BASiCS_D_TestDE <- function(objectRef,
   else
   {
     message("It is recomended to perform an offset correction between the two sample cell populations.")
-    ChainTau = log(object@muTest / object@muRef)
+    ChainTau = log(objectTest@mu / objectRef@mu)
     MedianTau = apply(ChainTau, 2, median)  
   }
   
@@ -173,7 +176,7 @@ BASiCS_D_TestDE <- function(objectRef,
   }  
   
   # Changes in cell-to-cell biological over dispersion
-  ChainOmega = log(object@deltaTest / object@deltaRef)
+  ChainOmega = log(objectTest@delta / objectRef@delta)
   MedianOmega = apply(ChainOmega, 2, median)
   if(EpsilonD > 0) {ProbD = HiddenProbDE(chain = abs(ChainOmega), tol = EpsilonD)}
   else 
@@ -238,10 +241,10 @@ BASiCS_D_TestDE <- function(objectRef,
   if(!is.null(GenesSelect)) {ResultDiffOverDisp[!GenesSelect] = "ExcludedByUser"}
   
   # Gene-specific parameters' summaries
-  MedianMuTest = apply(object@muTest, 2, median)
-  MedianMuRef = apply(object@muRef, 2, median)  
-  MedianDeltaTest = apply(object@deltaTest, 2, median)
-  MedianDeltaRef = apply(object@deltaRef, 2, median)
+  MedianMuTest = apply(objectTest@mu, 2, median)
+  MedianMuRef = apply(objectRef@mu, 2, median)  
+  MedianDeltaTest = apply(objectTest@delta, 2, median)
+  MedianDeltaRef = apply(objectRef@delta, 2, median)
   MuBase=(MedianMuRef * nRef + MedianMuTest * nTest)/n
   DeltaBase=(MedianDeltaRef * nRef + MedianDeltaTest * nTest)/n
   
