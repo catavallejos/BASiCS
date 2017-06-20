@@ -30,7 +30,8 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
     after normalisation and the removal of technical variation.
 License: GPL (>= 2)
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.1.0),
+    S4Vectors
 Imports:
     SummarizedExperiment,
     BiocGenerics,
@@ -38,7 +39,8 @@ Imports:
     methods,
     coda,
     scran,
-    testthat
+    testthat,
+    data.table
 Suggests:
     knitr,
 LinkingTo: Rcpp, RcppArmadillo

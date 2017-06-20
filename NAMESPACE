@@ -1,13 +1,21 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
-importFrom(Rcpp, evalCpp)
-importFrom(coda, HPDinterval)
-importFrom(methods, Summary)
-importFrom(testthat, context,
-           test_check)
-importClassesFrom(SummarizedExperiment, SummarizedExperiment)
-importMethodsFrom(BiocGenerics, counts)
-importMethodsFrom(scran, computeSumFactors)
+importFrom("Rcpp", "evalCpp")
+importFrom("coda", "HPDinterval")
+importFrom("methods", "Summary")
+importFrom("testthat", "context",
+           "test_check")
+import("SummarizedExperiment")
+importFrom("graphics", "abline", "barplot", "legend", "lines", "par",
+             "points", "segments")
+importFrom("data.table", "fread")
+importFrom("methods", "is", "new", "show")
+importFrom("S4Vectors", "metadata")
+importFrom("stats", "median", "model.matrix", "rgamma", "rpois",
+             "runif")
+importFrom("utils", "packageVersion", "write.table")
+importMethodsFrom("BiocGenerics", "counts")
+importMethodsFrom("scran", "computeSumFactors")
 
 exportClasses("BASiCS_Chain" , "BASiCS_Summary")
 
