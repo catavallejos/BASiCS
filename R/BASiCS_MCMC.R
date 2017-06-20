@@ -335,8 +335,8 @@ BASiCS_MCMC <- function(
   
   
   Chain$mu = Chain$mu[,1:q.bio]
-  colnames(Chain$mu) = Data@GeneNames[!rowData(Data)$Tech]
-  colnames(Chain$delta) = Data@GeneNames[!rowData(Data)$Tech]
+  colnames(Chain$mu) = rownames(assay(Data))[!rowData(Data)$Tech]
+  colnames(Chain$delta) = rownames(assay(Data))[!rowData(Data)$Tech]
   colnames(Chain$phi) = paste0("Cell",1:n)
   if(length(metadata(Data)$SpikeInput) > 1) {colnames(Chain$s) = paste0("Cell",1:n)}
   colnames(Chain$nu) = paste0("Cell",1:n)
@@ -378,8 +378,8 @@ BASiCS_MCMC <- function(
             paste0("'",StoreDir,"' directory ... "), "\n",
             "--------------------------------------------------------------------", "\n")
     
-    colnames(Chain$ls.mu) = Data@GeneNames[!rowData(Data)$Tech]
-    colnames(Chain$ls.delta) = Data@GeneNames[!rowData(Data)$Tech]
+    colnames(Chain$ls.mu) = rownames(assay(Data))[!rowData(Data)$Tech]
+    colnames(Chain$ls.delta) = rownames(assay(Data))[!rowData(Data)$Tech]
     colnames(Chain$ls.phi) = "AllCells"
     colnames(Chain$ls.nu) = paste0("Cell",1:n)
     colnames(Chain$ls.theta) = paste0("Batch",1:nBatch)
@@ -418,7 +418,7 @@ BASiCS_MCMC <- function(
       
       setwd(StoreDir)
       
-      TableRef = cbind.data.frame("GeneNames" = Data@GeneNames[RefGene+1], 
+      TableRef = cbind.data.frame("GeneNames" = rownames(assay(Data))[RefGene+1], 
                                   "GeneIndex" = RefGene+1, 
                                   stringsAsFactors = FALSE)
       write.table(TableRef,paste0("TableRef_",RunName,".txt"), col.names = T, row.names = F)
@@ -429,7 +429,7 @@ BASiCS_MCMC <- function(
     {
       setwd(StoreDir)
       
-      TableRef = cbind.data.frame("GeneNames" = Data@GeneNames[RefGenes+1], 
+      TableRef = cbind.data.frame("GeneNames" = rownames(assay(Data))[RefGenes+1], 
                                   "GeneIndex" = RefGenes+1, 
                                   "ReferenceFreq" = Chain$RefFreq[RefGenes+1],
                                   stringsAsFactors = FALSE)

@@ -19,12 +19,12 @@ HiddenBASiCS_MCMC_Start<-function(
   if(n < 120) {sizes.aux = c(20, 40)}
   if(n < 80) {sizes.aux = c(20)}
   if(n < 40) {sizes.aux = c(10)}
-  size_scran <- scran::computeSumFactors(assay(Data)[!rowData(Data)$Tech], sizes = sizes.aux)
+  size_scran <- scran::computeSumFactors(as.matrix(assay(Data)[!rowData(Data)$Tech,,drop=FALSE]), sizes = sizes.aux)
   
   if(length(metadata(Data)$SpikeInput) > 1)
   {
     # Initialize s as the empirical capture efficiency rates
-    s0 = colSums(assay(Data)[rowData(Data)$Tech]) / sum(metadata(Data)$SpikeInput); nu0=s0
+    s0 = colSums(assay(Data)[rowData(Data)$Tech,]) / sum(metadata(Data)$SpikeInput); nu0=s0
     phi0 = size_scran / s0
     phi0 = n * phi0 / sum(phi0)   
     

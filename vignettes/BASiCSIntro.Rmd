@@ -98,11 +98,11 @@ The input dataset for BASiCS must contain the following 3 elements:
 
 * `SpikeInfo`: a `data.frame` with $q-q_0$ rows. First column must contain the names associated to the spike-in genes (as in `rownames(Counts)`). Second column must contain the input number of molecules for the spike-in genes (amount per cell).
 
-These elements must be stored into an object of class `BASiCS_Data`. For example, the following code simulates a dataset with 10 genes (7 biological and 3 spike-in) and 5 cells. 
+These elements must be stored into an object of class `BASiCS_Data`. For example, the following code simulates a dataset with 50 genes (40 biological and 10 spike-in) and 40 cells. 
 
 ```{r ExampleDataTest}
 set.seed(1)
-Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+Counts = Counts = matrix(rpois(50*40, 2), ncol = 40)
 rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
 Tech = c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
@@ -113,7 +113,7 @@ SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeI
 DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo)
 
 # With batch effect
-DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = rep(c(1,2), each = 5)) 
+DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
 Some datasets require filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering 
@@ -133,7 +133,7 @@ A similar code can be used when the data contains multiple batches of cells (in 
 ```{r FilterBatch}
 Filter = BASiCS_Filter(Counts = Counts, Tech = Tech, 
                        SpikeInput = SpikeInput, 
-                       BatchInfo = c(rep(1, times = 5), rep(2, times = 5)),
+                       BatchInfo = c(rep(1, times = 20), rep(2, times = 20)),
                        MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
                        MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
 SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID %in% 
@@ -265,7 +265,7 @@ It is also possible to generate similar plots for other model parameters
 plot(MCMC_Summary, Param = "mu", main = "All genes")
 plot(MCMC_Summary, Param = "mu", Genes = 1:10, main = "First 10 genes")
 plot(MCMC_Summary, Param = "delta", main = "All genes")
-plot(MCMC_Summary, Param = "delta", Genes = c(2,5,10,50,100), main = "5 customized genes")
+plot(MCMC_Summary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
 plot(MCMC_Summary, Param = "nu", main = "All cells")
 plot(MCMC_Summary, Param = "nu", Cells = 1:5, main = "First 5 cells")
 plot(MCMC_Summary, Param = "theta")
