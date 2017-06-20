@@ -152,11 +152,10 @@ Data = makeExampleBASiCS_Data(WithBatch = FALSE)
 Once a `BASiCS_Data` object has been created, we can access its elements using the functions `counts`, `displayTechIndicator` or `displaySpikeInput`. For example: 
 
 ```{r DisplayData}
-head(counts(Data))
-dim(counts(Data, type="biological"))
-dim(counts(Data, type="technical"))
-table(displayTechIndicator(Data))
-length(displaySpikeInput(Data))
+head(assay(Data))
+length(which(rowData(Data)$Tech))
+table(rowData(Data)$Tech)
+length(metadata(Data)$SpikeInput)
 ```
 
 ## Fitting the BASiCS model

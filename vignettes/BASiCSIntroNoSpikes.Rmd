@@ -53,14 +53,12 @@ For illustration purposes, the BASiCS package includes a built-in simulated data
 
 ```{r ExampleData}
 Data = makeExampleBASiCS_Data(WithSpikes = FALSE)
-CountsAux <- as.matrix(rbind(Data@Counts, rowSums(Data@Counts)))
-GeneNamesAux <- c(rownames(Data@Counts), "SumGene")
+CountsAux <- as.matrix(rbind(assay(Data), rowSums(Data@Counts)))
+rownames(CountsAux) <- c(rownames(assay(Data)), "SumGene")
 
-DataAux <- new("BASiCS_Data", 
-            Counts = CountsAux,
+DataAux <- newBASiCS_Data(Counts = CountsAux,
             Tech = c(Data@Tech, FALSE),
             SpikeInput = Data@SpikeInput,
-            GeneNames = GeneNamesAux,
             BatchInfo = Data@BatchInfo)
 ```
 
