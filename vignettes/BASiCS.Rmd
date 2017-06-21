@@ -13,6 +13,11 @@ opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 BiocStyle::markdown()
 ```
 
+# Introduction to BASiCS: Bayesian Analysis of Single-Cell Sequencing data
+Package: `r Biocpkg("BASiCS")` <br />
+Author: Catalina Vallejos (cnvallej@uc.cl) <br />
+Compilation date: `r Sys.Date()`
+
 ***
 
 # Introduction 
