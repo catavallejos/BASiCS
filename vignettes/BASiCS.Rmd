@@ -13,6 +13,10 @@ opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 BiocStyle::markdown()
 ```
 
+```{r library, echo=FALSE}
+library(BASiCS)
+```
+
 # Introduction to BASiCS: Bayesian Analysis of Single-Cell Sequencing data
 Package: `r Biocpkg("BASiCS")` <br />
 Author: Catalina Vallejos (cnvallej@uc.cl) <br />
@@ -31,6 +35,9 @@ Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene
 3. The total variability of the expression counts is decomposed into technical and biological components. 
 
 BASiCS also provides an intuitive detection criterion for highly (or lowly) variable genes within the population of cells under study. This is formalized by means of tail posterior probabilities associated to high (or low) biological cell-to-cell variance contributions, quantities that can be easily interpreted by applied users. 
+
+<!-- new paragraph on differential testing --> 
+Furthermore, BASiCS allows the testing for differential mean expression and differential expression variability between two cell populations. Parameters for comparisons are estimated separately by running the BASiCS model on the two cell populations. 
 
 Here, we demonstrate how to use BASiCS using a simulated dataset. 
 
@@ -67,35 +74,95 @@ A graphical representation of the BASiCS model is displayed below, based on the 
 <img src="./BASiCS_DAG.jpg" height="400px" width="600px" />
 \centerline{\includegraphics[height=4in]{./BASiCS_DAG.jpg}}
 
+## Performing differential testing with BASiCS
+<!-- we need an explanation on the model for differential testing --> 
+
 ***
 
-# Installation
-
-BASiCS can be installed directly from Github. 
-
-```{r install, include=FALSE}
-#library(devtools)
-#install_github('catavallejos/BASiCS', build_vignettes = TRUE)
-```
-
-This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and re-install. 
-
-```{r dependencies}
-#library(devtools)
-#source("http://bioconductor.org/biocLite.R")
-#biocLite("BiocGenerics")
-#install.packages("Rcpp")
-```
-
-After a successful installation, the BASiCS library can be loaded using[^footnoteInstall] 
-
-```{r load_packages}
-library(BASiCS)
-```
-
-[^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
-
 # Using BASiCS
+
+## Quick start
+<!-- new quick start section --> 
+Here we present the main functions of BASiCS to **1.** perform variance decomposition and normalize the data, **2.** detect highly  variable genes and **3.** test for differential mean expression and differential variability between two cell populations. 
+Each of the following steps are explained in more detail throughout this workflow.
+
+### The input dataset
+As explained in the next section, the input data consists of a `Counts` matrix containing all biological and technical genes, a `Tech` logical indicator if a gene is of biological or technical origin and a `SpikeInfo` data.frame that contains the added number of spike-in molecules for each technical gene. These information are stored in a `SummarizedExperiment` class form the `r Biocpkg("SummarizedExperiment")` package. 
+Here, we use an example dataset that contains spike-in genes.
+
+```{r quick-start-data, results='hide'}
+Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+```
+
+### Running the BASiCS model
+Using the generated `Data` object, the BASiCS package performs model parameter estimation by running an MCMC.
+Essential parameters for running the MCMC are: `N` total number of iterations, `Thin` number of iterations at which the current estimate is stored, `Burn` length of burn-in period.
+Downstream analysis is done on the generated MCMC chain object
+
+```{r quick-start-MCMC, results='hide'}
+MCMC_output <- BASiCS_MCMC(Data = Data, N = 20000, Thin = 20, Burn = 10000, PrintProgress = FALSE)
+```
+
+### Variance decomposition and normalization
+We can now estimate the effect of technical noise on the overall variance of the data. Therefore the overall variance is decomposed into a technical, biological and residual part. 
+
+```{r quick-start-VarDecomp}
+VarDecomp <- BASiCS_VarianceDecomp(Data = Data, object = MCMC_output, Plot = TRUE)
+```
+
+In the next step the techncail effect of the data can be removed.
+
+```{r quick-start-normalization}
+norm <- BASiCS_DenoisedCounts(Data = Data, Chain = MCMC_output)
+```
+
+### Detection of highly variable genes
+BASiCS can also be used to detect genes with high biological heterogneity. The `VarYhreshold` parameter sets the lower threshold of the biological proportion of the overall variance (0.7: 70% of overall variance is explained by biology). The `EviThreshold` parameter sets the threshold for the propability to detect a gene as highly variable.
+
+```{r quick-start-HVGdetection}
+HVG <- BASiCS_DetectHVG(Data, MCMC_output, VarThreshold = 0.7, Plot = TRUE, EviThreshold = 0.8)
+```
+
+Highly variable genes are marked as `HVG$Table$HVG == TRUE`.
+
+### Differential expression and differential over-dispersion testing
+To test differential mean expression and differential over-dispersion between two cell populations, we simulate two different sets of data and run the MCMC seperately on these datasets.
+
+```{r quick-start-DataForDE, results='hide'}
+Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, Case1 = TRUE)
+Data2 <- makeExampleBASiCS_Data(WithSpikes = TRUE, Case1 = FALSE)
+
+MCMC_output1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000, PrintProgress = FALSE)
+MCMC_output2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000, PrintProgress = FALSE)
+```
+
+The differential testing is performed on the generated MCMC objects that contain cell population specific model parameters. `objectRef` takes the MCMC object of the referrnce population while `objectTest` contains the MCMC object of the test populatio. `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
+
+```{r quick-start-test, results='hide'}
+Test <- BASiCS_D_TestDE(objectRef = MCMC_output1, objectTest = MCMC_output2,
+                        EpsilonM = 0.4, EpsilonD = 0.4, OffSet = TRUE)
+```
+
+The resulting output list can be subsetted to extract genes that are differentially expressed 
+
+```{r quick-start-DE, results='hide'}
+Test$Table[Test$Table$ResultDiffExp == "Ref+",]
+Test$Table[Test$Table$ResultDiffExp == "Test+",]
+```
+
+or differentially variable.
+
+```{r quick-start-DV, results='hide'}
+Test$Table[Test$Table$ResultDiffOverDisp== "Ref+",]
+Test$Table[Test$Table$ResultDiffOverDisp == "Test+",]
+```
+
+To assess the difference in variability, we recommend selecting the genes that do not change in mean expression:
+
+```{r quick-start-DV2, results='hide'}
+Test$Table[Test$Table$ResultDiffExp == "NoDiff" & Test$Table$ResultDiffOverDisp== "Ref+",]
+Test$Table[Test$Table$ResultDiffExp == "NoDiff" & Test$Table$ResultDiffOverDisp == "Test+",]
+```
 
 ##  The input dataset
 
