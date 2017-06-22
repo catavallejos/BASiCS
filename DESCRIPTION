@@ -43,6 +43,7 @@ Imports:
     data.table
 Suggests:
     knitr,
+    BiocStyle
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
