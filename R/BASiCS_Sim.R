@@ -56,7 +56,7 @@ BASiCS_Sim<-function(
   if(!(is.vector(mu) & is.numeric(mu) & all(mu>0))) stop("Invalid argument value for 'mu'.")
   if(!(is.vector(mu_spikes) & is.numeric(mu_spikes) & all(mu_spikes>0))) stop("Invalid argument value for 'mu_spikes'.")
   if(!(is.vector(delta) & is.numeric(delta) & all(delta>=0))) stop("Invalid argument value for 'delta'.")
-  if(!(is.vector(phi) & is.numeric(phi) & all(phi>0) & all.equal(sum(phi),n))) stop("Invalid argument value for 'phi'.")
+  if(!(is.vector(phi) & is.numeric(phi) & all(phi>0) & isTRUE(all.equal(sum(phi),n, tolerance = 0.01)))) stop("Invalid argument value for 'phi'.")
   if(!(is.vector(s) & is.numeric(s) & all(s>0) & length(s)==n)) stop("Invalid argument value for 's'.")
   if(!(is.numeric(theta) & length(theta)==1 & theta>=0)) stop("Invalid argument value for 'theta'.")
   
