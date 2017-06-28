@@ -269,6 +269,7 @@ setMethod("show",
 #' @param pch As in \code{\link[graphics]{par}}. 
 #' @param col As in \code{\link[graphics]{par}}. 
 #' @param bty As in \code{\link[graphics]{par}}. 
+#' @param smooth Logical if the \code{\link[graphics]{smoothScatter}} function should be used for plotting.
 #' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @examples
