@@ -176,7 +176,7 @@ The input values required to perform this analysis are:
 Additionally, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
 
 ```{r quick-start-test, results='hide'}
-Test <- BASiCS_D_TestDE(objectRef = Chain1, objectTest = Chain2,
+Test <- BASiCS_TestDE(objectRef = Chain1, objectTest = Chain2,
                         EpsilonM = 0.4, EpsilonD = 0.4, OffSet = TRUE)
 ```
 
