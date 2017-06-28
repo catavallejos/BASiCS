@@ -119,13 +119,13 @@ BASiCS_TestDE <- function(ChainRef,
     MedianMuRefOffSet = apply(ChainMuRefOffSet, 2, median)
     MedianMuTestOffSet = apply(ChainMuTestOffSet, 2, median)
     
-    ChainTau = log(ChainMuTestOffSet / ChainMuRefOffSet )
+    ChainTau = log2(ChainMuTestOffSet / ChainMuRefOffSet )
     MedianTau = apply(ChainTau, 2, median)
   }
   else
   {
     message("It is recomended to perform an offset correction between the two sample cell populations.")
-    ChainTau = log(ChainTest@mu / ChainRef@mu)
+    ChainTau = log2(ChainTest@mu / ChainRef@mu)
     MedianTau = apply(ChainTau, 2, median)  
   }
   
@@ -176,7 +176,7 @@ BASiCS_TestDE <- function(ChainRef,
   }  
   
   # Changes in cell-to-cell biological over dispersion
-  ChainOmega = log(ChainTest@delta / ChainRef@delta)
+  ChainOmega = log2(ChainTest@delta / ChainRef@delta)
   MedianOmega = apply(ChainOmega, 2, median)
   if(EpsilonD > 0) {ProbD = HiddenProbDE(chain = abs(ChainOmega), tol = EpsilonD)}
   else 

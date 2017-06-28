@@ -182,11 +182,11 @@ Test <- BASiCS_D_TestDE(objectRef = Chain1, objectTest = Chain2,
 
 <span style="color:green"> TO-DO 7: RENAME FUNCTION ABOVE AS `BASiCS_TestDE` </span>
 
-<span style="color:red"> TO-DO 8: RENAME ARGUMENTS `objectRef` AND `objectTest` AS `ChainTest` AND `ChainRef` RESPECTIVELY. </span>
+<span style="color:green"> TO-DO 8: RENAME ARGUMENTS `objectRef` AND `objectTest` AS `ChainTest` AND `ChainRef` RESPECTIVELY. </span>
 
 <span style="color:red"> TO-DO 9: ADD MA PLOT AS AN OUTPUT OF THIS FUNCTION </span>
 
-<span style="color:red"> TO-DO 10: MODIFY FUNCTION SO THAT LFC THRESHOLDS ARE IN LOG2 SCALE </span>
+<span style="color:green"> TO-DO 10: MODIFY FUNCTION SO THAT LFC THRESHOLDS ARE IN LOG2 SCALE </span>
 
 The resulting output list can be subsetted to extract genes that are differentially expressed 
 
