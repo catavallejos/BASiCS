@@ -140,7 +140,7 @@ BASiCS_DetectHVG <- function(Data,
     cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
     cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
     cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1)
-    xlab = ifelse("xlab" %in% names(args),args$xlab, expression(mu[i]))
+    xlab = ifelse("xlab" %in% names(args),args$xlab, "Mean expression")
     ylab = ifelse("ylab" %in% names(args),args$ylab, "HVG probability")
     main = ifelse("main" %in% names(args),args$main, "")
     
@@ -275,7 +275,7 @@ BASiCS_DetectLVG <- function(Data,
     cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
     cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
     cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1)
-    xlab = ifelse("xlab" %in% names(args),args$xlab, expression(mu[i]))
+    xlab = ifelse("xlab" %in% names(args),args$xlab, "Mean expression")
     ylab = ifelse("ylab" %in% names(args),args$ylab, "LVG probability")
     main = ifelse("main" %in% names(args),args$main, "")
     
