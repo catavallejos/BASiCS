@@ -318,7 +318,7 @@ Finally, it is also possible to create a scatterplot of posterior estimates for 
 plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
 ```
 
-<span style="color:red"> TO-DO 14: POSSIBLY CHANGE THIS PLOT BY A 'smoothScatter' (OR ADD SMOOTH AS AN OPTION) </span>
+<span style="color:green"> TO-DO 14: POSSIBLY CHANGE THIS PLOT BY A 'smoothScatter' (OR ADD SMOOTH AS AN OPTION) </span>
 
 
 ## Normalisation and removal of technical variation
