@@ -180,7 +180,7 @@ Test <- BASiCS_D_TestDE(objectRef = Chain1, objectTest = Chain2,
                         EpsilonM = 0.4, EpsilonD = 0.4, OffSet = TRUE)
 ```
 
-<span style="color:red"> TO-DO 7: RENAME FUNCTION ABOVE AS `BASiCS_TestDE` </span>
+<span style="color:green"> TO-DO 7: RENAME FUNCTION ABOVE AS `BASiCS_TestDE` </span>
 
 <span style="color:red"> TO-DO 8: RENAME ARGUMENTS `objectRef` AND `objectTest` AS `ChainTest` AND `ChainRef` RESPECTIVELY. </span>
 
