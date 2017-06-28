@@ -39,4 +39,4 @@ export(BASiCS_Filter,
        BASiCS_VarThresholdSearchLVG,
        BASiCS_DenoisedRates,
        BASiCS_DenoisedCounts,
-       BASiCS_D_TestDE)
+       BASiCS_TestDE)

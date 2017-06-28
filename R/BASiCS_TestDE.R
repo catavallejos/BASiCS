@@ -1,4 +1,4 @@
-#' @name BASiCS_D_TestDE
+#' @name BASiCS_TestDE
 #' 
 #' @title Detection of genes with changes in expression
 #' 
@@ -20,7 +20,7 @@
 #' @param GenesSelect Optional argument to provide a user-defined list of genes to be considered for the comparison (default = NULL). When used, this argument must be a vector of 'TRUE' (include gene) / 'FALSE' (exclude gene) indicator, with the same length as the number of intrinsic genes and following the same order as how genes are displayed in the table of counts.  This argument is necessary in order to have a meaningful EFDR calibration when the user decides to exclude some genes from the comparison. 
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #' 
-#' @return \code{BASiCS_D_TestDE} returns a list of 4 elements:
+#' @return \code{BASiCS_TestDE} returns a list of 4 elements:
 #' \describe{
 #' \item{\code{Table}}{A \code{\link[base]{data.frame}} containing the results of the differential expression test}
 #'    \describe{
@@ -63,8 +63,8 @@
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @rdname BASiCS_D_TestDE
-BASiCS_D_TestDE <- function(objectRef,
+#' @rdname BASiCS_TestDE
+BASiCS_TestDE <- function(objectRef,
                             objectTest,
                             EpsilonM = 0.10,
                             EpsilonD = 0.10,
