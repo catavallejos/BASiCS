@@ -397,7 +397,7 @@ More details regarding the model setup, prior specification and implementation a
 
 # Acknowledgements
 
-We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for support and discussions throughout the development of this R library. In particular, we are grateful to A. Lun (CRUK-CI) for advise and support during the preparation the BioConductor submission. 
+We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for support and discussions throughout the development of this R library. In particular, we are grateful to A. Lun (CRUK-CI) for advise and support during the preparation the Bioconductor submission. 
 
 This work has been supported by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European Bioinformatics Institute (core European Molecular Biology Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
 
