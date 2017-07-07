@@ -7,7 +7,7 @@ importFrom("testthat", "context",
            "test_check")
 import("SummarizedExperiment")
 importFrom("graphics", "abline", "barplot", "legend", "lines", "par",
-             "points", "segments”, “smoothScatter”)
+             "points", "segments", "smoothScatter")
 importFrom("data.table", "fread")
 importFrom("graphics", "plot")
 importFrom("methods", "is", "new", "show")
