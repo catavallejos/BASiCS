@@ -34,12 +34,19 @@ library(BASiCS)
 
 ### Troubleshooting
 
-If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library. </a> This can be installed in the Mac terminal using the following command:
+#### `gfortran` error
+
+If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library. </a> 
+
+- If you are running R versions 3.0.0 - R 3.3.0, this can be installed in the Mac terminal using the following command:
 
 ```{}
 curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
 sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
 ```
+- If you are running R 3.4.0, you should install the official gfortran 6.1.0 binary for OS X El Capitan (10.11) from https://gcc.gnu.org/wiki/GFortranBinaries. 
+
+#### `pandoc` error
 
 If you are not using RStudio, you might need to manually install `pandoc` in order to create the vignette provided for BASiCS
 
