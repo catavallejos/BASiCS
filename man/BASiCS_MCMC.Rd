@@ -127,12 +127,11 @@ plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
 #BASiCS_VarThresholdSearchLVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PloS Computational Biology.
 
 Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single cell level. Genome Biology.
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

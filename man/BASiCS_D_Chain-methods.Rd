@@ -26,4 +26,3 @@ Data = makeExampleBASiCS_D_Data()
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
-

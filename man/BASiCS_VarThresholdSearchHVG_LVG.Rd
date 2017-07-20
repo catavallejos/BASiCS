@@ -4,6 +4,7 @@
 \alias{BASiCS_VarThresholdSearchHVG}
 \alias{BASiCS_VarThresholdSearchHVG_LVG}
 \alias{BASiCS_VarThresholdSearchLVG}
+\alias{BASiCS_VarThresholdSearchHVG_LVG}
 \title{Detection method for highly and lowly variable genes using a grid of variance contribution thresholds}
 \usage{
 BASiCS_VarThresholdSearchHVG(Data, object, VarThresholdsGrid,
@@ -39,10 +40,9 @@ See vignette
 help(BASiCS_MCMC)
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

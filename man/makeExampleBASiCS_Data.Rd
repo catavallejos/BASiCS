@@ -24,10 +24,9 @@ Data = makeExampleBASiCS_Data()
 is(Data, "BASiCS_Data")
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

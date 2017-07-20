@@ -28,13 +28,12 @@ MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
 MCMC_Output_Load <- BASiCS_LoadChain(RunName = "Test", StoreDir = getwd())
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

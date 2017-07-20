@@ -2,8 +2,8 @@
 % Please edit documentation in R/Classes.R
 \docType{class}
 \name{BASiCS_D_Data-class}
-\alias{BASiCS_D_Data,BASiCS_D_Data-class}
 \alias{BASiCS_D_Data-class}
+\alias{BASiCS_D_Data,BASiCS_D_Data-class}
 \title{The BASiCS_D_Data class}
 \description{
 Container of expression counts from single-cell 
@@ -32,15 +32,15 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 \item{\code{GeneNames}}{Vector of length \code{q} containing gene names. Default value: \code{GeneNames = paste("Gene", 1:q)}, 
 with numbering order as in the input dataset.}
 }}
+
 \examples{
 
 # See vignette
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

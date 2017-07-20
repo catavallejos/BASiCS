@@ -2,8 +2,8 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{plot-BASiCS_D_Summary-method}
-\alias{plot,BASiCS_D_Summary-method}
 \alias{plot-BASiCS_D_Summary-method}
+\alias{plot,BASiCS_D_Summary-method}
 \title{'plot' method for BASiCS_D_Summary objects}
 \usage{
 \S4method{plot}{BASiCS_D_Summary,ANY}(x, Param = "muTest", Param2 = NULL,
@@ -56,4 +56,3 @@ help(BASiCS_D_MCMC)
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
-

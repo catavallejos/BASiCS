@@ -4,6 +4,7 @@
 \alias{BASiCS_DetectHVG}
 \alias{BASiCS_DetectHVG_LVG}
 \alias{BASiCS_DetectLVG}
+\alias{BASiCS_DetectHVG_LVG}
 \title{Detection method for highly and lowly variable genes}
 \usage{
 BASiCS_DetectHVG(Data, object, VarThreshold, EviThreshold = NULL,
@@ -56,13 +57,12 @@ See vignette
 help(BASiCS_MCMC)
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

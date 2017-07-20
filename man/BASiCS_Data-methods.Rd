@@ -3,17 +3,22 @@
 \docType{methods}
 \name{BASiCS_Data-methods}
 \alias{BASiCS_Data-methods}
+\alias{show,BASiCS_Data-method}
+\alias{BASiCS_Data-methods}
 \alias{counts}
 \alias{counts,BASiCS_Data-method}
-\alias{displayBatchInfo}
-\alias{displayBatchInfo,BASiCS_Data-method}
-\alias{displayGeneNames}
-\alias{displayGeneNames,BASiCS_Data-method}
+\alias{BASiCS_Data-methods}
 \alias{displaySpikeInput}
 \alias{displaySpikeInput,BASiCS_Data-method}
+\alias{BASiCS_Data-methods}
 \alias{displayTechIndicator}
 \alias{displayTechIndicator,BASiCS_Data-method}
-\alias{show,BASiCS_Data-method}
+\alias{BASiCS_Data-methods}
+\alias{displayGeneNames}
+\alias{displayGeneNames,BASiCS_Data-method}
+\alias{BASiCS_Data-methods}
+\alias{displayBatchInfo}
+\alias{displayBatchInfo,BASiCS_Data-method}
 \title{S4 methods for BASiCS_Data objects}
 \usage{
 \S4method{show}{BASiCS_Data}(object)
@@ -67,13 +72,12 @@ displayGeneNames(Data)
 displayBatchInfo(Data)
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Data-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

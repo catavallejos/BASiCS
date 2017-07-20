@@ -2,8 +2,8 @@
 % Please edit documentation in R/Classes.R
 \docType{class}
 \name{BASiCS_Summary-class}
-\alias{BASiCS_Summary,BASiCS_Summary-class}
 \alias{BASiCS_Summary-class}
+\alias{BASiCS_Summary,BASiCS_Summary-class}
 \title{The BASiCS_Summary class}
 \description{
 Container of a summary of a \code{\link[BASiCS]{BASiCS_Chain-class}} object.  
@@ -25,6 +25,7 @@ density interval and third column contains the upper limits of high posterior de
 
 \item{\code{theta}}{Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (each row represents one batch)}
 }}
+
 \examples{
 
 # A BASiCS_Summary object created by the Summary method.
@@ -33,4 +34,3 @@ MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 MCMC_Summary <- Summary(MCMC_Output)
 
 }
-

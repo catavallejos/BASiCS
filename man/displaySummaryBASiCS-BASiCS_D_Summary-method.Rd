@@ -2,9 +2,9 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{displaySummaryBASiCS-BASiCS_D_Summary-method}
+\alias{displaySummaryBASiCS-BASiCS_D_Summary-method}
 \alias{displaySummaryBASiCS}
 \alias{displaySummaryBASiCS,BASiCS_D_Summary-method}
-\alias{displaySummaryBASiCS-BASiCS_D_Summary-method}
 \title{Accessors for the slots of a BASiCS_D_Summary object}
 \usage{
 \S4method{displaySummaryBASiCS}{BASiCS_D_Summary}(object, Param = "muTest")
@@ -27,10 +27,9 @@ Accessors for the slots of a \code{\link[BASiCS]{BASiCS_D_Summary-class}}
 help(BASiCS_D_MCMC)
   
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Summary-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

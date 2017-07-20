@@ -2,9 +2,9 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{plot-BASiCS_D_Chain-method}
+\alias{plot-BASiCS_D_Chain-method}
 \alias{plot}
 \alias{plot,BASiCS_D_Chain-method}
-\alias{plot-BASiCS_D_Chain-method}
 \title{'plot' method for BASiCS_D_Chain objects}
 \usage{
 \S4method{plot}{BASiCS_D_Chain,ANY}(x, Param = "muTest", Gene = NULL,
@@ -39,4 +39,3 @@ help(BASiCS_D_MCMC)
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
 }
-

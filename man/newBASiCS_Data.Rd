@@ -49,13 +49,12 @@ DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
 # Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Data-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

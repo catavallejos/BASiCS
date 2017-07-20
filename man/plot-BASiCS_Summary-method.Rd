@@ -2,8 +2,8 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{plot-BASiCS_Summary-method}
-\alias{plot,BASiCS_Summary-method}
 \alias{plot-BASiCS_Summary-method}
+\alias{plot,BASiCS_Summary-method}
 \title{'plot' method for BASiCS_Summary objects}
 \usage{
 \S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,
@@ -48,10 +48,9 @@
 help(BASiCS_MCMC)
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

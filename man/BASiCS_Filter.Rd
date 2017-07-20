@@ -58,13 +58,12 @@ SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID \%in\%
 FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Data-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

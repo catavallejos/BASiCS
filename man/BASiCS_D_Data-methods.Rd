@@ -3,13 +3,16 @@
 \docType{methods}
 \name{BASiCS_D_Data-methods}
 \alias{BASiCS_D_Data-methods}
+\alias{show,BASiCS_D_Data-method}
+\alias{BASiCS_D_Data-methods}
 \alias{counts}
 \alias{counts,BASiCS_D_Data-method}
+\alias{BASiCS_D_Data-methods}
 \alias{displaySpikeInput}
 \alias{displaySpikeInput,BASiCS_D_Data-method}
+\alias{BASiCS_D_Data-methods}
 \alias{displayTechIndicator}
 \alias{displayTechIndicator,BASiCS_D_Data-method}
-\alias{show,BASiCS_D_Data-method}
 \title{S4 methods for BASiCS_D_Data objects}
 \usage{
 \S4method{show}{BASiCS_D_Data}(object)
@@ -62,10 +65,9 @@ displayTechIndicator(Data)
 displaySpikeInput(Data, samples = "test")
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Data-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

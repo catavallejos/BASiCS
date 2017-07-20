@@ -70,10 +70,9 @@ See vignette
 # See vignette
 
 }
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_D_Chain-class}}
 }
-
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+}

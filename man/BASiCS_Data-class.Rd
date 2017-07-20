@@ -2,8 +2,8 @@
 % Please edit documentation in R/Classes.R
 \docType{class}
 \name{BASiCS_Data-class}
-\alias{BASiCS_Data,BASiCS_Data-class}
 \alias{BASiCS_Data-class}
+\alias{BASiCS_Data,BASiCS_Data-class}
 \title{The BASiCS_Data class}
 \description{
 Container of expression counts from single-cell 
@@ -24,6 +24,7 @@ with numbering order as in the input dataset.}
 
 \item{\code{BatchInfo}}{Vector of lenght \code{n} containing batch indicators.}
 }}
+
 \examples{
 
 # Expression counts
@@ -49,13 +50,12 @@ displaySpikeInput(Data)
 displayBatchInfo(Data)
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Data-methods}}, \code{\link[BASiCS]{BASiCS_MCMC}}.
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

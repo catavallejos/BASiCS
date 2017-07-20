@@ -23,10 +23,9 @@ Data = makeExampleBASiCS_Data()
 MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 
 }
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-}
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
-
+\author{
+Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+}

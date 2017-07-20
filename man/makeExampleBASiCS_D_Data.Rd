@@ -22,4 +22,3 @@ is(Data, "BASiCS_D_Data")
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
 }
-
