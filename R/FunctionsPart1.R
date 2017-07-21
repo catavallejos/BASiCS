@@ -1003,14 +1003,14 @@ newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta)
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 BASiCS_LoadChain <- function(RunName, StoreDir = getwd(), WithSpikes = TRUE)
 {
-  ChainMu = as.matrix(fread(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt"))))
-  ChainDelta = as.matrix(fread(file.path(StoreDir, paste0("chain_delta_", RunName, ".txt"))))
-  ChainPhi = as.matrix(fread(file.path(StoreDir, paste0("chain_phi_", RunName, ".txt"))))
+  ChainMu = as.matrix(data.table::fread(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt"))))
+  ChainDelta = as.matrix(data.table::fread(file.path(StoreDir, paste0("chain_delta_", RunName, ".txt"))))
+  ChainPhi = as.matrix(data.table::fread(file.path(StoreDir, paste0("chain_phi_", RunName, ".txt"))))
   # Add-hoc fix for the no-spikes case
-  if(WithSpikes == TRUE) {ChainS = as.matrix(fread(file.path(StoreDir, paste0("chain_s_", RunName, ".txt"))))}
+  if(WithSpikes == TRUE) {ChainS = as.matrix(data.table::fread(file.path(StoreDir, paste0("chain_s_", RunName, ".txt"))))}
   else {ChainS = matrix(1, ncol = ncol(ChainPhi), nrow = nrow(ChainPhi))}
-  ChainNu = as.matrix(fread(file.path(StoreDir, paste0("chain_nu_", RunName, ".txt"))))
-  ChainTheta = as.matrix(fread(file.path(StoreDir, paste0("chain_theta_", RunName, ".txt"))))
+  ChainNu = as.matrix(data.table::fread(file.path(StoreDir, paste0("chain_nu_", RunName, ".txt"))))
+  ChainTheta = as.matrix(data.table::fread(file.path(StoreDir, paste0("chain_theta_", RunName, ".txt"))))
   
   MCMC_Output = newBASiCS_Chain(mu = ChainMu, 
                                 delta = ChainDelta, 
