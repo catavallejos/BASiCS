@@ -464,7 +464,7 @@ HiddenBASiCS_MCMC_Start<-function(
   cv2Bio <- varsBio / (meansBio)^2
   delta0 = rgamma(q.bio,1,1) + 1
   Aux = which(meansBio > quantile(meansBio, 0.10))
-  delta0[Aux] <- cv2Bio2[Aux]
+  delta0[Aux] <- cv2Bio[Aux]
   # 1e-3 added to be coherent with tolerance used within MCMC sampler
   delta0 = delta0 + 1e-3
 

@@ -263,7 +263,7 @@ version 0.7.26: (2017-02-09)
 - Update of 'newBASiCS_Data' function to prevent issues related to unused levels when the 'BatchInfo' argument is set as a 'factor' (thanks to Kevin Rue-Albrecht for pointing out this issue)
 
 version 0.7.27: (2017-05-09)
-- Bug fixed in 'BASiCS_Filter' function to stop the code crashing when there are genes with zero counts across all cells. 
+- Bug fixed in 'BASiCS_Filter' function to stop the code crashing when there are genes with zero counts across all cells.
 
 version 0.7.28: (2017-07-21)
 - Fixed dependency to 'data.table' to prevent errors in 'BASiCS_LoadChain' function(thanks to Yongchao Ge for pointing out this issue). This change affects the DESCRIPTION file as well as the 'BASiCS_LoadChain' function. 
@@ -271,4 +271,7 @@ version 0.7.28: (2017-07-21)
 version 0.7.29: (2017-07-24)
 - 'BASiCS:::HiddenBASiCS_MCMC_Start' function modified regarding the definition of starting values for mu (to avoid adding +1 when it's not necessary)
 -  'BASiCS:::HiddenBASiCS_MCMC_Start' modified to have better starting values for delta (this is based on eq 2 from Vallejos et al, 2016)
+
+version 0.7.30: (2017-07-26)
+- Typo fixed in 'BASiCS:::HiddenBASiCS_MCMC_Start' function (thanks to @bdulken for pointing out this issue)
 
