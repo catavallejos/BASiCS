@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 0.7.27
-Date: : 2017-05-09
+Version: 0.7.30
+Date: : 2017-07-26
 Author: Catalina A. Vallejos
 Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
@@ -44,6 +44,8 @@ Imports:
 Suggests:
     knitr,
     BiocStyle
+Suggests:
+    knitr
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
