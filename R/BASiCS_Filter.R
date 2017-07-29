@@ -39,6 +39,8 @@
 #'          names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
 #' FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 #'
+#' @seealso \code{\link[BASiCS]{BASiCS_Data-class}}
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
@@ -54,24 +56,24 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
   GeneIndex = 1:q
   
   # Remove cells with zero counts in either biological or technical genes
-  IncludeCells = ifelse(apply(Counts[!Tech,],2,sum)>0 & apply(Counts[Tech,],2,sum)>0, TRUE, FALSE)
+  IncludeCells = ifelse(apply(Counts[!Tech,],2,sum)>0 & apply(Counts[Tech,],2,sum)>0, T, F)
   if(sum(IncludeCells) == 0) stop('All cells have zero biological or technical counts (across all transcripts) \n')
   IncludeCells = ifelse(apply(Counts,2,sum) >= MinTotalCountsPerCell, IncludeCells, F)
   Counts1 = Counts[,IncludeCells]
   
   # Remove transcripts with zero counts across all cells
-  IncludeBio = ifelse(apply(Counts1[!Tech,],1,sum) >= MinTotalCountsPerGene, TRUE, FALSE)
-  IncludeTech = ifelse(apply(Counts1[Tech,],1,sum) >= MinTotalCountsPerGene, TRUE, FALSE)
+  IncludeBio = ifelse(apply(Counts1[!Tech,],1,sum) >= MinTotalCountsPerGene, T, F)
+  IncludeTech = ifelse(apply(Counts1[Tech,],1,sum) >= MinTotalCountsPerGene, T, F)
   
   # Remove transcripts expressed in less than 'MinExpressedCells' cells
   NonZero <- I(Counts1>0)
-  IncludeBio = ifelse(apply(NonZero[!Tech,], 1, sum) >= MinCellsWithExpression, IncludeBio, FALSE)
-  IncludeTech = ifelse(apply(NonZero[Tech,], 1, sum) >= MinCellsWithExpression, IncludeTech, FALSE)
+  IncludeBio = ifelse(apply(NonZero[!Tech,], 1, sum) >= MinCellsWithExpression, IncludeBio, F)
+  IncludeTech = ifelse(apply(NonZero[Tech,], 1, sum) >= MinCellsWithExpression, IncludeTech, F)
   
   # Remove transcripts with low counts in the cells where they are expressed
   if(min(apply(NonZero[!Tech,], 1, sum)) == 0 & MinCellsWithExpression == 0) warning("Some genes have zero counts in all cells. These should be removed before running the analysis (use 'MinCellsWithExpression' > 0).")
-  IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[!Tech,], 1, sum), IncludeBio, FALSE)
-  IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[Tech,], 1, sum), IncludeTech, FALSE)
+  IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[!Tech,], 1, sum), IncludeBio, F)
+  IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[Tech,], 1, sum), IncludeTech, F)
   
   if(!is.null(BatchInfo))
   {
