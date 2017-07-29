@@ -277,3 +277,5 @@ version 0.7.30: (2017-07-26)
 
 version 1.0.0: (2017-07-29)
 - Initial big merge with Nils' changes (in preparation for Bioconductor submission)
+- For reference, here is a summary of the changes implemented by Nils:
+  * 
