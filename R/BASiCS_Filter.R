@@ -72,7 +72,7 @@ BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
   if(min(apply(NonZero[!Tech,], 1, sum)) == 0 & MinCellsWithExpression == 0) warning("Some genes have zero counts in all cells. These should be removed before running the analysis (use 'MinCellsWithExpression' > 0).")
   IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[!Tech,], 1, sum), IncludeBio, FALSE)
   IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[Tech,], 1, sum), IncludeTech, FALSE)
-  
+
   if(!is.null(BatchInfo))
   {
     list("Counts" = Counts1[c(IncludeBio,IncludeTech),], 
