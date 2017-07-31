@@ -276,6 +276,35 @@ version 0.7.30: (2017-07-26)
 - Typo fixed in 'BASiCS:::HiddenBASiCS_MCMC_Start' function (thanks to @bdulken for pointing out this issue)
 
 version 1.0.0: (2017-07-29)
-- Initial big merge with Nils' changes (in preparation for Bioconductor submission)
-- For reference, here is a summary of the changes implemented by Nils:
-  * 
+- Initial big merge with @nilseling changes (in preparation for Bioconductor submission)
+- For reference, here is a summary of the changes implemented by @nilseling:
+  * Creation of individual .R for each R function (but all 'Hidden' functions are in one file)
+  * BASiCS_Data class replaced by SummarizedExperiment class (Bioconductor)
+  * Contact email updated to 'cvallejos@@turing.ac.uk'
+  * Methods for BASiCS_Data and BASiCS_D_Data objects removed (these classes no longer exist)
+  * Adjust newBASiCS_Data function to create a SummarizedExperiment object
+  * 'cat' calls replaced by 'message' calls
+  * Clean up of BASiCS_D_TestDE function (removed unused args)
+  * Clean up of BASiCS_DetectHVG_LVG function (using SummarizedExperiment class)
+  * Clean up of BASiCS_MCMC function (using SummarizedExperiment class)
+  * Clean up of BASiCS_Sim function (using SummarizedExperiment class; extra arg 'muSpikes')
+  * Clean up of BASiCS_DetectHVG_LVG function (using SummarizedExperiment class)
+  * Clean up of BASiCS_VarianceDecomp function (using SummarizedExperiment class)
+  * Clean up of BASiCS_VarThresholdSearchHVG function (using SummarizedExperiment class)
+  * Clean up of BASiCS_DenoisedCounts function (using SummarizedExperiment class)
+  * Clean up of BASiCS_DenoisedRates function (using SummarizedExperiment class)
+  * Clean up of HiddenBASiCS_MCMC_Start function (using SummarizedExperiment class)
+  * Clean up of makeExampleBASiCS_Data function (using SummarizedExperiment class) 
+  * Removed methods associated to BASiCS_D_MCMC class (no longer in use)
+  * NAMESPACE + Rd files updated accordingly
+  * DESCRIPTION file updated accordingly
+
+  UPDATED UP TO JUNE 19
+  
+- TODO:
+  * Update welcome message to summarise all changes
+  * Update description to emphasise *supervised* experiments
+  * Implement change suggested by Giacomo
+  
+  
+  
