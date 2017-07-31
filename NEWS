@@ -298,6 +298,7 @@ version 1.0.0: (2017-07-29)
   * Removed methods associated to BASiCS_D_MCMC class (no longer in use)
   * NAMESPACE + Rd files updated accordingly
   * DESCRIPTION file updated accordingly
+  * Vignette file updated accordingly
   
 version 1.0.1: (2017-07-31)
 - Minor changes function-by-function (revision of documentation + minor bugs)
