@@ -7,9 +7,9 @@
 BASiCS_LoadChain(RunName, StoreDir = getwd(), WithSpikes = TRUE)
 }
 \arguments{
-\item{RunName}{String used to index `.txt` files storing chains (as in \code{BASiCS_MCMC} function)}
+\item{RunName}{String used to index `.Rds` files storing the MCMC chains (produced by the \code{BASiCS_MCMC} function)}
 
-\item{StoreDir}{Directory where `.txt` files are stored. Default: \code{StoreDir = getwd()}}
+\item{StoreDir}{Directory where `.Rds` files is stored. Default: \code{StoreDir = getwd()}}
 
 \item{WithSpikes}{\code{TRUE}/\code{FALSE} indicator of spike-ins usage. Default: \code{WithSpikes = TRUE}}
 }
@@ -23,9 +23,10 @@ a \code{\link[BASiCS]{BASiCS_Chain-class}} object
 \examples{
 
 Data = makeExampleBASiCS_Data()
-MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
-                           StoreChains = TRUE, StoreDir = getwd(), RunName = "Test")
-MCMC_Output_Load <- BASiCS_LoadChain(RunName = "Test", StoreDir = getwd())
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
+                           StoreChains = TRUE, StoreDir = tempdir(), 
+                           RunName = "Test")
+ChainLoad <- BASiCS_LoadChain(RunName = "Test", StoreDir = tempdir())
 
 }
 \references{

@@ -310,6 +310,15 @@ version 1.0.1: (2017-07-31)
   * makeExampleBASiCS_Data : `Case1` param replaced by `Example` (vignette + unit test updated accordingly)
   * BASiCS_MCMC : default value for PriorDelta set to 'log-normal' 
   * HiddenBASiCS_MCMC_Start : new starting values for delta (as in main repo)
+  
+version 1.0.2: (2017-08-01)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_MCMC : 'MCMC_Output' replaced by 'Chain' in examples
+- Major changes function by function
+  * BASiCS_MCMC : chains stored a single .Rds files, with BASiCS_Chain format (rather than separate .txt files)
+  * BASiCS_LoadChain : updated accordingly
+  * BASiCS_DetectHVG : evidence threhold to be defined by EFDR only 
+- Vignette updated accordingly 
 
 - TODO:
   * Update welcome message to summarise all changes
@@ -320,6 +329,9 @@ version 1.0.1: (2017-07-31)
   * Check that help of BASiCS_MCMC runs smoothly (HVG/LVG onwards)
   * Change cut-off criteria for HVG / LVG 
   * Add checks to BASiCS_MCMC verify SE object has all the required info. 
-  * Edit output to store an Rds object 
+  * Store all necessary parameters for chain restart
+  * Edit BASiCS_DetectLVG as BASiCS_DetectHVG
+  * Add comment to BASiCS_DetectHVG
+  * Update vignette accordingly
   
   

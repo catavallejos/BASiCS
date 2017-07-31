@@ -252,6 +252,8 @@ Chain <- BASiCS_MCMC(Data, N = 20000, Thin = 10, Burn = 10000,
                      StoreDir = tempdir(), RunName = "Example")
 ```
 
+In this example, the output of `BASiCS_MCMC` will be stored as a `BASiCS_Chain` object in the file "chain_Example.Rds", within the `tempdir()` directory. 
+
 To load pre-computed MCMC chains, 
 
 ```{r LoadChainNotRun}

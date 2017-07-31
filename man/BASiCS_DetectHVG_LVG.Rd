@@ -8,7 +8,7 @@
 \title{Detection method for highly and lowly variable genes}
 \usage{
 BASiCS_DetectHVG(Data, object, VarThreshold, EviThreshold = NULL,
-  OrderVariable = "Prob", Plot = FALSE, ...)
+  EFDR = 0.05, OrderVariable = "Prob", Plot = FALSE, ...)
 
 BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
   OrderVariable = "Prob", Plot = FALSE, ...)
@@ -22,9 +22,11 @@ BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
 
 \item{EviThreshold}{Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)}
 
+\item{EFDR}{Target for expected false discovery rate related to HVG detection (default = 0.05)}
+
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
 
-\item{Plot}{If \code{Plot = T} a plot of the gene specific expression level against HVG or LVG is generated.}
+\item{Plot}{If \code{Plot = TRUE} a plot of the gene specific expression level against HVG or LVG is generated.}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
 }

@@ -55,52 +55,52 @@
 #'
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs migth be required to reach convergence
-#' MCMC_Output <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, PrintProgress = FALSE)
+#' Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, PrintProgress = FALSE)
 #' 
 #' # `displayChainBASiCS` can be used to extract information from this output. For example:
-#' head(displayChainBASiCS(MCMC_Output, Param = "mu"))
+#' head(displayChainBASiCS(Chain, Param = "mu"))
 #'
 #' # Traceplot (examples only)
-#' plot(MCMC_Output, Param = "mu", Gene = 1)
-#' plot(MCMC_Output, Param = "phi", Cell = 1)
-#' plot(MCMC_Output, Param = "theta", Batch = 1)
+#' plot(Chain, Param = "mu", Gene = 1)
+#' plot(Chain, Param = "phi", Cell = 1)
+#' plot(Chain, Param = "theta", Batch = 1)
 #'
 #' # Calculating posterior medians and 95% HPD intervals
-#' MCMC_Summary <- Summary(MCMC_Output)
+#' ChainSummary <- Summary(Chain)
 #' 
 #' # `displaySummaryBASiCS` can be used to extract information from this output. For example:
-#' head(displaySummaryBASiCS(MCMC_Summary, Param = "mu"))
+#' head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
 #'
 #' # Graphical display of posterior medians and 95% HPD intervals (examples only)
-#' plot(MCMC_Summary, Param = "mu", main = "All genes")
-#' plot(MCMC_Summary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-#' plot(MCMC_Summary, Param = "phi", main = "All cells")
-#' plot(MCMC_Summary, Param = "phi", Cells = 1:5, main = "First 5 cells")
-#' plot(MCMC_Summary, Param = "theta")
+#' plot(ChainSummary, Param = "mu", main = "All genes")
+#' plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
+#' plot(ChainSummary, Param = "phi", main = "All cells")
+#' plot(ChainSummary, Param = "phi", Cells = 1:5, main = "First 5 cells")
+#' plot(ChainSummary, Param = "theta")
 #'
 #' # To constrast posterior medians of cell-specific parameters (example only)
 #' par(mfrow = c(1,2))
-#' plot(MCMC_Summary, Param = "phi", Param2 = "s", smooth = FALSE)
-#' plot(MCMC_Summary, Param = "phi", Param2 = "s", smooth = TRUE) # Recommended for large numbers of cells
+#' plot(ChainSummary, Param = "phi", Param2 = "s", smooth = FALSE)
+#' plot(ChainSummary, Param = "phi", Param2 = "s", smooth = TRUE) # Recommended for large numbers of cells
 #'
 #' # To constrast posterior medians of gene-specific parameters
 #' par(mfrow = c(1,2))
-#' plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
-#' plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE) # Recommended
+#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
+#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE) # Recommended
 #'
 #' # Highly and lowly variable genes detection
-#' #DetectHVG <- BASiCS_DetectHVG(Data, MCMC_Output, VarThreshold = 0.70, Plot = TRUE)
-#' #DetectLVG <- BASiCS_DetectLVG(Data, MCMC_Output, VarThreshold = 0.40, Plot = TRUE)
+#' DetectHVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.70, EFDR = 0.05, Plot = TRUE)
+#' #DetectLVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.40, Plot = TRUE)
 #'
-#' #plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", col = 8)
+#' #plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
 #' #points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3],
 #' #       pch = 16, col = "red", cex = 1)
 #' #points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3],
 #' #       pch = 16, col = "blue", cex = 1)
 #'
 #' # If variance thresholds are not fixed
-#' #BASiCS_VarThresholdSearchHVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
-#' #BASiCS_VarThresholdSearchLVG(Data, MCMC_Output, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
+#' #BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
+#' #BASiCS_VarThresholdSearchLVG(Data, Chain, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
@@ -339,51 +339,6 @@ BASiCS_MCMC <- function(
   print(Time)
   cat("\n")
   
-  OldDir = getwd()
-  
-  if(StoreChains)
-  {
-    setwd(StoreDir)
-    
-    message("--------------------------------------------------------------------", "\n",
-            "Storing MCMC chains of model parameters as .txt files in", "\n",
-            paste0("'",StoreDir,"' directory ... "), "\n",
-            "--------------------------------------------------------------------", "\n")
-    
-    write.table(Chain$mu[,1:q.bio],paste0("chain_mu_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
-    write.table(Chain$delta,paste0("chain_delta_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
-    write.table(Chain$phi,paste0("chain_phi_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
-    if(length(metadata(Data)$SpikeInput) > 1){write.table(Chain$s,paste0("chain_s_",RunName,".txt"),col.names=TRUE,row.names=FALSE)}
-    write.table(Chain$nu,paste0("chain_nu_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
-    write.table(Chain$theta,paste0("chain_theta_",RunName,".txt"),col.names=TRUE,row.names=FALSE)
-    
-    setwd(OldDir)
-  }
-  
-  if(StoreAdapt)
-  {
-    setwd(StoreDir)
-    
-    message("--------------------------------------------------------------------", "\n",
-            "Storing trajectories of adaptive proposal variances (log-scale) as .txt files in", "\n",
-            paste0("'",StoreDir,"' directory ... "), "\n",
-            "--------------------------------------------------------------------", "\n")
-    
-    colnames(Chain$ls.mu) = rownames(assay(Data))[!rowData(Data)$Tech]
-    colnames(Chain$ls.delta) = rownames(assay(Data))[!rowData(Data)$Tech]
-    colnames(Chain$ls.phi) = "AllCells"
-    colnames(Chain$ls.nu) = paste0("Cell",1:n)
-    colnames(Chain$ls.theta) = paste0("Batch",1:nBatch)
-    
-    write.table(Chain$ls.mu,paste0("chain_ls.mu_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$ls.delta,paste0("chain_ls.delta_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$ls.phi,paste0("chain_ls.phi_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$ls.nu,paste0("chain_ls.nu_",RunName,".txt"),col.names=T,row.names=F)
-    write.table(Chain$ls.theta,paste0("chain_ls.theta_",RunName,".txt"),col.names=T,row.names=F)
-    
-    setwd(OldDir)
-  }
-  
   message("--------------------------------------------------------------------", "\n",
           "Output", "\n",
           "--------------------------------------------------------------------", "\n")
@@ -393,6 +348,45 @@ BASiCS_MCMC <- function(
   ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi,
                                 s = Chain$s, nu = Chain$nu, theta = Chain$theta)
   
+  OldDir = getwd()
+  
+  if(StoreChains)
+  {
+    setwd(StoreDir)
+    
+    message("--------------------------------------------------------------------", "\n",
+            "BASiCS_Chain object stored as ", paste0("chain_",RunName,".Rds"), 
+            "file in", "\n",
+            paste0("'",StoreDir,"' directory ... "), "\n",
+            "--------------------------------------------------------------------", "\n")
+    
+    saveRDS(ChainClass, file=paste0("chain_",RunName,".Rds"))
+  
+    setwd(OldDir)
+  }
+  
+  if(StoreAdapt)
+  {
+    setwd(StoreDir)
+    
+    message("--------------------------------------------------------------------", "\n",
+            "Storing trajectories of adaptive proposal variances (log-scale) as ",
+            paste0("chain_ls_",RunName,".Rds"), "file in \n",
+            paste0("'",StoreDir,"' directory ... "), "\n",
+            "--------------------------------------------------------------------", "\n")
+    
+    ChainLS <- list("ls.mu" = Chain$ls.mu, 
+                    "ls.delta" = Chain$ls.delta, 
+                    "ls.phi" = Chain$ls.phi, 
+                    "ls.nu" = Chain$ls.nu, 
+                    "ls.theta" = Chain$ls.theta)
+    saveRDS(ChainLS, file=paste0("chain_ls_",RunName,".Rds"))
+    
+    setwd(OldDir)
+  }
+  
+  # This 'if' refers to the no-spikes case
+  # Still under development - ignore for now!
   if(length(metadata(Data)$SpikeInput) == 1)
   {
     message("\n",
