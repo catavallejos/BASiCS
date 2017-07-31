@@ -8,7 +8,7 @@
 #' @param Tech Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.
 #' @param SpikeInfo \code{data.frame} whose first and second columns contain the gene names assigned to the spike-in genes
 #' (they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.
-#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information.
+#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}. 
 #'
 #' @return An object of class \code{\linkS4class{SummarizedExperiment}}.
 #'
@@ -31,14 +31,18 @@
 #' # Creating a BASiCS_Data object (with batch effect)
 #' BatchInfo = c(rep(1, 5), rep(2, 5))
 #' DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
+#' 
 #'
 #' # Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 #'
 #' @seealso \code{\linkS4class{SummarizedExperiment}}
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' 
+#' Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
   

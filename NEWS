@@ -298,13 +298,27 @@ version 1.0.0: (2017-07-29)
   * Removed methods associated to BASiCS_D_MCMC class (no longer in use)
   * NAMESPACE + Rd files updated accordingly
   * DESCRIPTION file updated accordingly
-
-  UPDATED UP TO JUNE 19
   
+version 1.0.1: (2017-07-31)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * newBASiCS_Data : added ref to GB paper + default par value doc + Nils as author
+  * BASiCS_Filter : added ref to GB paper + default par value doc 
+  * makeExampleBASiCS_Data : added ref to GB paper + default par value doc + Nils as author
+  * BASiCS_MCMC : added ref to GB paper + Nils as author + fix print of system.time + updated examples
+- Major changes function by function
+  * makeExampleBASiCS_Data : `Case1` param replaced by `Example` (vignette + unit test updated accordingly)
+  * BASiCS_MCMC : default value for PriorDelta set to 'log-normal' 
+  * HiddenBASiCS_MCMC_Start : new starting values for delta (as in main repo)
+
 - TODO:
   * Update welcome message to summarise all changes
   * Update description to emphasise *supervised* experiments
   * Implement change suggested by Giacomo
-  
+  * Replace SummarizedExperiment by SingleCellExperiment class
+  * Storage in terms of Rdata files + BASiCS_Load updated accordingly
+  * Check that help of BASiCS_MCMC runs smoothly (HVG/LVG onwards)
+  * Change cut-off criteria for HVG / LVG 
+  * Add checks to BASiCS_MCMC verify SE object has all the required info. 
+  * Edit output to store an Rds object 
   
   

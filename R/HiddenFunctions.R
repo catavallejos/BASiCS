@@ -49,14 +49,24 @@ HiddenBASiCS_MCMC_Start<-function(
     # Initialize mu using average 'normalised counts' across cells
     nCountsBio <- t( t(assay(Data)) / phi0 )
     meansBio <- rowMeans( nCountsBio )
-    mu0 <- meansBio + 1 # +1 to avoid zeros as starting values    
+    # +1 to avoid zeros as starting values 
+    meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
+    mu0 <- meansBio 
   }
   
   # Random stating value for delta
+  # Defined by the CV for high- and mid-expressed genes
+  # This comes from equation (2) in Vallejos et al (2016)
+  varsBio <- apply( nCountsBio, 1, var )
+  cv2Bio <- varsBio / (meansBio)^2
   delta0 = rgamma(q.bio,1,1) + 1
+  Aux = which(meansBio > quantile(meansBio, 0.10))
+  delta0[Aux] <- cv2Bio[Aux]
+  # 1e-3 added to be coherent with tolerance used within MCMC sampler
+  delta0 = delta0 + 1e-3
   
   # Random stating value for theta (within typically observed range)
-  theta0=runif(1, min = 0.2, max = 1)
+  theta0 = runif(1, min = 0.2, max = 1)
   
   # If given, load default values for adaptive proposal variances
   args <- list(...)

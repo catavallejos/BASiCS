@@ -16,15 +16,15 @@ First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows
 
 \item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.}
 
-\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information.}
+\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}.}
 
-\item{MinTotalCountsPerCell}{Minimum value of total expression counts required per cell (biological and technical)}
+\item{MinTotalCountsPerCell}{Minimum value of total expression counts required per cell (biological and technical). Default value: \code{MinTotalCountsPerCell = 2}.}
 
-\item{MinTotalCountsPerGene}{Minimum value of total expression counts required per transcript (biological and technical)}
+\item{MinTotalCountsPerGene}{Minimum value of total expression counts required per transcript (biological and technical). Default value: \code{MinTotalCountsPerGene = 2}.}
 
-\item{MinCellsWithExpression}{Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript.}
+\item{MinCellsWithExpression}{Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript. Default value: \code{MinCellsWithExpression = 2}.}
 
-\item{MinAvCountsPerCellsWithExpression}{Minimum average number of counts per cells where expression is detected. Criteria applied to each transcript.}
+\item{MinAvCountsPerCellsWithExpression}{Minimum average number of counts per cells where expression is detected. Criteria applied to each transcript. Default value: \code{MinAvCountsPerCellsWithExpression = 2}.}
 }
 \value{
 A list of 2 elements
@@ -38,7 +38,8 @@ A list of 2 elements
 }
 }
 \description{
-\code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria.
+\code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria. The output of this function can be combined with \code{newBASiCS_Data} to generate a 
+the \code{\linkS4class{SummarizedExperiment}} object required to run BASiCS.
 }
 \examples{
 
@@ -59,7 +60,9 @@ FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+
+Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

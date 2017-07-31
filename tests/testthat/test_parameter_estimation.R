@@ -1,7 +1,7 @@
 context("Basic example of parameter estimation")
 
 test_that("paramater estimations are correct", {
-    Data = makeExampleBASiCS_Data(WithSpikes = TRUE, Case1 = TRUE)
+    Data = makeExampleBASiCS_Data(WithSpikes = TRUE, Example = 1)
     MCMC_Output <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, PrintProgress = FALSE)
     MCMC_Summary <- Summary(MCMC_Output, prob = 0.995)
     # Parameters used for the simulation

@@ -1,17 +1,18 @@
 #' @title Filter for input datasets
 #'
-#' @description \code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria.
+#' @description \code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria. The output of this function can be combined with \code{newBASiCS_Data} to generate a 
+#' the \code{\linkS4class{SummarizedExperiment}} object required to run BASiCS. 
 #'
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.
 #' @param Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
 #' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.
-#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information.
-#' @param MinTotalCountsPerCell Minimum value of total expression counts required per cell (biological and technical)
-#' @param MinTotalCountsPerGene Minimum value of total expression counts required per transcript (biological and technical)
-#' @param MinCellsWithExpression Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript.
-#' @param MinAvCountsPerCellsWithExpression Minimum average number of counts per cells where expression is detected. Criteria applied to each transcript.
-#'
+#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}. 
+#' @param MinTotalCountsPerCell Minimum value of total expression counts required per cell (biological and technical). Default value: \code{MinTotalCountsPerCell = 2}.
+#' @param MinTotalCountsPerGene Minimum value of total expression counts required per transcript (biological and technical). Default value: \code{MinTotalCountsPerGene = 2}.
+#' @param MinCellsWithExpression Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript. Default value: \code{MinCellsWithExpression = 2}.
+#' @param MinAvCountsPerCellsWithExpression Minimum average number of counts per cells where expression is detected. Criteria applied to each transcript. Default value: \code{MinAvCountsPerCellsWithExpression = 2}.
+#' 
 #' @return A list of 2 elements
 #' \describe{
 #' \item{\code{Counts}}{Filtered matrix of expression counts}
@@ -41,7 +42,10 @@
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' 
+#' Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
                           MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
                           MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)

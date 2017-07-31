@@ -94,7 +94,8 @@ DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo,
 
 Note: sone datasets require filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering. For examples, refer to `help(BASiCS_Filter)`.  
 
-<span style="color:green"> TO-DO 2: EXPLAIN HOW TO CONVERT AN STANDARD `SummarizedExperiment` OBJECT INTO ONE THAT CAN BE USED WITHIN BASiCS </span>
+<!---
+<span style="color:green"> TO-DO 2: EXPLAIN HOW TO CONVERT AN STANDARD `SummarizedExperiment` OBJECT INTO ONE THAT CAN BE USED WITHIN BASiCS </span> ---> 
 
 To convert an existing `SummarizedExperiment` object (`Data`) into one that can be used within BASiCS, meta-information must be stored in the object.
 
@@ -120,10 +121,10 @@ If the optional parameter `PrintProgress` is set to `TRUE`, the R console will d
 
 ```{r quick-start-MCMC, results='hide'}
 Chain <- BASiCS_MCMC(Data = Data, N = 20000, Thin = 20, Burn = 10000, 
-                           PrintProgress = FALSE)
+                     PrintProgress = FALSE)
 ```
 
-<span style="color:green"> TO-DO 3: THE 'MESSAGES' OUTPUT OF THIS FUNCTION IS DISTORTED WHEN REPORTING RUNNING TIME </span>
+<!--- <span style="color:green"> TO-DO 3: THE 'MESSAGES' OUTPUT OF THIS FUNCTION IS DISTORTED WHEN REPORTING RUNNING TIME </span> ---> 
 
 **Important: it is ESSENTIAL to assess the convergence of the MCMC algorithm BEFORE running the downstream analyses described in this document. For guidance regarding this step, refer to the 'Convergence assessment' section of this vignette**
 
@@ -156,8 +157,8 @@ head(HVG$Table)
 To illustrate the use of the differential mean expression and differential over-dispersion tests between two cell populations, we generate two synthetic sets of data and run the MCMC algorithm seperately for each dataset.
 
 ```{r quick-start-DataForDE, results='hide'}
-Data1 <- makeExampleBASiCS_Data(Case1 = TRUE)
-Data2 <- makeExampleBASiCS_Data(Case1 = FALSE)
+Data1 <- makeExampleBASiCS_Data(Example = 1)
+Data2 <- makeExampleBASiCS_Data(Example = 2)
 
 Chain1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000, 
                       PrintProgress = FALSE)
