@@ -314,7 +314,7 @@ version 1.0.1: (2017-07-31)
 version 1.0.2: (2017-08-01)
 - Minor changes function-by-function (revision of documentation + minor bugs)
   * BASiCS_MCMC : 'MCMC_Output' replaced by 'Chain' in examples
-- Major changes function by function
+- Major changes function-by-function
   * BASiCS_MCMC : chains stored a single .Rds files, with BASiCS_Chain format (rather than separate .txt files)
   * BASiCS_LoadChain : updated accordingly
   * BASiCS_DetectHVG : evidence threhold to be defined by EFDR only 
@@ -323,9 +323,17 @@ version 1.0.2: (2017-08-01)
 version 1.0.3: (2017-08-01)
 - Minor changes function-by-function (revision of documentation + minor bugs)
   * BASiCS_DetectHVG / LVG: added vertical/horizontal lines in EFDR/EFND plot, subtasks moved to hidden functions (avoids repeated code)
-- Major changes function by function
+- Major changes function-by-function
   * BASiCS_DetectLVG : evidence threhold to be defined by EFDR only 
   * BASiCS_DetectHVG / LVG: fix on default prob threshold = 0.5 when optimal is < 0.5
+- Examples in BASiCS_MCMC updated accordingly
+- Vignette updated accordingly
+
+version 1.0.4: (2017-08-01)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+
+- Major changes function-by-function
+
 - Examples in BASiCS_MCMC updated accordingly
 - Vignette updated accordingly
 
