@@ -4,8 +4,8 @@
 \alias{BASiCS_TestDE}
 \title{Detection of genes with changes in expression}
 \usage{
-BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.1, EpsilonD = 0.1,
-  EviThresholdM = NULL, EviThresholdD = NULL,
+BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
+  log(2), EviThresholdM = NULL, EviThresholdD = NULL,
   OrderVariable = "ProbDiffExp", GroupLabelRef = "Ref",
   GroupLabelTest = "Test", Plot = FALSE, OffSet = TRUE, EFDR_M = 0.05,
   EFDR_D = 0.05, GenesSelect = NULL, ...)
@@ -79,14 +79,19 @@ BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.1, EpsilonD = 0.1,
 \description{
 Function to assess changes in expression (mean and over-dispersion)
 }
-\details{
-See vignette
-}
 \examples{
 
-# See vignette
+# Loadind two synthetic datasets
+Data1 <- makeExampleBASiCS_Data(Example = 1)
+Data2 <- makeExampleBASiCS_Data(Example = 2)
 
-}
-\author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
+# Running the MCMC (separately for each group of cells) 
+Chain1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000, 
+                      PrintProgress = FALSE)
+Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000, 
+                      PrintProgress = FALSE)
+                      
+Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
+                      EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
+
 }

@@ -88,7 +88,7 @@
 #' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
 #' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE) # Recommended
 #'
-#' # Highly and lowly variable genes detection
+#' # Highly and lowly variable genes detection (within a single group of cells)
 #' DetectHVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.70, EFDR = 0.10, Plot = TRUE)
 #' DetectLVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.50, EFDR = 0.10, Plot = TRUE)
 #'
@@ -99,8 +99,11 @@
 #'        pch = 16, col = "blue", cex = 1))
 #'
 #' # If variance thresholds are not fixed
-#' #BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
-#' #BASiCS_VarThresholdSearchLVG(Data, Chain, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
+#' BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01), EFDR = 0.10)
+#' BASiCS_VarThresholdSearchLVG(Data, Chain, VarThresholdsGrid = seq(0.50,0.55,by=0.01), EFDR = 0.10)
+#' 
+#' # For examples of differential analyses between 2 populations of cells:
+#' ?BASiCS_TestDE
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'

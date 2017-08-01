@@ -37,7 +37,7 @@ BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is
 
 3. The total variability of the expression counts is decomposed into technical and biological components. 
 
-**Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells.**
+**Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
 
 BASiCS includes two built-in types of downstream analyses:
 
@@ -45,7 +45,7 @@ BASiCS includes two built-in types of downstream analyses:
 
 - **For 2 (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional differential expression tools, BASiCS can uncover changes in mean expression between the groups. Besides this, BASiCS can also uncover changes in *over-dispersion* --- a measure for residual cell-to-cell variation that is observed after accounting for technical noise. This feature has led, for example, to novel insights in the context of immune cells across aging [3]. Evidence of differential expression is quantified through tail posterior probabilities associated to large *absolute log-fold changes* of mean and over-dispersion between the groups. 
 
-<span style="color:red"> TO-DO 1: POSSIBLY SPECIFY THAT LOG-FOLD CHANGES ARE IN LOG2 SCALE </span>
+<!--- <span style="color:red"> TO-DO 1: POSSIBLY SPECIFY THAT LOG-FOLD CHANGES ARE IN LOG2 SCALE </span> ---> 
 
 A brief description for the statistical model implemented in BASiCS is provided in the "Methodology" section of this document. 
 
@@ -119,14 +119,18 @@ Parameter estimation is performed using the `BASiCS_MCMC` function. Essential pa
 
 If the optional parameter `PrintProgress` is set to `TRUE`, the R console will display the progress of the MCMC algorithm. For other optional parameters refer to `help(BASiCS_MCMC)`. 
 
-```{r quick-start-MCMC, results='hide'}
+```{r quick-start-MCMC}
 Chain <- BASiCS_MCMC(Data = Data, N = 20000, Thin = 20, Burn = 10000, 
                      PrintProgress = FALSE)
 ```
 
+Please ensure that the acceptance rates displayed in the output of this function are around 0.44. If they are too far from this value, you might need to increase the number of iterations. 
+
 <!--- <span style="color:green"> TO-DO 3: THE 'MESSAGES' OUTPUT OF THIS FUNCTION IS DISTORTED WHEN REPORTING RUNNING TIME </span> ---> 
 
 **Important: it is ESSENTIAL to assess the convergence of the MCMC algorithm BEFORE running the downstream analyses described in this document. For guidance regarding this step, refer to the 'Convergence assessment' section of this vignette**
+
+<span style="color:red"> NOTE: DEFAULT PRIOR FOR GAMMA DEFINED BY LOG-NORMAL DISTRIBUTION NOW. </span> 
 
 ### Detection of highly variable genes
 
@@ -134,7 +138,7 @@ The following code is used to identify **highly variable genes (HVG) ** within a
 
 For each gene, this function returns the posterior probability as a measure of evidence for being a HVG. A cut-off value for these posterior probabilities can be set by controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.05).
 
-**Note: this criteria for threshold choice is new. Original version set `EviThreshold` defined such that EFDR = EFNR.**
+**Note: this criteria for threshold choice is new. Original version defined  `EviThreshold` such that EFDR = EFNR.**
 
 <!---
 <span style="color:red"> TO-DO 4: CHANGE CUT-OFF SEARCH TO BE COHERENT WITH DE ANALYSIS (I.E. SET BY EFDR ONLY) </span> --->
@@ -152,6 +156,8 @@ The results for the test are stored in `HVG$Table`. HVG are marked as `HVG$Table
 ```{r quick-start-HVGdetectionTable}
 head(HVG$Table)
 ```
+
+<span style="color:red"> TO-DO: WE MIGHT WANT A LESS CONSERVATIVE EFDR GOAL. CHECK THIS WITH REAL DATA. </span> 
 
 ### Detection of lowly variable genes
 
@@ -194,14 +200,16 @@ The input values required to perform this analysis are:
 
 Additionally, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
 
+**Note: previous versions of BASiCS used natural logarithm instead**
+
 ```{r quick-start-test, results='hide'}
 Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
-                        EpsilonM = 0.4, EpsilonD = 0.4, OffSet = TRUE)
+                      EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
 ```
 
-<span style="color:green"> TO-DO 7: RENAME FUNCTION ABOVE AS `BASiCS_TestDE` </span>
+<!---<span style="color:green"> TO-DO 7: RENAME FUNCTION ABOVE AS `BASiCS_TestDE` </span>---> 
 
-<span style="color:green"> TO-DO 8: RENAME ARGUMENTS `objectRef` AND `objectTest` AS `ChainTest` AND `ChainRef` RESPECTIVELY. </span>
+<!--- <span style="color:green"> TO-DO 8: RENAME ARGUMENTS `objectRef` AND `objectTest` AS `ChainTest` AND `ChainRef` RESPECTIVELY. </span> ---> 
 
 <span style="color:red"> TO-DO 9: ADD MA PLOT AS AN OUTPUT OF THIS FUNCTION </span>
 
@@ -335,11 +343,15 @@ plot(MCMC_Summary, Param = "s", Cells = 1:5)
 
 Finally, it is also possible to create a scatterplot of posterior estimates for gene-specific parameters. Typically, this plot will exhibit the confounding effect that is observed between mean and over-dispersion. 
 
-```{r DispVsExp, fig.width = 3.5, fig.height = 3.5}
-plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x")
+```{r DispVsExp, fig.width = 7, fig.height = 3.5}
+par(mfrow = c(1,2))
+plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
+plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE)
 ```
 
-<span style="color:green"> TO-DO 14: POSSIBLY CHANGE THIS PLOT BY A 'smoothScatter' (OR ADD SMOOTH AS AN OPTION) </span>
+The option `smooth = TRUE` is generally recommended as this plot will contain thousands of genes when analysing real datasets. 
+
+<!---<span style="color:green"> TO-DO 14: POSSIBLY CHANGE THIS PLOT BY A 'smoothScatter' (OR ADD SMOOTH AS AN OPTION) </span> ---> 
 
 
 ## Normalisation and removal of technical variation

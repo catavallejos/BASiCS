@@ -56,18 +56,26 @@
 #'  
 #' @examples
 #' 
-#' # See vignette
+#' # Loadind two synthetic datasets
+#' Data1 <- makeExampleBASiCS_Data(Example = 1)
+#' Data2 <- makeExampleBASiCS_Data(Example = 2)
 #' 
-#' @details See vignette
+#' # Running the MCMC (separately for each group of cells) 
+#' Chain1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000, 
+#'                       PrintProgress = FALSE)
+#' Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000, 
+#'                       PrintProgress = FALSE)
+#'                       
+#' Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
+#'                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
 #' 
-#' 
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @authors Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #' 
 #' @rdname BASiCS_TestDE
 BASiCS_TestDE <- function(ChainRef,
                             ChainTest,
-                            EpsilonM = 0.10,
-                            EpsilonD = 0.10,
+                            EpsilonM = 0.40 * log(2),
+                            EpsilonD = 0.40 * log(2),
                             EviThresholdM = NULL,
                             EviThresholdD = NULL,
                             OrderVariable = "ProbDiffExp",
@@ -107,6 +115,8 @@ BASiCS_TestDE <- function(ChainRef,
   if(!is.null(GenesSelect) & !is.logical(GenesSelect)) stop("Invalid value for 'GenesSelect'")
   # if(!is.null(GenesSelect) & (length(GenesSelect) == sum(!GenesSelect))) stop("Invalid value for 'GenesSelect'")
 
+  message("Log-fold change thresholds are now set in a log2 scale. \n Previous versions of BASiCS used a natural logarithm scale.")
+  
   nTest = ncol(ChainTest@nu)
   nRef = ncol(ChainRef@nu)
   n = nTest + nRef
@@ -253,14 +263,14 @@ BASiCS_TestDE <- function(ChainRef,
                               "ExpTest"= round(as.numeric(MedianMuTest),3),
                               "ExpRef"= round(as.numeric(MedianMuRef),3),
                               "ExpFC"= round(as.numeric(exp(MedianTau)),3),
-                              "ExpLogFC"= round(as.numeric(MedianTau),3),
+                              "ExpLog2FC"= round(as.numeric(MedianTau),3),
                               "ProbDiffExp"= round(as.numeric(ProbM),3),
                               "ResultDiffExp" = ResultDiffExp,
                               "OverDispOverall"= round(as.numeric(DeltaBase),3),
                               "OverDispTest"= round(as.numeric(MedianDeltaTest),3),
                               "OverDispRef"= round(as.numeric(MedianDeltaRef),3),  
                               "OverDispFC"= round(as.numeric(exp(MedianOmega)),3), 
-                              "OverDispLogFC"= round(as.numeric(MedianOmega),3),
+                              "OverDispLog2FC"= round(as.numeric(MedianOmega),3),
                               "ProbDiffOverDisp"= round(as.numeric(ProbD),3),
                               "ResultDiffOverDisp" = ResultDiffOverDisp,
                               stringsAsFactors = FALSE)

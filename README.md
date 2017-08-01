@@ -1,6 +1,6 @@
 # BASiCS
 
-Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hierarchical model to analyse single-cell RNA sequencing datasets in the context of **supervised** experiments, where the groups of cells of interest are known a priori (e.g. experimental conditions or cell types). 
+Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hierarchical model to perform statistical analyses of single-cell RNA sequencing datasets in the context of **supervised** experiments (where the groups of cells of interest are known a priori, e.g. experimental conditions or cell types). 
 
 In BASiCS:
 

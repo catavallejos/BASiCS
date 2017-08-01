@@ -7,11 +7,11 @@
 \alias{BASiCS_VarThresholdSearchHVG_LVG}
 \title{Detection method for highly and lowly variable genes using a grid of variance contribution thresholds}
 \usage{
-BASiCS_VarThresholdSearchHVG(Data, object, VarThresholdsGrid,
-  PrintProgress = FALSE)
+BASiCS_VarThresholdSearchHVG(Data, object, VarThresholdsGrid, EFDR = 0.1,
+  Progress = TRUE)
 
-BASiCS_VarThresholdSearchLVG(Data, object, VarThresholdsGrid,
-  PrintProgress = FALSE)
+BASiCS_VarThresholdSearchLVG(Data, object, VarThresholdsGrid, EFDR = 0.1,
+  Progress = TRUE)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
@@ -20,7 +20,9 @@ BASiCS_VarThresholdSearchLVG(Data, object, VarThresholdsGrid,
 
 \item{VarThresholdsGrid}{Grid of values for the variance contribution threshold (they must be contained in (0,1))}
 
-\item{PrintProgress}{If \code{PrintProgress = TRUE}, partial output is printed in the console.}
+\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)}
+
+\item{Progress}{If \code{Progress = TRUE}, partial output is printed in the console.}
 }
 \value{
 \describe{

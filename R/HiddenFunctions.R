@@ -310,7 +310,7 @@ HiddenPlot1DetectHVG_LVG <- function(EviThresholds,
   abline(v = OptThreshold[1], col = "red", lwd = 2, lty = 1)
   if(length(EviThreshold) == 0)
   {
-    legend('topleft', c("EFDR", "EFNR", "Desided EFDR"), lty = c(1:2,1), 
+    legend('topleft', c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2,1), 
            col = c("black", "black", "blue"), bty = "n", lwd = 2)  
   }
 }

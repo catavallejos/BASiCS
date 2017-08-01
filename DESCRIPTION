@@ -3,31 +3,28 @@ Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
 Version: 1.0.4
 Date: : 2017-08-01
-Author: Catalina A. Vallejos
+Author: Catalina Vallejos, Nils Eling, Sylvia Richardson, John Marioni
 Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
-    heterogeneity in gene expression levels in seemingly homogeneous
-    populations of cells. However, these experiments are prone to high levels
-    of unexplained technical noise, creating new challenges for identifying
-    genes that show genuine heterogeneous expression within the population of
-    cells under study. BASiCS (Bayesian Analysis of Single-Cell Sequencing
-    data) is an integrated Bayesian hierarchical model where: (ii)
-    cell-specific normalization constants are estimated as part of the model
-    parameters, (ii) technical variability is quantified based on spike-in
-    genes that are artificially introduced to each analysed cells lysate and
-    (iii) the total variability of the expression counts is decomposed into
-    technical and biological components. BASiCS also provides an intuitive
-    detection criterion for highly (or lowly) variable genes within the
-    population of cells under study. This is formalized by means of tail
-    posterior probabilities associated to high (or low) biological cell-to-cell
-    variance contributions, quantities that can be easily interpreted by
-    applied users. Additionally, BASiCS has now been extended to compare gene
-    expression patterns between pre-specified populations of cells. Unlike traditional
-    differential expression tools, BASiCS quantifies changes in expression that lie
-    beyond comparisons of means, also allowing the study of changes in cell-to-cell
-    heterogeneity. The latter are quantified via a biological over-dispersion
-    parameter that measures residual over-dispersion (with respect to Poisson sampling)
-    after normalisation and the removal of technical variation.
+ heterogeneity in gene expression levels in seemingly homogeneous 
+ populations of cells. However, these experiments are prone to high levels
+ of unexplained technical noise, creating new challenges for identifying
+ genes that show genuine heterogeneous expression within the population of
+ cells under study. BASiCS (Bayesian Analysis of Single-Cell Sequencing
+ data) is an integrated Bayesian hierarchical model to perform statistical 
+ analyses of single-cell RNA sequencing datasets in the context of supervised
+ experiments (where the groups of cells of interest are known a priori, 
+ e.g. experimental conditions or cell types). BASiCS performs built-in 
+ data normalisation (global scaling) and technical noise quantification 
+ (based on spike-in genes). BASiCS provides an intuitive detection criterion for highly (or lowly) 
+ variable genes within a single group of cells. Additionally, BASiCS can 
+ compare gene expression patterns between two or more pre-specified groups of cells. 
+ Unlike traditional differential expression tools, BASiCS quantifies changes 
+ in expression that lie beyond comparisons of means, also allowing the study 
+ of changes in cell-to-cell heterogeneity. The latter are quantified via a 
+ biological over-dispersion parameter that measures residual over-dispersion 
+ (with respect to Poisson sampling) after normalisation and the removal of 
+ technical variation. 
 License: GPL (>= 2)
 Depends:
     R (>= 3.1.0),

@@ -331,29 +331,30 @@ version 1.0.3: (2017-08-01)
 
 version 1.0.4: (2017-08-01)
 - Minor changes function-by-function (revision of documentation + minor bugs)
-
+  * BASiCS_VarThresholdSearchHVG / LVG : EFDR criteria updated as in BASiCS_DetectHVG / LVG
+  * BASiCS_TestDE : added examples
 - Major changes function-by-function
-
+  * BASiCS_D_TestDE : no longer in use message added
 - Examples in BASiCS_MCMC updated accordingly
 - Vignette updated accordingly
+- Updated DESCRIPTION file (authors and description)
+- Updated welcome message (with link to new wiki)
 
 - TODO:
-  * Update welcome message to summarise all changes (link to wiki)
-  * Update description to emphasise *supervised* experiments
+  * Add examples of table viewing in BASiCS_TestDE 
+  * Report offset + uncertainty in BASiCS_TestDE
+  * Offset plot in BASiCS_TestDE
+  * Separate output table for mean and overdispersion in BASiCS_TestDE
+  * Add ACF to chain plots
+  * In plots, change axis labels to be text (no greek!)
+  * Implement BASiCS_Denoise in C++
+  * Create 'no longer in use' message for selected functions. 
   * Implement change suggested by Giacomo Zanella
   * Replace SummarizedExperiment by SingleCellExperiment class
-  * Storage in terms of Rdata files + BASiCS_Load updated accordingly
-  * Check that help of BASiCS_MCMC runs smoothly (HVG/LVG onwards)
-  * Change cut-off criteria for HVG / LVG 
   * Add checks to BASiCS_MCMC verify SE object has all the required info. 
   * Store all necessary parameters for chain restart
-  * Edit BASiCS_DetectLVG as BASiCS_DetectHVG
-  * Add comment to BASiCS_DetectHVG
-  * Update vignette accordingly
-  * Update MCMC_Chain class + messages
   * Convert Rcpp print to messages
-  * Create hidden vignette with test cases (e.g. different thresholds for HVG/LVG)
-  * Delete/update BASiCS_VarThresholdSearchHVG LVG (add message)
-  * Check all plot are in the same log scale
+  * Create extra vignette file with test cases (e.g. different thresholds for HVG/LVG), to be removed from BioC submission
+  * Check all plots are in the same log scale
   
   

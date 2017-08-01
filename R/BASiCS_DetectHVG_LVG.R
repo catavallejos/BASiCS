@@ -9,7 +9,7 @@
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param VarThreshold Variance contribution threshold (must be a positive value, between 0 and 1)
 #' @param EviThreshold Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)
-#' @param EFDR Target for expected false discovery rate related to HVG/LVG detection (default = 0.05)
+#' @param EFDR Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.
 #' @param Plot If \code{Plot = TRUE} a plot of the gene specific expression level against HVG or LVG is generated.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
@@ -52,7 +52,7 @@ BASiCS_DetectHVG <- function(Data,
                              object,
                              VarThreshold,
                              EviThreshold = NULL,
-                             EFDR = 0.05, 
+                             EFDR = 0.10, 
                              OrderVariable = "Prob",
                              Plot = FALSE,
                              ...)
@@ -142,7 +142,7 @@ BASiCS_DetectLVG <- function(Data,
                              object,
                              VarThreshold,
                              EviThreshold = NULL,
-                             EFDR = 0.05,
+                             EFDR = 0.10,
                              OrderVariable = "Prob",
                              Plot = FALSE,
                              ...)

@@ -64,7 +64,7 @@ MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datas
 
 # Built-in simulated dataset
 Data = makeExampleBASiCS_Data()
-# To analyse real data, please refer to the instructions in: https://github.com/catavallejos/BASiCS/wiki/Input-preparation
+# To analyse real data, please refer to the instructions in: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
 
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence
@@ -101,7 +101,7 @@ par(mfrow = c(1,2))
 plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
 plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE) # Recommended
 
-# Highly and lowly variable genes detection
+# Highly and lowly variable genes detection (within a single group of cells)
 DetectHVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.70, EFDR = 0.10, Plot = TRUE)
 DetectLVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.50, EFDR = 0.10, Plot = TRUE)
 
@@ -112,8 +112,11 @@ with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
        pch = 16, col = "blue", cex = 1))
 
 # If variance thresholds are not fixed
-#BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01))
-#BASiCS_VarThresholdSearchLVG(Data, Chain, VarThresholdsGrid = seq(0.40,0.45,by=0.01))
+BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01), EFDR = 0.10)
+BASiCS_VarThresholdSearchLVG(Data, Chain, VarThresholdsGrid = seq(0.50,0.55,by=0.01), EFDR = 0.10)
+
+# For examples of differential analyses between 2 populations of cells:
+?BASiCS_TestDE
 
 }
 \references{
