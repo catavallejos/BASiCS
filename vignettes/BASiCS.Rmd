@@ -130,26 +130,44 @@ Chain <- BASiCS_MCMC(Data = Data, N = 20000, Thin = 20, Burn = 10000,
 
 ### Detection of highly variable genes
 
-The following code is used to identify **highly variable genes (HVG) ** within a group of cells. The `VarThreshold` parameter sets a lower threshold for the proportion of variability that is assigned to the biological component (`Sigma`). In the example below, HVG are defined as those genes for which at least 70\% of their total variability is attributed to the biological variability component. 
+The following code is used to identify **highly variable genes (HVG) ** within a group of cells. The `VarThreshold` parameter sets a lower threshold for the proportion of variability that is assigned to the biological component (`Sigma`). In the example below, HVG are defined as those genes for which **at least** 70\% of their total variability is attributed to the biological variability component. 
 
-For each gene, this function returns the posterior probability as a measure of evidence for being a HVG. A cut-off value for these posterior probabilities can be set by controlling EFDR and/or EFNR (defaul option: `EviThreshold` defined such that EFDR = EFNR).
+For each gene, this function returns the posterior probability as a measure of evidence for being a HVG. A cut-off value for these posterior probabilities can be set by controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.05).
 
-<span style="color:red"> TO-DO 4: CHANGE CUT-OFF SEARCH TO BE COHERENT WITH DE ANALYSIS (I.E. SET BY EFDR ONLY) </span>
+**Note: this criteria for threshold choice is new. Original version set `EviThreshold` defined such that EFDR = EFNR.**
 
-<span style="color:green"> TO-DO 5: CHANGE X-LABEL OF OUTPUT PLOT TO BE 'MEAN EXPRESSION' (RATHER THAN GREEK CHARACTHER). POSSIBLY REMOVE PLOT FROM THIS VIGNETTE </span>
+<!---
+<span style="color:red"> TO-DO 4: CHANGE CUT-OFF SEARCH TO BE COHERENT WITH DE ANALYSIS (I.E. SET BY EFDR ONLY) </span> --->
+
+<!---
+<span style="color:green"> TO-DO 5: CHANGE X-LABEL OF OUTPUT PLOT TO BE 'MEAN EXPRESSION' (RATHER THAN GREEK CHARACTHER). POSSIBLY REMOVE PLOT FROM THIS VIGNETTE </span> --->
 
 ```{r quick-start-HVGdetection}
 par(mfrow = c(1,2))
 HVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.7, Plot = TRUE)
 ```
 
-The results for the test are stored in `HVG$Table`. Highly variable genes are marked as `HVG$Table$HVG == TRUE`.
+The results for the test are stored in `HVG$Table`. HVG are marked as `HVG$Table$HVG == TRUE`.
 
 ```{r quick-start-HVGdetectionTable}
 head(HVG$Table)
 ```
 
-<span style="color:red"> TO-DO 6: AFTER CHANGING CUT-OFF FINDING CRITERIA, ADD EXAMPLE FOR LVG DETECTION </span>
+### Detection of lowly variable genes
+
+To identify **lowly variable genes (LVG) ** within a group of cells, we follow a similar procedure. In the example below, LVG are defined as those genes for which **at most** 40\% of their total variability is attributed to the biological variability component. 
+
+```{r quick-start-LVGdetection}
+par(mfrow = c(1,2))
+LVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.4, Plot = TRUE)
+```
+
+The results for the test are stored in `LVG$Table`. LVG are marked as `LVG$Table$LVG == TRUE`.
+
+```{r quick-start-LVGdetectionTable}
+head(LVG$Table)
+```
+
 
 
 ### Differential expression 

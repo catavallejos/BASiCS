@@ -320,10 +320,19 @@ version 1.0.2: (2017-08-01)
   * BASiCS_DetectHVG : evidence threhold to be defined by EFDR only 
 - Vignette updated accordingly 
 
+version 1.0.3: (2017-08-01)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_DetectHVG / LVG: added vertical/horizontal lines in EFDR/EFND plot, subtasks moved to hidden functions (avoids repeated code)
+- Major changes function by function
+  * BASiCS_DetectLVG : evidence threhold to be defined by EFDR only 
+  * BASiCS_DetectHVG / LVG: fix on default prob threshold = 0.5 when optimal is < 0.5
+- Examples in BASiCS_MCMC updated accordingly
+- Vignette updated accordingly
+
 - TODO:
-  * Update welcome message to summarise all changes
+  * Update welcome message to summarise all changes (link to wiki)
   * Update description to emphasise *supervised* experiments
-  * Implement change suggested by Giacomo
+  * Implement change suggested by Giacomo Zanella
   * Replace SummarizedExperiment by SingleCellExperiment class
   * Storage in terms of Rdata files + BASiCS_Load updated accordingly
   * Check that help of BASiCS_MCMC runs smoothly (HVG/LVG onwards)
@@ -333,5 +342,10 @@ version 1.0.2: (2017-08-01)
   * Edit BASiCS_DetectLVG as BASiCS_DetectHVG
   * Add comment to BASiCS_DetectHVG
   * Update vignette accordingly
+  * Update MCMC_Chain class + messages
+  * Convert Rcpp print to messages
+  * Create hidden vignette with test cases (e.g. different thresholds for HVG/LVG)
+  * Delete/update BASiCS_VarThresholdSearchHVG LVG (add message)
+  * Check all plot are in the same log scale
   
   

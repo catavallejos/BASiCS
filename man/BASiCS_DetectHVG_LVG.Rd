@@ -11,7 +11,7 @@ BASiCS_DetectHVG(Data, object, VarThreshold, EviThreshold = NULL,
   EFDR = 0.05, OrderVariable = "Prob", Plot = FALSE, ...)
 
 BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
-  OrderVariable = "Prob", Plot = FALSE, ...)
+  EFDR = 0.05, OrderVariable = "Prob", Plot = FALSE, ...)
 }
 \arguments{
 \item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
@@ -22,7 +22,7 @@ BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
 
 \item{EviThreshold}{Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)}
 
-\item{EFDR}{Target for expected false discovery rate related to HVG detection (default = 0.05)}
+\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.05)}
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
 
@@ -62,7 +62,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}

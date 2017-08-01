@@ -89,14 +89,14 @@
 #' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE) # Recommended
 #'
 #' # Highly and lowly variable genes detection
-#' DetectHVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.70, EFDR = 0.05, Plot = TRUE)
-#' #DetectLVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.40, Plot = TRUE)
+#' DetectHVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.70, EFDR = 0.10, Plot = TRUE)
+#' DetectLVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.50, EFDR = 0.10, Plot = TRUE)
 #'
-#' #plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
-#' #points(DetectHVG$Table[DetectHVG$Table$HVG==1,2], DetectHVG$Table[DetectHVG$Table$HVG==1,3],
-#' #       pch = 16, col = "red", cex = 1)
-#' #points(DetectLVG$Table[DetectLVG$Table$LVG==1,2], DetectLVG$Table[DetectLVG$Table$LVG==1,3],
-#' #       pch = 16, col = "blue", cex = 1)
+#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
+#' with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
+#'        pch = 16, col = "red", cex = 1))
+#' with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
+#'        pch = 16, col = "blue", cex = 1))
 #'
 #' # If variance thresholds are not fixed
 #' #BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01))

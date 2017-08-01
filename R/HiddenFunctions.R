@@ -202,3 +202,143 @@ HiddenEFNR<-function(
 {
   return(sum(Prob*I(EviThreshold>=Prob))/sum(I(EviThreshold>=Prob)))
 }
+
+HiddenHeaderDetectHVG_LVG <- function(Data,
+                                      object,
+                                      VarThreshold,
+                                      EviThreshold = NULL,
+                                      EFDR = 0.05, 
+                                      OrderVariable = "Prob",
+                                      Plot = FALSE)
+{
+  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
+  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  if(VarThreshold<0 | VarThreshold>1 | !is.finite(VarThreshold)) stop("Variance contribution thresholds for HVG/LVG detection must be contained in (0,1)")
+  if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert TRUE or FALSE for Plot parameter")
+  if(!is.null(EviThreshold))
+  {
+    if(EviThreshold<0 | EviThreshold>1 | !is.finite(EviThreshold))
+      stop("Evidence thresholds for HVG and LVG detection must be contained in (0,1) \n For automatic threshold search use EviThreshold = NULL.")
+  }
+  if(!(OrderVariable %in% c("GeneNames", "Mu", "Delta", "Sigma", "Prob"))) stop("Invalid 'OrderVariable' value")
+  if(is.null(EviThreshold)) {message(paste("Posterior probability threshold to be defined by EFDR = ", 100*EFDR, "% (+-2.5% tolerance) ..."))}
+}
+
+
+HiddenThresholdSearchDetectHVG_LVG <- function(EviThreshold,
+                                               VarThreshold,
+                                               Prob, 
+                                               EFDR)
+{
+  # If EviThreshold is not set a priori (search)
+  if(length(EviThreshold) == 0)
+  {
+    EviThresholds <- seq(0.5,0.9995,by=0.0005)
+    
+    EFDRgrid <- sapply(EviThresholds, HiddenEFDR, VarThreshold = VarThreshold, Prob = Prob)
+    EFNRgrid <- sapply(EviThresholds, HiddenEFNR, VarThreshold = VarThreshold, Prob = Prob)
+    
+    above <- abs(EFDRgrid - EFDR)
+    
+    if(sum(!is.na(above)) > 0)
+    {
+      # Search EFDR closest to the desired value
+      EFDRopt <- EFDRgrid[above == min(above, na.rm = TRUE) & !is.na(above)] 
+      # If multiple threholds lead to same EFDR, choose the one with the lowest EFDR
+      EFNRopt <- EFNRgrid[EFDRgrid == mean(EFDRopt) & !is.na(EFDRgrid)]
+      if(sum(!is.na(EFNRopt)) > 0)
+      {
+        optimal <- which(EFDRgrid == mean(EFDRopt) & EFNRgrid == mean(EFNRopt))
+      } 
+      else
+      {
+        optimal <- which(EFDRgrid == mean(EFDRopt))
+      }
+      # Quick fix for EFDR/EFNR ties; possibly not an issue in real datasets
+      optimal <- median(round(median(optimal)))
+      OptThreshold <- c(EviThresholds[optimal], EFDRgrid[optimal], EFNRgrid[optimal])
+      
+      if(OptThreshold[1] < 0.5) 
+      {
+        message("For the given variance contribution threshold, the evidence threshold 
+                that achieves the desired EFDR is below 0.5. By default, the evidence
+                threshold will be set at 0.5 (corresponding EFDR/EFNR reported)")
+        OptThreshold <- c(EviThresholds[1], EFDRgrid[1], EFNRgrid[1])
+      }
+      
+      # Message when different to desired EFDR is large
+      if( abs(OptThreshold[2] - EFDR) > 0.025 )
+      {
+        message("For the given variance contribution threshold, it is not possible 
+                to find an evidence threshold (>0.5) that achieves the desired EFDR level 
+                (tolerance +- 0.025). The output of this function reflects the 
+                closest possible value. \n")         
+      }  
+      }
+    else
+    {
+      message("For the given variance contribution threshold, it is not possible 
+              to estimate EFDR. By default, the evidence
+              threshold will be set at 0.5. \n")    
+      OptThreshold <- c(0.5, NA, NA)  
+    }
+  }
+  # If EviThreshold is set a priori
+  else
+  {
+    EFDR = HiddenEFDR(EviThreshold, VarThreshold, Prob)
+    EFNR = HiddenEFNR(EviThreshold, VarThreshold, Prob)
+    OptThreshold <- c(EviThreshold, EFDR, EFNR)
+  }  
+  list("EviThresholds" = EviThresholds,
+       "EFDRgrid" = EFDRgrid,
+       "EFNRgrid" = EFNRgrid,
+       "OptThreshold" = OptThreshold)
+}
+
+HiddenPlot1DetectHVG_LVG <- function(EviThresholds, 
+                                     EFDRgrid,
+                                     EFNRgrid,
+                                     OptThreshold,
+                                     EviThreshold,
+                                     EFDR)
+{
+  plot(EviThresholds, EFDRgrid, type = "l", lty = 1, bty = "n", lwd = 2,  
+       ylab = "Error rate", xlab = "Evidence threshold", ylim = c(0,1))
+  lines(EviThresholds, EFNRgrid, lty = 2, lwd = 2)
+  if(length(EviThreshold) == 0) {abline(h = EFDR, col = "blue", lwd = 2, lty = 1)}
+  abline(v = OptThreshold[1], col = "red", lwd = 2, lty = 1)
+  if(length(EviThreshold) == 0)
+  {
+    legend('topleft', c("EFDR", "EFNR", "Desided EFDR"), lty = c(1:2,1), 
+           col = c("black", "black", "blue"), bty = "n", lwd = 2)  
+  }
+}
+
+HiddenPlot2DetectHVG_LVG <- function(args, 
+                                     Task, 
+                                     Mu, 
+                                     Prob,
+                                     OptThreshold,
+                                     Hits)
+{
+  if("ylim" %in% names(args)) {ylim = args$ylim} else{ylim = c(0, 1)}
+  if("xlim" %in% names(args)) {xlim = args$xlim} else{xlim = c(min(Mu),max(Mu))}
+  cex = ifelse("cex" %in% names(args),args$cex, 1.5)
+  pch = ifelse("pch" %in% names(args),args$pch, 16)
+  col = ifelse("col" %in% names(args),args$col, 8)
+  bty = ifelse("bty" %in% names(args),args$bty, "n")
+  cex.lab = ifelse("cex.lab" %in% names(args),args$cex.lab, 1)
+  cex.axis = ifelse("cex.axis" %in% names(args),args$cex.axis, 1)
+  cex.main = ifelse("cex.main" %in% names(args),args$cex.main, 1)
+  xlab = ifelse("xlab" %in% names(args),args$xlab, "Mean expression")
+  if(Task == "HVG") {ylab = ifelse("ylab" %in% names(args),args$ylab, "HVG probability")}
+  else {ylab = ifelse("ylab" %in% names(args),args$ylab, "LVG probability")}
+  main = ifelse("main" %in% names(args),args$main, "")
+  
+  plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex,
+       bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
+       xlab = xlab, ylab = ylab, main = main)
+  abline(h = OptThreshold[1], lty = 2, col = "black")
+  points(Mu[Hits], Prob[Hits], pch = pch, col = "red", cex = cex)
+}
