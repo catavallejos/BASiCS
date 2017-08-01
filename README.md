@@ -19,7 +19,7 @@ devtools::install_github("catavallejos/BASiCS", build_vignettes = TRUE)
 
 This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and repeat the installation. 
 
-```{r dependencies}
+```R
 #library(devtools)
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("BiocGenerics")
@@ -29,7 +29,7 @@ This installation might fail if some of the dependency libraries are not yet ins
 
 After a successful installation, the BASiCS library can be loaded using[^footnoteInstall] 
 
-```{r load_packages}
+```R
 library(BASiCS)
 ```
 
@@ -41,50 +41,35 @@ A summary of the installation errors that have been reported for BASiCS is provi
 
 ## How to use BASiCS?
 
-- To detect highly and lowly variable genes within a populations of cells: please refer to the vignette
+BASiCS includes a vignette where its usage is illutrated. To access the vignette, please use:
 
 ```R
-vignette('BASiCSIntro')
+vignette('BASiCS')
 ```
 
-- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a>
+Individual topics are summarized in the BASiCS wiki:
 
-TODO: a quick start for BASiCS. Like vignette("some-stuff")
+- [Quick start](https://github.com/catavallejos/BASiCS/wiki/Quick-start)
 
-## Development
+- [Input preparation](https://github.com/catavallejos/BASiCS/wiki/Input-preparation)
 
-### Sanity check
+- [MCMC convergence](https://github.com/catavallejos/BASiCS/wiki/MCMC-convergence)
 
-In the folder of the development version from GitHub:
+- [Posterior summary](https://github.com/catavallejos/BASiCS/wiki/Posterior-summary)
 
-```
-R CMD check .
-```
+- [HVL & LVG detection](https://github.com/catavallejos/BASiCS/wiki/HVG-&-LVG-detection) for a single group of cells
 
-### Build from source
+- [Differential analysis](https://github.com/catavallejos/BASiCS/wiki/Differential-analysis) between 2 groups of cells (mean and over-dispersion)
 
-In the parent folder of the development version from GitHub:
 
-```
-R CMD build BASiCS
-```
+<!---- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a> TODO: a quick start for BASiCS. Like vignette("some-stuff") ---> 
 
-And run then
+## Authors
 
-```R
-install.packages('BASiCS_x.x.x.tar.gz', repos=NULL)
-```
-
-on the generated file.
-
-## Author
-
-Catalina A. Vallejos (cvallejos 'at' turing.ac.uk)
-
-## Collaborators
-
-- <a href="https://github.com/horta"> Danilo Horta </a>
-- <a href="https://github.com/nilseling"> Nils Eling </a>
+- [Catalina Vallejos](https://sites.google.com/view/catalinavallejos) (cvallejos 'at' turing.ac.uk)
+- [Nils Eling](https://github.com/nilseling)
+- John Marioni
+- Sylvia Richardson
 
 ## Acknowledgements
 
