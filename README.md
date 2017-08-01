@@ -37,7 +37,7 @@ library(BASiCS)
 
 ## Installation troubleshooting
 
-A summary of the installation errors that have been reported for BASiCS is provided [here](https://github.com/catavallejos/BASiCS/wiki/8.-Installation-troubleshooting). If you encounter any additional issues, **please let us know so that we can update this information**.
+A summary of the installation errors that have been reported for BASiCS is provided [here](https://github.com/catavallejos/BASiCS/wiki/7.-Installation-troubleshooting). If you encounter any additional issues, **please let us know so that we can update this information**.
 
 ## How to use BASiCS?
 
@@ -49,17 +49,17 @@ vignette('BASiCS')
 
 Individual topics are summarized in the BASiCS wiki:
 
-- [Quick start](https://github.com/catavallejos/BASiCS/wiki/2.-Quick-start)
+- [Quick start](https://github.com/catavallejos/BASiCS/wiki/1.-Quick-start)
 
-- [Input preparation](https://github.com/catavallejos/BASiCS/wiki/3.-Input-preparation)
+- [Input preparation](https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation)
 
-- [MCMC convergence](https://github.com/catavallejos/BASiCS/wiki/4.-MCMC-convergence)
+- [MCMC convergence](https://github.com/catavallejos/BASiCS/wiki/3.-MCMC-convergence)
 
-- [Posterior summary](https://github.com/catavallejos/BASiCS/wiki/5.-Posterior-summary)
+- [Posterior summary](https://github.com/catavallejos/BASiCS/wiki/4.-Posterior-summary)
 
-- [HVL & LVG detection](https://github.com/catavallejos/BASiCS/wiki/6.-HVG-&-LVG-detection) for a single group of cells
+- [HVL & LVG detection](https://github.com/catavallejos/BASiCS/wiki/5.-HVG-&-LVG-detection) for a single group of cells
 
-- [Differential analysis](https://github.com/catavallejos/BASiCS/wiki/7.-Differential-analysis) between 2 groups of cells (mean and over-dispersion)
+- [Differential analysis](https://github.com/catavallejos/BASiCS/wiki/6.-Differential-analysis) between 2 groups of cells (mean and over-dispersion)
 
 
 <!---- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a> TODO: a quick start for BASiCS. Like vignette("some-stuff") ---> 
