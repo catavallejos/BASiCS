@@ -1,5 +1,8 @@
 # BASiCS
-Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hierarchical model where:
+
+Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hierarchical model to analyse single-cell RNA sequencing datasets in the context of **supervised** experiments, where the groups of cells of interest are known a priori (e.g. experimental conditions or cell types). 
+
+In BASiCS:
 
 - Cell-specific normalization constants are estimated as part of the model parameters.
 - Technical variability is quantified based on spike-in genes that are artificially introduced to each analysed cells lysate.
@@ -32,25 +35,9 @@ library(BASiCS)
 
 [^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
 
-### Troubleshooting
+## Installation troubleshooting
 
-#### `gfortran` error
-
-If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library. </a> 
-
-- If you are running R versions 3.0.0 - R 3.3.0, this can be installed in the Mac terminal using the following command:
-
-```{}
-curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
-sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
-```
-- If you are running R 3.4.0, you should install the official gfortran 6.1.0 binary for OS X El Capitan (10.11) from https://gcc.gnu.org/wiki/GFortranBinaries. 
-
-#### `pandoc` error
-
-If you are not using RStudio, you might need to manually install `pandoc` in order to create the vignette provided for BASiCS
-
-Additional installation issues/solutions can be found here: https://github.com/catavallejos/BASiCS/issues/9
+A summary of the installation errors that have been reported for BASiCS is provided [here](https://github.com/catavallejos/BASiCS/wiki/Installation-troubleshooting). If you encounter any additional issues, **please let us know so that we can update this information**.
 
 ## How to use BASiCS?
 
