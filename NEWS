@@ -345,11 +345,20 @@ version 1.0.5: (2017-08-01)
   * BASiCS_TestDE : plotting functionality for offset added
 - ACF plot added to BASiCS_Chain plots
 
+version 1.0.6: (2017-08-02)
+- 'matrixStats' added within 'Imports' in DESCRIPTION (to use 'colMedians' function)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_TestDE : Improved offset plots
+- Major changes function-by-function
+  * BASiCS_TestDE : Ref/Test notation changed to Group1/2 + output table names changed (to Mean/Disp) + 
+  offset corrected objects as output + separated output tables Mean/Disp + post prob threshold moved to hidden function (avoids duplicated code)
+
 - TODO:
+  * Ensure EFDR for diff disp ignores diff mean genes
+  * Plot EFDR / EFNR grid
+  * Add MA plot BASiCS_TestDE  
   * Add examples of table viewing in BASiCS_TestDE 
-  * Report offset + uncertainty in BASiCS_TestDE
-  * Offset plot in BASiCS_TestDE
-  * Separate output table for mean and overdispersion in BASiCS_TestDE
+  * Check if we can have pre-loaded Chain objects for vignette (maybe after heavy thining?)
   * In plots, change axis labels to be text (no greek!)
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
@@ -360,11 +369,8 @@ version 1.0.5: (2017-08-01)
   * Convert Rcpp print to messages
   * Create extra vignette file with test cases (e.g. different thresholds for HVG/LVG), to be removed from BioC submission
   * Check all plots are in the same log scale
-  * Missing info about offset for phi (to do GenBio figure)
-  * Return offset corrected chain
-  * Revise whether offset correction is correctly applied
-  * Change ref/test to group1, group2
   * How does Aaron solve the offset issue? Are we assuming most genes are not DE?
+
   
   
   

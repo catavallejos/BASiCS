@@ -4,16 +4,16 @@
 \alias{BASiCS_TestDE}
 \title{Detection of genes with changes in expression}
 \usage{
-BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
+BASiCS_TestDE(Chain1, Chain2, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
   log(2), EviThresholdM = NULL, EviThresholdD = NULL,
-  OrderVariable = "ProbDiffExp", GroupLabelRef = "Ref",
-  GroupLabelTest = "Test", Plot = TRUE, PlotOffset = TRUE,
-  OffSet = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, GenesSelect = NULL, ...)
+  OrderVariable = "Prob", GroupLabel1 = "Group1", GroupLabel2 = "Group2",
+  Plot = TRUE, PlotOffset = TRUE, OffSet = TRUE, EFDR_M = 0.05,
+  EFDR_D = 0.05, GenesSelect = NULL, ...)
 }
 \arguments{
-\item{ChainRef}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Reference cell population}
+\item{Chain1}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the first group of cells}
 
-\item{ChainTest}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Test cell population}
+\item{Chain2}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the second group of cells}
 
 \item{EpsilonM}{Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)}
 
@@ -23,11 +23,11 @@ BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
 
 \item{EviThresholdD}{Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive value, between 0 and 1)}
 
-\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "ProbDiffExp", "ProbDiffOverDisp")}.}
+\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "Prob")}.}
 
-\item{GroupLabelRef}{Label assigned to reference group. Default: \code{GroupLabelRef = "Ref"}}
+\item{GroupLabel1}{Label assigned to reference group. Default: \code{GroupLabel1 = "Group1"}}
 
-\item{GroupLabelTest}{Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}}
+\item{GroupLabel2}{Label assigned to reference group. Default: \code{GroupLabel2 = "Group2"}}
 
 \item{Plot}{If \code{Plot = TRUE}, MA and volcano plots are generated.}
 
@@ -46,23 +46,27 @@ BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
 \value{
 \code{BASiCS_TestDE} returns a list of 4 elements:
 \describe{
-\item{\code{Table}}{A \code{\link[base]{data.frame}} containing the results of the differential expression test}
+\item{\code{TableMean}}{A \code{\link[base]{data.frame}} containing the results of the differential mean test}
    \describe{
-   \item{\code{GeneNames}}{Gene name of each biological gene}
-   \item{\code{ExpOverall}}{For each biological gene, the mean expression parameter \eqn{\mu[i]} is averaged across the test and refernce cell population.}
-   \item{\code{ExpTest}}{Mean expression parameter \eqn{\mu[i]} for each biological gene in the test cell population.}
-   \item{\code{ExpRef}}{Mean expression parameter \eqn{\mu[i]} for each biological gene in the reference cell population.}
-   \item{\code{ExpFC}}{Fold change in mean expression parameters between the test and reference cell population.}
-   \item{\code{ExpLogFC}}{Log-transformed fold change in mean expression parameters.}
-   \item{\code{ProbDiffExp}}{Posterior probability for detection mean expression difference between the test and reference cell population given the supplied parameters.}
-   \item{\code{ResultDiffExp}}{Indicator if a gene is higher expressed in the test or refernce population.}
-   \item{\code{OverDispOverall}}{For each biological gene, the over-dispersion hyper-parameter \eqn{\delta[i]} is averaged across the test and refernce cell population.}
-   \item{\code{OverDispTest}}{Over-dispersion hyper-parameter \eqn{\delta[i]} for each biological gene in the test cell population.}
-   \item{\code{OverDispRef}}{Over-dispersion hyper-parameter \eqn{\delta[i]} for each biological gene in the reference cell population.}
-   \item{\code{OverDispFC}}{Fold change in over-dispersion hyper-parameters between the test and reference cell population.}
-   \item{\code{OverDispLogFC}}{Log-transformed fold change in over-dispersion hyper-parameters.}
-   \item{\code{ProbDiffOverDisp}}{Posterior probability for detection over-dispersion difference between the test and reference cell population given the supplied parameters.}
-   \item{\code{ResultDiffOverDisp}}{Indicator if a gene has a higher over-dispersion in the test or refernce population.}
+   \item{\code{GeneNames}}{Gene name}
+   \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu[i]} is averaged across both groups of cells (weighted by sample size).}
+   \item{\code{Mean1}}{Estimated mean expression parameter \eqn{\mu[i]} for each biological gene in the first group of cells.}
+   \item{\code{Mean2}}{Estimated mean expression parameter \eqn{\mu[i]} for each biological gene in the second group of cells.}
+   \item{\code{MeanFC}}{Fold change in mean expression parameters between the first and second groups of cells.}
+   \item{\code{MeanLog2FC}}{Log2-transformed fold change in mean expression between the first and second groups of cells.}
+   \item{\code{ProbDiffMean}}{Posterior probability for mean expression difference between the first and second groups of cells.}
+   \item{\code{ResultDiffExp}}{Indicator if a gene has a higher mean expression in the first or second groups of cells.}
+   }
+\item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the results of the differential dispersion test (excludes genes for which the mean changes).}
+   \describe{
+   \item{\code{GeneNames}}{Gene name}
+   \item{\code{DispOverall}}{For each gene, the estimated over-dispersion parameter \eqn{\delta[i]} is averaged across both groups of cells (weighted by sample size).}
+   \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta[i]} for each biological gene in the first group of cells.}
+   \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta[i]} for each biological gene in the second group of cells.}
+   \item{\code{DispFC}}{Fold change in over-dispersion parameters between the between the first and second groups of cells.}
+   \item{\code{DispLog2FC}}{Log-transformed fold change in over-dispersion between the first and second groups of cells.}
+   \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion difference between the first and second groups of cells.}
+   \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher over-dispersion in the first or second groups of cells.}
    }
  \item{\code{DiffExpSummary}}{A list containing the following information for the differential mean expression test:}
    \describe{
@@ -76,6 +80,11 @@ BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
   }
+ \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain-class}} object: \code{Chain1} after offset removal.}
+ \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain-class}} object: \code{Chain2} after offset removal
+ (this is only provided for completeness; \code{Chain2} is not affected by the offset).}
+ \item{\code{OffsetChain}}{MCMC chain calculated for the offset effect.}
+ \item{\code{Offset}}{Estimated offset (posterior median of \code{OffsetChain}). Default value set equal to 1 when offset correction is not performed.}
 }
 }
 \description{
@@ -93,7 +102,7 @@ Chain1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000,
 Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000, 
                       PrintProgress = FALSE)
                       
-Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
+Test <- BASiCS_TestDE(Chain1 = Chain1, Chain2 = Chain2,
                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
 
 }
