@@ -13,7 +13,8 @@
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "ProbDiffExp", "ProbDiffOverDisp")}.
 #' @param GroupLabelRef Label assigned to reference group. Default: \code{GroupLabelRef = "Ref"}
 #' @param GroupLabelTest Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}
-#' @param Plot If \code{Plot = TRUE}, error rates control rates and volcano plots are generated.  
+#' @param Plot If \code{Plot = TRUE}, MA and volcano plots are generated. 
+#' @param PlotOffset If \code{Plot = TRUE}, the offset effect is visualised.   
 #' @param OffSet Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step. 
 #' @param EFDR_M Target for expected false discovery rate related to the comparison of means (default = 0.05)
 #' @param EFDR_D Target for expected false discovery rate related to the comparison of dispersions (default = 0.05)
@@ -69,7 +70,7 @@
 #' Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
 #'                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
 #' 
-#' @authors Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #' 
 #' @rdname BASiCS_TestDE
 BASiCS_TestDE <- function(ChainRef,
@@ -81,7 +82,8 @@ BASiCS_TestDE <- function(ChainRef,
                             OrderVariable = "ProbDiffExp",
                             GroupLabelRef = "Ref",
                             GroupLabelTest = "Test",
-                            Plot = FALSE, 
+                            Plot = TRUE, 
+                            PlotOffset = TRUE, 
                             OffSet = TRUE, 
                             EFDR_M = 0.05,
                             EFDR_D = 0.05,
@@ -120,17 +122,86 @@ BASiCS_TestDE <- function(ChainRef,
   nTest = ncol(ChainTest@nu)
   nRef = ncol(ChainRef@nu)
   n = nTest + nRef
-  # Changes in overall expression
+  # With offset correction
   if(OffSet)
   {
-    # With offset correction
-    ChainMuRefOffSet = ChainRef@mu / rowSums(ChainRef@mu)
-    ChainMuTestOffSet = ChainTest@mu / rowSums(ChainTest@mu)
+    # Calculating iteration-specific offset
+    OffsetChain <- rowSums(ChainRef@mu)/rowSums(ChainTest@mu)
+    # Offset point estimate
+    OffsetEst <- median(OffsetChain)
+    
+    # Offset correction gene-specific parameters
+    ChainMuRefOffSet = ChainRef@mu / OffsetEst
+    ChainMuTestOffSet = ChainTest@mu 
     MedianMuRefOffSet = apply(ChainMuRefOffSet, 2, median)
     MedianMuTestOffSet = apply(ChainMuTestOffSet, 2, median)
-    
     ChainTau = log2(ChainMuTestOffSet / ChainMuRefOffSet )
     MedianTau = apply(ChainTau, 2, median)
+    
+    # Offset correction cell-specific parameters
+    ChainPhiRefOffSet = ChainRef@phi * Offset
+    
+    if(!PlotOffset)
+    {
+      message(paste("--------------------------------------------------------------------- \n",
+                    "Offset estimate:", OffsetEst, ".\n",
+                    "To visualise its effect, please use 'PlotOffset = TRUE'.\n",
+                    "--------------------------------------------------------------------- \n"))      
+    }
+    else
+    {    
+      message(paste("--------------------------------------------------------------------- \n",
+                    "Offset estimate:", OffsetEst, ".\n",
+                    "--------------------------------------------------------------------- \n"))
+    }
+
+    
+    if(PlotOffset == TRUE)
+    {
+      par(ask=TRUE)
+      # Offset uncertainty
+      boxplot(OffsetChain, frame = FALSE, 
+              main = "Offset MCMC chain", ylab = "Offset estimate") 
+      # Normalisation parameters pre-after offset
+      par(mfrow = c(1,2))
+      boxplot(cbind(colMedians(ChainRef@phi),
+                    colMedians(ChainTest@phi)), frame = "FALSE",
+              main = "Before correction", 
+              names = c(GroupLabelRef, GroupLabelTest),
+              ylab = "mRNA content normalisation")
+      boxplot(cbind(colMedians(ChainPhiRefOffSet),
+                    colMedians(ChainTest@phi)), frame = "FALSE",
+              main = "After correction", 
+              names = c(GroupLabelRef, GroupLabelTest),
+              ylab = "mRNA content normalisation")
+      # Mean expression parameters pre-after offset
+      par(mfrow = c(1,2))
+      boxplot(cbind(colMedians(ChainRef@mu),
+                    colMedians(ChainTest@mu)), frame = "FALSE",
+              main = "Before correction", 
+              names = c(GroupLabelRef, GroupLabelTest),
+              ylab = "Mean expression", log = "y")
+      boxplot(cbind(MedianMuRefOffSet,
+                    MedianMuTestOffSet), frame = "FALSE",
+              main = "After correction", 
+              names = c(GroupLabelRef, GroupLabelTest),
+              ylab = "Mean expression", log = "y")
+      # MA plot pre/after offset
+      par(mfrow = c(1,2))
+      MuBase=(colMedians(ChainRef@mu) * nRef + colMedians(ChainTest@mu) * nTest)/n
+      smoothScatter(MuBase, colMedians(log2(ChainTest@mu / ChainRef@mu )), 
+           bty = "n", xlab = "Mean expresssion", # pch = 16, col = "grey", 
+           ylab = "Log2 fold change", main = "Before correction", log = "x")
+      abline(h = 0, lty = 2)
+      abline(h = log(OffsetEst), lty = 2, col = "red")
+      
+      MuBase=(MedianMuRefOffSet * nRef + MedianMuTestOffSet * nTest)/n
+      smoothScatter(MuBase, MedianTau, 
+           bty = "n", xlab = "Mean expresssion", # pch = 16, col = "grey", 
+           ylab = "Log2 fold change", main = "After correction", log = "x")
+      abline(h = 0, lty = 2)
+      par(ask=FALSE)
+    }
   }
   else
   {

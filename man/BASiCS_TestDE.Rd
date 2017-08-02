@@ -7,8 +7,8 @@
 BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
   log(2), EviThresholdM = NULL, EviThresholdD = NULL,
   OrderVariable = "ProbDiffExp", GroupLabelRef = "Ref",
-  GroupLabelTest = "Test", Plot = FALSE, OffSet = TRUE, EFDR_M = 0.05,
-  EFDR_D = 0.05, GenesSelect = NULL, ...)
+  GroupLabelTest = "Test", Plot = TRUE, PlotOffset = TRUE,
+  OffSet = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, GenesSelect = NULL, ...)
 }
 \arguments{
 \item{ChainRef}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the Reference cell population}
@@ -29,7 +29,9 @@ BASiCS_TestDE(ChainRef, ChainTest, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
 
 \item{GroupLabelTest}{Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}}
 
-\item{Plot}{If \code{Plot = TRUE}, error rates control rates and volcano plots are generated.}
+\item{Plot}{If \code{Plot = TRUE}, MA and volcano plots are generated.}
+
+\item{PlotOffset}{If \code{Plot = TRUE}, the offset effect is visualised.}
 
 \item{OffSet}{Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step.}
 
@@ -94,4 +96,7 @@ Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000,
 Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
 
+}
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling
 }

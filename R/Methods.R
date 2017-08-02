@@ -158,7 +158,9 @@ setMethod("plot",
             if(Param == "nu") {object = x@nu; Column = Cell; ylab = if(ylab == "") ylab = bquote(nu[.(Column)])} 
             if(Param == "theta") {object = x@theta; Column = Batch; ylab = if(ylab == "") ylab = bquote(theta[.(Column)])} 
             
+            par(mfrow = c(1,2))
             plot(object[,Column], type="l", xlab = xlab, ylab = ylab, ...)
+            acf(object[,Column], main = "Autocorrelation")
           })
 
 

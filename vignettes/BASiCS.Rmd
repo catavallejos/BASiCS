@@ -293,14 +293,19 @@ Chain <- BASiCS_LoadChain("Example", StoreDir = tempdir())
 
 ## Convergence assessment
 
-To assess convergence of the chain, the convergence diagnostics provided by the package `coda` can be used. Additionally, a visual inspection is provided by traceplots, for example:
+To assess convergence of the chain, the convergence diagnostics provided by the package `coda` can be used. Additionally, the chains can be visually inspected. For example:
 
-```{r Traceplots, fig.height = 3, fig.width = 3}
+```{r Traceplots, fig.height = 3, fig.width = 6}
 plot(Chain, Param = "mu", Gene = 1, log = "y")
 plot(Chain, Param = "phi", Cell = 1)
 ```
 
-<span style="color:red"> TO-DO 14: ADD ACF TO THESE PLOTS </span>
+In the figures above:
+
+- Left panels show traceplots for the chains
+- Right panels show the autocorrelation function (see `?acf`)
+
+<!---<span style="color:red"> TO-DO 14: ADD ACF TO THESE PLOTS </span>---> 
 
 ## Summarising the posterior distribution
 
