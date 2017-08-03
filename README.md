@@ -89,5 +89,7 @@ This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP
 
 ## References
 
-- <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). PLoS Computational Biology. </a>
-- <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Genome Biology. </a>
+- [1] <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). PLoS Computational Biology. </a>
+- [2] <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Genome Biology. </a>
+- [3] <a href="http://science.sciencemag.org/content/355/6332/1433">Martinez-Jimenes <em>et al.</em> (2017). Science. </a>
+- [4] <a href="https://www.ncbi.nlm.nih.gov/pubmed/15054023">Newton <em>et al.</em> (2004). Biostatistics. </a>
