@@ -1,12 +1,20 @@
 # BASiCS
 
-Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hierarchical model to perform statistical analyses of single-cell RNA sequencing datasets in the context of **supervised** experiments (where the groups of cells of interest are known a priori, e.g. experimental conditions or cell types). 
+Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene expression levels within seemingly homogeneous populations of cells. However, these experiments are prone to high levels of technical noise, creating new challenges for identifying genes that show genuine heterogeneous expression within the group of cells under study. 
 
-In BASiCS:
+BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is an integrated Bayesian hierarchical model that propagates statistical uncertainty by simultaneously performing data normalisation (global scaling), technical noise quantification and two types of **supervised** downstream analyses: 
 
-- Cell-specific normalization constants are estimated as part of the model parameters.
-- Technical variability is quantified based on spike-in genes that are artificially introduced to each analysed cells lysate.
-- The total variability of the expression counts is decomposed into technical and biological components.
+- **For a single group of cells** [1]: BASiCS provides a criterion to identify highly (and lowly) variable genes within the group. 
+
+- **For two (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional differential expression tools, BASiCS can uncover changes in mean expression between the groups. Besides this, BASiCS can also uncover changes in *over-dispersion* --- a measure for the residual cell-to-cell variation that is observed after accounting for technical noise. This feature has led, for example, to novel insights in the context of immune cells across aging [3].
+
+In both cases, a probabilistic output is provided, with posterior probability thresholds calibrated through the expected false discovery rate (EFDR) [4].
+
+Currently, BASiCS relies on the use of **spike-in genes** --- that are artificially introduced to each cell's lysate --- to perform these analyses. 
+
+**Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
+
+For technical details, references are provided at the bottom of this document. 
 
 ## Installation
 

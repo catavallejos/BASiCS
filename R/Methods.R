@@ -271,7 +271,7 @@ setMethod("show",
 #' @param pch As in \code{\link[graphics]{par}}. 
 #' @param col As in \code{\link[graphics]{par}}. 
 #' @param bty As in \code{\link[graphics]{par}}. 
-#' @param SmoothPlot Logical if the \code{\link[graphics]{smoothScatter}} function should be used for plotting.
+#' @param SmoothPlot Logical parameter. If \code{TRUE}, transparency will be added to the color of the dots. 
 #' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @examples
@@ -334,19 +334,22 @@ setMethod("plot",
             }
             
             else{
+              args = list(...)
               ValidCombination = FALSE
+              if(SmoothPlot)
+              {
+                col = rgb(col2rgb(col)[1], col2rgb(col)[2], 
+                          col2rgb(col)[3],50,maxColorValue=255) 
+              }
+              
               if(Param == "mu" & Param2 == "delta")
               {
                 ValidCombination = TRUE
                 Columns = Genes; if(ylab == "") ylab = expression(delta[i]); if(xlab == "") xlab = expression(mu[i])
                 if(xlim == "") {xlim = c(min(x@mu[Columns,1]),max(x@mu[Columns,1]))}
                 if(ylim == "") {ylim = c(min(x@delta[Columns,1]),max(x@delta[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@mu[Columns,1], x@delta[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...) 
-                }
-                else{
-                  plot(x@mu[Columns,1], x@delta[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...) 
-                }
+
+                plot(x@mu[Columns,1], x@delta[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...) 
               }
               if(Param == "delta" & Param2 == "mu")
               {
@@ -362,12 +365,7 @@ setMethod("plot",
                 Columns = Cells; if(ylab == "") ylab = expression(s[i]); if(xlab == "") xlab = expression(phi[i])
                 if(xlim == "") {xlim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
                 if(ylim == "") {ylim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@phi[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                else{
-                  plot(x@phi[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }              
+                plot(x@phi[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
                 }
               if(Param == "s" & Param2 == "phi")
               {
@@ -375,12 +373,7 @@ setMethod("plot",
                 Columns = Cells; if(ylab == "") ylab = expression(phi[i]); if(xlab == "") xlab = expression(s[i])
                 if(ylim == "") {ylim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
                 if(xlim == "") {xlim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@s[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                else{
-                  plot(x@s[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
+                plot(x@s[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
                 }
               if(Param == "phi" & Param2 == "nu")
               {
@@ -388,12 +381,7 @@ setMethod("plot",
                 Columns = Cells; if(ylab == "") ylab = expression(nu[i]); if(xlab == "") xlab = expression(phi[i])
                 if(xlim == "") {xlim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
                 if(ylim == "") {ylim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@phi[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                else{
-                  plot(x@phi[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
+                plot(x@phi[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
               }
               if(Param == "nu" & Param2 == "phi")
               {
@@ -401,38 +389,25 @@ setMethod("plot",
                 Columns = Cells; if(ylab == "") ylab = expression(phi[i]); if(xlab == "") xlab = expression(nu[i])
                 if(ylim == "") {ylim = c(min(x@phi[Columns,1]),max(x@phi[Columns,1]))}
                 if(xlim == "") {xlim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@nu[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                else{
-                  plot(x@nu[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                }
+                plot(x@nu[Columns,1], x@phi[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
+              }
               if(Param == "s" & Param2 == "nu")
               {
                 ValidCombination = TRUE
                 Columns = Cells; if(ylab == "") ylab = expression(nu[i]); if(xlab == "") xlab = expression(s[i])
                 if(xlim == "") {xlim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
                 if(ylim == "") {ylim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@s[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                else{
-                  plot(x@s[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                }
+
+                plot(x@s[Columns,1], x@nu[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
+              }
               if(Param == "nu" & Param2 == "s")
               {
                 ValidCombination = TRUE
                 Columns = Cells; if(ylab == "") ylab = expression(s[i]); if(xlab == "") xlab = expression(nu[i])
                 if(ylim == "") {ylim = c(min(x@s[Columns,1]),max(x@s[Columns,1]))}
                 if(xlim == "") {xlim = c(min(x@nu[Columns,1]),max(x@nu[Columns,1]))}
-                if(SmoothPlot){
-                  graphics::smoothScatter(x@nu[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
-                else{
-                  plot(x@nu[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
-                }
+
+                plot(x@nu[Columns,1], x@s[Columns,1], xlab = xlab, ylab = ylab, ylim = ylim, pch = pch, col = col, bty = bty, ...)                
               }
               
               if(ValidCombination == FALSE) {stop("Invalid combination for Param and Param2 \n - 

@@ -196,17 +196,17 @@ BASiCS_TestDE <- function(Chain1,
       # MA plot pre/after offset
       message("MA plot before/after offset correction ...")
       par(mfrow = c(1,2))
-      graphics::smoothScatter(MuBase_old, MedianTau_old, 
-           bty = "n", xlab = "Mean expresssion",  
+      graphics::smoothScatter(log2(MuBase_old), MedianTau_old, 
+           bty = "n", xlab = "Mean expresssion (log2)",  
            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
-           main = "Before correction (log2offset = red line)", log = "x")
+           main = "Before correction (log2offset = red line)")
       abline(h = 0, lty = 2)
-      abline(h = log(OffsetEst), lty = 1, col = "red")
+      abline(h = log2(OffsetEst), lty = 1, col = "red")
       
-      graphics::smoothScatter(MuBase, MedianTau, 
-           bty = "n", xlab = "Mean expresssion", 
+      graphics::smoothScatter(log2(MuBase), MedianTau, 
+           bty = "n", xlab = "Mean expresssion (log2)", 
            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2),
-           main = "After correction", log = "x")
+           main = "After correction")
       abline(h = 0, lty = 2)
       par(ask=FALSE)
     }
@@ -341,7 +341,7 @@ BASiCS_TestDE <- function(Chain1,
         
     if(Search)
     {    
-        message("EFDR/EFNR control ...")
+        message("EFDR/EFNR control plots ...")
         par(mfrow = c(1,2))
         EviThresholds <- seq(0.5,0.9995,by=0.00025)
         plot(EviThresholds, AuxMean$EFDRgrid, type = "l", lty = 1, 
@@ -362,23 +362,40 @@ BASiCS_TestDE <- function(Chain1,
                col = c("black","black", "blue"), bty = "n")
     }
     
-    message("MA plot ...")
-    
+    message("MA plots ...")
     par(mfrow = c(1,2))
-    graphics::smoothScatter(MuBase, MedianTau, 
-                            bty = "n", xlab = "Mean expresssion",  
+    with(TableMean, graphics::smoothScatter(log2(MeanOverall), MeanLog2FC, 
+                            bty = "n", xlab = "Mean expresssion (log2)",  
                             ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
-                            main = "Differential mean test", log = "x")
+                            main = "Differential mean test"))
     with(TableMean[!(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff")), ],
-         points(MeanOverall, MeanLog2FC, pch = 16, col = "red"))
-    abline(h = 0, lty = 2)
-    graphics::smoothScatter(MuBase[NotDE], MedianOmega, 
-                            bty = "n", xlab = "Mean expresssion", 
+         points(log2(MeanOverall), MeanLog2FC, pch = 16, col = "red"))
+    abline(h = c(-EpsilonM, EpsilonM), lty = 2)
+    with(TableDisp, graphics::smoothScatter(log2(MeanOverall), DispLog2FC, 
+                            bty = "n", xlab = "Mean expresssion (log2)", 
                             ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2),
-                            main = "Differential dispersion test", log = "x")
-    with(TableDisp[!(TableDisp$ResultDiffDisp %in% c("ExcludedByUser", "NoDiff")), ],
-         points(MeanOverall, DispLog2FC, pch = 16, col = "red"))
-    abline(h = 0, lty = 2)
+                            main = "Differential dispersion test"))
+    with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ],
+         points(log2(MeanOverall), DispLog2FC, pch = 16, col = "red"))
+    abline(h = c(-EpsilonD, EpsilonD), lty = 2)
+    
+    message("Volcano plots ...")
+    par(mfrow = c(1,2))
+    with(TableMean, graphics::smoothScatter(MeanLog2FC, ProbDiffMean,
+                            bty = "n", ylab = "Posterior probability",  
+                            xlab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
+                            main = "Differential mean test", ylim = c(0,1)))
+    with(TableMean[!(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff")), ],
+         points(MeanLog2FC, ProbDiffMean, pch = 16, col = "red"))
+    abline(v = c(-EpsilonM, EpsilonM), lty = 2)
+    with(TableDisp, graphics::smoothScatter(DispLog2FC, ProbDiffDisp,
+                            bty = "n", ylab = "Posterior probability", 
+                            xlab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2),
+                            main = "Differential dispersion test", ylim = c(0,1)))
+    with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ],
+         points(DispLog2FC, ProbDiffDisp, pch = 16, col = "red"))
+    abline(v = c(-EpsilonD, EpsilonD), lty = 2)
+    
     par(ask=FALSE)
   }
   

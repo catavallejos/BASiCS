@@ -59,18 +59,18 @@
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, PrintProgress = FALSE)
 #' 
 #' # For illustration purposes we load a built-in 'BASiCS_Chain' object (obtained using the 'BASiCS_MCMC' function)
-#' #data(ChainSC)
+#' data(ChainSC)
 #' 
 #' # `displayChainBASiCS` can be used to extract information from this output. For example:
-#' head(displayChainBASiCS(Chain, Param = "mu"))
+#' head(displayChainBASiCS(ChainSC, Param = "mu"))
 #'
 #' # Traceplot (examples only)
-#' plot(Chain, Param = "mu", Gene = 1)
-#' plot(Chain, Param = "phi", Cell = 1)
-#' plot(Chain, Param = "theta", Batch = 1)
+#' plot(ChainSC, Param = "mu", Gene = 1)
+#' plot(ChainSC, Param = "phi", Cell = 1)
+#' plot(ChainSC, Param = "theta", Batch = 1)
 #'
 #' # Calculating posterior medians and 95% HPD intervals
-#' ChainSummary <- Summary(Chain)
+#' ChainSummary <- Summary(ChainSC)
 #' 
 #' # `displaySummaryBASiCS` can be used to extract information from this output. For example:
 #' head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
@@ -91,11 +91,12 @@
 #' # To constrast posterior medians of gene-specific parameters
 #' par(mfrow = c(1,2))
 #' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
-#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE) # Recommended
+#' # Recommended
+#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE) 
 #'
 #' # Highly and lowly variable genes detection (within a single group of cells)
-#' DetectHVG <- BASiCS_DetectHVG(Data, ChainSC, VarThreshold = 0.70, EFDR = 0.10, Plot = TRUE)
-#' DetectLVG <- BASiCS_DetectLVG(Data, ChainSC, VarThreshold = 0.50, EFDR = 0.10, Plot = TRUE)
+#' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, EFDR = 0.10, Plot = TRUE)
+#' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, EFDR = 0.10, Plot = TRUE)
 #'
 #' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
 #' with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
@@ -104,8 +105,8 @@
 #'        pch = 16, col = "blue", cex = 1))
 #'
 #' # If variance thresholds are not fixed
-#' BASiCS_VarThresholdSearchHVG(Data, Chain, VarThresholdsGrid = seq(0.70,0.75,by=0.01), EFDR = 0.10)
-#' BASiCS_VarThresholdSearchLVG(Data, Chain, VarThresholdsGrid = seq(0.50,0.55,by=0.01), EFDR = 0.10)
+#' BASiCS_VarThresholdSearchHVG(ChainSC, VarThresholdsGrid = seq(0.55,0.65,by=0.01), EFDR = 0.10)
+#' BASiCS_VarThresholdSearchLVG(ChainSC, VarThresholdsGrid = seq(0.35,0.45,by=0.01), EFDR = 0.10)
 #' 
 #' # For examples of differential analyses between 2 populations of cells:
 #' ?BASiCS_TestDE

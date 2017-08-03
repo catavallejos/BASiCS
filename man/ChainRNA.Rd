@@ -9,7 +9,7 @@
 ChainRNA
 }
 \description{
-Small extract (50 MCMC iterations, 1000 randomly selected genes) from the chain obtained in Vallejos et al (2016),
+Small extract (100 MCMC iterations, 500 randomly selected genes) from the chain obtained in Vallejos et al (2016),
 related to pool-and-split samples (this corresponds to the RNA 2i samples in Grun et al, 2014).
 }
 \references{

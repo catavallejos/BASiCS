@@ -59,15 +59,13 @@ HiddenEFNR<-function(
   return(sum(Prob*I(EviThreshold>=Prob))/sum(I(EviThreshold>=Prob)))
 }
 
-HiddenHeaderDetectHVG_LVG <- function(Data,
-                                      object,
+HiddenHeaderDetectHVG_LVG <- function(object,
                                       VarThreshold,
                                       EviThreshold = NULL,
                                       EFDR = 0.05, 
                                       OrderVariable = "Prob",
                                       Plot = FALSE)
 {
-  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
   if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   if(VarThreshold<0 | VarThreshold>1 | !is.finite(VarThreshold)) stop("Variance contribution thresholds for HVG/LVG detection must be contained in (0,1)")
   if(!is.logical(Plot) | length(Plot)!=1) stop("Please insert TRUE or FALSE for Plot parameter")
@@ -80,23 +78,18 @@ HiddenHeaderDetectHVG_LVG <- function(Data,
   if(is.null(EviThreshold)) {message(paste("Posterior probability threshold to be defined by EFDR = ", 100*EFDR, "% (+-2.5% tolerance) ..."))}
 }
 
-HiddenPlot1DetectHVG_LVG <- function(EviThresholds, 
+HiddenPlot1DetectHVG_LVG <- function(ProbThresholds, 
                                      EFDRgrid,
                                      EFNRgrid,
-                                     OptThreshold,
-                                     EviThreshold,
                                      EFDR)
 {
-  plot(EviThresholds, EFDRgrid, type = "l", lty = 1, bty = "n", lwd = 2,  
-       ylab = "Error rate", xlab = "Evidence threshold", ylim = c(0,1))
-  lines(EviThresholds, EFNRgrid, lty = 2, lwd = 2)
-  if(length(EviThreshold) == 0) {abline(h = EFDR, col = "blue", lwd = 2, lty = 1)}
-  abline(v = OptThreshold[1], col = "red", lwd = 2, lty = 1)
-  if(length(EviThreshold) == 0)
-  {
-    legend('topleft', c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2,1), 
-           col = c("black", "black", "blue"), bty = "n", lwd = 2)  
-  }
+  plot(ProbThresholds, EFDRgrid, type = "l", lty = 1, bty = "n", lwd = 2,  
+       ylab = "Error rate", xlab = "Probability threshold", ylim = c(0,1))
+  lines(ProbThresholds, EFNRgrid, lty = 2, lwd = 2)
+  abline(h = EFDR, col = "blue", lwd = 2, lty = 1)
+  legend('topleft', c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2,1), 
+         col = c("black", "black", "blue"), bty = "n", lwd = 2)  
+
 }
 
 HiddenPlot2DetectHVG_LVG <- function(args, 
@@ -120,11 +113,16 @@ HiddenPlot2DetectHVG_LVG <- function(args,
   else {ylab = ifelse("ylab" %in% names(args),args$ylab, "LVG probability")}
   main = ifelse("main" %in% names(args),args$main, "")
   
+  col = rgb(col2rgb(col)[1], col2rgb(col)[2], 
+            col2rgb(col)[3],50,maxColorValue=255)
+  
   plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex,
        bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
        xlab = xlab, ylab = ylab, main = main)
   abline(h = OptThreshold[1], lty = 2, col = "black")
-  points(Mu[Hits], Prob[Hits], pch = pch, col = "red", cex = cex)
+  points(Mu[Hits], Prob[Hits], pch = pch, col = rgb(col2rgb("red")[1], col2rgb("red")[2], 
+                                                    col2rgb("red")[3],50,maxColorValue=255), 
+         cex = cex)
 }
 
 

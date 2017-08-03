@@ -5,8 +5,7 @@
 #'
 #' @description Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
 #'
-#' @param Data an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param VarThresholdsGrid Grid of values for the variance contribution threshold (they must be contained in (0,1))
 #' @param EFDR Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)
 #' @param Progress If \code{Progress = TRUE}, partial output is printed in the console.
@@ -31,14 +30,12 @@
 #'
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
 BASiCS_VarThresholdSearchHVG=function(
-  Data,
-  object,
+  Chain,
   VarThresholdsGrid, #
   EFDR = 0.10,
   Progress = TRUE)
 {
-  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  if(!is(Chain,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
     stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
   
@@ -51,7 +48,7 @@ BASiCS_VarThresholdSearchHVG=function(
     
     if(Progress) {message(paste0("Evaluating variance contribution threshold = ",100*VarThreshold," % ... \n"))}
     
-    suppressMessages(DetectHVG <- BASiCS_DetectHVG(Data, object, EFDR = EFDR, VarThreshold = VarThreshold))
+    suppressMessages(DetectHVG <- BASiCS_DetectHVG(Chain, EFDR = EFDR, VarThreshold = VarThreshold))
     
     Table[i,]=c(100*VarThreshold, round(100*DetectHVG$EFDR,2),
                 round(100*DetectHVG$EFNR,2),
@@ -64,14 +61,13 @@ BASiCS_VarThresholdSearchHVG=function(
 #' @aliases BASiCS_VarThresholdSearchLVG BASiCS_VarThresholdSearchHVG_LVG
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
 BASiCS_VarThresholdSearchLVG=function(
-  Data,
-  object,
+  Chain,
   VarThresholdsGrid, # Range of values for the variance contribution threshold (they must be contained in (0,1))
   EFDR = 0.10,
   Progress = TRUE)
 {
   
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  if(!is(Chain,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
   if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
     stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
   
@@ -84,7 +80,7 @@ BASiCS_VarThresholdSearchLVG=function(
     
     if(Progress) {message(paste0("Evaluating variance contribution threshold = ",100*VarThreshold," % ... \n"))}
     
-    suppressMessages(DetectLVG <- BASiCS_DetectLVG(Data, object, EFDR = EFDR, VarThreshold = VarThreshold))
+    suppressMessages(DetectLVG <- BASiCS_DetectLVG(Chain, EFDR = EFDR, VarThreshold = VarThreshold))
     
     Table[i,]=c(100*VarThreshold, round(100*DetectLVG$EFDR,2),round(100*DetectLVG$EFNR,2),
                 DetectLVG$EviThreshold,sum(as.numeric(DetectLVG$Table[,7])))

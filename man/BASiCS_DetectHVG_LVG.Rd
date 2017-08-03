@@ -7,22 +7,20 @@
 \alias{BASiCS_DetectHVG_LVG}
 \title{Detection method for highly and lowly variable genes}
 \usage{
-BASiCS_DetectHVG(Data, object, VarThreshold, EviThreshold = NULL,
-  EFDR = 0.1, OrderVariable = "Prob", Plot = FALSE, ...)
+BASiCS_DetectHVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
+  OrderVariable = "Prob", Plot = FALSE, ...)
 
-BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
-  EFDR = 0.1, OrderVariable = "Prob", Plot = FALSE, ...)
+BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
+  OrderVariable = "Prob", Plot = FALSE, ...)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
-
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
 \item{VarThreshold}{Variance contribution threshold (must be a positive value, between 0 and 1)}
 
-\item{EviThreshold}{Optional parameter. Evidence threshold (must be a positive value, between 0 and 1)}
+\item{ProbThreshold}{Optional parameter. Posterior probability threshold (must be a positive value, between 0 and 1)}
 
-\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)}
+\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.05)}
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
 
@@ -35,15 +33,15 @@ BASiCS_DetectLVG(Data, object, VarThreshold, EviThreshold = NULL,
 \describe{
 \item{\code{Table}}{Matrix whose columns contain}
    \describe{
-   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index in the assay(Data) counts table}
-   \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name in the assay(Data) counts table}
+   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index as in the order present in the analysed \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
+   \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name as in the order present in the analysed \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }
    \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, probability of being highly variable according to the given thresholds.}
    \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, indicator of being detected as highly variable according to the given thresholds. }
    }
-\item{\code{EviThreshold}}{Evidence threshold.}
+\item{\code{ProbThreshold}}{Posterior probability threshold.}
 \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 }

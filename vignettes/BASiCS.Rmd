@@ -20,7 +20,7 @@ library(BASiCS)
 # Introduction to BASiCS
 
 Package: `r Biocpkg("BASiCS")` <br />
-Authors: Catalina Vallejos (cnvallej@uc.cl), Nils Eling (eling@ebi.ac.uk) <br />
+Authors: Catalina Vallejos (cnvallej@uc.cl) and Nils Eling (eling@ebi.ac.uk) <br />
 Compilation date: `r Sys.Date()`
 
 ***
@@ -29,23 +29,17 @@ Compilation date: `r Sys.Date()`
 
 Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene expression levels within seemingly homogeneous populations of cells. However, these experiments are prone to high levels of technical noise, creating new challenges for identifying genes that show genuine heterogeneous expression within the group of cells under study. 
 
-BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is an integrated Bayesian hierarchical model where: 
+BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is an integrated Bayesian hierarchical model that propagates statistical uncertainty by simultaneously performing data normalisation (global scaling), technical noise quantification and two types of **supervised** downstream analyses: 
 
-1. Cell-specific normalization constants are treated as model parameters   
+- **For a single group of cells** [1]: BASiCS provides a criterion to identify highly (and lowly) variable genes within the group. 
 
-2. Technical variability is quantified based on spike-in genes that are artificially introduced to each cell's lysate and 
+- **For two (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional differential expression tools, BASiCS can uncover changes in mean expression between the groups. Besides this, BASiCS can also uncover changes in *over-dispersion* --- a measure for the residual cell-to-cell variation that is observed after accounting for technical noise. This feature has led, for example, to novel insights in the context of immune cells across aging [3].
 
-3. The total variability of the expression counts is decomposed into technical and biological components. 
+In both cases, a probabilistic output is provided, with posterior probability thresholds calibrated through the expected false discovery rate (EFDR) [4].
+
+Currently, BASiCS relies on the use of **spike-in genes** --- that are artificially introduced to each cell's lysate --- to perform these analyses. 
 
 **Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
-
-BASiCS includes two built-in types of downstream analyses:
-
-- **For a single group of cells** [1]: BASiCS provides an intuitive detection criterion for highly (and lowly) variable genes within the group. This is formalized by means of tail posterior probabilities associated to high (or low) biological cell-to-cell variance contributions, quantities that can be easily interpreted by applied users. 
-
-- **For 2 (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional differential expression tools, BASiCS can uncover changes in mean expression between the groups. Besides this, BASiCS can also uncover changes in *over-dispersion* --- a measure for residual cell-to-cell variation that is observed after accounting for technical noise. This feature has led, for example, to novel insights in the context of immune cells across aging [3]. Evidence of differential expression is quantified through tail posterior probabilities associated to large *absolute log-fold changes* of mean and over-dispersion between the groups. 
-
-<!--- <span style="color:red"> TO-DO 1: POSSIBLY SPECIFY THAT LOG-FOLD CHANGES ARE IN LOG2 SCALE </span> ---> 
 
 A brief description for the statistical model implemented in BASiCS is provided in the "Methodology" section of this document. 
 
@@ -53,17 +47,11 @@ A brief description for the statistical model implemented in BASiCS is provided 
 
 # Quick start
 
-Here, we use synthetic data to illustrate the BASiCS analysis pipeline. 
-
-<!-- new quick start section --> 
-<!---Here we present the main functions of BASiCS to **1.** perform variance decomposition and normalize the data, **2.** detect highly  variable genes and **3.** test for differential mean expression and differential variability between two cell populations. 
-Each of the following steps are explained in more detail throughout this workflow. --> 
-
 ### The input dataset
 
 The input dataset for BASiCS must be stored as an `SummarizedExperiment` object (see `r Biocpkg("SummarizedExperiment")` package). 
 
-The `newBASiCS_Data` function can be used to create the required `SummarizedExperiment` object based on the following information:
+The `newBASiCS_Data` function can be used to create the input data object based on the following information:
 
 * `Counts`: a matrix of raw expression counts with dimensions $q$ times $n$. Within this matrix, $q_0$ rows must correspond to biological genes and $q-q_0$ rows must correspond to technical spike-in genes. Gene names must be stored as `rownames(Counts)`.
 
@@ -71,7 +59,7 @@ The `newBASiCS_Data` function can be used to create the required `SummarizedExpe
 
 * `SpikeInfo`: a `data.frame` with $q-q_0$ rows. First column must contain the names associated to the spike-in genes (as in `rownames(Counts)`). Second column must contain the input number of molecules for the spike-in genes (amount per cell).
 
-* `BatchInfo` (optional argument): vector of length $n$ to indicate batch structure in situations where cells have been processed using multiple batches. 
+* `BatchInfo` (optional): vector of length $n$ to indicate batch structure (whenever cells have been processed using multiple batches). 
 
 For example, the following code simulates a dataset with 50 genes (40 biological and 10 spike-in) and 40 cells. 
 
@@ -84,18 +72,17 @@ set.seed(2)
 SpikeInput = rgamma(10,1,1)
 SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeInput)
 
-# No batch effect
+# No batch structure
 DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo)
 
-# With batch effect
+# With batch structure
 DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, 
                              BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
-Note: sone datasets require filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering. For examples, refer to `help(BASiCS_Filter)`.  
+Note: scRNA-seq datasets typically require quality control filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering. For examples, refer to `help(BASiCS_Filter)`.  
 
-<!---
-<span style="color:green"> TO-DO 2: EXPLAIN HOW TO CONVERT AN STANDARD `SummarizedExperiment` OBJECT INTO ONE THAT CAN BE USED WITHIN BASiCS </span> ---> 
+Note: the `r Biocpkg("scater")` package provides enhanced functionality for the pre-processing of scRNA-seq datasets. 
 
 To convert an existing `SummarizedExperiment` object (`Data`) into one that can be used within BASiCS, meta-information must be stored in the object.
 
@@ -103,11 +90,7 @@ To convert an existing `SummarizedExperiment` object (`Data`) into one that can 
 
 * `metadata(Data)`: the `SpikeInfo` and `BatchInfo` objects are stored in the `metadata` slot of the `SummarizedExperiment` object: `metadata(Data)=list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. Once the additional information is included, the object can be used within BASiCS.
 
-Hereafter, we use the following built-in synthetic dataset to illustrate the usage of BASiCS. 
-
-```{r quick-start-data, results='hide'}
-Data <- makeExampleBASiCS_Data()
-```
+<span style="color:red"> TO-DO: REPLACE THIS BY THE NEW SC OBJECT. AFTERWARDS, CHECK THAT APPROPRIATE CHECKS ARE PERFORMED TO GUARANTEE THAT THE METADATA IS CORRECTLY PROVIDED. </span> 
 
 ### Running the MCMC sampler
 
@@ -117,163 +100,105 @@ Parameter estimation is performed using the `BASiCS_MCMC` function. Essential pa
 * `Thin`: length of the thining period (i.e. only every `Thin` iterations will be stored in the output of the `BASiCS_MCMC`)
 * `Burn`: length of burn-in period (i.e. the initial `Burn` iterations that will be discarded from the output of the `BASiCS_MCMC`)
 
-If the optional parameter `PrintProgress` is set to `TRUE`, the R console will display the progress of the MCMC algorithm. For other optional parameters refer to `help(BASiCS_MCMC)`. 
+If the optional parameter `PrintProgress` is set to `TRUE`, the R console will display the progress of the MCMC algorithm. For other optional parameters refer to `help(BASiCS_MCMC)`. Hereafter, we illustrate the usage of `BASiCS_MCMC` using a built-in synthetic dataset.
 
 ```{r quick-start-MCMC}
-Chain <- BASiCS_MCMC(Data = Data, N = 20000, Thin = 20, Burn = 10000, 
+Data <- makeExampleBASiCS_Data()
+Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
                      PrintProgress = FALSE)
 ```
 
-Please ensure that the acceptance rates displayed in the output of this function are around 0.44. If they are too far from this value, you might need to increase the number of iterations. 
+**Important remarks:**
 
-<!--- <span style="color:green"> TO-DO 3: THE 'MESSAGES' OUTPUT OF THIS FUNCTION IS DISTORTED WHEN REPORTING RUNNING TIME </span> ---> 
+- Please ensure the acceptance rates displayed in the console output of `BASiCS_MCMC` are around 0.44. If they are too far from this value, you should increase the number of iterations. 
 
-**Important: it is ESSENTIAL to assess the convergence of the MCMC algorithm BEFORE running the downstream analyses described in this document. For guidance regarding this step, refer to the 'Convergence assessment' section of this vignette**
+- It is **essential** to assess the convergence of the MCMC algorithm **before** continuing with downstream analyses. For guidance regarding this step, refer to the 'Convergence assessment' section of this vignette
 
-<span style="color:red"> NOTE: DEFAULT PRIOR FOR GAMMA DEFINED BY LOG-NORMAL DISTRIBUTION NOW. </span> 
+Typically, setting `N=20000`, `Thin=20` and `Burn=10000` leads to stable results. 
 
-### Detection of highly variable genes
+<span style="color:red"> NOTE: DEFAULT PRIOR FOR GAMMA DEFINED BY LOG-NORMAL DISTRIBUTION NOW. THIS IS REQUIRED FOR DIFFERENTIAL DISPERSION TESTS. </span> 
 
-The following code is used to identify **highly variable genes (HVG) ** within a group of cells. The `VarThreshold` parameter sets a lower threshold for the proportion of variability that is assigned to the biological component (`Sigma`). In the example below, HVG are defined as those genes for which **at least** 70\% of their total variability is attributed to the biological variability component. 
+### Analysis for a single group of cells
 
-For each gene, this function returns the posterior probability as a measure of evidence for being a HVG. A cut-off value for these posterior probabilities can be set by controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.05).
+We illustrate this analysis using a small extract from the MCMC chain obtained in [2] when analysing the single cell samples provided in [5]. This is included within `BASiCS` as the `ChainSC` dataset. 
 
-**Note: this criteria for threshold choice is new. Original version defined  `EviThreshold` such that EFDR = EFNR.**
-
-<!---
-<span style="color:red"> TO-DO 4: CHANGE CUT-OFF SEARCH TO BE COHERENT WITH DE ANALYSIS (I.E. SET BY EFDR ONLY) </span> --->
-
-<!---
-<span style="color:green"> TO-DO 5: CHANGE X-LABEL OF OUTPUT PLOT TO BE 'MEAN EXPRESSION' (RATHER THAN GREEK CHARACTHER). POSSIBLY REMOVE PLOT FROM THIS VIGNETTE </span> --->
-
-```{r quick-start-HVGdetection}
-par(mfrow = c(1,2))
-HVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.7, Plot = TRUE)
+```{r LoadSingleData}
+data(ChainSC)
 ```
 
-The results for the test are stored in `HVG$Table`. HVG are marked as `HVG$Table$HVG == TRUE`.
+The following code is used to identify **highly variable genes (HVG)** and **lowly variable genes (LVG) ** within these cells. The `VarThreshold` parameter sets a lower threshold for the proportion of variability that is assigned to the biological component (`Sigma`). In the examples below:
+
+- HVG are defined as those genes for which **at least** 60\% of their total variability is attributed to the biological variability component. 
+- LVG are defined as those genes for which **at most** 40\% of their total variability is attributed to the biological variability component.
+
+For each gene, these functions return posterior probabilities as a measure of HVG/LVG evidence. A cut-off value for these posterior probabilities is set by controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.05).
+
+```{r quick-start-HVGdetection, fig.height = 6, fig.width = 6}
+par(mfrow = c(2,2))
+HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
+LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
+```
+
+To access the results of these tests, please use. 
 
 ```{r quick-start-HVGdetectionTable}
 head(HVG$Table)
-```
-
-<span style="color:red"> TO-DO: WE MIGHT WANT A LESS CONSERVATIVE EFDR GOAL. CHECK THIS WITH REAL DATA. </span> 
-
-### Detection of lowly variable genes
-
-To identify **lowly variable genes (LVG) ** within a group of cells, we follow a similar procedure. In the example below, LVG are defined as those genes for which **at most** 40\% of their total variability is attributed to the biological variability component. 
-
-```{r quick-start-LVGdetection}
-par(mfrow = c(1,2))
-LVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.4, Plot = TRUE)
-```
-
-The results for the test are stored in `LVG$Table`. LVG are marked as `LVG$Table$LVG == TRUE`.
-
-```{r quick-start-LVGdetectionTable}
 head(LVG$Table)
 ```
 
-
-
-### Differential expression 
-
-To illustrate the use of the differential mean expression and differential over-dispersion tests between two cell populations, we generate two synthetic sets of data and run the MCMC algorithm seperately for each dataset.
-
-```{r quick-start-DataForDE, results='hide'}
-Data1 <- makeExampleBASiCS_Data(Example = 1)
-Data2 <- makeExampleBASiCS_Data(Example = 2)
-
-Chain1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000, 
-                      PrintProgress = FALSE)
-Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000, 
-                      PrintProgress = FALSE)
+```{r quick-start-HVGdetectionPlot}
+SummarySC <- Summary(ChainSC)
+plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
+with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
+with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
 ```
 
-**Hereafter, we arbitrarily refer to `Data1` and `Data2` as the reference and test groups, respectively. **
+<span style="color:red"> Note: this criteria for threshold choice is new. Original version defined  `EviThreshold` such that EFDR = EFNR. However, this 
+is more consistent with the differential tests and its more stable 
+(sometimes, we couldn't find a threshold such that EFDR = EFNR). </span>
 
-The input values required to perform this analysis are:
+### Analysis for two groups of cells 
 
-* `ChainRef`: the output of running the `MCMC_BASiCS` on the reference group of cells 
+To illustrate the use of the differential mean expression and differential over-dispersion tests between two cell populations, we use extracts from the MCMC chains obtained in [2] when analysing the [5] dataset (single cells vs pool-and-split samples). These were obtained by independently running the `BASiCS_MCMC` function for each group of cells. 
 
-* `ChainTest`: the output of running the `MCMC_BASiCS` on the test group of cells 
-
-Additionally, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
-
-**Note: previous versions of BASiCS used natural logarithm instead**
-
-```{r quick-start-test, results='hide'}
-Test <- BASiCS_TestDE(Chain1 = Chain1, Chain2 = Chain2,
-                      EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
+```{r quick-start-LoadBothData}
+data(ChainSC)
+data(ChainRNA)
 ```
 
-<!---<span style="color:green"> TO-DO 7: RENAME FUNCTION ABOVE AS `BASiCS_TestDE` </span>---> 
+```{r quick-start-TestDE}
+Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
+                      GroupLabel1 = "SC", GroupLabel2 = "P&S",
+                      EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2),
+                      EFDR_M = 0.05, EFDR_D = 0.05,
+                      OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)
+```
 
-<!--- <span style="color:green"> TO-DO 8: RENAME ARGUMENTS `objectRef` AND `objectTest` AS `ChainTest` AND `ChainRef` RESPECTIVELY. </span> ---> 
+In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
 
-<span style="color:red"> TO-DO 9: ADD MA PLOT AS AN OUTPUT OF THIS FUNCTION </span>
+**Due to the confounding between mean and over-dispersion that is typically observed in scRNA-seq datasets, we only assess changes in over-dispersion for those genes in which the mean does not change between the groups.**
 
-<span style="color:green"> TO-DO 10: MODIFY FUNCTION SO THAT LFC THRESHOLDS ARE IN LOG2 SCALE </span>
+<span style="color:red"> Note: previous versions of BASiCS used natural logarithm instead </.span>
 
-The resulting output list can be subsetted to extract genes that are differentially expressed 
+The resulting output list can be displayed using
 
 ```{r quick-start-DE, results='hide', eval = FALSE}
-Test$Table[Test$Table$ResultDiffExp == "Ref+",]
-Test$Table[Test$Table$ResultDiffExp == "Test+",]
+head(Test$TableMean)
+head(Test$TableDisp)
 ```
 
-Due to the confounding between mean and over-dispersion that is typically observed in scRNA-seq datasets, we only assess changes in over-dispersion for those genes in which the mean does not change between the groups. 
-
-<span style="color:red"> TO-DO 11: MAKE SURE THIS IS CORRECTLY DONE WITHIN THE LIBRARY </span>
-
-<!--- To assess the difference in variability, we recommend selecting the genes that do not change in mean expression: --> 
-
-```{r quick-start-DV2, results='hide', eval = FALSE}
-Test$Table[Test$Table$ResultDiffExp == "NoDiff" & Test$Table$ResultDiffOverDisp== "Ref+",]
-Test$Table[Test$Table$ResultDiffExp == "NoDiff" & Test$Table$ResultDiffOverDisp == "Test+",]
-```
+<span style="color:red"> SHOULD WE SEPARATE TESTS FOR MEAN AND DISPERSION 
+INTO TWO SEPARATE FUNCTIONS? </span> 
 
 # Additional details
 
-<span style="color:red"> TO-DO 12: MAKE SURE THE `BASiCS_Filter` FUNCTION HAS APPROPRIATE DOCUMENTATION </span>
+### Storing and loading MCMC chains
 
-<!--- 
-
-## Filtering the input dataset
-
-
-```{r Filter}
-Filter = BASiCS_Filter(Counts = Counts, Tech = Tech, SpikeInput = SpikeInput, 
-                       MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
-                       MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
-SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID %in% 
-                              names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
-FilterData = newBASiCS_Data(Counts = Filter$Counts, Tech = Filter$Tech, 
-                            SpikeInfo = SpikeInfoFilter)
-```
-
-A similar code can be used when the data contains multiple batches of cells (in this example, there are 2 batches with 5 cells each):
-
-```{r FilterBatch}
-Filter = BASiCS_Filter(Counts = Counts, Tech = Tech, 
-                       SpikeInput = SpikeInput, 
-                       BatchInfo = c(rep(1, times = 20), rep(2, times = 20)),
-                       MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
-                       MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
-SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID %in% 
-                              names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
-FilterData = newBASiCS_Data(Counts = Filter$Counts, Tech = Filter$Tech, 
-                            SpikeInfo = SpikeInfoFilter, BatchInfo = Filter$BatchInfo)
-```
-
---> 
-
-## Storing and loading MCMC chains
-
-If the user wants to externally store the output of this sampler (recommended), additional parameters `StoreChains`, `StoreDir` and `RunName` are required. For example
+To externally store the output of `BASiCS_MCMC` (recommended), additional parameters `StoreChains`, `StoreDir` and `RunName` are required. For example:
 
 ```{r MCMCNotRun}
-Chain <- BASiCS_MCMC(Data, N = 20000, Thin = 10, Burn = 10000,
+Data <- makeExampleBASiCS_Data()
+Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                      PrintProgress = FALSE, StoreChains = TRUE, 
                      StoreDir = tempdir(), RunName = "Example")
 ```
@@ -285,11 +210,6 @@ To load pre-computed MCMC chains,
 ```{r LoadChainNotRun}
 Chain <- BASiCS_LoadChain("Example", StoreDir = tempdir()) 
 ```
-
-<span style="color:red"> TO-DO 13: CHECK WHETHER THE USE OF tempdir AFFECTS CHECKS </span>
-
-<!---
-[^Fread]: For large datasets and/or large number of iterations, it is recommended to use the R library `data.table` and replace `read.table` by `fread`.  --> 
 
 ## Convergence assessment
 
@@ -318,13 +238,13 @@ displayChainBASiCS(Chain, Param = "mu")[1:5,1:5]
 As a summary of the posterior distribution, the function `Summary` calculates posterior medians and the High Posterior Density (HPD) intervals for each model parameter. As a default option, HPD intervals contain 0.95 probability. 
 
 ```{r Summary}
-MCMC_Summary <- Summary(Chain)
+ChainSummary <- Summary(Chain)
 ```
 
 The function `displaySummaryBASiCS` extract posterior summaries for individual parameters. For example
 
 ```{r SummaryExample}
-head(displaySummaryBASiCS(MCMC_Summary, Param = "mu"))
+head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
 ```
 
 
@@ -332,32 +252,29 @@ The following figures display posterior medians and the corresponding HPD 95% in
 
 ```{r OtherHPD, fig.width = 7, fig.height = 7}
 par(mfrow = c(2,2))
-plot(MCMC_Summary, Param = "mu", main = "All genes", log = "y")
-plot(MCMC_Summary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-plot(MCMC_Summary, Param = "delta", main = "All genes")
-plot(MCMC_Summary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
+plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
+plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
+plot(ChainSummary, Param = "delta", main = "All genes")
+plot(ChainSummary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
 ```
 
 It is also possible to obtain similar summaries for the normalising constants $\phi_j$ and $s_j$. 
 
 ```{r Normalisation, fig.width = 7, fig.height = 3.5}
 par(mfrow = c(1,2))
-plot(MCMC_Summary, Param = "phi")
-plot(MCMC_Summary, Param = "s", Cells = 1:5)
+plot(ChainSummary, Param = "phi")
+plot(ChainSummary, Param = "s", Cells = 1:5)
 ```
 
 Finally, it is also possible to create a scatterplot of posterior estimates for gene-specific parameters. Typically, this plot will exhibit the confounding effect that is observed between mean and over-dispersion. 
 
 ```{r DispVsExp, fig.width = 7, fig.height = 3.5}
 par(mfrow = c(1,2))
-plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
-plot(MCMC_Summary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE)
+plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
+plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE)
 ```
 
-The option `smooth = TRUE` is generally recommended as this plot will contain thousands of genes when analysing real datasets. 
-
-<!---<span style="color:green"> TO-DO 14: POSSIBLY CHANGE THIS PLOT BY A 'smoothScatter' (OR ADD SMOOTH AS AN OPTION) </span> ---> 
-
+The option `SmoothPlot = TRUE` is generally recommended as this plot will contain thousands of genes when analysing real datasets. 
 
 ## Normalisation and removal of technical variation
 
@@ -390,9 +307,9 @@ DenoisedProp = BASiCS_DenoisedRates(Data = Data, Chain = Chain, Propensities = T
 DenoisedProp[1:5, 1:5]
 ```
 
-<span style="color:red"> TO-DO 15: DECIDE WHETHER IT MAKES SENSE TO HAVE BOTH OPTIONS </span>
+<span style="color:red"> TO-DO: DECIDE WHETHER IT MAKES SENSE TO HAVE BOTH OPTIONS </span>
 
-<span style="color:red"> TO-DO 16: IMPLEMENT THIS FUNCTION IN C++ SO THAT IS IT FAST </span>
+<span style="color:red"> TO-DO: IMPLEMENT THIS FUNCTION IN C++ SO THAT IS IT FAST </span>
 
 # Methodology
 
@@ -419,7 +336,7 @@ Additional (nuisance) parameters are interpreted as follows:
 
 * $\phi_j$: cell-specific normalizing constants related to differences in mRNA content (identifiability constrain: $\sum_{j=1}^n \phi_j = n$). 
 
-* $s_j$: cell-specific normalizing constants related to technical cell-specific biases (for more details regarding this interpretation see [4]).
+* $s_j$: cell-specific normalizing constants related to technical cell-specific biases (for more details regarding this interpretation see [6]).
 
 * $\theta$: technical over-dispersion parameter, controlling the strenght of cell-to-cell technical variability. 
 
@@ -451,9 +368,13 @@ This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP
 
 [3] Martinez-Jimenez CP, Eling N, Chen H, Vallejos CA, Kolodziejczyk AA, Connor F, Stojic L, Rayner TF, Stubbington MJT, Teichmann SA, de la Roche M, Marioni JC and Odom DT (2017) Aging increases cell-to-cell transcriptional variability upon immune stimulation. *Science* 355 (6332), 1433-1436.
 
-[4] Vallejos CA, Risso D, Scialdone A, Dudoit S and Marioni JCM (2017) Normalizing single-cell RNA-sequencing data: challenges and opportunities. *Nature Methods* 14, 565-571.
+[4] Newton MA, Noueiry A, Sarkar D, Ahlquist P (2004) Detecting differential gene expression with a semiparametric hierarchical mixture method. *Biostatistics* 5 (2), 155–76.
 
-[5] Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. *Journal of Computational and Graphical Statistics* 18: 349-367. 
+[5] Gr&uuml;n D, Kester L, van Oudenaarden A (2014) Validation of noise models for single-cell transcriptomics. *Nature Methods* 11 (6), 637–40.
+
+[6] Vallejos CA, Risso D, Scialdone A, Dudoit S and Marioni JCM (2017) Normalizing single-cell RNA-sequencing data: challenges and opportunities. *Nature Methods* 14, 565-571.
+
+[7] Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. *Journal of Computational and Graphical Statistics* 18: 349-367. 
 
 # Session information
 

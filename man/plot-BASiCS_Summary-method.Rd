@@ -39,7 +39,7 @@
 
 \item{bty}{As in \code{\link[graphics]{par}}.}
 
-\item{SmoothPlot}{Logical if the \code{\link[graphics]{smoothScatter}} function should be used for plotting.}
+\item{SmoothPlot}{Logical parameter. If \code{TRUE}, transparency will be added to the color of the dots.}
 
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
 }

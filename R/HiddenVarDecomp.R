@@ -1,21 +1,21 @@
 # Used in BASiCS_VarianceDecomp
-HiddenVarDecomp <- function(Data, object)
+HiddenVarDecomp <- function(Chain)
 {
   
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  if(!is(Chain,"BASiCS_Chain")) stop("'Chain' is not a BASiCS_Chain class object.")
   
-  N = nrow(object@delta); q.bio = ncol(object@delta)
-  UniqueBatch = unique(metadata(Data)$BatchInfo)
+  N = nrow(Chain@delta); q.bio = ncol(Chain@delta)
+  UniqueBatch = colnames(Chain@theta)
   nBatch = length(UniqueBatch)
   
-  if(nBatch > 1) {Theta = apply(object@theta, 1, median)}
-  else{ Theta = as.vector(object@theta)}
+  if(nBatch > 1) {Theta = apply(Chain@theta, 1, median)}
+  else{ Theta = as.vector(Chain@theta)}
   
   # To store global values (uses median values across all cells)
-  PhiS = apply(object@phi *object@s, 1, median)
-  Aux = (1/(PhiS * object@mu[,1:q.bio])) + object@delta * (Theta+1)
+  PhiS = apply(Chain@phi *Chain@s, 1, median)
+  Aux = (1/(PhiS * Chain@mu[,1:q.bio])) + Chain@delta * (Theta+1)
   TechVarGlobal = Theta / ( Aux + Theta )
-  BioVarGlobal = (object@delta * (Theta + 1)) / (Aux + Theta)
+  BioVarGlobal = (Chain@delta * (Theta + 1)) / (Aux + Theta)
   
   # To store batch specific values (in arrays)
   TechVarBatch = array(0, dim = c(N, q.bio, nBatch)) # Technical
@@ -25,11 +25,11 @@ HiddenVarDecomp <- function(Data, object)
   {
     for(Batch in 1:nBatch)
     {
-      PhiSBatch = apply(object@phi[, metadata(Data)$BatchInfo == UniqueBatch[Batch]] *
-                          object@s[, metadata(Data)$BatchInfo == UniqueBatch[Batch]], 1, median)
-      Aux = (1/(PhiSBatch * object@mu[,1:q.bio])) + object@delta *(object@theta[,Batch]+1)
-      TechVarBatch[,,Batch] = object@theta[,Batch] / ( Aux + object@theta[,Batch] )
-      BioVarBatch[,,Batch] = (object@delta * (object@theta[,Batch] + 1)) / (Aux + object@theta[,Batch])
+      PhiSBatch = apply(Chain@phi[, grep(UniqueBatch[Batch], colnames(Chain@phi))] *
+                          Chain@s[, grep(UniqueBatch[Batch], colnames(Chain@phi))], 1, median)
+      Aux = (1/(PhiSBatch * Chain@mu[,1:q.bio])) + Chain@delta *(Chain@theta[,Batch]+1)
+      TechVarBatch[,,Batch] = Chain@theta[,Batch] / ( Aux + Chain@theta[,Batch] )
+      BioVarBatch[,,Batch] = (Chain@delta * (Chain@theta[,Batch] + 1)) / (Aux + Chain@theta[,Batch])
     }
   }
   

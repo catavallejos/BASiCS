@@ -365,14 +365,27 @@ version 1.0.7: (2017-08-03)
 - 'smooth' argument changed to 'SmoothPlot' in plot functions/methods
 - Added reference :: to basic functions (e.g. boxplot, var, acf, etc)
 - devtools::check() OK - 1 warning : BiocStyle in vignette
+
+version 1.0.8: (2017-08-03)
+- 'Data' arg removed from args in:
+  'HiddenHeaderDetectHVG_LVG' + 'HiddenVarDecomp' + 'BASiCS_DetectHVG' + 'BASiCS_DetectLVG'
+  + 'BASiCS_VarThresholdSearchHVG' + 'BASiCS_VarThresholdSearchLVG'
+- 'object' arg renamed as 'Chain' in 'BASiCS_DetectHVG' + 'BASiCS_DetectLVG' 
+  + 'BASiCS_VarThresholdSearchHVG' + 'BASiCS_VarThresholdSearchLVG'
+- Examples in BASiCS_MCMC updated to use built-in chain
+- Removal of 'smoothPlot' usage in plots for 'BASiCS_Summary' class (avoids issues with log)
+- Volcano plots added in BASiCS_TestDE function
+- Resolved issues with log scale in 'smoothScatter'
+- Minor bugs fixed in BASiCS_TestDE
+- 'EviThreshold' arg replaced by 'ProbThreshold' in 'BASiCS_HVG' + 'BASiCS_LVG'
+- Vignette updated accordingly
   
 - TODO:
-  * Remove Data from BASiCS_DetectHVG / LVG functions (if possible) - only required for batch info
+  * Compile vignette + pdf manual for revision
+  * Change plots to use ggplot2
   * Should we separate BASiCS_TestDE in two functions : different tol for DE ? 
   * Test all changes in a full pipeline
   * Resolve warning
-  * Modify help of BASiCS_MCMC to use built-in chains
-  * Modify vignette to use built-in chains
   * In plots, change axis labels to be text (no greek!)
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
