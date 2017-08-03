@@ -11,9 +11,9 @@ BASiCS_D_TestDE(Data = NULL, object = NULL, GeneNames = NULL,
   OffSet = FALSE, EFDR_M = 0.05, EFDR_D = 0.05, GenesSelect = NULL, ...)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}}
+\item{Data}{an object of class \code{BASiCS_D_Data-class} (class no longer in use)}
 
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_D_Chain-class}}}
+\item{object}{an object of class \code{BASiCS_D_Data-class} (class no longer in use)}
 
 \item{GeneNames}{Vector containing gene names to be used in results table (argument to be removed as 'GeneNames' will be an slot of `BASiCS_D_Data` object)}
 
@@ -50,15 +50,12 @@ This function is no longer in use and will be removed in future releases. Please
 Function to assess changes in expression (mean and over-dispersion). This function is no longer in use and will be removed in future releases. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 }
 \details{
-See vignette
+This function is no longer in use and will be removed in future releases.
 }
 \examples{
 
-# See vignette
+# This function is no longer in use and will be removed in future releases.
 
-}
-\seealso{
-\code{\link[BASiCS]{BASiCS_D_Chain-class}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

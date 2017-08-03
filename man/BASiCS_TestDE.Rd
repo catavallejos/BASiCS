@@ -60,6 +60,7 @@ BASiCS_TestDE(Chain1, Chain2, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
 \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the results of the differential dispersion test (excludes genes for which the mean changes).}
    \describe{
    \item{\code{GeneNames}}{Gene name}
+   \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu[i]} is averaged across both groups of cells (weighted by sample size).}
    \item{\code{DispOverall}}{For each gene, the estimated over-dispersion parameter \eqn{\delta[i]} is averaged across both groups of cells (weighted by sample size).}
    \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta[i]} for each biological gene in the first group of cells.}
    \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta[i]} for each biological gene in the second group of cells.}
@@ -92,18 +93,20 @@ Function to assess changes in expression (mean and over-dispersion)
 }
 \examples{
 
-# Loadind two synthetic datasets
-Data1 <- makeExampleBASiCS_Data(Example = 1)
-Data2 <- makeExampleBASiCS_Data(Example = 2)
+# Loading two 'BASiCS_Chain' objects (obtained using the 'BASiCS_MCMC' function)
+data(ChainSC)
+data(ChainRNA)
 
-# Running the MCMC (separately for each group of cells) 
-Chain1 <- BASiCS_MCMC(Data = Data1, N = 20000, Thin = 20, Burn = 10000, 
-                      PrintProgress = FALSE)
-Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 20, Burn = 10000, 
-                      PrintProgress = FALSE)
-                      
-Test <- BASiCS_TestDE(Chain1 = Chain1, Chain2 = Chain2,
+Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
+                      GroupLabel1 = "SC", GroupLabel2 = "P&S",
                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
+                      
+# Results for the differential mean test
+head(Test$TableMean)
+
+# Results for the differential over-dispersion test
+# This only includes genes marked as 'NoDiff' in Test$TableMean 
+head(Test$TableDisp)                    
 
 }
 \author{

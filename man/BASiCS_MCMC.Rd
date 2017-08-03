@@ -64,11 +64,15 @@ MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datas
 
 # Built-in simulated dataset
 Data = makeExampleBASiCS_Data()
-# To analyse real data, please refer to the instructions in: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
+# To analyse real data, please refer to the instructions in: 
+# https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
 
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence
-Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, PrintProgress = FALSE)
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, PrintProgress = FALSE)
+
+# For illustration purposes we load a built-in 'BASiCS_Chain' object (obtained using the 'BASiCS_MCMC' function)
+#data(ChainSC)
 
 # `displayChainBASiCS` can be used to extract information from this output. For example:
 head(displayChainBASiCS(Chain, Param = "mu"))
@@ -93,17 +97,18 @@ plot(ChainSummary, Param = "theta")
 
 # To constrast posterior medians of cell-specific parameters (example only)
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = "phi", Param2 = "s", smooth = FALSE)
-plot(ChainSummary, Param = "phi", Param2 = "s", smooth = TRUE) # Recommended for large numbers of cells
+plot(ChainSummary, Param = "phi", Param2 = "s", SmoothPlot = FALSE)
+# Recommended for large numbers of cells
+plot(ChainSummary, Param = "phi", Param2 = "s", SmoothPlot = TRUE) 
 
 # To constrast posterior medians of gene-specific parameters
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = FALSE)
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", smooth = TRUE) # Recommended
+plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
+plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE) # Recommended
 
 # Highly and lowly variable genes detection (within a single group of cells)
-DetectHVG <- BASiCS_DetectHVG(Data, Chain, VarThreshold = 0.70, EFDR = 0.10, Plot = TRUE)
-DetectLVG <- BASiCS_DetectLVG(Data, Chain, VarThreshold = 0.50, EFDR = 0.10, Plot = TRUE)
+DetectHVG <- BASiCS_DetectHVG(Data, ChainSC, VarThreshold = 0.70, EFDR = 0.10, Plot = TRUE)
+DetectLVG <- BASiCS_DetectLVG(Data, ChainSC, VarThreshold = 0.50, EFDR = 0.10, Plot = TRUE)
 
 plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
 with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],

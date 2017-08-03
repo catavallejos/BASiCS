@@ -10,7 +10,7 @@
 \S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,
   Genes = NULL, Cells = NULL, Batches = NULL, xlab = "", ylab = "",
   xlim = "", ylim = "", pch = 16, col = "blue", bty = "n",
-  smooth = TRUE, ...)
+  SmoothPlot = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{BASiCS_Summary} object.}
@@ -39,7 +39,7 @@
 
 \item{bty}{As in \code{\link[graphics]{par}}.}
 
-\item{smooth}{Logical if the \code{\link[graphics]{smoothScatter}} function should be used for plotting.}
+\item{SmoothPlot}{Logical if the \code{\link[graphics]{smoothScatter}} function should be used for plotting.}
 
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
 }

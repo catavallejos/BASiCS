@@ -203,7 +203,7 @@ Additionally, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$
 **Note: previous versions of BASiCS used natural logarithm instead**
 
 ```{r quick-start-test, results='hide'}
-Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
+Test <- BASiCS_TestDE(Chain1 = Chain1, Chain2 = Chain2,
                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
 ```
 
@@ -217,7 +217,7 @@ Test <- BASiCS_TestDE(ChainRef = Chain1, ChainTest = Chain2,
 
 The resulting output list can be subsetted to extract genes that are differentially expressed 
 
-```{r quick-start-DE, results='hide'}
+```{r quick-start-DE, results='hide', eval = FALSE}
 Test$Table[Test$Table$ResultDiffExp == "Ref+",]
 Test$Table[Test$Table$ResultDiffExp == "Test+",]
 ```
@@ -228,7 +228,7 @@ Due to the confounding between mean and over-dispersion that is typically observ
 
 <!--- To assess the difference in variability, we recommend selecting the genes that do not change in mean expression: --> 
 
-```{r quick-start-DV2, results='hide'}
+```{r quick-start-DV2, results='hide', eval = FALSE}
 Test$Table[Test$Table$ResultDiffExp == "NoDiff" & Test$Table$ResultDiffOverDisp== "Ref+",]
 Test$Table[Test$Table$ResultDiffExp == "NoDiff" & Test$Table$ResultDiffOverDisp == "Test+",]
 ```
@@ -437,7 +437,7 @@ More details regarding the model setup, prior specification and implementation a
 
 We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for support and discussions throughout the development of this R library. In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and support during the preparation the Bioconductor submission. 
 
-We also acknowledge feedback and contributions from (Github aliases provided within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
+We also acknowledge feedback and contributions from (Github aliases provided within parenthesis): Ben Dulken (bdulken), Chang Xu (xuchang116), Danilo Horta (Horta), Dmitriy Zhukov (dvzhukov), Jens Preu&szlig;ner (jenzopr), Joanna Dreux (Joannacodes), Kevin Rue-Albrecht (kevinrue), Luke Zappia (lazappi), Simon Anders (s-andrews), Yongchao Ge and Yuan Cao (yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European Bioinformatics Institute (core European Molecular Biology Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
 
@@ -453,7 +453,7 @@ This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP
 
 [4] Vallejos CA, Risso D, Scialdone A, Dudoit S and Marioni JCM (2017) Normalizing single-cell RNA-sequencing data: challenges and opportunities. *Nature Methods* 14, 565-571.
 
-[5]: Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. *Journal of Computational and Graphical Statistics* 18: 349-367. 
+[5] Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. *Journal of Computational and Graphical Statistics* 18: 349-367. 
 
 # Session information
 

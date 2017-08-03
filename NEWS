@@ -352,13 +352,27 @@ version 1.0.6: (2017-08-02)
 - Major changes function-by-function
   * BASiCS_TestDE : Ref/Test notation changed to Group1/2 + output table names changed (to Mean/Disp) + 
   offset corrected objects as output + separated output tables Mean/Disp + post prob threshold moved to hidden function (avoids duplicated code)
-
+  
+version 1.0.7: (2017-08-03)
+- Multiple changes in BASiCS_TestDE:
+  * Added examples of table viewing in doc
+  * Added chain extracts to run examples
+  * Results for differential dispersion to exclude differential mean genes
+  * EFDR / EFNR control plot added
+  * MA plots added
+- Main hidden functions moved into individual files
+- 'graphics' + 'KernSmooth' added as dependence to use 'smoothScatter'
+- 'smooth' argument changed to 'SmoothPlot' in plot functions/methods
+- Added reference :: to basic functions (e.g. boxplot, var, acf, etc)
+- devtools::check() OK - 1 warning : BiocStyle in vignette
+  
 - TODO:
-  * Ensure EFDR for diff disp ignores diff mean genes
-  * Plot EFDR / EFNR grid
-  * Add MA plot BASiCS_TestDE  
-  * Add examples of table viewing in BASiCS_TestDE 
-  * Check if we can have pre-loaded Chain objects for vignette (maybe after heavy thining?)
+  * Remove Data from BASiCS_DetectHVG / LVG functions (if possible) - only required for batch info
+  * Should we separate BASiCS_TestDE in two functions : different tol for DE ? 
+  * Test all changes in a full pipeline
+  * Resolve warning
+  * Modify help of BASiCS_MCMC to use built-in chains
+  * Modify vignette to use built-in chains
   * In plots, change axis labels to be text (no greek!)
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
@@ -368,7 +382,6 @@ version 1.0.6: (2017-08-02)
   * Store all necessary parameters for chain restart
   * Convert Rcpp print to messages
   * Create extra vignette file with test cases (e.g. different thresholds for HVG/LVG), to be removed from BioC submission
-  * Check all plots are in the same log scale
   * How does Aaron solve the offset issue? Are we assuming most genes are not DE?
 
   

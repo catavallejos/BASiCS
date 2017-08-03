@@ -4,8 +4,8 @@
 #' 
 #' @description Function to assess changes in expression (mean and over-dispersion). This function is no longer in use and will be removed in future releases. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 #' 
-#' @param Data an object of class \code{\link[BASiCS]{BASiCS_D_Data-class}}
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_D_Chain-class}}
+#' @param Data an object of class \code{BASiCS_D_Data-class} (class no longer in use)
+#' @param object an object of class \code{BASiCS_D_Data-class} (class no longer in use)
 #' @param GeneNames Vector containing gene names to be used in results table (argument to be removed as 'GeneNames' will be an slot of `BASiCS_D_Data` object)
 #' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)
 #' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number)
@@ -25,12 +25,9 @@
 #'  
 #' @examples
 #' 
-#' # See vignette
+#' # This function is no longer in use and will be removed in future releases.
 #' 
-#' @details See vignette
-#' 
-#' 
-#' @seealso \code{\link[BASiCS]{BASiCS_D_Chain-class}} 
+#' @details This function is no longer in use and will be removed in future releases.
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 #' 
