@@ -169,12 +169,13 @@ data(ChainRNA)
 ```{r quick-start-TestDE}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "P&S",
-                      EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2),
+                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       EFDR_M = 0.05, EFDR_D = 0.05,
                       OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
-In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
+In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). As a default option: `EpsilonM = EpsilonD = log2(1.5)` (i.e. 
+50\% increase). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
 
 **Due to the confounding between mean and over-dispersion that is typically observed in scRNA-seq datasets, we only assess changes in over-dispersion for those genes in which the mean does not change between the groups.**
 

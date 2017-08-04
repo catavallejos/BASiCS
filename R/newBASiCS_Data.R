@@ -45,6 +45,9 @@
 #' Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
+  # Validity checks for SpikeInfo
+  if(!is.data.frame(SpikeInfo)) stop("'SpikeInfo' must be a 'data.frame'")
+  if(data.table::is.data.table(SpikeInfo)) stop("'SpikeInfo' must be a 'data.frame'")
   
   if(is.null(BatchInfo)) {BatchInfo = rep(1, times = ncol(Counts))}
   
@@ -67,14 +70,11 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   errors <- character()
   
   if(!(is.numeric(Counts) & all(Counts>=0) & 
-       sum(!is.finite(Counts))==0 )) errors <- c(errors, "Invalid value for Counts")
-  
-  if(sum(Counts %% 1) > 0) errors <- c(errors, "Invalid value for Counts (entries must be positive integers)")          
-  
-  if(!(is.logical(Tech))) errors <- c(errors, "Invalid value for Tech")
-  
+       sum(!is.finite(Counts))==0 )) errors <- c(errors, "Invalid value for 'Counts'")
+  if(sum(Counts %% 1) > 0) errors <- c(errors, "Invalid value for 'Counts' (entries must be positive integers)")          
+  if(!(is.logical(Tech))) errors <- c(errors, "Invalid value for 'Tech'")
   if(!(is.numeric(SpikeInput) & all(SpikeInput>0) & 
-       sum(!is.finite(SpikeInput))==0 )) errors <- c(errors, "Invalid value for SpikeInput.")
+       sum(!is.finite(SpikeInput))==0 )) errors <- c(errors, "Invalid value for 'SpikeInput'.")
   
   q = nrow(Counts)
   q.bio = q - length(SpikeInput)
@@ -121,7 +121,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   if (length(errors) == 0) TRUE else stop(errors)
   
   # Create a SummarizedExperiment data object
-  Data <- SummarizedExperiment(assays = list(Counts = as.matrix(Counts)),
+  Data <- SummarizedExperiment::SummarizedExperiment(assays = list(Counts = as.matrix(Counts)),
                                rowData = data.frame(row.names = rownames(Counts), Tech = Tech),
                                metadata = list(SpikeInput = SpikeInput, BatchInfo = BatchInfo))
   

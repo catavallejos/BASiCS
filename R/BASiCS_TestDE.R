@@ -6,8 +6,8 @@
 #' 
 #' @param Chain1 an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the first group of cells
 #' @param Chain2 an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the second group of cells
-#' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)
-#' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number)
+#' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
+#' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
 #' @param EviThresholdM Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)
 #' @param EviThresholdD Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "Prob")}.
@@ -73,7 +73,7 @@
 #' 
 #' Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
 #'                       GroupLabel1 = "SC", GroupLabel2 = "P&S",
-#'                       EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
+#'                       EpsilonM = log2(1.5), EpsilonD = log2(1.5), OffSet = TRUE)
 #'                       
 #' # Results for the differential mean test
 #' head(Test$TableMean)
@@ -87,8 +87,8 @@
 #' @rdname BASiCS_TestDE
 BASiCS_TestDE <- function(Chain1,
                           Chain2,
-                          EpsilonM = 0.40 * log(2),
-                          EpsilonD = 0.40 * log(2),
+                          EpsilonM = log2(1.5),
+                          EpsilonD = log2(1.5),
                           EviThresholdM = NULL,
                           EviThresholdD = NULL,
                           OrderVariable = "Prob",

@@ -4,20 +4,20 @@
 \alias{BASiCS_TestDE}
 \title{Detection of genes with changes in expression}
 \usage{
-BASiCS_TestDE(Chain1, Chain2, EpsilonM = 0.4 * log(2), EpsilonD = 0.4 *
-  log(2), EviThresholdM = NULL, EviThresholdD = NULL,
-  OrderVariable = "Prob", GroupLabel1 = "Group1", GroupLabel2 = "Group2",
-  Plot = TRUE, PlotOffset = TRUE, OffSet = TRUE, EFDR_M = 0.05,
-  EFDR_D = 0.05, GenesSelect = NULL, ...)
+BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+  EviThresholdM = NULL, EviThresholdD = NULL, OrderVariable = "Prob",
+  GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
+  PlotOffset = TRUE, OffSet = TRUE, EFDR_M = 0.05, EFDR_D = 0.05,
+  GenesSelect = NULL, ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the first group of cells}
 
 \item{Chain2}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the second group of cells}
 
-\item{EpsilonM}{Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)}
+\item{EpsilonM}{Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 
-\item{EpsilonD}{Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number)}
+\item{EpsilonD}{Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 
 \item{EviThresholdM}{Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)}
 
@@ -99,7 +99,7 @@ data(ChainRNA)
 
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "P&S",
-                      EpsilonM = 0.4*log(2), EpsilonD = 0.4*log(2), OffSet = TRUE)
+                      EpsilonM = log2(1.5), EpsilonD = log2(1.5), OffSet = TRUE)
                       
 # Results for the differential mean test
 head(Test$TableMean)
