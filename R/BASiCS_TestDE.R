@@ -177,13 +177,15 @@ BASiCS_TestDE <- function(Chain1,
     
     if(PlotOffset == TRUE)
     {
+      message("Plots to follow: \n")
+      message("1. Posterior uncertainty for offset estimate \n")
+      message("2. Mean expression parameters before/after offset correction \n")
+      message("3. MA plot before/after offset correction \n")
       par(ask=TRUE)
       # Offset uncertainty
-      message("Posterior uncertainty for offset estimate ... ")
       graphics::boxplot(OffsetChain, frame = FALSE, 
               main = "Offset MCMC chain", ylab = "Offset estimate") 
       # Mean expression parameters before/after offset correction
-      message("Mean expression parameters before/after offset correction ...")
       par(mfrow = c(1,2))
       graphics::boxplot(cbind(matrixStats::colMedians(Chain1@mu), Summary2@mu[,1]), 
               frame = FALSE, main = "Before correction", 
@@ -194,7 +196,6 @@ BASiCS_TestDE <- function(Chain1,
               names = c(GroupLabel1, GroupLabel2),
               ylab = "Mean expression", log = "y")
       # MA plot pre/after offset
-      message("MA plot before/after offset correction ...")
       par(mfrow = c(1,2))
       graphics::smoothScatter(log2(MuBase_old), MedianTau_old, 
            bty = "n", xlab = "Mean expresssion (log2)",  
@@ -202,7 +203,6 @@ BASiCS_TestDE <- function(Chain1,
            main = "Before correction (log2offset = red line)")
       abline(h = 0, lty = 2)
       abline(h = log2(OffsetEst), lty = 1, col = "red")
-      
       graphics::smoothScatter(log2(MuBase), MedianTau, 
            bty = "n", xlab = "Mean expresssion (log2)", 
            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2),
@@ -306,42 +306,30 @@ BASiCS_TestDE <- function(Chain1,
             "--------------------------------------------------------------------- \n")    
   }
   
-  nMeanPlus1 = sum(ResultDiffMean == paste0(GroupLabel1,"+"))
-  nMeanPlus2 = sum(ResultDiffMean == paste0(GroupLabel2,"+"))
-  nDispPlus1 = sum(ResultDiffDisp == paste0(GroupLabel1,"+"))
-  nDispPlus2 = sum(ResultDiffDisp == paste0(GroupLabel2,"+"))
-  
-  message("--------------------------------------------------------------------- \n",
-          paste(nMeanPlus1 + nMeanPlus2, " genes with a change on the overall expression:  \n"),
-          paste("- Higher expression in ",GroupLabel1,"samples:", nMeanPlus1, "\n"),
-          paste("- Higher expression in ",GroupLabel2,"samples:", nMeanPlus2, "\n"),
-          paste("- Fold change tolerance = ", round(100*EpsilonM,2), "% \n"),
-          paste("- Evidence threshold = ", OptThresholdM[1], "\n"),
-          paste("- EFDR = ", round(100*OptThresholdM[2],2), "% \n"),
-          paste("- EFNR = ", round(100*OptThresholdM[3],2), "% \n"),
-          "--------------------------------------------------------------------- \n",
-          "\n",
-          "--------------------------------------------------------------------- \n",
-          paste(nDispPlus1 + nDispPlus2, " genes with a change on the cell-to-cell biological over dispersion:  \n"),
-          paste("- Higher over dispersion in ",GroupLabel1,"samples:", nDispPlus1, "\n"),
-          paste("- Higher over dispersion in ",GroupLabel2,"samples:", nDispPlus2, "\n"),
-          paste("- Fold change tolerance = ", round(100*EpsilonD,2), "% \n"),
-          paste("- Evidence threshold = ", OptThresholdD[1], "\n"),
-          paste("- EFDR = ", round(100*OptThresholdD[2],2), "% \n"),
-          paste("- EFNR = ", round(100*OptThresholdD[3],2), "% \n"),
-          paste("NOTE: differential dispersion results only include the", length(MedianOmega),
-                "for which the mean did not change. \n"),
-          "--------------------------------------------------------------------- \n")
-  
+
   if(Plot)
   {    
     args <- list(...)
     
+    
+    if(Search)
+    {
+      message("Plots to follow: \n")
+      message("1. EFDR/EFNR control plots \n") 
+      message("2. MA plots \n") 
+      message("3. Volcano plots \n")
+    }
+    else 
+    {
+      message("Plots to follow: \n")
+      message("1. MA plots \n") 
+      message("2. Volcano plots \n")      
+    }
+
     par(ask=TRUE)
         
     if(Search)
-    {    
-        message("EFDR/EFNR control plots ...")
+    {   
         par(mfrow = c(1,2))
         EviThresholds <- seq(0.5,0.9995,by=0.00025)
         plot(EviThresholds, AuxMean$EFDRgrid, type = "l", lty = 1, 
@@ -362,7 +350,7 @@ BASiCS_TestDE <- function(Chain1,
                col = c("black","black", "blue"), bty = "n")
     }
     
-    message("MA plots ...")
+    
     par(mfrow = c(1,2))
     with(TableMean, graphics::smoothScatter(log2(MeanOverall), MeanLog2FC, 
                             bty = "n", xlab = "Mean expresssion (log2)",  
@@ -398,6 +386,33 @@ BASiCS_TestDE <- function(Chain1,
     
     par(ask=FALSE)
   }
+  
+  nMeanPlus1 = sum(ResultDiffMean == paste0(GroupLabel1,"+"))
+  nMeanPlus2 = sum(ResultDiffMean == paste0(GroupLabel2,"+"))
+  nDispPlus1 = sum(ResultDiffDisp == paste0(GroupLabel1,"+"))
+  nDispPlus2 = sum(ResultDiffDisp == paste0(GroupLabel2,"+"))
+  
+  message("--------------------------------------------------------------------- \n",
+          paste(nMeanPlus1 + nMeanPlus2, " genes with a change on the overall expression:  \n"),
+          paste("- Higher expression in ",GroupLabel1,"samples:", nMeanPlus1, "\n"),
+          paste("- Higher expression in ",GroupLabel2,"samples:", nMeanPlus2, "\n"),
+          paste("- Fold change tolerance = ", round(100*EpsilonM,2), "% \n"),
+          paste("- Evidence threshold = ", OptThresholdM[1], "\n"),
+          paste("- EFDR = ", round(100*OptThresholdM[2],2), "% \n"),
+          paste("- EFNR = ", round(100*OptThresholdM[3],2), "% \n"),
+          "--------------------------------------------------------------------- \n",
+          "\n",
+          "--------------------------------------------------------------------- \n",
+          paste(nDispPlus1 + nDispPlus2, " genes with a change on the cell-to-cell biological over dispersion:  \n"),
+          paste("- Higher over dispersion in ",GroupLabel1,"samples:", nDispPlus1, "\n"),
+          paste("- Higher over dispersion in ",GroupLabel2,"samples:", nDispPlus2, "\n"),
+          paste("- Fold change tolerance = ", round(100*EpsilonD,2), "% \n"),
+          paste("- Evidence threshold = ", OptThresholdD[1], "\n"),
+          paste("- EFDR = ", round(100*OptThresholdD[2],2), "% \n"),
+          paste("- EFNR = ", round(100*OptThresholdD[3],2), "% \n"),
+          paste("NOTE: differential dispersion results only include the", length(MedianOmega),
+                "for which the mean did not change. \n"),
+          "--------------------------------------------------------------------- \n")
   
   list("TableMean" = TableMean, "TableDisp" = TableDisp, 
        "DiffMeanSummary" = list("EviThreshold" = OptThresholdM[1],

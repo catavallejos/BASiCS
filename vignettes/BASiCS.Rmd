@@ -4,7 +4,7 @@
 %\VignetteEngine{knitr::knitr}
 -->
 
-```{r, echo=FALSE, results="hide", message=FALSE}
+```{r, echo=FALSE, results="hide", message=TRUE}
 require(knitr)
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 ```
@@ -166,7 +166,7 @@ data(ChainSC)
 data(ChainRNA)
 ```
 
-```{r quick-start-TestDE}
+```{r quick-start-TestDE, fig.width=10, fig.height=5}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "P&S",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),

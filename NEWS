@@ -385,20 +385,14 @@ version 1.0.9: (2017-08-04)
 - BASiCS_TestDE : default value for EpsilonM & EpsilonD has changed
 - Vignette + examples updated accordingly
 
-
-
+version 1.0.10: (2017-08-06)
+- BASiCS_TestDE : changes in output messages
+- Gene name added in plot method for BASiCS_Chain objects
   
-- TODO:
-  * Bug reports:
-    - newBASiCS_Data complains when ERCCs are not in the same order
-    - Add check for data.frame, not data.table!
-    - Name of gene as main in traceplot
-    - Wrong default value for LCF threshold in BASiCS_TestDE
+- DEVELOPMENT NOTES:
   * Compile vignette + pdf manual for revision
   * Change plots to use ggplot2
   * Should we separate BASiCS_TestDE in two functions : different tol for DE ? 
-  * Test all changes in a full pipeline
-  * Resolve warning
   * In plots, change axis labels to be text (no greek!)
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 

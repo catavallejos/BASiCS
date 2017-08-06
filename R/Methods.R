@@ -159,7 +159,8 @@ setMethod("plot",
             if(Param == "theta") {object = x@theta; Column = Batch; ylab = if(ylab == "") ylab = bquote(theta[.(Column)])} 
             
             par(mfrow = c(1,2))
-            plot(object[,Column], type="l", xlab = xlab, ylab = ylab, ...)
+            plot(object[,Column], type="l", xlab = xlab, ylab = ylab, 
+                 main = colnames(object)[Column], ...)
             stats::acf(object[,Column], main = "Autocorrelation")
           })
 
