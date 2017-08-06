@@ -366,8 +366,6 @@ BASiCS_TestDE <- function(Chain1,
     with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ],
          points(log2(MeanOverall), DispLog2FC, pch = 16, col = "red"))
     abline(h = c(-EpsilonD, EpsilonD), lty = 2)
-    
-    message("Volcano plots ...")
     par(mfrow = c(1,2))
     with(TableMean, graphics::smoothScatter(MeanLog2FC, ProbDiffMean,
                             bty = "n", ylab = "Posterior probability",  

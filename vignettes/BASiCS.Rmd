@@ -168,7 +168,7 @@ data(ChainRNA)
 
 ```{r quick-start-TestDE, fig.width=10, fig.height=5}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
-                      GroupLabel1 = "SC", GroupLabel2 = "P&S",
+                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       EFDR_M = 0.05, EFDR_D = 0.05,
                       OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)

@@ -388,7 +388,7 @@ version 1.0.9: (2017-08-04)
 version 1.0.10: (2017-08-06)
 - BASiCS_TestDE : changes in output messages
 - Gene name added in plot method for BASiCS_Chain objects
-  
+
 - DEVELOPMENT NOTES:
   * Compile vignette + pdf manual for revision
   * Change plots to use ggplot2
