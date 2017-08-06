@@ -40,7 +40,8 @@ Imports:
     data.table,
     matrixStats,
     graphics,
-    KernSmooth
+    KernSmooth,
+    grDevices
 Suggests:
     knitr,
     BiocStyle

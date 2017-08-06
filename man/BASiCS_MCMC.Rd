@@ -71,7 +71,8 @@ Data = makeExampleBASiCS_Data()
 # Longer runs migth be required to reach convergence
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, PrintProgress = FALSE)
 
-# For illustration purposes we load a built-in 'BASiCS_Chain' object (obtained using the 'BASiCS_MCMC' function)
+# For illustration purposes we load a built-in 'BASiCS_Chain' object 
+# (obtained using the 'BASiCS_MCMC' function)
 data(ChainSC)
 
 # `displayChainBASiCS` can be used to extract information from this output. For example:

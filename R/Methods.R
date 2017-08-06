@@ -339,8 +339,8 @@ setMethod("plot",
               ValidCombination = FALSE
               if(SmoothPlot)
               {
-                col = rgb(col2rgb(col)[1], col2rgb(col)[2], 
-                          col2rgb(col)[3],50,maxColorValue=255) 
+                col = grDevices::rgb(grDevices::col2rgb(col)[1], grDevices::col2rgb(col)[2], 
+                                     grDevices::col2rgb(col)[3],50,maxColorValue=255) 
               }
               
               if(Param == "mu" & Param2 == "delta")

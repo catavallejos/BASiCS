@@ -4,13 +4,11 @@
 \alias{BASiCS_VarianceDecomp}
 \title{Decomposition of gene expression variability according to BASiCS}
 \usage{
-BASiCS_VarianceDecomp(Data, object, OrderVariable = "BioVarGlobal",
-  Plot = TRUE, ...)
+BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal", Plot = TRUE,
+  ...)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
-
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
 \item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.}
 

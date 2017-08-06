@@ -923,7 +923,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   // START OF MCMC LOOP
   for (i=0; i<N; i++) {
     
-//    Rcpp::checkUserInterrupt();
+    Rcpp::checkUserInterrupt();
     
     if(i==burn)
     {

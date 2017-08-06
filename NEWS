@@ -389,7 +389,14 @@ version 1.0.10: (2017-08-06)
 - BASiCS_TestDE : changes in output messages
 - Gene name added in plot method for BASiCS_Chain objects
 
+version 1.0.11: (2017-08-06)
+- BASiCS_VarianceDecomp : small bugs fixed (unused Data object)
+- colnames fixed on cell-specific slots ChainSC and ChainRNA
+- Rcpp::checkUserInterrupt() activated in C++ code for interruptions
+- 'grDevices' added as dependency
+
 - DEVELOPMENT NOTES:
+  * Delete BASiCS_VarianceDecomp? 
   * Compile vignette + pdf manual for revision
   * Change plots to use ggplot2
   * Should we separate BASiCS_TestDE in two functions : different tol for DE ? 

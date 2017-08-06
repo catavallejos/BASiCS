@@ -113,15 +113,16 @@ HiddenPlot2DetectHVG_LVG <- function(args,
   else {ylab = ifelse("ylab" %in% names(args),args$ylab, "LVG probability")}
   main = ifelse("main" %in% names(args),args$main, "")
   
-  col = rgb(col2rgb(col)[1], col2rgb(col)[2], 
-            col2rgb(col)[3],50,maxColorValue=255)
+  col = grDevices::rgb(grDevices::col2rgb(col)[1], grDevices::col2rgb(col)[2], 
+                       grDevices::col2rgb(col)[3],50,maxColorValue=255)
   
   plot(Mu, Prob, log="x", pch = pch, ylim = ylim, xlim = xlim, col = col, cex = cex,
        bty = bty, cex.lab = cex.lab, cex.axis = cex.axis, cex.main = cex.main,
        xlab = xlab, ylab = ylab, main = main)
   abline(h = OptThreshold[1], lty = 2, col = "black")
-  points(Mu[Hits], Prob[Hits], pch = pch, col = rgb(col2rgb("red")[1], col2rgb("red")[2], 
-                                                    col2rgb("red")[3],50,maxColorValue=255), 
+  points(Mu[Hits], Prob[Hits], pch = pch, 
+         col = grDevices::rgb(grDevices::col2rgb("red")[1], grDevices::col2rgb("red")[2], 
+                              grDevices::col2rgb("red")[3],50,maxColorValue=255), 
          cex = cex)
 }
 

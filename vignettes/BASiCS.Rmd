@@ -369,9 +369,9 @@ This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP
 
 [3] Martinez-Jimenez CP, Eling N, Chen H, Vallejos CA, Kolodziejczyk AA, Connor F, Stojic L, Rayner TF, Stubbington MJT, Teichmann SA, de la Roche M, Marioni JC and Odom DT (2017) Aging increases cell-to-cell transcriptional variability upon immune stimulation. *Science* 355 (6332), 1433-1436.
 
-[4] Newton MA, Noueiry A, Sarkar D, Ahlquist P (2004) Detecting differential gene expression with a semiparametric hierarchical mixture method. *Biostatistics* 5 (2), 155–76.
+[4] Newton MA, Noueiry A, Sarkar D, Ahlquist P (2004) Detecting differential gene expression with a semiparametric hierarchical mixture method. *Biostatistics* 5 (2), 155-76.
 
-[5] Gr&uuml;n D, Kester L, van Oudenaarden A (2014) Validation of noise models for single-cell transcriptomics. *Nature Methods* 11 (6), 637–40.
+[5] Gr&uuml;n D, Kester L, van Oudenaarden A (2014) Validation of noise models for single-cell transcriptomics. *Nature Methods* 11 (6), 637-40.
 
 [6] Vallejos CA, Risso D, Scialdone A, Dudoit S and Marioni JCM (2017) Normalizing single-cell RNA-sequencing data: challenges and opportunities. *Nature Methods* 14, 565-571.
 

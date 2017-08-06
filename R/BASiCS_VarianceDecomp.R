@@ -5,8 +5,7 @@
 #'
 #' @description Function to decompose total variability of gene expression into biological and technical components.
 #'
-#' @param Data an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated
 #' @param ... Other arguments to be passed to \code{\link[graphics]{barplot}}
@@ -35,22 +34,20 @@
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 #'
 #' @rdname BASiCS_VarianceDecomp
-BASiCS_VarianceDecomp <- function(Data,
-                                  object,
+BASiCS_VarianceDecomp <- function(Chain,
                                   OrderVariable = "BioVarGlobal",
                                   Plot = TRUE,
                                   ...)
 {
   if(!(OrderVariable %in% c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoise"))) stop("Invalid 'OrderVariable' value.")
-  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object. Please use the 'newBASiCS_Data' function to create a SummarizedExperiment object.")
-  if(!is(object,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
+  if(!is(Chain,"BASiCS_Chain")) stop("'Chain' is not a BASiCS_Chain class object.")
   
-  q.bio = ncol(object@delta)
-  UniqueBatch = unique(metadata(Data)$BatchInfo)
+  q.bio = ncol(Chain@delta)
+  UniqueBatch = colnames(Chain@theta)
   nBatch = length(UniqueBatch)
   
   # Calculating variance decomposition
-  VarDecomp = HiddenVarDecomp(Data, object)
+  VarDecomp = HiddenVarDecomp(Chain)
   
   # Global values
   BioVarGlobal = apply(VarDecomp$BioVarGlobal, 2, median)
@@ -58,7 +55,7 @@ BASiCS_VarianceDecomp <- function(Data,
   ShotNoiseGlobal = 1-BioVarGlobal-TechVarGlobal
   
   Genes = 1:q.bio
-  GeneNames = rownames(assay(Data))[!rowData(Data)$Tech]
+  GeneNames = colnames(Chain@mu)
   
   if(nBatch > 1)
   {

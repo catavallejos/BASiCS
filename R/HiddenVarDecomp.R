@@ -1,7 +1,6 @@
 # Used in BASiCS_VarianceDecomp
 HiddenVarDecomp <- function(Chain)
 {
-  
   if(!is(Chain,"BASiCS_Chain")) stop("'Chain' is not a BASiCS_Chain class object.")
   
   N = nrow(Chain@delta); q.bio = ncol(Chain@delta)
