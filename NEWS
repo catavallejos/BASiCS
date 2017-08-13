@@ -395,6 +395,10 @@ version 1.0.11: (2017-08-06)
 - Rcpp::checkUserInterrupt() activated in C++ code for interruptions
 - 'grDevices' added as dependency
 
+version 1.0.11: (2017-08-13)
+- 'WithSpikes' argument removed from 'BASiCS_LoadChain' function
+
+
 - DEVELOPMENT NOTES:
   * Delete BASiCS_VarianceDecomp? 
   * Compile vignette + pdf manual for revision

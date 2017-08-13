@@ -5,7 +5,6 @@
 #'
 #' @param RunName String used to index `.Rds` files storing the MCMC chains (produced by the \code{BASiCS_MCMC} function)
 #' @param StoreDir Directory where `.Rds` files is stored. Default: \code{StoreDir = getwd()}
-#' @param WithSpikes \code{TRUE}/\code{FALSE} indicator of spike-ins usage. Default: \code{WithSpikes = TRUE}
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
 #'
@@ -22,7 +21,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-BASiCS_LoadChain <- function(RunName, StoreDir = getwd(), WithSpikes = TRUE)
+BASiCS_LoadChain <- function(RunName, StoreDir = getwd())
 {
   Chain <- readRDS(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
   return(Chain)
