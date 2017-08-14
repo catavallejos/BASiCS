@@ -15,7 +15,7 @@
 #' (vector of length \code{n}, all elements must be positive numbers)
 #' @param theta Technical variability hyper-parameter \eqn{\theta} (must be positive)
 #'
-#' @return An object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}, simulated from the model implemented in BASiCS.
+#' @return An object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}, simulated from the model implemented in BASiCS.
 #'
 #' @examples
 #'
@@ -32,7 +32,7 @@
 #' head(assay(Data))
 #' dim(assay(Data))
 #' metadata(Data)$SpikeInput
-#' rowData(Data)$Tech
+#' isSpike(Data)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'

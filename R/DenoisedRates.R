@@ -4,7 +4,7 @@
 #'
 #' @description Calculates normalised and denoised expression rates, by removing the effect of technical variation.
 #'
-#' @param Data an object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}
+#' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param PrintProgress If \code{TRUE}, partial progress information is printed in the console.
 #' @param Propensities If \code{TRUE}, returns underlying expression propensitites \eqn{\rho[ij]}. Otherwise, denoised rates \eqn{\mu[i] \rho[ij]} are returned.
@@ -29,7 +29,7 @@ BASiCS_DenoisedRates=function(
   PrintProgress = FALSE,
   Propensities = FALSE)
 {
-  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object.")
+  if(!is(Data,"SingleCellExperiment")) stop("'Data' is not a SingleCellExperiment class object.")
   if(!is(Chain,"BASiCS_Chain")) stop("'Chain' is not a BASiCS_Chain class object.")
   
   N=dim(Chain@delta)[1]; q.bio=dim(Chain@delta)[2]; n=dim(Chain@phi)[2]

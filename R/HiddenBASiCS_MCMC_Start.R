@@ -3,11 +3,11 @@ HiddenBASiCS_MCMC_Start<-function(
   Data,
   ...)
 {
-  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object.")
+  if(!is(Data,"SingleCellExperiment")) stop("'Data' is not a SingleCellExperiment class object.")
   
   # Number of instrinsic genes
-  q <- length(rowData(Data)$Tech)
-  q.bio<-sum(!rowData(Data)$Tech)
+  q <- length(isSpike(Data))
+  q.bio<-sum(!isSpike(Data))
   # Number of cells
   n <- dim(assay(Data))[2]
   
@@ -18,18 +18,18 @@ HiddenBASiCS_MCMC_Start<-function(
   if(n < 120) {sizes.aux = c(20, 40)}
   if(n < 80) {sizes.aux = c(20)}
   if(n < 40) {sizes.aux = c(10)}
-  size_scran <- scran::computeSumFactors(as.matrix(assay(Data)[!rowData(Data)$Tech,,drop=FALSE]), sizes = sizes.aux)
+  size_scran <- scran::computeSumFactors(as.matrix(assay(Data)[!isSpike(Data),,drop=FALSE]), sizes = sizes.aux)
   
   if(length(metadata(Data)$SpikeInput) > 1)
   {
     # Initialize s as the empirical capture efficiency rates
-    s0 = colSums(assay(Data)[rowData(Data)$Tech,]) / sum(metadata(Data)$SpikeInput); nu0=s0
+    s0 = colSums(assay(Data)[isSpike(Data),]) / sum(metadata(Data)$SpikeInput); nu0=s0
     phi0 = size_scran / s0
     phi0 = n * phi0 / sum(phi0)   
     
     # Initialize mu using average 'normalised counts' across cells
     # and true input values for spike-in genes
-    nCountsBio <- t( t(assay(Data)[!rowData(Data)$Tech,]) / (phi0*s0) )
+    nCountsBio <- t( t(assay(Data)[!isSpike(Data),]) / (phi0*s0) )
     meansBio <- rowMeans( nCountsBio )
     mu0<-c(meansBio + 1,metadata(Data)$SpikeInput) # +1 to avoid zeros as starting values
   }

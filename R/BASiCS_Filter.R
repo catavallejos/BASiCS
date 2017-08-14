@@ -1,7 +1,7 @@
 #' @title Filter for input datasets
 #'
 #' @description \code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria. The output of this function can be combined with \code{newBASiCS_Data} to generate a 
-#' the \code{\linkS4class{SummarizedExperiment}} object required to run BASiCS. 
+#' the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS. 
 #'
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.

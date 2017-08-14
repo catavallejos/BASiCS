@@ -2,7 +2,7 @@
 #'
 #' @description MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datasets using the model described in Vallejos et al (2015).
 #'
-#' @param Data A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object. This MUST be formatted to include the spike-ins information. See vige
+#' @param Data A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. This MUST be formatted to include the spike-ins information. See vige
 #' @param N Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
 #' @param Burn Burn-in period for the MCMC sampler. Use \code{Burn>=1}, \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.
@@ -130,11 +130,11 @@ BASiCS_MCMC <- function(
 {
   
   
-  if(!is(Data,"SummarizedExperiment")) stop("'Data' is not a SummarizedExperiment class object.")
+  if(!is(Data,"SingleCellExperiment")) stop("'Data' is not a SingleCellExperiment class object.")
   # Add extra checks to ensure spike-ins info, etc is provided
   
   # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
-  q = length(rowData(Data)$Tech); q.bio = sum(!rowData(Data)$Tech); n = dim(assay(Data))[2]
+  q = length(isSpike(Data)); q.bio = sum(!isSpike(Data)); n = dim(assay(Data))[2]
   
   args <- list(...)
   
@@ -336,8 +336,8 @@ BASiCS_MCMC <- function(
   }
   
   Chain$mu = Chain$mu[,1:q.bio]
-  colnames(Chain$mu) = rownames(assay(Data))[!rowData(Data)$Tech]
-  colnames(Chain$delta) = rownames(assay(Data))[!rowData(Data)$Tech]
+  colnames(Chain$mu) = rownames(assay(Data))[!isSpike(Data)]
+  colnames(Chain$delta) = rownames(assay(Data))[!isSpike(Data)]
   CellLabels = paste0("Cell",1:n,"_Batch", metadata(Data)$BatchInfo)
   colnames(Chain$phi) = CellLabels
   if(length(metadata(Data)$SpikeInput) > 1) {colnames(Chain$s) = CellLabels}
