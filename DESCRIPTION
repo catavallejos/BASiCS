@@ -1,14 +1,14 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.0.11
-Date: : 2017-08-13
+Version: 1.0.12
+Date: : 2017-08-14
 Author: Catalina Vallejos, Nils Eling, Sylvia Richardson, John Marioni
 Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  heterogeneity in gene expression levels in seemingly homogeneous 
  populations of cells. However, these experiments are prone to high levels
- of unexplained technical noise, creating new challenges for identifying
+ of technical noise, creating new challenges for identifying
  genes that show genuine heterogeneous expression within the population of
  cells under study. BASiCS (Bayesian Analysis of Single-Cell Sequencing
  data) is an integrated Bayesian hierarchical model to perform statistical 
@@ -23,8 +23,7 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  in expression that lie beyond comparisons of means, also allowing the study 
  of changes in cell-to-cell heterogeneity. The latter are quantified via a 
  biological over-dispersion parameter that measures residual over-dispersion 
- (with respect to Poisson sampling) after normalisation and the removal of 
- technical variation. 
+ (with respect to Poisson sampling) after normalisation and technical noise removal. 
 License: GPL (>= 2)
 Depends:
     R (>= 3.1.0),

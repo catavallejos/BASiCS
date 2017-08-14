@@ -398,22 +398,22 @@ version 1.0.11: (2017-08-06)
 version 1.0.11: (2017-08-13)
 - 'WithSpikes' argument removed from 'BASiCS_LoadChain' function
 
+version 1.0.12: (2017-08-14)
+- 'SummarizedExperiment' class replaced by 'SingleCellExperiment'
+- Updated vignette
 
-- DEVELOPMENT NOTES:
+
+- DEVELOPMENT NOTES (potential changes):
   * Delete BASiCS_VarianceDecomp? 
-  * Compile vignette + pdf manual for revision
-  * Change plots to use ggplot2
+  * Change plots to use ggplot2?
   * Should we separate BASiCS_TestDE in two functions : different tol for DE ? 
   * In plots, change axis labels to be text (no greek!)
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
   * Implement change suggested by Giacomo Zanella
-  * Replace SummarizedExperiment by SingleCellExperiment class
   * Add checks to BASiCS_MCMC verify SE object has all the required info. 
   * Store all necessary parameters for chain restart
   * Convert Rcpp print to messages
-  * Create extra vignette file with test cases (e.g. different thresholds for HVG/LVG), to be removed from BioC submission
-  * How does Aaron solve the offset issue? Are we assuming most genes are not DE?
 
   
   

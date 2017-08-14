@@ -13,19 +13,19 @@ by the function \code{\link[BASiCS]{BASiCS_MCMC}}.
 \section{Slots}{
 
 \describe{
-\item{\code{mu}}{MCMC chain for gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes 
+\item{\code{mu}}{MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes 
 (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)}
 
-\item{\code{delta}}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
+\item{\code{delta}}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta_i}, biological genes only 
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 
-\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi[j]}
+\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi_j}
 (matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
 
-\item{\code{s}}{MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+\item{\code{s}}{MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
-\item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu[j]}
+\item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
 \item{\code{theta}}{MCMC chain for technical variability hyper-parameter(s) \eqn{\theta} (matrix, all elements must be positive, each colum 
@@ -36,7 +36,7 @@ represents 1 batch)}
 
 # A BASiCS_Chain object created by the BASiCS_MCMC function.
 Data = makeExampleBASiCS_Data()
-MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 
 }
 \references{
