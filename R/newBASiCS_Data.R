@@ -1,6 +1,6 @@
-#' @title Creates a SummarizedExperiment object from a matrix of expression counts and experimental information about spike-in genes
+#' @title Creates a SingleCellExperiment object from a matrix of expression counts and experimental information about spike-in genes
 #'
-#' @description \code{newBASiCS_Data} creates a \code{\linkS4class{SummarizedExperiment}} object from
+#' @description \code{newBASiCS_Data} creates a \code{\linkS4class{SingleCellExperiment}} object from
 #' a matrix of expression counts and experimental information about spike-in genes.
 #'
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements contain the expression counts to be analyses
@@ -10,7 +10,7 @@
 #' (they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.
 #' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}. 
 #'
-#' @return An object of class \code{\linkS4class{SummarizedExperiment}}.
+#' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
 #' @examples
 #' # Expression counts
@@ -35,7 +35,7 @@
 #'
 #' # Thanks to Simon Andrews for reporting an issue in previous version of this documentation
 #'
-#' @seealso \code{\linkS4class{SummarizedExperiment}}
+#' @seealso \code{\linkS4class{SingleCellExperiment}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
@@ -66,7 +66,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   }
   else {SpikeInput = 1}
   
-  # Checks for creating the SummarizedExperiment class
+  # Checks for creating the SingleCellExperiment class
   errors <- character()
   
   if(!(is.numeric(Counts) & all(Counts>=0) & 
@@ -87,10 +87,10 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
       errors <- c(errors, "Argument's dimensions are not compatible.")
     
     if(sum(apply(Counts[Tech,],2,sum) == 0) > 0) 
-      errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes. Please remove them before creating the SummarizedExperiment object.")
+      errors <- c(errors, "Some cells have zero reads mapping back to the spike-in genes. Please remove them before creating the SingleCellExperiment object.")
     
     if(sum(apply(Counts[!Tech,],2,sum) == 0) > 0) 
-      errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the SummarizedExperiment object.")
+      errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the SingleCellExperiment object.")
     
     if(!( sum(Tech[1:q.bio]) == 0 & sum(Tech[(q.bio+1):q])==q-q.bio )) 
       errors <- c(errors, "Expression counts are not in the right format (spike-in genes must be at the bottom of the matrix).")
@@ -99,7 +99,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   else
   {
     if(sum(apply(Counts,2,sum) == 0) > 0) 
-      errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the SummarizedExperiment object.")
+      errors <- c(errors, "Some cells have zero reads mapping back to the intrinsic genes. Please remove them before creating the SingleCellExperiment object.")
     
     if(length(unique(BatchInfo)) == 1)
       errors <- c(errors, "If spike-in genes are not available, BASiCS requires the data to contain at least 2 batches of cells (for the same population)")
@@ -120,10 +120,10 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   
   if (length(errors) == 0) TRUE else stop(errors)
   
-  # Create a SummarizedExperiment data object
-  Data <- SummarizedExperiment::SummarizedExperiment(assays = list(Counts = as.matrix(Counts)),
-                               rowData = data.frame(row.names = rownames(Counts), Tech = Tech),
+  # Create a SingleCellExperiment data object
+  Data <- SingleCellExperiment::SingleCellExperiment(assays = list(Counts = as.matrix(Counts)),
                                metadata = list(SpikeInput = SpikeInput, BatchInfo = BatchInfo))
+  isSpike(Data, "ERCC") <- Tech 
   
   show(Data)
   message('\n',
