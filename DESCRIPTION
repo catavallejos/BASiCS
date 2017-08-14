@@ -28,9 +28,10 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
 License: GPL (>= 2)
 Depends:
     R (>= 3.1.0),
-    S4Vectors,
     SingleCellExperiment
 Imports:
+    SummarizedExperiment,
+    S4Vectors,
     BiocGenerics,
     Rcpp (>= 0.11.3),
     methods,
