@@ -49,7 +49,7 @@ A brief description for the statistical model implemented in BASiCS is provided 
 
 ### The input dataset
 
-The input dataset for BASiCS must be stored as an `SummarizedExperiment` object (see `r Biocpkg("SummarizedExperiment")` package). 
+The input dataset for BASiCS must be stored as an `SingleCellExperiment` object (see `r Biocpkg("SingleCellExperiment")` package). 
 
 The `newBASiCS_Data` function can be used to create the input data object based on the following information:
 
@@ -84,13 +84,11 @@ Note: scRNA-seq datasets typically require quality control filtering before perf
 
 Note: the `r Biocpkg("scater")` package provides enhanced functionality for the pre-processing of scRNA-seq datasets. 
 
-To convert an existing `SummarizedExperiment` object (`Data`) into one that can be used within BASiCS, meta-information must be stored in the object.
+To convert an existing `SingleCellExperiment` object (`Data`) into one that can be used within BASiCS, meta-information must be stored in the object.
 
-* `colData(Data)=Tech`: the logical vector indicating biological/technical genes (see above) must be stored in the `colData` slot.
+* `isSpike(Data, "ERCC")=Tech`: the logical vector indicating biological/technical genes (see above) must be stored in the `int_metadata` slot via the `isSpike` function.
 
-* `metadata(Data)`: the `SpikeInfo` and `BatchInfo` objects are stored in the `metadata` slot of the `SummarizedExperiment` object: `metadata(Data)=list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. Once the additional information is included, the object can be used within BASiCS.
-
-<span style="color:red"> TO-DO: REPLACE THIS BY THE NEW SC OBJECT. AFTERWARDS, CHECK THAT APPROPRIATE CHECKS ARE PERFORMED TO GUARANTEE THAT THE METADATA IS CORRECTLY PROVIDED. </span> 
+* `metadata(Data)`: the `SpikeInfo` and `BatchInfo` objects are stored in the `metadata` slot of the `SingleCellExperiment` object: `metadata(Data)=list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. Once the additional information is included, the object can be used within BASiCS.
 
 ### Running the MCMC sampler
 
@@ -188,8 +186,8 @@ head(Test$TableMean)
 head(Test$TableDisp)
 ```
 
-<span style="color:red"> SHOULD WE SEPARATE TESTS FOR MEAN AND DISPERSION 
-INTO TWO SEPARATE FUNCTIONS? </span> 
+<!---<span style="color:red"> SHOULD WE SEPARATE TESTS FOR MEAN AND DISPERSION 
+INTO TWO SEPARATE FUNCTIONS? </span> ---> 
 
 # Additional details
 
@@ -308,9 +306,9 @@ DenoisedProp = BASiCS_DenoisedRates(Data = Data, Chain = Chain, Propensities = T
 DenoisedProp[1:5, 1:5]
 ```
 
-<span style="color:red"> TO-DO: DECIDE WHETHER IT MAKES SENSE TO HAVE BOTH OPTIONS </span>
+<!---<span style="color:red"> TO-DO: DECIDE WHETHER IT MAKES SENSE TO HAVE BOTH OPTIONS </span>---> 
 
-<span style="color:red"> TO-DO: IMPLEMENT THIS FUNCTION IN C++ SO THAT IS IT FAST </span>
+<!---<span style="color:red"> TO-DO: IMPLEMENT THIS FUNCTION IN C++ SO THAT IS IT FAST </span>---> 
 
 # Methodology
 
