@@ -39,7 +39,7 @@ A list of 2 elements
 }
 \description{
 \code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria. The output of this function can be combined with \code{newBASiCS_Data} to generate a 
-the \code{\linkS4class{SummarizedExperiment}} object required to run BASiCS.
+the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
 }
 \examples{
 

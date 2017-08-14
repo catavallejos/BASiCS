@@ -7,7 +7,7 @@
 BASiCS_MCMC(Data, N, Thin, Burn, ...)
 }
 \arguments{
-\item{Data}{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object. This MUST be formatted to include the spike-ins information. See vige}
+\item{Data}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. This MUST be formatted to include the spike-ins information. See vige}
 
 \item{N}{Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
 

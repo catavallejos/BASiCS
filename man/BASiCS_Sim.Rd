@@ -25,7 +25,7 @@ BASiCS_Sim(mu, mu_spikes, delta, phi, s, theta)
 \item{theta}{Technical variability hyper-parameter \eqn{\theta} (must be positive)}
 }
 \value{
-An object of class \code{\link[SummarizedExperiment]{SummarizedExperiment}}, simulated from the model implemented in BASiCS.
+An object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}, simulated from the model implemented in BASiCS.
 }
 \description{
 \code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS.
@@ -46,7 +46,7 @@ Data = BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
 head(assay(Data))
 dim(assay(Data))
 metadata(Data)$SpikeInput
-rowData(Data)$Tech
+isSpike(Data)
 
 }
 \references{

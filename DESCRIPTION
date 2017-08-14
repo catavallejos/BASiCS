@@ -45,8 +45,6 @@ Imports:
 Suggests:
     knitr,
     BiocStyle
-Suggests:
-    knitr
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1

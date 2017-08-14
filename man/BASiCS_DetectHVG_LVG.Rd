@@ -33,8 +33,8 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
 \describe{
 \item{\code{Table}}{Matrix whose columns contain}
    \describe{
-   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index as in the order present in the analysed \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
-   \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name as in the order present in the analysed \code{\link[SummarizedExperiment]{SummarizedExperiment}}}
+   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index as in the order present in the analysed \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+   \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name as in the order present in the analysed \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }

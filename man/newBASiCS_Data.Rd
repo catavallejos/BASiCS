@@ -2,7 +2,7 @@
 % Please edit documentation in R/newBASiCS_Data.R
 \name{newBASiCS_Data}
 \alias{newBASiCS_Data}
-\title{Creates a SummarizedExperiment object from a matrix of expression counts and experimental information about spike-in genes}
+\title{Creates a SingleCellExperiment object from a matrix of expression counts and experimental information about spike-in genes}
 \usage{
 newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 }
@@ -18,10 +18,10 @@ newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 \item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}.}
 }
 \value{
-An object of class \code{\linkS4class{SummarizedExperiment}}.
+An object of class \code{\linkS4class{SingleCellExperiment}}.
 }
 \description{
-\code{newBASiCS_Data} creates a \code{\linkS4class{SummarizedExperiment}} object from
+\code{newBASiCS_Data} creates a \code{\linkS4class{SingleCellExperiment}} object from
 a matrix of expression counts and experimental information about spike-in genes.
 }
 \examples{
@@ -54,7 +54,7 @@ Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequen
 Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 }
 \seealso{
-\code{\linkS4class{SummarizedExperiment}}
+\code{\linkS4class{SingleCellExperiment}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling
