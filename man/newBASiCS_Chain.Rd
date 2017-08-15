@@ -7,19 +7,19 @@
 newBASiCS_Chain(mu, delta, phi, s, nu, theta)
 }
 \arguments{
-\item{mu}{MCMC chain for gene-specific expression levels \eqn{\mu[i]}, defined as true input molecules in case of technical genes
+\item{mu}{MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes
 (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)}
 
-\item{delta}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
+\item{delta}{MCMC chain for gene-specific biological over-dispersion parameters \eqn{\delta_i}, biological genes only
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 
-\item{phi}{MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi[j]}
+\item{phi}{MCMC chain for cell-specific mRNA content normalising parameters \eqn{\phi_j}
 (matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
 
-\item{s}{MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+\item{s}{MCMC chain for cell-specific technical normalisation parameters \eqn{s_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
-\item{nu}{MCMC chain for cell-specific random effects \eqn{\nu[j]}
+\item{nu}{MCMC chain for cell-specific random effects \eqn{\nu_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
 \item{theta}{MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)}
@@ -32,23 +32,23 @@ An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
 }
 \examples{
 
-# Data = makeExampleBASiCS_Data()
-# MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
-#                StoreChains = TRUE, StoreDir = getwd(), RunName = "Test")
+Data = makeExampleBASiCS_Data()
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5)
 
-# ChainMu = as.matrix(read.table("chain_mu_Test.txt"))
-# ChainDelta = as.matrix(read.table("chain_delta_Test.txt"))
-# ChainPhi = as.matrix(read.table("chain_phi_Test.txt"))
-# ChainS = as.matrix(read.table("chain_s_Test.txt"))
-# ChainNu = as.matrix(read.table("chain_nu_Test.txt"))#
-# ChainTheta = read.table("chain_theta_Test.txt")[,1]
+ChainMu = displayChainBASiCS(Chain, "mu")
+ChainDelta = displayChainBASiCS(Chain, "delta")
+ChainPhi = displayChainBASiCS(Chain, "phi")
+ChainS = displayChainBASiCS(Chain, "s")
+ChainNu = displayChainBASiCS(Chain, "nu")
+ChainTheta = displayChainBASiCS(Chain, "theta")
 
-# MCMC_Output_Load <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
-#   phi = ChainPhi, s = ChainS, nu = ChainNu, theta = ChainTheta)
+ChainNew <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
+                            phi = ChainPhi, s = ChainS, 
+                            nu = ChainNu, theta = ChainTheta)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}

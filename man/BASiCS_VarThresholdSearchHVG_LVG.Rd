@@ -18,14 +18,14 @@ BASiCS_VarThresholdSearchLVG(Chain, VarThresholdsGrid, EFDR = 0.1,
 
 \item{VarThresholdsGrid}{Grid of values for the variance contribution threshold (they must be contained in (0,1))}
 
-\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)}
+\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection. Default: \code{EFDR = 0.10}.}
 
 \item{Progress}{If \code{Progress = TRUE}, partial output is printed in the console.}
 }
 \value{
 \describe{
-\item{\code{BASiCS_VarThresholdSearchHVG}}{A table displaying the results of highly variable genes detecting for different variance contribution thresholds.}
-\item{\code{BASiCS_VarThresholdSearchLVG}}{A table displaying the results of lowly variable genes detecting for different variance contribution thresholds.oo}
+\item{\code{BASiCS_VarThresholdSearchHVG}}{A table displaying the results of highly variable genes detection for different variance contribution thresholds.}
+\item{\code{BASiCS_VarThresholdSearchLVG}}{A table displaying the results of lowly variable genes detection for different variance contribution thresholds.}
 }
 }
 \description{
@@ -39,6 +39,9 @@ See vignette
 # See
 help(BASiCS_MCMC)
 
+}
+\references{
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}

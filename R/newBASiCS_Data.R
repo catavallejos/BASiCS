@@ -4,11 +4,12 @@
 #' a matrix of expression counts and experimental information about spike-in genes.
 #'
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements contain the expression counts to be analyses
-#' (including biological and technical spike-in genes). Gene names must be stored as `rownames(Counts)`.
+#' (including biological and technical spike-in genes). Gene names must be stored as \code{rownames(Counts)}.
 #' @param Tech Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.
 #' @param SpikeInfo \code{data.frame} whose first and second columns contain the gene names assigned to the spike-in genes
-#' (they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.
-#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}. 
+#' (they must match the ones in \code{rownames(Counts)}) and the associated input number of molecules, respectively.
+#' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. 
+#' Default value: \code{BatchInfo = NULL}. 
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
@@ -42,7 +43,6 @@
 #' @references 
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #' 
-#' Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 {
   # Validity checks for SpikeInfo
@@ -59,8 +59,8 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL)
   if(!is.null(SpikeInfo))
   {
     # Extracting spike-in input molecules in the correct order
-    if(sum(!(GeneNames[Tech] %in% SpikeInfo[,1])) > 0) stop("SpikeInfo is missing information for some of the spikes")
-    if(sum(!(SpikeInfo[,1] %in% GeneNames[Tech])) > 0) stop("SpikeInfo includes spikes that are not in the Counts matrix")
+    if(sum(!(GeneNames[Tech] %in% SpikeInfo[,1])) > 0) stop("'SpikeInfo' is missing information for some of the spikes")
+    if(sum(!(SpikeInfo[,1] %in% GeneNames[Tech])) > 0) stop("'SpikeInfo' includes spikes that are not in the Counts matrix")
     matching <- match(GeneNames[Tech], SpikeInfo[,1])
     SpikeInput <- SpikeInfo[matching,2]    
   }

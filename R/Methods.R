@@ -25,11 +25,13 @@ setGeneric("displaySummaryBASiCS", function(object, ...) standardGeneric("displa
 #' @examples
 #' 
 #' Data = makeExampleBASiCS_Data()
-#' MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 #' 
 #' @rdname BASiCS_Chain-methods
 setMethod("show",
@@ -68,15 +70,13 @@ setMethod("show",
 #' 
 #' @examples 
 #' 
-#' Data = makeExampleBASiCS_Data()
-#' MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
-#' MCMC_Summary <- Summary(MCMC_Output)
-#' 
-#' # See documentation of function BASiCS_MCMC
+#' help(BASiCS_MCMC)
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. 
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95){
@@ -116,7 +116,8 @@ setMethod("Summary",
 #' @description 'plot' method for BASiCS_Chain objects
 #' 
 #' @param x A \code{BASiCS_Chain} object.
-#' @param Param Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}
+#' @param Param Name of the slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
+#' \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}
 #' @param Gene Specifies which gene is requested. Required only if \code{Param = "mu"} or \code{"delta"} 
 #' @param Cell Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}
 #' @param Batch Specifies which batch is requested. Required only if \code{Param = "theta"}
@@ -131,7 +132,9 @@ setMethod("Summary",
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. 
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setMethod("plot",
           signature = "BASiCS_Chain",
           definition = function(x, 
@@ -176,7 +179,8 @@ setMethod("plot",
 #' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' 
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
-#' @param Param Name of the slot to be used for the accessed. Possible values: \code{mu, delta, phi, s, nu, theta}
+#' @param Param Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
+#' \code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}.
 #' 
 #' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' 
@@ -189,7 +193,9 @@ setMethod("plot",
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setMethod("displayChainBASiCS",
           signature = "BASiCS_Chain",
           definition = function(object, 
@@ -222,14 +228,15 @@ setMethod("displayChainBASiCS",
 #' 
 #' @examples
 #' 
-#' Data = makeExampleBASiCS_Data()
-#' MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
-#' Summary(MCMC_Output)
+#' # See
+#' help(BASiCS_MCMC)
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
 #' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+#'
 #' @rdname BASiCS_Summary-methods
 setMethod("show",
           signature = "BASiCS_Summary",
@@ -260,8 +267,10 @@ setMethod("show",
 #' @description 'plot' method for BASiCS_Summary objects
 #' 
 #' @param x A \code{BASiCS_Summary} object.
-#' @param Param Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}
-#' @param Param2 Name of the second slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu} (combinations between gene-specific and cell-specific parameters are not admitted)
+#' @param Param Name of the slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
+#' \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}
+#' @param Param2 Name of the second slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
+#' \code{"phi"}, \code{"s"} and \code{"nu"} (combinations between gene-specific and cell-specific parameters are not admitted)
 #' @param Genes Specifies which genes are requested. Required only if \code{Param = "mu"} or \code{"delta"} 
 #' @param Cells Specifies which cells are requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}
 #' @param Batches Specifies which batches are requested. Required only if \code{Param = "theta"}
@@ -282,7 +291,10 @@ setMethod("show",
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. 
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+#'
 setMethod("plot",
           signature = "BASiCS_Summary",
           definition = function(x, 
@@ -428,7 +440,8 @@ setMethod("plot",
 #' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary-class}}
 #' 
 #' @param object an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
-#' @param Param Name of the slot to be used for the accessed. Possible values: \code{mu, delta, phi, s, nu, theta}
+#' @param Param Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
+#' \code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}
 #'  
 #' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
 #' 
@@ -441,7 +454,9 @@ setMethod("plot",
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
           definition = function(object, 

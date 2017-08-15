@@ -7,7 +7,7 @@
 \alias{BASiCS_DetectHVG_LVG}
 \title{Detection method for highly and lowly variable genes}
 \usage{
-BASiCS_DetectHVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
+BASiCS_DetectHVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
   OrderVariable = "Prob", Plot = FALSE, ...)
 
 BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
@@ -20,11 +20,12 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
 
 \item{ProbThreshold}{Optional parameter. Posterior probability threshold (must be a positive value, between 0 and 1)}
 
-\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.05)}
+\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)}
 
-\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "Mu", "Delta", "Sigma", "Prob")}.}
+\item{OrderVariable}{Ordering variable for output. Possible values: \code{"GeneIndex"}, \code{"Mu"},
+\code{"Delta"}, \code{"Sigma"} and \code{"Prob"}.}
 
-\item{Plot}{If \code{Plot = TRUE} a plot of the gene specific expression level against HVG or LVG is generated.}
+\item{Plot}{If \code{Plot = TRUE} error control and expression versus HVG/LVG probability plots are generated}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
 }
@@ -35,8 +36,8 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
    \describe{
    \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index as in the order present in the analysed \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
    \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name as in the order present in the analysed \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
-   \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu[i]}}
-   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological cell-to-cell heterogeneity hyper-parameter \eqn{\delta[i]}}
+   \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific expression levels \eqn{\mu_i}}
+   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, posterior median of gene-specific biological over-dispersion parameter \eqn{\delta_i}}
    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, proportion of the total variability that is due to a cell-to-cell biological heterogeneity component. }
    \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, probability of being highly variable according to the given thresholds.}
    \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, indicator of being detected as highly variable according to the given thresholds. }
@@ -45,7 +46,7 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
 \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 }
-\code{BASiCS_DetectLVG} produces a similar output, replacing the element \code{HVG} by \code{LVG}, an indicator of a gene being detected as lowly variable according to the given thresholds.
+\code{BASiCS_DetectLVG} produces a similar output, replacing the column \code{HVG} by \code{LVG}, an indicator of a gene being detected as lowly variable according to the given thresholds.
 }
 \description{
 Functions to detect highly and lowly variable genes

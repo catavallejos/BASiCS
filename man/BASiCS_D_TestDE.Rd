@@ -4,57 +4,23 @@
 \alias{BASiCS_D_TestDE}
 \title{Detection of genes with changes in expression.}
 \usage{
-BASiCS_D_TestDE(Data = NULL, object = NULL, GeneNames = NULL,
-  EpsilonM = 0.1, EpsilonD = 0.1, EviThresholdM = NULL,
-  EviThresholdD = NULL, OrderVariable = "ProbDiffExp",
-  GroupLabelRef = "Ref", GroupLabelTest = "Test", Plot = FALSE,
-  OffSet = FALSE, EFDR_M = 0.05, EFDR_D = 0.05, GenesSelect = NULL, ...)
+BASiCS_D_TestDE(...)
 }
 \arguments{
-\item{Data}{an object of class \code{BASiCS_D_Data-class} (class no longer in use)}
-
-\item{object}{an object of class \code{BASiCS_D_Data-class} (class no longer in use)}
-
-\item{GeneNames}{Vector containing gene names to be used in results table (argument to be removed as 'GeneNames' will be an slot of `BASiCS_D_Data` object)}
-
-\item{EpsilonM}{Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number)}
-
-\item{EpsilonD}{Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number)}
-
-\item{EviThresholdM}{Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)}
-
-\item{EviThresholdD}{Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive value, between 0 and 1)}
-
-\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "ProbDiffExp", "ProbDiffOverDisp")}.}
-
-\item{GroupLabelRef}{Label assigned to reference group. Default: \code{GroupLabelRef = "Ref"}}
-
-\item{GroupLabelTest}{Label assigned to reference group. Default: \code{GroupLabelRef = "Test"}}
-
-\item{Plot}{If \code{Plot = T}, error rates control rates and volcano plots are generated.}
-
-\item{OffSet}{Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step.}
-
-\item{EFDR_M}{Target for expected false discovery rate related to the comparison of means (default = 0.05)}
-
-\item{EFDR_D}{Target for expected false discovery rate related to the comparison of dispersions (default = 0.05)}
-
-\item{GenesSelect}{Optional argument to provide a user-defined list of genes to be considered for the comparison (default = NULL). When used, this argument must be a vector of 'TRUE' (include gene) / 'FALSE' (exclude gene) indicator, with the same length as the number of intrinsic genes and following the same order as how genes are displayed in the table of counts.  This argument is necessary in order to have a meaningful EFDR calibration when the user decides to exclude some genes from the comparison.}
-
-\item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
+\item{...}{Optional parameters.}
 }
 \value{
-This function is no longer in use and will be removed in future releases. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
+This function is no longer in use and will be removed from future releases of \code{BASiCS}. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 }
 \description{
-Function to assess changes in expression (mean and over-dispersion). This function is no longer in use and will be removed in future releases. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
+This function is no longer in use and will be removed from future releases of \code{BASiCS}. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 }
 \details{
-This function is no longer in use and will be removed in future releases.
+This function is no longer in use and will be removed from future releases of \code{BASiCS}.
 }
 \examples{
 
-# This function is no longer in use and will be removed in future releases.
+# This function is no longer in use and will be removed in future releases of \\code{BASiCS}.
 
 }
 \author{

@@ -1,8 +1,8 @@
-#' @name DenoisedCounts
+#' @name BASiCS_DenoisedCounts
 #'
-#' @title Calculates normalised and denoised expression expression counts
+#' @title Calculates denoised expression expression counts
 #'
-#' @description Calculates normalised and denoised expression counts, by removing the effect of technical variation.
+#' @description Calculates denoised expression counts by removing cell-specific technical variation.
 #'
 #' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
@@ -14,13 +14,17 @@
 #'
 #' @details See vignette
 #'
-#' @return A matrix of normalised and denoised expression counts.
+#' @return A matrix of denoised expression counts.
 #'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' 
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #'
-#' @rdname DenoisedCounts
+#' @rdname BASiCS_DenoisedCounts
 BASiCS_DenoisedCounts=function(
   Data,
   Chain)

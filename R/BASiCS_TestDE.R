@@ -7,18 +7,21 @@
 #' @param Chain1 an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the first group of cells
 #' @param Chain2 an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the second group of cells
 #' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
-#' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
+#' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in biological over-dispersion (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
 #' @param EviThresholdM Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)
-#' @param EviThresholdD Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over dispersion (must be a positive value, between 0 and 1)
-#' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneIndex", "GeneNames", "Prob")}.
+#' @param EviThresholdD Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over-dispersion (must be a positive value, between 0 and 1)
+#' @param OrderVariable Ordering variable for output. Possible values: \code{"GeneIndex"}, \code{"GeneNames"} and \code{"Prob"}.
 #' @param GroupLabel1 Label assigned to reference group. Default: \code{GroupLabel1 = "Group1"}
 #' @param GroupLabel2 Label assigned to reference group. Default: \code{GroupLabel2 = "Group2"}
 #' @param Plot If \code{Plot = TRUE}, MA and volcano plots are generated. 
 #' @param PlotOffset If \code{Plot = TRUE}, the offset effect is visualised.   
 #' @param OffSet Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step. 
-#' @param EFDR_M Target for expected false discovery rate related to the comparison of means (default = 0.05)
-#' @param EFDR_D Target for expected false discovery rate related to the comparison of dispersions (default = 0.05)
-#' @param GenesSelect Optional argument to provide a user-defined list of genes to be considered for the comparison (default = NULL). When used, this argument must be a vector of 'TRUE' (include gene) / 'FALSE' (exclude gene) indicator, with the same length as the number of intrinsic genes and following the same order as how genes are displayed in the table of counts.  This argument is necessary in order to have a meaningful EFDR calibration when the user decides to exclude some genes from the comparison. 
+#' @param EFDR_M Target for expected false discovery rate related to the comparison of means. Default \code{EFDR_M = 0.10}.
+#' @param EFDR_D Target for expected false discovery rate related to the comparison of dispersions. Default \code{EFDR_D = 0.10}.
+#' @param GenesSelect Optional argument to provide a user-defined list of genes to be considered for the comparison.
+#' Default: \code{GenesSelect = NULL}. . When used, this argument must be a vector of \code{TRUE} (include gene) / \code{FALSE} (exclude gene) indicator, 
+#' with the same length as the number of intrinsic genes and following the same order as how genes are displayed in the table of counts.  
+#' This argument is necessary in order to have a meaningful EFDR calibration when the user decides to exclude some genes from the comparison. 
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
@@ -26,9 +29,9 @@
 #' \item{\code{TableMean}}{A \code{\link[base]{data.frame}} containing the results of the differential mean test}
 #'    \describe{
 #'    \item{\code{GeneNames}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu[i]} is averaged across both groups of cells (weighted by sample size).}
-#'    \item{\code{Mean1}}{Estimated mean expression parameter \eqn{\mu[i]} for each biological gene in the first group of cells.}
-#'    \item{\code{Mean2}}{Estimated mean expression parameter \eqn{\mu[i]} for each biological gene in the second group of cells.}
+#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu_i} is averaged across both groups of cells (weighted by sample size).}
+#'    \item{\code{Mean1}}{Estimated mean expression parameter \eqn{\mu_i} for each biological gene in the first group of cells.}
+#'    \item{\code{Mean2}}{Estimated mean expression parameter \eqn{\mu_i} for each biological gene in the second group of cells.}
 #'    \item{\code{MeanFC}}{Fold change in mean expression parameters between the first and second groups of cells.}
 #'    \item{\code{MeanLog2FC}}{Log2-transformed fold change in mean expression between the first and second groups of cells.}
 #'    \item{\code{ProbDiffMean}}{Posterior probability for mean expression difference between the first and second groups of cells.}
@@ -37,10 +40,10 @@
 #' \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the results of the differential dispersion test (excludes genes for which the mean changes).}
 #'    \describe{
 #'    \item{\code{GeneNames}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu[i]} is averaged across both groups of cells (weighted by sample size).}
-#'    \item{\code{DispOverall}}{For each gene, the estimated over-dispersion parameter \eqn{\delta[i]} is averaged across both groups of cells (weighted by sample size).}
-#'    \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta[i]} for each biological gene in the first group of cells.}
-#'    \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta[i]} for each biological gene in the second group of cells.}
+#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu_i} is averaged across both groups of cells (weighted by sample size).}
+#'    \item{\code{DispOverall}}{For each gene, the estimated over-dispersion parameter \eqn{\delta_i} is averaged across both groups of cells (weighted by sample size).}
+#'    \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta_i} for each biological gene in the first group of cells.}
+#'    \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta_i} for each biological gene in the second group of cells.}
 #'    \item{\code{DispFC}}{Fold change in over-dispersion parameters between the between the first and second groups of cells.}
 #'    \item{\code{DispLog2FC}}{Log-transformed fold change in over-dispersion between the first and second groups of cells.}
 #'    \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion difference between the first and second groups of cells.}
@@ -84,6 +87,9 @@
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #' 
+#' @references 
+#' Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+#'
 #' @rdname BASiCS_TestDE
 BASiCS_TestDE <- function(Chain1,
                           Chain2,
@@ -97,8 +103,8 @@ BASiCS_TestDE <- function(Chain1,
                           Plot = TRUE, 
                           PlotOffset = TRUE, 
                           OffSet = TRUE, 
-                          EFDR_M = 0.05,
-                          EFDR_D = 0.05,
+                          EFDR_M = 0.10,
+                          EFDR_D = 0.10,
                           GenesSelect = NULL, 
                             ...)
 {

@@ -8,14 +8,15 @@ newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements contain the expression counts to be analyses
-(including biological and technical spike-in genes). Gene names must be stored as `rownames(Counts)`.}
+(including biological and technical spike-in genes). Gene names must be stored as \code{rownames(Counts)}.}
 
 \item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.}
 
 \item{SpikeInfo}{\code{data.frame} whose first and second columns contain the gene names assigned to the spike-in genes
-(they must match the ones in `rownames(Counts)`) and the associated input number of molecules, respectively.}
+(they must match the ones in \code{rownames(Counts)}) and the associated input number of molecules, respectively.}
 
-\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}.}
+\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. 
+Default value: \code{BatchInfo = NULL}.}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}}.
@@ -49,9 +50,7 @@ DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
-
-Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\linkS4class{SingleCellExperiment}}

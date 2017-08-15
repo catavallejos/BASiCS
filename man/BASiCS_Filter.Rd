@@ -12,7 +12,7 @@ BASiCS_Filter(Counts, Tech, SpikeInput, BatchInfo = NULL,
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
 First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.}
 
-\item{Tech}{Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.}
+\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.}
 
 \item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.}
 
@@ -62,7 +62,7 @@ FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 \references{
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 
-Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

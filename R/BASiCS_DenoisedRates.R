@@ -1,13 +1,14 @@
-#' @name DenoisedRates
+#' @name BASiCS_DenoisedRates
 #'
-#' @title Calculates normalised and denoised expression rates
+#' @title Calculates denoised expression rates
 #'
 #' @description Calculates normalised and denoised expression rates, by removing the effect of technical variation.
 #'
 #' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
 #' @param PrintProgress If \code{TRUE}, partial progress information is printed in the console.
-#' @param Propensities If \code{TRUE}, returns underlying expression propensitites \eqn{\rho[ij]}. Otherwise, denoised rates \eqn{\mu[i] \rho[ij]} are returned.
+#' @param Propensities If \code{TRUE}, returns underlying expression propensitites \eqn{\rho_{ij}}. 
+#' Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.
 #'
 #' @examples
 #'
@@ -16,13 +17,17 @@
 #'
 #' @details See vignette
 #'
-#' @return A matrix of normalised and denoised expression counts.
+#' @return A matrix of denoised expression rates.
 #'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
-#' @rdname DenoisedRates
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#'
+#' @rdname BASiCS_DenoisedRates
 BASiCS_DenoisedRates=function(
   Data,
   Chain,

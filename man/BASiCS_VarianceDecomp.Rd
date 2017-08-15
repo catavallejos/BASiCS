@@ -10,7 +10,8 @@ BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal", Plot = TRUE,
 \arguments{
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
 
-\item{OrderVariable}{Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.}
+\item{OrderVariable}{Ordering variable for output. Possible values: \code{"GeneNames"}, \code{"BioVarGlobal"},
+\code{"TechVarGlobal"} and \code{"ShotNoiseGlobal"}.}
 
 \item{Plot}{If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated}
 
@@ -39,7 +40,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain-class}}

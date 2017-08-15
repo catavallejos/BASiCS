@@ -39,9 +39,9 @@ In both cases, a probabilistic output is provided, with posterior probability th
 
 Currently, BASiCS relies on the use of **spike-in genes** --- that are artificially introduced to each cell's lysate --- to perform these analyses. 
 
-**Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
-
 A brief description for the statistical model implemented in BASiCS is provided in the "Methodology" section of this document. 
+
+**Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
 
 ***
 
@@ -80,7 +80,7 @@ DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo,
                              BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
-Note: scRNA-seq datasets typically require quality control filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` performs this filtering. For examples, refer to `help(BASiCS_Filter)`.  
+Note: scRNA-seq datasets typically require quality control filtering before performing the analysis. This is in order to remove cells and/or transcripts with very low expression counts. The function `BASiCS_Filter` can be used to perform this task. For examples, refer to `help(BASiCS_Filter)`.  
 
 Note: the `r Biocpkg("scater")` package provides enhanced functionality for the pre-processing of scRNA-seq datasets. 
 
@@ -98,7 +98,9 @@ Parameter estimation is performed using the `BASiCS_MCMC` function. Essential pa
 * `Thin`: length of the thining period (i.e. only every `Thin` iterations will be stored in the output of the `BASiCS_MCMC`)
 * `Burn`: length of burn-in period (i.e. the initial `Burn` iterations that will be discarded from the output of the `BASiCS_MCMC`)
 
-If the optional parameter `PrintProgress` is set to `TRUE`, the R console will display the progress of the MCMC algorithm. For other optional parameters refer to `help(BASiCS_MCMC)`. Hereafter, we illustrate the usage of `BASiCS_MCMC` using a built-in synthetic dataset.
+If the optional parameter `PrintProgress` is set to `TRUE`, the R console will display the progress of the MCMC algorithm. For other optional parameters refer to `help(BASiCS_MCMC)`. 
+
+Here, we illustrate the usage of `BASiCS_MCMC` using a built-in synthetic dataset.
 
 ```{r quick-start-MCMC}
 Data <- makeExampleBASiCS_Data()
@@ -108,13 +110,14 @@ Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500,
 
 **Important remarks:**
 
-- Please ensure the acceptance rates displayed in the console output of `BASiCS_MCMC` are around 0.44. If they are too far from this value, you should increase the number of iterations. 
+- Please ensure the acceptance rates displayed in the console output of `BASiCS_MCMC` are around 0.44. If they are too far from this value, you should increase `N` and `Burn`. 
 
-- It is **essential** to assess the convergence of the MCMC algorithm **before** continuing with downstream analyses. For guidance regarding this step, refer to the 'Convergence assessment' section of this vignette
+- It is **essential** to assess the convergence of the MCMC algorithm **before** performing downstream analyses. For guidance regarding this step, refer to the 'Convergence assessment' section of this vignette
 
 Typically, setting `N=20000`, `Thin=20` and `Burn=10000` leads to stable results. 
 
-<span style="color:red"> NOTE: DEFAULT PRIOR FOR GAMMA DEFINED BY LOG-NORMAL DISTRIBUTION NOW. THIS IS REQUIRED FOR DIFFERENTIAL DISPERSION TESTS. </span> 
+<!---
+<span style="color:red"> NOTE: DEFAULT PRIOR FOR GAMMA DEFINED BY LOG-NORMAL DISTRIBUTION NOW. THIS IS REQUIRED FOR DIFFERENTIAL DISPERSION TESTS. </span>  ---> 
 
 ### Analysis for a single group of cells
 
@@ -124,12 +127,12 @@ We illustrate this analysis using a small extract from the MCMC chain obtained i
 data(ChainSC)
 ```
 
-The following code is used to identify **highly variable genes (HVG)** and **lowly variable genes (LVG) ** within these cells. The `VarThreshold` parameter sets a lower threshold for the proportion of variability that is assigned to the biological component (`Sigma`). In the examples below:
+The following code is used to identify **highly variable genes (HVG)** and **lowly variable genes (LVG)** within these cells. The `VarThreshold` parameter sets a lower threshold for the proportion of variability that is assigned to the biological component (`Sigma`). In the examples below:
 
 - HVG are defined as those genes for which **at least** 60\% of their total variability is attributed to the biological variability component. 
 - LVG are defined as those genes for which **at most** 40\% of their total variability is attributed to the biological variability component.
 
-For each gene, these functions return posterior probabilities as a measure of HVG/LVG evidence. A cut-off value for these posterior probabilities is set by controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.05).
+For each gene, these functions return posterior probabilities as a measure of HVG/LVG evidence. A cut-off value for these posterior probabilities is set by controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.10).
 
 ```{r quick-start-HVGdetection, fig.height = 6, fig.width = 6}
 par(mfrow = c(2,2))
@@ -151,9 +154,8 @@ with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
 with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
 ```
 
-<span style="color:red"> Note: this criteria for threshold choice is new. Original version defined  `EviThreshold` such that EFDR = EFNR. However, this 
-is more consistent with the differential tests and its more stable 
-(sometimes, we couldn't find a threshold such that EFDR = EFNR). </span>
+**Note**: this criteria for threshold has changed with respect to the original release of BASiCS (where `EviThreshold` was defined such that EFDR = EFNR). However, the new choice is more stable 
+(sometimes, it was not posible to find a threshold such that EFDR = EFNR). 
 
 ### Analysis for two groups of cells 
 
@@ -168,16 +170,16 @@ data(ChainRNA)
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      EFDR_M = 0.05, EFDR_D = 0.05,
+                      EFDR_M = 0.10, EFDR_D = 0.10,
                       OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). As a default option: `EpsilonM = EpsilonD = log2(1.5)` (i.e. 
 50\% increase). To adjust for differences in overall RNA content, an internal offset correction is performed when `OffSet=TRUE`. This is the recommended default.  
 
-**Due to the confounding between mean and over-dispersion that is typically observed in scRNA-seq datasets, we only assess changes in over-dispersion for those genes in which the mean does not change between the groups.**
+**Note: due to the confounding between mean and over-dispersion that is typically observed in scRNA-seq datasets, we only assess changes in over-dispersion for those genes in which the mean does not change between the groups.**
 
-<span style="color:red"> Note: previous versions of BASiCS used natural logarithm instead </.span>
+<!---<span style="color:red"> Note: previous versions of BASiCS used natural logarithm instead </.span> ---> 
 
 The resulting output list can be displayed using
 
@@ -329,13 +331,13 @@ In this setting, the key parameters to be used for downstream analyses are:
 
 * $\mu_i$: mean expression parameter for gene $i$ in the group of cells under study. In case of the spike-in technical genes, $\mu_i$ is assumed to be known and equal to the input number of molecules of the corresponding spike-in gene).
 
-* $\delta_i$: over-dispersion parameter for gene $i$, controlling the strength of the biological cell-to-cell expression heterogeneity of a gene $i$ across the population of cells under study.
+* $\delta_i$: over-dispersion parameter for gene $i$, a measure for the excess of variation that is observed after accounting for technical noise (with respect to Poisson samplin)
 
 Additional (nuisance) parameters are interpreted as follows:
 
-* $\phi_j$: cell-specific normalizing constants related to differences in mRNA content (identifiability constrain: $\sum_{j=1}^n \phi_j = n$). 
+* $\phi_j$: cell-specific normalizing parameters related to differences in mRNA content (identifiability constrain: $\sum_{j=1}^n \phi_j = n$). 
 
-* $s_j$: cell-specific normalizing constants related to technical cell-specific biases (for more details regarding this interpretation see [6]).
+* $s_j$: cell-specific normalizing parameters related to technical cell-specific biases (for more details regarding this interpretation see [6]).
 
 * $\theta$: technical over-dispersion parameter, controlling the strenght of cell-to-cell technical variability. 
 
@@ -343,7 +345,7 @@ When cells from the same group are processed in multiple sequencing batches, thi
 
 [^footnoteGamma]: We parametrize the Gamma distribution such that if $X \sim \mbox{Gamma}(a,b)$, then $\mbox{E}(X)=a/b$ and $\mbox{var}(X)=a/b^2$.
 
-In [2], this model has been extended to cases where multiple groups of cells are under study. This is achieved by assuming gene-specific parameters to be also group-specific. Based on this setup, evidence of differential expression is quantified through log-fold changes of gene-specific parameters (mean and over-dispersion) between the groups. 
+In [2], this model has been extended to cases where multiple groups of cells are under study. This is achieved by assuming gene-specific parameters to be also group-specific. Based on this setup, evidence of differential expression is quantified through log2-fold changes of gene-specific parameters (mean and over-dispersion) between the groups. 
 
 More details regarding the model setup, prior specification and implementation are described in [1] and [2]. 
 
@@ -353,7 +355,7 @@ More details regarding the model setup, prior specification and implementation a
 
 We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for support and discussions throughout the development of this R library. In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and support during the preparation the Bioconductor submission. 
 
-We also acknowledge feedback and contributions from (Github aliases provided within parenthesis): Ben Dulken (bdulken), Chang Xu (xuchang116), Danilo Horta (Horta), Dmitriy Zhukov (dvzhukov), Jens Preu&szlig;ner (jenzopr), Joanna Dreux (Joannacodes), Kevin Rue-Albrecht (kevinrue), Luke Zappia (lazappi), Simon Anders (s-andrews), Yongchao Ge and Yuan Cao (yuancao90), among others. 
+We also acknowledge feedback and contributions from (Github aliases provided within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preu&szlig;ner (@jenzopr), Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European Bioinformatics Institute (core European Molecular Biology Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
 

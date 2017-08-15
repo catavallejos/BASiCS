@@ -15,9 +15,11 @@
 \arguments{
 \item{x}{A \code{BASiCS_Summary} object.}
 
-\item{Param}{Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}}
+\item{Param}{Name of the slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
+\code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}}
 
-\item{Param2}{Name of the second slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu} (combinations between gene-specific and cell-specific parameters are not admitted)}
+\item{Param2}{Name of the second slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
+\code{"phi"}, \code{"s"} and \code{"nu"} (combinations between gene-specific and cell-specific parameters are not admitted)}
 
 \item{Genes}{Specifies which genes are requested. Required only if \code{Param = "mu"} or \code{"delta"}}
 
@@ -53,7 +55,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

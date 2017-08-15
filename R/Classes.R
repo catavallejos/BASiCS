@@ -8,11 +8,11 @@
 #' 
 #' @slot mu MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes 
 #' (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)
-#' @slot delta MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta_i}, biological genes only 
+#' @slot delta MCMC chain for gene-specific biological over-dispersion parameters \eqn{\delta_i}, biological genes only 
 #' (matrix with \code{q.bio} columns, all elements must be positive numbers)
-#' @slot phi MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi_j}
+#' @slot phi MCMC chain for cell-specific mRNA content normalising parameters \eqn{\phi_j}
 #' (matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})
-#' @slot s MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s_j}
+#' @slot s MCMC chain for cell-specific technical normalisation parameters \eqn{s_j}
 #' (matrix with \code{n} columns, all elements must be positive numbers)
 #' @slot nu MCMC chain for cell-specific random effects \eqn{\nu_j}
 #' (matrix with \code{n} columns, all elements must be positive numbers)
@@ -65,23 +65,23 @@ setClass("BASiCS_Chain",
 #' 
 #' @title The BASiCS_Summary class
 #' 
-#' @slot mu Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific expression levels \eqn{\mu[i]}.
-#' @slot delta Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
-#' @slot phi Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific mRNA content normalising constants \eqn{\phi[j]}
+#' @slot mu Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific expression levels \eqn{\mu_i}.
+#' @slot delta Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific biological cell-to-cell over-dispersion \eqn{\delta_i}, biological genes only 
+#' @slot phi Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific mRNA content normalising constants \eqn{\phi_j}
 #' @slot s Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
-#' @slot nu Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu[j]}
+#' @slot nu Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu_j}
 #' @slot theta Posterior median (first column), lower (second column) and upper (third column) limits of technical variability hyper-parameter \eqn{\theta} (each row represents one batch)
 #' 
 #' @examples
 #' 
 #' # A BASiCS_Summary object created by the Summary method.
 #' Data = makeExampleBASiCS_Data()
-#' MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
-#' MCMC_Summary <- Summary(MCMC_Output)
+#' Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+#' ChainSummary <- Summary(Chain)
 #' 
 #' @description Container of a summary of a \code{\link[BASiCS]{BASiCS_Chain-class}} object.  
-#' In each slot, first column contains posterior medians, second column contains the lower limits of an high posterior
-#' density interval and third column contains the upper limits of high posterior density intervals.
+#' In each slot, first column contains posterior medians; second and third columns respectively contain the 
+#' lower and upper limits of an high posterior density interval (for a given probability).
 setClass("BASiCS_Summary",
          representation = representation(
            mu = "matrix",

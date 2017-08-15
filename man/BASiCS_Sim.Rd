@@ -7,19 +7,19 @@
 BASiCS_Sim(mu, mu_spikes, delta, phi, s, theta)
 }
 \arguments{
-\item{mu}{Gene-specific expression levels \eqn{\mu[i]} for all biological genes 
+\item{mu}{Gene-specific expression levels \eqn{\mu_i} for all biological genes 
 (vector of length \code{q.bio}, all elements must be positive numbers)}
 
-\item{mu_spikes}{\eqn{\mu[i]} for all technical genes defined as true input molecules (SpikeInfo)
+\item{mu_spikes}{\eqn{\mu_i} for all technical genes defined as true input molecules (SpikeInfo)
 (vector of length \code{q-q.bio}, all elements must be positive numbers)}
 
-\item{delta}{Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
+\item{delta}{Gene-specific biological cell-to-cell over-dispersion parameters \eqn{\delta_i}, biological genes only
 (vector of length \code{q.bio}, all elements must be positive numbers)}
 
-\item{phi}{Cell-specific mRNA content normalising constants \eqn{\phi[j]}
+\item{phi}{Cell-specific mRNA content normalising constants \eqn{\phi_j}
 (vector of length \code{n}, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
 
-\item{s}{Cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+\item{s}{Cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s_j}
 (vector of length \code{n}, all elements must be positive numbers)}
 
 \item{theta}{Technical variability hyper-parameter \eqn{\theta} (must be positive)}
@@ -50,8 +50,8 @@ isSpike(Data)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
+Catalina A. Vallejos \email{cnvallej@uc.cl}, Nils Eling
 }

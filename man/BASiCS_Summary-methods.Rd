@@ -19,13 +19,12 @@ Prints a summary of the properties of \code{object}.
 }
 \examples{
 
-Data = makeExampleBASiCS_Data()
-MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
-Summary(MCMC_Output)
+# See
+help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

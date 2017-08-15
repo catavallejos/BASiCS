@@ -12,7 +12,8 @@
 \arguments{
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}}
 
-\item{Param}{Name of the slot to be used for the accessed. Possible values: \code{mu, delta, phi, s, nu, theta}}
+\item{Param}{Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
+\code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}}
 }
 \value{
 The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
@@ -27,7 +28,7 @@ help(BASiCS_MCMC)
   
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Summary-class}}

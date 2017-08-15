@@ -16,13 +16,13 @@ by the function \code{\link[BASiCS]{BASiCS_MCMC}}.
 \item{\code{mu}}{MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes 
 (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)}
 
-\item{\code{delta}}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta_i}, biological genes only 
+\item{\code{delta}}{MCMC chain for gene-specific biological over-dispersion parameters \eqn{\delta_i}, biological genes only 
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 
-\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi_j}
+\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalising parameters \eqn{\phi_j}
 (matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
 
-\item{\code{s}}{MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s_j}
+\item{\code{s}}{MCMC chain for cell-specific technical normalisation parameters \eqn{s_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
 \item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu_j}

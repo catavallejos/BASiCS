@@ -5,7 +5,7 @@
 #'
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
 #' First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.
-#' @param Tech Logical vector of length \code{q}. If \code{Tech = F} the gene is biological; otherwise the gene is spike-in.
+#' @param Tech Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.
 #' @param SpikeInput Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.
 #' @param BatchInfo Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}. 
 #' @param MinTotalCountsPerCell Minimum value of total expression counts required per cell (biological and technical). Default value: \code{MinTotalCountsPerCell = 2}.
@@ -45,7 +45,7 @@
 #' @references 
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #' 
-#' Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+#' Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
 BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
                           MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
                           MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)

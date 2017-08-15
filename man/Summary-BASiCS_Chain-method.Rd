@@ -23,15 +23,11 @@ density interval with probabilty equal to \code{prob}.
 }
 \examples{
 
-Data = makeExampleBASiCS_Data()
-MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
-MCMC_Summary <- Summary(MCMC_Output)
-
-# See documentation of function BASiCS_MCMC
+help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

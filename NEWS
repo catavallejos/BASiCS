@@ -402,6 +402,10 @@ version 1.0.12: (2017-08-14)
 - 'SummarizedExperiment' class replaced by 'SingleCellExperiment'
 - Updated vignette
 
+version 1.0.13: (2017-08-15)
+- Minor changes to documentation
+- Minor changes to vignette
+
 
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 

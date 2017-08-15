@@ -6,7 +6,8 @@
 #' @description Function to decompose total variability of gene expression into biological and technical components.
 #'
 #' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
-#' @param OrderVariable Ordering variable for output. Must take values in \code{c("GeneNames", "BioVarGlobal", "TechVarGlobal", "ShotNoiseGlobal")}.
+#' @param OrderVariable Ordering variable for output. Possible values: \code{"GeneNames"}, \code{"BioVarGlobal"},
+#'  \code{"TechVarGlobal"} and \code{"ShotNoiseGlobal"}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated
 #' @param ... Other arguments to be passed to \code{\link[graphics]{barplot}}
 #'
@@ -26,12 +27,12 @@
 #'
 #' @details See vignette
 #'
-#'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_VarianceDecomp
 BASiCS_VarianceDecomp <- function(Chain,

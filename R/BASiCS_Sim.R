@@ -3,15 +3,15 @@
 #' @description \code{BASiCS_Sim} creates a simulated dataset from the model implemented in BASiCS.
 #' This function is used in order to illustrate the performance of the \code{BASiCS} library.
 #'
-#' @param mu Gene-specific expression levels \eqn{\mu[i]} for all biological genes 
+#' @param mu Gene-specific expression levels \eqn{\mu_i} for all biological genes 
 #' (vector of length \code{q.bio}, all elements must be positive numbers)
-#' @param mu_spikes \eqn{\mu[i]} for all technical genes defined as true input molecules (SpikeInfo)
+#' @param mu_spikes \eqn{\mu_i} for all technical genes defined as true input molecules (SpikeInfo)
 #' (vector of length \code{q-q.bio}, all elements must be positive numbers)
-#' @param delta Gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only
+#' @param delta Gene-specific biological cell-to-cell over-dispersion parameters \eqn{\delta_i}, biological genes only
 #' (vector of length \code{q.bio}, all elements must be positive numbers)
-#' @param phi Cell-specific mRNA content normalising constants \eqn{\phi[j]}
+#' @param phi Cell-specific mRNA content normalising constants \eqn{\phi_j}
 #' (vector of length \code{n}, all elements must be positive numbers and the sum of its elements must be equal to \code{n})
-#' @param s Cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
+#' @param s Cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s_j}
 #' (vector of length \code{n}, all elements must be positive numbers)
 #' @param theta Technical variability hyper-parameter \eqn{\theta} (must be positive)
 #'
@@ -34,9 +34,11 @@
 #' metadata(Data)$SpikeInput
 #' isSpike(Data)
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}, Nils Eling
 #'
-#' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 BASiCS_Sim<-function(
   mu,
   mu_spikes,
