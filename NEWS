@@ -403,11 +403,11 @@ version 1.0.12: (2017-08-14)
 - Updated vignette
 
 
-- DEVELOPMENT NOTES (potential changes):
+- DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
-  * Should we separate BASiCS_TestDE in two functions : different tol for DE ? 
-  * In plots, change axis labels to be text (no greek!)
+  * Should we separate BASiCS_TestDE in two functions : different tolerance for DE ? 
+  * In plots, change axis labels to be text (no greek)?
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
   * Implement change suggested by Giacomo Zanella
