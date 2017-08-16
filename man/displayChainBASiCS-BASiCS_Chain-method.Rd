@@ -10,16 +10,16 @@
 \S4method{displayChainBASiCS}{BASiCS_Chain}(object, Param = "mu")
 }
 \arguments{
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
 \item{Param}{Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
 \code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}.}
 }
 \value{
-The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 }
 \description{
-Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain-class}}
+Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain}}
 }
 \examples{
 
@@ -31,7 +31,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

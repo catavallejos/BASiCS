@@ -14,7 +14,7 @@ BASiCS_VarThresholdSearchLVG(Chain, VarThresholdsGrid, EFDR = 0.1,
   Progress = TRUE)
 }
 \arguments{
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
 \item{VarThresholdsGrid}{Grid of values for the variance contribution threshold (they must be contained in (0,1))}
 
@@ -44,7 +44,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

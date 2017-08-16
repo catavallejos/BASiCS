@@ -5,7 +5,7 @@
 #'
 #' @description Functions to detect highly and lowly variable genes
 #'
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #' @param VarThreshold Variance contribution threshold (must be a positive value, between 0 and 1)
 #' @param ProbThreshold Optional parameter. Posterior probability threshold (must be a positive value, between 0 and 1)
 #' @param EFDR Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)
@@ -40,7 +40,7 @@
 #' @details See vignette
 #'
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
@@ -139,7 +139,7 @@ BASiCS_DetectHVG <- function(Chain,
 BASiCS_DetectLVG <- function(Chain,
                              VarThreshold,
                              ProbThreshold = NULL,
-                             EFDR = 0.05,
+                             EFDR = 0.10,
                              OrderVariable = "Prob",
                              Plot = FALSE,
                              ...)

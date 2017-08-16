@@ -25,10 +25,10 @@ newBASiCS_Chain(mu, delta, phi, s, nu, theta)
 \item{theta}{MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
+An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 }
 \description{
-\code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain-class}} object from pre-computed MCMC chains.
+\code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain}} object from pre-computed MCMC chains.
 }
 \examples{
 
@@ -51,7 +51,7 @@ ChainNew <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

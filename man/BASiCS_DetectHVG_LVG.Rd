@@ -10,11 +10,11 @@
 BASiCS_DetectHVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
   OrderVariable = "Prob", Plot = FALSE, ...)
 
-BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.05,
+BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
   OrderVariable = "Prob", Plot = FALSE, ...)
 }
 \arguments{
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
 \item{VarThreshold}{Variance contribution threshold (must be a positive value, between 0 and 1)}
 
@@ -64,7 +64,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

@@ -14,7 +14,7 @@
 \item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}} function.}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.
+An object of class \code{\link[BASiCS]{BASiCS_Summary}}.
 }
 \description{
 For each of the BASiCS parameters (see Vallejos et al 2015), 

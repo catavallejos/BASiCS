@@ -6,17 +6,16 @@ Date: : 2017-08-15
 Author: Catalina Vallejos, Nils Eling, Sylvia Richardson, John Marioni
 Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
- heterogeneity in gene expression levels in seemingly homogeneous 
- populations of cells. However, these experiments are prone to high levels
- of technical noise, creating new challenges for identifying
- genes that show genuine heterogeneous expression within the population of
- cells under study. BASiCS (Bayesian Analysis of Single-Cell Sequencing
- data) is an integrated Bayesian hierarchical model to perform statistical 
- analyses of single-cell RNA sequencing datasets in the context of supervised
- experiments (where the groups of cells of interest are known a priori, 
- e.g. experimental conditions or cell types). BASiCS performs built-in 
- data normalisation (global scaling) and technical noise quantification 
- (based on spike-in genes). BASiCS provides an intuitive detection criterion for highly (or lowly) 
+ heterogeneity in gene expression levels in seemingly homogeneous populations 
+ of cells. However, these experiments are prone to high levels of technical noise, 
+ creating new challenges for identifying genes that show genuine heterogeneous 
+ expression within the population of cells under study. BASiCS (Bayesian Analysis 
+ of Single-Cell Sequencing data) is an integrated Bayesian hierarchical model to 
+ perform statistical analyses of single-cell RNA sequencing datasets in the context 
+ of supervised experiments (where the groups of cells of interest are known a priori, 
+ e.g. experimental conditions or cell types). BASiCS performs built-in data normalisation 
+ (global scaling) and technical noise quantification (based on spike-in genes). 
+ BASiCS provides an intuitive detection criterion for highly (or lowly) 
  variable genes within a single group of cells. Additionally, BASiCS can 
  compare gene expression patterns between two or more pre-specified groups of cells. 
  Unlike traditional differential expression tools, BASiCS quantifies changes 

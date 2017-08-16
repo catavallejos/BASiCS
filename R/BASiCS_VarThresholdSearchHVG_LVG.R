@@ -5,7 +5,7 @@
 #'
 #' @description Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
 #'
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #' @param VarThresholdsGrid Grid of values for the variance contribution threshold (they must be contained in (0,1))
 #' @param EFDR Target for expected false discovery rate related to HVG/LVG detection. Default: \code{EFDR = 0.10}.
 #' @param Progress If \code{Progress = TRUE}, partial output is printed in the console.
@@ -24,7 +24,7 @@
 #' }
 #'
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 

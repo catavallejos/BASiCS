@@ -15,7 +15,7 @@
 Prints a summary of the properties of \code{object}.
 }
 \description{
-'show' method for \code{\link[BASiCS]{BASiCS_Chain-class}} objects.
+'show' method for \code{\link[BASiCS]{BASiCS_Chain}} objects.
 }
 \examples{
 

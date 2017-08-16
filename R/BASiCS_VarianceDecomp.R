@@ -5,7 +5,7 @@
 #'
 #' @description Function to decompose total variability of gene expression into biological and technical components.
 #'
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #' @param OrderVariable Ordering variable for output. Possible values: \code{"GeneNames"}, \code{"BioVarGlobal"},
 #'  \code{"TechVarGlobal"} and \code{"ShotNoiseGlobal"}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated
@@ -27,7 +27,7 @@
 #'
 #' @details See vignette
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'

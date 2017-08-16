@@ -15,7 +15,7 @@
 Prints a summary of the properties of \code{object}.
 }
 \description{
-'show' method for \code{\link[BASiCS]{BASiCS_Summary-class}} objects.
+'show' method for \code{\link[BASiCS]{BASiCS_Summary}} objects.
 }
 \examples{
 

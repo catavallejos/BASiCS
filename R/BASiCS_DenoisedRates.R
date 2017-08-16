@@ -5,7 +5,7 @@
 #' @description Calculates normalised and denoised expression rates, by removing the effect of technical variation.
 #'
 #' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #' @param PrintProgress If \code{TRUE}, partial progress information is printed in the console.
 #' @param Propensities If \code{TRUE}, returns underlying expression propensitites \eqn{\rho_{ij}}. 
 #' Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.
@@ -19,7 +19,7 @@
 #'
 #' @return A matrix of denoised expression rates.
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'

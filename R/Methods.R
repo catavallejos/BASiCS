@@ -16,7 +16,7 @@ setGeneric("displaySummaryBASiCS", function(object, ...) standardGeneric("displa
 #' 
 #' @title 'show' method for BASiCS_Chain objects
 #' 
-#' @description 'show' method for \code{\link[BASiCS]{BASiCS_Chain-class}} objects.
+#' @description 'show' method for \code{\link[BASiCS]{BASiCS_Chain}} objects.
 #' 
 #' @param object A \code{BASiCS_Chain} object.
 #' 
@@ -66,7 +66,7 @@ setMethod("show",
 #' @param x A \code{BASiCS_Chain} object.
 #' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}} function. 
 #' 
-#' @return An object of class \code{\link[BASiCS]{BASiCS_Summary-class}}. 
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Summary}}. 
 #' 
 #' @examples 
 #' 
@@ -176,20 +176,20 @@ setMethod("plot",
 #' 
 #' @title Accessors for the slots of a BASiCS_Chain object
 #' 
-#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain}}
 #' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #' @param Param Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
 #' \code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}.
 #' 
-#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #' 
 #' @examples
 #' 
 #' # See
 #' help(BASiCS_MCMC)
 #'   
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
@@ -220,7 +220,7 @@ setMethod("displayChainBASiCS",
 #' 
 #' @title 'show' method for BASiCS_Summary objects
 #' 
-#' @description 'show' method for \code{\link[BASiCS]{BASiCS_Summary-class}} objects.
+#' @description 'show' method for \code{\link[BASiCS]{BASiCS_Summary}} objects.
 #' 
 #' @param object A \code{BASiCS_Summary} object.
 #' 
@@ -437,20 +437,20 @@ setMethod("plot",
 #' 
 #' @title Accessors for the slots of a BASiCS_Summary object
 #' 
-#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' @description Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary}}
 #' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Summary}}
 #' @param Param Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
 #' \code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}
 #'  
-#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' @return The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary}}
 #' 
 #' @examples
 #' 
 #' # See
 #' help(BASiCS_MCMC)
 #'   
-#' @seealso \code{\link[BASiCS]{BASiCS_Summary-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Summary}}
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 

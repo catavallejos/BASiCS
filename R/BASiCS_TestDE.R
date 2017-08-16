@@ -4,8 +4,8 @@
 #' 
 #' @description Function to assess changes in expression (mean and over-dispersion)
 #' 
-#' @param Chain1 an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the first group of cells
-#' @param Chain2 an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the second group of cells
+#' @param Chain1 an object of class \code{\link[BASiCS]{BASiCS_Chain}} containing parameter estimates for the first group of cells
+#' @param Chain2 an object of class \code{\link[BASiCS]{BASiCS_Chain}} containing parameter estimates for the second group of cells
 #' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
 #' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in biological over-dispersion (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
 #' @param EviThresholdM Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)
@@ -61,8 +61,8 @@
 #'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 #'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 #'   }
-#'  \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain-class}} object: \code{Chain1} after offset removal.}
-#'  \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain-class}} object: \code{Chain2} after offset removal
+#'  \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: \code{Chain1} after offset removal.}
+#'  \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: \code{Chain2} after offset removal
 #'  (this is only provided for completeness; \code{Chain2} is not affected by the offset).}
 #'  \item{\code{OffsetChain}}{MCMC chain calculated for the offset effect.}
 #'  \item{\code{Offset}}{Estimated offset (posterior median of \code{OffsetChain}). Default value set equal to 1 when offset correction is not performed.}

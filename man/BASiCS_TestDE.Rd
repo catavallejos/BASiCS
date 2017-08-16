@@ -11,9 +11,9 @@ BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
   GenesSelect = NULL, ...)
 }
 \arguments{
-\item{Chain1}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the first group of cells}
+\item{Chain1}{an object of class \code{\link[BASiCS]{BASiCS_Chain}} containing parameter estimates for the first group of cells}
 
-\item{Chain2}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}} containing parameter estimates for the second group of cells}
+\item{Chain2}{an object of class \code{\link[BASiCS]{BASiCS_Chain}} containing parameter estimates for the second group of cells}
 
 \item{EpsilonM}{Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 
@@ -84,8 +84,8 @@ This argument is necessary in order to have a meaningful EFDR calibration when t
   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
   }
- \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain-class}} object: \code{Chain1} after offset removal.}
- \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain-class}} object: \code{Chain2} after offset removal
+ \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: \code{Chain1} after offset removal.}
+ \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: \code{Chain2} after offset removal
  (this is only provided for completeness; \code{Chain2} is not affected by the offset).}
  \item{\code{OffsetChain}}{MCMC chain calculated for the offset effect.}
  \item{\code{Offset}}{Estimated offset (posterior median of \code{OffsetChain}). Default value set equal to 1 when offset correction is not performed.}

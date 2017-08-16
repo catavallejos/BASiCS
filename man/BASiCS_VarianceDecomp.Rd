@@ -8,7 +8,7 @@ BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal", Plot = TRUE,
   ...)
 }
 \arguments{
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
 \item{OrderVariable}{Ordering variable for output. Possible values: \code{"GeneNames"}, \code{"BioVarGlobal"},
 \code{"TechVarGlobal"} and \code{"ShotNoiseGlobal"}.}
@@ -43,7 +43,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

@@ -1,6 +1,6 @@
 #' @title Creates a BASiCS_Chain object from pre-computed MCMC chains
 #'
-#' @description \code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain-class}} object from pre-computed MCMC chains.
+#' @description \code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain}} object from pre-computed MCMC chains.
 #'
 #' @param mu MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes
 #' (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)
@@ -14,7 +14,7 @@
 #' (matrix with \code{n} columns, all elements must be positive numbers)
 #' @param theta MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)
 #'
-#' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 #'
 #' @examples
 #'
@@ -32,7 +32,7 @@
 #'                             phi = ChainPhi, s = ChainS, 
 #'                             nu = ChainNu, theta = ChainTheta)
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'

@@ -5,7 +5,7 @@
 #' @description Calculates denoised expression counts by removing cell-specific technical variation.
 #'
 #' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @examples
 #'
@@ -14,9 +14,10 @@
 #'
 #' @details See vignette
 #'
-#' @return A matrix of denoised expression counts.
+#' @return A matrix of denoised expression counts. These are defined as \eqn{X_{ij}/(\phi_j \nu_j)} for biological genes and 
+#' \eqn{X_{ij}/(\nu_j)} for spike-in genes.
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 

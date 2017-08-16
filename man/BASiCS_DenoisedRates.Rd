@@ -10,7 +10,7 @@ BASiCS_DenoisedRates(Data, Chain, PrintProgress = FALSE,
 \arguments{
 \item{Data}{an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
 
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
 \item{PrintProgress}{If \code{TRUE}, partial progress information is printed in the console.}
 
@@ -36,7 +36,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain-class}}
+\code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

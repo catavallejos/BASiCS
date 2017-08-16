@@ -58,7 +58,7 @@ If changed, it must be a list containing the following elements: \code{mu0},
 }}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
+An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 }
 \description{
 MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datasets using the model described in Vallejos et al (2015).

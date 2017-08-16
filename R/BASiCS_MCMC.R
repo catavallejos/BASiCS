@@ -48,7 +48,7 @@
 #' \code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
 #' }
 #'
-#' @return An object of class \code{\link[BASiCS]{BASiCS_Chain-class}}.
+#' @return An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 #'
 #' @examples
 #'
