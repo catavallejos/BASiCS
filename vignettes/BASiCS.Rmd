@@ -116,9 +116,6 @@ Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500,
 
 Typically, setting `N=20000`, `Thin=20` and `Burn=10000` leads to stable results. 
 
-<!---
-<span style="color:red"> NOTE: DEFAULT PRIOR FOR GAMMA DEFINED BY LOG-NORMAL DISTRIBUTION NOW. THIS IS REQUIRED FOR DIFFERENTIAL DISPERSION TESTS. </span>  ---> 
-
 ### Analysis for a single group of cells
 
 We illustrate this analysis using a small extract from the MCMC chain obtained in [2] when analysing the single cell samples provided in [5]. This is included within `BASiCS` as the `ChainSC` dataset. 
@@ -226,8 +223,6 @@ In the figures above:
 - Left panels show traceplots for the chains
 - Right panels show the autocorrelation function (see `?acf`)
 
-<!---<span style="color:red"> TO-DO 14: ADD ACF TO THESE PLOTS </span>---> 
-
 ## Summarising the posterior distribution
 
 To access the MCMC chains associated to individual parameter use the function `displayChainBASiCS`. For example, 
@@ -307,10 +302,6 @@ Alternative, denoised expression propensities $\hat{\rho}_{ij}$ can also be extr
 DenoisedProp = BASiCS_DenoisedRates(Data = Data, Chain = Chain, Propensities = TRUE)
 DenoisedProp[1:5, 1:5]
 ```
-
-<!---<span style="color:red"> TO-DO: DECIDE WHETHER IT MAKES SENSE TO HAVE BOTH OPTIONS </span>---> 
-
-<!---<span style="color:red"> TO-DO: IMPLEMENT THIS FUNCTION IN C++ SO THAT IS IT FAST </span>---> 
 
 # Methodology
 
