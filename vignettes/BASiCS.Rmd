@@ -176,17 +176,12 @@ In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
 
 **Note: due to the confounding between mean and over-dispersion that is typically observed in scRNA-seq datasets, we only assess changes in over-dispersion for those genes in which the mean does not change between the groups.**
 
-<!---<span style="color:red"> Note: previous versions of BASiCS used natural logarithm instead </.span> ---> 
-
 The resulting output list can be displayed using
 
 ```{r quick-start-DE, results='hide', eval = FALSE}
 head(Test$TableMean)
 head(Test$TableDisp)
 ```
-
-<!---<span style="color:red"> SHOULD WE SEPARATE TESTS FOR MEAN AND DISPERSION 
-INTO TWO SEPARATE FUNCTIONS? </span> ---> 
 
 # Additional details
 
