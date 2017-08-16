@@ -12,7 +12,8 @@ BASiCS_DenoisedCounts(Data, Chain)
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 }
 \value{
-A matrix of denoised expression counts. These are defined as \eqn{X_{ij}/(\phi_j \nu_j)} for biological genes and 
+A matrix of denoised expression counts. These are defined as 
+\eqn{X_{ij}/(\phi_j \nu_j)} for biological genes and 
 \eqn{X_{ij}/(\nu_j)} for spike-in genes.
 }
 \description{

@@ -14,20 +14,23 @@
 \arguments{
 \item{x}{A \code{BASiCS_Chain} object.}
 
-\item{Param}{Name of the slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
-\code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}}
+\item{Param}{Name of the slot to be used for the plot. Possible values: \code{'mu'}, \code{'delta'}, 
+\code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
 
-\item{Gene}{Specifies which gene is requested. Required only if \code{Param = "mu"} or \code{"delta"}}
+\item{Gene}{Specifies which gene is requested. Required only if \code{Param = 'mu'} or \code{'delta'}}
 
-\item{Cell}{Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}}
+\item{Cell}{Specifies which cell is requested. Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
 
-\item{Batch}{Specifies which batch is requested. Required only if \code{Param = "theta"}}
+\item{Batch}{Specifies which batch is requested. Required only if \code{Param = 'theta'}}
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 
 \item{xlab}{As in \code{\link[graphics]{par}}.}
 
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
+}
+\value{
+A plot object
 }
 \description{
 'plot' method for BASiCS_Chain objects

@@ -178,7 +178,7 @@ In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
 
 The resulting output list can be displayed using
 
-```{r quick-start-DE, results='hide', eval = FALSE}
+```{r quick-start-DE}
 head(Test$TableMean)
 head(Test$TableDisp)
 ```

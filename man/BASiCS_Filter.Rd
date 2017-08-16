@@ -45,11 +45,11 @@ the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
 
 set.seed(1)
 Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
-rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
+rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
 Tech = c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
 SpikeInput = rgamma(10,1,1)
-SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeInput)
+SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10), 'SpikeInput' = SpikeInput)
 
 Filter = BASiCS_Filter(Counts, Tech, SpikeInput,
                        MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,

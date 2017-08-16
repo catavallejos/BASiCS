@@ -15,17 +15,17 @@
 \arguments{
 \item{x}{A \code{BASiCS_Summary} object.}
 
-\item{Param}{Name of the slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
-\code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}}
+\item{Param}{Name of the slot to be used for the plot. Possible values: \code{'mu'}, \code{'delta'}, 
+\code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
 
-\item{Param2}{Name of the second slot to be used for the plot. Possible values: \code{"mu"}, \code{"delta"}, 
-\code{"phi"}, \code{"s"} and \code{"nu"} (combinations between gene-specific and cell-specific parameters are not admitted)}
+\item{Param2}{Name of the second slot to be used for the plot. Possible values: \code{'mu'}, \code{'delta'}, 
+\code{'phi'}, \code{'s'} and \code{'nu'} (combinations between gene-specific and cell-specific parameters are not admitted)}
 
-\item{Genes}{Specifies which genes are requested. Required only if \code{Param = "mu"} or \code{"delta"}}
+\item{Genes}{Specifies which genes are requested. Required only if \code{Param = 'mu'} or \code{'delta'}}
 
-\item{Cells}{Specifies which cells are requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}}
+\item{Cells}{Specifies which cells are requested. Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
 
-\item{Batches}{Specifies which batches are requested. Required only if \code{Param = "theta"}}
+\item{Batches}{Specifies which batches are requested. Required only if \code{Param = 'theta'}}
 
 \item{xlab}{As in \code{\link[graphics]{par}}.}
 
@@ -44,6 +44,9 @@
 \item{SmoothPlot}{Logical parameter. If \code{TRUE}, transparency will be added to the color of the dots.}
 
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
+}
+\value{
+A plot object
 }
 \description{
 'plot' method for BASiCS_Summary objects

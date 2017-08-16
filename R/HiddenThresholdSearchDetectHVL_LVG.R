@@ -4,9 +4,9 @@ HiddenThresholdSearchDetectHVG_LVG <- function(ProbThreshold,
                                                Prob, 
                                                EFDR)
 {
-  # If EviThreshold is not set a priori (search)
   if(length(ProbThreshold) == 0)
   {
+    # If EviThreshold is not set a priori (search)
     ProbThresholds <- seq(0.5,0.9995,by=0.0005)
     
     EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, VarThreshold = VarThreshold, Prob = Prob)
@@ -40,15 +40,15 @@ HiddenThresholdSearchDetectHVG_LVG <- function(ProbThreshold,
         OptThreshold <- c(ProbThresholds[1], EFDRgrid[1], EFNRgrid[1])
       }
       
-      # Message when different to desired EFDR is large
       if( abs(OptThreshold[2] - EFDR) > 0.025 )
       {
+        # Message when different to desired EFDR is large
         message("For the given variance contribution threshold, it is not possible 
                 to find a probability threshold (>0.5) that achieves the desired EFDR level 
                 (tolerance +- 0.025). The output of this function reflects the 
                 closest possible value. \n")         
       }  
-      }
+    }
     else
     {
       message("For the given variance contribution threshold, it is not possible 
@@ -56,10 +56,10 @@ HiddenThresholdSearchDetectHVG_LVG <- function(ProbThreshold,
               threshold will be set at 0.5. \n")    
       OptThreshold <- c(0.5, NA, NA)  
     }
-      }
-  # If EviThreshold is set a priori
+  }
   else
   {
+    # If EviThreshold is set a priori
     EFDR = HiddenEFDR(ProbThreshold, VarThreshold, Prob)
     EFNR = HiddenEFNR(ProbThreshold, VarThreshold, Prob)
     OptThreshold <- c(ProbThreshold, EFDR, EFNR)

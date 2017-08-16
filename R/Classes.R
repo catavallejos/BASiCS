@@ -28,36 +28,31 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
 #' @references Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
-setClass("BASiCS_Chain",
-         representation = representation(
-           mu = "matrix",
-           delta = "matrix",
-           phi = "matrix",
-           s = "matrix",
-           nu = "matrix",
-           theta = "matrix"),
-         validity = function(object){
-           errors <- character()
-           
-           if(length(object@mu)==0 | length(object@delta)==0 | 
-              length(object@phi)==0 | length(object@s)==0 | 
-              length(object@nu)==0 | length(object@theta)==0) {errors <-c(errors,"One or more slots are missing"); stop(errors)}   
-           
-           N = nrow(object@mu)
-           n = ncol(object@phi)
-           if(nrow(object@delta) != N |
-              nrow(object@phi) != N | nrow(object@s) != N |
-              nrow(object@nu) != N | nrow(object@theta) != N |
-              ncol(object@mu) != ncol(object@delta) |
-              ncol(object@s) != n | ncol(object@nu) != n) {errors <-c(errors,"Slots' dimensions are not compatible")}
-           
-           if(sum(!is.finite(object@mu)) + sum(!is.finite(object@delta)) +
-              sum(!is.finite(object@phi)) + sum(!is.finite(object@s)) +
-              sum(!is.finite(object@nu)) + sum(!is.finite(object@theta))) {errors <-c(errors,"One or more of the slots contains NAs or Infinite values")}
-           
-           if (length(errors) == 0) TRUE else errors
-         }
-)
+setClass("BASiCS_Chain", representation = representation(mu = "matrix", delta = "matrix", phi = "matrix", s = "matrix", 
+    nu = "matrix", theta = "matrix"), validity = function(object) {
+    errors <- character()
+    
+    if (length(object@mu) == 0 | length(object@delta) == 0 | length(object@phi) == 0 | length(object@s) == 0 | length(object@nu) == 
+        0 | length(object@theta) == 0) {
+        errors <- c(errors, "One or more slots are missing")
+        stop(errors)
+    }
+    
+    N = nrow(object@mu)
+    n = ncol(object@phi)
+    if (nrow(object@delta) != N | nrow(object@phi) != N | nrow(object@s) != N | nrow(object@nu) != N | nrow(object@theta) != 
+        N | ncol(object@mu) != ncol(object@delta) | ncol(object@s) != n | ncol(object@nu) != n) {
+        errors <- c(errors, "Slots' dimensions are not compatible")
+    }
+    
+    if (sum(!is.finite(object@mu)) + sum(!is.finite(object@delta)) + sum(!is.finite(object@phi)) + sum(!is.finite(object@s)) + 
+        sum(!is.finite(object@nu)) + sum(!is.finite(object@theta))) {
+        errors <- c(errors, "One or more of the slots contains NAs or Infinite values")
+    }
+    
+    if (length(errors) == 0) 
+        TRUE else errors
+})
 
 
 #' @name BASiCS_Summary
@@ -82,18 +77,11 @@ setClass("BASiCS_Chain",
 #' @description Container of a summary of a \code{\link[BASiCS]{BASiCS_Chain}} object.  
 #' In each slot, first column contains posterior medians; second and third columns respectively contain the 
 #' lower and upper limits of an high posterior density interval (for a given probability).
-setClass("BASiCS_Summary",
-         representation = representation(
-           mu = "matrix",
-           delta = "matrix",
-           phi = "matrix",
-           s = "matrix",
-           nu = "matrix",
-           theta = "matrix"),
-         validity = function(object){
-           if(sum(!is.finite(object@mu))>0 | sum(!is.finite(object@delta))>0 | 
-                sum(!is.finite(object@phi))>0 | sum(!is.finite(object@s))>0 |
-                sum(!is.finite(object@nu))>0 | sum(!is.finite(object@theta))>0) stop("Invalid slots") 
-           else {TRUE} 
-         }
-)
+setClass("BASiCS_Summary", representation = representation(mu = "matrix", delta = "matrix", phi = "matrix", s = "matrix", 
+    nu = "matrix", theta = "matrix"), validity = function(object) {
+    if (sum(!is.finite(object@mu)) > 0 | sum(!is.finite(object@delta)) > 0 | sum(!is.finite(object@phi)) > 0 | sum(!is.finite(object@s)) > 
+        0 | sum(!is.finite(object@nu)) > 0 | sum(!is.finite(object@theta)) > 0) 
+        stop("Invalid slots") else {
+        TRUE
+    }
+})

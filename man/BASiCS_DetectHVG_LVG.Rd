@@ -22,8 +22,8 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
 
 \item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection (default = 0.10)}
 
-\item{OrderVariable}{Ordering variable for output. Possible values: \code{"GeneIndex"}, \code{"Mu"},
-\code{"Delta"}, \code{"Sigma"} and \code{"Prob"}.}
+\item{OrderVariable}{Ordering variable for output. Possible values: \code{'GeneIndex'}, \code{'Mu'},
+\code{'Delta'}, \code{'Sigma'} and \code{'Prob'}.}
 
 \item{Plot}{If \code{Plot = TRUE} error control and expression versus HVG/LVG probability plots are generated}
 

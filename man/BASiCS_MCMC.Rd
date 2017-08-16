@@ -79,47 +79,47 @@ Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, PrintProgress = FALSE)
 data(ChainSC)
 
 # `displayChainBASiCS` can be used to extract information from this output. For example:
-head(displayChainBASiCS(ChainSC, Param = "mu"))
+head(displayChainBASiCS(ChainSC, Param = 'mu'))
 
 # Traceplot (examples only)
-plot(ChainSC, Param = "mu", Gene = 1)
-plot(ChainSC, Param = "phi", Cell = 1)
-plot(ChainSC, Param = "theta", Batch = 1)
+plot(ChainSC, Param = 'mu', Gene = 1)
+plot(ChainSC, Param = 'phi', Cell = 1)
+plot(ChainSC, Param = 'theta', Batch = 1)
 
 # Calculating posterior medians and 95\% HPD intervals
 ChainSummary <- Summary(ChainSC)
 
 # `displaySummaryBASiCS` can be used to extract information from this output. For example:
-head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
+head(displaySummaryBASiCS(ChainSummary, Param = 'mu'))
 
 # Graphical display of posterior medians and 95\% HPD intervals (examples only)
-plot(ChainSummary, Param = "mu", main = "All genes")
-plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-plot(ChainSummary, Param = "phi", main = "All cells")
-plot(ChainSummary, Param = "phi", Cells = 1:5, main = "First 5 cells")
-plot(ChainSummary, Param = "theta")
+plot(ChainSummary, Param = 'mu', main = 'All genes')
+plot(ChainSummary, Param = 'mu', Genes = 1:10, main = 'First 10 genes')
+plot(ChainSummary, Param = 'phi', main = 'All cells')
+plot(ChainSummary, Param = 'phi', Cells = 1:5, main = 'First 5 cells')
+plot(ChainSummary, Param = 'theta')
 
 # To constrast posterior medians of cell-specific parameters (example only)
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = "phi", Param2 = "s", SmoothPlot = FALSE)
+plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = FALSE)
 # Recommended for large numbers of cells
-plot(ChainSummary, Param = "phi", Param2 = "s", SmoothPlot = TRUE) 
+plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = TRUE) 
 
 # To constrast posterior medians of gene-specific parameters
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = FALSE)
 # Recommended
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE) 
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = TRUE) 
 
 # Highly and lowly variable genes detection (within a single group of cells)
 DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, EFDR = 0.10, Plot = TRUE)
 DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, EFDR = 0.10, Plot = TRUE)
 
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
 with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
-       pch = 16, col = "red", cex = 1))
+       pch = 16, col = 'red', cex = 1))
 with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
-       pch = 16, col = "blue", cex = 1))
+       pch = 16, col = 'blue', cex = 1))
 
 # If variance thresholds are not fixed
 BASiCS_VarThresholdSearchHVG(ChainSC, VarThresholdsGrid = seq(0.55,0.65,by=0.01), EFDR = 0.10)

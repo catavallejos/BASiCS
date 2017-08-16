@@ -1,5 +1,6 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
+importFrom("stats", "acf")
 importFrom("Rcpp", "evalCpp")
 importFrom("coda", "HPDinterval")
 importFrom("methods", "Summary")

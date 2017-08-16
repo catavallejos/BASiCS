@@ -23,11 +23,11 @@ BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
 
 \item{EviThresholdD}{Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over-dispersion (must be a positive value, between 0 and 1)}
 
-\item{OrderVariable}{Ordering variable for output. Possible values: \code{"GeneIndex"}, \code{"GeneNames"} and \code{"Prob"}.}
+\item{OrderVariable}{Ordering variable for output. Possible values: \code{'GeneIndex'}, \code{'GeneNames'} and \code{'Prob'}.}
 
-\item{GroupLabel1}{Label assigned to reference group. Default: \code{GroupLabel1 = "Group1"}}
+\item{GroupLabel1}{Label assigned to reference group. Default: \code{GroupLabel1 = 'Group1'}}
 
-\item{GroupLabel2}{Label assigned to reference group. Default: \code{GroupLabel2 = "Group2"}}
+\item{GroupLabel2}{Label assigned to reference group. Default: \code{GroupLabel2 = 'Group2'}}
 
 \item{Plot}{If \code{Plot = TRUE}, MA and volcano plots are generated.}
 
@@ -101,7 +101,7 @@ data(ChainSC)
 data(ChainRNA)
 
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
-                      GroupLabel1 = "SC", GroupLabel2 = "P&S",
+                      GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5), OffSet = TRUE)
                       
 # Results for the differential mean test

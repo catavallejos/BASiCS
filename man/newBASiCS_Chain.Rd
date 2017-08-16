@@ -35,12 +35,12 @@ An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 Data = makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5)
 
-ChainMu = displayChainBASiCS(Chain, "mu")
-ChainDelta = displayChainBASiCS(Chain, "delta")
-ChainPhi = displayChainBASiCS(Chain, "phi")
-ChainS = displayChainBASiCS(Chain, "s")
-ChainNu = displayChainBASiCS(Chain, "nu")
-ChainTheta = displayChainBASiCS(Chain, "theta")
+ChainMu = displayChainBASiCS(Chain, 'mu')
+ChainDelta = displayChainBASiCS(Chain, 'delta')
+ChainPhi = displayChainBASiCS(Chain, 'phi')
+ChainS = displayChainBASiCS(Chain, 's')
+ChainNu = displayChainBASiCS(Chain, 'nu')
+ChainTheta = displayChainBASiCS(Chain, 'theta')
 
 ChainNew <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
                             phi = ChainPhi, s = ChainS, 

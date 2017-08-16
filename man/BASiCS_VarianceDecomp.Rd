@@ -10,8 +10,8 @@ BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal", Plot = TRUE,
 \arguments{
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
-\item{OrderVariable}{Ordering variable for output. Possible values: \code{"GeneNames"}, \code{"BioVarGlobal"},
-\code{"TechVarGlobal"} and \code{"ShotNoiseGlobal"}.}
+\item{OrderVariable}{Ordering variable for output. Possible values: \code{'GeneNames'}, \code{'BioVarGlobal'},
+\code{'TechVarGlobal'} and \code{'ShotNoiseGlobal'}.}
 
 \item{Plot}{If \code{TRUE}, a barplot of the variance decomposition (global and by batches, if any) is generated}
 

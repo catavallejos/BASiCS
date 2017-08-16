@@ -24,8 +24,8 @@ a \code{\link[BASiCS]{BASiCS_Chain}} object
 Data = makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
                            StoreChains = TRUE, StoreDir = tempdir(), 
-                           RunName = "Test")
-ChainLoad <- BASiCS_LoadChain(RunName = "Test", StoreDir = tempdir())
+                           RunName = 'Test')
+ChainLoad <- BASiCS_LoadChain(RunName = 'Test', StoreDir = tempdir())
 
 }
 \references{

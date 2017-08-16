@@ -27,11 +27,11 @@
 #'
 #' set.seed(1)
 #' Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
-#' rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
+#' rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
 #' Tech = c(rep(FALSE,40),rep(TRUE,10))
 #' set.seed(2)
 #' SpikeInput = rgamma(10,1,1)
-#' SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), "SpikeInput" = SpikeInput)
+#' SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10), 'SpikeInput' = SpikeInput)
 #'
 #' Filter = BASiCS_Filter(Counts, Tech, SpikeInput,
 #'                        MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
@@ -46,54 +46,45 @@
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #' 
 #' Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
-BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL,
-                          MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
-                          MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
-{
-  q = length(Tech)
-  q.bio = q - sum(SpikeInput)
-  n = ncol(Counts)
-  
-  CellIndex = 1:n
-  GeneIndex = 1:q
-  
-  # Remove cells with zero counts in either biological or technical genes
-  IncludeCells = ifelse(apply(Counts[!Tech,],2,sum)>0 & apply(Counts[Tech,],2,sum)>0, TRUE, FALSE)
-  if(sum(IncludeCells) == 0) stop('All cells have zero biological or technical counts (across all transcripts) \n')
-  IncludeCells = ifelse(apply(Counts,2,sum) >= MinTotalCountsPerCell, IncludeCells, F)
-  Counts1 = Counts[,IncludeCells]
-  
-  # Remove transcripts with zero counts across all cells
-  IncludeBio = ifelse(apply(Counts1[!Tech,],1,sum) >= MinTotalCountsPerGene, TRUE, FALSE)
-  IncludeTech = ifelse(apply(Counts1[Tech,],1,sum) >= MinTotalCountsPerGene, TRUE, FALSE)
-  
-  # Remove transcripts expressed in less than 'MinExpressedCells' cells
-  NonZero <- I(Counts1>0)
-  IncludeBio = ifelse(apply(NonZero[!Tech,], 1, sum) >= MinCellsWithExpression, IncludeBio, FALSE)
-  IncludeTech = ifelse(apply(NonZero[Tech,], 1, sum) >= MinCellsWithExpression, IncludeTech, FALSE)
-  
-  # Remove transcripts with low counts in the cells where they are expressed
-  if(min(apply(NonZero[!Tech,], 1, sum)) == 0 & MinCellsWithExpression == 0) warning("Some genes have zero counts in all cells. These should be removed before running the analysis (use 'MinCellsWithExpression' > 0).")
-  IncludeBio = ifelse(apply(Counts1[!Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[!Tech,], 1, sum), IncludeBio, FALSE)
-  IncludeTech = ifelse(apply(Counts1[Tech,], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[Tech,], 1, sum), IncludeTech, FALSE)
-
-  if(!is.null(BatchInfo))
-  {
-    list("Counts" = Counts1[c(IncludeBio,IncludeTech),], 
-         "Tech" = Tech[c(IncludeBio,IncludeTech)],
-         "SpikeInput" = SpikeInput[IncludeTech], 
-         "BatchInfo" = BatchInfo[IncludeCells],
-         "IncludeGenes" = c(IncludeBio,IncludeTech), 
-         "IncludeCells" = IncludeCells)
-  }
-  else
-  {
-    list("Counts" = Counts1[c(IncludeBio,IncludeTech),], 
-         "Tech" = Tech[c(IncludeBio,IncludeTech)],
-         "SpikeInput" = SpikeInput[IncludeTech], 
-         "BatchInfo" = NULL,
-         "IncludeGenes" = c(IncludeBio,IncludeTech), 
-         "IncludeCells" = IncludeCells)    
-  }
-  
+BASiCS_Filter <- function(Counts, Tech, SpikeInput, BatchInfo = NULL, MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2, 
+    MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2) {
+    q = length(Tech)
+    q.bio = q - sum(SpikeInput)
+    n = ncol(Counts)
+    
+    CellIndex = 1:n
+    GeneIndex = 1:q
+    
+    # Remove cells with zero counts in either biological or technical genes
+    IncludeCells = ifelse(apply(Counts[!Tech, ], 2, sum) > 0 & apply(Counts[Tech, ], 2, sum) > 0, TRUE, FALSE)
+    if (sum(IncludeCells) == 0) 
+        stop("All cells have zero biological or technical counts (across all transcripts) \n")
+    IncludeCells = ifelse(apply(Counts, 2, sum) >= MinTotalCountsPerCell, IncludeCells, FALSE)
+    Counts1 = Counts[, IncludeCells]
+    
+    # Remove transcripts with zero counts across all cells
+    IncludeBio = ifelse(apply(Counts1[!Tech, ], 1, sum) >= MinTotalCountsPerGene, TRUE, FALSE)
+    IncludeTech = ifelse(apply(Counts1[Tech, ], 1, sum) >= MinTotalCountsPerGene, TRUE, FALSE)
+    
+    # Remove transcripts expressed in less than 'MinExpressedCells' cells
+    NonZero <- I(Counts1 > 0)
+    IncludeBio = ifelse(apply(NonZero[!Tech, ], 1, sum) >= MinCellsWithExpression, IncludeBio, FALSE)
+    IncludeTech = ifelse(apply(NonZero[Tech, ], 1, sum) >= MinCellsWithExpression, IncludeTech, FALSE)
+    
+    # Remove transcripts with low counts in the cells where they are expressed
+    if (min(apply(NonZero[!Tech, ], 1, sum)) == 0 & MinCellsWithExpression == 0) 
+        warning("Some genes have zero counts in all cells. These should be removed before running the analysis (use 'MinCellsWithExpression' > 0).")
+    IncludeBio = ifelse(apply(Counts1[!Tech, ], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[!Tech, 
+        ], 1, sum), IncludeBio, FALSE)
+    IncludeTech = ifelse(apply(Counts1[Tech, ], 1, sum) >= MinAvCountsPerCellsWithExpression * apply(NonZero[Tech, 
+        ], 1, sum), IncludeTech, FALSE)
+    
+    if (!is.null(BatchInfo)) {
+        list(Counts = Counts1[c(IncludeBio, IncludeTech), ], Tech = Tech[c(IncludeBio, IncludeTech)], SpikeInput = SpikeInput[IncludeTech], 
+            BatchInfo = BatchInfo[IncludeCells], IncludeGenes = c(IncludeBio, IncludeTech), IncludeCells = IncludeCells)
+    } else {
+        list(Counts = Counts1[c(IncludeBio, IncludeTech), ], Tech = Tech[c(IncludeBio, IncludeTech)], SpikeInput = SpikeInput[IncludeTech], 
+            BatchInfo = NULL, IncludeGenes = c(IncludeBio, IncludeTech), IncludeCells = IncludeCells)
+    }
+    
 }

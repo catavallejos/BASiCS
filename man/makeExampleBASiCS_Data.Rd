@@ -24,7 +24,7 @@ model in BASiCS (Vallejos et al, 2015). This is used to illustrate BASiCS in som
 }
 \examples{
 Data = makeExampleBASiCS_Data()
-is(Data, "SingleCellExperiment")
+is(Data, 'SingleCellExperiment')
 
 }
 \references{

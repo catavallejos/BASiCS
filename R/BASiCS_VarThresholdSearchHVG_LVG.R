@@ -32,62 +32,55 @@
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
-BASiCS_VarThresholdSearchHVG=function(
-  Chain,
-  VarThresholdsGrid, #
-  EFDR = 0.10,
-  Progress = TRUE)
-{
-  if(!is(Chain,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
-    stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
-  
-  Table=matrix(0,nrow=length(VarThresholdsGrid),ncol=5)
-  colnames(Table)=c("Var. Threshold (%)","EFDR (%)", "EFNR (%)","Optimal evidence thres.","# Detected genes")
-  
-  for(i in 1:length(VarThresholdsGrid))
-  {
-    VarThreshold=VarThresholdsGrid[i]
+BASiCS_VarThresholdSearchHVG = function(Chain, VarThresholdsGrid, EFDR = 0.1, Progress = TRUE) {
+    if (!is(Chain, "BASiCS_Chain")) 
+        stop("'object' is not a BASiCS_Chain class object.")
+    if (sum(VarThresholdsGrid < 0) > 0 | sum(VarThresholdsGrid > 1) > 0 | sum(!is.finite(VarThresholdsGrid)) > 0) 
+        stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
     
-    if(Progress) {message(paste0("Evaluating variance contribution threshold = ",100*VarThreshold," % ... \n"))}
+    Table = matrix(0, nrow = length(VarThresholdsGrid), ncol = 5)
+    colnames(Table) = c("Var. Threshold (%)", "EFDR (%)", "EFNR (%)", "Optimal evidence thres.", "# Detected genes")
     
-    suppressMessages(DetectHVG <- BASiCS_DetectHVG(Chain, EFDR = EFDR, VarThreshold = VarThreshold))
-    
-    Table[i,]=c(100*VarThreshold, round(100*DetectHVG$EFDR,2),
-                round(100*DetectHVG$EFNR,2),
-                DetectHVG$EviThreshold,sum(as.numeric(DetectHVG$Table[,7])))
-  }
-  return(Table)
+    for (i in 1:length(VarThresholdsGrid)) {
+        VarThreshold = VarThresholdsGrid[i]
+        
+        if (Progress) {
+            message(paste0("Evaluating variance contribution threshold = ", 100 * VarThreshold, " % ... \n"))
+        }
+        
+        suppressMessages(DetectHVG <- BASiCS_DetectHVG(Chain, EFDR = EFDR, VarThreshold = VarThreshold))
+        
+        Table[i, ] = c(100 * VarThreshold, round(100 * DetectHVG$EFDR, 2), round(100 * DetectHVG$EFNR, 2), DetectHVG$EviThreshold, 
+            sum(as.numeric(DetectHVG$Table[, 7])))
+    }
+    return(Table)
 }
 
 #' @name BASiCS_VarThresholdSearchLVG
 #' @aliases BASiCS_VarThresholdSearchLVG BASiCS_VarThresholdSearchHVG_LVG
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
-BASiCS_VarThresholdSearchLVG=function(
-  Chain,
-  VarThresholdsGrid, # Range of values for the variance contribution threshold (they must be contained in (0,1))
-  EFDR = 0.10,
-  Progress = TRUE)
-{
-  
-  if(!is(Chain,"BASiCS_Chain")) stop("'object' is not a BASiCS_Chain class object.")
-  if(sum(VarThresholdsGrid<0)>0 | sum(VarThresholdsGrid>1)>0 | sum(!is.finite(VarThresholdsGrid))>0 )
-    stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
-  
-  Table=matrix(0,nrow=length(VarThresholdsGrid),ncol=5)
-  colnames(Table)=c("VarThres (%)","EFDR (%)", "EFNR (%)","Optimal evi thres","# Detected genes")
-  
-  for(i in 1:length(VarThresholdsGrid))
-  {
-    VarThreshold=VarThresholdsGrid[i]
+BASiCS_VarThresholdSearchLVG = function(Chain, VarThresholdsGrid, EFDR = 0.1, Progress = TRUE) {
     
-    if(Progress) {message(paste0("Evaluating variance contribution threshold = ",100*VarThreshold," % ... \n"))}
+    if (!is(Chain, "BASiCS_Chain")) 
+        stop("'object' is not a BASiCS_Chain class object.")
+    if (sum(VarThresholdsGrid < 0) > 0 | sum(VarThresholdsGrid > 1) > 0 | sum(!is.finite(VarThresholdsGrid)) > 0) 
+        stop("Variance contribution thresholds for HVG and LVG detection must be contained in (0,1).")
     
-    suppressMessages(DetectLVG <- BASiCS_DetectLVG(Chain, EFDR = EFDR, VarThreshold = VarThreshold))
+    Table = matrix(0, nrow = length(VarThresholdsGrid), ncol = 5)
+    colnames(Table) = c("VarThres (%)", "EFDR (%)", "EFNR (%)", "Optimal evi thres", "# Detected genes")
     
-    Table[i,]=c(100*VarThreshold, round(100*DetectLVG$EFDR,2),round(100*DetectLVG$EFNR,2),
-                DetectLVG$EviThreshold,sum(as.numeric(DetectLVG$Table[,7])))
-    
-  }
-  return(Table)
+    for (i in 1:length(VarThresholdsGrid)) {
+        VarThreshold = VarThresholdsGrid[i]
+        
+        if (Progress) {
+            message(paste0("Evaluating variance contribution threshold = ", 100 * VarThreshold, " % ... \n"))
+        }
+        
+        suppressMessages(DetectLVG <- BASiCS_DetectLVG(Chain, EFDR = EFDR, VarThreshold = VarThreshold))
+        
+        Table[i, ] = c(100 * VarThreshold, round(100 * DetectLVG$EFDR, 2), round(100 * DetectLVG$EFNR, 2), DetectLVG$EviThreshold, 
+            sum(as.numeric(DetectLVG$Table[, 7])))
+        
+    }
+    return(Table)
 }

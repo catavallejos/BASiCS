@@ -66,47 +66,47 @@
 #' data(ChainSC)
 #' 
 #' # `displayChainBASiCS` can be used to extract information from this output. For example:
-#' head(displayChainBASiCS(ChainSC, Param = "mu"))
+#' head(displayChainBASiCS(ChainSC, Param = 'mu'))
 #'
 #' # Traceplot (examples only)
-#' plot(ChainSC, Param = "mu", Gene = 1)
-#' plot(ChainSC, Param = "phi", Cell = 1)
-#' plot(ChainSC, Param = "theta", Batch = 1)
+#' plot(ChainSC, Param = 'mu', Gene = 1)
+#' plot(ChainSC, Param = 'phi', Cell = 1)
+#' plot(ChainSC, Param = 'theta', Batch = 1)
 #'
 #' # Calculating posterior medians and 95% HPD intervals
 #' ChainSummary <- Summary(ChainSC)
 #' 
 #' # `displaySummaryBASiCS` can be used to extract information from this output. For example:
-#' head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
+#' head(displaySummaryBASiCS(ChainSummary, Param = 'mu'))
 #'
 #' # Graphical display of posterior medians and 95% HPD intervals (examples only)
-#' plot(ChainSummary, Param = "mu", main = "All genes")
-#' plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-#' plot(ChainSummary, Param = "phi", main = "All cells")
-#' plot(ChainSummary, Param = "phi", Cells = 1:5, main = "First 5 cells")
-#' plot(ChainSummary, Param = "theta")
+#' plot(ChainSummary, Param = 'mu', main = 'All genes')
+#' plot(ChainSummary, Param = 'mu', Genes = 1:10, main = 'First 10 genes')
+#' plot(ChainSummary, Param = 'phi', main = 'All cells')
+#' plot(ChainSummary, Param = 'phi', Cells = 1:5, main = 'First 5 cells')
+#' plot(ChainSummary, Param = 'theta')
 #'
 #' # To constrast posterior medians of cell-specific parameters (example only)
 #' par(mfrow = c(1,2))
-#' plot(ChainSummary, Param = "phi", Param2 = "s", SmoothPlot = FALSE)
+#' plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = FALSE)
 #' # Recommended for large numbers of cells
-#' plot(ChainSummary, Param = "phi", Param2 = "s", SmoothPlot = TRUE) 
+#' plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = TRUE) 
 #'
 #' # To constrast posterior medians of gene-specific parameters
 #' par(mfrow = c(1,2))
-#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
+#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = FALSE)
 #' # Recommended
-#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE) 
+#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = TRUE) 
 #'
 #' # Highly and lowly variable genes detection (within a single group of cells)
 #' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, EFDR = 0.10, Plot = TRUE)
 #' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, EFDR = 0.10, Plot = TRUE)
 #'
-#' plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", col = 8)
+#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
 #' with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
-#'        pch = 16, col = "red", cex = 1))
+#'        pch = 16, col = 'red', cex = 1))
 #' with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
-#'        pch = 16, col = "blue", cex = 1))
+#'        pch = 16, col = 'blue', cex = 1))
 #'
 #' # If variance thresholds are not fixed
 #' BASiCS_VarThresholdSearchHVG(ChainSC, VarThresholdsGrid = seq(0.55,0.65,by=0.01), EFDR = 0.10)
@@ -121,330 +121,284 @@
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
 #' 
 #' Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
-BASiCS_MCMC <- function(
-  Data,
-  N,
-  Thin,
-  Burn,
-  ...)
-{
-  
-  
-  if(!is(Data,"SingleCellExperiment")) stop("'Data' is not a SingleCellExperiment class object.")
-  # Add extra checks to ensure spike-ins info, etc is provided
-  
-  # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
-  q = length(isSpike(Data)); q.bio = sum(!isSpike(Data)); n = dim(assay(Data))[2]
-  
-  args <- list(...)
-  
-  if(!("PriorDelta" %in% names(args))) {message(" --------------------------------------------------------------------------- \n IMPORTANT: by default, the argument PriorDelta is now set equal to 'log-normal' (recommended value). \n Vallejos et al (2015) used a 'gamma' prior instead.  \n --------------------------------------------------------------------------- \n" )}
-  
-  
-  if("PriorParam" %in% names(args)) {PriorParam = args$PriorParam}
-  else { PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)}
-  AR = ifelse("AR" %in% names(args),args$AR, 0.44)
-  StopAdapt = ifelse("StopAdapt" %in% names(args),args$StopAdapt, Burn)
-  StoreChains = ifelse("StoreChains" %in% names(args),args$StoreChains, F)
-  StoreAdapt = ifelse("StoreAdapt" %in% names(args),args$StoreAdapt, F)
-  StoreDir = ifelse("StoreDir" %in% names(args),args$StoreDir, getwd())
-  RunName = ifelse("RunName" %in% names(args),args$RunName, "")
-  PrintProgress = ifelse("PrintProgress" %in% names(args),args$PrintProgress, TRUE)
-  PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "gamma")
-  
-  if(!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) stop("Invalid parameter values.")
-  if(!(N%%Thin==0 & N>=max(4,Thin))) stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
-  if(!(Thin%%1==0 & Thin>=2)) stop("Please use an integer value for Thin (Thin>=2).")
-  if(!(Burn%%Thin==0 & Burn<N & Burn>=1)) stop("Please use an integer value for Burn. It must also be lower than N and a multiple of thin (Burn>=1).")
-  
-  if(!(PriorParam$s2.mu>0  & length(PriorParam$s2.mu) == 1 &
-       PriorParam$s2.delta>0  & length(PriorParam$s2.delta) == 1 &
-       PriorParam$a.delta>0  & length(PriorParam$a.delta) == 1 &
-       PriorParam$b.delta>0  & length(PriorParam$b.delta) == 1 &
-       all(PriorParam$p.phi>0) & length(PriorParam$p.phi) == n &
-       PriorParam$a.s>0      & length(PriorParam$a.s) == 1 &
-       PriorParam$b.s>0      & length(PriorParam$b.s) == 1 &
-       PriorParam$a.theta>0  & length(PriorParam$a.theta) == 1 &
-       PriorParam$b.theta>0) & length(PriorParam$b.theta) == 1) stop("Invalid prior hyper-parameter values.")
-  
-  if(!(AR>0 & AR<1 & length(AR) == 1)) stop("Invalid AR value. Recommended value: AR = 0.44.")
-  if(!(StopAdapt>0)) stop("Invalid StopAdapt value.")
-  if(!(is.logical(StoreChains) & length(StoreChains) == 1)) stop("Invalid StoreChains value.")
-  if(!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) stop("Invalid StoreAdapt value.")
-  if(!(file.info(StoreDir)["isdir"])) stop("Invalid StoreDir value.")
-  if(!(PriorDelta %in% c("gamma","log-normal"))) stop("Invalid PriorDelta value.")
-  
-  PriorDeltaNum = ifelse(PriorDelta == "gamma", 1, 2)
-  
-  # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
-  sum.bycell.all<-apply(assay(Data),1,sum)
-  sum.bycell.bio<-apply(assay(Data)[1:q.bio,],1,sum)
-  sum.bygene.all<-apply(assay(Data),2,sum)
-  sum.bygene.bio<-apply(assay(Data)[1:q.bio,],2,sum)
-  
-  ls.phi0 = ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
-  
-  # GENERATING STARTING VALUES
-  if("Start" %in% names(args)) {Start = args$Start}
-  else{Start=HiddenBASiCS_MCMC_Start(Data)}
-  # Starting values for MCMC chains
-  mu0=as.vector(Start$mu0); delta0=as.vector(Start$delta0)
-  phi0=as.vector(Start$phi0); s0=as.vector(Start$s0)
-  nu0=as.vector(Start$nu0); theta0=as.numeric(Start$theta0)
-  # Starting values for adaptive proposal variances
-  ls.mu0=as.vector(Start$ls.mu0); ls.delta0=as.vector(Start$ls.delta0)
-  ls.phi0=as.numeric(Start$ls.phi0)
-  ls.nu0=as.vector(Start$ls.nu0); ls.theta0=as.numeric(Start$ls.theta0)
-  
-  StoreAdaptNumber = as.numeric(StoreAdapt)
-  nBatch = length(unique(metadata(Data)$BatchInfo))
-  
-  # If spikes are available (stable version)
-  if(length(metadata(Data)$SpikeInput) > 1)
-  {
-    if(nBatch > 1)
-    {
-      BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo)-1)
-      
-      # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-      Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(
-        N,
-        Thin,
-        Burn,
-        as.matrix(assay(Data)),
-        BatchDesign,
-        mu0, delta0, phi0, s0, nu0, theta0,
-        PriorParam$s2.mu,
-        PriorParam$a.delta, PriorParam$b.delta,
-        PriorParam$p.phi,
-        PriorParam$a.s, PriorParam$b.s,
-        PriorParam$a.theta, PriorParam$b.theta,
-        AR,
-        ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
-        sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-        StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
-        PriorParam$s2.delta, PriorDeltaNum))
+BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
+    
+    
+    if (!is(Data, "SingleCellExperiment")) 
+        stop("'Data' is not a SingleCellExperiment class object.")
+    # Add extra checks to ensure spike-ins info, etc is provided
+    
+    # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
+    q = length(isSpike(Data))
+    q.bio = sum(!isSpike(Data))
+    n = dim(assay(Data))[2]
+    
+    args <- list(...)
+    
+    if (!("PriorDelta" %in% names(args))) {
+        message(" --------------------------------------------------------------------------- \n IMPORTANT: by default, the argument PriorDelta is now set equal to 'log-normal' (recommended value). \n Vallejos et al (2015) used a 'gamma' prior instead.  \n --------------------------------------------------------------------------- \n")
     }
-    else
-    {
-      # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-      Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(
-        N,
-        Thin,
-        Burn,
-        as.matrix(assay(Data)),
-        mu0, delta0, phi0, s0, nu0, theta0,
-        PriorParam$s2.mu,
-        PriorParam$a.delta, PriorParam$b.delta,
-        PriorParam$p.phi,
-        PriorParam$a.s, PriorParam$b.s,
-        PriorParam$a.theta, PriorParam$b.theta,
-        AR,
-        ls.mu0, ls.delta0, ls.phi0, ls.nu0, ls.theta0,
-        sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-        StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
-        PriorParam$s2.delta, PriorDeltaNum))
-    }  
-  }
-  # If spikes are not available
-  else
-  {
-    message("--------------------------------------------------------------------", "\n",
-            'IMPORTANT: this part of the code is under development. DO NOT USE \n',
-            'This part of the code is just a place-holder',
+    
+    
+    if ("PriorParam" %in% names(args)) {
+        PriorParam = args$PriorParam
+    } else {
+        PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.phi = 1, 
+            b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+    }
+    AR = ifelse("AR" %in% names(args), args$AR, 0.44)
+    StopAdapt = ifelse("StopAdapt" %in% names(args), args$StopAdapt, Burn)
+    StoreChains = ifelse("StoreChains" %in% names(args), args$StoreChains, F)
+    StoreAdapt = ifelse("StoreAdapt" %in% names(args), args$StoreAdapt, F)
+    StoreDir = ifelse("StoreDir" %in% names(args), args$StoreDir, getwd())
+    RunName = ifelse("RunName" %in% names(args), args$RunName, "")
+    PrintProgress = ifelse("PrintProgress" %in% names(args), args$PrintProgress, TRUE)
+    PriorDelta = ifelse("PriorDelta" %in% names(args), args$PriorDelta, "gamma")
+    
+    if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) 
+        stop("Invalid parameter values.")
+    if (!(N%%Thin == 0 & N >= max(4, Thin))) 
+        stop("Please use an integer value for N. It must also be a multiple of thin (N>=4)).")
+    if (!(Thin%%1 == 0 & Thin >= 2)) 
+        stop("Please use an integer value for Thin (Thin>=2).")
+    if (!(Burn%%Thin == 0 & Burn < N & Burn >= 1)) 
+        stop("Please use an integer value for Burn. It must also be lower than N and a multiple of thin (Burn>=1).")
+    
+    if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 & PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 
+        1 & PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 & PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 
+        1 & all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == n & PriorParam$a.s > 0 & length(PriorParam$a.s) == 
+        1 & PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 & PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 
+        1 & PriorParam$b.theta > 0) & length(PriorParam$b.theta) == 1) 
+        stop("Invalid prior hyper-parameter values.")
+    
+    if (!(AR > 0 & AR < 1 & length(AR) == 1)) 
+        stop("Invalid AR value. Recommended value: AR = 0.44.")
+    if (!(StopAdapt > 0)) 
+        stop("Invalid StopAdapt value.")
+    if (!(is.logical(StoreChains) & length(StoreChains) == 1)) 
+        stop("Invalid StoreChains value.")
+    if (!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) 
+        stop("Invalid StoreAdapt value.")
+    if (!(file.info(StoreDir)["isdir"])) 
+        stop("Invalid StoreDir value.")
+    if (!(PriorDelta %in% c("gamma", "log-normal"))) 
+        stop("Invalid PriorDelta value.")
+    
+    PriorDeltaNum = ifelse(PriorDelta == "gamma", 1, 2)
+    
+    # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
+    sum.bycell.all <- apply(assay(Data), 1, sum)
+    sum.bycell.bio <- apply(assay(Data)[1:q.bio, ], 1, sum)
+    sum.bygene.all <- apply(assay(Data), 2, sum)
+    sum.bygene.bio <- apply(assay(Data)[1:q.bio, ], 2, sum)
+    
+    ls.phi0 = ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
+    
+    # GENERATING STARTING VALUES
+    if ("Start" %in% names(args)) {
+        Start = args$Start
+    } else {
+        Start = HiddenBASiCS_MCMC_Start(Data)
+    }
+    # Starting values for MCMC chains
+    mu0 = as.vector(Start$mu0)
+    delta0 = as.vector(Start$delta0)
+    phi0 = as.vector(Start$phi0)
+    s0 = as.vector(Start$s0)
+    nu0 = as.vector(Start$nu0)
+    theta0 = as.numeric(Start$theta0)
+    # Starting values for adaptive proposal variances
+    ls.mu0 = as.vector(Start$ls.mu0)
+    ls.delta0 = as.vector(Start$ls.delta0)
+    ls.phi0 = as.numeric(Start$ls.phi0)
+    ls.nu0 = as.vector(Start$ls.nu0)
+    ls.theta0 = as.numeric(Start$ls.theta0)
+    
+    StoreAdaptNumber = as.numeric(StoreAdapt)
+    nBatch = length(unique(metadata(Data)$BatchInfo))
+    
+    # If spikes are available (stable version)
+    if (length(metadata(Data)$SpikeInput) > 1) {
+        if (nBatch > 1) {
+            BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
+            
+            # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
+            Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(N, Thin, Burn, as.matrix(assay(Data)), BatchDesign, 
+                mu0, delta0, phi0, s0, nu0, theta0, PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, PriorParam$p.phi, 
+                PriorParam$a.s, PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, AR, ls.mu0, ls.delta0, ls.phi0, 
+                ls.nu0, ls.theta0, sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio, StoreAdaptNumber, 
+                StopAdapt, as.numeric(PrintProgress), PriorParam$s2.delta, PriorDeltaNum))
+        } else {
+            # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
+            Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, as.matrix(assay(Data)), mu0, delta0, 
+                phi0, s0, nu0, theta0, PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, PriorParam$p.phi, 
+                PriorParam$a.s, PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, AR, ls.mu0, ls.delta0, ls.phi0, 
+                ls.nu0, ls.theta0, sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio, StoreAdaptNumber, 
+                StopAdapt, as.numeric(PrintProgress), PriorParam$s2.delta, PriorDeltaNum))
+        }
+    } else {
+        # If spikes are not available
+        message("--------------------------------------------------------------------", "\n", "IMPORTANT: this part of the code is under development. DO NOT USE \n", 
+            "This part of the code is just a place-holder", "--------------------------------------------------------------------", 
+            "\n")
+        
+        if (PriorDelta == "gamma") 
+            stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
+        
+        # 1: Full constrain; 2: Non-zero genes only
+        ConstrainType = ifelse("ConstrainType" %in% names(args), args$ConstrainType, 2)
+        ConstrainLimit = ifelse("ConstrainLimit" %in% names(args), args$ConstrainLimit, 1)
+        ConstrainAlpha = ifelse("ConstrainAlpha" %in% names(args), args$ConstrainAlpha, 0.05)
+        ConstrainProb = ifelse("ConstrainProb" %in% names(args), args$ConstrainProb, 0.95)
+        
+        BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
+        BatchSizes = table(metadata(Data)$BatchInfo)
+        BatchIds = as.numeric(names(BatchSizes))
+        BatchOffSet = rep(1, times = nBatch)
+        for (k in 2:nBatch) {
+            BatchOffSet[k] = median(colSums(assay(Data)[, metadata(Data)$BatchInfo == BatchIds[k]]))/median(colSums(assay(Data)[, 
+                metadata(Data)$BatchInfo == BatchIds[1]]))
+        }
+        # Auxiliary vector contaning a gene index
+        Index = (1:q.bio) - 1
+        # In the following '+1' is used as c++ vector indexes vectors setting '0' as its first element Constrain for
+        # gene-specific expression rates
+        if (ConstrainType == 1) {
+            # Full constrain Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid
+            # numerical issues)
+            ConstrainGene = (1:q.bio) - 1
+            NotConstrainGene = 0
+            Constrain = mean(log(mu0[ConstrainGene + 1]))
+        }
+        if (ConstrainType == 2) {
+            # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing
+            # 'mu0' (to avoid numerical issues)
+            ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
+            NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
+            Constrain = mean(log(mu0[ConstrainGene + 1]))
+        }
+        if (ConstrainType == 3) {
+            # Trimmed constrain based on detection
+            Detection = rowMeans(assay(Data) > 0)
+            ConstrainGene = which(Detection >= ConstrainLimit) - 1
+            NotConstrainGene = which(Detection < ConstrainLimit) - 1
+            Constrain = mean(log(mu0[ConstrainGene + 1]))
+        }
+        
+        StochasticRef = ifelse("StochasticRef" %in% names(args), args$StochasticRef, FALSE)
+        
+        if (StochasticRef == TRUE) {
+            aux.ref = cbind(ConstrainGene, abs(log(mu0[ConstrainGene + 1]) - Constrain))
+            aux.ref = aux.ref[order(aux.ref[, 2]), ]
+            RefGenes = aux.ref[1:200, 1]
+            RefGene = RefGenes[1]
+        } else {
+            aux.ref = which(abs(log(mu0[ConstrainGene + 1]) - Constrain) == min(abs(log(mu0[ConstrainGene + 1]) - 
+                Constrain)))[1]
+            RefGene = ConstrainGene[aux.ref]
+            RefGenes = RefGene
+        }
+        
+        # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
+        Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(N, Thin, Burn, as.matrix(assay(Data)), BatchDesign, 
+            mu0, delta0, phi0, nu0, theta0, PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, PriorParam$a.phi, 
+            PriorParam$b.phi, PriorParam$a.theta, PriorParam$b.theta, AR, ls.mu0, ls.delta0, ls.nu0, ls.theta0, sum.bycell.all, 
+            sum.bygene.all, StoreAdaptNumber, StopAdapt, as.numeric(PrintProgress), PriorParam$s2.delta, PriorDeltaNum, 
+            metadata(Data)$BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet, Constrain, Index, RefGene, RefGenes, 
+            ConstrainGene, NotConstrainGene, ConstrainType))
+    }
+    
+    Chain$mu = Chain$mu[, 1:q.bio]
+    colnames(Chain$mu) = rownames(assay(Data))[!isSpike(Data)]
+    colnames(Chain$delta) = rownames(assay(Data))[!isSpike(Data)]
+    CellLabels = paste0("Cell", 1:n, "_Batch", metadata(Data)$BatchInfo)
+    colnames(Chain$phi) = CellLabels
+    if (length(metadata(Data)$SpikeInput) > 1) {
+        colnames(Chain$s) = CellLabels
+    }
+    colnames(Chain$nu) = CellLabels
+    colnames(Chain$theta) = paste0("Batch", unique(metadata(Data)$BatchInfo))
+    
+    cat("--------------------------------------------------------------------", "\n")
+    cat("MCMC running time", "\n")
+    cat("--------------------------------------------------------------------", "\n")
+    print(Time)
+    cat("\n")
+    
+    message("--------------------------------------------------------------------", "\n", "Output", "\n", "--------------------------------------------------------------------", 
+        "\n")
+    
+    if (length(metadata(Data)$SpikeInput) == 1) {
+        Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))
+    }
+    
+    ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi, s = Chain$s, nu = Chain$nu, 
+        theta = Chain$theta)
+    
+    OldDir = getwd()
+    
+    if (StoreChains) {
+        setwd(StoreDir)
+        
+        message("--------------------------------------------------------------------", "\n", "BASiCS_Chain object stored as ", 
+            paste0("chain_", RunName, ".Rds"), "file in", "\n", paste0("'", StoreDir, "' directory ... "), "\n", 
             "--------------------------------------------------------------------", "\n")
-    
-    if(PriorDelta == "gamma") stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
-    
-    # 1: Full constrain; 2: Non-zero genes only
-    ConstrainType = ifelse("ConstrainType" %in% names(args),args$ConstrainType, 2)
-    ConstrainLimit = ifelse("ConstrainLimit" %in% names(args),args$ConstrainLimit, 1)
-    ConstrainAlpha = ifelse("ConstrainAlpha" %in% names(args),args$ConstrainAlpha, 0.05)
-    ConstrainProb = ifelse("ConstrainProb" %in% names(args),args$ConstrainProb, 0.95)
-    
-    BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo)-1)
-    BatchSizes = table(metadata(Data)$BatchInfo)
-    BatchIds = as.numeric(names(BatchSizes))
-    BatchOffSet = rep(1, times = nBatch)
-    for(k in 2:nBatch)
-    {
-      BatchOffSet[k] = median(colSums(assay(Data)[,metadata(Data)$BatchInfo == BatchIds[k]])) / 
-        median(colSums(assay(Data)[,metadata(Data)$BatchInfo == BatchIds[1]]))
-    }
-    # Auxiliary vector contaning a gene index
-    Index = (1:q.bio) - 1
-    # In the following '+1' is used as c++ vector indexes vectors setting '0' as its first element
-    # Constrain for gene-specific expression rates
-    if(ConstrainType == 1) # Full constrain
-    {
-      # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
-      ConstrainGene = (1:q.bio) - 1
-      NotConstrainGene = 0
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-    }
-    if(ConstrainType == 2) # Trimmed constrain based on mean
-    {
-      # Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid numerical issues)
-      ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
-      NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
-      Constrain = mean(log(mu0[ConstrainGene+1]))
-    }
-    if(ConstrainType == 3) # Trimmed constrain based on detection
-    {
-      Detection = rowMeans(assay(Data) > 0)
-      ConstrainGene = which(Detection >= ConstrainLimit) - 1
-      NotConstrainGene = which(Detection < ConstrainLimit) - 1
-      Constrain = mean(log(mu0[ConstrainGene+1]))
+        
+        saveRDS(ChainClass, file = paste0("chain_", RunName, ".Rds"))
+        
+        setwd(OldDir)
     }
     
-    StochasticRef = ifelse("StochasticRef" %in% names(args),args$StochasticRef, FALSE)
-    
-    if(StochasticRef == TRUE)
-    {
-      aux.ref = cbind(ConstrainGene, abs(log(mu0[ConstrainGene+1]) - Constrain))
-      aux.ref = aux.ref[order(aux.ref[,2]),]
-      RefGenes = aux.ref[1:200, 1]
-      RefGene = RefGenes[1]
-    }
-    else
-    {
-      aux.ref = which(abs(log(mu0[ConstrainGene+1]) - Constrain) == min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
-      RefGene = ConstrainGene[aux.ref]   
-      RefGenes = RefGene    
-    }
-    
-    # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-    Time = system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
-      N,
-      Thin,
-      Burn,
-      as.matrix(assay(Data)),
-      BatchDesign,
-      mu0, delta0, phi0, nu0, theta0,
-      PriorParam$s2.mu,
-      PriorParam$a.delta, PriorParam$b.delta,
-      PriorParam$a.phi, PriorParam$b.phi,
-      PriorParam$a.theta, PriorParam$b.theta,
-      AR,
-      ls.mu0, ls.delta0, ls.nu0, ls.theta0,
-      sum.bycell.all, sum.bygene.all, 
-      StoreAdaptNumber,StopAdapt,as.numeric(PrintProgress),
-      PriorParam$s2.delta, PriorDeltaNum, 
-      metadata(Data)$BatchInfo, BatchIds, as.vector(BatchSizes), BatchOffSet,
-      Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, 
-      ConstrainType))
-  }
-  
-  Chain$mu = Chain$mu[,1:q.bio]
-  colnames(Chain$mu) = rownames(assay(Data))[!isSpike(Data)]
-  colnames(Chain$delta) = rownames(assay(Data))[!isSpike(Data)]
-  CellLabels = paste0("Cell",1:n,"_Batch", metadata(Data)$BatchInfo)
-  colnames(Chain$phi) = CellLabels
-  if(length(metadata(Data)$SpikeInput) > 1) {colnames(Chain$s) = CellLabels}
-  colnames(Chain$nu) = CellLabels
-  colnames(Chain$theta) = paste0("Batch", unique(metadata(Data)$BatchInfo))
-  
-  cat("--------------------------------------------------------------------", "\n")
-  cat("MCMC running time", "\n")
-  cat("--------------------------------------------------------------------", "\n")
-  print(Time)
-  cat("\n")
-  
-  message("--------------------------------------------------------------------", "\n",
-          "Output", "\n",
-          "--------------------------------------------------------------------", "\n")
-  
-  if(length(metadata(Data)$SpikeInput) == 1) {Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))}
-  
-  ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi,
-                                s = Chain$s, nu = Chain$nu, theta = Chain$theta)
-  
-  OldDir = getwd()
-  
-  if(StoreChains)
-  {
-    setwd(StoreDir)
-    
-    message("--------------------------------------------------------------------", "\n",
-            "BASiCS_Chain object stored as ", paste0("chain_",RunName,".Rds"), 
-            "file in", "\n",
-            paste0("'",StoreDir,"' directory ... "), "\n",
+    if (StoreAdapt) {
+        setwd(StoreDir)
+        
+        message("--------------------------------------------------------------------", "\n", "Storing trajectories of adaptive proposal variances (log-scale) as ", 
+            paste0("chain_ls_", RunName, ".Rds"), "file in \n", paste0("'", StoreDir, "' directory ... "), "\n", 
             "--------------------------------------------------------------------", "\n")
-    
-    saveRDS(ChainClass, file=paste0("chain_",RunName,".Rds"))
-  
-    setwd(OldDir)
-  }
-  
-  if(StoreAdapt)
-  {
-    setwd(StoreDir)
-    
-    message("--------------------------------------------------------------------", "\n",
-            "Storing trajectories of adaptive proposal variances (log-scale) as ",
-            paste0("chain_ls_",RunName,".Rds"), "file in \n",
-            paste0("'",StoreDir,"' directory ... "), "\n",
-            "--------------------------------------------------------------------", "\n")
-    
-    ChainLS <- list("ls.mu" = Chain$ls.mu, 
-                    "ls.delta" = Chain$ls.delta, 
-                    "ls.phi" = Chain$ls.phi, 
-                    "ls.nu" = Chain$ls.nu, 
-                    "ls.theta" = Chain$ls.theta)
-    saveRDS(ChainLS, file=paste0("chain_ls_",RunName,".Rds"))
-    
-    setwd(OldDir)
-  }
-  
-  # This 'if' refers to the no-spikes case
-  # Still under development - ignore for now!
-  if(length(metadata(Data)$SpikeInput) == 1)
-  {
-    message("\n",
-            "--------------------------------------------------------------------", "\n", 
-            paste("BASiCS version", packageVersion("BASiCS"), ": horizontal integration (no-spikes case)"), "\n",
-            "--------------------------------------------------------------------", "\n",
-            paste("ConstrainType:", ConstrainType), "\n")  
-    if(length(RefGenes) == 1) 
-    {
-      message(paste("Reference gene:", RefGene + 1), "\n",
-              paste("Information stored as a .txt file in"), "\n",
-              paste0("'",StoreDir,"' directory ... "), "\n",
-              "--------------------------------------------------------------------", "\n")
-      
-      setwd(StoreDir)
-      
-      TableRef = cbind.data.frame("GeneNames" = rownames(assay(Data))[RefGene+1], 
-                                  "GeneIndex" = RefGene+1, 
-                                  stringsAsFactors = FALSE)
-      write.table(TableRef,paste0("TableRef_",RunName,".txt"), col.names = T, row.names = F)
-      
-      setwd(OldDir)      
+        
+        ChainLS <- list(ls.mu = Chain$ls.mu, ls.delta = Chain$ls.delta, ls.phi = Chain$ls.phi, ls.nu = Chain$ls.nu, 
+            ls.theta = Chain$ls.theta)
+        saveRDS(ChainLS, file = paste0("chain_ls_", RunName, ".Rds"))
+        
+        setwd(OldDir)
     }
-    else
-    {
-      setwd(StoreDir)
-      
-      TableRef = cbind.data.frame("GeneNames" = rownames(assay(Data))[RefGenes+1], 
-                                  "GeneIndex" = RefGenes+1, 
-                                  "ReferenceFreq" = Chain$RefFreq[RefGenes+1],
-                                  stringsAsFactors = FALSE)
-      write.table(TableRef,paste0("TableRef_",RunName,".txt"), col.names = T, row.names = F)
-      
-      setwd(OldDir)
-      
-      message(paste("Randomly, 1 out of", length(RefGenes), "genes was left as reference at each iteration"), "\n",
-              paste("List of reference genes and their associated frequencies stored as a .txt file in"), "\n",
-              paste0("'",StoreDir,"' directory ... "), "\n",
-              "--------------------------------------------------------------------", "\n")
+    
+    # This 'if' refers to the no-spikes case Still under development - ignore for now!
+    if (length(metadata(Data)$SpikeInput) == 1) {
+        message("\n", "--------------------------------------------------------------------", "\n", paste("BASiCS version", 
+            packageVersion("BASiCS"), ": horizontal integration (no-spikes case)"), "\n", "--------------------------------------------------------------------", 
+            "\n", paste("ConstrainType:", ConstrainType), "\n")
+        if (length(RefGenes) == 1) {
+            message(paste("Reference gene:", RefGene + 1), "\n", paste("Information stored as a .txt file in"), "\n", 
+                paste0("'", StoreDir, "' directory ... "), "\n", "--------------------------------------------------------------------", 
+                "\n")
+            
+            setwd(StoreDir)
+            
+            TableRef = cbind.data.frame(GeneNames = rownames(assay(Data))[RefGene + 1], GeneIndex = RefGene + 1, 
+                stringsAsFactors = FALSE)
+            write.table(TableRef, paste0("TableRef_", RunName, ".txt"), col.names = TRUE, row.names = FALSE)
+            
+            setwd(OldDir)
+        } else {
+            setwd(StoreDir)
+            
+            TableRef = cbind.data.frame(GeneNames = rownames(assay(Data))[RefGenes + 1], GeneIndex = RefGenes + 1, 
+                ReferenceFreq = Chain$RefFreq[RefGenes + 1], stringsAsFactors = FALSE)
+            write.table(TableRef, paste0("TableRef_", RunName, ".txt"), col.names = TRUE, row.names = FALSE)
+            
+            setwd(OldDir)
+            
+            message(paste("Randomly, 1 out of", length(RefGenes), "genes was left as reference at each iteration"), 
+                "\n", paste("List of reference genes and their associated frequencies stored as a .txt file in"), 
+                "\n", paste0("'", StoreDir, "' directory ... "), "\n", "--------------------------------------------------------------------", 
+                "\n")
+        }
+    } else {
+        message("--------------------------------------------------------------------", "\n", paste("BASiCS version", 
+            packageVersion("BASiCS"), ": vertical integration (spikes case)"), "\n", "--------------------------------------------------------------------", 
+            "\n")
     }
-  }
-  else
-  {
-    message("--------------------------------------------------------------------", "\n",
-            paste("BASiCS version", packageVersion("BASiCS"), ": vertical integration (spikes case)"), "\n",
-            "--------------------------------------------------------------------", "\n")
-  }
-  
-  return(ChainClass)
+    
+    return(ChainClass)
 }

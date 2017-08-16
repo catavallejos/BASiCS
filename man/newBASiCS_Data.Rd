@@ -29,7 +29,7 @@ a matrix of expression counts and experimental information about spike-in genes.
 # Expression counts
 set.seed(1)
 Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
-rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
+rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
 
 # Technical information
 Tech = c(rep(FALSE,40),rep(TRUE,10))

@@ -14,8 +14,8 @@
 #' Data = makeExampleBASiCS_Data()
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
 #'                            StoreChains = TRUE, StoreDir = tempdir(), 
-#'                            RunName = "Test")
-#' ChainLoad <- BASiCS_LoadChain(RunName = "Test", StoreDir = tempdir())
+#'                            RunName = 'Test')
+#' ChainLoad <- BASiCS_LoadChain(RunName = 'Test', StoreDir = tempdir())
 #'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
@@ -23,8 +23,7 @@
 #'
 #' @references 
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
-BASiCS_LoadChain <- function(RunName, StoreDir = getwd())
-{
-  Chain <- readRDS(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
-  return(Chain)
+BASiCS_LoadChain <- function(RunName, StoreDir = getwd()) {
+    Chain <- readRDS(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
+    return(Chain)
 }

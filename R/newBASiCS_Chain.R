@@ -21,12 +21,12 @@
 #' Data = makeExampleBASiCS_Data()
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5)
 #'
-#' ChainMu = displayChainBASiCS(Chain, "mu")
-#' ChainDelta = displayChainBASiCS(Chain, "delta")
-#' ChainPhi = displayChainBASiCS(Chain, "phi")
-#' ChainS = displayChainBASiCS(Chain, "s")
-#' ChainNu = displayChainBASiCS(Chain, "nu")
-#' ChainTheta = displayChainBASiCS(Chain, "theta")
+#' ChainMu = displayChainBASiCS(Chain, 'mu')
+#' ChainDelta = displayChainBASiCS(Chain, 'delta')
+#' ChainPhi = displayChainBASiCS(Chain, 'phi')
+#' ChainS = displayChainBASiCS(Chain, 's')
+#' ChainNu = displayChainBASiCS(Chain, 'nu')
+#' ChainTheta = displayChainBASiCS(Chain, 'theta')
 #'
 #' ChainNew <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
 #'                             phi = ChainPhi, s = ChainS, 
@@ -39,9 +39,8 @@
 #' @references 
 #' 
 #' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
-newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta)
-{
-  Chain <- new("BASiCS_Chain", mu = mu, delta = delta, phi = phi, s = s, nu = nu, theta = theta)
-  show(Chain)
-  return(Chain)
+newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta) {
+    Chain <- new("BASiCS_Chain", mu = mu, delta = delta, phi = phi, s = s, nu = nu, theta = theta)
+    show(Chain)
+    return(Chain)
 }

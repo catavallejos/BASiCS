@@ -12,8 +12,8 @@
 \arguments{
 \item{object}{an object of class \code{\link[BASiCS]{BASiCS_Summary}}}
 
-\item{Param}{Name of the slot to be used for the accessed. Possible values: \code{"mu"}, 
-\code{"delta"}, \code{"phi"}, \code{"s"}, \code{"nu"} and \code{"theta"}}
+\item{Param}{Name of the slot to be used for the accessed. Possible values: \code{'mu'}, 
+\code{'delta'}, \code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
 }
 \value{
 The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary}}
