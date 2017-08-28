@@ -2,7 +2,7 @@
 # package initialization
 # ==============================================================
 .onAttach = function(libname, pkgname) {
-  msg = "BASiCS now (v1.0.0 onwards) utilizes the SingleCellExperiment class \n 
+  msg = "BASiCS now (v0.99.0 onwards) utilizes the SingleCellExperiment class \n 
   to collect the dataset information: expression counts, information on spike-ins \n 
   and batch information. For more information use vignette('BASiCS'). \n 
   In preparation to the Bioconductor submission, multiple functions have been modified. \n
