@@ -10,19 +10,22 @@ BASiCS_D_TestDE(...)
 \item{...}{Optional parameters.}
 }
 \value{
-This function is no longer in use and will be removed from future releases of 
-\code{BASiCS}. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
+This function is no longer in use and will 
+be removed from future releases of \code{BASiCS}. 
+Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 }
 \description{
-This function is no longer in use and will be removed from future releases 
-of \code{BASiCS}. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
+This function is no longer in use and will 
+be removed from future releases of \code{BASiCS}. 
+Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 }
 \details{
-This function is no longer in use and will be removed from future releases of \code{BASiCS}.
+This function is no longer in use and will 
+be removed from future releases of \code{BASiCS}.
 }
 \examples{
 
-# This function is no longer in use and will be removed in future releases.
+# Use 'BASiCS_TestDE' instead
 help(BASiCS_TestDE)
 
 }

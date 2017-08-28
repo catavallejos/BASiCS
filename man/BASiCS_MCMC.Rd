@@ -7,61 +7,93 @@
 BASiCS_MCMC(Data, N, Thin, Burn, ...)
 }
 \arguments{
-\item{Data}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. This MUST be formatted to 
-include the spike-ins information (see vignette).}
+\item{Data}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. 
+This MUST be formatted to include the spike-ins information (see vignette).}
 
-\item{N}{Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
+\item{N}{Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, 
+\code{N} being a multiple of \code{Thin}.}
 
 \item{Thin}{Thining period for the MCMC sampler. Use \code{Thin>=2}.}
 
-\item{Burn}{Burn-in period for the MCMC sampler. Use \code{Burn>=1}, \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.}
+\item{Burn}{Burn-in period for the MCMC sampler. Use \code{Burn>=1}, 
+\code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.}
 
 \item{...}{Optional parameters.
 \describe{
-\item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}. Default value: \code{PriorDelta = 'log-normal'}. 
-\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015, 2016). 
+\item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. 
+Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 
+'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}. 
+Default value: \code{PriorDelta = 'log-normal'}. 
+\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter 
+values required for the adopted prior (see Vallejos et al, 2015, 2016). 
 All elements must be positive real numbers.
 \describe{
-  \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu_i}.
+  \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) 
+  prior that is shared by all gene-specific expression rate parameters \eqn{\mu_i}.
   Default: \code{s2.mu = 0.5}.}
-  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior that is shared by all gene-specific over-dispersion parameters \eqn{\delta_i}.
+  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. 
+  Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior 
+  that is shared by all gene-specific over-dispersion parameters \eqn{\delta_i}.
   Default: \code{s2.delta = 0.5}. }
-  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological over-dispersion parameters \eqn{\delta_i}.
+  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. 
+  Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior 
+  that is shared by all gene-specific biological over-dispersion parameters \eqn{\delta_i}.
   Default: \code{a.delta = 1}.}
-  \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological over-dispersion hyper-parameters \eqn{\delta_i}.
+  \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. 
+  Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior 
+  that is shared by all gene-specific biological over-dispersion hyper-parameters \eqn{\delta_i}.
   Default: \code{b.delta = 1}.}
-  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) cell-specific mRNA content normalising constants \eqn{\phi_j / n}.
+  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) 
+  cell-specific mRNA content normalising constants \eqn{\phi_j / n}.
   Default: \code{p.phi} \code{= rep(1, n)}.}
-  \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
+  \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
+  prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
   Default: \code{a.s = 1}.}
-  \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
+  \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
+  prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
   Default: \code{b.s = 1}.}
-  \item{\code{a.theta}}{Shape hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
+  \item{\code{a.theta}}{Shape hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) 
+  prior for technical noise hyper-parameter \eqn{\theta}.
   Default: \code{a.theta = 1}.}
-  \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
+  \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) 
+  prior for technical noise hyper-parameter \eqn{\theta}.
   Default: \code{b.theta = 1}.}
 
 }}
-\item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{AR = 0.44}}.
+\item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. 
+It must be a positive number between 0 and 1. Default (and recommended): \code{AR = 0.44}}.
 
-\item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
+\item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. 
+Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
 
-\item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName} argument used to index the file name). Default: \code{StoreChains = FALSE}.}
-\item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of adaptive proposal variances (in log-scale) for all parameters is stored as a list in a `.Rds` file (\code{RunName} argument used to index file name). Default: \code{StoreAdapt = FALSE}.}
-\item{\code{StoreDir}}{Directory where output files are stored. Only required if \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
-\item{\code{RunName}}{String used to index `.Rds` files storing chains and/or adaptive proposal variances.}
-\item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
-\item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
-\item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to specify this argument. Default options have been tuned to facilitate convergence. 
+\item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated \code{BASiCS_Chain} 
+object is stored as a `.Rds` file (\code{RunName} argument used to index the file name). 
+Default: \code{StoreChains = FALSE}.}
+\item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of adaptive proposal 
+variances (in log-scale) for all parameters is stored as a list in a `.Rds` file 
+(\code{RunName} argument used to index file name). Default: \code{StoreAdapt = FALSE}.}
+\item{\code{StoreDir}}{Directory where output files are stored. Only required if 
+\code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). 
+Default: \code{StoreDir = getwd()}.}
+\item{\code{RunName}}{String used to index `.Rds` files storing chains 
+and/or adaptive proposal variances.}
+\item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based 
+progress report is suppressed.}
+\item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter 
+of the Metropolis proposals for \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
+\item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to 
+specify this argument. Default options have been tuned to facilitate convergence. 
 If changed, it must be a list containing the following elements: \code{mu0},
-\code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
+\code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, 
+\code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
 }}
 }
 \value{
 An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 }
 \description{
-MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datasets using the model described in Vallejos et al (2015).
+MCMC sampler to perform Bayesian inference for single-cell 
+mRNA sequencing datasets using the model described in Vallejos et al (2015).
 }
 \examples{
 
@@ -130,9 +162,9 @@ help(BASiCS_TestDE)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 
-Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+Vallejos, Richardson and Marioni (2016). Genome Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling

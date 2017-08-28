@@ -28,9 +28,9 @@ is(Data, 'SingleCellExperiment')
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 
-Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+Vallejos, Marioni and Richardson (2016). Genome Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling

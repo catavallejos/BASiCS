@@ -1,51 +1,83 @@
 #' @title BASiCS MCMC sampler
 #'
-#' @description MCMC sampler to perform Bayesian inference for single-cell mRNA sequencing datasets using the model described in Vallejos et al (2015).
+#' @description MCMC sampler to perform Bayesian inference for single-cell 
+#' mRNA sequencing datasets using the model described in Vallejos et al (2015).
 #'
-#' @param Data A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. This MUST be formatted to 
-#' include the spike-ins information (see vignette). 
-#' @param N Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.
+#' @param Data A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. 
+#' This MUST be formatted to include the spike-ins information (see vignette). 
+#' @param N Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, 
+#' \code{N} being a multiple of \code{Thin}.
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
-#' @param Burn Burn-in period for the MCMC sampler. Use \code{Burn>=1}, \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.
+#' @param Burn Burn-in period for the MCMC sampler. Use \code{Burn>=1}, 
+#' \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.
 #' @param ... Optional parameters.
 #' \describe{
-#' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}. Default value: \code{PriorDelta = 'log-normal'}. 
-#' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter values required for the adopted prior (see Vallejos et al, 2015, 2016). 
+#' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. 
+#' Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 
+#' 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}. 
+#' Default value: \code{PriorDelta = 'log-normal'}. 
+#' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter 
+#' values required for the adopted prior (see Vallejos et al, 2015, 2016). 
 #' All elements must be positive real numbers.
 #' \describe{
-#'   \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) prior that is shared by all gene-specific expression rate parameters \eqn{\mu_i}.
+#'   \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) 
+#'   prior that is shared by all gene-specific expression rate parameters \eqn{\mu_i}.
 #'   Default: \code{s2.mu = 0.5}.}
-#'   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior that is shared by all gene-specific over-dispersion parameters \eqn{\delta_i}.
+#'   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. 
+#'   Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior 
+#'   that is shared by all gene-specific over-dispersion parameters \eqn{\delta_i}.
 #'   Default: \code{s2.delta = 0.5}. }
-#'   \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological over-dispersion parameters \eqn{\delta_i}.
+#'   \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. 
+#'   Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior 
+#'   that is shared by all gene-specific biological over-dispersion parameters \eqn{\delta_i}.
 #'   Default: \code{a.delta = 1}.}
-#'   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior that is shared by all gene-specific biological over-dispersion hyper-parameters \eqn{\delta_i}.
+#'   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. 
+#'   Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior 
+#'   that is shared by all gene-specific biological over-dispersion hyper-parameters \eqn{\delta_i}.
 #'   Default: \code{b.delta = 1}.}
-#'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) cell-specific mRNA content normalising constants \eqn{\phi_j / n}.
+#'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) 
+#'   cell-specific mRNA content normalising constants \eqn{\phi_j / n}.
 #'   Default: \code{p.phi} \code{= rep(1, n)}.}
-#'   \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
+#'   \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
+#'   prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
 #'   Default: \code{a.s = 1}.}
-#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
+#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
+#'   prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
 #'   Default: \code{b.s = 1}.}
-#'   \item{\code{a.theta}}{Shape hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
+#'   \item{\code{a.theta}}{Shape hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) 
+#'   prior for technical noise hyper-parameter \eqn{\theta}.
 #'   Default: \code{a.theta = 1}.}
-#'   \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) prior for technical noise hyper-parameter \eqn{\theta}.
+#'   \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) 
+#'   prior for technical noise hyper-parameter \eqn{\theta}.
 #'   Default: \code{b.theta = 1}.}
 #'
 #' }}
-#' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. It must be a positive number between 0 and 1. Default (and recommended): \code{AR = 0.44}}.
+#' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. 
+#' It must be a positive number between 0 and 1. Default (and recommended): \code{AR = 0.44}}.
 #'
-#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
+#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. 
+#' Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
 #'
-#' \item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName} argument used to index the file name). Default: \code{StoreChains = FALSE}.}
-#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of adaptive proposal variances (in log-scale) for all parameters is stored as a list in a `.Rds` file (\code{RunName} argument used to index file name). Default: \code{StoreAdapt = FALSE}.}
-#' \item{\code{StoreDir}}{Directory where output files are stored. Only required if \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
-#' \item{\code{RunName}}{String used to index `.Rds` files storing chains and/or adaptive proposal variances.}
-#' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based progress report is suppressed.}
-#' \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter of the Metropolis proposals for \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
-#' \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to specify this argument. Default options have been tuned to facilitate convergence. 
+#' \item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated \code{BASiCS_Chain} 
+#' object is stored as a `.Rds` file (\code{RunName} argument used to index the file name). 
+#' Default: \code{StoreChains = FALSE}.}
+#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of adaptive proposal 
+#' variances (in log-scale) for all parameters is stored as a list in a `.Rds` file 
+#' (\code{RunName} argument used to index file name). Default: \code{StoreAdapt = FALSE}.}
+#' \item{\code{StoreDir}}{Directory where output files are stored. Only required if 
+#' \code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). 
+#' Default: \code{StoreDir = getwd()}.}
+#' \item{\code{RunName}}{String used to index `.Rds` files storing chains 
+#' and/or adaptive proposal variances.}
+#' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based 
+#' progress report is suppressed.}
+#' \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter 
+#' of the Metropolis proposals for \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
+#' \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to 
+#' specify this argument. Default options have been tuned to facilitate convergence. 
 #' If changed, it must be a list containing the following elements: \code{mu0},
-#' \code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
+#' \code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, 
+#' \code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
 #' }
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
@@ -118,9 +150,9 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
 #' @references 
-#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
-#' Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+#' Vallejos, Richardson and Marioni (2016). Genome Biology.
 BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     
     
@@ -136,20 +168,24 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     args <- list(...)
     
     if (!("PriorDelta" %in% names(args))) {
-        message(" --------------------------------------------------------------------------- \n IMPORTANT: by default, the argument PriorDelta is now set equal to 'log-normal' (recommended value). \n Vallejos et al (2015) used a 'gamma' prior instead.  \n --------------------------------------------------------------------------- \n")
+        message(" --------------------------------------------------------------------------- \n 
+                IMPORTANT: by default, the argument PriorDelta is now set equal to 'log-normal' 
+                (recommended value). \n Vallejos et al (2015) used a 'gamma' prior instead.  \n 
+                --------------------------------------------------------------------------- \n")
     }
     
     
     if ("PriorParam" %in% names(args)) {
         PriorParam = args$PriorParam
     } else {
-        PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, b.delta = 1, p.phi = rep(1, times = n), a.phi = 1, 
-            b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+        PriorParam = list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+                          b.delta = 1, p.phi = rep(1, times = n), 
+                          a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
     }
     AR = ifelse("AR" %in% names(args), args$AR, 0.44)
     StopAdapt = ifelse("StopAdapt" %in% names(args), args$StopAdapt, Burn)
-    StoreChains = ifelse("StoreChains" %in% names(args), args$StoreChains, F)
-    StoreAdapt = ifelse("StoreAdapt" %in% names(args), args$StoreAdapt, F)
+    StoreChains = ifelse("StoreChains" %in% names(args), args$StoreChains, FALSE)
+    StoreAdapt = ifelse("StoreAdapt" %in% names(args), args$StoreAdapt, FALSE)
     StoreDir = ifelse("StoreDir" %in% names(args), args$StoreDir, getwd())
     RunName = ifelse("RunName" %in% names(args), args$RunName, "")
     PrintProgress = ifelse("PrintProgress" %in% names(args), args$PrintProgress, TRUE)
@@ -162,13 +198,18 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     if (!(Thin%%1 == 0 & Thin >= 2)) 
         stop("Please use an integer value for Thin (Thin>=2).")
     if (!(Burn%%Thin == 0 & Burn < N & Burn >= 1)) 
-        stop("Please use an integer value for Burn. It must also be lower than N and a multiple of thin (Burn>=1).")
+        stop("Please use an integer value for Burn. It must also be lower than N and a multiple of 
+             thin (Burn>=1).")
     
-    if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 & PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 
-        1 & PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 & PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 
-        1 & all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == n & PriorParam$a.s > 0 & length(PriorParam$a.s) == 
-        1 & PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 & PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 
-        1 & PriorParam$b.theta > 0) & length(PriorParam$b.theta) == 1) 
+    if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 & 
+          PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 & 
+          PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 & 
+          PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 1 & 
+          all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == n & 
+          PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 & 
+          PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 & 
+          PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 & 
+          PriorParam$b.theta > 0) & length(PriorParam$b.theta) == 1) 
         stop("Invalid prior hyper-parameter values.")
     
     if (!(AR > 0 & AR < 1 & length(AR) == 1)) 
@@ -223,24 +264,47 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
             BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
             
             # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-            Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(N, Thin, Burn, as.matrix(assay(Data)), BatchDesign, 
-                mu0, delta0, phi0, s0, nu0, theta0, PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, PriorParam$p.phi, 
-                PriorParam$a.s, PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, AR, ls.mu0, ls.delta0, ls.phi0, 
-                ls.nu0, ls.theta0, sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio, StoreAdaptNumber, 
-                StopAdapt, as.numeric(PrintProgress), PriorParam$s2.delta, PriorDeltaNum))
+            Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(N, Thin, Burn, 
+                                                                  as.matrix(assay(Data)), 
+                                                                  BatchDesign, 
+                                                                  mu0, delta0, phi0, s0, nu0, theta0,
+                                                                  PriorParam$s2.mu, 
+                                                                  PriorParam$a.delta, PriorParam$b.delta, 
+                                                                  PriorParam$p.phi, 
+                                                                  PriorParam$a.s, PriorParam$b.s, 
+                                                                  PriorParam$a.theta, PriorParam$b.theta, 
+                                                                  AR, 
+                                                                  ls.mu0, ls.delta0, 
+                                                                  ls.phi0, ls.nu0, ls.theta0, 
+                                                                  sum.bycell.all, sum.bycell.bio, 
+                                                                  sum.bygene.all, sum.bygene.bio, 
+                                                                  StoreAdaptNumber, 
+                                                                  StopAdapt, as.numeric(PrintProgress), 
+                                                                  PriorParam$s2.delta, PriorDeltaNum))
         } else {
             # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-            Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, as.matrix(assay(Data)), mu0, delta0, 
-                phi0, s0, nu0, theta0, PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, PriorParam$p.phi, 
-                PriorParam$a.s, PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, AR, ls.mu0, ls.delta0, ls.phi0, 
-                ls.nu0, ls.theta0, sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio, StoreAdaptNumber, 
-                StopAdapt, as.numeric(PrintProgress), PriorParam$s2.delta, PriorDeltaNum))
+            Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, as.matrix(assay(Data)), 
+                                                             mu0, delta0, phi0, s0, nu0, theta0, 
+                                                             PriorParam$s2.mu, PriorParam$a.delta, 
+                                                             PriorParam$b.delta, PriorParam$p.phi, 
+                                                             PriorParam$a.s, PriorParam$b.s, 
+                                                             PriorParam$a.theta, PriorParam$b.theta, 
+                                                             AR, 
+                                                             ls.mu0, ls.delta0, 
+                                                             ls.phi0, ls.nu0, ls.theta0, 
+                                                             sum.bycell.all, sum.bycell.bio, 
+                                                             sum.bygene.all, sum.bygene.bio, 
+                                                             StoreAdaptNumber, StopAdapt, 
+                                                             as.numeric(PrintProgress), 
+                                                             PriorParam$s2.delta, PriorDeltaNum))
         }
     } else {
         # If spikes are not available
-        message("--------------------------------------------------------------------", "\n", "IMPORTANT: this part of the code is under development. DO NOT USE \n", 
-            "This part of the code is just a place-holder", "--------------------------------------------------------------------", 
-            "\n")
+        message("--------------------------------------------------------------------", "\n", 
+                "IMPORTANT: this part of the code is under development. DO NOT USE \n", 
+                "This part of the code is just a place-holder", 
+                "--------------------------------------------------------------------", 
+                "\n")
         
         if (PriorDelta == "gamma") 
             stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
@@ -261,18 +325,19 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         }
         # Auxiliary vector contaning a gene index
         Index = (1:q.bio) - 1
-        # In the following '+1' is used as c++ vector indexes vectors setting '0' as its first element Constrain for
+        # In the following '+1' is used as c++ vector indexes vectors setting '0' as its 
+        # first element Constrain for
         # gene-specific expression rates
         if (ConstrainType == 1) {
-            # Full constrain Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing 'mu0' (to avoid
-            # numerical issues)
+            # Full constrain Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added 
+            # when computing 'mu0' (to avoid numerical issues)
             ConstrainGene = (1:q.bio) - 1
             NotConstrainGene = 0
             Constrain = mean(log(mu0[ConstrainGene + 1]))
         }
         if (ConstrainType == 2) {
-            # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added when computing
-            # 'mu0' (to avoid numerical issues)
+            # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' as 1 pseudo-count 
+            # was added when computing 'mu0' (to avoid numerical issues)
             ConstrainGene = which(mu0 >= ConstrainLimit + 1) - 1
             NotConstrainGene = which(mu0 < ConstrainLimit + 1) - 1
             Constrain = mean(log(mu0[ConstrainGene + 1]))
@@ -325,24 +390,28 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     print(Time)
     cat("\n")
     
-    message("--------------------------------------------------------------------", "\n", "Output", "\n", "--------------------------------------------------------------------", 
-        "\n")
+    message("--------------------------------------------------------------------", "\n", 
+            "Output", "\n", 
+            "--------------------------------------------------------------------", "\n")
     
     if (length(metadata(Data)$SpikeInput) == 1) {
         Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))
     }
     
-    ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, phi = Chain$phi, s = Chain$s, nu = Chain$nu, 
-        theta = Chain$theta)
+    ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, 
+                                  phi = Chain$phi, s = Chain$s, 
+                                  nu = Chain$nu, theta = Chain$theta)
     
     OldDir = getwd()
     
     if (StoreChains) {
         setwd(StoreDir)
         
-        message("--------------------------------------------------------------------", "\n", "BASiCS_Chain object stored as ", 
-            paste0("chain_", RunName, ".Rds"), "file in", "\n", paste0("'", StoreDir, "' directory ... "), "\n", 
-            "--------------------------------------------------------------------", "\n")
+        message("--------------------------------------------------------------------", "\n", 
+                "BASiCS_Chain object stored as ", 
+                paste0("chain_", RunName, ".Rds"), "file in", "\n", 
+                paste0("'", StoreDir, "' directory ... "), "\n", 
+                "--------------------------------------------------------------------", "\n")
         
         saveRDS(ChainClass, file = paste0("chain_", RunName, ".Rds"))
         
@@ -352,12 +421,15 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     if (StoreAdapt) {
         setwd(StoreDir)
         
-        message("--------------------------------------------------------------------", "\n", "Storing trajectories of adaptive proposal variances (log-scale) as ", 
-            paste0("chain_ls_", RunName, ".Rds"), "file in \n", paste0("'", StoreDir, "' directory ... "), "\n", 
-            "--------------------------------------------------------------------", "\n")
+        message("--------------------------------------------------------------------", "\n", 
+                "Storing trajectories of adaptive proposal variances (log-scale) as ", 
+                paste0("chain_ls_", RunName, ".Rds"), "file in \n", 
+                paste0("'", StoreDir, "' directory ... "), "\n", 
+                "--------------------------------------------------------------------", "\n")
         
-        ChainLS <- list(ls.mu = Chain$ls.mu, ls.delta = Chain$ls.delta, ls.phi = Chain$ls.phi, ls.nu = Chain$ls.nu, 
-            ls.theta = Chain$ls.theta)
+        ChainLS <- list(ls.mu = Chain$ls.mu, ls.delta = Chain$ls.delta, 
+                        ls.phi = Chain$ls.phi, ls.nu = Chain$ls.nu, 
+                        ls.theta = Chain$ls.theta)
         saveRDS(ChainLS, file = paste0("chain_ls_", RunName, ".Rds"))
         
         setwd(OldDir)
@@ -365,9 +437,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     
     # This 'if' refers to the no-spikes case Still under development - ignore for now!
     if (length(metadata(Data)$SpikeInput) == 1) {
-        message("\n", "--------------------------------------------------------------------", "\n", paste("BASiCS version", 
-            packageVersion("BASiCS"), ": horizontal integration (no-spikes case)"), "\n", "--------------------------------------------------------------------", 
-            "\n", paste("ConstrainType:", ConstrainType), "\n")
+        message("\n", "--------------------------------------------------------------------", "\n", 
+                paste("BASiCS version", packageVersion("BASiCS"), 
+                      ": horizontal integration (no-spikes case)"), "\n", 
+                "--------------------------------------------------------------------", 
+                "\n", paste("ConstrainType:", ConstrainType), "\n")
         if (length(RefGenes) == 1) {
             message(paste("Reference gene:", RefGene + 1), "\n", paste("Information stored as a .txt file in"), "\n", 
                 paste0("'", StoreDir, "' directory ... "), "\n", "--------------------------------------------------------------------", 

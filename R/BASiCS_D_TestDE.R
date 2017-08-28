@@ -2,20 +2,23 @@
 #' 
 #' @title Detection of genes with changes in expression.
 #' 
-#' @description This function is no longer in use and will be removed from future releases 
-#' of \code{BASiCS}. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
+#' @description This function is no longer in use and will 
+#' be removed from future releases of \code{BASiCS}. 
+#' Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 #' 
 #' @param ... Optional parameters.
 #' 
-#' @return This function is no longer in use and will be removed from future releases of 
-#' \code{BASiCS}. Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
+#' @return This function is no longer in use and will 
+#' be removed from future releases of \code{BASiCS}. 
+#' Please use \code{\link[BASiCS]{BASiCS_TestDE}} instead.
 #'  
 #' @examples
 #' 
-#' # This function is no longer in use and will be removed in future releases.
+#' # Use 'BASiCS_TestDE' instead
 #' help(BASiCS_TestDE)
 #' 
-#' @details This function is no longer in use and will be removed from future releases of \code{BASiCS}.
+#' @details This function is no longer in use and will 
+#' be removed from future releases of \code{BASiCS}.
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
 #' 

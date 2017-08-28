@@ -38,7 +38,7 @@
 #'
 #' @references 
 #' 
-#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta) {
     Chain <- new("BASiCS_Chain", mu = mu, delta = delta, phi = phi, s = s, nu = nu, theta = theta)
     show(Chain)

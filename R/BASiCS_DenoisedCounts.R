@@ -2,9 +2,11 @@
 #'
 #' @title Calculates denoised expression expression counts
 #'
-#' @description Calculates denoised expression counts by removing cell-specific technical variation.
+#' @description Calculates denoised expression counts by removing 
+#' cell-specific technical variation.
 #'
-#' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#' @param Data an object of class 
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @examples
@@ -24,7 +26,7 @@
 #' 
 #' @references 
 #' 
-#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_DenoisedCounts
 BASiCS_DenoisedCounts = function(Data, Chain) {

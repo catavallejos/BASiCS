@@ -8,20 +8,24 @@ BASiCS_DenoisedRates(Data, Chain, PrintProgress = FALSE,
   Propensities = FALSE)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+\item{Data}{an object of class 
+\code{\link[SingleCellExperiment]{SingleCellExperiment}}}
 
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
-\item{PrintProgress}{If \code{TRUE}, partial progress information is printed in the console.}
+\item{PrintProgress}{If \code{TRUE}, partial progress 
+information is printed in the console.}
 
-\item{Propensities}{If \code{TRUE}, returns underlying expression propensitites \eqn{\rho_{ij}}. 
+\item{Propensities}{If \code{TRUE}, returns underlying 
+expression propensitites \eqn{\rho_{ij}}. 
 Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.}
 }
 \value{
 A matrix of denoised expression rates.
 }
 \description{
-Calculates normalised and denoised expression rates, by removing the effect of technical variation.
+Calculates normalised and denoised expression rates, by 
+removing the effect of technical variation.
 }
 \details{
 See vignette
@@ -33,7 +37,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}

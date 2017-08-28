@@ -48,7 +48,7 @@ ChainNew <- newBASiCS_Chain(mu = ChainMu, delta = ChainDelta,
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}

@@ -20,9 +20,9 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
 #' @references 
-#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
-#' Vallejos, Marioni and Richardson (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+#' Vallejos, Marioni and Richardson (2016). Genome Biology.
 makeExampleBASiCS_Data <- function(WithBatch = FALSE, WithSpikes = TRUE, Example = 1) {
     Mu = c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19, 83.92, 3.89, 6.34, 57.87, 12.45, 8.08, 7.31, 15.56, 15.91, 
         12.24, 15.96, 19.14, 4.2, 6.75, 27.74, 8.88, 21.21, 19.89, 7.14, 11.09, 7.19, 20.64, 73.9, 9.05, 6.13, 16.4, 

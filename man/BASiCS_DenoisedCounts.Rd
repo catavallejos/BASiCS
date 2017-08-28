@@ -7,7 +7,8 @@
 BASiCS_DenoisedCounts(Data, Chain)
 }
 \arguments{
-\item{Data}{an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+\item{Data}{an object of class 
+\code{\link[SingleCellExperiment]{SingleCellExperiment}}}
 
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 }
@@ -17,7 +18,8 @@ A matrix of denoised expression counts. These are defined as
 \eqn{X_{ij}/(\nu_j)} for spike-in genes.
 }
 \description{
-Calculates denoised expression counts by removing cell-specific technical variation.
+Calculates denoised expression counts by removing 
+cell-specific technical variation.
 }
 \details{
 See vignette
@@ -29,7 +31,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}

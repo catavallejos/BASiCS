@@ -41,7 +41,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
 #' @references 
-#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
 newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL) {
     # Validity checks for SpikeInfo

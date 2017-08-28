@@ -4,68 +4,109 @@
 #' 
 #' @description Function to assess changes in expression (mean and over-dispersion)
 #' 
-#' @param Chain1 an object of class \code{\link[BASiCS]{BASiCS_Chain}} containing parameter estimates for the first group of cells
-#' @param Chain2 an object of class \code{\link[BASiCS]{BASiCS_Chain}} containing parameter estimates for the second group of cells
-#' @param EpsilonM Minimum fold change tolerance threshold for detecting changes in overall expression (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
-#' @param EpsilonD Minimum fold change tolerance threshold for detecting changes in biological over-dispersion (must be a positive real number). Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
-#' @param EviThresholdM Optional parameter. Evidence threshold for detecting changes in overall expression (must be a positive value, between 0 and 1)
-#' @param EviThresholdD Optional parameter. Evidence threshold for detecting changes in cell-to-cell biological over-dispersion (must be a positive value, between 0 and 1)
-#' @param OrderVariable Ordering variable for output. Possible values: \code{'GeneIndex'}, \code{'GeneNames'} and \code{'Prob'}.
-#' @param GroupLabel1 Label assigned to reference group. Default: \code{GroupLabel1 = 'Group1'}
-#' @param GroupLabel2 Label assigned to reference group. Default: \code{GroupLabel2 = 'Group2'}
+#' @param Chain1 an object of class \code{\link[BASiCS]{BASiCS_Chain}} 
+#' containing parameter estimates for the first group of cells
+#' @param Chain2 an object of class \code{\link[BASiCS]{BASiCS_Chain}} 
+#' containing parameter estimates for the second group of cells
+#' @param EpsilonM Minimum fold change tolerance threshold for detecting 
+#' changes in overall expression (must be a positive real number). 
+#' Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
+#' @param EpsilonD Minimum fold change tolerance threshold for detecting 
+#' changes in biological over-dispersion (must be a positive real number). 
+#' Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
+#' @param EviThresholdM Optional parameter. Evidence threshold for detecting 
+#' changes in overall expression (must be a positive value, between 0 and 1)
+#' @param EviThresholdD Optional parameter. Evidence threshold for detecting 
+#' changes in cell-to-cell biological over-dispersion (must be a positive value, between 0 and 1)
+#' @param OrderVariable Ordering variable for output. Possible values: \code{'GeneIndex'}, 
+#' \code{'GeneNames'} and \code{'Prob'}.
+#' @param GroupLabel1 Label assigned to reference group. 
+#' Default: \code{GroupLabel1 = 'Group1'}
+#' @param GroupLabel2 Label assigned to reference group. 
+#' Default: \code{GroupLabel2 = 'Group2'}
 #' @param Plot If \code{Plot = TRUE}, MA and volcano plots are generated. 
 #' @param PlotOffset If \code{Plot = TRUE}, the offset effect is visualised.   
-#' @param OffSet Optional argument to remove a fix offset effect (if not previously removed from the MCMC chains). This argument will be removed shorly, once offset removal is built as an internal step. 
-#' @param EFDR_M Target for expected false discovery rate related to the comparison of means. Default \code{EFDR_M = 0.10}.
-#' @param EFDR_D Target for expected false discovery rate related to the comparison of dispersions. Default \code{EFDR_D = 0.10}.
-#' @param GenesSelect Optional argument to provide a user-defined list of genes to be considered for the comparison.
-#' Default: \code{GenesSelect = NULL}. . When used, this argument must be a vector of \code{TRUE} (include gene) / \code{FALSE} (exclude gene) indicator, 
-#' with the same length as the number of intrinsic genes and following the same order as how genes are displayed in the table of counts.  
-#' This argument is necessary in order to have a meaningful EFDR calibration when the user decides to exclude some genes from the comparison. 
+#' @param OffSet Optional argument to remove a fix offset effect (if not 
+#' previously removed from the MCMC chains). This argument will be removed shorly, 
+#' once offset removal is built as an internal step. 
+#' @param EFDR_M Target for expected false discovery rate related to the comparison 
+#' of means. Default \code{EFDR_M = 0.10}.
+#' @param EFDR_D Target for expected false discovery rate related to the comparison 
+#' of dispersions. Default \code{EFDR_D = 0.10}.
+#' @param GenesSelect Optional argument to provide a user-defined list of genes to 
+#' be considered for the comparison.
+#' Default: \code{GenesSelect = NULL}. . When used, this argument must be a vector 
+#' of \code{TRUE} (include gene) / \code{FALSE} (exclude gene) indicator, 
+#' with the same length as the number of intrinsic genes and following the same 
+#' order as how genes are displayed in the table of counts.  
+#' This argument is necessary in order to have a meaningful EFDR calibration when 
+#' the user decides to exclude some genes from the comparison. 
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #' 
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
 #' \describe{
-#' \item{\code{TableMean}}{A \code{\link[base]{data.frame}} containing the results of the differential mean test}
+#' \item{\code{TableMean}}{A \code{\link[base]{data.frame}} containing the results 
+#' of the differential mean test}
 #'    \describe{
 #'    \item{\code{GeneNames}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu_i} is averaged across both groups of cells (weighted by sample size).}
-#'    \item{\code{Mean1}}{Estimated mean expression parameter \eqn{\mu_i} for each biological gene in the first group of cells.}
-#'    \item{\code{Mean2}}{Estimated mean expression parameter \eqn{\mu_i} for each biological gene in the second group of cells.}
-#'    \item{\code{MeanFC}}{Fold change in mean expression parameters between the first and second groups of cells.}
-#'    \item{\code{MeanLog2FC}}{Log2-transformed fold change in mean expression between the first and second groups of cells.}
-#'    \item{\code{ProbDiffMean}}{Posterior probability for mean expression difference between the first and second groups of cells.}
-#'    \item{\code{ResultDiffExp}}{Indicator if a gene has a higher mean expression in the first or second groups of cells.}
+#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter 
+#'    \eqn{\mu_i} is averaged across both groups of cells (weighted by sample size).}
+#'    \item{\code{Mean1}}{Estimated mean expression parameter \eqn{\mu_i} for each 
+#'    biological gene in the first group of cells.}
+#'    \item{\code{Mean2}}{Estimated mean expression parameter \eqn{\mu_i} for each 
+#'    biological gene in the second group of cells.}
+#'    \item{\code{MeanFC}}{Fold change in mean expression parameters between the first 
+#'    and second groups of cells.}
+#'    \item{\code{MeanLog2FC}}{Log2-transformed fold change in mean expression between 
+#'    the first and second groups of cells.}
+#'    \item{\code{ProbDiffMean}}{Posterior probability for mean expression difference 
+#'    between the first and second groups of cells.}
+#'    \item{\code{ResultDiffExp}}{Indicator if a gene has a higher mean expression in 
+#'    the first or second groups of cells.}
 #'    }
-#' \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the results of the differential dispersion test (excludes genes for which the mean changes).}
+#' \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the results of 
+#' the differential dispersion test (excludes genes for which the mean changes).}
 #'    \describe{
 #'    \item{\code{GeneNames}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter \eqn{\mu_i} is averaged across both groups of cells (weighted by sample size).}
-#'    \item{\code{DispOverall}}{For each gene, the estimated over-dispersion parameter \eqn{\delta_i} is averaged across both groups of cells (weighted by sample size).}
-#'    \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta_i} for each biological gene in the first group of cells.}
-#'    \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta_i} for each biological gene in the second group of cells.}
-#'    \item{\code{DispFC}}{Fold change in over-dispersion parameters between the between the first and second groups of cells.}
-#'    \item{\code{DispLog2FC}}{Log-transformed fold change in over-dispersion between the first and second groups of cells.}
-#'    \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion difference between the first and second groups of cells.}
-#'    \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher over-dispersion in the first or second groups of cells.}
+#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter 
+#'    \eqn{\mu_i} is averaged across both groups of cells (weighted by sample size).}
+#'    \item{\code{DispOverall}}{For each gene, the estimated over-dispersion parameter 
+#'    \eqn{\delta_i} is averaged across both groups of cells (weighted by sample size).}
+#'    \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta_i} for each 
+#'    biological gene in the first group of cells.}
+#'    \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta_i} for each 
+#'    biological gene in the second group of cells.}
+#'    \item{\code{DispFC}}{Fold change in over-dispersion parameters between the between 
+#'    the first and second groups of cells.}
+#'    \item{\code{DispLog2FC}}{Log-transformed fold change in over-dispersion between 
+#'    the first and second groups of cells.}
+#'    \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion difference 
+#'    between the first and second groups of cells.}
+#'    \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher over-dispersion in 
+#'    the first or second groups of cells.}
 #'    }
-#'  \item{\code{DiffExpSummary}}{A list containing the following information for the differential mean expression test:}
+#'  \item{\code{DiffExpSummary}}{A list containing the following information for the 
+#'  differential mean expression test:}
 #'    \describe{
 #'   \item{\code{EviThreshold}}{Evidence thresholds.}
 #'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 #'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 #'   }
-#'  \item{\code{DiffOverDispSummary}}{A list containing the following information for the differential over-dispersion test:}
+#'  \item{\code{DiffOverDispSummary}}{A list containing the following information for 
+#'  the differential over-dispersion test:}
 #'    \describe{
 #'   \item{\code{EviThreshold}}{Evidence thresholds.}
 #'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 #'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 #'   }
-#'  \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: \code{Chain1} after offset removal.}
-#'  \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: \code{Chain2} after offset removal
+#'  \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: 
+#'  \code{Chain1} after offset removal.}
+#'  \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: 
+#'  \code{Chain2} after offset removal
 #'  (this is only provided for completeness; \code{Chain2} is not affected by the offset).}
 #'  \item{\code{OffsetChain}}{MCMC chain calculated for the offset effect.}
-#'  \item{\code{Offset}}{Estimated offset (posterior median of \code{OffsetChain}). Default value set equal to 1 when offset correction is not performed.}
+#'  \item{\code{Offset}}{Estimated offset (posterior median of \code{OffsetChain}). 
+#'  Default value set equal to 1 when offset correction is not performed.}
 #' }
 #'  
 #' @examples
@@ -88,12 +129,24 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #' 
 #' @references 
-#' Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+#' Vallejos, Richardson and Marioni (2016). Genome Biology.
 #'
 #' @rdname BASiCS_TestDE
-BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5), EviThresholdM = NULL, EviThresholdD = NULL, 
-    OrderVariable = "Prob", GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE, OffSet = TRUE, 
-    EFDR_M = 0.1, EFDR_D = 0.1, GenesSelect = NULL, ...) {
+BASiCS_TestDE <- function(Chain1, 
+                          Chain2, 
+                          EpsilonM = log2(1.5), 
+                          EpsilonD = log2(1.5), 
+                          EviThresholdM = NULL, 
+                          EviThresholdD = NULL, 
+                          OrderVariable = "Prob", 
+                          GroupLabel1 = "Group1", 
+                          GroupLabel2 = "Group2", 
+                          Plot = TRUE, 
+                          PlotOffset = TRUE, 
+                          OffSet = TRUE, 
+                          EFDR_M = 0.1, 
+                          EFDR_D = 0.1, 
+                          GenesSelect = NULL, ...) {
     # Checking validity of input arguments
     if (!is(Chain1, "BASiCS_Chain")) 
         stop("'Chain1' is not a 'BASiCS_Chain' class object.")
@@ -116,9 +169,11 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
         stop("Please insert TRUE or FALSE for Plot parameter")
     if (!is.null(EviThresholdM) | !is.null(EviThresholdD)) {
         if (EviThresholdM < 0 | EviThresholdM > 1 | !is.finite(EviThresholdM)) 
-            stop("Evidence threshold 'EviThresholdM' must be contained in (0,1) \n For automatic threshold search use EviThresholdM = NULL.")
+            stop("Evidence threshold 'EviThresholdM' must be contained in (0,1) \n 
+                 For automatic threshold search use EviThresholdM = NULL.")
         if (EviThresholdD < 0 | EviThresholdD > 1 | !is.finite(EviThresholdD)) 
-            stop("Evidence threshold 'EviThresholdD' must be contained in (0,1) \n For automatic threshold search use EviThresholdD = NULL.")
+            stop("Evidence threshold 'EviThresholdD' must be contained in (0,1) \n 
+                 For automatic threshold search use EviThresholdD = NULL.")
     }
     if (!(OrderVariable %in% c("GeneIndex", "GeneNames", "Prob"))) 
         stop("Invalid 'OrderVariable' value")
@@ -130,9 +185,9 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
         stop("Invalid value for 'GenesSelect'")
     if (!is.null(GenesSelect) & !is.logical(GenesSelect)) 
         stop("Invalid value for 'GenesSelect'")
-    # if(!is.null(GenesSelect) & (length(GenesSelect) == sum(!GenesSelect))) stop('Invalid value for 'GenesSelect'')
-    
-    message("Log-fold change thresholds are now set in a log2 scale. \n Previous versions of BASiCS used a natural logarithm scale.")
+
+    message("Log-fold change thresholds are now set in a log2 scale. \n 
+            Previous versions of BASiCS used a natural logarithm scale.")
     
     n1 = ncol(Chain1@nu)
     n2 = ncol(Chain2@nu)
@@ -163,12 +218,16 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
         MedianTau = matrixStats::colMedians(ChainTau)
         
         if (!PlotOffset) {
-            message(paste("--------------------------------------------------------------------- \n", "Offset estimate:", 
-                round(OffsetEst, 4), "(ratio", GroupLabel1, "vs", GroupLabel2, ").\n", "To visualise its effect, please use 'PlotOffset = TRUE'.\n", 
+            message(paste("--------------------------------------------------------------------- \n", 
+                          "Offset estimate:", 
+                round(OffsetEst, 4), "(ratio", GroupLabel1, "vs", GroupLabel2, ").\n", 
+                "To visualise its effect, please use 'PlotOffset = TRUE'.\n", 
                 "--------------------------------------------------------------------- \n"))
         } else {
-            message(paste("--------------------------------------------------------------------- \n", "Offset estimate:", 
-                round(OffsetEst, 4), "(ratio", GroupLabel1, "vs", GroupLabel2, ").\n", "--------------------------------------------------------------------- \n"))
+            message(paste("--------------------------------------------------------------------- \n", 
+                          "Offset estimate:", 
+                round(OffsetEst, 4), "(ratio", GroupLabel1, "vs", GroupLabel2, ").\n", 
+                "--------------------------------------------------------------------- \n"))
         }
         
         
@@ -179,27 +238,35 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
             message("3. MA plot before/after offset correction \n")
             par(ask = TRUE)
             # Offset uncertainty
-            graphics::boxplot(OffsetChain, frame = FALSE, main = "Offset MCMC chain", ylab = "Offset estimate")
+            graphics::boxplot(OffsetChain, frame = FALSE, main = "Offset MCMC chain", 
+                              ylab = "Offset estimate")
             # Mean expression parameters before/after offset correction
             par(mfrow = c(1, 2))
-            graphics::boxplot(cbind(matrixStats::colMedians(Chain1@mu), Summary2@mu[, 1]), frame = FALSE, main = "Before correction", 
+            graphics::boxplot(cbind(matrixStats::colMedians(Chain1@mu), Summary2@mu[, 1]), 
+                              frame = FALSE, main = "Before correction", 
                 names = c(GroupLabel1, GroupLabel2), ylab = "Mean expression", log = "y")
-            graphics::boxplot(cbind(Summary1@mu[, 1], Summary2@mu[, 1]), frame = FALSE, main = "After correction", 
+            graphics::boxplot(cbind(Summary1@mu[, 1], Summary2@mu[, 1]), frame = FALSE, 
+                              main = "After correction", 
                 names = c(GroupLabel1, GroupLabel2), ylab = "Mean expression", log = "y")
             # MA plot pre/after offset
             par(mfrow = c(1, 2))
-            graphics::smoothScatter(log2(MuBase_old), MedianTau_old, bty = "n", xlab = "Mean expresssion (log2)", 
-                ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), main = "Before correction (log2offset = red line)")
+            graphics::smoothScatter(log2(MuBase_old), MedianTau_old, bty = "n", 
+                                    xlab = "Mean expresssion (log2)", 
+                ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
+                main = "Before correction (log2offset = red line)")
             abline(h = 0, lty = 2)
             abline(h = log2(OffsetEst), lty = 1, col = "red")
-            graphics::smoothScatter(log2(MuBase), MedianTau, bty = "n", xlab = "Mean expresssion (log2)", ylab = paste("Log2 fold change", 
+            graphics::smoothScatter(log2(MuBase), MedianTau, bty = "n", 
+                                    xlab = "Mean expresssion (log2)", ylab = paste("Log2 fold change", 
                 GroupLabel1, "vs", GroupLabel2), main = "After correction")
             abline(h = 0, lty = 2)
             par(ask = FALSE)
         }
     } else {
-        message(paste("--------------------------------------------------------------------- \n", "It is recomended to perform a global offset correction between the two groups of cells \n", 
-            "Default offset value set equal to 1.\n", "To perform offset correction, please set 'Offset = TRUE'. \n", 
+        message(paste("--------------------------------------------------------------------- \n", 
+                      "It is recomended to perform a global offset correction between the two groups of cells \n", 
+            "Default offset value set equal to 1.\n", 
+            "To perform offset correction, please set 'Offset = TRUE'. \n", 
             "--------------------------------------------------------------------- \n"))
         
         Summary1 <- Summary(Chain1)
@@ -218,7 +285,8 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
     Search = is.null(EviThresholdM)
     
     # Changes in mean expression
-    AuxMean <- HiddenThresholdSearchTestDE(ChainTau, EpsilonM, EviThresholdM, GenesSelect, EFDR_M, Task = "Differential mean")
+    AuxMean <- HiddenThresholdSearchTestDE(ChainTau, EpsilonM, EviThresholdM, 
+                                           GenesSelect, EFDR_M, Task = "Differential mean")
     ProbM = AuxMean$Prob
     OptThresholdM = AuxMean$OptThreshold
     # Test results
@@ -231,9 +299,13 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
         ResultDiffMean[!GenesSelect] = "ExcludedByUser"
     }
     # Output table
-    TableMean = cbind.data.frame(GeneNames = GeneNames, MeanOverall = round(as.numeric(MuBase), 3), Mean1 = round(as.numeric(Summary1@mu[, 
-        1]), 3), Mean2 = round(as.numeric(Summary2@mu[, 1]), 3), MeanFC = round(as.numeric(exp(MedianTau)), 3), MeanLog2FC = round(as.numeric(MedianTau), 
-        3), ProbDiffMean = round(as.numeric(ProbM), 3), ResultDiffMean = ResultDiffMean, stringsAsFactors = FALSE)
+    TableMean = cbind.data.frame(GeneNames = GeneNames, MeanOverall = round(as.numeric(MuBase), 3), 
+                                 Mean1 = round(as.numeric(Summary1@mu[, 1]), 3), 
+                                 Mean2 = round(as.numeric(Summary2@mu[, 1]), 3), 
+                                 MeanFC = round(as.numeric(exp(MedianTau)), 3), 
+                                 MeanLog2FC = round(as.numeric(MedianTau), 3), 
+                                 ProbDiffMean = round(as.numeric(ProbM), 3), 
+                                 ResultDiffMean = ResultDiffMean, stringsAsFactors = FALSE)
     
     # Genes for which mean doesn't change
     NotDE <- which(ResultDiffMean == "NoDiff")
@@ -242,7 +314,8 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
     ChainOmega = log2(Chain1@delta[, NotDE]/Chain2@delta[, NotDE])
     MedianOmega = matrixStats::colMedians(ChainOmega)
     DeltaBase = (Summary1@delta[NotDE, 1] * n1 + Summary2@delta[NotDE, 1] * n2)/n
-    AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega, EpsilonD, EviThresholdD, NULL, EFDR_D, Task = "Differential dispersion")
+    AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega, EpsilonD, EviThresholdD, NULL, 
+                                           EFDR_D, Task = "Differential dispersion")
     ProbD = AuxDisp$Prob
     OptThresholdD = AuxDisp$OptThreshold
     # Test results
@@ -252,10 +325,15 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
     ResultDiffDisp[DispPlus1] = paste0(GroupLabel1, "+")
     ResultDiffDisp[DispPlus2] = paste0(GroupLabel2, "+")
     # Output table
-    TableDisp = cbind.data.frame(GeneNames = GeneNames[NotDE], MeanOverall = round(as.numeric(MuBase[NotDE]), 3), 
-        DispOverall = round(as.numeric(DeltaBase), 3), Disp1 = round(as.numeric(Summary1@delta[NotDE, 1]), 3), Disp2 = round(as.numeric(Summary2@delta[NotDE, 
-            1]), 3), DispFC = round(as.numeric(exp(MedianOmega)), 3), DispLog2FC = round(as.numeric(MedianOmega), 
-            3), ProbDiffDisp = round(as.numeric(ProbD), 3), ResultDiffDisp = ResultDiffDisp, stringsAsFactors = FALSE)
+    TableDisp = cbind.data.frame(GeneNames = GeneNames[NotDE], 
+                                 MeanOverall = round(as.numeric(MuBase[NotDE]), 3), 
+                                 DispOverall = round(as.numeric(DeltaBase), 3), 
+                                 Disp1 = round(as.numeric(Summary1@delta[NotDE, 1]), 3), 
+                                 Disp2 = round(as.numeric(Summary2@delta[NotDE, 1]), 3), 
+                                 DispFC = round(as.numeric(exp(MedianOmega)), 3), 
+                                 DispLog2FC = round(as.numeric(MedianOmega), 3), 
+                                 ProbDiffDisp = round(as.numeric(ProbD), 3), 
+                                 ResultDiffDisp = ResultDiffDisp, stringsAsFactors = FALSE)
     
     # Update after removing DE genes from Disp table!  Reordering the tables
     GeneIndex = 1:length(MuBase)
@@ -277,8 +355,10 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
     TableDisp = TableDisp[order(orderVar, decreasing = TRUE), ]
     
     if (!is.null(GenesSelect)) {
-        message("--------------------------------------------------------------------- \n", paste("The user excluded ", 
-            sum(!GenesSelect), " genes from the comparison. \n"), "These genes are marked as 'ExcludedByUser' in the results table and excluded from EFDR calibration. \n", 
+        message("--------------------------------------------------------------------- \n", 
+                paste("The user excluded ", 
+            sum(!GenesSelect), " genes from the comparison. \n"), 
+            "These genes are marked as 'ExcludedByUser' in the results table and excluded from EFDR calibration. \n", 
             "--------------------------------------------------------------------- \n")
     }
     
@@ -303,42 +383,56 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
         if (Search) {
             par(mfrow = c(1, 2))
             EviThresholds <- seq(0.5, 0.9995, by = 0.00025)
-            plot(EviThresholds, AuxMean$EFDRgrid, type = "l", lty = 1, bty = "n", ylab = "Error rate", xlab = "Evidence threshold", 
+            plot(EviThresholds, AuxMean$EFDRgrid, type = "l", lty = 1, bty = "n", 
+                 ylab = "Error rate", xlab = "Evidence threshold", 
                 ylim = c(0, 1), main = "Differential mean test")
             lines(EviThresholds, AuxMean$EFNRgrid, lty = 2)
             abline(h = EFDR_M, col = "blue", lwd = 2, lty = 1)
             abline(v = OptThresholdM[1], col = "red", lwd = 2, lty = 1)
-            legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2, 1), col = c("black", "black", "blue"), bty = "n")
-            plot(EviThresholds, AuxDisp$EFDRgrid, type = "l", lty = 1, bty = "n", ylab = "Error rate", xlab = "Evidence threshold", 
+            legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2, 1), 
+                   col = c("black", "black", "blue"), bty = "n")
+            plot(EviThresholds, AuxDisp$EFDRgrid, type = "l", lty = 1, bty = "n", 
+                 ylab = "Error rate", xlab = "Evidence threshold", 
                 ylim = c(0, 1), main = "Differential dispersion test")
             lines(EviThresholds, AuxDisp$EFNRgrid, lty = 2)
             abline(h = EFDR_D, col = "blue", lwd = 2, lty = 1)
             abline(v = OptThresholdD[1], col = "red", lwd = 2, lty = 1)
-            legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2, 1), col = c("black", "black", "blue"), bty = "n")
+            legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2, 1), 
+                   col = c("black", "black", "blue"), bty = "n")
         }
         
         
         par(mfrow = c(1, 2))
-        with(TableMean, graphics::smoothScatter(log2(MeanOverall), MeanLog2FC, bty = "n", xlab = "Mean expresssion (log2)", 
-            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), main = "Differential mean test"))
-        with(TableMean[!(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff")), ], points(log2(MeanOverall), 
+        with(TableMean, graphics::smoothScatter(log2(MeanOverall), MeanLog2FC, 
+                                                bty = "n", xlab = "Mean expresssion (log2)", 
+            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
+            main = "Differential mean test"))
+        with(TableMean[!(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff")), ], 
+             points(log2(MeanOverall), 
             MeanLog2FC, pch = 16, col = "red"))
         abline(h = c(-EpsilonM, EpsilonM), lty = 2)
-        with(TableDisp, graphics::smoothScatter(log2(MeanOverall), DispLog2FC, bty = "n", xlab = "Mean expresssion (log2)", 
-            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), main = "Differential dispersion test"))
-        with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ], points(log2(MeanOverall), DispLog2FC, pch = 16, col = "red"))
+        with(TableDisp, graphics::smoothScatter(log2(MeanOverall), DispLog2FC, 
+                                                bty = "n", xlab = "Mean expresssion (log2)", 
+            ylab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
+            main = "Differential dispersion test"))
+        with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ], points(log2(MeanOverall), 
+                                                                       DispLog2FC, pch = 16, col = "red"))
         abline(h = c(-EpsilonD, EpsilonD), lty = 2)
         par(mfrow = c(1, 2))
-        with(TableMean, graphics::smoothScatter(MeanLog2FC, ProbDiffMean, bty = "n", ylab = "Posterior probability", 
-            xlab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), main = "Differential mean test", ylim = c(0, 
-                1)))
-        with(TableMean[!(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff")), ], points(MeanLog2FC, ProbDiffMean, 
-            pch = 16, col = "red"))
+        with(TableMean, graphics::smoothScatter(MeanLog2FC, ProbDiffMean, 
+                                                bty = "n", ylab = "Posterior probability", 
+                                                xlab = paste("Log2 fold change", GroupLabel1, "vs", 
+                                                             GroupLabel2), 
+                                                main = "Differential mean test", ylim = c(0, 1)))
+        with(TableMean[!(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff")), ], 
+             points(MeanLog2FC, ProbDiffMean, pch = 16, col = "red"))
         abline(v = c(-EpsilonM, EpsilonM), lty = 2)
-        with(TableDisp, graphics::smoothScatter(DispLog2FC, ProbDiffDisp, bty = "n", ylab = "Posterior probability", 
-            xlab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), main = "Differential dispersion test", 
-            ylim = c(0, 1)))
-        with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ], points(DispLog2FC, ProbDiffDisp, pch = 16, col = "red"))
+        with(TableDisp, graphics::smoothScatter(DispLog2FC, ProbDiffDisp, 
+                                                bty = "n", ylab = "Posterior probability", 
+            xlab = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2), 
+            main = "Differential dispersion test", ylim = c(0, 1)))
+        with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ], 
+             points(DispLog2FC, ProbDiffDisp, pch = 16, col = "red"))
         abline(v = c(-EpsilonD, EpsilonD), lty = 2)
         
         par(ask = FALSE)
@@ -349,21 +443,33 @@ BASiCS_TestDE <- function(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(
     nDispPlus1 = sum(ResultDiffDisp == paste0(GroupLabel1, "+"))
     nDispPlus2 = sum(ResultDiffDisp == paste0(GroupLabel2, "+"))
     
-    message("--------------------------------------------------------------------- \n", paste(nMeanPlus1 + nMeanPlus2, 
-        " genes with a change on the overall expression:  \n"), paste("- Higher expression in ", GroupLabel1, "samples:", 
-        nMeanPlus1, "\n"), paste("- Higher expression in ", GroupLabel2, "samples:", nMeanPlus2, "\n"), paste("- Fold change tolerance = ", 
-        round(100 * EpsilonM, 2), "% \n"), paste("- Evidence threshold = ", OptThresholdM[1], "\n"), paste("- EFDR = ", 
-        round(100 * OptThresholdM[2], 2), "% \n"), paste("- EFNR = ", round(100 * OptThresholdM[3], 2), "% \n"), 
-        "--------------------------------------------------------------------- \n", "\n", "--------------------------------------------------------------------- \n", 
+    message("--------------------------------------------------------------------- \n", 
+            paste(nMeanPlus1 + nMeanPlus2, " genes with a change on the overall expression:  \n"), 
+            paste("- Higher expression in ", GroupLabel1, "samples:", nMeanPlus1, "\n"), 
+            paste("- Higher expression in ", GroupLabel2, "samples:", nMeanPlus2, "\n"), 
+            paste("- Fold change tolerance = ", round(100 * EpsilonM, 2), "% \n"), 
+            paste("- Evidence threshold = ", OptThresholdM[1], "\n"), 
+            paste("- EFDR = ", round(100 * OptThresholdM[2], 2), "% \n"), 
+            paste("- EFNR = ", round(100 * OptThresholdM[3], 2), "% \n"), 
+        "--------------------------------------------------------------------- \n", "\n", 
+        "--------------------------------------------------------------------- \n", 
         paste(nDispPlus1 + nDispPlus2, " genes with a change on the cell-to-cell biological over dispersion:  \n"), 
-        paste("- Higher over dispersion in ", GroupLabel1, "samples:", nDispPlus1, "\n"), paste("- Higher over dispersion in ", 
-            GroupLabel2, "samples:", nDispPlus2, "\n"), paste("- Fold change tolerance = ", round(100 * EpsilonD, 
-            2), "% \n"), paste("- Evidence threshold = ", OptThresholdD[1], "\n"), paste("- EFDR = ", round(100 * 
-            OptThresholdD[2], 2), "% \n"), paste("- EFNR = ", round(100 * OptThresholdD[3], 2), "% \n"), paste("NOTE: differential dispersion results only include the", 
-            length(MedianOmega), "for which the mean did not change. \n"), "--------------------------------------------------------------------- \n")
+        paste("- Higher over dispersion in ", GroupLabel1, "samples:", nDispPlus1, "\n"), 
+        paste("- Higher over dispersion in ", GroupLabel2, "samples:", nDispPlus2, "\n"), 
+        paste("- Fold change tolerance = ", round(100 * EpsilonD, 2), "% \n"), 
+        paste("- Evidence threshold = ", OptThresholdD[1], "\n"), 
+        paste("- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n"), 
+        paste("- EFNR = ", round(100 * OptThresholdD[3], 2), "% \n"), 
+        paste("NOTE: differential dispersion results only include the", 
+              length(MedianOmega), "for which the mean did not change. \n"), 
+        "--------------------------------------------------------------------- \n")
     
-    list(TableMean = TableMean, TableDisp = TableDisp, DiffMeanSummary = list(EviThreshold = OptThresholdM[1], EFDR = OptThresholdM[2], 
-        EFNR = OptThresholdM[3]), DiffDispSummary = list(EviThreshold = OptThresholdD[1], EFDR = OptThresholdD[2], 
-        EFNR = OptThresholdD[3]), Chain1_offset = Chain1_offset, Chain2_offset = Chain2_offset, OffsetChain = OffsetChain, 
-        Offset = OffsetEst)
+    list(TableMean = TableMean, 
+         TableDisp = TableDisp, 
+         DiffMeanSummary = list(EviThreshold = OptThresholdM[1], 
+                                EFDR = OptThresholdM[2], EFNR = OptThresholdM[3]), 
+         DiffDispSummary = list(EviThreshold = OptThresholdD[1], EFDR = OptThresholdD[2], 
+                                EFNR = OptThresholdD[3]), 
+         Chain1_offset = Chain1_offset, Chain2_offset = Chain2_offset,
+         OffsetChain = OffsetChain, Offset = OffsetEst)
 }

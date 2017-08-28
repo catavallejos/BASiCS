@@ -50,7 +50,7 @@ DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\linkS4class{SingleCellExperiment}}

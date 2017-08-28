@@ -123,7 +123,7 @@ setMethod("Summary", signature = "BASiCS_Chain", definition = function(x, prob =
 #' 
 #' @references 
 #' 
-#' Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 setMethod("plot", signature = "BASiCS_Chain", definition = function(x, Param = "mu", Gene = NULL, Cell = NULL, Batch = 1, 
     ylab = "", xlab = "", ...) {
     

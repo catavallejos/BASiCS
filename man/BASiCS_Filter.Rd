@@ -9,22 +9,36 @@ BASiCS_Filter(Counts, Tech, SpikeInput, BatchInfo = NULL,
   MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
 }
 \arguments{
-\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements corresponds to the simulated expression counts.
-First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} rows correspond to technical spike-in genes.}
+\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements 
+corresponds to the simulated expression counts.
+First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} 
+rows correspond to technical spike-in genes.}
 
-\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene is biological; otherwise the gene is spike-in.}
+\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene 
+is biological; otherwise the gene is spike-in.}
 
-\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the simulated input concentrations for the spike-in genes.}
+\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the 
+simulated input concentrations for the spike-in genes.}
 
-\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. Not required if a single batch is present on the data. Default value: \code{BatchInfo = NULL}.}
+\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. 
+Not required if a single batch is present on the data. 
+Default value: \code{BatchInfo = NULL}.}
 
-\item{MinTotalCountsPerCell}{Minimum value of total expression counts required per cell (biological and technical). Default value: \code{MinTotalCountsPerCell = 2}.}
+\item{MinTotalCountsPerCell}{Minimum value of total expression counts required 
+per cell (biological and technical). 
+Default value: \code{MinTotalCountsPerCell = 2}.}
 
-\item{MinTotalCountsPerGene}{Minimum value of total expression counts required per transcript (biological and technical). Default value: \code{MinTotalCountsPerGene = 2}.}
+\item{MinTotalCountsPerGene}{Minimum value of total expression counts 
+required per transcript (biological and technical). 
+Default value: \code{MinTotalCountsPerGene = 2}.}
 
-\item{MinCellsWithExpression}{Minimum number of cells where expression must be detected (positive count). Criteria applied to each transcript. Default value: \code{MinCellsWithExpression = 2}.}
+\item{MinCellsWithExpression}{Minimum number of cells where expression 
+must be detected (positive count). Criteria applied to each transcript. 
+Default value: \code{MinCellsWithExpression = 2}.}
 
-\item{MinAvCountsPerCellsWithExpression}{Minimum average number of counts per cells where expression is detected. Criteria applied to each transcript. Default value: \code{MinAvCountsPerCellsWithExpression = 2}.}
+\item{MinAvCountsPerCellsWithExpression}{Minimum average number of 
+counts per cells where expression is detected. Criteria applied to 
+each transcript. Default value: \code{MinAvCountsPerCellsWithExpression = 2}.}
 }
 \value{
 A list of 2 elements
@@ -38,7 +52,9 @@ A list of 2 elements
 }
 }
 \description{
-\code{BASiCS_Filter} indicates which transcripts and cells pass a pre-defined inclusion criteria. The output of this function can be combined with \code{newBASiCS_Data} to generate a 
+\code{BASiCS_Filter} indicates which transcripts and 
+cells pass a pre-defined inclusion criteria. The output of this 
+function can be combined with \code{newBASiCS_Data} to generate a 
 the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
 }
 \examples{
@@ -60,9 +76,9 @@ FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology. 
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 
-Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+Vallejos, Richardson and Marioni (2016). Genome Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

@@ -5,7 +5,8 @@
 \alias{BASiCS_VarThresholdSearchHVG_LVG}
 \alias{BASiCS_VarThresholdSearchLVG}
 \alias{BASiCS_VarThresholdSearchHVG_LVG}
-\title{Detection method for highly and lowly variable genes using a grid of variance contribution thresholds}
+\title{Detection method for highly and lowly variable genes using 
+a grid of variance contribution thresholds}
 \usage{
 BASiCS_VarThresholdSearchHVG(Chain, VarThresholdsGrid, EFDR = 0.1,
   Progress = TRUE)
@@ -16,20 +17,25 @@ BASiCS_VarThresholdSearchLVG(Chain, VarThresholdsGrid, EFDR = 0.1,
 \arguments{
 \item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
 
-\item{VarThresholdsGrid}{Grid of values for the variance contribution threshold (they must be contained in (0,1))}
+\item{VarThresholdsGrid}{Grid of values for the variance contribution 
+threshold (they must be contained in (0,1))}
 
-\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection. Default: \code{EFDR = 0.10}.}
+\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection. 
+Default: \code{EFDR = 0.10}.}
 
 \item{Progress}{If \code{Progress = TRUE}, partial output is printed in the console.}
 }
 \value{
 \describe{
-\item{\code{BASiCS_VarThresholdSearchHVG}}{A table displaying the results of highly variable genes detection for different variance contribution thresholds.}
-\item{\code{BASiCS_VarThresholdSearchLVG}}{A table displaying the results of lowly variable genes detection for different variance contribution thresholds.}
+\item{\code{BASiCS_VarThresholdSearchHVG}}{A table displaying the results of 
+highly variable genes detection for different variance contribution thresholds.}
+\item{\code{BASiCS_VarThresholdSearchLVG}}{A table displaying the results of 
+lowly variable genes detection for different variance contribution thresholds.}
 }
 }
 \description{
-Detection method for highly and lowly variable genes using a grid of variance contribution thresholds
+Detection method for highly and lowly variable genes 
+using a grid of variance contribution thresholds
 }
 \details{
 See vignette
@@ -41,7 +47,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}
