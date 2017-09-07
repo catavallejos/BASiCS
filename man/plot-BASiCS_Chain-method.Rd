@@ -5,10 +5,7 @@
 \alias{plot-BASiCS_Chain-method}
 \alias{plot}
 \alias{plot,BASiCS_Chain-method}
-<<<<<<< HEAD
-=======
 \alias{plot,BASiCS_Chain,ANY-method}
->>>>>>> BioC
 \title{'plot' method for BASiCS_Chain objects}
 \usage{
 \S4method{plot}{BASiCS_Chain,ANY}(x, Param = "mu", Gene = NULL,
@@ -17,15 +14,6 @@
 \arguments{
 \item{x}{A \code{BASiCS_Chain} object.}
 
-<<<<<<< HEAD
-\item{Param}{Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}}
-
-\item{Gene}{Specifies which gene is requested. Required only if \code{Param = "mu"} or \code{"delta"}}
-
-\item{Cell}{Specifies which cell is requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}}
-
-\item{Batch}{Specifies which batch is requested. Required only if \code{Param = "theta"}}
-=======
 \item{Param}{Name of the slot to be used for the plot. Possible values: \code{'mu'}, \code{'delta'}, 
 \code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
 
@@ -34,7 +22,6 @@
 \item{Cell}{Specifies which cell is requested. Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
 
 \item{Batch}{Specifies which batch is requested. Required only if \code{Param = 'theta'}}
->>>>>>> BioC
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 
@@ -42,12 +29,9 @@
 
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
 }
-<<<<<<< HEAD
-=======
 \value{
 A plot object
 }
->>>>>>> BioC
 \description{
 'plot' method for BASiCS_Chain objects
 }
@@ -58,15 +42,8 @@ help(BASiCS_MCMC)
 
 }
 \references{
-<<<<<<< HEAD
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
-}
-\author{
-Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
-=======
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
->>>>>>> BioC
 }
