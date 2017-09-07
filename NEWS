@@ -275,3 +275,156 @@ version 0.7.29: (2017-07-24)
 version 0.7.30: (2017-07-26)
 - Typo fixed in 'BASiCS:::HiddenBASiCS_MCMC_Start' function (thanks to @bdulken for pointing out this issue)
 
+version 1.0.0: (2017-07-29)
+- Initial big merge with @nilseling changes (in preparation for Bioconductor submission)
+- For reference, here is a summary of the changes implemented by @nilseling:
+  * Creation of individual .R for each R function (but all 'Hidden' functions are in one file)
+  * BASiCS_Data class replaced by SummarizedExperiment class (Bioconductor)
+  * Contact email updated to 'cvallejos@@turing.ac.uk'
+  * Methods for BASiCS_Data and BASiCS_D_Data objects removed (these classes no longer exist)
+  * Adjust newBASiCS_Data function to create a SummarizedExperiment object
+  * 'cat' calls replaced by 'message' calls
+  * Clean up of BASiCS_D_TestDE function (removed unused args)
+  * Clean up of BASiCS_DetectHVG_LVG function (using SummarizedExperiment class)
+  * Clean up of BASiCS_MCMC function (using SummarizedExperiment class)
+  * Clean up of BASiCS_Sim function (using SummarizedExperiment class; extra arg 'muSpikes')
+  * Clean up of BASiCS_DetectHVG_LVG function (using SummarizedExperiment class)
+  * Clean up of BASiCS_VarianceDecomp function (using SummarizedExperiment class)
+  * Clean up of BASiCS_VarThresholdSearchHVG function (using SummarizedExperiment class)
+  * Clean up of BASiCS_DenoisedCounts function (using SummarizedExperiment class)
+  * Clean up of BASiCS_DenoisedRates function (using SummarizedExperiment class)
+  * Clean up of HiddenBASiCS_MCMC_Start function (using SummarizedExperiment class)
+  * Clean up of makeExampleBASiCS_Data function (using SummarizedExperiment class) 
+  * Removed methods associated to BASiCS_D_MCMC class (no longer in use)
+  * NAMESPACE + Rd files updated accordingly
+  * DESCRIPTION file updated accordingly
+  * Vignette file updated accordingly
+  
+version 1.0.1: (2017-07-31)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * newBASiCS_Data : added ref to GB paper + default par value doc + Nils as author
+  * BASiCS_Filter : added ref to GB paper + default par value doc 
+  * makeExampleBASiCS_Data : added ref to GB paper + default par value doc + Nils as author
+  * BASiCS_MCMC : added ref to GB paper + Nils as author + fix print of system.time + updated examples
+- Major changes function by function
+  * makeExampleBASiCS_Data : `Case1` param replaced by `Example` (vignette + unit test updated accordingly)
+  * BASiCS_MCMC : default value for PriorDelta set to 'log-normal' 
+  * HiddenBASiCS_MCMC_Start : new starting values for delta (as in main repo)
+  
+version 1.0.2: (2017-08-01)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_MCMC : 'MCMC_Output' replaced by 'Chain' in examples
+- Major changes function-by-function
+  * BASiCS_MCMC : chains stored a single .Rds files, with BASiCS_Chain format (rather than separate .txt files)
+  * BASiCS_LoadChain : updated accordingly
+  * BASiCS_DetectHVG : evidence threhold to be defined by EFDR only 
+- Vignette updated accordingly 
+
+version 1.0.3: (2017-08-01)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_DetectHVG / LVG: added vertical/horizontal lines in EFDR/EFND plot, subtasks moved to hidden functions (avoids repeated code)
+- Major changes function-by-function
+  * BASiCS_DetectLVG : evidence threhold to be defined by EFDR only 
+  * BASiCS_DetectHVG / LVG: fix on default prob threshold = 0.5 when optimal is < 0.5
+- Examples in BASiCS_MCMC updated accordingly
+- Vignette updated accordingly
+
+version 1.0.4: (2017-08-01)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_VarThresholdSearchHVG / LVG : EFDR criteria updated as in BASiCS_DetectHVG / LVG
+  * BASiCS_TestDE : added examples
+- Major changes function-by-function
+  * BASiCS_D_TestDE : no longer in use message added
+- Examples in BASiCS_MCMC updated accordingly
+- Vignette updated accordingly
+- Updated DESCRIPTION file (authors and description)
+- Updated welcome message (with link to new wiki)
+
+version 1.0.5: (2017-08-01)
+- Major changes function-by-function
+  * BASiCS_TestDE : plotting functionality for offset added
+- ACF plot added to BASiCS_Chain plots
+
+version 1.0.6: (2017-08-02)
+- 'matrixStats' added within 'Imports' in DESCRIPTION (to use 'colMedians' function)
+- Minor changes function-by-function (revision of documentation + minor bugs)
+  * BASiCS_TestDE : Improved offset plots
+- Major changes function-by-function
+  * BASiCS_TestDE : Ref/Test notation changed to Group1/2 + output table names changed (to Mean/Disp) + 
+  offset corrected objects as output + separated output tables Mean/Disp + post prob threshold moved to hidden function (avoids duplicated code)
+  
+version 1.0.7: (2017-08-03)
+- Multiple changes in BASiCS_TestDE:
+  * Added examples of table viewing in doc
+  * Added chain extracts to run examples
+  * Results for differential dispersion to exclude differential mean genes
+  * EFDR / EFNR control plot added
+  * MA plots added
+- Main hidden functions moved into individual files
+- 'graphics' + 'KernSmooth' added as dependence to use 'smoothScatter'
+- 'smooth' argument changed to 'SmoothPlot' in plot functions/methods
+- Added reference :: to basic functions (e.g. boxplot, var, acf, etc)
+- devtools::check() OK - 1 warning : BiocStyle in vignette
+
+version 1.0.8: (2017-08-03)
+- 'Data' arg removed from args in:
+  'HiddenHeaderDetectHVG_LVG' + 'HiddenVarDecomp' + 'BASiCS_DetectHVG' + 'BASiCS_DetectLVG'
+  + 'BASiCS_VarThresholdSearchHVG' + 'BASiCS_VarThresholdSearchLVG'
+- 'object' arg renamed as 'Chain' in 'BASiCS_DetectHVG' + 'BASiCS_DetectLVG' 
+  + 'BASiCS_VarThresholdSearchHVG' + 'BASiCS_VarThresholdSearchLVG'
+- Examples in BASiCS_MCMC updated to use built-in chain
+- Removal of 'smoothPlot' usage in plots for 'BASiCS_Summary' class (avoids issues with log)
+- Volcano plots added in BASiCS_TestDE function
+- Resolved issues with log scale in 'smoothScatter'
+- Minor bugs fixed in BASiCS_TestDE
+- 'EviThreshold' arg replaced by 'ProbThreshold' in 'BASiCS_HVG' + 'BASiCS_LVG'
+- Vignette updated accordingly
+
+version 1.0.9: (2017-08-04)
+- newBASiCS_Data : added check to ensure SpikeInfo is a data.frame
+- BASiCS_TestDE : default value for EpsilonM & EpsilonD has changed
+- Vignette + examples updated accordingly
+
+version 1.0.10: (2017-08-06)
+- BASiCS_TestDE : changes in output messages
+- Gene name added in plot method for BASiCS_Chain objects
+
+version 1.0.11: (2017-08-06)
+- BASiCS_VarianceDecomp : small bugs fixed (unused Data object)
+- colnames fixed on cell-specific slots ChainSC and ChainRNA
+- Rcpp::checkUserInterrupt() activated in C++ code for interruptions
+- 'grDevices' added as dependency
+
+version 1.0.11: (2017-08-13)
+- 'WithSpikes' argument removed from 'BASiCS_LoadChain' function
+
+version 1.0.12: (2017-08-14)
+- 'SummarizedExperiment' class replaced by 'SingleCellExperiment'
+- Updated vignette
+
+version 1.0.13: (2017-08-15)
+- Minor changes to documentation
+- Minor changes to vignette
+
+version 1.1.0: (2017-08-16)
+- Minor changes required to pass BiocCheck (used formatR and BiocChecks)
+
+version 0.99.0: (2017-08-28)
+- Minor changes to complete Bioconductor submission checklist
+- Version re-numbered according to Bioconductor guidelines
+
+- DEVELOPMENT NOTES (potential future changes):
+  * Delete BASiCS_VarianceDecomp? 
+  * Change plots to use ggplot2?
+  * Should we separate BASiCS_TestDE in two functions : different tolerance for DE ? 
+  * In plots, change axis labels to be text (no greek)?
+  * Implement BASiCS_Denoise in C++
+  * Create 'no longer in use' message for selected functions. 
+  * Implement change suggested by Giacomo Zanella
+  * Add checks to BASiCS_MCMC verify SE object has all the required info. 
+  * Store all necessary parameters for chain restart
+  * Convert Rcpp print to messages
+
+  
+  
+  

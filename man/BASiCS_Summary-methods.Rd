@@ -15,6 +15,7 @@
 Prints a summary of the properties of \code{object}.
 }
 \description{
+<<<<<<< HEAD
 'show' method for \code{\link[BASiCS]{BASiCS_Summary-class}} objects.
 }
 \examples{
@@ -29,4 +30,19 @@ Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequen
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+=======
+'show' method for \code{\link[BASiCS]{BASiCS_Summary}} objects.
+}
+\examples{
+
+# See
+help(BASiCS_MCMC)
+
+}
+\references{
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+}
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+>>>>>>> BioC
 }

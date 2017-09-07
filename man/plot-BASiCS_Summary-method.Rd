@@ -3,16 +3,27 @@
 \docType{methods}
 \name{plot-BASiCS_Summary-method}
 \alias{plot-BASiCS_Summary-method}
+<<<<<<< HEAD
 \alias{plot,BASiCS_Summary-method}
+=======
+\alias{plot,BASiCS_Summary-method,}
+\alias{plot,BASiCS_Summary,ANY-method}
+>>>>>>> BioC
 \title{'plot' method for BASiCS_Summary objects}
 \usage{
 \S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,
   Genes = NULL, Cells = NULL, Batches = NULL, xlab = "", ylab = "",
+<<<<<<< HEAD
   xlim = "", ylim = "", pch = 16, col = "blue", bty = "n", ...)
+=======
+  xlim = "", ylim = "", pch = 16, col = "blue", bty = "n",
+  SmoothPlot = TRUE, ...)
+>>>>>>> BioC
 }
 \arguments{
 \item{x}{A \code{BASiCS_Summary} object.}
 
+<<<<<<< HEAD
 \item{Param}{Name of the slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu, theta}}
 
 \item{Param2}{Name of the second slot to be used for the plot. Possible values: \code{mu, delta, phi, s, nu} (combinations between gene-specific and cell-specific parameters are not admitted)}
@@ -22,6 +33,19 @@
 \item{Cells}{Specifies which cells are requested. Required only if \code{Param = "phi", "s"} or \code{"nu"}}
 
 \item{Batches}{Specifies which batches are requested. Required only if \code{Param = "theta"}}
+=======
+\item{Param}{Name of the slot to be used for the plot. Possible values: \code{'mu'}, \code{'delta'}, 
+\code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
+
+\item{Param2}{Name of the second slot to be used for the plot. Possible values: \code{'mu'}, \code{'delta'}, 
+\code{'phi'}, \code{'s'} and \code{'nu'} (combinations between gene-specific and cell-specific parameters are not admitted)}
+
+\item{Genes}{Specifies which genes are requested. Required only if \code{Param = 'mu'} or \code{'delta'}}
+
+\item{Cells}{Specifies which cells are requested. Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
+
+\item{Batches}{Specifies which batches are requested. Required only if \code{Param = 'theta'}}
+>>>>>>> BioC
 
 \item{xlab}{As in \code{\link[graphics]{par}}.}
 
@@ -37,8 +61,18 @@
 
 \item{bty}{As in \code{\link[graphics]{par}}.}
 
+<<<<<<< HEAD
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
 }
+=======
+\item{SmoothPlot}{Logical parameter. If \code{TRUE}, transparency will be added to the color of the dots.}
+
+\item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
+}
+\value{
+A plot object
+}
+>>>>>>> BioC
 \description{
 'plot' method for BASiCS_Summary objects
 }
@@ -49,8 +83,15 @@ help(BASiCS_MCMC)
 
 }
 \references{
+<<<<<<< HEAD
 Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data.
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+=======
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+}
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+>>>>>>> BioC
 }

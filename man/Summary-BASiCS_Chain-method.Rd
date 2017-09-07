@@ -14,7 +14,11 @@
 \item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}} function.}
 }
 \value{
+<<<<<<< HEAD
 An object of class \code{\link[BASiCS]{BASiCS_Summary-class}}.
+=======
+An object of class \code{\link[BASiCS]{BASiCS_Summary}}.
+>>>>>>> BioC
 }
 \description{
 For each of the BASiCS parameters (see Vallejos et al 2015), 
@@ -23,6 +27,7 @@ density interval with probabilty equal to \code{prob}.
 }
 \examples{
 
+<<<<<<< HEAD
 Data = makeExampleBASiCS_Data()
 MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 MCMC_Summary <- Summary(MCMC_Output)
@@ -35,4 +40,14 @@ Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequen
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+=======
+help(BASiCS_MCMC)
+
+}
+\references{
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+}
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+>>>>>>> BioC
 }

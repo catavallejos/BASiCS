@@ -6,5 +6,4 @@ src/*.so
 src/*.dll
 inst/doc
 ..Rcheck
-
-TableRef_.txt
+*/.DS_Store

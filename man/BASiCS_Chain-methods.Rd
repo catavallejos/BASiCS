@@ -15,11 +15,16 @@
 Prints a summary of the properties of \code{object}.
 }
 \description{
+<<<<<<< HEAD
 'show' method for \code{\link[BASiCS]{BASiCS_Chain-class}} objects.
+=======
+'show' method for \code{\link[BASiCS]{BASiCS_Chain}} objects.
+>>>>>>> BioC
 }
 \examples{
 
 Data = makeExampleBASiCS_Data()
+<<<<<<< HEAD
 MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 
 }
@@ -28,4 +33,14 @@ Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequen
 }
 \author{
 Catalina A. Vallejos \email{catalina.vallejos@mrc-bsu.cam.ac.uk}
+=======
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
+
+}
+\references{
+Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+}
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+>>>>>>> BioC
 }

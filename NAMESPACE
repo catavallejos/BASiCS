@@ -1,22 +1,28 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
-importFrom(Rcpp, evalCpp)
-importFrom(coda, HPDinterval)
-importFrom(methods, Summary)
-importFrom(testthat, context,
-           test_check)
-importMethodsFrom(BiocGenerics, counts)
-importMethodsFrom(scran, computeSumFactors)
+importFrom("stats", "acf")
+importFrom("Rcpp", "evalCpp")
+importFrom("coda", "HPDinterval")
+importFrom("methods", "Summary")
+importFrom("testthat", "context",
+           "test_check")
+import("SingleCellExperiment")
+import("KernSmooth")
+importFrom("graphics", "abline", "barplot", "legend", "lines", "par",
+             "points", "segments", "smoothScatter")
+importFrom("data.table", "fread")
+importFrom("graphics", "plot")
+importFrom("methods", "is", "new", "show")
+importFrom("S4Vectors", "metadata")
+importFrom("SummarizedExperiment", "assay")
+importFrom("stats", "median", "model.matrix", "rgamma", "rpois", "runif")
+importFrom("utils", "packageVersion", "write.table")
+importMethodsFrom("BiocGenerics", "counts")
+importMethodsFrom("scran", "computeSumFactors")
 
-exportClasses("BASiCS_Data", "BASiCS_Chain" , "BASiCS_Summary",
-              "BASiCS_D_Data", "BASiCS_D_Chain" , "BASiCS_D_Summary")
+exportClasses("BASiCS_Chain" , "BASiCS_Summary")
 
-exportMethods(counts, 
-              displayTechIndicator, 
-              displaySpikeInput,
-              displayGeneNames,
-              displayBatchInfo,
-              Summary,
+exportMethods(Summary,
               plot,
               displayChainBASiCS,
               displaySummaryBASiCS)
@@ -34,9 +40,5 @@ export(BASiCS_Filter,
        BASiCS_VarThresholdSearchHVG,
        BASiCS_VarThresholdSearchLVG,
        BASiCS_DenoisedRates,
-       newBASiCS_D_Data,
-       CombineBASiCS_Data,
-       makeExampleBASiCS_D_Data,
-       newBASiCS_D_Chain,
-       CombineBASiCS_Chain,
-       BASiCS_D_TestDE)
+       BASiCS_DenoisedCounts,
+       BASiCS_TestDE)

@@ -1,9 +1,20 @@
 # BASiCS
-Bayesian Analysis of Single-Cell Sequencing Data is an integrated Bayesian hierarchical model where:
 
-- Cell-specific normalization constants are estimated as part of the model parameters.
-- Technical variability is quantified based on spike-in genes that are artificially introduced to each analysed cells lysate.
-- The total variability of the expression counts is decomposed into technical and biological components.
+Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene expression levels within seemingly homogeneous populations of cells. However, these experiments are prone to high levels of technical noise, creating new challenges for identifying genes that show genuine heterogeneous expression within the group of cells under study. 
+
+BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is an integrated Bayesian hierarchical model that propagates statistical uncertainty by simultaneously performing data normalisation (global scaling), technical noise quantification and two types of **supervised** downstream analyses: 
+
+- **For a single group of cells** [1]: BASiCS provides a criterion to identify highly (and lowly) variable genes within the group. 
+
+- **For two (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional differential expression tools, BASiCS can uncover changes in mean expression between the groups. Besides this, BASiCS can also uncover changes in *over-dispersion* --- a measure for the residual cell-to-cell variation that is observed after accounting for technical noise. This feature has led, for example, to novel insights in the context of immune cells across aging [3].
+
+In both cases, a probabilistic output is provided, with posterior probability thresholds calibrated through the expected false discovery rate (EFDR) [4].
+
+Currently, BASiCS relies on the use of **spike-in genes** --- that are artificially introduced to each cell's lysate --- to perform these analyses. 
+
+**Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
+
+For technical details, references are provided at the bottom of this document. 
 
 ## Installation
 
@@ -16,7 +27,7 @@ devtools::install_github("catavallejos/BASiCS", build_vignettes = TRUE)
 
 This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and repeat the installation. 
 
-```{r dependencies}
+```R
 #library(devtools)
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("BiocGenerics")
@@ -26,80 +37,59 @@ This installation might fail if some of the dependency libraries are not yet ins
 
 After a successful installation, the BASiCS library can be loaded using[^footnoteInstall] 
 
-```{r load_packages}
+```R
 library(BASiCS)
 ```
 
 [^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
 
-### Troubleshooting
+## Installation troubleshooting
 
-#### `gfortran` error
-
-If you are unable to install BASiCS in a Mac OS X system, <a href="http://thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error/"> you might require an additional gfortran library. </a> 
-
-- If you are running R versions 3.0.0 - R 3.3.0, this can be installed in the Mac terminal using the following command:
-
-```{}
-curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
-sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
-```
-- If you are running R 3.4.0, you should install the official gfortran 6.1.0 binary for OS X El Capitan (10.11) from https://gcc.gnu.org/wiki/GFortranBinaries. 
-
-#### `pandoc` error
-
-If you are not using RStudio, you might need to manually install `pandoc` in order to create the vignette provided for BASiCS
-
-Additional installation issues/solutions can be found here: https://github.com/catavallejos/BASiCS/issues/9
+A summary of the installation errors that have been reported for BASiCS is provided [here](https://github.com/catavallejos/BASiCS/wiki/7.-Installation-troubleshooting). If you encounter any additional issues, **please let us know so that we can update this information**.
 
 ## How to use BASiCS?
 
-- To detect highly and lowly variable genes within a populations of cells: please refer to the vignette
+BASiCS includes a vignette where its usage is illutrated. To access the vignette, please use:
 
 ```R
-vignette('BASiCSIntro')
+vignette('BASiCS')
 ```
 
-- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a>
+Individual topics are summarized in the BASiCS wiki:
 
-TODO: a quick start for BASiCS. Like vignette("some-stuff")
+- [Quick start](https://github.com/catavallejos/BASiCS/wiki/1.-Quick-start)
 
-## Development
+- [Input preparation](https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation)
 
-### Sanity check
+- [MCMC convergence](https://github.com/catavallejos/BASiCS/wiki/3.-MCMC-convergence)
 
-In the folder of the development version from GitHub:
+- [Posterior summary](https://github.com/catavallejos/BASiCS/wiki/4.-Posterior-summary)
 
-```
-R CMD check .
-```
+- [HVL & LVG detection](https://github.com/catavallejos/BASiCS/wiki/5.-HVG-&-LVG-detection) for a single group of cells
 
-### Build from source
+- [Differential analysis](https://github.com/catavallejos/BASiCS/wiki/6.-Differential-analysis) between 2 groups of cells (mean and over-dispersion)
 
-In the parent folder of the development version from GitHub:
 
-```
-R CMD build BASiCS
-```
+<!---- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a> TODO: a quick start for BASiCS. Like vignette("some-stuff") ---> 
 
-And run then
+## Authors
 
-```R
-install.packages('BASiCS_x.x.x.tar.gz', repos=NULL)
-```
+- [Catalina Vallejos](https://sites.google.com/view/catalinavallejos) (cvallejos 'at' turing.ac.uk)
+- [Nils Eling](https://github.com/nilseling)
+- John Marioni
+- Sylvia Richardson
 
-on the generated file.
+## Acknowledgements
 
-## Author
+We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for support and discussions throughout the development of this R library. In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and support during the preparation the Bioconductor submission. 
 
-Catalina A. Vallejos (cvallejos 'at' turing.ac.uk)
+We also acknowledge feedback and contributions from (Github aliases provided within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
 
-## Collaborators
-
-- <a href="https://github.com/horta"> Danilo Horta </a>
-- <a href="https://github.com/nilseling"> Nils Eling </a>
+This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European Bioinformatics Institute (core European Molecular Biology Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
 
 ## References
 
-- <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). BASiCS: Bayesian Analysis of Single-Cell Sequencing Data </a>
-- <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Beyond comparisons of means: understanding changes in gene expression at the single cell level</a>
+- [1] <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). PLoS Computational Biology. </a>
+- [2] <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Genome Biology. </a>
+- [3] <a href="http://science.sciencemag.org/content/355/6332/1433">Martinez-Jimenes <em>et al.</em> (2017). Science. </a>
+- [4] <a href="https://www.ncbi.nlm.nih.gov/pubmed/15054023">Newton <em>et al.</em> (2004). Biostatistics. </a>
