@@ -88,7 +88,7 @@ of the differential mean test}
    the first or second groups of cells.}
    }
 \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the results of 
-the differential dispersion test (excludes genes for which the mean changes).}
+the differential dispersion test (excludes genes for which the mean does not changes).
    \describe{
    \item{\code{GeneNames}}{Gene name}
    \item{\code{MeanOverall}}{For each gene, the estimated mean expression parameter 
@@ -107,21 +107,21 @@ the differential dispersion test (excludes genes for which the mean changes).}
    between the first and second groups of cells.}
    \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher over-dispersion in 
    the first or second groups of cells.}
-   }
+   }}
  \item{\code{DiffExpSummary}}{A list containing the following information for the 
- differential mean expression test:}
+ differential mean expression test:
    \describe{
   \item{\code{EviThreshold}}{Evidence thresholds.}
   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
-  }
+  }}
  \item{\code{DiffOverDispSummary}}{A list containing the following information for 
- the differential over-dispersion test:}
+ the differential over-dispersion test:
    \describe{
   \item{\code{EviThreshold}}{Evidence thresholds.}
   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
-  }
+  }}
  \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: 
  \code{Chain1} after offset removal.}
  \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object: 

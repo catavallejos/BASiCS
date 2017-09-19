@@ -517,7 +517,16 @@ version 0.99.2: (2017-09-18)
 - 'newBASiCS_Chain': format 
 
 version 0.99.3: (2017-09-19)
+
 - Extra unit test (parameter estimates for a given seed)
+- Format + vectorisation in `HiddenThresholdSearchTestDE` function
+- `HiddenProbDE` removed as no longer needed
+
+- TODO:
+  * Fix indent in TestDE documentation
+  * Fix FoldChange to 2 scale TestDE
+  * Message when EFDR is not met
+  * Update HiddenThresholdSearchTestDE as in qPCRBayes
 
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 

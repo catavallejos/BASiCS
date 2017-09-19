@@ -7,10 +7,6 @@ HiddenTailProbLowDV <- function(chain, threshold) {
     return(sum(chain < threshold)/length(chain))
 }
 
-HiddenProbDE <- function(chain, tol) {
-    return(apply(chain, 2, HiddenTailProbUpDV, threshold = tol))
-}
-
 HiddenEFDRDV <- function(EviThreshold, Prob) {
     return(sum((1 - Prob) * I(Prob > EviThreshold))/sum(I(Prob > EviThreshold)))
 }
