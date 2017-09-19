@@ -1,20 +1,27 @@
 #' @title Creates a BASiCS_Chain object from pre-computed MCMC chains
 #'
-#' @description \code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain}} object from pre-computed MCMC chains.
+#' @description \code{BASiCS_Chain} creates a \code{\linkS4class{BASiCS_Chain}} 
+#' object from pre-computed MCMC chains.
 #'
-#' @param mu MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes
-#' (matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)
-#' @param delta MCMC chain for gene-specific biological over-dispersion parameters \eqn{\delta_i}, biological genes only
+#' @param mu MCMC chain for gene-specific mean expression parameters 
+#' \eqn{\mu_i}, defined as true input molecules in case of technical genes
+#' (matrix with \code{q} columns, technical genes located at the end of the 
+#' matrix, all elements must be positive numbers)
+#' @param delta MCMC chain for gene-specific biological over-dispersion 
+#' parameters \eqn{\delta_i}, biological genes only
 #' (matrix with \code{q.bio} columns, all elements must be positive numbers)
-#' @param phi MCMC chain for cell-specific mRNA content normalising parameters \eqn{\phi_j}
-#' (matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})
-#' @param s MCMC chain for cell-specific technical normalisation parameters \eqn{s_j}
-#' (matrix with \code{n} columns, all elements must be positive numbers)
+#' @param phi MCMC chain for cell-specific mRNA content normalising parameters 
+#' \eqn{\phi_j} (matrix with \code{n} columns, all elements must be positive 
+#' numbers and the sum of its elements must be equal to \code{n})
+#' @param s MCMC chain for cell-specific technical normalisation parameters 
+#' \eqn{s_j} (matrix with \code{n} columns, all elements must be 
+#' positive numbers)
 #' @param nu MCMC chain for cell-specific random effects \eqn{\nu_j}
 #' (matrix with \code{n} columns, all elements must be positive numbers)
-#' @param theta MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)
+#' @param theta MCMC chain for technical variability hyper-parameter 
+#' \eqn{\theta} (vector, all elements must be positive)
 #'
-#' @return An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
+#' @return An object of class \code{\linkS4class{BASiCS_Chain}}.
 #'
 #' @examples
 #'
@@ -39,8 +46,17 @@
 #' @references 
 #' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-newBASiCS_Chain <- function(mu, delta, phi, s, nu, theta) {
-    Chain <- new("BASiCS_Chain", mu = mu, delta = delta, phi = phi, s = s, nu = nu, theta = theta)
-    show(Chain)
+newBASiCS_Chain <- function(mu, 
+                            delta, 
+                            phi, 
+                            s, 
+                            nu, 
+                            theta) {
+    Chain <- new("BASiCS_Chain", mu = mu, 
+                                 delta = delta, 
+                                 phi = phi, 
+                                 s = s, 
+                                 nu = nu, 
+                                 theta = theta)
     return(Chain)
 }

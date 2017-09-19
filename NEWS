@@ -514,6 +514,7 @@ version 0.99.2: (2017-09-18)
 - 'newBASiCS_Data': format + checks moved to `HiddenChecksBASiCS_Data` function
 - `HiddenChecksBASiCS_Data`: use of colMeans2, rowMeans2
 - Format in welcome message
+- 'newBASiCS_Chain': format 
 
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 

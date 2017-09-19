@@ -7,28 +7,35 @@
 newBASiCS_Chain(mu, delta, phi, s, nu, theta)
 }
 \arguments{
-\item{mu}{MCMC chain for gene-specific expression levels \eqn{\mu_i}, defined as true input molecules in case of technical genes
-(matrix with \code{q} columns, technical genes located at the end of the matrix, all elements must be positive numbers)}
+\item{mu}{MCMC chain for gene-specific mean expression parameters 
+\eqn{\mu_i}, defined as true input molecules in case of technical genes
+(matrix with \code{q} columns, technical genes located at the end of the 
+matrix, all elements must be positive numbers)}
 
-\item{delta}{MCMC chain for gene-specific biological over-dispersion parameters \eqn{\delta_i}, biological genes only
+\item{delta}{MCMC chain for gene-specific biological over-dispersion 
+parameters \eqn{\delta_i}, biological genes only
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 
-\item{phi}{MCMC chain for cell-specific mRNA content normalising parameters \eqn{\phi_j}
-(matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
+\item{phi}{MCMC chain for cell-specific mRNA content normalising parameters 
+\eqn{\phi_j} (matrix with \code{n} columns, all elements must be positive 
+numbers and the sum of its elements must be equal to \code{n})}
 
-\item{s}{MCMC chain for cell-specific technical normalisation parameters \eqn{s_j}
-(matrix with \code{n} columns, all elements must be positive numbers)}
+\item{s}{MCMC chain for cell-specific technical normalisation parameters 
+\eqn{s_j} (matrix with \code{n} columns, all elements must be 
+positive numbers)}
 
 \item{nu}{MCMC chain for cell-specific random effects \eqn{\nu_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
 
-\item{theta}{MCMC chain for technical variability hyper-parameter \eqn{\theta} (vector, all elements must be positive)}
+\item{theta}{MCMC chain for technical variability hyper-parameter 
+\eqn{\theta} (vector, all elements must be positive)}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
+An object of class \code{\linkS4class{BASiCS_Chain}}.
 }
 \description{
-\code{BASiCS_Chain} creates a \code{\link[BASiCS]{BASiCS_Chain}} object from pre-computed MCMC chains.
+\code{BASiCS_Chain} creates a \code{\linkS4class{BASiCS_Chain}} 
+object from pre-computed MCMC chains.
 }
 \examples{
 
