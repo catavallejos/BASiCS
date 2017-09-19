@@ -12,142 +12,199 @@ version 0.1.2: (2015-04-23)
 
 version 0.1.3: (2015-05-18)
 
-- In 'plotBASiCSDispVsExp': 'log="xy"' argument added
-- In class 'BASiCS_Data': internal checks added (pre-filter of samples and transcripts)
-- In 'BASiCS_MCMC' c++ code: Rcpp::checkUserInterrupt() added for fast user-requested interruption of MCMC sampler
-- S4 method 'plot' for 'BASiCS_Chain' signature: argument 'Column' replaced by 'Gene' and 'Cell'
-- Replacement of 'plotBASiCSNormPhi' and 'plotBASiCSNormS' by S4 method 'plot' ('BASiCS_Summary' signature)
-- S4 method 'plot' for 'BASiCS_Summary' signature: does not include plots for all model parameters
-- S4 method 'plot' for 'BASiCS_Summary' signature: does not include scatterplots of gene-specific and cell-specific model parameters (replacing 'plotBASiCSExpVsDisp')
-- 'BASiCS_VarianceDecomp' has been made visible to users (former 'HiddenVarDecomp' function) and output does now allow gene annotation. 
+- 'plotBASiCSDispVsExp': 'log="xy"' argument added
+- 'BASiCS_Data': internal checks added (pre-filter of samples and transcripts)
+- 'BASiCS_MCMC' c++ code: Rcpp::checkUserInterrupt() added for fast 
+user-requested interruption of MCMC sampler
+- S4 method 'plot' for 'BASiCS_Chain' signature: argument 'Column' replaced by 
+'Gene' and 'Cell'
+- Replacement of 'plotBASiCSNormPhi' and 'plotBASiCSNormS' by S4 method 'plot' 
+('BASiCS_Summary' signature)
+- S4 method 'plot' for 'BASiCS_Summary' signature: does not include plots for 
+all model parameters
+- S4 method 'plot' for 'BASiCS_Summary' signature: does not include 
+scatterplots of gene-specific and cell-specific model parameters (replacing 
+'plotBASiCSExpVsDisp')
+- 'BASiCS_VarianceDecomp' has been made visible to users (former 
+'HiddenVarDecomp' function) and output does now allow gene annotation. 
 - 'BASiCS_Filter' function added.
-- Vignette has been updated according to the changes above. Instructions for installation were added. 
+- Vignette has been updated according to the changes above. Instructions for 
+installation were added. 
 - 'BASiCS_Filter' function added.
 - Dependency to R (>= 3.1.0) has been added.
 
 version 0.1.4: (2015-05-21)
 
-- 'BASiCS_Denoise' function added. It produces a table of normalised and denoised expression counts (after removing the effect of technical variation). 
+- 'BASiCS_Denoise' function added. It produces a table of normalised and 
+denoised expression counts (after removing the effect of technical variation). 
 
 version 0.1.5: (2015-05-27)
-- Small typo in 'BASiCS_VarThresholdSearchHVG' and 'BASiCS_VarThresholdSearchLVG' has been fixed. 
+- Small typo in 'BASiCS_VarThresholdSearchHVG' and 
+'BASiCS_VarThresholdSearchLVG' has been fixed. 
 
 version 0.1.6: (2015-06-01)
-- Replacement of parameter-specific 'displayChain's functions by a generic method displayChainBASiCS
-- Replacement of parameter-specific 'displaySummary's functions by a generic method displaySummaryBASiCS
-- In 'BASiCS_DetectHVG' and 'BASiCS_DetectLVG': constrain added to that prob >= 0.5 is required to detect HVG and LVG
+- Replacement of parameter-specific 'displayChain's functions by a generic 
+method displayChainBASiCS
+- Replacement of parameter-specific 'displaySummary's functions by a generic 
+method displaySummaryBASiCS
+- In 'BASiCS_DetectHVG' and 'BASiCS_DetectLVG': constrain added to that 
+prob >= 0.5 is required to detect HVG and LVG
 
 version 0.2.0: (2015-06-24)
-- New parametrization for mRNA content size factors $\phi_j$ that improves mixing of the MCMC algorithm (using adaptive Dirichlet proposals)
+- New parametrization for mRNA content size factors $\phi_j$ that improves 
+mixing of the MCMC algorithm (using adaptive Dirichlet proposals)
 - Updated vignette
 
 version 0.2.1: (2015-07-23)
-- Argument 'GeneNames' has been added to functions 'BASiCS_VarianceDecomp', 'BASiCS_DetectHVG', 'BASiCS_DetectLVG' so that users can specify gene labels or names that will be used for these functions's output. 
+- Argument 'GeneNames' has been added to functions 'BASiCS_VarianceDecomp', 
+'BASiCS_DetectHVG', 'BASiCS_DetectLVG' so that users can specify gene labels 
+or names that will be used for these functions's output. 
 
 version 0.3.0: (2015-07-31)
 - New slot BacthInfo in 'BASiCS_Data' class
 - Batch-speficic technical variability parameters are allowed
-- 'BASiCS_VarianceDecomp' modified to accommodate batch membership (including graphical output)
+- 'BASiCS_VarianceDecomp' modified to accommodate batch membership (including 
+graphical output)
 
 version 0.3.1: (2015-09-17)
 - New slot GeneNames in 'BASiCS_Data' class
-- Changes in the constructor `newBASiCS_Data` to allow easier construction of `BASiCS_Data` objects
-- Minor changes to some functions' output to use the new GeneNames slot of 'BASiCS_Data' class
+- Changes in the constructor `newBASiCS_Data` to allow easier construction of 
+`BASiCS_Data` objects
+- Minor changes to some functions' output to use the new GeneNames slot of 
+'BASiCS_Data' class
 
 version 0.3.2: (2015-10-23)
-- Minor changes to the output of `BASiCS_MCMC` function (colnames of the elements related to the parameter $\theta$)
-- Addition of extra optional parameter `ls.phi0` to `BASiCS_MCMC` function. This is helpful on situations where the default value led to slow mixing to the chains related to the normalising constants $\phi_j$'s. 
+- Minor changes to the output of `BASiCS_MCMC` function (colnames of the 
+elements related to the parameter $\theta$)
+- Addition of extra optional parameter `ls.phi0` to `BASiCS_MCMC` function. 
+This is helpful on situations where the default value led to slow mixing to 
+the chains related to the normalising constants $\phi_j$'s. 
 
 version 0.3.3: (2015-11-05)
 - Same method as before but improved performance of C++ code
 
 version 0.3.4: (2015-11-11)
-- Fix of example code of 'newBASiCS_Data' function. Thanks to Simon Andrews for pointing out this issue.
+- Fix of example code of 'newBASiCS_Data' function. Thanks to Simon Andrews 
+for pointing out this issue.
 
 version 0.3.5: (2015-11-27)
-- Optional argument `PriorDelta` added to `BASiCS_MCMC` function, to allow optional use of `gamma` or `log-normal` priors for delta. 
-- In `BASiCS_MCMC` function, change of default value of `s2.mu` to 0.5. Allows better shrinkage in situations where a gene has zero counts across all cells.
-- In `BASiCS_Data` class. Count matrices where a gene has zero counts across all cells are now allowed. However, a warning is returned in such case. Only use such matrices when running differential expression results. 
+- Optional argument `PriorDelta` added to `BASiCS_MCMC` function, to allow 
+optional use of `gamma` or `log-normal` priors for delta. 
+- In `BASiCS_MCMC` function, change of default value of `s2.mu` to 0.5. Allows
+better shrinkage in situations where a gene has zero counts across all cells.
+- In `BASiCS_Data` class. Count matrices where a gene has zero counts across 
+all cells are now allowed. However, a warning is returned in such case. 
+Only use such matrices when running differential expression results. 
 
 version 0.4.0: (2015-12-21)
-- Preliminary functions for differential expression analyses (mean and over-dispersion) have been added. 
+- Preliminary functions for differential expression analyses (mean and 
+over-dispersion) have been added. 
 
 version 0.4.1: (2016-02-05)
-- Fixed bug in vignette (usage of `newBASiCS_Data` function). Same bug has been fixed in documentation of class `BASiCS_Data`. 
-- Optional argument 'Start' added to `BASiCS_MCMC` function to allow running chains with a variety of user-defined starting point. In general, we do not advise to use this argument as the default option has been tuned to facilitate convergence. 
-- Updated documentation of 'BASiCS_DetectHVG' and 'BASiCS_VarianceDecomp' function (removing 'GeneNames' argument)
+- Fixed bug in vignette (usage of `newBASiCS_Data` function). Same bug has 
+been fixed in documentation of class `BASiCS_Data`. 
+- Optional argument 'Start' added to `BASiCS_MCMC` function to allow running 
+chains with a variety of user-defined starting point. In general, we do not 
+advise to use this argument as the default option has been tuned to 
+facilitate convergence. 
+- Updated documentation of 'BASiCS_DetectHVG' and 'BASiCS_VarianceDecomp' 
+function (removing 'GeneNames' argument)
 - Updated documentation for 'BASiCS_DV_TestDE' function. 
 - Missing @description sections added to several .Rd files. 
 
 version 0.5.0: (2016-03-03)
-- Extended package description to include comparisons between pre-specified populations of cells
-- `BASiCS_DV_Data`, `BASiCS_DV_Chain` and `BASiCS_DV_Summary` classes replaced by `BASiCS_D_Data`, `BASiCS_D_Chain` and `BASiCS_D_Summary` classes, respectively.
+- Extended package description to include comparisons between pre-specified 
+populations of cells
+- `BASiCS_DV_Data`, `BASiCS_DV_Chain` and `BASiCS_DV_Summary` classes 
+replaced by `BASiCS_D_Data`, `BASiCS_D_Chain` and `BASiCS_D_Summary` 
+classes, respectively.
 - Slot 'offset' added to `BASiCS_D_Chain` and `BASiCS_D_Summary` classes.
 - Slot 'probHPD' added to `BASiCS_D_Summary` class. 
-- Creation of `CombineBASiCS_Data` function to combine 2 independent `BASiCS_Data` objects into one `BASiCS_D_Data` object.
-- Offset value added to the input of `show` method for `BASiCS_D_Chain` and `BASiCS_D_Summary` classes. 
-- Creation of `CombineBASiCS_Chain` function to combine 2 independent `BASiCS_Chain` objects into one `BASiCS_D_Chain` object.
+- Creation of `CombineBASiCS_Data` function to combine 2 independent 
+`BASiCS_Data` objects into one `BASiCS_D_Data` object.
+- Offset value added to the input of `show` method for `BASiCS_D_Chain` 
+and `BASiCS_D_Summary` classes. 
+- Creation of `CombineBASiCS_Chain` function to combine 2 independent 
+`BASiCS_Chain` objects into one `BASiCS_D_Chain` object.
 - 'GeneNames' slot added to `BASiCS_Data` class
 
 version 0.5.1: (2016-03-07)
-- In function `BASiCS_D_TestDE`. Probability threshold set to 0.95 when EFDR fails to calibrate (simulations under the null)
+- In function `BASiCS_D_TestDE`. Probability threshold set to 0.95 
+when EFDR fails to calibrate (simulations under the null)
 
 version 0.5.2: (2016-03-07)
-- In function `BASiCS_D_TestDE`. Probability threshold set to 0.90 when EFDR fails to calibrate (simulations under the null)
+- In function `BASiCS_D_TestDE`. Probability threshold set to 0.90 
+when EFDR fails to calibrate (simulations under the null)
 - Fixed version number in description file.
 
 version 0.5.3: (2016-03-09)
 - Slots `BatchInfoTest` and `BatchInfoRef` added to `BASiCS_D_Data` class.
-- `newBASiCS_D_Data` function modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
-- `CombineBASiCS_Data` function modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
-- `show` method for `BASiCS_D_Data` class modified to incorporate `BatchInfoTest` and `BatchInfoRef` slots.
+- `newBASiCS_D_Data` function modified to incorporate `BatchInfoTest` 
+and `BatchInfoRef` slots.
+- `CombineBASiCS_Data` function modified to incorporate `BatchInfoTest` 
+and `BatchInfoRef` slots.
+- `show` method for `BASiCS_D_Data` class modified to incorporate 
+`BatchInfoTest` and `BatchInfoRef` slots.
 - `GeneNames` argument missing in `makeExampleBASiCS_D_Data` has been added. 
-- Slots `thetaTest` and `thetaRef` of `BASiCS_D_Chain` objects modified to accept matrices (necessary to allow multiple batches).
+- Slots `thetaTest` and `thetaRef` of `BASiCS_D_Chain` objects modified 
+to accept matrices (necessary to allow multiple batches).
 
 version 0.5.4: (2016-04-15)
 - Minor fixes to the documentation files
-- Argument `GenesSelect` was added to function `BASiCS_D_TestDE` to allow user-defined lists of genes to be included in the comparison between cell types. 
+- Argument `GenesSelect` was added to function `BASiCS_D_TestDE` to allow 
+user-defined lists of genes to be included in the comparison between cell types. 
 
 version 0.5.5: (2016-04-18)
-- Small fix when checking the validity of a `BASiCS_D_Data` object. Thanks to Nils Eling. 
+- Small fix when checking the validity of a `BASiCS_D_Data` object. 
+Thanks to Nils Eling. 
 - Fixed issue with documentation files. 
 
 version 0.5.6: (2016-04-19)
-- Fixed message in `BASiCS_D_Test` function. This does not affect functionality. Only the message that is printed in the console.
+- Fixed message in `BASiCS_D_Test` function. This does not affect 
+functionality. Only the message that is printed in the console.
 
 version 0.5.7: (2016-04-27)
 - Welcome message added
 
 version 0.5.8: (2016-05-18) 
-- After profiling of c++ functions, minor edits to improve memory usage. These do not affect user interface
+- After profiling of c++ functions, minor edits to improve memory usage. 
+These do not affect user interface
 - Small change in funtion 'makeExampleBASiCS_Data' to avoid 'NOTICE' message
 
 version 0.5.9: (2016-05-19)
 - Dependency to 'scran' added
-- 'HiddenBASiCS_MCMC_Start' modified to use 'scran' estimates as starting values. This allows faster convergence.
+- 'HiddenBASiCS_MCMC_Start' modified to use 'scran' estimates as starting 
+values. This allows faster convergence.
 - Updated 'README.md' file to build and access vignette during installation 
 
 version 0.5.10: (2016-05-20)
-- Updated bug in 'HiddenBASiCS_MCMC_Start' function (thanks to Joanna Dreux for noticing this issue)
+- Updated bug in 'HiddenBASiCS_MCMC_Start' function (thanks to Joanna 
+Dreux for noticing this issue)
 
 version 0.5.11: (2016-05-24)
 - 'importMethodsFrom(scran, computeSumFactors)' added to NAMESPACE
 
 version 0.6.1: (2016-05-25)
-- Argument 'WithSpikes' added to 'makeExampleBASiCS_Data', generating an example data with no spikes
-- Modifications to validity checks of 'BASiCS_Data' class to allow no spikes case (SpikeInput = 1)
+- Argument 'WithSpikes' added to 'makeExampleBASiCS_Data', generating 
+an example data with no spikes
+- Modifications to validity checks of 'BASiCS_Data' class to allow no 
+spikes case (SpikeInput = 1)
 - 'show' methods for 'BASiCS_Data' class modified to deal with no spike case
 - Checks for 'BASiCS_Data' object modified to require: either spikes or batches
-- 'BASiCS_MCMC' modified for no spikes case (if/else statement only, not yet functional)
+- 'BASiCS_MCMC' modified for no spikes case (if/else statement only, 
+not yet functional)
 - 'HiddenBASiCS_MCMC_Start' modified for no spikes case
 - Function 'HiddenBASiCS_MCMCcppNoSpikes' added. Update for 'phi' is pending. 
 - Small vignette file for no spikes case added
 
 version 0.6.2: (2016-05-31)
 - Template for 'phiUpdateNoSpikes' has been added. 
-- Minor change in 'phiUpdate' for all 'HiddenBASiCS_MCMCcpp' functions (to avoid re-writing phi0)
-- Faster adaptation steps for 'HiddenBASiCS_MCMCcppBatch' 'HiddenBASiCS_MCMCcppNoSpikes'
-- 'HiddenBASiCS_MCMCcppNoSpikes' completed for testing stage (not ready for users)
+- Minor change in 'phiUpdate' for all 'HiddenBASiCS_MCMCcpp' functions 
+(to avoid re-writing phi0)
+- Faster adaptation steps for 'HiddenBASiCS_MCMCcppBatch' 
+'HiddenBASiCS_MCMCcppNoSpikes'
+- 'HiddenBASiCS_MCMCcppNoSpikes' completed for testing stage 
+(not ready for users)
 
 version 0.6.3: (2016-05-31)
 - Small update in wellcome message. 
@@ -200,7 +257,8 @@ version 0.7.8: (2016-08-15)
 version 0.7.9: (2016-10-31)
 - C++ code cleaned regarding parameter updates (no spikes case)
 - Updated email in description file and welcome message
-- 'BASiCS_MCMC' modified so that "log-normal" is the default value for PriorDelta
+- 'BASiCS_MCMC' modified so that "log-normal" is the default value 
+for PriorDelta
 
 version 0.7.10: (2016-10-31)
 - Minor changes in 'BASiCS_MCMC' to have more meaningful variable names
@@ -210,18 +268,23 @@ version 0.7.11: (2016-10-31)
 - Comments added to clarify no spikes case in 'BASiCS_MCMC' function. 
 
 version 0.7.12: (2016-11-01)
-- Change in defaul value of 'PriorDelta' (v 0.7.9) has been reverted for reproducibility issues. Message added to the start of the function so that users are aware of making the change. 
+- Change in defaul value of 'PriorDelta' (v 0.7.9) has been reverted 
+for reproducibility issues. Message added to the start of the function 
+so that users are aware of making the change. 
 - PriorDelta = 'gamma' is now allowed for no spikes case
 
 version 0.7.13: (2016-11-02)
-- Typo on the arguments of 'HiddenBASiCS_MCMCcppNoSpikes' function has been fixed ('Constrain' instead of 'ConstrainType')
-- Validity check '(y(i) > 1e-3)' moved later on in 'deltaUpdateNoSpikes' to avoid breaking the code when it is not really necessary!
+- Typo on the arguments of 'HiddenBASiCS_MCMCcppNoSpikes' function has been 
+fixed ('Constrain' instead of 'ConstrainType')
+- Validity check '(y(i) > 1e-3)' moved later on in 'deltaUpdateNoSpikes' to 
+avoid breaking the code when it is not really necessary!
 
 version 0.7.14: (2016-11-03)
 - Debug message removed from 'muUpdateNoSpikes' function. 
 
 version 0.7.15: (2016-11-07)
-- ConstrainType = 1 (untrimmed) re-introduced for no-spike case (illustration purposes only)
+- ConstrainType = 1 (untrimmed) re-introduced for no-spike case (illustration 
+purposes only)
 - RefGene removed from AR report
 - Added console report of RefGene choice
 
@@ -232,7 +295,8 @@ version 0.7.17: (2016-11-07)
 - Error fixed in the definition of RefGenes
 
 version 0.7.18: (2016-11-08)
-- Function 'BASiCS_LoadChain' added to simplify the loading of pre-computed chains
+- Function 'BASiCS_LoadChain' added to simplify the loading of 
+pre-computed chains
 - Imports from 'testthat' library added to NAMESPACE file
 - Small changes in 'BASiCS_D' classes to allow offset
 
@@ -243,7 +307,8 @@ version 0.7.20: (2016-11-14)
 - 'newBASiCS_Data' function modified to allow no spikes case
 
 version 0.7.21: (2016-11-15)
-- 'ConstrainType' = 4, 5 added (exclude genes with capture in less than 'ConstrainLimit'100% of the cells)
+- 'ConstrainType' = 4, 5 added (exclude genes with capture in less than 
+'ConstrainLimit'100% of the cells)
 
 version 0.7.22: (2016-11-16)
 - Fixed bug for 'ConstrainType' = 5 (affects no spike case only)
@@ -252,49 +317,68 @@ version 0.7.23: (2016-11-21)
 - Cleaning-up of identifiability constrain options for the no spike case
 
 version 0.7.24: (2016-11-23)
-- Median changed to mean when calculating identifiability constrain for the no spike case
+- Median changed to mean when calculating identifiability constrain for 
+the no spike case
 
 version 0.7.25: (2017-01-11)
 - Fixed typo in vignette file (thanks to Dmitriy Zhukov for pointing this out)
 
 version 0.7.26: (2017-02-09)
-- Update of 'BASiCS_Filter' function to include a 'BatchInfo' argument (thanks to Dmitriy Zhukov for suggesting this)
+- Update of 'BASiCS_Filter' function to include a 'BatchInfo' argument 
+(thanks to Dmitriy Zhukov for suggesting this)
 - Vignette file updated accordingly.
-- Update of 'newBASiCS_Data' function to prevent issues related to unused levels when the 'BatchInfo' argument is set as a 'factor' (thanks to Kevin Rue-Albrecht for pointing out this issue)
+- Update of 'newBASiCS_Data' function to prevent issues related to 
+unused levels when the 'BatchInfo' argument is set as a 'factor' (thanks 
+to Kevin Rue-Albrecht for pointing out this issue)
 
 version 0.7.27: (2017-05-09)
-- Bug fixed in 'BASiCS_Filter' function to stop the code crashing when there are genes with zero counts across all cells.
+- Bug fixed in 'BASiCS_Filter' function to stop the code crashing when there 
+are genes with zero counts across all cells.
 
 version 0.7.28: (2017-07-21)
-- Fixed dependency to 'data.table' to prevent errors in 'BASiCS_LoadChain' function(thanks to Yongchao Ge for pointing out this issue). This change affects the DESCRIPTION file as well as the 'BASiCS_LoadChain' function. 
+- Fixed dependency to 'data.table' to prevent errors in 'BASiCS_LoadChain' 
+function(thanks to Yongchao Ge for pointing out this issue). This change 
+affects the DESCRIPTION file as well as the 'BASiCS_LoadChain' function. 
 
 version 0.7.29: (2017-07-24)
-- 'BASiCS:::HiddenBASiCS_MCMC_Start' function modified regarding the definition of starting values for mu (to avoid adding +1 when it's not necessary)
--  'BASiCS:::HiddenBASiCS_MCMC_Start' modified to have better starting values for delta (this is based on eq 2 from Vallejos et al, 2016)
+- 'BASiCS:::HiddenBASiCS_MCMC_Start' function modified regarding the definition 
+of starting values for mu (to avoid adding +1 when it's not necessary)
+-  'BASiCS:::HiddenBASiCS_MCMC_Start' modified to have better starting values 
+for delta (this is based on eq 2 from Vallejos et al, 2016)
 
 version 0.7.30: (2017-07-26)
-- Typo fixed in 'BASiCS:::HiddenBASiCS_MCMC_Start' function (thanks to @bdulken for pointing out this issue)
+- Typo fixed in 'BASiCS:::HiddenBASiCS_MCMC_Start' function (thanks to 
+@bdulken for pointing out this issue)
 
 version 1.0.0: (2017-07-29)
-- Initial big merge with @nilseling changes (in preparation for Bioconductor submission)
+- Initial big merge with @nilseling changes (in preparation for 
+Bioconductor submission)
 - For reference, here is a summary of the changes implemented by @nilseling:
-  * Creation of individual .R for each R function (but all 'Hidden' functions are in one file)
+  * Creation of individual .R for each R function (but all 'Hidden' functions 
+  are in one file)
   * BASiCS_Data class replaced by SummarizedExperiment class (Bioconductor)
   * Contact email updated to 'cvallejos@@turing.ac.uk'
-  * Methods for BASiCS_Data and BASiCS_D_Data objects removed (these classes no longer exist)
+  * Methods for BASiCS_Data and BASiCS_D_Data objects removed (these classes 
+  no longer exist)
   * Adjust newBASiCS_Data function to create a SummarizedExperiment object
   * 'cat' calls replaced by 'message' calls
   * Clean up of BASiCS_D_TestDE function (removed unused args)
   * Clean up of BASiCS_DetectHVG_LVG function (using SummarizedExperiment class)
   * Clean up of BASiCS_MCMC function (using SummarizedExperiment class)
-  * Clean up of BASiCS_Sim function (using SummarizedExperiment class; extra arg 'muSpikes')
+  * Clean up of BASiCS_Sim function (using SummarizedExperiment class; 
+  extra arg 'muSpikes')
   * Clean up of BASiCS_DetectHVG_LVG function (using SummarizedExperiment class)
-  * Clean up of BASiCS_VarianceDecomp function (using SummarizedExperiment class)
-  * Clean up of BASiCS_VarThresholdSearchHVG function (using SummarizedExperiment class)
-  * Clean up of BASiCS_DenoisedCounts function (using SummarizedExperiment class)
+  * Clean up of BASiCS_VarianceDecomp function 
+  (using SummarizedExperiment class)
+  * Clean up of BASiCS_VarThresholdSearchHVG function 
+  (using SummarizedExperiment class)
+  * Clean up of BASiCS_DenoisedCounts function 
+  (using SummarizedExperiment class)
   * Clean up of BASiCS_DenoisedRates function (using SummarizedExperiment class)
-  * Clean up of HiddenBASiCS_MCMC_Start function (using SummarizedExperiment class)
-  * Clean up of makeExampleBASiCS_Data function (using SummarizedExperiment class) 
+  * Clean up of HiddenBASiCS_MCMC_Start function 
+  (using SummarizedExperiment class)
+  * Clean up of makeExampleBASiCS_Data function 
+  (using SummarizedExperiment class) 
   * Removed methods associated to BASiCS_D_MCMC class (no longer in use)
   * NAMESPACE + Rd files updated accordingly
   * DESCRIPTION file updated accordingly
@@ -302,12 +386,16 @@ version 1.0.0: (2017-07-29)
   
 version 1.0.1: (2017-07-31)
 - Minor changes function-by-function (revision of documentation + minor bugs)
-  * newBASiCS_Data : added ref to GB paper + default par value doc + Nils as author
+  * newBASiCS_Data : added ref to GB paper + default par value doc + 
+  Nils as author
   * BASiCS_Filter : added ref to GB paper + default par value doc 
-  * makeExampleBASiCS_Data : added ref to GB paper + default par value doc + Nils as author
-  * BASiCS_MCMC : added ref to GB paper + Nils as author + fix print of system.time + updated examples
+  * makeExampleBASiCS_Data : added ref to GB paper + default par value doc + 
+  Nils as author
+  * BASiCS_MCMC : added ref to GB paper + Nils as author + fix print of 
+  system.time + updated examples
 - Major changes function by function
-  * makeExampleBASiCS_Data : `Case1` param replaced by `Example` (vignette + unit test updated accordingly)
+  * makeExampleBASiCS_Data : `Case1` param replaced by `Example` 
+  (vignette + unit test updated accordingly)
   * BASiCS_MCMC : default value for PriorDelta set to 'log-normal' 
   * HiddenBASiCS_MCMC_Start : new starting values for delta (as in main repo)
   
@@ -315,23 +403,27 @@ version 1.0.2: (2017-08-01)
 - Minor changes function-by-function (revision of documentation + minor bugs)
   * BASiCS_MCMC : 'MCMC_Output' replaced by 'Chain' in examples
 - Major changes function-by-function
-  * BASiCS_MCMC : chains stored a single .Rds files, with BASiCS_Chain format (rather than separate .txt files)
+  * BASiCS_MCMC : chains stored a single .Rds files, with BASiCS_Chain format 
+  (rather than separate .txt files)
   * BASiCS_LoadChain : updated accordingly
   * BASiCS_DetectHVG : evidence threhold to be defined by EFDR only 
 - Vignette updated accordingly 
 
 version 1.0.3: (2017-08-01)
 - Minor changes function-by-function (revision of documentation + minor bugs)
-  * BASiCS_DetectHVG / LVG: added vertical/horizontal lines in EFDR/EFND plot, subtasks moved to hidden functions (avoids repeated code)
+  * BASiCS_DetectHVG / LVG: added vertical/horizontal lines in EFDR/EFND plot, 
+  subtasks moved to hidden functions (avoids repeated code)
 - Major changes function-by-function
   * BASiCS_DetectLVG : evidence threhold to be defined by EFDR only 
-  * BASiCS_DetectHVG / LVG: fix on default prob threshold = 0.5 when optimal is < 0.5
+  * BASiCS_DetectHVG / LVG: fix on default prob threshold = 0.5 when optimal 
+  is < 0.5
 - Examples in BASiCS_MCMC updated accordingly
 - Vignette updated accordingly
 
 version 1.0.4: (2017-08-01)
 - Minor changes function-by-function (revision of documentation + minor bugs)
-  * BASiCS_VarThresholdSearchHVG / LVG : EFDR criteria updated as in BASiCS_DetectHVG / LVG
+  * BASiCS_VarThresholdSearchHVG / LVG : EFDR criteria updated as in 
+  BASiCS_DetectHVG / LVG
   * BASiCS_TestDE : added examples
 - Major changes function-by-function
   * BASiCS_D_TestDE : no longer in use message added
@@ -346,12 +438,15 @@ version 1.0.5: (2017-08-01)
 - ACF plot added to BASiCS_Chain plots
 
 version 1.0.6: (2017-08-02)
-- 'matrixStats' added within 'Imports' in DESCRIPTION (to use 'colMedians' function)
+- 'matrixStats' added within 'Imports' in DESCRIPTION (to use 
+'colMedians' function)
 - Minor changes function-by-function (revision of documentation + minor bugs)
   * BASiCS_TestDE : Improved offset plots
 - Major changes function-by-function
-  * BASiCS_TestDE : Ref/Test notation changed to Group1/2 + output table names changed (to Mean/Disp) + 
-  offset corrected objects as output + separated output tables Mean/Disp + post prob threshold moved to hidden function (avoids duplicated code)
+  * BASiCS_TestDE : Ref/Test notation changed to Group1/2 + output table names 
+  changed (to Mean/Disp) + 
+  offset corrected objects as output + separated output tables Mean/Disp + post 
+  prob threshold moved to hidden function (avoids duplicated code)
   
 version 1.0.7: (2017-08-03)
 - Multiple changes in BASiCS_TestDE:
@@ -368,12 +463,14 @@ version 1.0.7: (2017-08-03)
 
 version 1.0.8: (2017-08-03)
 - 'Data' arg removed from args in:
-  'HiddenHeaderDetectHVG_LVG' + 'HiddenVarDecomp' + 'BASiCS_DetectHVG' + 'BASiCS_DetectLVG'
-  + 'BASiCS_VarThresholdSearchHVG' + 'BASiCS_VarThresholdSearchLVG'
+  'HiddenHeaderDetectHVG_LVG' + 'HiddenVarDecomp' + 'BASiCS_DetectHVG' + 
+  'BASiCS_DetectLVG' + 'BASiCS_VarThresholdSearchHVG' + 
+  'BASiCS_VarThresholdSearchLVG'
 - 'object' arg renamed as 'Chain' in 'BASiCS_DetectHVG' + 'BASiCS_DetectLVG' 
   + 'BASiCS_VarThresholdSearchHVG' + 'BASiCS_VarThresholdSearchLVG'
 - Examples in BASiCS_MCMC updated to use built-in chain
-- Removal of 'smoothPlot' usage in plots for 'BASiCS_Summary' class (avoids issues with log)
+- Removal of 'smoothPlot' usage in plots for 'BASiCS_Summary' class (avoids 
+issues with log)
 - Volcano plots added in BASiCS_TestDE function
 - Resolved issues with log scale in 'smoothScatter'
 - Minor bugs fixed in BASiCS_TestDE
@@ -416,7 +513,7 @@ version 0.99.0: (2017-08-28)
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
-  * Should we separate BASiCS_TestDE in two functions : different tolerance for DE ? 
+  * Should we separate BASiCS_TestDE in two functions? 
   * In plots, change axis labels to be text (no greek)?
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
