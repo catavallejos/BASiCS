@@ -1,15 +1,20 @@
 context("Basic example of parameter estimation")
 
-test_that("paramater estimations are correct", {
-    Data = makeExampleBASiCS_Data(WithSpikes = TRUE, Example = 1)
-    MCMC_Output <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, PrintProgress = FALSE)
-    MCMC_Summary <- Summary(MCMC_Output, prob = 0.995)
-    # Parameters used for the simulation
-    Mu =  c( 8.36,  10.65,   4.88,   6.29,  21.72,  12.93,  30.19,  83.92,   3.89,   6.34,
-             57.87,  12.45,   8.08,   7.31,  15.56,  15.91,  12.24,  15.96,  19.14,   4.20,
-             6.75,  27.74,   8.88,  21.21,  19.89,   7.14,  11.09,   7.19,  20.64,  73.90,
-             9.05,   6.13,  16.40,   6.08,  17.89,   6.98,  10.25,  14.05,   8.14,   5.67,
-             6.95,  11.16,  11.83,   7.56, 159.05,  16.41,   4.58,  15.46,  10.96,  25.05)
+test_that("paramater estimations are correct", 
+          {
+            Data = makeExampleBASiCS_Data(WithSpikes = TRUE, Example = 1)
+            Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+                                 PrintProgress = FALSE)
+            PostSummary <- Summary(Chain, prob = 0.995)
+    
+            # Parameters used for the simulation
+            Mu =  c( 8.36,  10.65,   4.88,   6.29,  21.72,  12.93,  30.19,  
+                     83.92,   3.89,   6.34, 57.87,  12.45,   8.08,   7.31,  
+                     15.56,  15.91,  12.24,  15.96,  19.14,   4.20, 6.75,  
+                     27.74,   8.88,  21.21,  19.89,   7.14,  11.09,   7.19,  
+                     20.64,  73.90, 9.05,   6.13,  16.40,   6.08,  17.89,   
+                     6.98,  10.25,  14.05,   8.14,   5.67, 6.95,  11.16,  11.83,
+                     7.56, 159.05,  16.41,   4.58,  15.46,  10.96,  25.05)
     Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85, 0.27, 0.53, 1.31,
               0.26, 0.81, 0.72, 0.70, 0.96, 0.58, 1.15, 0.82, 0.25, 5.32,
               1.13, 0.31, 0.66, 0.27, 0.76, 1.39, 1.18, 1.57, 0.55, 0.17,
@@ -20,16 +25,16 @@ test_that("paramater estimations are correct", {
     S = c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37,
           0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
 
-    s = sum(Mu >= MCMC_Summary@mu[,2] & Mu <= MCMC_Summary@mu[,3]) / 50
+    s = sum(Mu >= PostSummary@mu[,2] & Mu <= PostSummary@mu[,3]) / 50
     expect_that(s >= 0.9, is_true())
 
-    s = sum(Delta >= MCMC_Summary@delta[,2] & Delta <= MCMC_Summary@delta[,3])
+    s = sum(Delta >= PostSummary@delta[,2] & Delta <= PostSummary@delta[,3])
     s = s / 50
     expect_that(s >= 0.9, is_true())
 
-    s = sum(Phi >= MCMC_Summary@phi[,2] & Phi <= MCMC_Summary@phi[,3]) / 20
+    s = sum(Phi >= PostSummary@phi[,2] & Phi <= PostSummary@phi[,3]) / 20
     expect_that(s >= 0.9, is_true())
 
-    s = sum(S >= MCMC_Summary@s[,2] & S <= MCMC_Summary@s[,3]) / 20 
+    s = sum(S >= PostSummary@s[,2] & S <= PostSummary@s[,3]) / 20 
     expect_that(s >= 0.9, is_true())
 })

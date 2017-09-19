@@ -1,5 +1,6 @@
 # Used in BASiCS_MCMC
-HiddenBASiCS_MCMC_Start <- function(Data, ...) {
+HiddenBASiCS_MCMC_Start <- function(Data, ...) 
+{
     if (!is(Data, "SingleCellExperiment")) 
         stop("'Data' is not a SingleCellExperiment class object.")
     
@@ -9,26 +10,32 @@ HiddenBASiCS_MCMC_Start <- function(Data, ...) {
     # Number of cells
     n <- dim(assay(Data))[2]
     
+    # Separating spike-ins from the rest of genes
+    CountsBio <- as.matrix(assay(Data)[!isSpike(Data), , drop = FALSE]) 
+    CountsTech <- as.matrix(assay(Data)[isSpike(Data), , drop = FALSE])
+    
     # Initialize normalization as the 'scran' estimates
     sizes.aux = c(20, 40, 60, 80, 100)
     if (n < 200) {
-        sizes.aux = c(20, 40, 60, 80)
+        sizes.aux <- c(20, 40, 60, 80)
     }
     if (n < 160) {
-        sizes.aux = c(20, 40, 60)
+        sizes.aux <- c(20, 40, 60)
     }
     if (n < 120) {
-        sizes.aux = c(20, 40)
+        sizes.aux <- c(20, 40)
     }
     if (n < 80) {
-        sizes.aux = c(20)
+        sizes.aux <- c(20)
     }
     if (n < 40) {
-        sizes.aux = c(10)
+        sizes.aux <- c(10)
     }
-    size_scran <- scran::computeSumFactors(as.matrix(assay(Data)[!isSpike(Data), , drop = FALSE]), sizes = sizes.aux)
     
-    if (length(metadata(Data)$SpikeInput) > 1) {
+    size_scran <- scran::computeSumFactors(as.matrix(assay(Data)[!isSpike(Data), , drop = FALSE]) , sizes = sizes.aux)
+    
+    if (length(metadata(Data)$SpikeInput) > 1) 
+    {
         # Initialize s as the empirical capture efficiency rates
         s0 = colSums(assay(Data)[isSpike(Data), ])/sum(metadata(Data)$SpikeInput)
         nu0 = s0

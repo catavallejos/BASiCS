@@ -516,6 +516,9 @@ version 0.99.2: (2017-09-18)
 - Format in welcome message
 - 'newBASiCS_Chain': format 
 
+version 0.99.3: (2017-09-19)
+- Extra unit test (parameter estimates for a given seed)
+
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
