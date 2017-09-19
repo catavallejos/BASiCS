@@ -510,6 +510,10 @@ version 0.99.0: (2017-08-28)
 - Minor changes to complete Bioconductor submission checklist
 - Version re-numbered according to Bioconductor guidelines
 
+version 0.99.2: (2017-09-18)
+- 'newBASiCS_Data': format + checks moved to `HiddenChecksBASiCS_Data` function
+- `HiddenChecksBASiCS_Data`: use of colMeans2, rowMeans2
+
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
