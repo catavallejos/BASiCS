@@ -20,12 +20,13 @@ HiddenChecksBASiCS_Data <- function(Counts,
         sum(!is.finite(SpikeInput)) == 0)) 
     errors <- c(errors, "Invalid value for 'SpikeInput'.")
   
-  q = nrow(Counts)
-  q.bio = q - length(SpikeInput)
-  n = ncol(Counts)
+  q <- nrow(Counts)
+  q.bio <- q - length(SpikeInput)
+  n <- ncol(Counts)
   
   # Checks valid for datasets with spikes only
-  if (length(SpikeInput) > 1) {
+  if (length(SpikeInput) > 1) 
+  {
     if (!(length(Tech) == q & sum(!Tech) == q.bio)) 
       errors <- c(errors, "Argument's dimensions are not compatible.")
     
@@ -66,13 +67,9 @@ HiddenChecksBASiCS_Data <- function(Counts,
     errors <- c(errors, "Incorrect length of GeneNames.")
   
   if (sum(matrixStats::rowSums2(Counts) == 0) > 0) 
-    warning("Some genes have zero counts across all cells. Unless 
-            running a differential expression analysis, please remove 
-            those genes. Otherwise, the BASiCS_Data object is still a valid 
-            object. However, due to the lack of counts, posterior estimates for 
-            mu[i] and delta[i] associated to those genes will be driven by the 
-            prior. In such case, you must specify `PriorDelta = 'log-normal' 
-            in BASiCS_MCMC function. ")
+    warning("Some genes have zero counts across all cells. \n",
+            "If comparing 2 groups, use `PriorDelta = 'log-normal' in BASiCS_MCMC.\n",
+            "If not, please remove those genes.")
   
   if (length(BatchInfo) != n) 
     errors <- c(errors, "BatchInfo slot is not compatible with the number of 

@@ -2,10 +2,10 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
                                         GenesSelect, EFDR, Task) 
 {
   # Calculating posterior probabilities
-  if (Epsilon > 0) { Prob <- colMeans(abs(ChainLFC) > Epsilon) } 
+  if (Epsilon > 0) { Prob <- matrixStats::colMeans2(abs(ChainLFC) > Epsilon) } 
   else 
   {
-    Prob_aux <- colMeans(ChainLFC > 0)
+    Prob_aux <- matrixStats::colMeans2(ChainLFC > 0)
     Prob <- 2 * pmax(Prob_aux, 1 - Prob_aux) - 1
   }
   

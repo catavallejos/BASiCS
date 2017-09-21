@@ -51,12 +51,10 @@ newBASiCS_Chain <- function(mu,
                             phi, 
                             s, 
                             nu, 
-                            theta) {
-    Chain <- new("BASiCS_Chain", mu = mu, 
-                                 delta = delta, 
-                                 phi = phi, 
-                                 s = s, 
-                                 nu = nu, 
-                                 theta = theta)
-    return(Chain)
+                            theta) 
+{
+  Chain <- new("BASiCS_Chain", mu = mu, delta = delta, 
+                               phi = phi, s = s, 
+                               nu = nu, theta = theta)
+  return(Chain)
 }

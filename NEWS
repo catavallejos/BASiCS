@@ -516,15 +516,19 @@ version 0.99.2: (2017-09-18)
 - Format in welcome message
 - 'newBASiCS_Chain': format 
 
-version 0.99.3: (2017-09-19)
+version 0.99.3: (2017-09-21)
 
 - Extra unit test (parameter estimates for a given seed)
 - Format + vectorisation in `HiddenThresholdSearchTestDE` function
 - `HiddenProbDE` removed as no longer needed
+- Additional unit test for differential test added
+- Format for `BASiCS_TestDE` function 
+- Format for `HiddenBASiCS_MCMC_Start` function
+- Format for `HiddenChecksBASiCS` function
+- Format for `BASiCS_D_TestDE`
 
 - TODO:
-  * Fix indent in TestDE documentation
-  * Fix FoldChange to 2 scale TestDE
+  * Clean-up cpp code as in Biomark model
 
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 

@@ -48,60 +48,54 @@
 #' @references 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
-newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL) {
-  
-    # Validity checks for SpikeInfo
-    if (!is.data.frame(SpikeInfo)) 
-        stop("'SpikeInfo' must be a 'data.frame'")
-    if (data.table::is.data.table(SpikeInfo)) 
-        stop("'SpikeInfo' must be a 'data.frame'")
+newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL) 
+{
+  # Validity checks for SpikeInfo
+  if (!is.data.frame(SpikeInfo)) 
+      stop("'SpikeInfo' must be a 'data.frame'")
+  if (data.table::is.data.table(SpikeInfo)) 
+      stop("'SpikeInfo' must be a 'data.frame'")
     
-    if (is.null(BatchInfo)) {
-        BatchInfo <- rep(1, times = ncol(Counts))
-    }
+  if (is.null(BatchInfo)) { BatchInfo <- rep(1, times = ncol(Counts)) }
     
-    # Re-ordering genes
-    Counts <- as.matrix(rbind(Counts[!Tech, ], Counts[Tech, ]))
-    Tech <- c(Tech[!Tech], Tech[Tech])
-    GeneNames <- rownames(Counts)
+  # Re-ordering genes
+  Counts <- as.matrix(rbind(Counts[!Tech, ], Counts[Tech, ]))
+  Tech <- c(Tech[!Tech], Tech[Tech])
+  GeneName <- rownames(Counts)
     
-    if (!is.null(SpikeInfo)) {
-      
-        # Extracting spike-in input molecules in the correct order
-        if (sum(!(GeneNames[Tech] %in% SpikeInfo[, 1])) > 0) 
-            stop("'SpikeInfo' is missing information for some of the spikes")
-        if (sum(!(SpikeInfo[, 1] %in% GeneNames[Tech])) > 0) 
-            stop("'SpikeInfo' includes spikes that are not in 'Counts'")
-        matching <- match(GeneNames[Tech], SpikeInfo[, 1])
-        SpikeInput <- SpikeInfo[matching, 2]
-    } 
-    else { SpikeInput <- 1 }
+  if (!is.null(SpikeInfo)) 
+  {
+    # Extracting spike-in input molecules in the correct order
+    if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) 
+        stop("'SpikeInfo' is missing information for some of the spikes")
+    if (sum(!(SpikeInfo[, 1] %in% GeneName[Tech])) > 0) 
+        stop("'SpikeInfo' includes spikes that are not in 'Counts'")
+    matching <- match(GeneName[Tech], SpikeInfo[, 1])
+    SpikeInput <- SpikeInfo[matching, 2]
+  } 
+  else { SpikeInput <- 1 }
     
-    # Checks to assess if the data contains the required information
-    errors <- HiddenChecksBASiCS_Data(Counts, Tech, SpikeInput, 
-                                      GeneNames, BatchInfo)
-    if (length(errors) > 0) stop(errors) 
+  # Checks to assess if the data contains the required information
+  errors <- HiddenChecksBASiCS_Data(Counts, Tech, SpikeInput, 
+                                    GeneName, BatchInfo)
+  if (length(errors) > 0) stop(errors) 
     
-    # Create a SingleCellExperiment data object
-    Data <- SingleCellExperiment::SingleCellExperiment(
+  # Create a SingleCellExperiment data object
+  Data <- SingleCellExperiment::SingleCellExperiment(
                 assays = list(Counts = as.matrix(Counts)), 
                 metadata = list(SpikeInput = SpikeInput, 
                 BatchInfo = BatchInfo))
-    isSpike(Data, "ERCC") <- Tech
+  isSpike(Data, "ERCC") <- Tech
     
-    message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 
-            "    - You must remove poor quality cells before creating the 
-            BASiCS data object \n", 
-            "    - We recommend to pre-filter very lowly expressed transcripts 
-            before creating the object. \n", 
-            "      Inclusion criteria may vary for each data. For example, 
-            remove transcripts \n", 
-            "          - with low total counts across of all of the samples \n", 
+  message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 
+            "    - You must remove poor quality cells before hand \n", 
+            "    - We recommend to pre-filter lowly expressed transcripts. \n", 
+            "      Inclusion criteria may vary for each data. \n",
+            "      For example, remove transcripts: \n", 
+            "          - with low total counts across of all of the cells \n", 
             "          - that are only expressed in a few cells \n", 
-            "            (by default genes expressed in only 1 cell 
-            are not accepted) \n", 
-            "          - with very low total counts across the samples where 
-            the transcript is expressed \n", 
-            "\n BASiCS_Filter can be used for this purpose \n")
-    return(Data)
+            "            (genes expressed in only 1 cell are not accepted) \n", 
+            "\n BASiCS_Filter can be used for this purpose. \n")
+  
+  return(Data)
 }

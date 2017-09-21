@@ -33,7 +33,7 @@ changes in cell-to-cell biological over-dispersion
 (must be a positive value, between 0 and 1)}
 
 \item{OrderVariable}{Ordering variable for output. 
-Possible values: \code{'GeneIndex'}, \code{'GeneNames'} and \code{'Prob'}.}
+Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.}
 
 \item{GroupLabel1}{Label assigned to reference group. 
 Default: \code{GroupLabel1 = 'Group1'}}
@@ -70,9 +70,9 @@ when the user decides to exclude some genes from the comparison.}
 \code{BASiCS_TestDE} returns a list of 4 elements:
 \describe{
 \item{\code{TableMean}}{A \code{\link[base]{data.frame}} containing the 
-      results of the differential mean test}
+      results of the differential mean test
    \describe{
-   \item{\code{GeneNames}}{Gene name}
+   \item{\code{GeneName}}{Gene name}
    \item{\code{MeanOverall}}{For each gene, the estimated mean expression 
          parameter \eqn{\mu_i} is averaged across both groups of cells 
          (weighted by sample size).}
@@ -88,12 +88,12 @@ when the user decides to exclude some genes from the comparison.}
          difference between the first and second groups of cells.}
    \item{\code{ResultDiffExp}}{Indicator if a gene has a higher mean 
          expression in the first or second groups of cells.}
-   }
+   }}
 \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the 
       results of the differential dispersion test (excludes genes for which 
       the mean does not changes).
    \describe{
-   \item{\code{GeneNames}}{Gene name}
+   \item{\code{GeneName}}{Gene name}
    \item{\code{MeanOverall}}{For each gene, the estimated mean expression 
          parameter \eqn{\mu_i} is averaged across both groups of cells 
          (weighted by sample size).}
