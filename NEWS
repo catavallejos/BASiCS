@@ -526,6 +526,7 @@ version 0.99.3: (2017-09-21)
 - Format for `HiddenBASiCS_MCMC_Start` function
 - Format for `HiddenChecksBASiCS` function
 - Format for `BASiCS_D_TestDE`
+- Format for all S4 methods
 
 - TODO:
   * Clean-up cpp code as in Biomark model

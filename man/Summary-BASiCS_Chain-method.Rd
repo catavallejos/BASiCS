@@ -9,17 +9,17 @@
 \S4method{Summary}{BASiCS_Chain}(x, prob = 0.95)
 }
 \arguments{
-\item{x}{A \code{BASiCS_Chain} object.}
+\item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
 \item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}} function.}
 }
 \value{
-An object of class \code{\link[BASiCS]{BASiCS_Summary}}.
+An object of class \code{\linkS4class{BASiCS_Summary}}.
 }
 \description{
 For each of the BASiCS parameters (see Vallejos et al 2015), 
-\code{Summary} returns the corresponding postior medians and limits of the high posterior
-density interval with probabilty equal to \code{prob}.
+\code{Summary} returns the corresponding postior medians and limits of 
+the high posterior density interval (probabilty equal to \code{prob})
 }
 \examples{
 
@@ -27,7 +27,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

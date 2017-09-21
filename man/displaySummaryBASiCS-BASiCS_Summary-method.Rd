@@ -5,21 +5,23 @@
 \alias{displaySummaryBASiCS-BASiCS_Summary-method}
 \alias{displaySummaryBASiCS}
 \alias{displaySummaryBASiCS,BASiCS_Summary-method}
-\title{Accessors for the slots of a BASiCS_Summary object}
+\title{Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}} object}
 \usage{
 \S4method{displaySummaryBASiCS}{BASiCS_Summary}(object, Param = "mu")
 }
 \arguments{
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Summary}}}
+\item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Param}{Name of the slot to be used for the accessed. Possible values: \code{'mu'}, 
-\code{'delta'}, \code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
+\item{Param}{Name of the slot to be used for the accessed. 
+Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'}, 
+\code{'s'}, \code{'nu'} and \code{'theta'}}
 }
 \value{
-The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Summary}}
+The requested slot of a \code{\linkS4class{BASiCS_Summary}} object
 }
 \description{
-Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Summary}}
+Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}}
+object
 }
 \examples{
 
@@ -28,7 +30,7 @@ help(BASiCS_MCMC)
   
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Summary}}
