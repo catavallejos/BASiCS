@@ -525,8 +525,6 @@ version 0.99.3: (2017-09-19)
 - TODO:
   * Fix indent in TestDE documentation
   * Fix FoldChange to 2 scale TestDE
-  * Message when EFDR is not met
-  * Update HiddenThresholdSearchTestDE as in qPCRBayes
 
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
