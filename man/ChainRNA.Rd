@@ -4,17 +4,19 @@
 \name{ChainRNA}
 \alias{ChainRNA}
 \title{Extract from the chain obtained in Vallejos et al (2016): pool-and-split samples}
-\format{An object of class \code{\link[BASiCS]{BASiCS_Chain}} containing 10 MCMC iterations.}
+\format{An object of class \code{\linkS4class{BASiCS_Chain}} 
+containing 10 MCMC iterations.}
 \usage{
 ChainRNA
 }
 \description{
-Small extract (100 MCMC iterations, 500 randomly selected genes) from the chain obtained in Vallejos et al (2016),
-related to pool-and-split samples (this corresponds to the RNA 2i samples in Grun et al, 2014).
+Small extract (100 MCMC iterations, 500 randomly selected genes) from the 
+chain obtained in Vallejos et al (2016), related to pool-and-split samples 
+(this corresponds to the RNA 2i samples in Grun et al, 2014).
 }
 \references{
-Vallejos, Richardson and Marioni (2016). Beyond comparisons of means: understanding changes in gene expression at the single-cell level. Genome Biology.
+Vallejos, Richardson and Marioni (2016). Genome Biology.
 
-Grun, Kester and van Oudenaarden (2014). Validation of noise models for single-cell transcriptomics. Nature Methods
+Grun, Kester and van Oudenaarden (2014). Nature Methods.
 }
 \keyword{datasets}

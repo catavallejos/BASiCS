@@ -33,7 +33,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Summary}}
+\code{\linkS4class{BASiCS_Summary}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

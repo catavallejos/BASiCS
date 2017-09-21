@@ -528,6 +528,14 @@ version 0.99.3: (2017-09-21)
 - Format for `BASiCS_D_TestDE`
 - Format for all S4 methods
 
+version 0.99.3: (2017-09-21)
+
+- 2^ added to FC in `BASiCS_TestDE` TableDisp
+- Format for data documentation
+- Format for classes definition
+- Format + vectorization for `BASiCS_Filter`
+- Format for `BASiCS_LoadChain`
+
 - TODO:
   * Clean-up cpp code as in Biomark model
 
@@ -539,7 +547,6 @@ version 0.99.3: (2017-09-21)
   * Implement BASiCS_Denoise in C++
   * Create 'no longer in use' message for selected functions. 
   * Implement change suggested by Giacomo Zanella
-  * Add checks to BASiCS_MCMC verify SE object has all the required info. 
   * Store all necessary parameters for chain restart
   * Convert Rcpp print to messages
 

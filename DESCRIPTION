@@ -48,6 +48,7 @@ Suggests:
     BiocStyle
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
-biocViews: Normalization, Sequencing, RNASeq, Software, GeneExpression,
-        Transcriptomics, SingleCell, DifferentialExpression, Bayesian, CellBiology
+biocViews: Normalization, Sequencing, RNASeq, Software, 
+        GeneExpression, Transcriptomics, SingleCell, 
+        DifferentialExpression, Bayesian, CellBiology
 RoxygenNote: 6.0.1

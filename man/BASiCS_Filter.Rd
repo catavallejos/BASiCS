@@ -14,27 +14,27 @@ corresponds to the simulated expression counts.
 First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} 
 rows correspond to technical spike-in genes.}
 
-\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the gene 
-is biological; otherwise the gene is spike-in.}
+\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} 
+the gene is biological; otherwise the gene is spike-in.}
 
-\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate the 
-simulated input concentrations for the spike-in genes.}
+\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate 
+the simulated input concentrations for the spike-in genes.}
 
-\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch information. 
-Not required if a single batch is present on the data. 
-Default value: \code{BatchInfo = NULL}.}
+\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch 
+information. Not required if a single batch is present on the data. 
+Default: \code{BatchInfo = NULL}.}
 
-\item{MinTotalCountsPerCell}{Minimum value of total expression counts required 
-per cell (biological and technical). 
-Default value: \code{MinTotalCountsPerCell = 2}.}
+\item{MinTotalCountsPerCell}{Minimum value of total expression counts 
+required per cell (biological and technical). 
+Default: \code{MinTotalCountsPerCell = 2}.}
 
 \item{MinTotalCountsPerGene}{Minimum value of total expression counts 
 required per transcript (biological and technical). 
-Default value: \code{MinTotalCountsPerGene = 2}.}
+Default: \code{MinTotalCountsPerGene = 2}.}
 
 \item{MinCellsWithExpression}{Minimum number of cells where expression 
 must be detected (positive count). Criteria applied to each transcript. 
-Default value: \code{MinCellsWithExpression = 2}.}
+Default: \code{MinCellsWithExpression = 2}.}
 
 \item{MinAvCountsPerCellsWithExpression}{Minimum average number of 
 counts per cells where expression is detected. Criteria applied to 
@@ -60,19 +60,21 @@ the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
 \examples{
 
 set.seed(1)
-Counts = Counts = matrix(rpois(50*10, 2), ncol = 10)
+Counts <- matrix(rpois(50*10, 2), ncol = 10)
 rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
-Tech = c(rep(FALSE,40),rep(TRUE,10))
+Tech <- c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
-SpikeInput = rgamma(10,1,1)
-SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10), 'SpikeInput' = SpikeInput)
+SpikeInput <- rgamma(10,1,1)
+SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10), 
+                        'SpikeInput' = SpikeInput)
 
 Filter = BASiCS_Filter(Counts, Tech, SpikeInput,
-                       MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
-                       MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
-SpikeInfoFilter = SpikeInfo[SpikeInfo$SpikeID \%in\%
-         names(Filter$IncludeGenes)[Filter$IncludeGenes == TRUE],]
-FilterData = newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
+                       MinTotalCountsPerCell = 2, 
+                       MinTotalCountsPerGene = 2,
+                       MinCellsWithExpression = 2, 
+                       MinAvCountsPerCellsWithExpression = 2)
+SpikeInfoFilter <- SpikeInfo[SpikeInfo$SpikeID \%in\% rownames(Filter$Counts),]
+FilterData <- newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 
 }
 \references{

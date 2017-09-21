@@ -579,7 +579,7 @@ setMethod("plot",
 #' # See
 #' help(BASiCS_MCMC)
 #'   
-#' @seealso \code{\link[BASiCS]{BASiCS_Summary}}
+#' @seealso \code{\linkS4class{BASiCS_Summary}}
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
