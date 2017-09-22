@@ -543,6 +543,9 @@ required due to DataSC, DataRNA)
 - Format for `makeExampleBASiCS_Data`
 - Format for `BASiCS_Sim`
 
+version 0.99.3: (2017-09-22)
+
+
 - TODO:
   * Clean-up cpp code as in Biomark model
 

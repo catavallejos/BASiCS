@@ -7,25 +7,27 @@
 #' expression into biological and technical components.
 #'
 #' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
-#' @param OrderVariable Ordering variable for output. Possible values: \code{'GeneNames'}, 
-#' \code{'BioVarGlobal'},
-#'  \code{'TechVarGlobal'} and \code{'ShotNoiseGlobal'}.
+#' @param OrderVariable Ordering variable for output. 
+#' Possible values: \code{'GeneName'}, \code{'BioVarGlobal'},
+#'  \code{'TechVarGlobal'} and \code{'ShotNoiseGlobal'}. 
+#' Default: \code{OrderVariable = "BioVarGlobal"}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition 
-#' (global and by batches, if any) is generated
+#' (global and by batches, if any) is generated. Default: \code{Plot = TRUE}.
 #' @param ... Other arguments to be passed to \code{\link[graphics]{barplot}}
 #'
 #' @return A \code{\link[base]{data.frame}} whose first 4 columns correspond to
 #' \describe{
 #' \item{\code{GeneName}}{Gene name (as indicated by user)}
 #' \item{\code{BioVarGlobal}}{Percentage of variance explained by a biological 
-#' cell-to-cell heterogeneity component (overall across all cells)}
+#'                            component (overall across all cells)}
 #' \item{\code{TechVarGlobal}}{Percentage of variance explained by the technical 
-#' cell-to-cell heterogeneity component (overall across all cells)}
-#' \item{\code{ShotNoiseGlobal}}{Percentage of variance explained by the shot noise 
-#' component (baseline, overall across all cells)}
+#'                             component (overall across all cells)}
+#' \item{\code{ShotNoiseGlobal}}{Percentage of variance explained by the shot 
+#'                               noise component (baseline Poisson noise, 
+#'                               overall across all cells)}
 #' }
-#' If more than 1 batch of cells are being analysed, the remaining columns contain 
-#' the corresponding variance decomposition calculated within each batch.
+#' If more than 1 batch of cells are being analysed, the remaining columns 
+#' contain the corresponding variance decomposition calculated within each batch.
 #'
 #' @examples
 #'
@@ -45,7 +47,7 @@
 BASiCS_VarianceDecomp <- function(Chain, 
                                   OrderVariable = "BioVarGlobal", 
                                   Plot = TRUE, ...) {
-    if (!(OrderVariable %in% c("GeneNames", "BioVarGlobal", 
+    if (!(OrderVariable %in% c("GeneName", "BioVarGlobal", 
                                "TechVarGlobal", "ShotNoise"))) 
         stop("Invalid 'OrderVariable' value.")
     if (!is(Chain, "BASiCS_Chain")) 
@@ -64,7 +66,7 @@ BASiCS_VarianceDecomp <- function(Chain,
     ShotNoiseGlobal = 1 - BioVarGlobal - TechVarGlobal
     
     Genes = 1:q.bio
-    GeneNames = colnames(Chain@mu)
+    GeneName = colnames(Chain@mu)
     
     if (nBatch > 1) {
         VarDecompBatch = NULL
@@ -80,19 +82,19 @@ BASiCS_VarianceDecomp <- function(Chain,
         colnames(VarDecompBatch) = paste0(rep(c("BioVarBatch", "TechBatch", "ShotNoiseBatch"), 
                                               nBatch), rep(1:nBatch, each = 3))
         
-        out = cbind.data.frame(GeneIndex = Genes, GeneNames = GeneNames, 
+        out = cbind.data.frame(GeneIndex = Genes, GeneName = GeneName, 
                                BioVarGlobal = BioVarGlobal, TechVarGlobal = TechVarGlobal, 
             ShotNoiseGlobal = ShotNoiseGlobal, VarDecompBatch, stringsAsFactors = FALSE)
     } else {
-        out = cbind.data.frame(GeneIndex = Genes, GeneNames = GeneNames, 
+        out = cbind.data.frame(GeneIndex = Genes, GeneName = GeneName, 
                                BioVarGlobal = BioVarGlobal, TechVarGlobal = TechVarGlobal, 
                                ShotNoiseGlobal = ShotNoiseGlobal, stringsAsFactors = FALSE)
     }
     rownames(out) = Genes
     
     # Re-order before output
-    if (OrderVariable == "GeneNames") 
-        orderVar = GeneNames
+    if (OrderVariable == "GeneName") 
+        orderVar = GeneName
     if (OrderVariable == "BioVarGlobal") 
         orderVar = BioVarGlobal
     if (OrderVariable == "TechVarGlobal") 
