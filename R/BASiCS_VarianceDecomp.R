@@ -6,7 +6,7 @@
 #' @description Function to decompose total variability of gene 
 #' expression into biological and technical components.
 #'
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
+#' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}} 
 #' @param OrderVariable Ordering variable for output. 
 #' Possible values: \code{'GeneName'}, \code{'BioVarGlobal'},
 #'  \code{'TechVarGlobal'} and \code{'ShotNoiseGlobal'}. 
@@ -36,108 +36,116 @@
 #'
 #' @details See vignette
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
+#' @seealso \code{\linkS4class{BASiCS_Chain}} 
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references 
+#' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_VarianceDecomp
 BASiCS_VarianceDecomp <- function(Chain, 
                                   OrderVariable = "BioVarGlobal", 
-                                  Plot = TRUE, ...) {
-    if (!(OrderVariable %in% c("GeneName", "BioVarGlobal", 
-                               "TechVarGlobal", "ShotNoise"))) 
-        stop("Invalid 'OrderVariable' value.")
-    if (!is(Chain, "BASiCS_Chain")) 
-        stop("'Chain' is not a BASiCS_Chain class object.")
+                                  Plot = TRUE, ...) 
+{
+  if (!(OrderVariable %in% c("GeneName", "BioVarGlobal", 
+                             "TechVarGlobal", "ShotNoise"))) 
+    stop("Invalid 'OrderVariable' value.")
+  if (!is(Chain, "BASiCS_Chain")) 
+    stop("'Chain' is not a BASiCS_Chain class object.")
     
-    q.bio = ncol(Chain@delta)
-    UniqueBatch = colnames(Chain@theta)
-    nBatch = length(UniqueBatch)
+  q.bio <- ncol(Chain@delta)
+  UniqueBatch <- colnames(Chain@theta)
+  nBatch <- length(UniqueBatch)
     
-    # Calculating variance decomposition
-    VarDecomp = HiddenVarDecomp(Chain)
+  # Calculating variance decomposition
+  VarDecomp <- HiddenVarDecomp(Chain)
     
-    # Global values
-    BioVarGlobal = apply(VarDecomp$BioVarGlobal, 2, median)
-    TechVarGlobal = apply(VarDecomp$TechVarGlobal, 2, median)
-    ShotNoiseGlobal = 1 - BioVarGlobal - TechVarGlobal
+  # Global values
+  BioVarGlobal <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
+  TechVarGlobal <- matrixStats::colMedians(VarDecomp$TechVarGlobal)
+  ShotNoiseGlobal <- 1 - BioVarGlobal - TechVarGlobal
     
-    Genes = 1:q.bio
-    GeneName = colnames(Chain@mu)
+  Genes <- seq_len(q.bio)
+  GeneName <- colnames(Chain@mu)
     
-    if (nBatch > 1) {
-        VarDecompBatch = NULL
+  if (nBatch > 1) 
+  {
+    VarDecompBatch <- NULL
         
-        for (Batch in 1:nBatch) {
-            VarDecompBatch = cbind(VarDecompBatch, 
-                                   apply(VarDecomp$BioVarBatch[, , Batch], 2, median), 
-                                   apply(VarDecomp$TechVarBatch[, , Batch], 2, median), 
-                                   1 - apply(VarDecomp$BioVarBatch[, , Batch], 2, median) - 
-                                     apply(VarDecomp$TechVarBatch[, , Batch], 2, median))
-        }
-        
-        colnames(VarDecompBatch) = paste0(rep(c("BioVarBatch", "TechBatch", "ShotNoiseBatch"), 
-                                              nBatch), rep(1:nBatch, each = 3))
-        
-        out = cbind.data.frame(GeneIndex = Genes, GeneName = GeneName, 
-                               BioVarGlobal = BioVarGlobal, TechVarGlobal = TechVarGlobal, 
-            ShotNoiseGlobal = ShotNoiseGlobal, VarDecompBatch, stringsAsFactors = FALSE)
-    } else {
-        out = cbind.data.frame(GeneIndex = Genes, GeneName = GeneName, 
-                               BioVarGlobal = BioVarGlobal, TechVarGlobal = TechVarGlobal, 
-                               ShotNoiseGlobal = ShotNoiseGlobal, stringsAsFactors = FALSE)
+    for (Batch in seq_len(nBatch)) 
+    {
+      BioVarAux <- matrixStats::colMedians(VarDecomp$BioVarBatch[, , Batch])
+      TechVarAux <- matrixStats::colMedians(VarDecomp$TechVarBatch[, , Batch])
+      VarDecompBatch <- cbind(VarDecompBatch, BioVarAux, 
+                              TechVarAux, 1 - BioVarAux - TechVarAux)
     }
-    rownames(out) = Genes
-    
-    # Re-order before output
-    if (OrderVariable == "GeneName") 
-        orderVar = GeneName
-    if (OrderVariable == "BioVarGlobal") 
-        orderVar = BioVarGlobal
-    if (OrderVariable == "TechVarGlobal") 
-        orderVar = TechVarGlobal
-    if (OrderVariable == "ShotNoiseGlobal") 
-        orderVar = 1 - BioVarGlobal - TechVarGlobal
-    out = out[order(orderVar, decreasing = TRUE), ]
-    
-    if (Plot) {
-        args <- list(...)
-        main = ifelse("main" %in% names(args), args$main, "Overall variance decomposition")
-        ylab = ifelse("ylab" %in% names(args), args$ylab, "% of variance")
-        beside = ifelse("beside" %in% names(args), args$beside, FALSE)
-        if ("col" %in% names(args)) {
-            col = args$col
-        } else {
-            col = c("lightblue", "mistyrose", "lightcyan")
-        }
-        if ("legend" %in% names(args)) {
-            legend = args$legend
-        } else {
-            legend = c("Biological", "Technical", "Shot noise")
-        }
-        if ("args.legend" %in% names(args)) {
-            args.legend = args$args.legend
-        } else {
-            args.legend = list(x = "bottomright", bg = "white")
-        }
-        if ("names.arg" %in% names(args)) {
-            names.arg = args$names.arg
-        } else {
-            if (nBatch > 1) {
-                names.arg = c("Overall", paste("Batch ", 1:nBatch))
-            } else {
-                names.arg = c("Overall")
-            }
-        }
         
-        outmat = 100 * matrix(apply(out[, -c(1:2)], 2, mean), nrow = 3, byrow = FALSE)
-        barplot(outmat, beside = beside, main = main, ylab = ylab, col = col, 
-                legend = legend, args.legend = args.legend, 
-                names.arg = names.arg)
-    }
+    colnames(VarDecompBatch) <- paste0(rep(c("BioVarBatch", 
+                                             "TechBatch", 
+                                             "ShotNoiseBatch"), 
+                                              nBatch), 
+                                       rep(seq_len(nBatch), each = 3))
+        
+    out <- cbind.data.frame(GeneIndex = Genes, GeneName = GeneName, 
+                            BioVarGlobal = BioVarGlobal, 
+                            TechVarGlobal = TechVarGlobal, 
+                            ShotNoiseGlobal = ShotNoiseGlobal, 
+                            VarDecompBatch, stringsAsFactors = FALSE)
+  } 
+  else 
+  {
+    out <- cbind.data.frame(GeneIndex = Genes, GeneName = GeneName, 
+                            BioVarGlobal = BioVarGlobal, 
+                            TechVarGlobal = TechVarGlobal, 
+                            ShotNoiseGlobal = ShotNoiseGlobal, 
+                            stringsAsFactors = FALSE)
+  }
+  rownames(out) <- Genes
     
-    return(out)
+  # Re-order before output
+  if (OrderVariable == "GeneName") { orderVar <- GeneName }
+  if (OrderVariable == "BioVarGlobal") { orderVar <- BioVarGlobal }
+  if (OrderVariable == "TechVarGlobal") { orderVar <- TechVarGlobal }
+  if (OrderVariable == "ShotNoiseGlobal") 
+    orderVar <- 1 - BioVarGlobal - TechVarGlobal
+  
+  out <- out[order(orderVar, decreasing = TRUE), ]
+    
+  if (Plot) 
+  {
+    args <- list(...)
+    main <- ifelse("main" %in% names(args), 
+                   args$main, "Overall variance decomposition")
+    ylab <- ifelse("ylab" %in% names(args), args$ylab, "% of variance")
+    beside <- ifelse("beside" %in% names(args), args$beside, FALSE)
+    
+    if ("col" %in% names(args)) { col <- args$col } 
+    else { col <- c("lightblue", "mistyrose", "lightcyan") }
+    
+    if ("legend" %in% names(args)) { legend = args$legend } 
+    else { legend <- c("Biological", "Technical", "Shot noise") }
+    
+    if ("args.legend" %in% names(args)) { args.legend = args$args.legend } 
+    else { args.legend <- list(x = "bottomright", bg = "white") }
+    
+    if ("names.arg" %in% names(args)) { names.arg <- args$names.arg } 
+    else 
+    {
+      if (nBatch > 1) 
+      { 
+        names.arg <- c("Overall", paste("Batch ", seq_len(nBatch))) 
+      } 
+      else { names.arg <- c("Overall") } 
+    }
+        
+    outmat <- 100 * matrix(apply(out[, -c(1:2)], 2, mean), 
+                           nrow = 3, byrow = FALSE)
+    barplot(outmat, beside = beside, main = main, 
+            ylab = ylab, col = col, 
+            legend = legend, args.legend = args.legend, 
+            names.arg = names.arg)
+  }
+  return(out)
 }

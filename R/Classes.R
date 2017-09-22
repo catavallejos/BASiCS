@@ -128,5 +128,5 @@ setClass("BASiCS_Summary",
               sum(!is.finite(object@s)) > 0 | 
               sum(!is.finite(object@nu)) > 0 | 
               sum(!is.finite(object@theta)) > 0) 
-                stop("Invalid slots") else { TRUE }
+                return("Invalid slots") else { TRUE }
       })

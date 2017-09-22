@@ -545,6 +545,17 @@ required due to DataSC, DataRNA)
 
 version 0.99.3: (2017-09-22)
 
+- Format + matrixStats usage in `BASiCS_VarianceDecomp`
+- Unit test for HVG/LVG detection added
+- Minor bug in `BASiCS_TestDE` resolved (related to colMeans2 use)
+- Format + matrixStats usage in `HiddenVarDecomp`
+- `message` replaced by `cat` in Methods.R
+- Removal of no-longer-needed Hidden functions
+- Format in `HiddenHeaderDetectHVG_LVG`
+- Format in `HiddenPlot1DetectHVG_LVG` + `HiddenPlot2DetectHVG_LVG`
+- Format + matrixStats usage in `BASiCS_DetectHVG` + `BASiCS_DetectLVG`
+- Format in `BASiCS_VarThresholdSearchHVG`
+- Format in `HiddenThresholdSearchDetectHVG_LVG`
 
 - TODO:
   * Clean-up cpp code as in Biomark model

@@ -168,7 +168,7 @@ BASiCS_TestDE <- function(Chain1,
   if (!identical(colnames(Chain1@mu), colnames(Chain2@mu))) 
     stop("The  'BASiCS_Chain' objects contain genes in different order.")
     
-  GeneName = colnames(Chain1@mu)
+  GeneName <- colnames(Chain1@mu)
     
   if (EpsilonM < 0 | !is.finite(EpsilonM)) 
     stop("'EpsilonM' must be a positive real value")
@@ -340,7 +340,7 @@ BASiCS_TestDE <- function(Chain1,
                                   ResultDiffMean = ResultDiffMean, 
                                   stringsAsFactors = FALSE)
     # Rounding to 3 decimal points
-    TableMean[, 2:7] <- round(TableMean[, 2:7], 3)
+    TableMean[, seq(2,7)] <- round(TableMean[, seq(2,7)], 3)
     
     # Genes for which mean doesn't change
     NotDE <- which(ResultDiffMean == "NoDiff")
@@ -375,10 +375,10 @@ BASiCS_TestDE <- function(Chain1,
                                   ResultDiffDisp = ResultDiffDisp, 
                                   stringsAsFactors = FALSE)
     # Rounding to 3 decimal points
-    TableDisp[, 2:8] <- round(TableDisp[, 2:8], 3)
+    TableDisp[, seq(2,8)] <- round(TableDisp[, seq(2,8)], 3)
     
     # Update after removing DE genes from Disp table!  Reordering the tables
-    GeneIndex <- 1:length(MuBase)
+    GeneIndex <- seq_len(length(MuBase))
     
     if (OrderVariable == "GeneIndex") 
         orderVar = GeneIndex

@@ -15,22 +15,25 @@ BASiCS_VarThresholdSearchLVG(Chain, VarThresholdsGrid, EFDR = 0.1,
   Progress = TRUE)
 }
 \arguments{
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
+\item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
 \item{VarThresholdsGrid}{Grid of values for the variance contribution 
 threshold (they must be contained in (0,1))}
 
-\item{EFDR}{Target for expected false discovery rate related to HVG/LVG detection. 
-Default: \code{EFDR = 0.10}.}
+\item{EFDR}{Target for expected false discovery rate related to 
+HVG/LVG detection. Default: \code{EFDR = 0.10}.}
 
-\item{Progress}{If \code{Progress = TRUE}, partial output is printed in the console.}
+\item{Progress}{If \code{Progress = TRUE}, partial output is 
+printed in the console. Default: \code{Progress = TRUE}.}
 }
 \value{
 \describe{
 \item{\code{BASiCS_VarThresholdSearchHVG}}{A table displaying the results of 
-highly variable genes detection for different variance contribution thresholds.}
+      highly variable genes detection for different variance 
+      contribution thresholds.}
 \item{\code{BASiCS_VarThresholdSearchLVG}}{A table displaying the results of 
-lowly variable genes detection for different variance contribution thresholds.}
+      lowly variable genes detection for different variance 
+      contribution thresholds.}
 }
 }
 \description{
@@ -50,7 +53,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain}}
+\code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

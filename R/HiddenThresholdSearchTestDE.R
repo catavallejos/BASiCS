@@ -2,10 +2,13 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
                                         GenesSelect, EFDR, Task) 
 {
   # Calculating posterior probabilities
-  if (Epsilon > 0) { Prob <- matrixStats::colMeans2(abs(ChainLFC) > Epsilon) } 
+  if (Epsilon > 0) 
+  { 
+    Prob <- matrixStats::colMeans2(ifelse(abs(ChainLFC) > Epsilon, 1, 0)) 
+  } 
   else 
   {
-    Prob_aux <- matrixStats::colMeans2(ChainLFC > 0)
+    Prob_aux <- matrixStats::colMeans2(ifelse(ChainLFC > 0, 1, 0))
     Prob <- 2 * pmax(Prob_aux, 1 - Prob_aux) - 1
   }
   
@@ -17,13 +20,13 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
     
     if (is.null(GenesSelect)) 
     {
-      EFDRgrid <- sapply(ProbThresholds, HiddenEFDRDV, Prob = Prob)
-      EFNRgrid <- sapply(ProbThresholds, HiddenEFNRDV, Prob = Prob)
+      EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob)
+      EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob)
     } 
     else 
     {
-      EFDRgrid <- sapply(ProbThresholds, HiddenEFDRDV, Prob = Prob[GenesSelect])
-      EFNRgrid <- sapply(ProbThresholds, HiddenEFNRDV, Prob = Prob[GenesSelect])
+      EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob[GenesSelect])
+      EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob[GenesSelect])
     }
     
     above <- abs(EFDRgrid - EFDR)
@@ -67,13 +70,13 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
     # When a posterior probability threshold has been set a priori
     if (is.null(GenesSelect)) 
     {
-      EFDRgrid <- HiddenEFDRDV(ProbThreshold, Prob)
-      EFNRgrid <- HiddenEFNRDV(ProbThreshold, Prob)
+      EFDRgrid <- HiddenEFDR(ProbThreshold, Prob)
+      EFNRgrid <- HiddenEFNR(ProbThreshold, Prob)
     } 
     else 
     {
-      EFDRgrid <- HiddenEFDRDV(ProbThreshold, Prob[GenesSelect])
-      EFNRgrid <- HiddenEFNRDV(ProbThreshold, Prob[GenesSelect])
+      EFDRgrid <- HiddenEFDR(ProbThreshold, Prob[GenesSelect])
+      EFNRgrid <- HiddenEFNR(ProbThreshold, Prob[GenesSelect])
     }
     OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid)
   }

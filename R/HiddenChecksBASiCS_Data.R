@@ -40,7 +40,8 @@ HiddenChecksBASiCS_Data <- function(Counts,
                   intrinsic genes. Please remove them before creating the 
                   SingleCellExperiment object.")
     
-    if (!(sum(Tech[1:q.bio]) == 0 & sum(Tech[(q.bio + 1):q]) == q - q.bio)) 
+    if (!(sum(Tech[seq_len(q.bio)]) == 0 & 
+          sum(Tech[seq(q.bio + 1, q)]) == q - q.bio)) 
       errors <- c(errors, "Expression counts are not in the right format 
                   (spike-in genes must be at the bottom of the matrix).")
   } 

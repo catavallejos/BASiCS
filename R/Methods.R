@@ -41,19 +41,19 @@ setMethod("show",
             q.bio <- ncol(object@delta)
             n <- ncol(object@phi)
             nBatch <- ncol(object@theta)
-            message("An object of class ", class(object), "\n", 
-                    " ", N, " MCMC samples.\n", sep = "")
+            cat("An object of class ", class(object), "\n", 
+                " ", N, " MCMC samples.\n", sep = "")
             if (nBatch > 1) 
             {
-              message(" Dataset contains ", q.bio, " biological genes and \n", 
-                      n, " cells (", nBatch, " batches). \n", sep = "")
+              cat(" Dataset contains ", q.bio, " biological genes and ", 
+                  n, " cells (", nBatch, " batches). \n", sep = "")
             } 
             else 
             {
-              message(" Dataset contains ", q.bio, " biological genes and \n", 
-                      n, " cells (1 batch). \n", sep = "")
+              cat(" Dataset contains ", q.bio, " biological genes and ", 
+                  n, " cells (1 batch). \n", sep = "")
             }
-            message(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
+            cat(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
           })
 
 #' @name Summary
@@ -283,23 +283,23 @@ setMethod("show",
             q.bio <- nrow(object@delta)
             n <- nrow(object@phi)
             nBatch <- nrow(object@theta)
-            message("An object of class ", class(object), "\n",
-                    " Contains posterior medians and the limits of the \n", 
-                    " HPD interval for all BASiCS model parameters.\n")
+            cat("An object of class ", class(object), "\n",
+                " Contains posterior medians and the limits of the \n", 
+                " HPD interval for all BASiCS model parameters.\n")
     
             if (nBatch > 1) 
             {
-              message(" Dataset contains ", q, " genes \n", 
-                      "(", q.bio, " biological and ", q-q.bio, " technical) \n",
-                      "and ", n, " cells (", nBatch, " batches). \n")
+              cat(" Dataset contains ", q, " genes", 
+                  "(", q.bio, " biological and ", q-q.bio, " technical) \n",
+                  " and ", n, " cells (", nBatch, " batches). \n", sep = "")
             } 
             else 
             {
-              message(" Dataset contains ", q, " genes \n",
-                      "(", q.bio, " biological and ", q-q.bio, " technical) \n", 
-                      "and ", n, " cells (1 batch). \n")
+              cat(" Dataset contains ", q, " genes",
+                  "(", q.bio, " biological and ", q-q.bio, " technical) \n", 
+                  " and ", n, " cells (1 batch). \n", sep = "")
             }
-            message(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
+            cat(" Elements (slots): mu, delta, phi, s, nu and theta.\n")
           })
 
 

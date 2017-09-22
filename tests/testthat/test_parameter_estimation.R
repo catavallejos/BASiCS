@@ -1,40 +1,27 @@
-context("Basic example of parameter estimation")
+context("Parameter estimation")
 
-test_that("paramater estimations are correct", 
-          {
-            Data = makeExampleBASiCS_Data(WithSpikes = TRUE, Example = 1)
-            Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
-                                 PrintProgress = FALSE)
-            PostSummary <- Summary(Chain, prob = 0.995)
-    
-            # Parameters used for the simulation
-            Mu =  c( 8.36,  10.65,   4.88,   6.29,  21.72,  12.93,  30.19,  
-                     83.92,   3.89,   6.34, 57.87,  12.45,   8.08,   7.31,  
-                     15.56,  15.91,  12.24,  15.96,  19.14,   4.20, 6.75,  
-                     27.74,   8.88,  21.21,  19.89,   7.14,  11.09,   7.19,  
-                     20.64,  73.90, 9.05,   6.13,  16.40,   6.08,  17.89,   
-                     6.98,  10.25,  14.05,   8.14,   5.67, 6.95,  11.16,  11.83,
-                     7.56, 159.05,  16.41,   4.58,  15.46,  10.96,  25.05)
-    Delta = c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85, 0.27, 0.53, 1.31,
-              0.26, 0.81, 0.72, 0.70, 0.96, 0.58, 1.15, 0.82, 0.25, 5.32,
-              1.13, 0.31, 0.66, 0.27, 0.76, 1.39, 1.18, 1.57, 0.55, 0.17,
-              1.40, 1.47, 0.57, 2.55, 0.62, 0.77, 1.47, 0.91, 1.53, 2.89,
-              1.43, 0.77, 1.37, 0.57, 0.15, 0.33, 3.99, 0.47, 0.87, 0.86)
-    Phi = c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97,
-            1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
-    S = c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37,
-          0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
+test_that("paramater estimations match the given seed", 
+{
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, Example = 1)
+  set.seed(18)
+  Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+                       PrintProgress = FALSE)
+  PostSummary <- Summary(Chain)
+            
+  # Check if parameter estimates match for the first 5 genes and cells
+  Mu <- c(7.403,  4.795,  4.098,  5.278, 18.812)
+  MuObs <- as.vector(round(PostSummary@mu[1:5,1],3))
+  expect_that(all.equal(MuObs, Mu), is_true())
+            
+  Delta <- c(1.169, 2.308, 0.620, 1.594, 0.577)
+  DeltaObs <- as.vector(round(PostSummary@delta[1:5,1],3))
+  expect_that(all.equal(DeltaObs, Delta), is_true())
 
-    s = sum(Mu >= PostSummary@mu[,2] & Mu <= PostSummary@mu[,3]) / 50
-    expect_that(s >= 0.9, is_true())
-
-    s = sum(Delta >= PostSummary@delta[,2] & Delta <= PostSummary@delta[,3])
-    s = s / 50
-    expect_that(s >= 0.9, is_true())
-
-    s = sum(Phi >= PostSummary@phi[,2] & Phi <= PostSummary@phi[,3]) / 20
-    expect_that(s >= 0.9, is_true())
-
-    s = sum(S >= PostSummary@s[,2] & S <= PostSummary@s[,3]) / 20 
-    expect_that(s >= 0.9, is_true())
+  Phi <- c(1.084, 1.014, 0.918, 0.989, 0.908)
+  PhiObs <- as.vector(round(PostSummary@phi[1:5,1],3))
+  expect_that(all.equal(PhiObs, Phi), is_true())
+            
+  S <- c(0.282, 0.532, 0.081, 0.213, 0.528)
+  SObs <- as.vector(round(PostSummary@s[1:5,1],3))
+  expect_that(all.equal(SObs, S), is_true())
 })

@@ -160,7 +160,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
       set.seed(i + 10000)
       Counts.sim[i, ] <- rpois(n, lambda = Nu * Rho[i, ] * Mu[i])
     }
-    rownames(Counts.sim) <- paste0("Gene", 1:q.bio)
+    rownames(Counts.sim) <- paste0("Gene", seq_len(q.bio))
         
     Data <- newBASiCS_Data(Counts = Counts.sim, 
                            Tech = rep(FALSE, q.bio), 
