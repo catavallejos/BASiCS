@@ -536,6 +536,13 @@ version 0.99.3: (2017-09-21)
 - Format + vectorization for `BASiCS_Filter`
 - Format for `BASiCS_LoadChain`
 
+version 0.99.3: (2017-09-22)
+
+- Removal of second example in `makeExampleBASiCS_Data` (no longer
+required due to DataSC, DataRNA)
+- Format for `makeExampleBASiCS_Data`
+- Format for `BASiCS_Sim`
+
 - TODO:
   * Clean-up cpp code as in Biomark model
 
