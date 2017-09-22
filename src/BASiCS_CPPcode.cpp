@@ -2109,3 +2109,42 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   
 }
 
+// [[Rcpp::export]]
+arma::mat HiddenBASiCS_DenoisedRates(
+  NumericMatrix CountsBio, 
+  NumericMatrix Mu,
+  NumericMatrix Delta,
+  NumericMatrix Phi, 
+  NumericMatrix Nu,
+  int N,
+  int qbio,
+  int n)
+{
+  // Transformations to arma objects
+  arma::mat CountsBio_arma = as_arma(CountsBio);
+  arma::mat Mu_arma = as_arma(Mu);
+  arma::mat Delta_arma = as_arma(Delta);
+  arma::mat Phi_arma = as_arma(Phi);
+  arma::mat Nu_arma = as_arma(Nu);
+  
+  // Where to store the results
+  arma::mat Rho = arma::zeros(qbio, n);
+  // Auxiliary matrices
+  arma::mat m1; arma::mat m2;
+  
+  for (int i = 0; i<N; i++) 
+  {
+    Rcpp::checkUserInterrupt();
+    
+    m1 = CountsBio_arma; 
+    m1.each_col() += 1/Delta_arma.row(i).t(); 
+    m2 = Mu_arma.row(i).t() * (Phi_arma.row(i) % Nu_arma.row(i));
+    m2.each_col() += 1/Delta_arma.row(i).t(); 
+    Rho += m1 / m2; 
+  } 
+  return(Rho / N);
+}
+  
+  
+  
+

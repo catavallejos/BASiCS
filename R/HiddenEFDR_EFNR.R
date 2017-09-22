@@ -1,5 +1,3 @@
-#### Helper functions 
-
 HiddenEFDR <- function(EviThreshold, VarThreshold, Prob) {
     return(sum((1 - Prob) * I(Prob > EviThreshold))/sum(I(Prob > EviThreshold)))
 }

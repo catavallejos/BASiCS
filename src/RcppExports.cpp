@@ -143,11 +143,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// HiddenBASiCS_DenoisedRates
+arma::mat HiddenBASiCS_DenoisedRates(NumericMatrix CountsBio, NumericMatrix Mu, NumericMatrix Delta, NumericMatrix Phi, NumericMatrix Nu, int N, int qbio, int n);
+RcppExport SEXP _BASiCS_HiddenBASiCS_DenoisedRates(SEXP CountsBioSEXP, SEXP MuSEXP, SEXP DeltaSEXP, SEXP PhiSEXP, SEXP NuSEXP, SEXP NSEXP, SEXP qbioSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type CountsBio(CountsBioSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Mu(MuSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Phi(PhiSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Nu(NuSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type qbio(qbioSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_DenoisedRates(CountsBio, Mu, Delta, Phi, Nu, N, qbio, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcpp", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcpp, 33},
     {"_BASiCS_HiddenBASiCS_MCMCcppBatch", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppBatch, 34},
     {"_BASiCS_HiddenBASiCS_MCMCcppNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppNoSpikes, 40},
+    {"_BASiCS_HiddenBASiCS_DenoisedRates", (DL_FUNC) &_BASiCS_HiddenBASiCS_DenoisedRates, 8},
     {NULL, NULL, 0}
 };
 

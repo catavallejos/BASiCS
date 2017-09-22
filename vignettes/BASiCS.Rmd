@@ -287,7 +287,7 @@ $$ \Lambda_{ij} = \hat{\mu_i} \hat{\rho}_{ij},  $$
 where $\hat{\mu_i}$ represents the posterior median of $\mu_j$ and $\hat{\rho}_{ij}$ is given by its posterior mean (Monte Carlo estimate based on the MCMC sample of all model parameters).
 
 ```{r DenoisedProp}
-DenoisedRates = BASiCS_DenoisedRates(Data = Data, Chain = Chain, Propensities = FALSE)
+DenoisedRates <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, Propensities = FALSE)
 DenoisedRates[1:5, 1:5]
 ```
 
