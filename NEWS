@@ -561,10 +561,19 @@ version 0.99.3: (2017-09-22)
 
 - Calculations in `BASiCS_DenoisedRates` moved to C++ to increase speed
 
+version 0.99.3: (2017-09-24)
+
+- Format in `BASiCS_DenoisedCounts`
+- Edits in `HiddenBASiCS_MCMCcpp` and associated C++ functions
+  * Dimensions for mu storage upto q0 only
+  * Creation of generic storage values
+  * Formating of long lines
+  * Removal of no-longer-required functions and debug lines
+
 
 - TODO:
   * Clean-up cpp code as in Biomark model
-  * Move denoised counts to C++
+  * Merge batch/no-batch into a single function
 
 - DEVELOPMENT NOTES (potential future changes):
   * Add examples for Denoised rates/counts

@@ -25,3 +25,4 @@ test_that("paramater estimations match the given seed",
   SObs <- as.vector(round(PostSummary@s[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
 })
+

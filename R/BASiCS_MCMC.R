@@ -284,19 +284,22 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         } else {
             # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
             Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, as.matrix(assay(Data)), 
-                                                             mu0, delta0, phi0, s0, nu0, theta0, 
+                                                             mu0[(q.bio+1):q],
+                                                             mu0[1:q.bio], delta0, phi0, s0, nu0, theta0, 
                                                              PriorParam$s2.mu, PriorParam$a.delta, 
-                                                             PriorParam$b.delta, PriorParam$p.phi, 
+                                                             PriorParam$b.delta, 
+                                                             PriorParam$s2.delta,
+                                                             PriorDeltaNum,
+                                                             PriorParam$p.phi, 
                                                              PriorParam$a.s, PriorParam$b.s, 
                                                              PriorParam$a.theta, PriorParam$b.theta, 
                                                              AR, 
-                                                             ls.mu0, ls.delta0, 
+                                                             ls.mu0[1:q.bio], ls.delta0, 
                                                              ls.phi0, ls.nu0, ls.theta0, 
                                                              sum.bycell.all, sum.bycell.bio, 
                                                              sum.bygene.all, sum.bygene.bio, 
                                                              StoreAdaptNumber, StopAdapt, 
-                                                             as.numeric(PrintProgress), 
-                                                             PriorParam$s2.delta, PriorDeltaNum))
+                                                             as.numeric(PrintProgress)))
         }
     } else {
         # If spikes are not available
