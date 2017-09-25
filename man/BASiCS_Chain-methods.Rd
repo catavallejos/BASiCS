@@ -9,22 +9,22 @@
 \S4method{show}{BASiCS_Chain}(object)
 }
 \arguments{
-\item{object}{A \code{BASiCS_Chain} object.}
+\item{object}{A \code{\linkS4class{BASiCS_Chain}} object.}
 }
 \value{
 Prints a summary of the properties of \code{object}.
 }
 \description{
-'show' method for \code{\link[BASiCS]{BASiCS_Chain}} objects.
+'show' method for \code{\linkS4class{BASiCS_Chain}} objects.
 }
 \examples{
 
-Data = makeExampleBASiCS_Data()
+Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

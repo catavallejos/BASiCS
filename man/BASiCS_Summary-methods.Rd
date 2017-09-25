@@ -9,13 +9,13 @@
 \S4method{show}{BASiCS_Summary}(object)
 }
 \arguments{
-\item{object}{A \code{BASiCS_Summary} object.}
+\item{object}{A \code{\linkS4class{BASiCS_Summary}} object.}
 }
 \value{
 Prints a summary of the properties of \code{object}.
 }
 \description{
-'show' method for \code{\link[BASiCS]{BASiCS_Summary}} objects.
+'show' method for \code{\linkS4class{BASiCS_Summary}} objects.
 }
 \examples{
 
@@ -24,7 +24,7 @@ help(BASiCS_MCMC)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

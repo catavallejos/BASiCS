@@ -10,16 +10,17 @@
 \S4method{displayChainBASiCS}{BASiCS_Chain}(object, Param = "mu")
 }
 \arguments{
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
+\item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
-\item{Param}{Name of the slot to be used for the accessed. Possible values: \code{'mu'}, 
-\code{'delta'}, \code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}.}
+\item{Param}{Name of the slot to be used for the accessed. 
+Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'}, 
+\code{'s'}, \code{'nu'} and \code{'theta'}.}
 }
 \value{
-The requested slot of an object of class \code{\link[BASiCS]{BASiCS_Chain}}
+The requested slot of a \code{\linkS4class{BASiCS_Chain}} object
 }
 \description{
-Accessors for the slots of a \code{\link[BASiCS]{BASiCS_Chain}}
+Accessors for the slots of a \code{\linkS4class{BASiCS_Chain}}
 }
 \examples{
 
@@ -28,10 +29,10 @@ help(BASiCS_MCMC)
   
 }
 \references{
-Vallejos, Marioni and Richardson (2015). Bayesian Analysis of Single-Cell Sequencing data. PLoS Computational Biology.
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain}}
+\code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

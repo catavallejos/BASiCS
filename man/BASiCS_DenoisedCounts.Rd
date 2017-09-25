@@ -7,15 +7,16 @@
 BASiCS_DenoisedCounts(Data, Chain)
 }
 \arguments{
-\item{Data}{an object of class 
-\code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+\item{Data}{an object of class \code{\linkS4class{SingleCellExperiment}}}
 
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
+\item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 }
 \value{
-A matrix of denoised expression counts. These are defined as 
-\eqn{X_{ij}/(\phi_j \nu_j)} for biological genes and 
-\eqn{X_{ij}/(\nu_j)} for spike-in genes.
+A matrix of denoised expression counts. In line with global scaling
+normalisation strategies, these are defined as \eqn{X_{ij}/(\phi_j \nu_j)} 
+for biological genes and \eqn{X_{ij}/(\nu_j)} for spike-in genes. For this
+calculation \eqn{\phi_j} \eqn{\nu_j} are estimated by their corresponding
+posterior medians.
 }
 \description{
 Calculates denoised expression counts by removing 
@@ -34,7 +35,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain}}
+\code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

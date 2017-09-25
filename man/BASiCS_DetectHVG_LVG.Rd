@@ -14,7 +14,7 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
   OrderVariable = "Prob", Plot = FALSE, ...)
 }
 \arguments{
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
+\item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
 \item{VarThreshold}{Variance contribution threshold 
 (must be a positive value, between 0 and 1)}
@@ -40,25 +40,27 @@ probability plots are generated}
 \describe{
 \item{\code{Table}}{Matrix whose columns contain}
    \describe{
-   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index as in the 
-   order present in the analysed 
-   \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
-   \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name as in the 
-   order present in the analysed 
-   \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. 
+        Gene index as in the order present in the analysed 
+        \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+   \item{\code{GeneName}}{Vector of length \code{q.bio}. 
+               Gene name as in the order present in the analysed 
+         \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, 
-   posterior median of gene-specific expression levels \eqn{\mu_i}}
-   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, 
-   posterior median of gene-specific biological 
-   over-dispersion parameter \eqn{\delta_i}}
-   \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, 
-   proportion of the total variability that is due to a 
-   cell-to-cell biological heterogeneity component. }
-   \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, 
-   probability of being highly variable according to the given thresholds.}
-   \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, 
-   indicator of being detected as highly variable 
-   according to the given thresholds. }
+         posterior median of gene-specific mean expression 
+         parameters \eqn{\mu_i}}
+   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological 
+         gene, posterior median of gene-specific biological 
+         over-dispersion parameter \eqn{\delta_i}}
+   \item{\code{Sigma}}{Vector of length \code{q.bio}. 
+         For each biological gene, proportion of the total variability 
+         that is due to a biological heterogeneity component. }
+   \item{\code{Prob}}{Vector of length \code{q.bio}. 
+         For each biological gene, probability of being highly variable 
+         according to the given thresholds.}
+   \item{\code{HVG}}{Vector of length \code{q.bio}. 
+         For each biological gene, indicator of being detected as highly 
+         variable according to the given thresholds. }
    }
 \item{\code{ProbThreshold}}{Posterior probability threshold.}
 \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
@@ -85,7 +87,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain}}
+\code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

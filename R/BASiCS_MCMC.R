@@ -258,47 +258,48 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     StoreAdaptNumber = as.numeric(StoreAdapt)
     nBatch = length(unique(metadata(Data)$BatchInfo))
     
+    if(nBatch > 1)
+    {
+      BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)  
+      BatchInfo <- as.numeric(metadata(Data)$BatchInfo)
+    }
+    else
+    { 
+      # If there are no batches or the user asked to ignore them
+      BatchDesign <- matrix(1, nrow = n, ncol = 1) 
+      BatchInfo <- rep(1, times = n)
+      nBatch <- 1
+    }
+    
+  
     # If spikes are available (stable version)
-    if (length(metadata(Data)$SpikeInput) > 1) {
-        if (nBatch > 1) {
-            BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
-            
-            # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-            Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(N, Thin, Burn, 
-                                                                  as.matrix(assay(Data)), 
-                                                                  BatchDesign, 
-                                                                  mu0, delta0, phi0, s0, nu0, theta0,
-                                                                  PriorParam$s2.mu, 
-                                                                  PriorParam$a.delta, PriorParam$b.delta, 
-                                                                  PriorParam$p.phi, 
-                                                                  PriorParam$a.s, PriorParam$b.s, 
-                                                                  PriorParam$a.theta, PriorParam$b.theta, 
-                                                                  AR, 
-                                                                  ls.mu0, ls.delta0, 
-                                                                  ls.phi0, ls.nu0, ls.theta0, 
-                                                                  sum.bycell.all, sum.bycell.bio, 
-                                                                  sum.bygene.all, sum.bygene.bio, 
-                                                                  StoreAdaptNumber, 
-                                                                  StopAdapt, as.numeric(PrintProgress), 
-                                                                  PriorParam$s2.delta, PriorDeltaNum))
-        } else {
-            # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-            Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, as.matrix(assay(Data)), 
-                                                             mu0, delta0, phi0, s0, nu0, theta0, 
-                                                             PriorParam$s2.mu, PriorParam$a.delta, 
-                                                             PriorParam$b.delta, PriorParam$p.phi, 
-                                                             PriorParam$a.s, PriorParam$b.s, 
-                                                             PriorParam$a.theta, PriorParam$b.theta, 
-                                                             AR, 
-                                                             ls.mu0, ls.delta0, 
-                                                             ls.phi0, ls.nu0, ls.theta0, 
-                                                             sum.bycell.all, sum.bycell.bio, 
-                                                             sum.bygene.all, sum.bygene.bio, 
-                                                             StoreAdaptNumber, StopAdapt, 
-                                                             as.numeric(PrintProgress), 
-                                                             PriorParam$s2.delta, PriorDeltaNum))
-        }
-    } else {
+    if (length(metadata(Data)$SpikeInput) > 1) 
+    {
+      # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
+      Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
+                                                       as.matrix(assay(Data)), 
+                                                       BatchDesign,
+                                                       mu0[(q.bio+1):q],
+                                                       mu0[1:q.bio], delta0, 
+                                                       phi0, s0, 
+                                                       nu0, rep(theta0, nBatch), 
+                                                       PriorParam$s2.mu, 
+                                                       PriorParam$a.delta, 
+                                                       PriorParam$b.delta, 
+                                                       PriorParam$s2.delta,
+                                                       PriorDeltaNum,
+                                                       PriorParam$p.phi, 
+                                                       PriorParam$a.s, PriorParam$b.s, 
+                                                       PriorParam$a.theta, PriorParam$b.theta, 
+                                                       AR, 
+                                                       ls.mu0[1:q.bio], ls.delta0, 
+                                                       ls.phi0, ls.nu0, rep(ls.theta0, nBatch), 
+                                                       sum.bycell.all, sum.bycell.bio, 
+                                                       sum.bygene.all, sum.bygene.bio, 
+                                                       StoreAdaptNumber, StopAdapt, 
+                                                       as.numeric(PrintProgress)))
+    } 
+    else {
         # If spikes are not available
         message("--------------------------------------------------------------------", "\n", 
                 "IMPORTANT: this part of the code is under development. DO NOT USE \n", 

@@ -20,11 +20,11 @@
 #' @details This function is no longer in use and will 
 #' be removed from future releases of \code{BASiCS}.
 #' 
-#' @author Catalina A. Vallejos \email{cnvallej@uc.cl}
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
 #' @rdname BASiCS_D_TestDE
 BASiCS_D_TestDE <- function(...) {
-    message("This function is no longer in use and will be removed in 
-           future releases. \n
-           Please use `BASiCS_TestDE` instead.")
+    message("This function is no longer in use. \n",
+            "It will be removed in future releases. \n",
+            "Please use `BASiCS_TestDE` instead.")
 }

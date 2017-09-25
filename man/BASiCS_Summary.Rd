@@ -6,24 +6,35 @@
 \alias{BASiCS_Summary-class}
 \title{The BASiCS_Summary class}
 \description{
-Container of a summary of a \code{\link[BASiCS]{BASiCS_Chain}} object.  
-In each slot, first column contains posterior medians; second and third columns respectively contain the 
-lower and upper limits of an high posterior density interval (for a given probability).
+Container of a summary of a \code{\linkS4class{BASiCS_Chain}} 
+object. In each slot, first column contains posterior medians; second and 
+third columns respectively contain the lower and upper limits of an high 
+posterior density interval (for a given probability).
 }
 \section{Slots}{
 
 \describe{
-\item{\code{mu}}{Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific mean expression parameters \eqn{\mu_i}.}
+\item{\code{mu}}{Posterior medians (1st column), lower (2nd column) and upper 
+(3rd column) limits of gene-specific mean expression parameters \eqn{\mu_i}.}
 
-\item{\code{delta}}{Posterior medians (first column), lower (second column) and upper (third column) limits of gene-specific biological over-dispersion parameters \eqn{\delta_i}, biological genes only}
+\item{\code{delta}}{Posterior medians (1st column), lower (2nd column) and upper 
+(3rd column) limits of gene-specific biological over-dispersion parameters 
+\eqn{\delta_i}, biological genes only}
 
-\item{\code{phi}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific mRNA content normalisation parameters \eqn{\phi_j}}
+\item{\code{phi}}{Posterior medians (1st column), lower (2nd column) and upper 
+(3rd column) limits of cell-specific mRNA content normalisation 
+parameters \eqn{\phi_j}}
 
-\item{\code{s}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific technical normalisation parameters \eqn{s[j]}}
+\item{\code{s}}{Posterior medians (1st column), lower (2nd column) and upper 
+(3rd column) limits of cell-specific technical normalisation 
+parameters \eqn{s[j]}}
 
-\item{\code{nu}}{Posterior medians (first column), lower (second column) and upper (third column) limits of cell-specific random effects \eqn{\nu_j}}
+\item{\code{nu}}{Posterior medians (1st column), lower (2nd column) and upper 
+(3rd column) limits of cell-specific random effects \eqn{\nu_j}}
 
-\item{\code{theta}}{Posterior median (first column), lower (second column) and upper (third column) limits of technical over-dispersion parameter(s) \eqn{\theta} (each row represents one batch)}
+\item{\code{theta}}{Posterior median (1st column), lower (2nd column) and upper 
+(3rd column) limits of technical over-dispersion parameter(s) \eqn{\theta} 
+(each row represents one batch)}
 }}
 
 \examples{

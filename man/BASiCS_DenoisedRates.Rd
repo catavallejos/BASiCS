@@ -8,20 +8,20 @@ BASiCS_DenoisedRates(Data, Chain, PrintProgress = FALSE,
   Propensities = FALSE)
 }
 \arguments{
-\item{Data}{an object of class 
-\code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+\item{Data}{an object of class \code{\linkS4class{SingleCellExperiment}}}
 
-\item{Chain}{an object of class \code{\link[BASiCS]{BASiCS_Chain}}}
+\item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
 \item{PrintProgress}{If \code{TRUE}, partial progress 
-information is printed in the console.}
+information is printed in the console. Default: \code{PrintProgress = FALSE}.}
 
 \item{Propensities}{If \code{TRUE}, returns underlying 
 expression propensitites \eqn{\rho_{ij}}. 
-Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.}
+Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.
+Default: \code{Propensities = FALSE}.}
 }
 \value{
-A matrix of denoised expression rates.
+A matrix of denoised expression rates (biological genes only)
 }
 \description{
 Calculates normalised and denoised expression rates, by 
@@ -40,7 +40,7 @@ help(BASiCS_MCMC)
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
-\code{\link[BASiCS]{BASiCS_Chain}}
+\code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

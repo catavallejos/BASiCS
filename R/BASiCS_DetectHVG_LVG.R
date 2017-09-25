@@ -5,7 +5,7 @@
 #'
 #' @description Functions to detect highly and lowly variable genes
 #'
-#' @param Chain an object of class \code{\link[BASiCS]{BASiCS_Chain}}
+#' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param VarThreshold Variance contribution threshold 
 #' (must be a positive value, between 0 and 1)
 #' @param ProbThreshold Optional parameter. Posterior probability threshold 
@@ -24,25 +24,27 @@
 #' \describe{
 #' \item{\code{Table}}{Matrix whose columns contain}
 #'    \describe{
-#'    \item{\code{GeneIndex}}{Vector of length \code{q.bio}. Gene index as in the 
-#'    order present in the analysed 
-#'    \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
-#'    \item{\code{GeneNames}}{Vector of length \code{q.bio}. Gene name as in the 
-#'    order present in the analysed 
-#'    \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+#'    \item{\code{GeneIndex}}{Vector of length \code{q.bio}. 
+#'         Gene index as in the order present in the analysed 
+#'         \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+#'    \item{\code{GeneName}}{Vector of length \code{q.bio}. 
+#'                Gene name as in the order present in the analysed 
+#'          \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
 #'    \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, 
-#'    posterior median of gene-specific expression levels \eqn{\mu_i}}
-#'    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological gene, 
-#'    posterior median of gene-specific biological 
-#'    over-dispersion parameter \eqn{\delta_i}}
-#'    \item{\code{Sigma}}{Vector of length \code{q.bio}. For each biological gene, 
-#'    proportion of the total variability that is due to a 
-#'    cell-to-cell biological heterogeneity component. }
-#'    \item{\code{Prob}}{Vector of length \code{q.bio}. For each biological gene, 
-#'    probability of being highly variable according to the given thresholds.}
-#'    \item{\code{HVG}}{Vector of length \code{q.bio}. For each biological gene, 
-#'    indicator of being detected as highly variable 
-#'    according to the given thresholds. }
+#'          posterior median of gene-specific mean expression 
+#'          parameters \eqn{\mu_i}}
+#'    \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological 
+#'          gene, posterior median of gene-specific biological 
+#'          over-dispersion parameter \eqn{\delta_i}}
+#'    \item{\code{Sigma}}{Vector of length \code{q.bio}. 
+#'          For each biological gene, proportion of the total variability 
+#'          that is due to a biological heterogeneity component. }
+#'    \item{\code{Prob}}{Vector of length \code{q.bio}. 
+#'          For each biological gene, probability of being highly variable 
+#'          according to the given thresholds.}
+#'    \item{\code{HVG}}{Vector of length \code{q.bio}. 
+#'          For each biological gene, indicator of being detected as highly 
+#'          variable according to the given thresholds. }
 #'    }
 #' \item{\code{ProbThreshold}}{Posterior probability threshold.}
 #' \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
@@ -61,11 +63,12 @@
 #' @details See vignette
 #'
 #'
-#' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
+#' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @references 
+#' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_DetectHVG_LVG
@@ -74,81 +77,76 @@ BASiCS_DetectHVG <- function(Chain,
                              ProbThreshold = NULL, 
                              EFDR = 0.1, 
                              OrderVariable = "Prob", 
-                             Plot = FALSE, ...) {
-    # Safety checks
-    HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
-                              ProbThreshold, EFDR, OrderVariable, Plot)
+                             Plot = FALSE, ...) 
+{
+  # Safety checks
+  HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
+                            ProbThreshold, EFDR, OrderVariable, Plot)
     
-    Search = FALSE
-    if (is.null(ProbThreshold)) 
-        Search = TRUE
+  # Variance decomposition
+  VarDecomp <- HiddenVarDecomp(Chain)
     
-    # Variance decomposition
-    VarDecomp <- HiddenVarDecomp(Chain)
+  # HVG probability for a given variance threshold
+  Prob <- matrixStats::colMeans2(ifelse(VarDecomp$BioVarGlobal > 
+                                          VarThreshold, 1, 0))
     
-    # HVG probability for a given variance threshold
-    Prob <- HiddenProbHVG(VarThreshold = VarThreshold, VarDecomp = VarDecomp)
+  # Threshold search
+  Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
+                                            VarThreshold, Prob, EFDR)
+  EFDRgrid <- Aux$EFDRgrid
+  EFNRgrid <- Aux$EFNRgrid
+  ProbThresholds <- Aux$ProbThresholds
+  OptThreshold <- Aux$OptThreshold
     
-    # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
-                                              VarThreshold, Prob, EFDR)
-    EFDRgrid <- Aux$EFDRgrid
-    EFNRgrid <- Aux$EFNRgrid
-    ProbThresholds <- Aux$ProbThresholds
-    OptThreshold <- Aux$OptThreshold
+  # Output preparation
+  Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
+  Mu <- matrixStats::colMedians(Chain@mu)
+  Delta <- matrixStats::colMedians(Chain@delta)
+  HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
     
-    # Output preparation
-    Sigma <- apply(VarDecomp$BioVarGlobal, 2, median)
-    Mu <- apply(Chain@mu, 2, median)
-    Delta <- apply(Chain@delta, 2, median)
-    HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
+  GeneIndex <- seq_along(Mu)
+  GeneName <- colnames(Chain@mu)
+
+  Table <- cbind.data.frame(GeneIndex = GeneIndex, GeneName = GeneName, 
+                            Mu = Mu, Delta = Delta, 
+                            Sigma = Sigma, Prob = Prob, 
+                            HVG = HVG, stringsAsFactors = FALSE)
+  
+  # Re-order the table of results
+  if (OrderVariable == "GeneName") { orderVar <- GeneName }
+  if (OrderVariable == "Mu") { orderVar <- Mu }
+  if (OrderVariable == "Delta") { orderVar <- Delta }
+  if (OrderVariable == "Sigma") { orderVar <- Sigma }
+  if (OrderVariable == "Prob") { orderVar <- Prob }
+  Table <- Table[order(orderVar, decreasing = TRUE), ]
     
-    # Output preparation
-    qbio = length(Sigma)
-    Genes = 1:qbio
-    GeneNames = colnames(Chain@mu)
-    
-    GeneIndex = 1:length(Mu)
-    Table = cbind.data.frame(GeneIndex = Genes, GeneNames = GeneNames, 
-                             Mu = Mu, Delta = Delta, Sigma = Sigma, Prob = Prob, 
-                             HVG = HVG, stringsAsFactors = FALSE)
-    rownames(Table) = Genes
-    if (OrderVariable == "GeneNames") 
-        orderVar = GeneNames
-    if (OrderVariable == "Mu") 
-        orderVar = Mu
-    if (OrderVariable == "Delta") 
-        orderVar = Delta
-    if (OrderVariable == "Sigma") 
-        orderVar = Sigma
-    if (OrderVariable == "Prob") 
-        orderVar = Prob
-    Table = Table[order(orderVar, decreasing = TRUE), ]
-    
-    if (Plot) {
-        args <- list(...)
-        
-        if (Search) {
-            par(ask = TRUE)
-            # EFDR / EFNR plot
-            HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
-        }
-        
-        # Output plot : mean vs prob
-        HiddenPlot2DetectHVG_LVG(args, Task = "HVG", Mu, Prob, OptThreshold, Hits = HVG)
-        
-        par(ask = FALSE)
+  if (Plot) 
+  {
+    args <- list(...)
+    Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
+    if (Search) 
+    {
+      # EFDR / EFNR plot
+      par(ask = TRUE)
+      HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
     }
+        
+    # Output plot : mean vs prob
+    HiddenPlot2DetectHVG_LVG(args, Task = "HVG", Mu, Prob, 
+                             OptThreshold, Hits = HVG)
+        
+    par(ask = FALSE)
+  }
     
-    message(paste(sum(HVG), " genes classified as highly variable using: \n"), 
-            paste("- Variance contribution threshold = ", 
-                  round(100 * VarThreshold, 2), "% \n"), 
-            paste("- Evidence threshold = ", OptThreshold[1], "\n"), 
-            paste("- EFDR = ", round(100 * OptThreshold[2], 2), "% \n"), 
-            paste("- EFNR = ", round(100 * OptThreshold[3], 2), "% \n"))
+  message(sum(HVG), " genes classified as highly variable using: \n", 
+          "- Variance contribution threshold = ", 
+          round(100 * VarThreshold, 2), "% \n", 
+          "- Evidence threshold = ", OptThreshold[1], "\n", 
+          "- EFDR = ", round(100 * OptThreshold[2], 2), "% \n", 
+          "- EFNR = ", round(100 * OptThreshold[3], 2), "% \n")
     
-    list(Table = Table, EviThreshold = OptThreshold[1], 
-         EFDR = OptThreshold[2], EFNR = OptThreshold[3])
+  list(Table = Table, EviThreshold = OptThreshold[1], 
+       EFDR = OptThreshold[2], EFNR = OptThreshold[3])
 }
 
 #' @name BASiCS_DetectLVG
@@ -159,79 +157,72 @@ BASiCS_DetectLVG <- function(Chain,
                              ProbThreshold = NULL, 
                              EFDR = 0.1, 
                              OrderVariable = "Prob", 
-                             Plot = FALSE, ...) {
-    # Safety checks
-    HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
+                             Plot = FALSE, ...) 
+{
+  # Safety checks
+  HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
                               ProbThreshold, EFDR, OrderVariable, Plot)
+  # Variance decomposition
+  VarDecomp <- HiddenVarDecomp(Chain)
     
-    Search = FALSE
-    if (is.null(ProbThreshold)) 
-        Search = TRUE
+  # LVG probability for a given variance threshold
+  Prob <- matrixStats::colMeans2(ifelse(VarDecomp$BioVarGlobal < 
+                                          VarThreshold, 1, 0))
+  
+  # Threshold search
+  Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
+                                            VarThreshold, Prob, EFDR)
+  EFDRgrid <- Aux$EFDRgrid
+  EFNRgrid <- Aux$EFNRgrid
+  ProbThresholds <- Aux$ProbThresholds
+  OptThreshold <- Aux$OptThreshold
+  
+  # Output preparation
+  Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
+  Mu <- matrixStats::colMedians(Chain@mu)
+  Delta <- matrixStats::colMedians(Chain@delta)
+  LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
+
+  GeneIndex <- seq_along(Mu)
+  GeneName <- colnames(Chain@mu)
+  
+  Table <- cbind.data.frame(GeneIndex = GeneIndex, GeneName = GeneName, 
+                            Mu = Mu, Delta = Delta, 
+                            Sigma = Sigma, Prob = Prob, 
+                            LVG = LVG, stringsAsFactors = FALSE)
     
-    # Variance decomposition
-    VarDecomp <- HiddenVarDecomp(Chain)
-    
-    # LVG probability for a given variance threshold
-    Prob <- HiddenProbLVG(VarThreshold = VarThreshold, VarDecomp = VarDecomp)
-    
-    # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
-                                              VarThreshold, Prob, EFDR)
-    EFDRgrid <- Aux$EFDRgrid
-    EFNRgrid <- Aux$EFNRgrid
-    ProbThresholds <- Aux$ProbThresholds
-    OptThreshold <- Aux$OptThreshold
-    
-    # Output preparation
-    Sigma <- apply(VarDecomp$BioVarGlobal, 2, median)
-    Mu <- apply(Chain@mu, 2, median)
-    Delta <- apply(Chain@delta, 2, median)
-    LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
-    
-    qbio = length(Sigma)
-    Genes = 1:qbio
-    GeneNames = colnames(Chain@mu)
-    GeneIndex = 1:length(Mu)
-    Table = cbind.data.frame(GeneIndex = Genes, GeneNames = GeneNames, 
-                             Mu = Mu, Delta = Delta, Sigma = Sigma, Prob = Prob, 
-                             LVG = LVG, stringsAsFactors = FALSE)
-    rownames(Table) = Genes
-    
-    if (OrderVariable == "GeneNames") 
-        orderVar = GeneNames
-    if (OrderVariable == "Mu") 
-        orderVar = Mu
-    if (OrderVariable == "Delta") 
-        orderVar = Delta
-    if (OrderVariable == "Sigma") 
-        orderVar = Sigma
-    if (OrderVariable == "Prob") 
-        orderVar = Prob
-    Table = Table[order(orderVar, decreasing = TRUE), ]
-    
-    if (Plot) {
-        args <- list(...)
-        
-        if (Search) {
-            par(ask = TRUE)
-            # EFDR / EFNR plot
-            HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
-        }
-        
-        # Output plot : mean vs prob
-        HiddenPlot2DetectHVG_LVG(args, Task = "LVG", Mu, Prob, 
-                                 OptThreshold, Hits = LVG)
-        
-        par(ask = FALSE)
-        
+  # Re-order the table of results
+  if (OrderVariable == "GeneName") { orderVar <- GeneName }
+  if (OrderVariable == "Mu") { orderVar <- Mu }
+  if (OrderVariable == "Delta") { orderVar <- Delta }
+  if (OrderVariable == "Sigma") { orderVar <- Sigma }
+  if (OrderVariable == "Prob") { orderVar <- Prob }
+  Table <- Table[order(orderVar, decreasing = TRUE), ]
+  
+  if (Plot) 
+  {
+    args <- list(...)
+    Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
+    if (Search) 
+    {
+      # EFDR / EFNR plot
+      par(ask = TRUE)
+      HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
     }
     
-    message(paste(sum(LVG), " genes classified as lowly variable using: \n"), 
-            paste("- Variance contribution threshold = ", 
-                  round(100 * VarThreshold, 2), "% \n"), 
-            paste("- Evidence threshold = ", OptThreshold[1], "\n"), 
-            paste("- EFDR = ", round(100 * OptThreshold[2], 2), "% \n"), 
-            paste("- EFNR = ", round(100 * OptThreshold[3], 2), "% \n"))
+    # Output plot : mean vs prob
+    HiddenPlot2DetectHVG_LVG(args, Task = "LVG", Mu, Prob, 
+                             OptThreshold, Hits = HVG)
+    
+    par(ask = FALSE)
+  }
+  
+  message(sum(LVG), " genes classified as lowly variable using: \n", 
+          "- Variance contribution threshold = ", 
+          round(100 * VarThreshold, 2), "% \n", 
+          "- Evidence threshold = ", OptThreshold[1], "\n", 
+          "- EFDR = ", round(100 * OptThreshold[2], 2), "% \n", 
+          "- EFNR = ", round(100 * OptThreshold[3], 2), "% \n")
     
     list(Table = Table, EviThreshold = OptThreshold[1], 
          EFDR = OptThreshold[2], EFNR = OptThreshold[3])
