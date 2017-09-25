@@ -31,8 +31,7 @@
 #' Vallejos, Marioni and Richardson (2016). Genome Biology.
 #' 
 makeExampleBASiCS_Data <- function(WithBatch = FALSE, 
-                                   WithSpikes = TRUE, 
-                                   Example = 1) 
+                                   WithSpikes = TRUE) 
 {
   Mu <- c( 8.36, 10.65,  4.88,  6.29, 21.72, 12.93, 30.19, 83.92,  3.89,  6.34, 
           57.87, 12.45,  8.08,  7.31, 15.56, 15.91, 12.24, 15.96, 19.14,  4.20, 

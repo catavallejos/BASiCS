@@ -5,7 +5,7 @@
 \title{Create a synthetic SingleCellExperiment example object with the 
 format required for BASiCS}
 \usage{
-makeExampleBASiCS_Data(WithBatch = FALSE, WithSpikes = TRUE, Example = 1)
+makeExampleBASiCS_Data(WithBatch = FALSE, WithSpikes = TRUE)
 }
 \arguments{
 \item{WithBatch}{If \code{TRUE}, 2 batches are generated (each of them 

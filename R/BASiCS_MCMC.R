@@ -98,13 +98,15 @@
 #'
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs migth be required to reach convergence
-#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, PrintProgress = FALSE)
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+#'                      PrintProgress = FALSE)
 #' 
 #' # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 #' # (obtained using the 'BASiCS_MCMC' function)
 #' data(ChainSC)
 #' 
-#' # `displayChainBASiCS` can be used to extract information from this output. For example:
+#' # `displayChainBASiCS` can be used to extract information from this output. 
+#' # For example:
 #' head(displayChainBASiCS(ChainSC, Param = 'mu'))
 #'
 #' # Traceplot (examples only)
@@ -115,17 +117,20 @@
 #' # Calculating posterior medians and 95% HPD intervals
 #' ChainSummary <- Summary(ChainSC)
 #' 
-#' # `displaySummaryBASiCS` can be used to extract information from this output. For example:
+#' # `displaySummaryBASiCS` can be used to extract information from this output. 
+#' # For example:
 #' head(displaySummaryBASiCS(ChainSummary, Param = 'mu'))
 #'
-#' # Graphical display of posterior medians and 95% HPD intervals (examples only)
+#' # Graphical display of posterior medians and 95% HPD intervals 
+#' # For example:
 #' plot(ChainSummary, Param = 'mu', main = 'All genes')
 #' plot(ChainSummary, Param = 'mu', Genes = 1:10, main = 'First 10 genes')
 #' plot(ChainSummary, Param = 'phi', main = 'All cells')
 #' plot(ChainSummary, Param = 'phi', Cells = 1:5, main = 'First 5 cells')
 #' plot(ChainSummary, Param = 'theta')
 #'
-#' # To constrast posterior medians of cell-specific parameters (example only)
+#' # To constrast posterior medians of cell-specific parameters 
+#' # For example:
 #' par(mfrow = c(1,2))
 #' plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = FALSE)
 #' # Recommended for large numbers of cells
@@ -133,13 +138,17 @@
 #'
 #' # To constrast posterior medians of gene-specific parameters
 #' par(mfrow = c(1,2))
-#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = FALSE)
+#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', 
+#'      SmoothPlot = FALSE)
 #' # Recommended
-#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = TRUE) 
+#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', 
+#'      SmoothPlot = TRUE) 
 #'
 #' # Highly and lowly variable genes detection (within a single group of cells)
-#' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, EFDR = 0.10, Plot = TRUE)
-#' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, EFDR = 0.10, Plot = TRUE)
+#' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, 
+#'                               EFDR = 0.10, Plot = TRUE)
+#' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, 
+#'                               EFDR = 0.10, Plot = TRUE)
 #'
 #' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
 #' with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
@@ -148,11 +157,20 @@
 #'        pch = 16, col = 'blue', cex = 1))
 #'
 #' # If variance thresholds are not fixed
-#' BASiCS_VarThresholdSearchHVG(ChainSC, VarThresholdsGrid = seq(0.55,0.65,by=0.01), EFDR = 0.10)
-#' BASiCS_VarThresholdSearchLVG(ChainSC, VarThresholdsGrid = seq(0.35,0.45,by=0.01), EFDR = 0.10)
+#' BASiCS_VarThresholdSearchHVG(ChainSC, 
+#'                              VarThresholdsGrid = seq(0.55,0.65,by=0.01), 
+#'                              EFDR = 0.10)
+#' BASiCS_VarThresholdSearchLVG(ChainSC, 
+#'                              VarThresholdsGrid = seq(0.35,0.45,by=0.01), 
+#'                              EFDR = 0.10)
+#'                              
+#' # To obtain denoised rates / counts, see:
+#' help(BASiCS_DenoisedRates)
+#' help(BASiCS_DenoisedCounts)
 #' 
 #' # For examples of differential analyses between 2 populations of cells see:
 #' help(BASiCS_TestDE)
+#' 
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
 #'
@@ -314,7 +332,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   {
     # If spikes are not available
     message("-------------------------------------------------------------\n",  
-            "IMPORTANT: this part of the code is under development. DO NOT USE \n", 
+            "IMPORTANT: this code is under development. DO NOT USE \n", 
             "This part of the code is just a place-holder \n", 
             "-------------------------------------------------------------\n")
         
@@ -349,7 +367,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # '0' as its first element Constrain for gene-specific expression rates
     if (ConstrainType == 1) 
     {
-      # Full constrain Note we use 'ConstrainLimit + 1' as 1 pseudo-count was added 
+      # Full constrain Note we use 'ConstrainLimit + 1' as 1 
+      # pseudo-count was added 
       # when computing 'mu0' (to avoid numerical issues)
       ConstrainGene <- (1:q.bio) - 1
       NotConstrainGene <- 0
@@ -357,7 +376,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     }
     if (ConstrainType == 2) 
     {
-      # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' as 1 pseudo-count 
+      # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' 
+      # as 1 pseudo-count 
       # was added when computing 'mu0' (to avoid numerical issues)
       ConstrainGene <- which(mu0 >= ConstrainLimit + 1) - 1
       NotConstrainGene <- which(mu0 < ConstrainLimit + 1) - 1
@@ -476,9 +496,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       setwd(StoreDir)
         
       message("-------------------------------------------------------------\n", 
-              "Storing trajectories of adaptive proposal variances (log-scale) as ", 
-              paste0("chain_ls_", RunName, ".Rds"), "file in \n", 
-              paste0("'", StoreDir, "' directory ... "), "\n", 
+              "Storing trajectories of adaptive proposal variances (log-scale) as", 
+              "chain_ls_", RunName, ".Rds file in \n", 
+              "'", StoreDir, "' directory ... \n", 
               "-------------------------------------------------------------\n")
         
       ChainLS <- list(ls.mu = Chain$ls.mu, ls.delta = Chain$ls.delta, 
@@ -489,7 +509,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       setwd(OldDir)
     }
     
-    # This 'if' refers to the no-spikes case Still under development - ignore for now!
+    # This 'if' refers to the no-spikes case 
+    # Still under development - ignore for now!
     if (length(metadata(Data)$SpikeInput) == 1) 
     {
       message("-------------------------------------------------------------\n", 

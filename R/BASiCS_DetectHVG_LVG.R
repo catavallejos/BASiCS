@@ -212,7 +212,7 @@ BASiCS_DetectLVG <- function(Chain,
     
     # Output plot : mean vs prob
     HiddenPlot2DetectHVG_LVG(args, Task = "LVG", Mu, Prob, 
-                             OptThreshold, Hits = HVG)
+                             OptThreshold, Hits = LVG)
     
     par(ask = FALSE)
   }

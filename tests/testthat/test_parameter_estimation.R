@@ -2,7 +2,7 @@ context("Parameter estimation\n")
 
 test_that("paramater estimations match the given seed", 
 {
-  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, Example = 1)
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(18)
   Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
                        PrintProgress = FALSE)

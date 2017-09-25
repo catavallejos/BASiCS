@@ -580,9 +580,15 @@ version 0.99.3: (2017-09-25)
   * Avoids double transponse for chain storage
   
 version 0.99.4: (2017-09-25)
-
+- Format in `BASiCS_MCMC`
+- Minor bug fixed in `BASiCS_DetectLVG` plots
+- Added examples in `BASiCS_DenoisedCounts` + `BASiCS_DenoisedRates`
+- Removal of `Example` argument in `makeExampleBASiCS_D_Data`
+- Format in vignette
+- R CMD CHECK passed
+- R CMD BiocCheck passed
+  
 - DEVELOPMENT NOTES (potential future changes):
-  * Add examples for Denoised rates/counts
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
   * Should we separate BASiCS_TestDE in two functions? 
@@ -590,7 +596,7 @@ version 0.99.4: (2017-09-25)
   * Create 'no longer in use' message for selected functions. 
   * Implement change suggested by Giacomo Zanella
   * Store all necessary parameters for chain restart
-  * Convert Rcpp print to messages
+  * Convert Rcpp print to messages ?
 
   
   

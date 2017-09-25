@@ -7,8 +7,6 @@
 #'
 #' @param Data an object of class \code{\linkS4class{SingleCellExperiment}} 
 #' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param PrintProgress If \code{TRUE}, partial progress 
-#' information is printed in the console. Default: \code{PrintProgress = FALSE}.
 #' @param Propensities If \code{TRUE}, returns underlying 
 #' expression propensitites \eqn{\rho_{ij}}. 
 #' Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.
@@ -16,8 +14,11 @@
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+#' Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+#'                      PrintProgress = FALSE)
+#'
+#' DR <- BASiCS_DenoisedRates(Data, Chain)
 #'
 #' @details See vignette
 #'
@@ -34,7 +35,6 @@
 #' @rdname BASiCS_DenoisedRates
 BASiCS_DenoisedRates = function(Data, 
                                 Chain, 
-                                PrintProgress = FALSE, 
                                 Propensities = FALSE) 
 {
   if (!is(Data, "SingleCellExperiment")) 
@@ -46,11 +46,6 @@ BASiCS_DenoisedRates = function(Data,
   q.bio <- ncol(Chain@delta)
   n <- ncol(Chain@phi)
 
-  # Message no longer required as calculations are faster
-#  message("This calculation requires a loop across the", N, "MCMC iterations\n",
-#          "Please be patient ... \n",
-#          "To see a progress report use PrintProgress = TRUE. \n")
-  
   CountsBio <- assay(Data)[!isSpike(Data),]
   Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
                                     Chain@mu, t(1/Chain@delta),

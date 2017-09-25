@@ -27,8 +27,11 @@ See vignette
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+                     PrintProgress = FALSE)
+
+DC <- BASiCS_DenoisedCounts(Data, Chain)
 
 }
 \references{
