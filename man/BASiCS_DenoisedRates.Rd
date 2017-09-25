@@ -4,16 +4,12 @@
 \alias{BASiCS_DenoisedRates}
 \title{Calculates denoised expression rates}
 \usage{
-BASiCS_DenoisedRates(Data, Chain, PrintProgress = FALSE,
-  Propensities = FALSE)
+BASiCS_DenoisedRates(Data, Chain, Propensities = FALSE)
 }
 \arguments{
 \item{Data}{an object of class \code{\linkS4class{SingleCellExperiment}}}
 
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
-
-\item{PrintProgress}{If \code{TRUE}, partial progress 
-information is printed in the console. Default: \code{PrintProgress = FALSE}.}
 
 \item{Propensities}{If \code{TRUE}, returns underlying 
 expression propensitites \eqn{\rho_{ij}}. 
@@ -32,8 +28,11 @@ See vignette
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+                     PrintProgress = FALSE)
+
+DR <- BASiCS_DenoisedRates(Data, Chain)
 
 }
 \references{

@@ -7,11 +7,11 @@
 BASiCS_MCMC(Data, N, Thin, Burn, ...)
 }
 \arguments{
-\item{Data}{A \code{\link[SingleCellExperiment]{SingleCellExperiment}} object. 
+\item{Data}{A \code{\linkS4class{SingleCellExperiment}} object. 
 This MUST be formatted to include the spike-ins information (see vignette).}
 
-\item{N}{Total number of iterations for the MCMC sampler. Use \code{N>=max(4,Thin)}, 
-\code{N} being a multiple of \code{Thin}.}
+\item{N}{Total number of iterations for the MCMC sampler. 
+Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
 
 \item{Thin}{Thining period for the MCMC sampler. Use \code{Thin>=2}.}
 
@@ -28,64 +28,71 @@ Default value: \code{PriorDelta = 'log-normal'}.
 values required for the adopted prior (see Vallejos et al, 2015, 2016). 
 All elements must be positive real numbers.
 \describe{
-  \item{\code{s2.mu}}{Scale hyper-parameter for the log-Normal(\code{0},\code{s2.mu}) 
-  prior that is shared by all gene-specific expression rate parameters \eqn{\mu_i}.
-  Default: \code{s2.mu = 0.5}.}
+  \item{\code{s2.mu}}{Scale hyper-parameter for the 
+        log-Normal(\code{0},\code{s2.mu}) prior that is shared by all 
+        gene-specific expression rate parameters \eqn{\mu_i}.
+        Default: \code{s2.mu = 0.5}.}
   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. 
-  Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) prior 
-  that is shared by all gene-specific over-dispersion parameters \eqn{\delta_i}.
-  Default: \code{s2.delta = 0.5}. }
+        Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) 
+        prior that is shared by all gene-specific over-dispersion parameters 
+        \eqn{\delta_i}. Default: \code{s2.delta = 0.5}. }
   \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. 
-  Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior 
-  that is shared by all gene-specific biological over-dispersion parameters \eqn{\delta_i}.
-  Default: \code{a.delta = 1}.}
+        Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) 
+        prior that is shared by all gene-specific biological over-dispersion 
+        parameters \eqn{\delta_i}. Default: \code{a.delta = 1}.}
   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. 
-  Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) prior 
-  that is shared by all gene-specific biological over-dispersion hyper-parameters \eqn{\delta_i}.
-  Default: \code{b.delta = 1}.}
-  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all (scaled by \code{n}) 
-  cell-specific mRNA content normalising constants \eqn{\phi_j / n}.
-  Default: \code{p.phi} \code{= rep(1, n)}.}
-  \item{\code{a.s}}{Shape hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
-  prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
-  Default: \code{a.s = 1}.}
+        Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) 
+        prior that is shared by all gene-specific biological over-dispersion 
+        hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.}
+  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all 
+        (scaled by \code{n}) cell-specific mRNA content normalising constants 
+        \eqn{\phi_j / n}. Default: \code{p.phi} \code{= rep(1, n)}.}
+  \item{\code{a.s}}{Shape hyper-parameter for the 
+        Gamma(\code{a.s},\code{b.s}) prior that is shared by all 
+        cell-specific capture efficiency normalising constants \eqn{s_j}.
+        Default: \code{a.s = 1}.}
   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
-  prior that is shared by all cell-specific capture efficiency normalising constants \eqn{s_j}.
-  Default: \code{b.s = 1}.}
-  \item{\code{a.theta}}{Shape hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) 
-  prior for technical noise hyper-parameter \eqn{\theta}.
-  Default: \code{a.theta = 1}.}
-  \item{\code{b.theta}}{Rate hyper-parameter for the Gamma(\code{a.theta},\code{b.theta}) 
-  prior for technical noise hyper-parameter \eqn{\theta}.
-  Default: \code{b.theta = 1}.}
+        prior that is shared by all cell-specific capture efficiency 
+        normalising constants \eqn{s_j}. Default: \code{b.s = 1}.}
+  \item{\code{a.theta}}{Shape hyper-parameter for the 
+        Gamma(\code{a.theta},\code{b.theta}) prior for technical noise 
+        parameter \eqn{\theta}. Default: \code{a.theta = 1}.}
+  \item{\code{b.theta}}{Rate hyper-parameter for the 
+        Gamma(\code{a.theta},\code{b.theta}) prior for technical noise 
+        parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
 
 }}
-\item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings updates. 
-It must be a positive number between 0 and 1. Default (and recommended): \code{AR = 0.44}}.
+\item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings 
+      updates. It must be a positive number between 0 and 1. Default 
+      (and recommended): \code{AR = 0.44}}.
 
-\item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer adapted. 
-Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
+\item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer 
+      adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
 
-\item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated \code{BASiCS_Chain} 
-object is stored as a `.Rds` file (\code{RunName} argument used to index the file name). 
-Default: \code{StoreChains = FALSE}.}
-\item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of adaptive proposal 
-variances (in log-scale) for all parameters is stored as a list in a `.Rds` file 
-(\code{RunName} argument used to index file name). Default: \code{StoreAdapt = FALSE}.}
-\item{\code{StoreDir}}{Directory where output files are stored. Only required if 
-\code{StoreChains = TRUE} and/or \code{StoreAdapt = TRUE}). 
-Default: \code{StoreDir = getwd()}.}
+\item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated 
+      \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName} 
+      argument used to index the file name). 
+      Default: \code{StoreChains = FALSE}.}
+\item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of 
+      adaptive proposal variances (in log-scale) for all parameters is 
+      stored as a list in a `.Rds` file (\code{RunName} argument used to 
+      index file name). Default: \code{StoreAdapt = FALSE}.}
+\item{\code{StoreDir}}{Directory where output files are stored. 
+      Only required if \code{StoreChains = TRUE} and/or 
+      \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
 \item{\code{RunName}}{String used to index `.Rds` files storing chains 
-and/or adaptive proposal variances.}
+      and/or adaptive proposal variances.}
 \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based 
-progress report is suppressed.}
+      progress report is suppressed.}
 \item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter 
-of the Metropolis proposals for \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
+      of the Metropolis proposals for 
+      \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
 \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to 
-specify this argument. Default options have been tuned to facilitate convergence. 
-If changed, it must be a list containing the following elements: \code{mu0},
-\code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, \code{theta0}, \code{ls.mu0}, 
-\code{ls.delta0}, \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
+      specify this argument. Default options have been tuned to facilitate 
+      convergence. If changed, it must be a list containing the following 
+      elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0}, 
+      \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, 
+      \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
 }}
 }
 \value{
@@ -104,13 +111,15 @@ Data = makeExampleBASiCS_Data()
 
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence
-Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, PrintProgress = FALSE)
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+                     PrintProgress = FALSE)
 
 # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 # (obtained using the 'BASiCS_MCMC' function)
 data(ChainSC)
 
-# `displayChainBASiCS` can be used to extract information from this output. For example:
+# `displayChainBASiCS` can be used to extract information from this output. 
+# For example:
 head(displayChainBASiCS(ChainSC, Param = 'mu'))
 
 # Traceplot (examples only)
@@ -121,17 +130,20 @@ plot(ChainSC, Param = 'theta', Batch = 1)
 # Calculating posterior medians and 95\% HPD intervals
 ChainSummary <- Summary(ChainSC)
 
-# `displaySummaryBASiCS` can be used to extract information from this output. For example:
+# `displaySummaryBASiCS` can be used to extract information from this output. 
+# For example:
 head(displaySummaryBASiCS(ChainSummary, Param = 'mu'))
 
-# Graphical display of posterior medians and 95\% HPD intervals (examples only)
+# Graphical display of posterior medians and 95\% HPD intervals 
+# For example:
 plot(ChainSummary, Param = 'mu', main = 'All genes')
 plot(ChainSummary, Param = 'mu', Genes = 1:10, main = 'First 10 genes')
 plot(ChainSummary, Param = 'phi', main = 'All cells')
 plot(ChainSummary, Param = 'phi', Cells = 1:5, main = 'First 5 cells')
 plot(ChainSummary, Param = 'theta')
 
-# To constrast posterior medians of cell-specific parameters (example only)
+# To constrast posterior medians of cell-specific parameters 
+# For example:
 par(mfrow = c(1,2))
 plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = FALSE)
 # Recommended for large numbers of cells
@@ -139,13 +151,17 @@ plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = TRUE)
 
 # To constrast posterior medians of gene-specific parameters
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = FALSE)
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', 
+     SmoothPlot = FALSE)
 # Recommended
-plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', SmoothPlot = TRUE) 
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', 
+     SmoothPlot = TRUE) 
 
 # Highly and lowly variable genes detection (within a single group of cells)
-DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, EFDR = 0.10, Plot = TRUE)
-DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, EFDR = 0.10, Plot = TRUE)
+DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, 
+                              EFDR = 0.10, Plot = TRUE)
+DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, 
+                              EFDR = 0.10, Plot = TRUE)
 
 plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
 with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
@@ -154,11 +170,20 @@ with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
        pch = 16, col = 'blue', cex = 1))
 
 # If variance thresholds are not fixed
-BASiCS_VarThresholdSearchHVG(ChainSC, VarThresholdsGrid = seq(0.55,0.65,by=0.01), EFDR = 0.10)
-BASiCS_VarThresholdSearchLVG(ChainSC, VarThresholdsGrid = seq(0.35,0.45,by=0.01), EFDR = 0.10)
+BASiCS_VarThresholdSearchHVG(ChainSC, 
+                             VarThresholdsGrid = seq(0.55,0.65,by=0.01), 
+                             EFDR = 0.10)
+BASiCS_VarThresholdSearchLVG(ChainSC, 
+                             VarThresholdsGrid = seq(0.35,0.45,by=0.01), 
+                             EFDR = 0.10)
+                             
+# To obtain denoised rates / counts, see:
+help(BASiCS_DenoisedRates)
+help(BASiCS_DenoisedCounts)
 
 # For examples of differential analyses between 2 populations of cells see:
 help(BASiCS_TestDE)
+
 
 }
 \references{
