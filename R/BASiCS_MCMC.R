@@ -258,23 +258,37 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     StoreAdaptNumber = as.numeric(StoreAdapt)
     nBatch = length(unique(metadata(Data)$BatchInfo))
     
+    Batch = ifelse("Batch" %in% names(args), args$Batch, TRUE)
+    if((nBatch > 1) & (Batch == TRUE))
+    {
+      BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)  
+      BatchInfo <- as.numeric(metadata(Data)$BatchInfo)
+    }
+    else
+    { 
+      # If there are no batches or the user asked to ignore them
+      BatchDesign <- matrix(1, nrow = n, ncol = 1) 
+      BatchInfo <- rep(1, times = n)
+      nBatch <- 1
+    }
+    
     # If spikes are available (stable version)
     if (length(metadata(Data)$SpikeInput) > 1) {
         if (nBatch > 1) {
-            BatchDesign = model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
             
             # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
             Time = system.time(Chain <- HiddenBASiCS_MCMCcppBatch(N, Thin, Burn, 
                                                                   as.matrix(assay(Data)), 
                                                                   BatchDesign, 
-                                                                  mu0, delta0, phi0, s0, nu0, theta0,
+                                                                  mu0[(q.bio+1):q],
+                                                                  mu0[1:q.bio], delta0, phi0, s0, nu0, theta0,
                                                                   PriorParam$s2.mu, 
                                                                   PriorParam$a.delta, PriorParam$b.delta, 
                                                                   PriorParam$p.phi, 
                                                                   PriorParam$a.s, PriorParam$b.s, 
                                                                   PriorParam$a.theta, PriorParam$b.theta, 
                                                                   AR, 
-                                                                  ls.mu0, ls.delta0, 
+                                                                  ls.mu0[1:q.bio], ls.delta0, 
                                                                   ls.phi0, ls.nu0, ls.theta0, 
                                                                   sum.bycell.all, sum.bycell.bio, 
                                                                   sum.bygene.all, sum.bygene.bio, 
@@ -284,6 +298,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         } else {
             # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
             Time = system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, as.matrix(assay(Data)), 
+                                                             BatchDesign,
                                                              mu0[(q.bio+1):q],
                                                              mu0[1:q.bio], delta0, phi0, s0, nu0, theta0, 
                                                              PriorParam$s2.mu, PriorParam$a.delta, 

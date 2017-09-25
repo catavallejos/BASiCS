@@ -53,8 +53,8 @@ BASiCS_DenoisedRates = function(Data,
   
   CountsBio <- assay(Data)[!isSpike(Data),]
   Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
-                                    Chain@mu, Chain@delta,
-                                    Chain@phi, Chain@nu,
+                                    Chain@mu, t(1/Chain@delta),
+                                    Chain@phi*Chain@nu,
                                     N, q.bio, n)
 
   if (Propensities) { out <- Rho } 
