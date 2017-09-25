@@ -1,4 +1,4 @@
-context("Basic example of HVG/LVG detection")
+context("Basic example of HVG/LVG detection\n")
 
 test_that("HVG/LVG detection is correct", 
 {

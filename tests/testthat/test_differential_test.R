@@ -1,4 +1,4 @@
-context("Differential test")
+context("Differential test\n")
 
 test_that("Differential test is correct", 
 {

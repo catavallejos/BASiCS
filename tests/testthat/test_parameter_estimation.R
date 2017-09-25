@@ -1,4 +1,4 @@
-context("Parameter estimation")
+context("Parameter estimation\n")
 
 test_that("paramater estimations match the given seed", 
 {

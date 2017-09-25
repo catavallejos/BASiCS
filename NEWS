@@ -573,12 +573,16 @@ version 0.99.3: (2017-09-24)
 version 0.99.3: (2017-09-25)
 - Edits in `HiddenBASiCS_MCMCcpp` and associated C++ functions
   * Optimization of MH updates
-- NOTE: batch case is broken!
+
+version 0.99.3: (2017-09-25)
+- Edits in `HiddenBASiCS_MCMCcpp` and associated C++ functions
+  * Batch & no-batch versions merged in a single function
+  * Avoids double transponse for chain storage
+
   
 
 - TODO:
-  * Clean-up cpp code as in Biomark model
-  * Merge batch/no-batch into a single function
+  * Test acceptance rates bug
 
 - DEVELOPMENT NOTES (potential future changes):
   * Add examples for Denoised rates/counts

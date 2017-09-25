@@ -1,4 +1,4 @@
-context("Denoised rates")
+context("Denoised rates\n")
 
 test_that("Denoised rates match the given seed", 
 {
