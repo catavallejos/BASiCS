@@ -597,6 +597,9 @@ No-spikes implementation
 - Temporary vignette file for no-spikes case has been created
 - `HiddenBASiCS_MCMCcppNoSpikes` updated to recycle vertical integration
 update functions
+
+TO-DO
+- Implement Giacomo's suggestion? 
   
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
