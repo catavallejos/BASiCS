@@ -591,6 +591,12 @@ version 0.99.4: (2017-09-25)
 version 0.99.5: (2017-09-26)  
 - Change of default `PriorDelta` value in `BASiCS_MCMC` 
 - Unit tests modified accordingly
+
+No-spikes implementation
+- `makeExampleBASiCS_Data` + `newBASiCS_Data` adapted to no-spikes case
+- Temporary vignette file for no-spikes case has been created
+- `HiddenBASiCS_MCMCcppNoSpikes` updated to recycle vertical integration
+update functions
   
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
