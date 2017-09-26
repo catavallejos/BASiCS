@@ -11,11 +11,11 @@ test_that("Denoised rates match the given seed",
 
   # Checks for 2 arbitrary sets of genes / cells
   
-  DRcheck0 <- c(2.711, 1.521, 2.676, 5.123, 9.303)
+  DRcheck0 <- c(2.713, 1.550, 2.479, 5.030, 8.787)
   DRcheck <- as.vector(round(DR[1:5,1], 3))
   expect_that(all.equal(DRcheck, DRcheck0), is_true())
             
-  DRcheck0 <- c(2.156, 2.974, 3.547, 2.566, 3.314)
+  DRcheck0 <- c(2.160, 2.958, 3.605, 2.586, 3.342)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   expect_that(all.equal(DRcheck, DRcheck0), is_true())
 })

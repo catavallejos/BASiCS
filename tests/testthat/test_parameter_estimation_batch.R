@@ -10,23 +10,23 @@ test_that("paramater estimations match the given seed",
   PostSummary <- Summary(Chain)
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(7.071,  5.032,  4.379,  5.256, 18.358)
+  Mu <- c(6.942,  5.007,  4.252,  5.378, 17.889)
   MuObs <- as.vector(round(PostSummary@mu[1:5,1],3))
   expect_that(all.equal(MuObs, Mu), is_true())
             
-  Delta <- c(1.226, 2.085, 0.597, 1.475, 0.598)
+  Delta <- c(1.193, 1.965, 0.721, 1.427, 0.677)
   DeltaObs <- as.vector(round(PostSummary@delta[1:5,1],3))
   expect_that(all.equal(DeltaObs, Delta), is_true())
 
-  Phi <- c(1.084, 1.032, 0.930, 0.940, 0.917)
+  Phi <- c(1.099, 1.042, 0.913, 0.952, 0.932)
   PhiObs <- as.vector(round(PostSummary@phi[1:5,1],3))
   expect_that(all.equal(PhiObs, Phi), is_true())
             
-  S <- c(0.304, 0.546, 0.092, 0.229, 0.527)
+  S <- c(0.284, 0.553, 0.093, 0.241, 0.512)
   SObs <- as.vector(round(PostSummary@s[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
   
-  Theta <- c(0.533, 0.354)
+  Theta <- c(0.501, 0.434)
   ThetaObs <- as.vector(round(PostSummary@theta[,1],3))
   expect_that(all.equal(ThetaObs, Theta), is_true())
 })

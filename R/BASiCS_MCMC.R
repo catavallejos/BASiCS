@@ -215,7 +215,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   RunName <- ifelse("RunName" %in% names(args), args$RunName, "")
   PrintProgress <- ifelse("PrintProgress" %in% names(args), 
                           args$PrintProgress, TRUE)
-  PriorDelta <- ifelse("PriorDelta" %in% names(args), args$PriorDelta, "gamma")
+  PriorDelta <- ifelse("PriorDelta" %in% names(args), 
+                       args$PriorDelta, "log-normal")
     
   if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) 
     stop("Invalid parameter values.")
