@@ -1557,11 +1557,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-//    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-//                                BatchDesign_arma, BatchSizes,
-//                                phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
-//    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
-//    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
+                                BatchDesign_arma, BatchSizes,
+                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
    
 
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 

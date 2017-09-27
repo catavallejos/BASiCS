@@ -346,7 +346,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     StochasticRef <- ifelse("StochasticRef" %in% names(args), 
                             args$StochasticRef, TRUE)
         
-    BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
     BatchSizes <- table(metadata(Data)$BatchInfo)
     BatchIds <- as.numeric(names(BatchSizes))
     BatchOffSet <- rep(1, times = nBatch)
@@ -399,17 +398,17 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      as.matrix(assay(Data)), 
                                                      BatchDesign, 
                                                      mu0, delta0, 
-                                                     s0, nu0, 
-                                                     c(1.936500, 1.601918), # rep(theta0, nBatch),  
+                                                     phi0, nu0, 
+                                                     rep(theta0, nBatch),  
                                                      PriorParam$s2.mu, 
                                                      PriorParam$a.delta, 
                                                      PriorParam$b.delta, 
+                                                     PriorParam$s2.delta,
+                                                     PriorDeltaNum,
                                                      PriorParam$a.s, 
                                                      PriorParam$b.s, 
                                                      PriorParam$a.theta, 
                                                      PriorParam$b.theta, 
-                                                     PriorParam$s2.delta, 
-                                                     PriorDeltaNum, 
                                                      AR, 
                                                      ls.mu0, ls.delta0, 
                                                      ls.nu0, 

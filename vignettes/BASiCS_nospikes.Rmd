@@ -122,7 +122,9 @@ plot(Chain2, Param = "theta", Batch = 1)
 plot(Chain2, Param = "mu", Gene = 1)
 plot(Chain2, Param = "delta", Gene = 1)
 Summary2 <- Summary(Chain2)
+```
 
+```{r}
 Chain3 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
                       PrintProgress = FALSE, StoreDir = tempdir(),
                       StochasticRef = TRUE)
