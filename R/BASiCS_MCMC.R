@@ -343,12 +343,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # 1: Full constrain; 2: Non-zero genes only
     ConstrainType <- ifelse("ConstrainType" %in% names(args), 
                             args$ConstrainType, 2)
-    ConstrainLimit <- ifelse("ConstrainLimit" %in% names(args), 
-                             args$ConstrainLimit, 1)
-    ConstrainAlpha <- ifelse("ConstrainAlpha" %in% names(args), 
-                             args$ConstrainAlpha, 0.05)
-    ConstrainProb <- ifelse("ConstrainProb" %in% names(args), 
-                            args$ConstrainProb, 0.95)
+    StochasticRef <- ifelse("StochasticRef" %in% names(args), 
+                            args$StochasticRef, TRUE)
         
     BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
     BatchSizes <- table(metadata(Data)$BatchInfo)
@@ -368,34 +364,19 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # '0' as its first element Constrain for gene-specific expression rates
     if (ConstrainType == 1) 
     {
-      # Full constrain Note we use 'ConstrainLimit + 1' as 1 
-      # pseudo-count was added 
-      # when computing 'mu0' (to avoid numerical issues)
+      # Full constrain 
       ConstrainGene <- (1:q.bio) - 1
       NotConstrainGene <- 0
       Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
     if (ConstrainType == 2) 
     {
-      # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' 
-      # as 1 pseudo-count 
-      # was added when computing 'mu0' (to avoid numerical issues)
-      ConstrainGene <- which(mu0 >= ConstrainLimit + 1) - 1
-      NotConstrainGene <- which(mu0 < ConstrainLimit + 1) - 1
+      # Trimmed constrain based on total counts > 0
+      ConstrainGene <- which(sum.bycell.bio > 0) - 1
+      NotConstrainGene <- which(sum.bycell.bio == 0) - 1
       Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
-    if (ConstrainType == 3) 
-    {
-      # Trimmed constrain based on detection
-      Detection <- rowMeans(assay(Data) > 0)
-      ConstrainGene <- which(Detection >= ConstrainLimit) - 1
-      NotConstrainGene <- which(Detection < ConstrainLimit) - 1
-      Constrain <- mean(log(mu0[ConstrainGene + 1]))
-    }
-        
-    StochasticRef <- ifelse("StochasticRef" %in% names(args), 
-                            args$StochasticRef, FALSE)
-        
+
     if (StochasticRef == TRUE) 
     {
       aux.ref <- cbind(ConstrainGene, 
@@ -444,7 +425,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      Index, RefGene, RefGenes, 
                                                      ConstrainGene, 
                                                      NotConstrainGene, 
-                                                     ConstrainType))
+                                                     ConstrainType,
+                                                     as.numeric(StochasticRef)))
   }
     
   Chain$mu <- Chain$mu[, 1:q.bio]

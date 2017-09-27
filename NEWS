@@ -597,9 +597,18 @@ No-spikes implementation
 - Temporary vignette file for no-spikes case has been created
 - `HiddenBASiCS_MCMCcppNoSpikes` updated to recycle vertical integration
 update functions
+- Fixed bug to allow use of stochastic reference
 
 TO-DO
 - Implement Giacomo's suggestion? 
+
+Summary of constrain types
+- ConstrainType: full or subset of genes 
+  * For the second case, different filter thresholds have been proposed
+- StochasticRef or no 
+- Idea: 
+  * Try StochasticRef with no filter
+  * Try StochasticRef with filter > 0 total counts
   
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
