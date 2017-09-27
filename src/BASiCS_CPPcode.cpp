@@ -1302,6 +1302,71 @@ arma::mat HiddenBASiCS_DenoisedRates(
 
 /* IGNORE CODE FROM HERE ONWARDS */
 
+/* Metropolis-Hastings updates of nu (batch case)
+ * Updates are implemented simulateaneously for all cells.
+ */
+arma::mat nuUpdateNoSpikes(
+    arma::vec const& nu0, 
+    arma::vec const& prop_var, 
+    arma::mat const& Counts,
+    arma::mat const& BatchDesign, 
+    arma::vec const& mu, 
+    arma::vec const& invdelta, 
+    arma::vec const& phi, 
+    arma::vec const& thetaBatch, 
+    arma::vec const& sum_bygene_all, 
+    int const& q0,
+    int const& n,
+    arma::vec & nu1,
+    arma::vec & u,
+    arma::vec & ind)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP    
+  nu1 = exp(arma::randn(n) % sqrt(prop_var) + log(nu0));
+  u = arma::randu(n);
+  
+  // ACCEPT/REJECT STEP
+  arma::vec log_aux = arma::zeros(n);
+  
+  for (int j=0; j < n; j++) 
+  {
+    for (int i=0; i < q0; i++) 
+    {
+      log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
+        log( ( nu1(j)*mu(i) + invdelta(i) ) / 
+        ( nu0(j)*mu(i) + invdelta(i) ));
+    } 
+  }
+  
+  log_aux += (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
+  log_aux -= (nu1 - nu0)  % (1/(thetaBatch % phi));   
+  
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+  * Proposed values are automatically rejected in the following cases:
+  * - If smaller than 1e-5
+  * - If the proposed value is not finite
+  * - When the acceptance rate cannot be numerally computed
+  */  
+  for (int j=0; j < n; j++)
+  {
+    if(arma::is_finite(log_aux(j)) & arma::is_finite(nu1(j)))
+    {
+      if( (log(u(j)) < log_aux(j)) & (nu1(j) > 1e-5) ) { ind(j) = 1; }
+      else {ind(j) = 0; nu1(j) = nu0(j); }
+    }      
+    else
+    {
+      ind(j) = 0; nu1(j) = nu0(j);
+      Rcpp::Rcout << "Error when updating nu " << j+1 << std::endl;
+      Rcpp::warning("Consider additional data filter if error is frequent.");    
+    }
+  }
+  
+  // OUTPUT
+  return join_rows(nu1, ind);
+}
 
 /* MCMC sampler 
  * N: Total number of MCMC draws 
@@ -1344,7 +1409,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericMatrix BatchDesign, // Design matrix representing batch information (number of columns must be equal to number of batches)
     NumericVector mu0, // Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ (true mRNA content for technical genes)  
     NumericVector delta0, // Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$  
-    NumericVector phi0, // Starting value of $\phi=(\phi_1,...,\phi_n)$'$ 
+    NumericVector s0, // Starting value of $\phi=(\phi_1,...,\phi_n)$'$ 
     NumericVector nu0, // Starting value of $\nu=(\nu_1,...,\nu_n)$'$   
     NumericVector theta0, // Starting value of $\theta$ 
     double s2mu, 
@@ -1352,8 +1417,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double bdelta, // Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
     double s2delta, 
     double prior_delta,
-    double aphi,
-    double bphi,
+    double as,
+    double bs,
     double atheta, // Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$
     double btheta, // Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$
     double ar, // Optimal acceptance rate for adaptive Metropolis-Hastings updates
@@ -1408,7 +1473,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux); 
   arma::mat delta = zeros(q0, Naux); 
-  arma::mat phi = ones(n, Naux);
+  arma::mat s = zeros(n, Naux);
   arma::mat nu = zeros(n, Naux); 
   arma::mat theta = zeros(nBatch, Naux);
   arma::mat LSmu;
@@ -1431,10 +1496,10 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec thetaAccept = zeros(nBatch); arma::vec PthetaAux = zeros(nBatch);
   
   // INITIALIZATION OF VALUES FOR MCMC RUN
-  arma::mat muAux = zeros(q0,2); muAux.col(0)=as_arma(mu0); 
-  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0)=as_arma(delta0); 
-  arma::vec phiAux = as_arma(phi0); 
-  arma::mat nuAux = zeros(n,2); nuAux.col(0)=as_arma(nu0);
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
+  arma::vec sAux = as_arma(s0); 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0);
   arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0); 
   arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
   
@@ -1486,17 +1551,17 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 
     // UPDATE OF PHI: 
     // SAME AS FULL CONDITIONAL FOR S IN THE VERTICAL INTEGRATION CASE
-    phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaBatch,
-                          aphi, bphi, BatchDesign_arma, n, y_n); 
+    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
+                        as, bs, BatchDesign_arma, n, y_n); 
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign_arma, BatchSizes,
-                                phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
-    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+//    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
+//                                BatchDesign_arma, BatchSizes,
+//                                phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
+//    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+//    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
    
 
     // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
@@ -1525,10 +1590,10 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts_arma, 0,
+    nuAux = nuUpdateNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma,
                           BatchDesign_arma,
                           muAux.col(0), 1/deltaAux.col(0),
-                          ones_n, phiAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                          sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                           y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
 
@@ -1564,7 +1629,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     {  
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
-      phi.col(i/Thin - Burn/Thin) = phiAux;
+      s.col(i/Thin - Burn/Thin) = sAux;
       nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0); 
       
@@ -1586,7 +1651,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
       Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
-      Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
+      Rcout << "s (cell 1): " << sAux(0) << std::endl;
       Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
       Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
       Rcout << "--------------------------------------------------------------------" << std::endl;
@@ -1637,7 +1702,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("phi") = phi.t(),
+        Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
         Rcpp::Named("ls.mu") = LSmu.t(),
@@ -1653,7 +1718,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("phi") = phi.t(),
+        Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
         Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
