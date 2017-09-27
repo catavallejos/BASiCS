@@ -598,6 +598,8 @@ No-spikes implementation
 - `HiddenBASiCS_MCMCcppNoSpikes` updated to recycle vertical integration
 update functions
 - Fixed bug to allow use of stochastic reference
+- Fixed bug in argument order for no-spikes version
+- Spikes version code clean-up
 
 TO-DO
 - Implement Giacomo's suggestion? 

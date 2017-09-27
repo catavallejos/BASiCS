@@ -346,17 +346,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     StochasticRef <- ifelse("StochasticRef" %in% names(args), 
                             args$StochasticRef, TRUE)
         
-    BatchSizes <- table(metadata(Data)$BatchInfo)
-    BatchIds <- as.numeric(names(BatchSizes))
-    BatchOffSet <- rep(1, times = nBatch)
-    for (k in 2:nBatch) 
-    {
-      aux1 <- matrixStats::colSums2(assay(Data)[, 
-                                      metadata(Data)$BatchInfo == BatchIds[k]])
-      aux2 <- colSums(assay(Data)[, metadata(Data)$BatchInfo == BatchIds[1]])
-      BatchOffSet[k] <-  median(aux1) / median(aux2)
-    }
-    
     # Auxiliary vector contaning a gene index
     Index <- (1:q.bio) - 1
     # In the following '+1' is used as c++ vector indexes vectors setting 
@@ -418,9 +407,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      StoreAdaptNumber, 
                                                      StopAdapt, 
                                                      as.numeric(PrintProgress), 
-                                                     metadata(Data)$BatchInfo, 
-                                                     BatchIds, 
-                                                     BatchOffSet, Constrain, 
+                                                     Constrain, 
                                                      Index, RefGene, RefGenes, 
                                                      ConstrainGene, 
                                                      NotConstrainGene, 
