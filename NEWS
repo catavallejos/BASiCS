@@ -510,7 +510,7 @@ version 0.99.0: (2017-08-28)
 - Minor changes to complete Bioconductor submission checklist
 - Version re-numbered according to Bioconductor guidelines
 
-version 0.99.2: (2017-09-18)
+version 0.99.2: (2017-09-18)- After @nturaga review
 - 'newBASiCS_Data': format + checks moved to `HiddenChecksBASiCS_Data` function
 - `HiddenChecksBASiCS_Data`: use of colMeans2, rowMeans2
 - Format in welcome message
@@ -591,6 +591,10 @@ version 0.99.4: (2017-09-25)
 version 0.99.5: (2017-09-26)  
 - Change of default `PriorDelta` value in `BASiCS_MCMC` 
 - Unit tests modified accordingly
+
+version 0.99.6: (2017-10-05) - After @nturaga review
+- `inst` folder has been deleted
+- Removal of `...` arg in `segments` - `plot` method for `BASiCS_Summary`
   
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
