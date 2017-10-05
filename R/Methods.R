@@ -426,11 +426,11 @@ setMethod("plot",
             {
               BarLength = ifelse(length(Columns) <= 10, 0.1, 2/length(Columns))
               segments(x0 = Column, y0 = object[Column, 2], 
-                       y1 = object[Column, 3], col = col, ...)
+                       y1 = object[Column, 3], col = col)
               segments(x0 = Column - BarLength, y0 = object[Column, 2], 
-                       x1 = Column + BarLength, col = col, ...)
+                       x1 = Column + BarLength, col = col)
               segments(x0 = Column - BarLength, y0 = object[Column, 3], 
-                       x1 = Column + BarLength, col = col, ...)
+                       x1 = Column + BarLength, col = col)
             }
           } 
           else 

@@ -510,7 +510,7 @@ version 0.99.0: (2017-08-28)
 - Minor changes to complete Bioconductor submission checklist
 - Version re-numbered according to Bioconductor guidelines
 
-version 0.99.2: (2017-09-18)
+version 0.99.2: (2017-09-18)- After @nturaga review
 - 'newBASiCS_Data': format + checks moved to `HiddenChecksBASiCS_Data` function
 - `HiddenChecksBASiCS_Data`: use of colMeans2, rowMeans2
 - Format in welcome message
@@ -592,6 +592,10 @@ version 0.99.5: (2017-09-26)
 - Change of default `PriorDelta` value in `BASiCS_MCMC` 
 - Unit tests modified accordingly
 
+version 0.99.6: (2017-10-05) - After @nturaga review
+- `inst` folder has been deleted
+- Removal of `...` arg in `segments` - `plot` method for `BASiCS_Summary`
+
 No-spikes implementation
 - `makeExampleBASiCS_Data` + `newBASiCS_Data` adapted to no-spikes case
 - Temporary vignette file for no-spikes case has been created
@@ -600,10 +604,6 @@ update functions
 - Fixed bug to allow use of stochastic reference
 - Fixed bug in argument order for no-spikes version
 - Spikes version code clean-up
-
-TO-DO
-- Implement Giacomo's suggestion? 
-
 Summary of constrain types
 - ConstrainType: full or subset of genes 
   * For the second case, different filter thresholds have been proposed
@@ -611,6 +611,9 @@ Summary of constrain types
 - Idea: 
   * Try StochasticRef with no filter
   * Try StochasticRef with filter > 0 total counts
+
+TO-DO
+- Implement Giacomo's suggestion? 
   
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
