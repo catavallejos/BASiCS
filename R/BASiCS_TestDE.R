@@ -157,7 +157,6 @@ BASiCS_TestDE <- function(Chain1,
                           GenesSelect = NULL, ...) 
 {
   # Checking validity of input arguments
-  # Test
   if (!is(Chain1, "BASiCS_Chain")) 
     stop("'Chain1' is not a 'BASiCS_Chain' class object.")
   if (!is(Chain2, "BASiCS_Chain")) 

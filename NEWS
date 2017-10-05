@@ -595,25 +595,6 @@ version 0.99.5: (2017-09-26)
 version 0.99.6: (2017-10-05) - After @nturaga review
 - `inst` folder has been deleted
 - Removal of `...` arg in `segments` - `plot` method for `BASiCS_Summary`
-
-No-spikes implementation
-- `makeExampleBASiCS_Data` + `newBASiCS_Data` adapted to no-spikes case
-- Temporary vignette file for no-spikes case has been created
-- `HiddenBASiCS_MCMCcppNoSpikes` updated to recycle vertical integration
-update functions
-- Fixed bug to allow use of stochastic reference
-- Fixed bug in argument order for no-spikes version
-- Spikes version code clean-up
-Summary of constrain types
-- ConstrainType: full or subset of genes 
-  * For the second case, different filter thresholds have been proposed
-- StochasticRef or no 
-- Idea: 
-  * Try StochasticRef with no filter
-  * Try StochasticRef with filter > 0 total counts
-
-TO-DO
-- Implement Giacomo's suggestion? 
   
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
