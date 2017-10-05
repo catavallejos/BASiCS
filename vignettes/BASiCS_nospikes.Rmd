@@ -1,0 +1,151 @@
+<!--
+%\VignetteIndexEntry{Introduction to BASiCS (no-spikes case)}
+%\VignettePackage{BiocStyle}
+%\VignetteEngine{knitr::knitr}
+-->
+  
+  ```{r, echo=FALSE, results="hide", message=TRUE}
+require(knitr)
+opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
+```
+
+```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+```{r library, echo=FALSE}
+library(BASiCS)
+```
+
+# BASiCS: vertical versus horizontal integration.
+
+Package: `r Biocpkg("BASiCS")` <br />
+Authors: Catalina Vallejos (cnvallej@uc.cl) and Nils Eling (eling@ebi.ac.uk) <br />
+Compilation date: `r Sys.Date()`
+
+***
+  
+# Introduction 
+  
+This vignette is to illustrate the no-spikes case of BASiCS. 
+
+# Quick start
+
+### The input dataset
+
+The input dataset for BASiCS must be stored as an `SingleCellExperiment` 
+object (see `r Biocpkg("SingleCellExperiment")` package). 
+
+The `newBASiCS_Data` function can be used to create the input data object based 
+on the following information:
+  
+* `Counts`: a matrix of raw expression counts with dimensions $q$ times $n$. 
+Within this matrix, $q_0$ rows must correspond to biological genes and $q-q_0$ 
+rows must correspond to technical spike-in genes. Gene names must be stored as `rownames(Counts)`.
+
+* `Tech`: a vector of `TRUE`/`FALSE` elements with length $q$. 
+If `Tech[i] = FALSE` the gene `i` is biological; otherwise the gene is spike-in. 
+This vector must be specified in the same order of genes as in the 
+`Counts` matrix. 
+
+* `SpikeInfo`: a `data.frame` with $q-q_0$ rows. First column must contain the 
+names associated to the spike-in genes (as in `rownames(Counts)`). Second column 
+must contain the input number of molecules for the spike-in genes 
+(amount per cell).
+
+* `BatchInfo` (optional): vector of length $n$ to indicate batch structure 
+(whenever cells have been processed using multiple batches). 
+
+For example, the following code simulates a dataset with 50 genes 
+(40 biological and 10 spike-in) and 40 cells. 
+
+```{r ExampleDataTest}
+set.seed(1)
+Counts <- matrix(rpois(50*40, 2), ncol = 40)
+rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
+Tech <- c(rep(FALSE,40),rep(TRUE,10))
+set.seed(2)
+SpikeInput <- rgamma(10,1,1)
+SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), 
+                        "SpikeInput" = SpikeInput)
+
+# With spikes; with batches
+DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo,
+                              BatchInfo = rep(c(1,2), each = 20))
+
+# Without spikes; with batches
+DataExample <- newBASiCS_Data(Counts, Tech, 
+                              BatchInfo = rep(c(1,2), each = 20)) 
+```
+
+
+***
+  
+  
+### Running the MCMC sampler
+  
+  Parameter estimation is performed using the `BASiCS_MCMC` function. 
+Essential parameters for running this algorithm are: 
+  
+* `N`: total number of iterations
+* `Thin`: length of the thining period (i.e. only every `Thin` iterations will 
+be stored in the output of the `BASiCS_MCMC`)
+* `Burn`: length of burn-in period (i.e. the initial `Burn` iterations that will 
+be discarded from the output of the `BASiCS_MCMC`)
+
+If the optional parameter `PrintProgress` is set to `TRUE`, the R 
+console will display the progress of the MCMC algorithm. 
+For other optional parameters refer to `help(BASiCS_MCMC)`. 
+
+Here, we illustrate the usage of `BASiCS_MCMC` using a built-in 
+synthetic datasets.
+
+- Vertical integration (with spikes)
+
+```{r quick-start-MCMC-vertical}
+Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
+Chain1 <- BASiCS_MCMC(Data = Data1, N = 1000, Thin = 10, Burn = 500, 
+                      PrintProgress = FALSE)
+Summary1 <- Summary(Chain1)
+```
+
+
+- Horizontal integration (no spikes case)
+
+```{r quick-start-MCMC-horizontal}
+Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
+Chain2 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
+                      PrintProgress = FALSE, StoreDir = tempdir(),
+                      StochasticRef = FALSE)
+plot(Chain2, Param = "phi", Cell = 1)
+plot(Chain2, Param = "theta", Batch = 1)
+plot(Chain2, Param = "mu", Gene = 1)
+plot(Chain2, Param = "delta", Gene = 1)
+Summary2 <- Summary(Chain2)
+```
+
+```{r}
+Chain3 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
+                      PrintProgress = FALSE, StoreDir = tempdir(),
+                      StochasticRef = TRUE)
+plot(Chain3, Param = "phi", Cell = 1)
+plot(Chain3, Param = "theta", Batch = 1)
+plot(Chain3, Param = "mu", Gene = 1)
+plot(Chain3, Param = "delta", Gene = 1)
+Summary3 <- Summary(Chain3)
+```
+
+# Case studies
+
+The following datasets can be used to test the performance of this approach:
+
+
+
+
+
+
+# Session information
+
+```{r SessionInfo}
+sessionInfo()
+```

@@ -343,59 +343,28 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # 1: Full constrain; 2: Non-zero genes only
     ConstrainType <- ifelse("ConstrainType" %in% names(args), 
                             args$ConstrainType, 2)
-    ConstrainLimit <- ifelse("ConstrainLimit" %in% names(args), 
-                             args$ConstrainLimit, 1)
-    ConstrainAlpha <- ifelse("ConstrainAlpha" %in% names(args), 
-                             args$ConstrainAlpha, 0.05)
-    ConstrainProb <- ifelse("ConstrainProb" %in% names(args), 
-                            args$ConstrainProb, 0.95)
+    StochasticRef <- ifelse("StochasticRef" %in% names(args), 
+                            args$StochasticRef, TRUE)
         
-    BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
-    BatchSizes <- table(metadata(Data)$BatchInfo)
-    BatchIds <- as.numeric(names(BatchSizes))
-    BatchOffSet <- rep(1, times = nBatch)
-    for (k in 2:nBatch) 
-    {
-      aux1 <- matrixStats::colSums2(assay(Data)[, 
-                                      metadata(Data)$BatchInfo == BatchIds[k]])
-      aux2 <- colSums(assay(Data)[, metadata(Data)$BatchInfo == BatchIds[1]])
-      BatchOffSet[k] <-  median(aux1) / median(aux2)
-    }
-    
     # Auxiliary vector contaning a gene index
     Index <- (1:q.bio) - 1
     # In the following '+1' is used as c++ vector indexes vectors setting 
     # '0' as its first element Constrain for gene-specific expression rates
     if (ConstrainType == 1) 
     {
-      # Full constrain Note we use 'ConstrainLimit + 1' as 1 
-      # pseudo-count was added 
-      # when computing 'mu0' (to avoid numerical issues)
+      # Full constrain 
       ConstrainGene <- (1:q.bio) - 1
       NotConstrainGene <- 0
       Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
     if (ConstrainType == 2) 
     {
-      # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' 
-      # as 1 pseudo-count 
-      # was added when computing 'mu0' (to avoid numerical issues)
-      ConstrainGene <- which(mu0 >= ConstrainLimit + 1) - 1
-      NotConstrainGene <- which(mu0 < ConstrainLimit + 1) - 1
+      # Trimmed constrain based on total counts > 0
+      ConstrainGene <- which(sum.bycell.bio > 0) - 1
+      NotConstrainGene <- which(sum.bycell.bio == 0) - 1
       Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
-    if (ConstrainType == 3) 
-    {
-      # Trimmed constrain based on detection
-      Detection <- rowMeans(assay(Data) > 0)
-      ConstrainGene <- which(Detection >= ConstrainLimit) - 1
-      NotConstrainGene <- which(Detection < ConstrainLimit) - 1
-      Constrain <- mean(log(mu0[ConstrainGene + 1]))
-    }
-        
-    StochasticRef <- ifelse("StochasticRef" %in% names(args), 
-                            args$StochasticRef, FALSE)
-        
+
     if (StochasticRef == TRUE) 
     {
       aux.ref <- cbind(ConstrainGene, 
@@ -418,40 +387,40 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      as.matrix(assay(Data)), 
                                                      BatchDesign, 
                                                      mu0, delta0, 
-                                                     phi0, nu0, theta0, 
+                                                     phi0, nu0, 
+                                                     rep(theta0, nBatch),  
                                                      PriorParam$s2.mu, 
                                                      PriorParam$a.delta, 
                                                      PriorParam$b.delta, 
-                                                     PriorParam$a.phi, 
-                                                     PriorParam$b.phi, 
+                                                     PriorParam$s2.delta,
+                                                     PriorDeltaNum,
+                                                     PriorParam$a.s, 
+                                                     PriorParam$b.s, 
                                                      PriorParam$a.theta, 
                                                      PriorParam$b.theta, 
                                                      AR, 
                                                      ls.mu0, ls.delta0, 
-                                                     ls.nu0, ls.theta0, 
+                                                     ls.nu0, 
+                                                     rep(ls.theta0, nBatch), 
                                                      sum.bycell.all, 
                                                      sum.bygene.all, 
                                                      StoreAdaptNumber, 
                                                      StopAdapt, 
                                                      as.numeric(PrintProgress), 
-                                                     PriorParam$s2.delta, 
-                                                     PriorDeltaNum, 
-                                                     metadata(Data)$BatchInfo, 
-                                                     BatchIds, 
-                                                     as.vector(BatchSizes), 
-                                                     BatchOffSet, Constrain, 
+                                                     Constrain, 
                                                      Index, RefGene, RefGenes, 
                                                      ConstrainGene, 
                                                      NotConstrainGene, 
-                                                     ConstrainType))
+                                                     ConstrainType,
+                                                     as.numeric(StochasticRef)))
   }
     
   Chain$mu <- Chain$mu[, 1:q.bio]
   colnames(Chain$mu) <- rownames(assay(Data))[!isSpike(Data)]
   colnames(Chain$delta) <- rownames(assay(Data))[!isSpike(Data)]
   CellLabels <- paste0("Cell", 1:n, "_Batch", metadata(Data)$BatchInfo)
-  colnames(Chain$phi) <- CellLabels
-  if (length(metadata(Data)$SpikeInput) > 1) { colnames(Chain$s) <- CellLabels }
+  colnames(Chain$s) <- CellLabels
+  if (length(metadata(Data)$SpikeInput) > 1) { colnames(Chain$phi) <- CellLabels }
   colnames(Chain$nu) <- CellLabels
   colnames(Chain$theta) <- paste0("Batch", unique(metadata(Data)$BatchInfo))
     
@@ -468,7 +437,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
 
     if (length(metadata(Data)$SpikeInput) == 1) 
     {
-        Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))
+        Chain$phi <- matrix(1, ncol = ncol(Chain$s), nrow = nrow(Chain$s))
     }
     
     ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, 
