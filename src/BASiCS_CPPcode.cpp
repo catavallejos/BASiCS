@@ -1268,7 +1268,7 @@ arma::mat muUpdateReg(
   // This is new due to regression prior on delta
   arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
-  for(int t=0; t < q_bio; t++)
+  for(int t=0; t < q0; t++)
   {
     log_aux(t) -= Rcpp::as<double>(wrap( ( lambda(t) * (pow(log(delta(t))-X_mu1.row(t) * beta,2) -  pow(log(delta(t))-X.row(t) * beta,2)) ) / (2 * sigma2 )));
   }
@@ -1324,7 +1324,6 @@ arma::mat deltaUpdateReg(
     arma::mat const& Counts, 
     arma::vec const& mu, 
     arma::vec const& phinu, 
-    double const& prior_delta,
     int const& q0,
     int const& n,
     arma::vec & delta1,
@@ -1359,7 +1358,7 @@ arma::mat deltaUpdateReg(
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
 
   // REGRESSION
-  for(int t=0; t < q_bio; t++)
+  for(int t=0; t < q0; t++)
   {
     log_aux(t) -= Rcpp::as<double>(wrap(((lambda(t)/(2 * sigma2)) * (pow(log(delta1(t)) - X.row(t) * beta,2) - pow(log(delta0(t)) - X.row(t) * beta,2)))));
   }
@@ -1642,9 +1641,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // REGRESSION
     muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                        phiAux, phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, y_q0, u_q0, ind_q0,
+                        phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, variance);     
-    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
+    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -1657,7 +1656,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, muAux.col(0), 
                               phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                               lambdaAux, X, sigma2Aux, betaAux);  
-    PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);}   
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}   
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -1706,7 +1705,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // REGRESSION
     // a, b, sigma2 update
-    s_aAux = sigma2_a0 + rg.size()/2;
+    s_aAux = sigma2_a0 + lambdaAux.size()/2;
     s_bAux = sigma2_b0 + Rcpp::as<double>(wrap(0.5*(m0_arma.t()*inv(V0_arma)*m0_arma + (betaAux - mAux).t()*V1*(betaAux - mAux) - mAux.t()*V1*mAux)));
     for(int z=0; z<lambdaAux.size(); z++){
       s_bAux += 0.5*(log(dr(z))*lambdaAux(z)*log(dr(z)));
@@ -1774,10 +1773,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);  
       
       // Regression
-      beta.row(i/thin - burn/thin) = betaAux.t();
-      lambda.row(i/thin - burn/thin) = lambdaAux.t();
-      sigma(i/thin - burn/thin) = sigma2Aux;
-      epsilon.row(i/thin - burn/thin) = epsilonAux.t();
+      beta.row(i/Thin - Burn/Thin) = betaAux.t();
+      lambda.row(i/Thin - Burn/Thin) = lambdaAux.t();
+      sigma(i/Thin - Burn/Thin) = sigma2Aux;
+      epsilon.row(i/Thin - Burn/Thin) = epsilonAux.t();
       
       if(StoreAdapt == 1)
       {
@@ -1899,13 +1898,11 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("beta")=beta.t(),
         Rcpp::Named("sigma2")=sigma.t(),
         Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t())); )); 
+        Rcpp::Named("epsilon")=epsilon.t())); 
     
   }
   
 }
-
-
 
 
 /* Metropolis-Hastings updates of mu 
