@@ -1545,6 +1545,36 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec ind_q0 = zeros(q0); arma::vec ind_n = zeros(n);
   arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
   
+  // REGRESSION SPECIFIC SECTION
+  
+  // Model matrix for regression
+  arma::mat X=arma::zeros(qbio, k);
+  
+  // Parameters for regression
+  arma::vec m0_arma = as_arma(m0);
+  arma::mat V0_arma = as_arma(V0);
+  arma::vec beta0_arma = as_arma(beta0);
+  arma::vec lambda0_arma = as_arma(lambda0);
+  arma::mat beta = arma::zeros(Naux,k);
+  arma::mat lambda = arma::zeros(Naux,qbio);
+  arma::vec sigma = arma::zeros(Naux);
+  arma::mat epsilon = arma::zeros(Naux, qbio);
+  double lambda_a;
+  double lambda_b;
+  
+  // INITIALIZATION OF REGRESSION PARAMETERS
+  arma::vec mAux = m0_arma; arma::mat VAux = V0_arma; arma::vec betaAux = beta0_arma;
+  arma::vec lambdaAux = lambda0_arma; 
+  double sigma2Aux = sigma20; double s_aAux = sigma2_a0; double s_bAux = sigma2_b0;
+  arma::vec epsilonAux = arma::zeros(qbio);
+  
+  // OTHER PARAMETERS FOR REGRESSION
+  arma::mat V1 = arma::zeros(k,k);
+  arma::mat VAuxUpdate;
+  arma::vec mAuxUpdate;
+  arma::mat MVRNORM;
+  arma::vec betaAuxUpdate;
+  
   Rcout << "-------------------------------------------------------------" << std::endl;  
   Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
   Rcout << "-------------------------------------------------------------" << std::endl;
@@ -1562,6 +1592,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     }
     
     Ibatch++; 
+    
+    // REGRESSION
+    // Model matrix initialization
+    arma::vec means = muAux(arma::span(0,qbio-1),0);
+    if(i==0){
+      X=designMatrix(k, means, variance);
+    }
     
     // UPDATE OF PHI: 
     // 1st ELEMENT IS THE UPDATE, 
