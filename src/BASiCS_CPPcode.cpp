@@ -1171,6 +1171,221 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
 
 }
 
+
+// Functions for regression case of BASiCS
+
+// Model matrix generation for regression
+arma::mat designMatrix(
+    int const& k, /* Number of Gaussian radial basis functions to use for regression */
+    arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_n)'$ */
+      double const& variance) 
+{
+  arma::vec x=log(mu);
+  double ran=x.max()-x.min();
+  arma::vec myu=arma::zeros(k-2);
+  myu(0)=x.min();
+  for(int i=1; i<myu.size(); i++){
+    myu(i)=myu(i-1) + ran/(k-3);
+  }
+  double h=(myu(1)-myu(0))*variance;
+  arma::mat X=arma::ones(x.size(),k);
+  X.col(1) = x;
+  for(int i=0; i<k-2; i++){
+    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
+    //X.col(i+1) = pow(x,i+1);
+  }
+  return X;
+}
+
+// Multivariate normal distribution
+arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
+  int ncols = sigma.n_cols;
+  arma::mat Y = arma::randn(n, ncols);
+  return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
+}
+
+
+/* Metropolis-Hastings updates of mu adapted to fit the regression prior for delta
+* Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
+*/
+arma::mat muUpdateReg(
+    arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
+arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
+arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
+arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
+arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
+arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
+arma::vec const& sum_bycell_bio, /* Sum of expression counts by cell (biological genes only) */
+double const& s2_mu,
+int const& q,
+int const& q_bio,
+int const& n,
+arma::vec & mu,
+arma::vec & ind,
+int const& k,
+arma::vec const& lambda,
+arma::vec const& beta,
+arma::mat const& X,
+double const& sigma2,
+arma::vec const& regGenes,
+double variance)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP    
+  arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var(span(0,q_bio - 1))) + log(mu0(span(0, q_bio - 1))));
+  arma::vec u = arma::randu(q_bio);
+  
+  // ACCEPT/REJECT STEP
+  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio - 1)))) % sum_bycell_bio; 
+  
+  // Loop to replace matrix operations, through genes and cells
+  for (int i=0; i < q_bio; i++)
+  {
+    for (int j=0; j < n; j++) 
+    {
+      log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
+        log( ( phi(j)*nu(j)*y(i)+(1/delta(i)) ) / ( phi(j)*nu(j)*mu0(i)+(1/delta(i)) ));
+    }
+  }
+  
+  // THERE IS A -1 COMMING FROM THE L0G-NORMAL PRIOR. IT CANCELS OUT AS PROPOSING IN THE LOG-SCALE. 
+  log_aux -= (0.5/s2_mu) * (pow(log(y),2) - pow(log(mu0(span(0, q_bio - 1))),2));
+  
+  // This is new due to regression prior on delta
+  arma::mat X_y = designMatrix(k, y, variance);
+
+  for(int t=0; t < q_bio; t++)
+  {
+    if(regGenes(t) == 1){
+      log_aux(t) -= Rcpp::as<double>(wrap( ( lambda(t) * (pow(log(delta(t))-X_y.row(t) * beta,2) -  pow(log(delta(t))-X.row(t) * beta,2)) ) / (2 * sigma2 )));
+    }
+  }
+  
+  // CREATING OUTPUT VARIABLE & DEBUG
+  for (int i=0; i < q_bio; i++)
+  {
+    if(arma::is_finite(log_aux(i)))
+    {
+      if(log(u(i)) < log_aux(i))
+      {
+        // DEBUG: Reject very small values to avoid numerical issues
+        if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; mu(i) = y(i);}
+        else{ind(i) = 0; mu(i) = mu0(i);}            
+      }
+      else{ind(i) = 0; mu(i) = mu0(i);}
+    }      
+    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
+    else
+    {
+      ind(i) = 0; mu(i) = mu0(i);
+      Rcpp::Rcout << "Something went wrong when updating mu " << i+1 << std::endl;
+      Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+    }
+  }
+  
+  // OUTPUT
+  return join_rows(mu, ind);
+}
+
+/* Metropolis-Hastings updates of delta 
+* Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
+*/
+arma::mat deltaUpdateReg(
+    arma::vec const& delta0, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
+arma::vec const& prop_var,  /* Current value of the proposal variances for $\delta=(\delta_1,...,\delta_{q_0})'$ */
+arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
+arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
+arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
+arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
+double const& a_delta, /* Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ */
+double const& b_delta, /* Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ */
+int const& q_bio,
+int const& n,
+double const& s2_delta,
+double const& prior_delta,
+arma::vec const& lambda,
+arma::mat const& X,
+double const& sigma2,
+arma::vec const& beta,
+arma::vec const& regGenes)
+{
+  using arma::span;
+  
+  // CREATING VARIABLES WHERE TO STORE DRAWS
+  arma::vec delta = arma::zeros(q_bio); 
+  arma::vec ind = arma::zeros(q_bio);
+  
+  // PROPOSAL STEP
+  arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(delta0));
+  arma::vec u = arma::randu(q_bio);
+  
+  // ACCEPT/REJECT STEP 
+  arma::vec log_aux = - n * (lgamma_cpp(1/y)-lgamma_cpp(1/delta0));
+  
+  // Loop to replace matrix operations, through genes and cells
+  for (int i=0; i < q_bio; i++)
+  {
+    for (int j=0; j < n; j++) 
+    {
+      log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( phi(j)*nu(j)*mu(i)+(1/y(i)) );
+      log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( phi(j)*nu(j)*mu(i)+(1/delta0(i)) );
+    }
+  }
+  
+  // +1 should appear because we update log(delta) not delta. However, it cancels out with the prior. 
+  log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
+  
+  // Component related to the prior
+  if(prior_delta == 1) {log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0);}
+  else {
+    for(int t=0; t < q_bio; t++)
+    {
+      if(regGenes(t) == 1){
+        log_aux(t) -= Rcpp::as<double>(wrap(regGenes(t)*((lambda(t)/(2 * sigma2)) * (pow(log(y(t)) - X.row(t) * beta,2) - pow(log(delta0(t)) - X.row(t) * beta,2)))));
+      }
+      else{
+        log_aux(t) -= Rcpp::as<double>(wrap((0.5/s2_delta) * (pow(log(y(t)),2) - pow(log(delta0(t)),2))));
+      }
+    }
+  }
+  
+  
+  // CREATING OUTPUT VARIABLE & DEBUG
+  for (int i=0; i < q_bio; i++)
+  {
+    if(arma::is_finite(log_aux(i)))
+    {
+      if(log(u(i)) < log_aux(i))
+      {
+        // DEBUG: Reject very small values to avoid numerical issues
+        if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; delta(i) = y(i);}
+        else{ind(i) = 0; delta(i) = delta0(i);}            
+      }
+      else{ind(i) = 0; delta(i) = delta0(i);}
+    }      
+    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
+    else
+    {
+      ind(i) = 0; delta(i) = delta0(i);
+      Rcpp::Rcout << log_aux(i) << std::endl;
+      Rcpp::Rcout << delta0(i) << std::endl;
+      Rcpp::Rcout << y(i) << std::endl;
+      Rcpp::Rcout << "Something went wrong when updating delta " << i+1 << std::endl;
+      Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+    }
+  }
+  
+  // OUTPUT
+  return join_rows(delta, ind);
+}
+
+
+
+
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes
  */
