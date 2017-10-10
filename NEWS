@@ -595,7 +595,10 @@ version 0.99.5: (2017-09-26)
 version 0.99.7: (2017-10-05) - After @nturaga review
 - `inst` folder has been deleted
 - Removal of `...` arg in `segments` - `plot` method for `BASiCS_Summary`
-  
+
+version 0.99.8: (2017-10-10)
+- version bump to trigger a new Bioconductor build
+
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
