@@ -1653,15 +1653,11 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    // REGRESSION
     deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, muAux.col(0), 
                               phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                               lambdaAux, X, sigma2Aux, betaAux);  
     PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);}   
-    deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
-                           muAux.col(0), phiAux % nuAux.col(0), 
-                           adelta, bdelta, s2delta, prior_delta, 
-                           q0, n, y_q0, u_q0, ind_q0);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);} 
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -1672,6 +1668,64 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                           y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
+    
+    // REGRESSION
+
+    // Save deltas in vector
+    arma::vec dr = deltaAux.col(0);
+    
+    // V, m, beta update
+    arma::mat inv_V0 = inv(V0_arma);
+    for(int x=0; x<k; x++){
+      for(int y=0; y<k; y++){
+        double cur_sum = 0;
+        for(int z=0; z<lambdaAux.size(); z++){
+          cur_sum += X(z,x)*lambdaAux(z)*X(z,y);
+        }
+        V1(x,y) = cur_sum + inv_V0(x,y);
+      }
+    }
+    
+    VAux=inv(V1);
+    
+    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0))
+    {
+      arma::vec mAux_pre = inv(V0_arma)*m0_arma;
+      for(int x=0; x<k; x++){
+        double cur_sum = 0;
+        for(int z=0; z<lambdaAux.size(); z++){
+          cur_sum += X(z,x)*lambdaAux(z)*log(dr(z));
+        }
+        mAux(x) = mAux_pre(x) + cur_sum;
+      }
+      mAux = VAux*mAux;
+      
+      MVRNORM = mvrnormArma(1,mAux,sigma2Aux * VAux);
+      betaAux = MVRNORM.row(0).t();
+    }
+    
+    // a, b, sigma2 update
+    s_aAux = sigma2_a0 + rg.size()/2;
+    s_bAux = sigma2_b0 + Rcpp::as<double>(wrap(0.5*(m0_arma.t()*inv(V0_arma)*m0_arma + (betaAux - mAux).t()*V1*(betaAux - mAux) - mAux.t()*V1*mAux)));
+    for(int z=0; z<lambdaAux.size(); z++){
+      s_bAux += 0.5*(log(dr(z))*lambdaAux(z)*log(dr(z)));
+    }
+    
+    if(s_aAux > 0 & s_bAux > 0){
+      sigma2Aux = pow(R::rgamma(s_aAux, 1.0/s_bAux),-1);
+    }
+    
+    // lambda update
+    lambda_a=(eta0+1)/2; 
+    for(int t=0; t<lambdaAux.size(); t++){
+      lambda_b = Rcpp::as<double>(wrap(0.5*(eta0+(pow(log(dr(t))-X.row(t)*betaAux,2))/sigma2Aux)));
+      lambdaAux(t)=R::rgamma(lambda_a,1.0/lambda_b);
+    }
+    
+    // epsilon update
+    for(int t=0; t<lambdaAux.size(); t++){
+      epsilonAux(t) = Rcpp::as<double>(wrap(log(dr(t))-X.row(t)*betaAux));
+    }
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt)
