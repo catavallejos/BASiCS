@@ -1403,7 +1403,6 @@ arma::mat deltaUpdateReg(
  * nu0: Starting value for nu
  * theta0: Starting value for theta
  * s2mu: prior variance for mu
- * prior_delta: whether gamma or log-normal prior is used for delta
  * aphi: Dirichlet hyper-parameter for phi
  * as: prior shape for s 
  * bs: prior rate for s 
@@ -1448,7 +1447,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     NumericVector nu0, 
     NumericVector theta0, 
     double s2mu,
-    double prior_delta,
     NumericVector aphi, 
     double as, 
     double bs,   
