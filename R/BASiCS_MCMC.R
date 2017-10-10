@@ -358,13 +358,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                            variance))
       
       # Remove epsilons for genes that are not expressed in at least 2 cells
-      if("Threshold" %in% names(args)){
-        #genes_for_regression <- as.numeric(rowMeans(assays(Data)$Counts[!rowData(Data)$Tech,]) >= args$Threshold)
-        genes <- as.numeric(apply(assays(Data)$Counts[!rowData(Data)$Tech,], 1, function(n){length(which(n>0))}) >= args$Threshold)
-      }
-      else{
-        genes <- as.numeric(apply(assays(Data)$Counts[!rowData(Data)$Tech,], 1, function(n){length(which(n>0))}) > 1)
-      }
+      genes <- which(apply(assays(Data)$Counts[!rowData(Data)$Tech,], 1, function(n){length(which(n>0))}) > 1)
       
       Chain$epsilon[,!genes] <- NA
       Chain$lambda[,!genes] <- NA
@@ -491,6 +485,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   Chain$mu <- Chain$mu[, 1:q.bio]
   colnames(Chain$mu) <- rownames(assay(Data))[!isSpike(Data)]
   colnames(Chain$delta) <- rownames(assay(Data))[!isSpike(Data)]
+  if(!is.null(Chain$epsilon) & !is.null(Chain$lambda)) {colnames(Chain$epsilon) = colnames(Chain$lambda) = colnames(Chain$mu)}
+  ###################### Change this to keep the cell labels the same
   CellLabels <- paste0("Cell", 1:n, "_Batch", metadata(Data)$BatchInfo)
   colnames(Chain$s) <- CellLabels
   if (length(metadata(Data)$SpikeInput) > 1) { colnames(Chain$phi) <- CellLabels }
@@ -512,11 +508,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     {
         Chain$phi <- matrix(1, ncol = ncol(Chain$s), nrow = nrow(Chain$s))
     }
-    
-    ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, 
-                                  phi = Chain$phi, s = Chain$s, 
-                                  nu = Chain$nu, theta = Chain$theta)
-    
+  
+    ChainClass <- newBASiCS_Chain(parameters = Chain)
+
     OldDir <- getwd()
     
     if (StoreChains) 
