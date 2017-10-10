@@ -1204,173 +1204,190 @@ arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
   return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
 }
 
-
-/* Metropolis-Hastings updates of mu adapted to fit the regression prior for delta
-* Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
-*/
+/* Metropolis-Hastings updates of mu 
+ * Updates are implemented simulateaneously for all biological genes
+ * mu0: current value of mu
+ * prop_var: current value of the proposal variances for mu
+ * Counts: matrix of expression counts
+ * delta: current value of inverse delta
+ * phinu: current value of phi * nu
+ * sum_bycell_bio: sum of expression counts by cell (biological genes only)
+ * s2_mu: prior hyper-variance for mu
+ * q0: number of biological genes
+ * n: number of cells
+ * mu: auxiliary vector for storage
+ * ind: auxiliary vector for storage
+ * k: number of regression components
+ * lambda: current values of lambda
+ * beta: current value of beta
+ * X: current design matrix
+ * sigma2: current value of sigma2
+ */
 arma::mat muUpdateReg(
-    arma::vec const& mu0, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-arma::vec const& prop_var, /* Current value of the proposal variances for $\mu_{bio}=(\mu_1,...,\mu_{q_0})'$ */
-arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */  
-arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
-arma::vec const& sum_bycell_bio, /* Sum of expression counts by cell (biological genes only) */
-double const& s2_mu,
-int const& q,
-int const& q_bio,
-int const& n,
-arma::vec & mu,
-arma::vec & ind,
-int const& k,
-arma::vec const& lambda,
-arma::vec const& beta,
-arma::mat const& X,
-double const& sigma2,
-double variance)
+    arma::vec const& mu0, 
+    arma::vec const& prop_var, 
+    arma::mat const& Counts, 
+    arma::vec const& delta, 
+    arma::vec const& phinu, 
+    arma::vec const& sum_bycell_bio, 
+    double const& s2_mu,
+    int const& q0,
+    int const& n,
+    arma::vec & mu1,
+    arma::vec & u, 
+    arma::vec & ind,
+    int const& k,
+    arma::vec const& lambda,
+    arma::vec const& beta,
+    arma::mat const& X,
+    double const& sigma2,
+    double variance
+    )
 {
-  using arma::span;
   
-  // PROPOSAL STEP    
-  arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var(span(0,q_bio - 1))) + log(mu0(span(0, q_bio - 1))));
-  arma::vec u = arma::randu(q_bio);
+  /* PROPOSAL STEP */
+  mu1 = exp( arma::randn(q0) % sqrt(prop_var) + log(mu0) );
+  u = arma::randu(q0);
   
-  // ACCEPT/REJECT STEP
-  arma::vec log_aux = (log(y) - log(mu0(span(0, q_bio - 1)))) % sum_bycell_bio; 
-  
-  // Loop to replace matrix operations, through genes and cells
-  for (int i=0; i < q_bio; i++)
+  /* ACCEPT/REJECT STEP 
+  * Note: there is a -1 factor coming from the log-normal prior. 
+  * However, it cancels out as using log-normal proposals.
+  */
+  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
+  for (int i=0; i < q0; i++)
   {
     for (int j=0; j < n; j++) 
     {
-      log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) *  
-        log( ( phi(j)*nu(j)*y(i)+(1/delta(i)) ) / ( phi(j)*nu(j)*mu0(i)+(1/delta(i)) ));
+      log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
+        log( ( phinu(j)*mu1(i) + 1/delta(i) ) / 
+        ( phinu(j)*mu0(i) + 1/delta(i) ));
     }
   }
-  
-  // THERE IS A -1 COMMING FROM THE L0G-NORMAL PRIOR. IT CANCELS OUT AS PROPOSING IN THE LOG-SCALE. 
-  log_aux -= (0.5/s2_mu) * (pow(log(y),2) - pow(log(mu0(span(0, q_bio - 1))),2));
+  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
   
   // This is new due to regression prior on delta
-  arma::mat X_y = designMatrix(k, y, variance);
-
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  
   for(int t=0; t < q_bio; t++)
   {
-    log_aux(t) -= Rcpp::as<double>(wrap( ( lambda(t) * (pow(log(delta(t))-X_y.row(t) * beta,2) -  pow(log(delta(t))-X.row(t) * beta,2)) ) / (2 * sigma2 )));
+    log_aux(t) -= Rcpp::as<double>(wrap( ( lambda(t) * (pow(log(delta(t))-X_mu1.row(t) * beta,2) -  pow(log(delta(t))-X.row(t) * beta,2)) ) / (2 * sigma2 )));
   }
   
-  // CREATING OUTPUT VARIABLE & DEBUG
-  for (int i=0; i < q_bio; i++)
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+   * Proposed values are automatically rejected in the following cases:
+   * - If smaller than 1e-3
+   * - If the proposed value is not finite
+   * - When the acceptance rate cannot be numerally computed
+   */
+  for (int i=0; i < q0; i++)
   {
-    if(arma::is_finite(log_aux(i)))
+    if( arma::is_finite(log_aux(i)) & arma::is_finite(mu1(i)) )
     {
-      if(log(u(i)) < log_aux(i))
-      {
-        // DEBUG: Reject very small values to avoid numerical issues
-        if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; mu(i) = y(i);}
-        else{ind(i) = 0; mu(i) = mu0(i);}            
-      }
-      else{ind(i) = 0; mu(i) = mu0(i);}
-    }      
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
+      if((log(u(i)) < log_aux(i)) & (mu1(i) > 1e-3)) { ind(i) = 1; }
+      else{ind(i) = 0; mu1(i) = mu0(i);}            
+    }
     else
     {
-      ind(i) = 0; mu(i) = mu0(i);
-      Rcpp::Rcout << "Something went wrong when updating mu " << i+1 << std::endl;
-      Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+      ind(i) = 0; mu1(i) = mu0(i);
+      Rcpp::Rcout << "Error when updating mu " << i+1 << std::endl;
+      Rcpp::warning("Consider additional data filter if error is frequent.");        
     }
   }
-  
-  // OUTPUT
-  return join_rows(mu, ind);
+  /* OUTPUT */
+  return join_rows(mu1, ind);
 }
 
-/* Metropolis-Hastings updates of delta 
-* Updates are implemented simulateaneously for all biological genes, significantly reducing the computational burden.
-*/
+/* Metropolis-Hastings updates of delta
+ * Updates are implemented simulateaneously for all biological genes.
+ * delta: current value of delta
+ * prop_var: current value of the proposal variances for delta
+ * Counts: matrix of expression counts
+ * mu: current value of mu
+ * phi: current value of phi
+ * nu: current value of nu
+ * a_delta: shape prior hyper-parameter for delta (when using a gamma prior)
+ * b_delta: rate prior hyper-parameter for delta (when using a gamma prior)
+ * s2delta: prior hyper-variance for delta (when using a log-normal prior)
+ * q0: number of biological genes
+ * n: number of cells
+ * prior_delta: whether gamma or log-normal priors are being used
+ * delta: auxiliary vector for storage
+ * ind: auxiliary vector for storage
+ * lambda: current value of lambda
+ * X: current design matrix
+ * sigma2: current value of sigma2
+ * beta: current value of beta
+ */
 arma::mat deltaUpdateReg(
-    arma::vec const& delta0, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-arma::vec const& prop_var,  /* Current value of the proposal variances for $\delta=(\delta_1,...,\delta_{q_0})'$ */
-arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
-arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */  
-double const& a_delta, /* Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ */
-double const& b_delta, /* Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ */
-int const& q_bio,
-int const& n,
-double const& prior_delta,
-arma::vec const& lambda,
-arma::mat const& X,
-double const& sigma2,
-arma::vec const& beta)
+    arma::vec const& delta0, 
+    arma::vec const& prop_var,  
+    arma::mat const& Counts, 
+    arma::vec const& mu, 
+    arma::vec const& phinu, 
+    double const& prior_delta,
+    int const& q0,
+    int const& n,
+    arma::vec & delta1,
+    arma::vec & u, 
+    arma::vec & ind,
+    arma::vec const& lambda,
+    arma::mat const& X,
+    double const& sigma2,
+    arma::vec const& beta)
 {
-  using arma::span;
   
-  // CREATING VARIABLES WHERE TO STORE DRAWS
-  arma::vec delta = arma::zeros(q_bio); 
-  arma::vec ind = arma::zeros(q_bio);
+  /* PROPOSAL STEP */
+  delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
+  u = arma::randu(q0);
   
-  // PROPOSAL STEP
-  arma::vec y = exp(arma::randn(q_bio) % sqrt(prop_var) + log(delta0));
-  arma::vec u = arma::randu(q_bio);
+  /* ACCEPT/REJECT STEP 
+  * Note: there is a -1 factor coming from the log-normal prior. 
+  * However, it cancels out as using log-normal proposals.
+  */
+  arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
   
-  // ACCEPT/REJECT STEP 
-  arma::vec log_aux = - n * (lgamma_cpp(1/y)-lgamma_cpp(1/delta0));
-  
-  // Loop to replace matrix operations, through genes and cells
-  for (int i=0; i < q_bio; i++)
+  for (int i=0; i < q0; i++)
   {
     for (int j=0; j < n; j++) 
     {
-      log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
-      log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( phi(j)*nu(j)*mu(i)+(1/y(i)) );
-      log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( phi(j)*nu(j)*mu(i)+(1/delta0(i)) );
+      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
+      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
+      log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
     }
   }
-  
-  // +1 should appear because we update log(delta) not delta. However, it cancels out with the prior. 
-  log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
-  
-  // Component related to the prior
-  if(prior_delta == 1) {log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0);}
-  else {
-    for(int t=0; t < q_bio; t++)
-    {
-      log_aux(t) -= Rcpp::as<double>(wrap(((lambda(t)/(2 * sigma2)) * (pow(log(y(t)) - X.row(t) * beta,2) - pow(log(delta0(t)) - X.row(t) * beta,2)))));
-    }
-  }
-  
-  
-  // CREATING OUTPUT VARIABLE & DEBUG
-  for (int i=0; i < q_bio; i++)
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+
+  // REGRESSION
+  for(int t=0; t < q_bio; t++)
   {
-    if(arma::is_finite(log_aux(i)))
+    log_aux(t) -= Rcpp::as<double>(wrap(((lambda(t)/(2 * sigma2)) * (pow(log(delta1(t)) - X.row(t) * beta,2) - pow(log(delta0(t)) - X.row(t) * beta,2)))));
+  }
+
+  
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+   * Proposed values are automatically rejected in the following cases:
+   * - If smaller than 1e-3
+   * - If the proposed value is not finite
+   * - When the acceptance rate cannot be numerally computed
+   */    
+  for (int i=0; i < q0; i++)
+  {
+    if( arma::is_finite(log_aux(i)) & arma::is_finite(delta1(i)) )
     {
-      if(log(u(i)) < log_aux(i))
-      {
-        // DEBUG: Reject very small values to avoid numerical issues
-        if(arma::is_finite(y(i)) & (y(i) > 1e-3)) {ind(i) = 1; delta(i) = y(i);}
-        else{ind(i) = 0; delta(i) = delta0(i);}            
-      }
-      else{ind(i) = 0; delta(i) = delta0(i);}
+      if((log(u(i)) < log_aux(i)) & (delta1(i) > 1e-3)) { ind(i) = 1; }
+      else {ind(i) = 0; delta1(i) = delta0(i); }
     }      
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
     else
     {
-      ind(i) = 0; delta(i) = delta0(i);
-      Rcpp::Rcout << log_aux(i) << std::endl;
-      Rcpp::Rcout << delta0(i) << std::endl;
-      Rcpp::Rcout << y(i) << std::endl;
-      Rcpp::Rcout << "Something went wrong when updating delta " << i+1 << std::endl;
-      Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
+      ind(i) = 0; delta1(i) = delta0(i);
+      Rcpp::Rcout << "Error when updating delta " << i+1 << std::endl;
+      Rcpp::warning("Consider additional data filter if error is frequent.");        
     }
   }
   
   // OUTPUT
-  return join_rows(delta, ind);
+  return join_rows(delta1, ind);
 }
 
 /* MCMC sampler 
@@ -1622,12 +1639,12 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
-    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR       
-    muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, 
-                     1/deltaAux.col(0), phiAux % nuAux.col(0), 
-                     sumByCellBio_arma, s2mu, q0, n,
-                     y_q0, u_q0, ind_q0);     
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
+    // REGRESSION
+    muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
+                        phiAux, phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, y_q0, u_q0, ind_q0,
+                        k, lambdaAux, betaAux, X, sigma2Aux, variance);     
+    PmuAux += muAux.col(1); if(i>=burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -1636,6 +1653,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, muAux.col(0), 
+                              phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
+                              lambdaAux, X, sigma2Aux, betaAux);  
+    PdeltaAux += deltaAux.col(1); if(i>=burn) {deltaAccept += deltaAux.col(1);}   
     deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
                            muAux.col(0), phiAux % nuAux.col(0), 
                            adelta, bdelta, s2delta, prior_delta, 
