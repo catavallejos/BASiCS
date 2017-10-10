@@ -1564,8 +1564,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   
   // REGRESSION SPECIFIC SECTION
   
-  // Model matrix for regression
-  arma::mat X=arma::zeros(qbio, k);
+  // Design matrix for regression
+  arma::mat X=arma::zeros(q0, k);
   
   // Parameters for regression
   arma::vec m0_arma = as_arma(m0);
@@ -1573,9 +1573,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec beta0_arma = as_arma(beta0);
   arma::vec lambda0_arma = as_arma(lambda0);
   arma::mat beta = arma::zeros(Naux,k);
-  arma::mat lambda = arma::zeros(Naux,qbio);
+  arma::mat lambda = arma::zeros(Naux,q0);
   arma::vec sigma = arma::zeros(Naux);
-  arma::mat epsilon = arma::zeros(Naux, qbio);
+  arma::mat epsilon = arma::zeros(Naux, q0);
   double lambda_a;
   double lambda_b;
   
@@ -1583,7 +1583,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec mAux = m0_arma; arma::mat VAux = V0_arma; arma::vec betaAux = beta0_arma;
   arma::vec lambdaAux = lambda0_arma; 
   double sigma2Aux = sigma20; double s_aAux = sigma2_a0; double s_bAux = sigma2_b0;
-  arma::vec epsilonAux = arma::zeros(qbio);
+  arma::vec epsilonAux = arma::zeros(q0);
   
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
@@ -1612,7 +1612,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // REGRESSION
     // Model matrix initialization
-    arma::vec means = muAux(arma::span(0,qbio-1),0);
+    arma::vec means = muAux(arma::span(0,q0-1),0);
     if(i==0){
       X=designMatrix(k, means, variance);
     }
@@ -1670,10 +1670,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
     
     // REGRESSION
-
     // Save deltas in vector
     arma::vec dr = deltaAux.col(0);
     
+    // REGRESSION
     // V, m, beta update
     arma::mat inv_V0 = inv(V0_arma);
     for(int x=0; x<k; x++){
@@ -1704,6 +1704,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       betaAux = MVRNORM.row(0).t();
     }
     
+    // REGRESSION
     // a, b, sigma2 update
     s_aAux = sigma2_a0 + rg.size()/2;
     s_bAux = sigma2_b0 + Rcpp::as<double>(wrap(0.5*(m0_arma.t()*inv(V0_arma)*m0_arma + (betaAux - mAux).t()*V1*(betaAux - mAux) - mAux.t()*V1*mAux)));
@@ -1715,6 +1716,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       sigma2Aux = pow(R::rgamma(s_aAux, 1.0/s_bAux),-1);
     }
     
+    // REGRESSION
     // lambda update
     lambda_a=(eta0+1)/2; 
     for(int t=0; t<lambdaAux.size(); t++){
@@ -1722,6 +1724,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       lambdaAux(t)=R::rgamma(lambda_a,1.0/lambda_b);
     }
     
+    // REGRESSION
     // epsilon update
     for(int t=0; t<lambdaAux.size(); t++){
       epsilonAux(t) = Rcpp::as<double>(wrap(log(dr(t))-X.row(t)*betaAux));
@@ -1752,6 +1755,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
         PphiAux = PphiAux0; 
         PnuAux = PnuAux0; PthetaAux = PthetaAux0; 
+        
+        // REGRESSION
+        // Update of model matrix every 50 iterations during Burn in period
+        X = designMatrix(k, means, variance);
       }
       
     }
@@ -1764,7 +1771,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       phi.col(i/Thin - Burn/Thin) = phiAux;
       s.col(i/Thin - Burn/Thin) = sAux;
       nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
-      theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);       
+      theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);  
+      
+      // Regression
+      beta.row(i/thin - burn/thin) = betaAux.t();
+      lambda.row(i/thin - burn/thin) = lambdaAux.t();
+      sigma(i/thin - burn/thin) = sigma2Aux;
+      epsilon.row(i/thin - burn/thin) = epsilonAux.t();
       
       if(StoreAdapt == 1)
       {
@@ -1789,6 +1802,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       Rcout << "s (cell 1): " << sAux(0) << std::endl;
       Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
       Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
+      Rcpp::Rcout << "betas: " << betaAux.t() << std::endl;
+      Rcpp::Rcout << "sigma: " << sigma2Aux << std::endl; 
+      Rcpp::Rcout << "lambda (gene 1): " << lambdaAux(0) << std::endl;
+      Rcpp::Rcout << "epsilon (gene 1): " << epsilonAux(0) << std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl;
       Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
       Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
@@ -1857,6 +1874,11 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
+        Rcpp::Named("beta")=beta.t(),
+        Rcpp::Named("sigma2")=sigma.t(),
+        Rcpp::Named("lambda")=lambda.t(),
+        Rcpp::Named("epsilon")=epsilon.t(),
+        Rcpp::Named("designMatrix")=X,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.phi") = LSphi,
@@ -1873,7 +1895,12 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("phi") = phi.t(),
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
-        Rcpp::Named("theta") = theta.t())); 
+        Rcpp::Named("theta") = theta.t(),
+        Rcpp::Named("beta")=beta.t(),
+        Rcpp::Named("sigma2")=sigma.t(),
+        Rcpp::Named("lambda")=lambda.t(),
+        Rcpp::Named("epsilon")=epsilon.t())); )); 
+    
   }
   
 }
