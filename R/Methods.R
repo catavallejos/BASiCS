@@ -6,6 +6,7 @@ setGeneric("displayChainBASiCS",
            function(object, ...) standardGeneric("displayChainBASiCS"))
 setGeneric("displaySummaryBASiCS", 
            function(object, ...) standardGeneric("displaySummaryBASiCS"))
+setGeneric("showFit", function(object, ...) standardGeneric("showFit"))
 
 #########################################################################
 # Methods for BASiCS_Chain objects
@@ -261,6 +262,98 @@ setMethod("displayChainBASiCS",
             if (Param == "sigma2") { return(object@parameters$sigma2) }
             if (Param == "lambda") { return(object@parameters$lambda) }
             if (Param == "epsilon") { return(object@parameters$epsilon) }
+          })
+
+#' @name showFit-BASiCS_Chain-method
+#' @aliases showFit showFit,BASiCS_Chain-method
+#' 
+#' @docType methods
+#' @rdname showFit-BASiCS_Chain-method
+#' 
+#' @title Plotting the trend after Bayesian regression
+#' 
+#' @description Plotting the trend after Bayesian regression using a \code{\link[BASiCS]{BASiCS_Chain-class}} object
+#' 
+#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param xlab As in \code{\link[graphics]{par}}. 
+#' @param ylab As in \code{\link[graphics]{par}}.
+#' @param pch As in \code{\link[graphics]{par}}. 
+#' @param col As in \code{\link[graphics]{par}}. 
+#' @param bty As in \code{\link[graphics]{par}}. 
+#' @param smooth Logical to indicate wether the smoothScatter function is used to plot the scatter plot.
+#' @param variance Variance used to build GRBFs for regression
+#' @param ... Additional parameters for plotting.
+#'  
+#' @examples
+#' Data = makeExampleBASiCS_Data()
+#' MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2, Regression = TRUE)
+#' showFit(MCMC_Output)
+#' 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
+#' @author Catalina Vallejos \email{cnvallej@@uc.cl}
+#' 
+#' @references New reference
+setMethod("showFit",
+          signature = "BASiCS_Chain",
+          definition = function(object,  
+                                xlab = "log(mu[i])",
+                                ylab = "log(delta[i])",
+                                pch = 16, 
+                                col = "blue",
+                                bty = "n",
+                                smooth = TRUE,
+                                variance = 1.2,
+                                ...){
+            
+            if(!("beta" %in% names(object@parameters))) stop("'Beta' is missing in parameters. 
+                                                             Regression was not performed while running the MCMC.")
+            
+            
+            m = log(object@parameters$mu[1,])
+            grid.mu <- seq(round(min(m), digits = 2), round(max(m), digits = 2), length.out = 1000)
+            
+            # Create design matrix across the grid
+            n = ncol(object@parameters$beta)
+            range = diff(range(grid.mu))
+            myu = seq(min(grid.mu), by = range/(n-3), length.out = n-2)
+            h = diff(myu)*variance
+            
+            B <- matrix(1,length(grid.mu),n)
+            B[,2] <- grid.mu
+            for (j in 1:(n-2)){
+              B[,j+2] = exp(-0.5*(grid.mu-myu[j])^2/(h[1]^2))
+            }
+            
+            # Calculate yhat = X*beta
+            yhat = apply(object@parameters$beta, 1, function(n){B%*%n})
+            yhat.HPD <- HPDinterval(mcmc(t(yhat)), 0.95)
+            
+            df <- data.frame(mu = log(colMedians(object@parameters$mu)),
+                             delta = log(colMedians(object@parameters$delta)),
+                             included = !is.na(object@parameters$epsilon[1,]))
+            
+            df2 <- data.frame(mu2 = grid.mu,
+                              yhat = rowMedians(yhat),
+                              yhat.upper = yhat.HPD[,2],
+                              yhat.lower = yhat.HPD[,1])
+            if(smooth == TRUE){
+              plot.out <- ggplot(df[df$included,]) + geom_hex(aes(mu, delta), bins = 100) +
+                scale_fill_gradientn("", colours = colorRampPalette(c("dark blue", "yellow", "dark red"))(100), guide=FALSE) +
+                geom_point(data = df[!df$included,], aes(mu, delta), colour="purple", alpha=0.3) +
+                xlab("log(mu)") + ylab("log(delta)") + theme_minimal(base_size = 15) +
+                geom_line(data = df2, mapping = aes(mu2, yhat), colour = "dark red") +
+                geom_ribbon(data = df2, mapping = aes(x = mu2, ymin = yhat.lower, ymax = yhat.upper),
+                            alpha = 0.5)
+            }
+            else{
+              plot.out <- ggplot(df[df$included,]) + geom_point(aes(mu, delta), colour = "dark blue") +
+                geom_point(data = df[!df$included,], aes(mu, delta), colour="purple", alpha=0.3) +
+                xlab("log(mu)") + ylab("log(delta)") + theme_minimal(base_size = 15) +
+                geom_line(data = df2, mapping = aes(mu2, yhat), colour = "dark red") + 
+                geom_ribbon(data = df2, mapping = aes(x = mu2, ymin = yhat.lower, ymax = yhat.upper),
+                            alpha = 0.5)
+            }
+            return(plot.out)
           })
 
 #########################################################################
