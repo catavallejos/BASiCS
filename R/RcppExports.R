@@ -5,6 +5,10 @@ HiddenBASiCS_MCMCcpp <- function(N, Thin, Burn, Counts, BatchDesign, muSpikes, m
     .Call('_BASiCS_HiddenBASiCS_MCMCcpp', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress)
 }
 
+HiddenBASiCS_MCMCcppReg <- function(N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance) {
+    .Call('_BASiCS_HiddenBASiCS_MCMCcppReg', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance)
+}
+
 HiddenBASiCS_DenoisedRates <- function(CountsBio, Mu, TransInvDelta, PhiNu, N, q0, n) {
     .Call('_BASiCS_HiddenBASiCS_DenoisedRates', PACKAGE = 'BASiCS', CountsBio, Mu, TransInvDelta, PhiNu, N, q0, n)
 }
