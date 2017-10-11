@@ -46,15 +46,8 @@
 #' @references 
 #' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-newBASiCS_Chain <- function(mu, 
-                            delta, 
-                            phi, 
-                            s, 
-                            nu, 
-                            theta) 
+newBASiCS_Chain <- function(parameters) 
 {
-  Chain <- new("BASiCS_Chain", mu = mu, delta = delta, 
-                               phi = phi, s = s, 
-                               nu = nu, theta = theta)
+  Chain <- new("BASiCS_Chain", parameters = parameters)
   return(Chain)
 }
