@@ -30,7 +30,8 @@ exportClasses("BASiCS_Chain" , "BASiCS_Summary")
 exportMethods(Summary,
               plot,
               displayChainBASiCS,
-              displaySummaryBASiCS)
+              displaySummaryBASiCS,
+	      showFit)
 
 export(BASiCS_Filter,
        newBASiCS_Data,
