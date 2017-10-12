@@ -163,12 +163,12 @@ BASiCS_TestDE <- function(Chain1,
     stop("'Chain2' is not a 'BASiCS_Chain' class object.")
     
   # Test compatibility of both BASiCS_Chain objects
-  if (ncol(Chain1@mu) != ncol(Chain2@mu)) 
+  if (ncol(Chain1@parameters$mu) != ncol(Chain2@parameters$mu)) 
     stop("The 'BASiCS_Chain' objects contain different number of genes.")
-  if (!identical(colnames(Chain1@mu), colnames(Chain2@mu))) 
+  if (!identical(colnames(Chain1@parameters$mu), colnames(Chain2@parameters$mu))) 
     stop("The  'BASiCS_Chain' objects contain genes in different order.")
     
-  GeneName <- colnames(Chain1@mu)
+  GeneName <- colnames(Chain1@parameters$mu)
     
   if (EpsilonM < 0 | !is.finite(EpsilonM)) 
     stop("'EpsilonM' must be a positive real value")
@@ -199,22 +199,22 @@ BASiCS_TestDE <- function(Chain1,
     message("Log-fold change thresholds are now set in a log2 scale. \n", 
             "Original BASiCS release used a natural logarithm scale.")
     
-    n1 <- ncol(Chain1@nu)
-    n2 <- ncol(Chain2@nu)
+    n1 <- ncol(Chain1@parameters$nu)
+    n2 <- ncol(Chain2@parameters$nu)
     n <- n1 + n2
     # With offset correction
     if (OffSet) 
     {
       # Calculating iteration-specific offset
-      OffsetChain <- matrixStats::rowSums2(Chain1@mu) / 
-                      matrixStats::rowSums2(Chain2@mu)
+      OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) / 
+                      matrixStats::rowSums2(Chain2@parameters$mu)
       # Offset point estimate
       OffsetEst <- median(OffsetChain)
         
       # Offset correction
       Chain1_offset <- Chain1
-      Chain1_offset@mu <- Chain1@mu / OffsetEst
-      Chain1_offset@phi <- Chain1@phi * OffsetEst
+      Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
+      Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
       Chain2_offset <- Chain2  # Chain2 requires no change
       Summary1 <- Summary(Chain1_offset)
       Summary2 <- Summary(Chain2_offset)
@@ -222,13 +222,13 @@ BASiCS_TestDE <- function(Chain1,
       # Pre-offset correction LFC estimates
       Summary1_old <- Summary(Chain1)
       Summary2_old <- Summary(Chain2)
-      MuBase_old <- (Summary1_old@mu[, 1] * n1 + Summary2_old@mu[, 1] * n2)/n
-      ChainTau_old <- log2(Chain1@mu / Chain2@mu)
+      MuBase_old <- (Summary1_old@parameters$mu[, 1] * n1 + Summary2_old@parameters$mu[, 1] * n2)/n
+      ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
       MedianTau_old <- matrixStats::colMedians(ChainTau_old)
         
       # Offset corrected LFC estimates
-      MuBase <- (Summary1@mu[, 1] * n1 + Summary2@mu[, 1] * n2)/n
-      ChainTau <- log2(Chain1_offset@mu / Chain2_offset@mu)
+      MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
+      ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
       MedianTau <- matrixStats::colMedians(ChainTau)
         
       if (!PlotOffset) 
@@ -260,11 +260,11 @@ BASiCS_TestDE <- function(Chain1,
                           main = "Offset MCMC chain", ylab = "Offset estimate")
         # Mean expression parameters before/after offset correction
         par(mfrow = c(1, 2))
-        graphics::boxplot(cbind(Summary1_old@mu[,1], Summary2_old@mu[,1]), 
+        graphics::boxplot(cbind(Summary1_old@parameters$mu[,1], Summary2_old@parameters$mu[,1]), 
                           frame = FALSE, main = "Before correction", 
                           names = c(GroupLabel1, GroupLabel2), 
                           ylab = "Mean expression", log = "y")
-        graphics::boxplot(cbind(Summary1@mu[, 1], Summary2@mu[, 1]), 
+        graphics::boxplot(cbind(Summary1@parameters$mu[, 1], Summary2@parameters$mu[, 1]), 
                           frame = FALSE, main = "After correction", 
                           names = c(GroupLabel1, GroupLabel2), 
                           ylab = "Mean expression", log = "y")
@@ -298,8 +298,8 @@ BASiCS_TestDE <- function(Chain1,
       
       Summary1 <- Summary(Chain1)
       Summary2 <- Summary(Chain2)
-      MuBase <- (Summary1@mu[, 1] * n1 + Summary2@mu[, 1] * n2)/n
-      ChainTau <- log2(Chain1@mu / Chain2@mu)
+      MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
+      ChainTau <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
       MedianTau <- matrixStats::colMedians(ChainTau)
       
       # Default values when no offset correction is applied
@@ -332,8 +332,8 @@ BASiCS_TestDE <- function(Chain1,
     # Output table
     TableMean <- cbind.data.frame(GeneName = GeneName, 
                                   MeanOverall = as.numeric(MuBase), 
-                                  Mean1 = as.numeric(Summary1@mu[,1]), 
-                                  Mean2 = as.numeric(Summary2@mu[,1]), 
+                                  Mean1 = as.numeric(Summary1@parameters$mu[,1]), 
+                                  Mean2 = as.numeric(Summary2@parameters$mu[,1]), 
                                   MeanFC = as.numeric(2^(MedianTau)), 
                                   MeanLog2FC = as.numeric(MedianTau), 
                                   ProbDiffMean = as.numeric(ProbM), 
@@ -346,9 +346,9 @@ BASiCS_TestDE <- function(Chain1,
     NotDE <- which(ResultDiffMean == "NoDiff")
     
     # Changes in over dispersion
-    ChainOmega <- log2(Chain1@delta[, NotDE] / Chain2@delta[, NotDE])
+    ChainOmega <- log2(Chain1@parameters$delta[, NotDE] / Chain2@parameters$delta[, NotDE])
     MedianOmega <- matrixStats::colMedians(ChainOmega)
-    DeltaBase <- (Summary1@delta[NotDE,1] * n1 + Summary2@delta[NotDE,1] * n2)/n
+    DeltaBase <- (Summary1@parameters$delta[NotDE,1] * n1 + Summary2@parameters$delta[NotDE,1] * n2)/n
     
     AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega, EpsilonD, 
                                            ProbThresholdD, NULL, 
@@ -367,8 +367,8 @@ BASiCS_TestDE <- function(Chain1,
     TableDisp <- cbind.data.frame(GeneName = GeneName[NotDE], 
                                   MeanOverall = as.numeric(MuBase[NotDE]), 
                                   DispOverall = as.numeric(DeltaBase), 
-                                  Disp1 = as.numeric(Summary1@delta[NotDE, 1]), 
-                                  Disp2 = as.numeric(Summary2@delta[NotDE, 1]), 
+                                  Disp1 = as.numeric(Summary1@parameters$delta[NotDE, 1]), 
+                                  Disp2 = as.numeric(Summary2@parameters$delta[NotDE, 1]), 
                                   DispFC = as.numeric(2^(MedianOmega)), 
                                   DispLog2FC = as.numeric(MedianOmega), 
                                   ProbDiffDisp = as.numeric(ProbD), 

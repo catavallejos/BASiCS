@@ -11,6 +11,45 @@ setGeneric("displaySummaryBASiCS",
 # Methods for BASiCS_Chain objects
 
 #' @name BASiCS_Chain-methods
+#' @aliases updateObject,BASiCS_Chain-method
+#' 
+#' @title 'updateObject' method for BASiCS_Chain objects
+#' 
+#' @description 'updateObject' method for \code{\linkS4class{BASiCS_Chain}} objects.
+#' 
+#' @param object A \code{\linkS4class{BASiCS_Chain}} object.
+#' 
+#' @return Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
+#' contains all model parameters in a single slot object (list).
+#' 
+#' @examples
+#' 
+#' # Not run
+#' # New_Chain <- updateObject(Old_Chain)
+#' 
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' 
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
+#'  
+#' @rdname BASiCS_Chain-methods
+setMethod("updateObject", 
+          signature = "BASiCS_Chain", 
+          definition = function(object) 
+          {
+            if (!("mu" %in% slotNames(object))){
+              stop("Object was not created by an older version of BASiCS")
+            }
+            
+            New_Chain <- makeBASiCS_Chain(parameters = list(mu = object$mu, 
+                                          delta = object$delta, phi = object$phi,
+                                          s = object$s, nu = object$nu, theta = object$theta))
+            
+            return(New_Chain)
+          })
+
+#' @name BASiCS_Chain-methods
 #' @aliases show,BASiCS_Chain-method
 #' 
 #' @title 'show' method for BASiCS_Chain objects
@@ -37,10 +76,10 @@ setMethod("show",
           signature = "BASiCS_Chain", 
           definition = function(object) 
           {
-            N <- nrow(object@mu)
-            q.bio <- ncol(object@delta)
-            n <- ncol(object@phi)
-            nBatch <- ncol(object@theta)
+            N <- nrow(object@parameters$mu)
+            q.bio <- ncol(object@parameters$delta)
+            n <- ncol(object@parameters$phi)
+            nBatch <- ncol(object@parameters$theta)
             cat("An object of class ", class(object), "\n", 
                 " ", N, " MCMC samples.\n", sep = "")
             if (nBatch > 1) 
@@ -86,19 +125,19 @@ setMethod("Summary",
           signature = "BASiCS_Chain", 
           definition = function(x, prob = 0.95) 
           {
-            Mu <- matrixStats::colMedians(x@mu)
-            Delta <- matrixStats::colMedians(x@delta)
-            Phi <- matrixStats::colMedians(x@phi)
-            S <- matrixStats::colMedians(x@s)
-            Nu <- matrixStats::colMedians(x@nu)
-            Theta <- matrixStats::colMedians(x@theta)
+            Mu <- matrixStats::colMedians(x@parameters$mu)
+            Delta <- matrixStats::colMedians(x@parameters$delta)
+            Phi <- matrixStats::colMedians(x@parameters$phi)
+            S <- matrixStats::colMedians(x@parameters$s)
+            Nu <- matrixStats::colMedians(x@parameters$nu)
+            Theta <- matrixStats::colMedians(x@parameters$theta)
     
-            HPDMu <- coda::HPDinterval(coda::mcmc(x@mu), prob = prob)
-            HPDDelta <- coda::HPDinterval(coda::mcmc(x@delta), prob = prob)
-            HPDPhi <- coda::HPDinterval(coda::mcmc(x@phi), prob = prob)
-            HPDS <- coda::HPDinterval(coda::mcmc(x@s), prob = prob)
-            HPDNu <- coda::HPDinterval(coda::mcmc(x@nu), prob = prob)
-            HPDTheta <- coda::HPDinterval(coda::mcmc(x@theta), prob = prob)
+            HPDMu <- coda::HPDinterval(coda::mcmc(x@parameters$mu), prob = prob)
+            HPDDelta <- coda::HPDinterval(coda::mcmc(x@parameters$delta), prob = prob)
+            HPDPhi <- coda::HPDinterval(coda::mcmc(x@parameters$phi), prob = prob)
+            HPDS <- coda::HPDinterval(coda::mcmc(x@parameters$s), prob = prob)
+            HPDNu <- coda::HPDinterval(coda::mcmc(x@parameters$nu), prob = prob)
+            HPDTheta <- coda::HPDinterval(coda::mcmc(x@parameters$theta), prob = prob)
     
             Output <- new("BASiCS_Summary", 
                           mu = cbind(Mu, HPDMu), 
@@ -167,32 +206,32 @@ setMethod("plot",
     
             if (Param == "mu") 
             {
-              object <- x@mu; Column <- Gene
+              object <- x@parameters$mu; Column <- Gene
               if (ylab == "") { ylab <- bquote(mu[.(Column)]) }
             }
             if (Param == "delta") 
             {
-              object <- x@delta; Column <- Gene
+              object <- x@parameters$delta; Column <- Gene
               if (ylab == "") { ylab = bquote(delta[.(Column)]) }
             }
             if (Param == "phi") 
             {
-              object <- x@phi; Column <- Cell
+              object <- x@parameters$phi; Column <- Cell
               if (ylab == "") { ylab = bquote(phi[.(Column)]) }
             }
             if (Param == "s") 
             {
-              object <- x@s; Column <- Cell
+              object <- x@parameters$s; Column <- Cell
               if (ylab == "") { ylab <- bquote(s[.(Column)]) }
             }
             if (Param == "nu") 
             {
-              object <- x@nu; Column <- Cell
+              object <- x@parameters$nu; Column <- Cell
               if (ylab == "") { ylab <- bquote(nu[.(Column)]) }
             }
             if (Param == "theta") 
             {
-              object <- x@theta; Column <- Batch
+              object <- x@parameters$theta; Column <- Batch
               if (ylab == "") { ylab <- bquote(theta[.(Column)]) }
             }
     
@@ -241,12 +280,12 @@ setMethod("displayChainBASiCS",
             if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) 
               stop("'Param' argument is invalid")
     
-            if (Param == "mu") { return(object@mu) }
-            if (Param == "delta") { return(object@delta) }
-            if (Param == "phi") { return(object@phi) }
-            if (Param == "s") { return(object@s) }
-            if (Param == "nu") { return(object@nu) }
-            if (Param == "theta") { return(object@theta) }
+            if (Param == "mu") { return(object@parameters$mu) }
+            if (Param == "delta") { return(object@parameters$delta) }
+            if (Param == "phi") { return(object@parameters$phi) }
+            if (Param == "s") { return(object@parameters$s) }
+            if (Param == "nu") { return(object@parameters$nu) }
+            if (Param == "theta") { return(object@parameters$theta) }
           })
 
 #########################################################################
@@ -279,10 +318,10 @@ setMethod("show",
           signature = "BASiCS_Summary", 
           definition = function(object) 
           {
-            q <- nrow(object@mu)
-            q.bio <- nrow(object@delta)
-            n <- nrow(object@phi)
-            nBatch <- nrow(object@theta)
+            q <- nrow(object@parameters$mu)
+            q.bio <- nrow(object@parameters$delta)
+            n <- nrow(object@parameters$phi)
+            nBatch <- nrow(object@parameters$theta)
             cat("An object of class ", class(object), "\n",
                 " Contains posterior medians and the limits of the \n", 
                 " HPD interval for all BASiCS model parameters.\n")
@@ -364,10 +403,10 @@ setMethod("plot",
             if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) 
               stop("'Param' argument is invalid")
     
-            q <- nrow(x@mu)
-            q.bio <- nrow(x@delta)
-            n <- nrow(x@phi)
-            nBatch <- nrow(x@theta)
+            q <- nrow(x@parameters$mu)
+            q.bio <- nrow(x@parameters$delta)
+            n <- nrow(x@parameters$phi)
+            nBatch <- nrow(x@parameters$theta)
     
             if (is.null(Genes)) { Genes <- seq_len(q.bio) }
             if (is.null(Cells)) { Cells <- seq_len(n) }
@@ -377,37 +416,37 @@ setMethod("plot",
             {
               if (Param == "mu") 
               {
-                object <- x@mu; Columns <- Genes
+                object <- x@parameters$mu; Columns <- Genes
                 if (ylab == "") { ylab = expression(mu[i]) }
                 if (xlab == "") { xlab = "Gene" }
               }
               if (Param == "delta") 
               {
-                object <- x@delta; Columns <- Genes
+                object <- x@parameters$delta; Columns <- Genes
                 if (ylab == "") { ylab = expression(delta[i]) }
                 if (xlab == "") { xlab = "Gene" }
               }
             if (Param == "phi") 
             {
-                object <- x@phi; Columns <- Cells
+                object <- x@parameters$phi; Columns <- Cells
                 if (ylab == "") { ylab = expression(phi[j]) }
                 if (xlab == "") { xlab = "Cell" }
             }
             if (Param == "s") 
             {
-                object <- x@s; Columns <- Cells
+                object <- x@parameters$s; Columns <- Cells
                 if (ylab == "") { ylab = expression(s[j]) }
                 if (xlab == "") { xlab = "Cell" }
             }
             if (Param == "nu") 
             {
-                object <- x@nu; Columns <- Cells
+                object <- x@parameters$nu; Columns <- Cells
                 if (ylab == "") { ylab = expression(nu[j]) }
                 if (xlab == "") { xlab = "Cell" }
             }
             if (Param == "theta") 
             {
-                object <- x@theta; Columns <- Batches
+                object <- x@parameters$theta; Columns <- Batches
                 if (ylab == "") { ylab = expression(theta[b]) }
                 if (xlab == "") { xlab = "Batch" }
             }
@@ -449,11 +488,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Genes
               if (ylab == "") { ylab <- expression(delta[i]) }
               if (xlab == "") { xlab <- expression(mu[i]) }
-              if (xlim == "") { xlim <- c(min(x@mu[Columns, 1]), 
-                                          max(x@mu[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@delta[Columns, 1]), 
-                                          max(x@delta[Columns, 1])) }
-              plot(x@mu[Columns, 1], x@delta[Columns, 1], 
+              if (xlim == "") { xlim <- c(min(x@parameters$mu[Columns, 1]), 
+                                          max(x@parameters$mu[Columns, 1])) }
+              if (ylim == "") { ylim <- c(min(x@parameters$delta[Columns, 1]), 
+                                          max(x@parameters$delta[Columns, 1])) }
+              plot(x@parameters$mu[Columns, 1], x@parameters$delta[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -462,11 +501,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Genes
               if (ylab == "") { ylab <- expression(mu[i]) }
               if (xlab == "") { xlab <- expression(delta[i]) }
-              if (ylim == "") { ylim <- c(min(x@mu[Columns, 1]), 
-                                          max(x@mu[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@delta[Columns, 1]), 
-                                          max(x@delta[Columns, 1])) }
-              plot(x@delta[Columns, 1], x@mu[Columns, 1], 
+              if (ylim == "") { ylim <- c(min(x@parameters$mu[Columns, 1]), 
+                                          max(x@parameters$mu[Columns, 1])) }
+              if (xlim == "") { xlim <- c(min(x@parameters$delta[Columns, 1]), 
+                                          max(x@parameters$delta[Columns, 1])) }
+              plot(x@parameters$delta[Columns, 1], x@parameters$mu[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -475,11 +514,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Cells
               if (ylab == "") { ylab <- expression(s[j]) }
               if (xlab == "") { xlab <- expression(phi[j]) }
-              if (xlim == "") { xlim <- c(min(x@phi[Columns, 1]), 
-                                          max(x@phi[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@s[Columns, 1]), 
-                                          max(x@s[Columns, 1])) }
-              plot(x@phi[Columns, 1], x@s[Columns, 1], 
+              if (xlim == "") { xlim <- c(min(x@parameters$phi[Columns, 1]), 
+                                          max(x@parameters$phi[Columns, 1])) }
+              if (ylim == "") { ylim <- c(min(x@parameters$s[Columns, 1]), 
+                                          max(x@parameters$s[Columns, 1])) }
+              plot(x@parameters$phi[Columns, 1], x@parameters$s[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -488,11 +527,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Cells
               if (ylab == "") { ylab <- expression(phi[j]) }
               if (xlab == "") { xlab <- expression(s[j]) }
-              if (ylim == "") { ylim <- c(min(x@phi[Columns, 1]), 
-                                          max(x@phi[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@s[Columns, 1]),
-                                          max(x@s[Columns, 1])) }
-              plot(x@s[Columns, 1], x@phi[Columns, 1], 
+              if (ylim == "") { ylim <- c(min(x@parameters$phi[Columns, 1]), 
+                                          max(x@parameters$phi[Columns, 1])) }
+              if (xlim == "") { xlim <- c(min(x@parameters$s[Columns, 1]),
+                                          max(x@parameters$s[Columns, 1])) }
+              plot(x@parameters$s[Columns, 1], x@parameters$phi[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -501,11 +540,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Cells
               if (ylab == "") { ylab <- expression(nu[j]) }
               if (xlab == "") { xlab <- expression(phi[j]) }
-              if (xlim == "") { xlim <- c(min(x@phi[Columns, 1]), 
-                                          max(x@phi[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@nu[Columns, 1]), 
-                                          max(x@nu[Columns, 1])) }
-              plot(x@phi[Columns, 1], x@nu[Columns, 1], 
+              if (xlim == "") { xlim <- c(min(x@parameters$phi[Columns, 1]), 
+                                          max(x@parameters$phi[Columns, 1])) }
+              if (ylim == "") { ylim <- c(min(x@parameters$nu[Columns, 1]), 
+                                          max(x@parameters$nu[Columns, 1])) }
+              plot(x@parameters$phi[Columns, 1], x@parameters$nu[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -514,11 +553,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Cells
               if (ylab == "") { ylab <- expression(phi[j]) }
               if (xlab == "") { xlab <- expression(nu[j]) }
-              if (ylim == "") { ylim <- c(min(x@phi[Columns, 1]), 
-                                          max(x@phi[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@nu[Columns, 1]), 
-                                          max(x@nu[Columns, 1])) }
-              plot(x@nu[Columns, 1], x@phi[Columns, 1], 
+              if (ylim == "") { ylim <- c(min(x@parameters$phi[Columns, 1]), 
+                                          max(x@parameters$phi[Columns, 1])) }
+              if (xlim == "") { xlim <- c(min(x@parameters$nu[Columns, 1]), 
+                                          max(x@parameters$nu[Columns, 1])) }
+              plot(x@parameters$nu[Columns, 1], x@parameters$phi[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -527,11 +566,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Cells
               if (ylab == "") { ylab <- expression(nu[j]) }
               if (xlab == "") { xlab <- expression(s[j]) }
-              if (xlim == "") { xlim <- c(min(x@s[Columns, 1]), 
-                                          max(x@s[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@nu[Columns, 1]), 
-                                          max(x@nu[Columns, 1])) }
-              plot(x@s[Columns, 1], x@nu[Columns, 1], 
+              if (xlim == "") { xlim <- c(min(x@parameters$s[Columns, 1]), 
+                                          max(x@parameters$s[Columns, 1])) }
+              if (ylim == "") { ylim <- c(min(x@parameters$nu[Columns, 1]), 
+                                          max(x@parameters$nu[Columns, 1])) }
+              plot(x@parameters$s[Columns, 1], x@parameters$nu[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -540,11 +579,11 @@ setMethod("plot",
               ValidCombination <- TRUE; Columns <- Cells
               if (ylab == "") { ylab <- expression(s[j]) }
               if (xlab == "") { xlab <- expression(nu[j]) }
-              if (ylim == "") { ylim <- c(min(x@s[Columns, 1]), 
-                                          max(x@s[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@nu[Columns, 1]), 
-                                          max(x@nu[Columns, 1])) }
-              plot(x@nu[Columns, 1], x@s[Columns, 1], 
+              if (ylim == "") { ylim <- c(min(x@parameters$s[Columns, 1]), 
+                                          max(x@parameters$s[Columns, 1])) }
+              if (xlim == "") { xlim <- c(min(x@parameters$nu[Columns, 1]), 
+                                          max(x@parameters$nu[Columns, 1])) }
+              plot(x@parameters$nu[Columns, 1], x@parameters$s[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }
@@ -594,10 +633,10 @@ setMethod("displaySummaryBASiCS",
             if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) 
               stop("'Param' argument is invalid")
     
-            if (Param == "mu") { return(object@mu) }
-            if (Param == "delta") { return(object@delta) }
-            if (Param == "phi") { return(object@phi) }
-            if (Param == "s") { return(object@s) }
-            if (Param == "nu") { return(object@nu) }
-            if (Param == "theta") { return(object@theta) }
+            if (Param == "mu") { return(object@parameters$mu) }
+            if (Param == "delta") { return(object@parameters$delta) }
+            if (Param == "phi") { return(object@parameters$phi) }
+            if (Param == "s") { return(object@parameters$s) }
+            if (Param == "nu") { return(object@parameters$nu) }
+            if (Param == "theta") { return(object@parameters$theta) }
           })

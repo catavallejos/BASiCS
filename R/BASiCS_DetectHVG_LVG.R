@@ -100,12 +100,12 @@ BASiCS_DetectHVG <- function(Chain,
     
   # Output preparation
   Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
-  Mu <- matrixStats::colMedians(Chain@mu)
-  Delta <- matrixStats::colMedians(Chain@delta)
+  Mu <- matrixStats::colMedians(Chain@parameters$mu)
+  Delta <- matrixStats::colMedians(Chain@parameters$delta)
   HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
     
   GeneIndex <- seq_along(Mu)
-  GeneName <- colnames(Chain@mu)
+  GeneName <- colnames(Chain@parameters$mu)
 
   Table <- cbind.data.frame(GeneIndex = GeneIndex, GeneName = GeneName, 
                             Mu = Mu, Delta = Delta, 
@@ -179,12 +179,12 @@ BASiCS_DetectLVG <- function(Chain,
   
   # Output preparation
   Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
-  Mu <- matrixStats::colMedians(Chain@mu)
-  Delta <- matrixStats::colMedians(Chain@delta)
+  Mu <- matrixStats::colMedians(Chain@parameters$mu)
+  Delta <- matrixStats::colMedians(Chain@parameters$delta)
   LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
 
   GeneIndex <- seq_along(Mu)
-  GeneName <- colnames(Chain@mu)
+  GeneName <- colnames(Chain@parameters$mu)
   
   Table <- cbind.data.frame(GeneIndex = GeneIndex, GeneName = GeneName, 
                             Mu = Mu, Delta = Delta, 

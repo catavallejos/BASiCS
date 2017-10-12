@@ -471,9 +471,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))
     }
     
-    ChainClass <- newBASiCS_Chain(mu = Chain$mu, delta = Chain$delta, 
-                                  phi = Chain$phi, s = Chain$s, 
-                                  nu = Chain$nu, theta = Chain$theta)
+    ChainClass <- newBASiCS_Chain(parameters = Chain)
     
     OldDir <- getwd()
     
