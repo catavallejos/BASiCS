@@ -42,6 +42,7 @@
 setClass("BASiCS_Chain", 
          representation = representation(
            parameters = "list"), 
+         contains="Versioned",
          validity = function(object) 
          {
             errors <- character()
@@ -74,7 +75,10 @@ setClass("BASiCS_Chain",
     
         if (length(errors) == 0) 
           TRUE else errors
-      })
+      },
+      prototype = prototype(new("Versioned",
+                                versions = c("BASiCS_Chain" = "0.99.8")))
+      )
 
 
 #' @name BASiCS_Summary

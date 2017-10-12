@@ -42,9 +42,9 @@ setMethod("updateObject",
             #  stop("Object was not created by an older version of BASiCS")
             #}
             
-            New_Chain <- makeBASiCS_Chain(parameters = list(mu = object$mu, 
-                                          delta = object$delta, phi = object$phi,
-                                          s = object$s, nu = object$nu, theta = object$theta))
+            New_Chain <- newBASiCS_Chain(parameters = list(mu = object@mu, 
+                                          delta = object@delta, phi = object@phi,
+                                          s = object@s, nu = object@nu, theta = object@theta))
             
             return(New_Chain)
           })
