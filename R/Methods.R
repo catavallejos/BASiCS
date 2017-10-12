@@ -36,11 +36,11 @@ setGeneric("displaySummaryBASiCS",
 #' @rdname BASiCS_Chain-methods
 setMethod("updateObject", 
           signature = "BASiCS_Chain", 
-          definition = function(object) 
+          definition = function(object, ..., verbose = FALSE) 
           {
-            if (!("mu" %in% slotNames(object))){
-              stop("Object was not created by an older version of BASiCS")
-            }
+            #if (!("mu" %in% slotNames(object))){
+            #  stop("Object was not created by an older version of BASiCS")
+            #}
             
             New_Chain <- makeBASiCS_Chain(parameters = list(mu = object$mu, 
                                           delta = object$delta, phi = object$phi,
