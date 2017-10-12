@@ -103,36 +103,36 @@ synthetic datasets.
 - Vertical integration (with spikes)
 
 ```{r quick-start-MCMC-vertical}
-Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
-Chain1 <- BASiCS_MCMC(Data = Data1, N = 1000, Thin = 10, Burn = 500, 
-                      PrintProgress = FALSE)
-Summary1 <- Summary(Chain1)
+#Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
+#Chain1 <- BASiCS_MCMC(Data = Data1, N = 1000, Thin = 10, Burn = 500, 
+#                      PrintProgress = FALSE)
+#Summary1 <- Summary(Chain1)
 ```
 
 
 - Horizontal integration (no spikes case)
 
 ```{r quick-start-MCMC-horizontal}
-Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-Chain2 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
-                      PrintProgress = FALSE, StoreDir = tempdir(),
-                      StochasticRef = FALSE)
-plot(Chain2, Param = "phi", Cell = 1)
-plot(Chain2, Param = "theta", Batch = 1)
-plot(Chain2, Param = "mu", Gene = 1)
-plot(Chain2, Param = "delta", Gene = 1)
-Summary2 <- Summary(Chain2)
+#Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
+#Chain2 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
+#                      PrintProgress = FALSE, StoreDir = tempdir(),
+#                      StochasticRef = FALSE)
+#plot(Chain2, Param = "phi", Cell = 1)
+#plot(Chain2, Param = "theta", Batch = 1)
+#plot(Chain2, Param = "mu", Gene = 1)
+#plot(Chain2, Param = "delta", Gene = 1)
+#Summary2 <- Summary(Chain2)
 ```
 
 ```{r}
-Chain3 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
-                      PrintProgress = FALSE, StoreDir = tempdir(),
-                      StochasticRef = TRUE)
-plot(Chain3, Param = "phi", Cell = 1)
-plot(Chain3, Param = "theta", Batch = 1)
-plot(Chain3, Param = "mu", Gene = 1)
-plot(Chain3, Param = "delta", Gene = 1)
-Summary3 <- Summary(Chain3)
+#Chain3 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
+#                      PrintProgress = FALSE, StoreDir = tempdir(),
+#                      StochasticRef = TRUE)
+#plot(Chain3, Param = "phi", Cell = 1)
+#plot(Chain3, Param = "theta", Batch = 1)
+#plot(Chain3, Param = "mu", Gene = 1)
+#plot(Chain3, Param = "delta", Gene = 1)
+#Summary3 <- Summary(Chain3)
 ```
 
 # Case studies

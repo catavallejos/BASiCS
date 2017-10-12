@@ -153,9 +153,9 @@ Here, we illustrate the usage of `BASiCS_MCMC` using a built-in
 synthetic dataset.
 
 ```{r quick-start-MCMC}
-Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
-                     PrintProgress = FALSE)
+#Data <- makeExampleBASiCS_Data()
+#Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
+#                     PrintProgress = FALSE)
 ```
 
 **Important remarks:**
@@ -178,7 +178,7 @@ in [2] when analysing the single cell samples provided in [5]. This is included
 within `BASiCS` as the `ChainSC` dataset. 
 
 ```{r LoadSingleData}
-data(ChainSC)
+#data(ChainSC)
 ```
 
 The following code is used to identify **highly variable genes (HVG)** and 
@@ -196,23 +196,23 @@ HVG/LVG evidence. A cut-off value for these posterior probabilities is set by
 controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.10).
 
 ```{r quick-start-HVGdetection, fig.height = 6, fig.width = 6}
-par(mfrow = c(2,2))
-HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
-LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
+#par(mfrow = c(2,2))
+#HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
+#LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
 ```
 
 To access the results of these tests, please use. 
 
 ```{r quick-start-HVGdetectionTable}
-head(HVG$Table)
-head(LVG$Table)
+#head(HVG$Table)
+#head(LVG$Table)
 ```
 
 ```{r quick-start-HVGdetectionPlot}
-SummarySC <- Summary(ChainSC)
-plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
-with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
-with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
+#SummarySC <- Summary(ChainSC)
+#plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
+#with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
+#with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
 ```
 
 **Note**: this criteria for threshold has changed with respect to the original 
@@ -229,16 +229,16 @@ pool-and-split samples). These were obtained by independently running the
 `BASiCS_MCMC` function for each group of cells. 
 
 ```{r quick-start-LoadBothData}
-data(ChainSC)
-data(ChainRNA)
+#data(ChainSC)
+#data(ChainRNA)
 ```
 
 ```{r quick-start-TestDE, fig.width=10, fig.height=5}
-Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
-                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
-                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      EFDR_M = 0.10, EFDR_D = 0.10,
-                      OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)
+#Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
+#                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
+#                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+#                      EFDR_M = 0.10, EFDR_D = 0.10,
+#                      OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
@@ -256,8 +256,8 @@ between the groups.
 The resulting output list can be displayed using
 
 ```{r quick-start-DE}
-head(Test$TableMean)
-head(Test$TableDisp)
+#head(Test$TableMean)
+#head(Test$TableDisp)
 ```
 
 # Additional details
@@ -268,10 +268,10 @@ To externally store the output of `BASiCS_MCMC` (recommended), additional
 parameters `StoreChains`, `StoreDir` and `RunName` are required. For example:
 
 ```{r MCMCNotRun}
-Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
-                     PrintProgress = FALSE, StoreChains = TRUE, 
-                     StoreDir = tempdir(), RunName = "Example")
+#Data <- makeExampleBASiCS_Data()
+#Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+#                     PrintProgress = FALSE, StoreChains = TRUE, 
+#                     StoreDir = tempdir(), RunName = "Example")
 ```
 
 In this example, the output of `BASiCS_MCMC` will be stored as a `BASiCS_Chain` 
@@ -280,7 +280,7 @@ object in the file "chain_Example.Rds", within the `tempdir()` directory.
 To load pre-computed MCMC chains, 
 
 ```{r LoadChainNotRun}
-Chain <- BASiCS_LoadChain("Example", StoreDir = tempdir()) 
+#Chain <- BASiCS_LoadChain("Example", StoreDir = tempdir()) 
 ```
 
 ## Convergence assessment
@@ -290,8 +290,8 @@ package `coda` can be used. Additionally, the chains can be visually inspected.
 For example:
 
 ```{r Traceplots, fig.height = 3, fig.width = 6}
-plot(Chain, Param = "mu", Gene = 1, log = "y")
-plot(Chain, Param = "phi", Cell = 1)
+#plot(Chain, Param = "mu", Gene = 1, log = "y")
+#plot(Chain, Param = "phi", Cell = 1)
 ```
 
 In the figures above:
@@ -304,7 +304,7 @@ In the figures above:
 To access the MCMC chains associated to individual parameter use the function `displayChainBASiCS`. For example, 
 
 ```{r AccessChains}
-displayChainBASiCS(Chain, Param = "mu")[1:5,1:5]
+#displayChainBASiCS(Chain, Param = "mu")[1:5,1:5]
 ```
 
 As a summary of the posterior distribution, the function `Summary` calculates 
@@ -312,14 +312,14 @@ posterior medians and the High Posterior Density (HPD) intervals for each model
 parameter. As a default option, HPD intervals contain 0.95 probability. 
 
 ```{r Summary}
-ChainSummary <- Summary(Chain)
+#ChainSummary <- Summary(Chain)
 ```
 
 The function `displaySummaryBASiCS` extract posterior summaries for individual 
 parameters. For example
 
 ```{r SummaryExample}
-head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
+#head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
 ```
 
 
@@ -328,29 +328,29 @@ intervals for gene-specific parameters $\mu_i$ (mean) and $\delta_i$
 (over-dispersion)
 
 ```{r OtherHPD, fig.width = 7, fig.height = 7}
-par(mfrow = c(2,2))
-plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
-plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-plot(ChainSummary, Param = "delta", main = "All genes")
-plot(ChainSummary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
+#par(mfrow = c(2,2))
+#plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
+#plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
+#plot(ChainSummary, Param = "delta", main = "All genes")
+#plot(ChainSummary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
 ```
 
 It is also possible to obtain similar summaries for the normalising constants 
 $\phi_j$ and $s_j$. 
 
 ```{r Normalisation, fig.width = 7, fig.height = 3.5}
-par(mfrow = c(1,2))
-plot(ChainSummary, Param = "phi")
-plot(ChainSummary, Param = "s", Cells = 1:5)
+#par(mfrow = c(1,2))
+#plot(ChainSummary, Param = "phi")
+#plot(ChainSummary, Param = "s", Cells = 1:5)
 ```
 
 Finally, it is also possible to create a scatterplot of posterior estimates for gene-specific parameters. Typically, this plot will exhibit the confounding 
 effect that is observed between mean and over-dispersion. 
 
 ```{r DispVsExp, fig.width = 7, fig.height = 3.5}
-par(mfrow = c(1,2))
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE)
+#par(mfrow = c(1,2))
+#plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
+#plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE)
 ```
 
 The option `SmoothPlot = TRUE` is generally recommended as this plot will 
@@ -370,8 +370,8 @@ $\hat{\phi}_j$ denotes the posterior median of $\phi_j$ and $\hat{\nu}_j$ is
 the posterior median of $\nu_j$.
 
 ```{r DenoisedCounts}
-DenoisedCounts = BASiCS_DenoisedCounts(Data = Data, Chain = Chain)
-DenoisedCounts[1:5, 1:5]
+#DenoisedCounts = BASiCS_DenoisedCounts(Data = Data, Chain = Chain)
+#DenoisedCounts[1:5, 1:5]
 ```
 
 Alternativelly, the user can compute the normalised and denoised expression 
@@ -385,18 +385,18 @@ $\hat{\rho}_{ij}$ is given by its posterior mean (Monte Carlo estimate based
 on the MCMC sample of all model parameters).
 
 ```{r DenoisedProp}
-DenoisedRates <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
-                                      Propensities = FALSE)
-DenoisedRates[1:5, 1:5]
+#DenoisedRates <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
+#                                      Propensities = FALSE)
+#DenoisedRates[1:5, 1:5]
 ```
 
 Alternative, denoised expression propensities $\hat{\rho}_{ij}$ can 
 also be extracted
 
 ```{r DenoisedRates}
-DenoisedProp = BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
-                                    Propensities = TRUE)
-DenoisedProp[1:5, 1:5]
+#DenoisedProp = BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
+#                                    Propensities = TRUE)
+#DenoisedProp[1:5, 1:5]
 ```
 
 # Methodology
