@@ -139,13 +139,13 @@ setMethod("Summary",
             HPDNu <- coda::HPDinterval(coda::mcmc(x@parameters$nu), prob = prob)
             HPDTheta <- coda::HPDinterval(coda::mcmc(x@parameters$theta), prob = prob)
     
-            Output <- new("BASiCS_Summary", 
+            Output <- new("BASiCS_Summary", parameters = list(
                           mu = cbind(Mu, HPDMu), 
                           delta = cbind(Delta, HPDDelta), 
                           phi = cbind(Phi, HPDPhi), 
                           s = cbind(S, HPDS), 
                           nu = cbind(Nu, HPDNu), 
-                          theta = cbind(Theta, HPDTheta))
+                          theta = cbind(Theta, HPDTheta)))
             return(Output)
           })
 

@@ -26,6 +26,7 @@
 #' \item{theta}{MCMC chain for technical over-dispersion parameter(s) 
 #' \eqn{\theta} (matrix, all elements must be positive, 
 #' each colum represents 1 batch)}
+#' }
 #'   
 #' @examples
 #' 
@@ -137,3 +138,4 @@ setClass("BASiCS_Summary",
       },
       prototype = prototype(new("Versioned",
                                 versions = c("BASiCS_Summary" = "0.99.8")))
+)
