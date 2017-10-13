@@ -134,4 +134,6 @@ setClass("BASiCS_Summary",
               sum(!is.finite(object@parameters$nu)) > 0 | 
               sum(!is.finite(object@parameters$theta)) > 0) 
                 return("Invalid slots") else { TRUE }
-      })
+      },
+      prototype = prototype(new("Versioned",
+                                versions = c("BASiCS_Summary" = "0.99.8")))
