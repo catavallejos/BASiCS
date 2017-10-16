@@ -127,7 +127,7 @@ setClass("BASiCS_Summary",
            parameters = "list"
          ), 
          contains="Versioned",
-         validity = function(object), 
+         validity = function(object) 
         {
           if (sum(!is.finite(object@parameters$mu)) > 0 | 
               sum(!is.finite(object@parameters$delta)) > 0 | 
