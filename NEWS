@@ -605,7 +605,7 @@ version 0.99.9: (2017-10-16)
 version 0.99.10: (2017-10-17)
 - Updated README with BioC installation instructions and @nturaga acknowledgment
 
-Devel_class branch: (2017-10-16) version number to be added in merge with master
+version 0.99.12: (2017-10-17) 
 - Update of NEWS with changes by @neling 
 - Small typo fix in class validity from @neling last commit
 - Changes in `BASiCS_Chain` and `BASiCS_Summary` classess to contain a single 
@@ -630,18 +630,9 @@ posterior probability thresholds as input
 - Unused argument removed from `HiddenEFDR` and `HiddenEFNR` functions
 - Minor changes to pass R CMD check
 - Check library passes R CMD BiocCheck
-
-
-- DEVELOPMENT NOTES (potential future changes):
-  * Add citations file
-  * Delete BASiCS_VarianceDecomp? 
-  * Change plots to use ggplot2?
-  * Should we separate BASiCS_TestDE in two functions? 
-  * In plots, change axis labels to be text (no greek)?
-  * Create 'no longer in use' message for selected functions. 
-  * Implement change suggested by Giacomo Zanella
-  * Store all necessary parameters for chain restart
-  * Convert Rcpp print to messages ?
+- Tidy up NAMESPACE
+- Tidy up NEWS
+- Merge Devel_class into master branch
 
   
   
