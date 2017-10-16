@@ -1,16 +1,33 @@
 # BASiCS
 
-Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene expression levels within seemingly homogeneous populations of cells. However, these experiments are prone to high levels of technical noise, creating new challenges for identifying genes that show genuine heterogeneous expression within the group of cells under study. 
+Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene 
+expression levels within seemingly homogeneous populations of cells. However, 
+these experiments are prone to high levels of technical noise, creating new 
+challenges for identifying genes that show genuine heterogeneous expression 
+within the group of cells under study. 
 
-BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is an integrated Bayesian hierarchical model that propagates statistical uncertainty by simultaneously performing data normalisation (global scaling), technical noise quantification and two types of **supervised** downstream analyses: 
+BASiCS (**B**ayesian **A**nalysis of **Si**ngle-**C**ell **S**equencing data) is 
+an integrated Bayesian hierarchical model that propagates statistical 
+uncertainty by simultaneously performing data normalisation (global scaling), 
+technical noise quantification and two types of **supervised** downstream
+analyses: 
 
-- **For a single group of cells** [1]: BASiCS provides a criterion to identify highly (and lowly) variable genes within the group. 
+- **For a single group of cells** [1]: BASiCS provides a criterion to identify 
+highly (and lowly) variable genes within the group. 
 
-- **For two (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional differential expression tools, BASiCS can uncover changes in mean expression between the groups. Besides this, BASiCS can also uncover changes in *over-dispersion* --- a measure for the residual cell-to-cell variation that is observed after accounting for technical noise. This feature has led, for example, to novel insights in the context of immune cells across aging [3].
+- **For two (or more) groups of cells** [2]: BASiCS allows the identification 
+of differentially expressed genes between the groups. As in traditional 
+differential expression tools, BASiCS can uncover changes in mean expression 
+between the groups. Besides this, BASiCS can also uncover changes in 
+*over-dispersion* --- a measure for the residual cell-to-cell variation that is 
+observed after accounting for technical noise. This feature has led, 
+for example, to novel insights in the context of immune cells across aging [3].
 
-In both cases, a probabilistic output is provided, with posterior probability thresholds calibrated through the expected false discovery rate (EFDR) [4].
+In both cases, a probabilistic output is provided, with posterior probability 
+thresholds calibrated through the expected false discovery rate (EFDR) [4].
 
-Currently, BASiCS relies on the use of **spike-in genes** --- that are artificially introduced to each cell's lysate --- to perform these analyses. 
+Currently, BASiCS relies on the use of **spike-in genes** --- that are 
+artificially introduced to each cell's lysate --- to perform these analyses. 
 
 **Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
 
@@ -18,14 +35,27 @@ For technical details, references are provided at the bottom of this document.
 
 ## Installation
 
-BASiCS will be submitted to BioConductor. In the meantime, the development version can be installed from GitHub:
+BASiCS is available in [Bioconductor](https://bioconductor.org/packages/BASiCS).
+To install the current release use:
+
+```R
+source("https://bioconductor.org/biocLite.R")
+biocLite("BASiCS")
+```
+
+Repeat using the [devel](https://bioconductor.org/developers/how-to/useDevel/) 
+version of Bioconductor for the latest development version. 
+
+Alternatively, the experimental version of BASiCS (this might be unstable)
+can be installed from GitHub:
 
 ```R
 # install.packages("devtools")
 devtools::install_github("catavallejos/BASiCS", build_vignettes = TRUE)
 ```
 
-This installation might fail if some of the dependency libraries are not yet installed. If so, please run the following lines and repeat the installation. 
+This installation might fail if some of the dependency libraries are not yet 
+installed. If so, please run the following lines and repeat the installation. 
 
 ```R
 #library(devtools)
@@ -35,21 +65,27 @@ This installation might fail if some of the dependency libraries are not yet ins
 #install.packages("Rcpp")
 ```
 
-After a successful installation, the BASiCS library can be loaded using[^footnoteInstall] 
+After a successful installation, the BASiCS library can be 
+loaded using[^footnoteInstall] 
 
 ```R
 library(BASiCS)
 ```
 
-[^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might appear. Please ignore. `BASiCS` imports some of the generic functions provided by `BiocGenerics` that do not have any methods attached.
+[^footnoteInstall]: The warning `"No methods found in "BiocGenerics""` might 
+appear. Please ignore. `BASiCS` imports some of the generic functions provided 
+by `BiocGenerics` that do not have any methods attached.
 
 ## Installation troubleshooting
 
-A summary of the installation errors that have been reported for BASiCS is provided [here](https://github.com/catavallejos/BASiCS/wiki/7.-Installation-troubleshooting). If you encounter any additional issues, **please let us know so that we can update this information**.
+A summary of the installation errors that have been reported for BASiCS is 
+provided [here](https://github.com/catavallejos/BASiCS/wiki/7.-Installation-troubleshooting). 
+If you encounter any additional issues, **please let us know so that we can update this information**.
 
 ## How to use BASiCS?
 
-BASiCS includes a vignette where its usage is illutrated. To access the vignette, please use:
+BASiCS includes a vignette where its usage is illutrated. 
+To access the vignette, please use:
 
 ```R
 vignette('BASiCS')
@@ -81,11 +117,24 @@ Individual topics are summarized in the BASiCS wiki:
 
 ## Acknowledgements
 
-We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for support and discussions throughout the development of this R library. In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and support during the preparation the Bioconductor submission. 
+We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for 
+support and discussions throughout the development of this R library. 
+In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and 
+support during the preparation the Bioconductor submission. 
 
-We also acknowledge feedback and contributions from (Github aliases provided within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
+We also acknowledge feedback and/or contributions from (Github aliases provided 
+within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), 
+Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), 
+Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), 
+Nitesh Turaga (@nturaga), Luke Zappia (@lazappi), Simon Anders (@s-andrews), 
+Yongchao Ge and Yuan Cao (@yuancao90), among others. 
 
-This work has been funded by the MRC Biostatistics Unit (MRC grant no. MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European Bioinformatics Institute (core European Molecular Biology Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
+This work has been funded by the MRC Biostatistics Unit (MRC grant no. 
+MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), 
+EMBL European Bioinformatics Institute (core European Molecular Biology 
+Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), 
+CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing 
+nitesInstitute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
 
 ## References
 
