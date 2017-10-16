@@ -5,10 +5,11 @@
 \title{Detection of genes with changes in expression}
 \usage{
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-  ProbThresholdM = NULL, ProbThresholdD = NULL, OrderVariable = "Prob",
+  PsiE = log2(1.5)/log2(exp(1)), ProbThresholdM = NULL,
+  ProbThresholdD = NULL, ProbThresholdE = NULL, OrderVariable = "Prob",
   GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
   PlotOffset = TRUE, OffSet = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
-  GenesSelect = NULL, ...)
+  EFDR_E = 0.1, GenesSelect = NULL, ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}} 

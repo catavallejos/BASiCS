@@ -14,27 +14,31 @@ posterior density interval (for a given probability).
 \section{Slots}{
 
 \describe{
+\item{\code{parameters}}{List of parameters in which each entry contains a matrix: first column contains posterior medians, second column contains the lower limits of an high posterior
+density interval and third column contains the upper limits of high posterior density intervals. List can contain:
+\describe{
 \item{\code{mu}}{Posterior medians (1st column), lower (2nd column) and upper 
 (3rd column) limits of gene-specific mean expression parameters \eqn{\mu_i}.}
-
 \item{\code{delta}}{Posterior medians (1st column), lower (2nd column) and upper 
 (3rd column) limits of gene-specific biological over-dispersion parameters 
-\eqn{\delta_i}, biological genes only}
-
+\eqn{\delta_i}, biological genes only }
 \item{\code{phi}}{Posterior medians (1st column), lower (2nd column) and upper 
 (3rd column) limits of cell-specific mRNA content normalisation 
 parameters \eqn{\phi_j}}
-
 \item{\code{s}}{Posterior medians (1st column), lower (2nd column) and upper 
 (3rd column) limits of cell-specific technical normalisation 
 parameters \eqn{s[j]}}
-
 \item{\code{nu}}{Posterior medians (1st column), lower (2nd column) and upper 
 (3rd column) limits of cell-specific random effects \eqn{\nu_j}}
-
 \item{\code{theta}}{Posterior median (1st column), lower (2nd column) and upper 
 (3rd column) limits of technical over-dispersion parameter(s) \eqn{\theta} 
 (each row represents one batch)}
+\item{\code{beta}}{Posterior median (first column), lower (second column) and upper (third column) limits of regression parameters \eqn{\beta}}
+\item{\code{sigma2}}{Posterior median (first column), lower (second column) and upper (third column) limits of regression variance \eqn{\sigma^2}}
+\item{\code{eta}}{Posterior median (first column), lower (second column) and upper (third column) limits of hype-parameter \eqn{\eta} for random effect on regression variance}
+\item{\code{lambda}}{Posterior median (first column), lower (second column) and upper (third column) limits of random effect \eqn{\lambda} on regression variance}
+\item{\code{epsilon}}{Posterior median (first column), lower (second column) and upper (third column) limits of regression residue \eqn{\epsilon} (mean adjusted over-dispersion)}
+}}
 }}
 
 \examples{
@@ -43,5 +47,6 @@ parameters \eqn{s[j]}}
 Data = makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 ChainSummary <- Summary(Chain)
+
 
 }

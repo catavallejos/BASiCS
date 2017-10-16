@@ -13,40 +13,48 @@ function \code{\link[BASiCS]{BASiCS_MCMC}}.
 \section{Slots}{
 
 \describe{
+\item{\code{parameters}}{List of matrices containing MCMC chains for each model parameter. Depending on the mode in which 
+BASiCS was run, the following parameters can appear in the list:
+\describe{
 \item{\code{mu}}{MCMC chain for gene-specific mean expression parameters 
 \eqn{\mu_i}, biological genes only 
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
-
-\item{\code{delta}}{MCMC chain for gene-specific biological over-dispersion 
-parameters \eqn{\delta_i}, biological genes only 
+\item{\code{delta}}{MCMC chain for gene-specific biological cell-to-cell heterogeneity hyper-parameters \eqn{\delta[i]}, biological genes only 
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
-
-\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalisation parameters 
-\eqn{\phi_j} (matrix with \code{n} columns, all elements must be positive 
-numbers and the sum of its elements must be equal to \code{n})}
-
-\item{\code{s}}{MCMC chain for cell-specific technical normalisation parameters 
-\eqn{s_j} (matrix with \code{n} columns, 
-all elements must be positive numbers)}
-
-\item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu_j}
+\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalising constants \eqn{\phi[j]}
+(matrix with \code{n} columns, all elements must be positive numbers and the sum of its elements must be equal to \code{n})}
+\item{\code{s}}{MCMC chain for cell-specific capture efficiency (or amplification biases if not using UMI based counts) normalising constants \eqn{s[j]}
 (matrix with \code{n} columns, all elements must be positive numbers)}
-
-\item{\code{theta}}{MCMC chain for technical over-dispersion parameter(s) 
-\eqn{\theta} (matrix, all elements must be positive, 
-each colum represents 1 batch)}
+\item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu[j]}
+(matrix with \code{n} columns, all elements must be positive numbers)}
+\item{\code{theta}}{MCMC chain for technical variability hyper-parameter(s) \eqn{\theta} (matrix, all elements must be positive, each colum 
+represents 1 batch)}
+\item{\code{beta}}{MCMC chain for regression parameters
+(matrix with \code{k} columns where k represent the number of chosen basis functions) }
+\item{\code{sigma2}}{MCMC chain for the variance used during regression
+(matrix with one column, sigma2 represents a gloabl parameter)}
+\item{\code{eta}}{MCMC chain for the degrees of freedom used for regression
+(matrix with one column)}
+\item{\code{lambda}}{MCMC chain for the gene-specific random effect on the regression variance
+(matrix with \code{q} columns)}
+\item{\code{epsilon}}{MCMC chain for the gene specific regression residue (mean corrected vraribility)
+(matrix with \code{q} columns)}
+}}
 }}
 
 \examples{
 
 # A BASiCS_Chain object created by the BASiCS_MCMC function.
-Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+Data = makeExampleBASiCS_Data()
+MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+
+# To run the model using the regession (mean adjustment of the over-dispersion parameters) use following function:
+MCMC_Output_Reg <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = TRUE, k = 12)
 
 }
 \references{
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}
+Catalina A. Vallejos \email{cnvallej@uc.cl}, Nils Eling \email{eling@ebi.ac.uk}
 }
