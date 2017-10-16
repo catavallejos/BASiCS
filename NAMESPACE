@@ -18,7 +18,8 @@ importFrom("SummarizedExperiment", "assay")
 importFrom("stats", "median", "model.matrix", "rgamma", "rpois", "runif")
 importFrom("utils", "packageVersion", "write.table")
 importFrom(matrixStats, rowMeans2, colMeans2,
-                        rowVars, colVars)
+                        rowVars, colVars,
+                        colMedians)
 
 importMethodsFrom("BiocGenerics", "counts", "updateObject")
 importMethodsFrom("scran", "computeSumFactors")
