@@ -599,7 +599,12 @@ version 0.99.7: (2017-10-05) - After @nturaga review
 version 0.99.8: (2017-10-10)
 - version bump to trigger a new Bioconductor build
 
-<<<<<<< HEAD
+version 0.99.9: (2017-10-16)
+- Updated URL and BugReports in DESCRIPTION
+
+version 0.99.10: (2017-10-17)
+- Updated README with BioC installation instructions and @nturaga acknowledgment
+
 Devel_class branch: (2017-10-16) version number to be added in merge with master
 - Update of NEWS with changes by @neling 
 - Small typo fix in class validity from @neling last commit
@@ -626,13 +631,6 @@ posterior probability thresholds as input
 - Minor changes to pass R CMD check
 - Check library passes R CMD BiocCheck
 
-=======
-version 0.99.9: (2017-10-16)
-- Updated URL and BugReports in DESCRIPTION
-
-version 0.99.10: (2017-10-17)
-- Updated README with BioC installation instructions and @nturaga acknowledgment
->>>>>>> master
 
 - DEVELOPMENT NOTES (potential future changes):
   * Add citations file
