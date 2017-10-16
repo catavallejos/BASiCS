@@ -12,15 +12,16 @@ importFrom("graphics", "abline", "barplot", "legend", "lines", "par",
              "points", "segments", "smoothScatter")
 importFrom("data.table", "fread")
 importFrom("graphics", "plot")
-importFrom("methods", "is", "new", "show")
+importFrom("methods", "is", "new", "show", "slotNames", ".hasSlot")
 importFrom("S4Vectors", "metadata")
 importFrom("SummarizedExperiment", "assay")
 importFrom("stats", "median", "model.matrix", "rgamma", "rpois", "runif")
 importFrom("utils", "packageVersion", "write.table")
 importFrom(matrixStats, rowMeans2, colMeans2,
-                        rowVars, colVars)
+                        rowVars, colVars,
+                        colMedians)
 
-importMethodsFrom("BiocGenerics", "counts")
+importMethodsFrom("BiocGenerics", "counts", "updateObject")
 importMethodsFrom("scran", "computeSumFactors")
 
 

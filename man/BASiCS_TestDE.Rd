@@ -7,7 +7,7 @@
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
   ProbThresholdM = NULL, ProbThresholdD = NULL, OrderVariable = "Prob",
   GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
-  PlotOffset = TRUE, OffSet = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
+  PlotOffset = TRUE, Offset = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
   GenesSelect = NULL, ...)
 }
 \arguments{
@@ -45,9 +45,8 @@ Default: \code{GroupLabel2 = 'Group2'}}
 
 \item{PlotOffset}{If \code{Plot = TRUE}, the offset effect is visualised.}
 
-\item{OffSet}{Optional argument to remove a fix offset effect (if not 
-previously removed from the MCMC chains). This argument will be removed 
-shorly, once offset removal is built as an internal step.}
+\item{Offset}{Optional argument to remove a fix offset effect (if not 
+previously removed from the MCMC chains). Default: \code{Offset = TRUE}.}
 
 \item{EFDR_M}{Target for expected false discovery rate related to 
 the comparison of means. Default \code{EFDR_M = 0.10}.}

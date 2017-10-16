@@ -4,15 +4,13 @@ HiddenThresholdSearchDetectHVG_LVG <- function(ProbThreshold,
                                                Prob, 
                                                EFDR)
 {
-  if(length(ProbThreshold) == 0)
+  if(is.null(ProbThreshold))
   {
     # If EviThreshold is not set a priori (search)
     ProbThresholds <- seq(0.5,0.9995,by=0.0005)
     
-    EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, 
-                       VarThreshold = VarThreshold, Prob = Prob)
-    EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, 
-                       VarThreshold = VarThreshold, Prob = Prob)
+    EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob)
+    EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob)
     
     above <- abs(EFDRgrid - EFDR)
     
@@ -60,9 +58,12 @@ HiddenThresholdSearchDetectHVG_LVG <- function(ProbThreshold,
   else
   {
     # If EviThreshold is set a priori
-    EFDR = HiddenEFDR(ProbThreshold, VarThreshold, Prob)
-    EFNR = HiddenEFNR(ProbThreshold, VarThreshold, Prob)
+    EFDR = HiddenEFDR(ProbThreshold, Prob)
+    EFNR = HiddenEFNR(ProbThreshold, Prob)
     OptThreshold <- c(ProbThreshold, EFDR, EFNR)
+    ProbThresholds <- NULL
+    EFDRgrid <- NULL
+    EFNRgrid <- NULL
   }  
   list("ProbThresholds" = ProbThresholds,
        "EFDRgrid" = EFDRgrid,

@@ -13,28 +13,26 @@ function \code{\link[BASiCS]{BASiCS_MCMC}}.
 \section{Slots}{
 
 \describe{
-\item{\code{mu}}{MCMC chain for gene-specific mean expression parameters 
+\item{\code{parameters}}{List of matrices containing MCMC chains for each model parameter. 
+\describe{
+\item{mu}{MCMC chain for gene-specific mean expression parameters 
 \eqn{\mu_i}, biological genes only 
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
-
-\item{\code{delta}}{MCMC chain for gene-specific biological over-dispersion 
+\item{delta}{MCMC chain for gene-specific biological over-dispersion 
 parameters \eqn{\delta_i}, biological genes only 
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
-
-\item{\code{phi}}{MCMC chain for cell-specific mRNA content normalisation parameters 
+\item{phi}{MCMC chain for cell-specific mRNA content normalisation parameters 
 \eqn{\phi_j} (matrix with \code{n} columns, all elements must be positive 
 numbers and the sum of its elements must be equal to \code{n})}
-
-\item{\code{s}}{MCMC chain for cell-specific technical normalisation parameters 
+\item{s}{MCMC chain for cell-specific technical normalisation parameters 
 \eqn{s_j} (matrix with \code{n} columns, 
 all elements must be positive numbers)}
-
-\item{\code{nu}}{MCMC chain for cell-specific random effects \eqn{\nu_j}
+\item{nu}{MCMC chain for cell-specific random effects \eqn{\nu_j}
 (matrix with \code{n} columns, all elements must be positive numbers)}
-
-\item{\code{theta}}{MCMC chain for technical over-dispersion parameter(s) 
+\item{theta}{MCMC chain for technical over-dispersion parameter(s) 
 \eqn{\theta} (matrix, all elements must be positive, 
 each colum represents 1 batch)}
+}}
 }}
 
 \examples{

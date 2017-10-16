@@ -82,6 +82,8 @@ BASiCS_DetectHVG <- function(Chain,
   # Safety checks
   HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
                             ProbThreshold, EFDR, OrderVariable, Plot)
+  
+  Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
     
   # Variance decomposition
   VarDecomp <- HiddenVarDecomp(Chain)
@@ -93,19 +95,22 @@ BASiCS_DetectHVG <- function(Chain,
   # Threshold search
   Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
                                             VarThreshold, Prob, EFDR)
-  EFDRgrid <- Aux$EFDRgrid
-  EFNRgrid <- Aux$EFNRgrid
-  ProbThresholds <- Aux$ProbThresholds
+  if(Search) 
+  { 
+    EFDRgrid <- Aux$EFDRgrid
+    EFNRgrid <- Aux$EFNRgrid
+    ProbThresholds <- Aux$ProbThresholds 
+  }
   OptThreshold <- Aux$OptThreshold
     
   # Output preparation
   Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
-  Mu <- matrixStats::colMedians(Chain@mu)
-  Delta <- matrixStats::colMedians(Chain@delta)
+  Mu <- matrixStats::colMedians(Chain@parameters$mu)
+  Delta <- matrixStats::colMedians(Chain@parameters$delta)
   HVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
     
   GeneIndex <- seq_along(Mu)
-  GeneName <- colnames(Chain@mu)
+  GeneName <- colnames(Chain@parameters$mu)
 
   Table <- cbind.data.frame(GeneIndex = GeneIndex, GeneName = GeneName, 
                             Mu = Mu, Delta = Delta, 
@@ -123,7 +128,6 @@ BASiCS_DetectHVG <- function(Chain,
   if (Plot) 
   {
     args <- list(...)
-    Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
     if (Search) 
     {
       # EFDR / EFNR plot
@@ -162,6 +166,9 @@ BASiCS_DetectLVG <- function(Chain,
   # Safety checks
   HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
                               ProbThreshold, EFDR, OrderVariable, Plot)
+  
+  Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
+  
   # Variance decomposition
   VarDecomp <- HiddenVarDecomp(Chain)
     
@@ -172,19 +179,22 @@ BASiCS_DetectLVG <- function(Chain,
   # Threshold search
   Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
                                             VarThreshold, Prob, EFDR)
-  EFDRgrid <- Aux$EFDRgrid
-  EFNRgrid <- Aux$EFNRgrid
-  ProbThresholds <- Aux$ProbThresholds
+  if(Search) 
+  { 
+    EFDRgrid <- Aux$EFDRgrid
+    EFNRgrid <- Aux$EFNRgrid
+    ProbThresholds <- Aux$ProbThresholds 
+  }
   OptThreshold <- Aux$OptThreshold
   
   # Output preparation
   Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
-  Mu <- matrixStats::colMedians(Chain@mu)
-  Delta <- matrixStats::colMedians(Chain@delta)
+  Mu <- matrixStats::colMedians(Chain@parameters$mu)
+  Delta <- matrixStats::colMedians(Chain@parameters$delta)
   LVG <- ifelse(Prob > OptThreshold[1], TRUE, FALSE)
 
   GeneIndex <- seq_along(Mu)
-  GeneName <- colnames(Chain@mu)
+  GeneName <- colnames(Chain@parameters$mu)
   
   Table <- cbind.data.frame(GeneIndex = GeneIndex, GeneName = GeneName, 
                             Mu = Mu, Delta = Delta, 
@@ -202,7 +212,6 @@ BASiCS_DetectLVG <- function(Chain,
   if (Plot) 
   {
     args <- list(...)
-    Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
     if (Search) 
     {
       # EFDR / EFNR plot

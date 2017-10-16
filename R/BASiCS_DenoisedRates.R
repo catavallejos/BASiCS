@@ -42,18 +42,18 @@ BASiCS_DenoisedRates = function(Data,
   if (!is(Chain, "BASiCS_Chain")) 
     stop("'Chain' is not a BASiCS_Chain class object.")
     
-  N <- nrow(Chain@delta)
-  q.bio <- ncol(Chain@delta)
-  n <- ncol(Chain@phi)
+  N <- nrow(Chain@parameters$delta)
+  q.bio <- ncol(Chain@parameters$delta)
+  n <- ncol(Chain@parameters$phi)
 
   CountsBio <- assay(Data)[!isSpike(Data),]
   Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
-                                    Chain@mu, t(1/Chain@delta),
-                                    Chain@phi*Chain@nu,
+                                    Chain@parameters$mu, t(1/Chain@parameters$delta),
+                                    Chain@parameters$phi*Chain@parameters$nu,
                                     N, q.bio, n)
 
   if (Propensities) { out <- Rho } 
-  else { out <- Rho * matrixStats::colMedians(Chain@mu) }
+  else { out <- Rho * matrixStats::colMedians(Chain@parameters$mu) }
     
   return(out)
     
