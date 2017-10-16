@@ -601,15 +601,32 @@ version 0.99.8: (2017-10-10)
 
 Devel_class branch: (2017-10-16) version number to be added in merge with master
 - Update of NEWS with changes by @neling 
+- Small typo fix in class validity from @neling last commit
 - Changes in `BASiCS_Chain` and `BASiCS_Summary` classess to contain a single 
 `list` slot where all parameters are stored. This allows greater flexibility 
 to incorporate ongoing developments of BASiCS but does not affect user interface. 
 - `BASiCS_DenoisedCounts`, `BASiCS_DenoisedRates`, `BASiCS_DetectHVG`, 
 `BASiCS_DetectLVG`, `BASiCS_MCMC`, `BASiCS_TestDE`, `HiddenVarDecomp`, 
-`newBASiCS_Chain` functions and all methods updated accordingly. 
-- Small typo fix in class validity from @neling last commit
+`newBASiCS_Chain` functions and all methods updated accordingly 
+- `ChainSC` and `ChainRNA` example objects updated accordingly
+- Unit tests updated accordingly
+- Wiki page updated accordingly
+- `updateObject` generic method imported from `BiocGenerics` 
+- New generic methods definition moved to AllGenerics.R
+- Change in class definition to store current packageVersion
+- `BASiCS_LoadChain` function updated to deal with old class definition and
+.txt storage.
+- Shorter welcome message. 
+- Sanity checks in `BASiCS_TestDE` moved to separate file. 
+- Updated code indentation in `BASiCS_TestDE`
+- Warning in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` when user provides
+posterior probability thresholds as input
+- Unused argument removed from `HiddenEFDR` and `HiddenEFNR` functions
+- Minor changes to pass R CMD check
+
 
 - DEVELOPMENT NOTES (potential future changes):
+  * Add citations file
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
   * Should we separate BASiCS_TestDE in two functions? 

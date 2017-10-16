@@ -10,6 +10,10 @@
 #' \code{StoreChains = TRUE})
 #' @param StoreDir Directory where `.Rds` file is stored. 
 #' Default: \code{StoreDir = getwd()}
+#' @param StoreUpdatedChain Only required when the input files contain an
+#' outdated version of a \code{\linkS4class{BASiCS_Chain}} object. 
+#' If \code{StoreUpdatedChain = TRUE}, an updated object is saved 
+#' (this overwrites original input file, if it was an `.Rds` file). 
 #'
 #' @return An object of class \code{\linkS4class{BASiCS_Chain}}.
 #'
@@ -29,9 +33,74 @@
 #' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
-BASiCS_LoadChain <- function(RunName, StoreDir = getwd()) 
+BASiCS_LoadChain <- function(RunName, 
+                             StoreDir = getwd(), 
+                             StoreUpdatedChain = FALSE) 
 {
+  if(file.exists(file.path(StoreDir, paste0("chain_", RunName, ".Rds"))))
+  {
     Chain <- readRDS(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
-    
-    return(Chain)
+    if(methods::.hasSlot(Chain, "mu"))
+    {
+      if(!is.null(Chain@mu))
+      {
+        message("`BASiCS_Chain` class definition was outdated. \n",
+                "Object updated to be compatible with BASiCS version ",
+                utils::packageVersion("BASiCS"), ".\n",
+                "To save updated object, please set 'StoreUpdatedChain' = TRUE.\n",
+                "(this overwrites original input file).\n") 
+        Chain <- updateObject(Chain)
+        if(StoreUpdatedChain == TRUE)
+        {
+          saveRDS(Chain, 
+                  file = file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
+        }
+      }      
+    }      
+  }
+  else
+  {
+    if(file.exists(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))) 
+    {
+      Mu <- data.table::fread(file.path(StoreDir, 
+                                        paste0("chain_mu_", RunName, ".txt")))
+      Delta <- data.table::fread(file.path(StoreDir, 
+                                           paste0("chain_delta_", RunName, ".txt")))
+      Phi <- data.table::fread(file.path(StoreDir, 
+                                         paste0("chain_phi_", RunName, ".txt")))
+      # Add-hoc fix for the no-spikes case
+      if(file.exists(file.path(StoreDir, 
+                               paste0("chain_s_", RunName, ".txt")))) 
+      {
+        S <- data.table::fread(file.path(StoreDir, 
+                                         paste0("chain_s_", RunName, ".txt")))
+      }
+      else { S = matrix(1, ncol = ncol(Phi), nrow = nrow(Phi)) }
+      Nu <- data.table::fread(file.path(StoreDir, 
+                                        paste0("chain_nu_", RunName, ".txt")))
+      Theta <- data.table::fread(file.path(StoreDir, 
+                                           paste0("chain_theta_", RunName, ".txt")))  
+      
+      Chain <- newBASiCS_Chain(list("mu" = as.matrix(Mu), 
+                                    "delta" = as.matrix(Delta), 
+                                    "phi" = as.matrix(Phi), 
+                                    "s" = as.matrix(S), 
+                                    "nu" = as.matrix(Nu), 
+                                    "theta" = as.matrix(Theta)))
+      
+      
+      message("`BASiCS_Chain` class definition was outdated. \n",
+              "Object updated to be compatible with BASiCS version ",
+              utils::packageVersion("BASiCS"), ".\n",
+              "To save updated object, please set 'StoreUpdatedChain' = TRUE.\n") 
+      
+      if(StoreUpdatedChain == TRUE)
+      {
+        saveRDS(Chain, 
+                file = file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
+      } 
+    }
+    else stop("Input file does not exist")
+  }
+  return(Chain)
 }
