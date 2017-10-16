@@ -37,7 +37,7 @@ setGeneric("showFit", function(object, ...) standardGeneric("showFit"))
 #' @rdname BASiCS_Chain-methods
 setMethod("updateObject", 
           signature = "BASiCS_Chain", 
-          definition = function(object, ..., verbose = FALSE) 
+          definition = function(object) 
           {
             #if (!("mu" %in% slotNames(object))){
             #  stop("Object was not created by an older version of BASiCS")
@@ -140,13 +140,41 @@ setMethod("Summary",
             HPDNu <- coda::HPDinterval(coda::mcmc(x@parameters$nu), prob = prob)
             HPDTheta <- coda::HPDinterval(coda::mcmc(x@parameters$theta), prob = prob)
     
-            Output <- new("BASiCS_Summary", 
-                          mu = cbind(Mu, HPDMu), 
+            if("epsilon" %in% names(x@parameters)){
+              Beta <- matrixStats::colMedians(x@parameters$beta)
+              Sigma2 <- matrixStats::colMedians(x@parameters$sigma2)
+              Eta <- matrixStats::colMedians(x@parameters$eta)
+              Lambda <- matrixStats::colMedians(x@parameters$lambda)
+              Epsilon <- matrixStats::colMedians(x@parameters$epsilon)
+              
+              HPDBeta <- coda::HPDinterval(coda::mcmc(x@parameters$beta), prob = prob)
+              HPDSigma2 <- coda::HPDinterval(coda::mcmc(x@parameters$sigma2), prob = prob)
+              HPDEta <- coda::HPDinterval(coda::mcmc(x@parameters$eta), prob = prob)
+              HPDLambda <- coda::HPDinterval(coda::mcmc(x@parameters$lambda), prob = prob)
+              HPDEpsilon <- coda::HPDinterval(coda::mcmc(x@parameters$epsilon), prob = prob)
+              
+              Output <- new("BASiCS_Summary", 
+                            parameters = list(mu = cbind(Mu, HPDMu), 
+                                              delta = cbind(Delta, HPDDelta), 
+                                              phi = cbind(Phi, HPDPhi), 
+                                              s = cbind(S, HPDS), 
+                                              nu = cbind(Nu, HPDNu), 
+                                              theta = cbind(Theta, HPDTheta),
+                                              beta = cbind(Beta, HPDBeta),
+                                              sigma2 = cbind(Sigma2, HPDSigma2),
+                                              eta = cbind(Eta, HPDEta),
+                                              lambda = cbind(Lambda, HPDLambda),
+                                              epsilon = cbind(Epsilon, HPDEpsilon))
+                            )
+            }
+            
+            Output <- new("BASiCS_Summary", parameters = list(mu = cbind(Mu, HPDMu), 
                           delta = cbind(Delta, HPDDelta), 
                           phi = cbind(Phi, HPDPhi), 
                           s = cbind(S, HPDS), 
                           nu = cbind(Nu, HPDNu), 
                           theta = cbind(Theta, HPDTheta))
+            )
             return(Output)
           })
 
@@ -746,4 +774,8 @@ setMethod("displaySummaryBASiCS",
             if (Param == "s") { return(object@parameters$s) }
             if (Param == "nu") { return(object@parameters$nu) }
             if (Param == "theta") { return(object@parameters$theta) }
+            if (Param == "beta") { return(object@parameters$beta) }
+            if (Param == "sigma2") { return(object@parameters$sigma2) }
+            if (Param == "lambda") { return(object@parameters$lambda) }
+            if (Param == "epsilon") { return(object@parameters$epsilon) }
           })

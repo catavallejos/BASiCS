@@ -219,9 +219,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                        args$PriorDelta, "log-normal")
   
   # This is specific for the regression case
-  if("Regression" %in% names(args) & args$Regression == TRUE){
+  if("Regression" %in% names(args)){
+    if(args$Regression == TRUE){
       k <- ifelse("k" %in% names(args), args$k, 12)
       if(k <= 3) stop("The number of basis functions needs to be >= 4.")
+    }
   }
   variance <- ifelse("Var" %in% names(args), args$Var, 1.2)
   eta <- ifelse("eta" %in% names(args), args$eta, 5)
@@ -275,8 +277,10 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   
   if("Start" %in% names(args)) {Start = args$Start}
   else{
-    if("Regression" %in% names(args) & args$Regression == TRUE){
-      Start=HiddenBASiCS_MCMC_Start(Data, "k"=k, "eta"=eta)
+    if("Regression" %in% names(args)){
+      if(args$Regression == TRUE){
+        Start=HiddenBASiCS_MCMC_Start(Data, "k"=k, "eta"=eta)
+      }
     }
     else{
       Start=HiddenBASiCS_MCMC_Start(Data)
@@ -298,11 +302,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   ls.theta0 <- as.numeric(Start$ls.theta0)
   
   # Starting values for Regression
-  if("Regression" %in% names(args) & args$Regression == TRUE){
+  if("Regression" %in% names(args)){
+    if(args$Regression == TRUE){
     m0=as.vector(Start$m0); V0=as.matrix(Start$V0)
     sigma2.a0 = Start$sigma2.a0; sigma2.b0 = Start$sigma2.b0
     beta0 = Start$beta0; sigma20 = Start$sigma20
     lambda0 = Start$lambda0
+    }
   }
     
   StoreAdaptNumber <- as.numeric(StoreAdapt)
@@ -326,6 +332,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   {
     # If regression case is chosen
     if("Regression" %in% names(args)){
+      if(args$Regression == TRUE){
       Time = system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
                                                            as.matrix(assay(Data)), 
                                                            BatchDesign,
@@ -358,10 +365,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                            variance))
       
       # Remove epsilons for genes that are not expressed in at least 2 cells
-      genes <- which(apply(assays(Data)$Counts[!rowData(Data)$Tech,], 1, function(n){length(which(n>0))}) > 1)
+      genes <- apply(assay(Data)[!isSpike(Data),], 1, function(n){length(which(n>0))}) > 1
       
       Chain$epsilon[,!genes] <- NA
       Chain$lambda[,!genes] <- NA
+      }
     }
     else{
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)

@@ -1569,10 +1569,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat V0_arma = as_arma(V0);
   arma::vec beta0_arma = as_arma(beta0);
   arma::vec lambda0_arma = as_arma(lambda0);
-  arma::mat beta = arma::zeros(Naux,k);
-  arma::mat lambda = arma::zeros(Naux,q0);
+  arma::mat beta = arma::zeros(k, Naux);
+  arma::mat lambda = arma::zeros(q0, Naux);
   arma::vec sigma = arma::zeros(Naux);
-  arma::mat epsilon = arma::zeros(Naux, q0);
+  arma::mat epsilon = arma::zeros(q0, Naux);
   double lambda_a;
   double lambda_b;
   
@@ -1771,10 +1771,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);  
       
       // Regression
-      beta.row(i/Thin - Burn/Thin) = betaAux.t();
-      lambda.row(i/Thin - Burn/Thin) = lambdaAux.t();
+      beta.col(i/Thin - Burn/Thin) = betaAux;
+      lambda.col(i/Thin - Burn/Thin) = lambdaAux;
       sigma(i/Thin - Burn/Thin) = sigma2Aux;
-      epsilon.row(i/Thin - Burn/Thin) = epsilonAux.t();
+      epsilon.col(i/Thin - Burn/Thin) = epsilonAux;
       
       if(StoreAdapt == 1)
       {

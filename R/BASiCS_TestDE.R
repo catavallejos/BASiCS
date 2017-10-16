@@ -15,10 +15,16 @@
 #' @param EpsilonD Minimum fold change tolerance threshold for detecting 
 #' changes in biological over-dispersion (must be a positive real number). 
 #' Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
+#' @param PsiE Minimum distance threshold for detecting 
+#' changes in residual over-dispersion (must be a positive real number). 
+#' Default value: \code{PsiE= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).
 #' @param ProbThresholdM Optional parameter. Probdence threshold for detecting 
 #' changes in overall expression (must be a positive value, between 0 and 1)
 #' @param ProbThresholdD Optional parameter. Probdence threshold for detecting 
 #' changes in cell-to-cell biological over-dispersion 
+#' (must be a positive value, between 0 and 1)
+#' @param ProbThresholdE Optional parameter. Probdence threshold for detecting 
+#' changes in residual over-dispersion 
 #' (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output. 
 #' Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
@@ -35,6 +41,8 @@
 #' the comparison of means. Default \code{EFDR_M = 0.10}.
 #' @param EFDR_D Target for expected false discovery rate related to 
 #' the comparison of dispersions. Default \code{EFDR_D = 0.10}.
+#' @param EFDR_E Target for expected false discovery rate related to 
+#' the comparison of residual over-dispersions. Default \code{EFDR_D = 0.10}.
 #' @param GenesSelect Optional argument to provide a user-defined list 
 #' of genes to be considered for the comparison.
 #' Default: \code{GenesSelect = NULL}. When used, this argument must be a vector 
@@ -208,8 +216,8 @@ BASiCS_TestDE <- function(Chain1,
     message("Log-fold change thresholds are now set in a log2 scale. \n", 
             "Original BASiCS release used a natural logarithm scale.")
     
-    n1 <- ncol(Chain1@nu)
-    n2 <- ncol(Chain2@nu)
+    n1 <- ncol(Chain1@parameters$nu)
+    n2 <- ncol(Chain2@parameters$nu)
     n <- n1 + n2
     # With offset correction
     if (OffSet) 
@@ -387,8 +395,8 @@ BASiCS_TestDE <- function(Chain1,
     TableDisp[, seq(2,8)] <- round(TableDisp[, seq(2,8)], 3)
     
     # Changes in residual over-dispersion - if regression approach was used
-    if(!is.null(ChainTest@parameters$epsilon)){
-      GenesSelect.epsilon <- !(is.na(ChainTest@parameters$epsilon[1,]) | is.na(ChainRef@parameters$epsilon[1,]))
+    if(!is.null(Chain1@parameters$epsilon)){
+      GenesSelect.epsilon <- !(is.na(Chain1@parameters$epsilon[1,]) | is.na(Chain2@parameters$epsilon[1,]))
       
       ChainPsi <- Chain2@parameters$epsilon - Chain1@parameters$epsilon
       MedianPsi <- matrixStats::colMedians(ChainPsi)
@@ -558,10 +566,13 @@ BASiCS_TestDE <- function(Chain1,
     nMeanPlus2 <- sum(ResultDiffMean == paste0(GroupLabel2, "+"))
     nDispPlus1 <- sum(ResultDiffDisp == paste0(GroupLabel1, "+"))
     nDispPlus2 <- sum(ResultDiffDisp == paste0(GroupLabel2, "+"))
-    nDispResPlus1 <- sum(ResultDiffResDisp == paste0(GroupLabel1, "+"))
-    nDispResPlus2 <- sum(ResultDiffResDisp == paste0(GroupLabel2, "+"))
+    if(!is.null(Chain1@parameters$epsilon)){
+      nResDispPlus1 <- sum(ResultDiffResDisp == paste0(GroupLabel1, "+"))
+      nResDispPlus2 <- sum(ResultDiffResDisp == paste0(GroupLabel2, "+"))
+    }
     
-    message("-------------------------------------------------------------\n", 
+    if(!is.null(Chain1@parameters$epsilon)){
+      message("-------------------------------------------------------------\n", 
             nMeanPlus1 + nMeanPlus2," genes with a change in mean expression:\n", 
             "- Higher expression in ", GroupLabel1, "samples:", nMeanPlus1, "\n", 
             "- Higher expression in ", GroupLabel2, "samples:", nMeanPlus2, "\n", 
@@ -591,7 +602,7 @@ BASiCS_TestDE <- function(Chain1,
             "- EFNR = ", round(100 * OptThresholdE[3], 2), "% \n", 
             "--------------------------------------------------------------\n")
     
-    list(TableMean = TableMean, 
+      list(TableMean = TableMean, 
          TableDisp = TableDisp, 
          TableResDisp = TableResDisp,
          DiffMeanSummary = list(ProbThreshold = OptThresholdM[1], 
@@ -607,4 +618,41 @@ BASiCS_TestDE <- function(Chain1,
          Chain2_offset = Chain2_offset,
          OffsetChain = OffsetChain, 
          Offset = OffsetEst)
+    }
+    else{
+      message("-------------------------------------------------------------\n", 
+              nMeanPlus1 + nMeanPlus2," genes with a change in mean expression:\n", 
+              "- Higher expression in ", GroupLabel1, "samples:", nMeanPlus1, "\n", 
+              "- Higher expression in ", GroupLabel2, "samples:", nMeanPlus2, "\n", 
+              "- Fold change tolerance = ", round(2^(EpsilonM), 2), "% \n",  
+              "- Probability threshold = ", OptThresholdM[1], "\n", 
+              "- EFDR = ", round(100 * OptThresholdM[2], 2), "% \n", 
+              "- EFNR = ", round(100 * OptThresholdM[3], 2), "% \n", 
+              "-------------------------------------------------------------\n\n", 
+              "-------------------------------------------------------------\n", 
+              nDispPlus1 + nDispPlus2," genes with a change in over dispersion:\n", 
+              "- Higher dispersion in ", GroupLabel1, "samples:", nDispPlus1,"\n", 
+              "- Higher dispersion in ", GroupLabel2, "samples:", nDispPlus2,"\n", 
+              "- Fold change tolerance = ", round(2^(EpsilonD), 2), "% \n", 
+              "- Probability threshold = ", OptThresholdD[1], "\n", 
+              "- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n", 
+              "- EFNR = ", round(100 * OptThresholdD[3], 2), "% \n", 
+              "NOTE: differential dispersion assessment only applied to the \n", 
+              length(MedianOmega), " genes for which the mean did not change. \n", 
+              "--------------------------------------------------------------\n")
+      
+      list(TableMean = TableMean, 
+           TableDisp = TableDisp, 
+           DiffMeanSummary = list(ProbThreshold = OptThresholdM[1], 
+                                  EFDR = OptThresholdM[2], 
+                                  EFNR = OptThresholdM[3]), 
+           DiffDispSummary = list(ProbThreshold = OptThresholdD[1], 
+                                  EFDR = OptThresholdD[2], 
+                                  EFNR = OptThresholdD[3]), 
+           Chain1_offset = Chain1_offset, 
+           Chain2_offset = Chain2_offset,
+           OffsetChain = OffsetChain, 
+           Offset = OffsetEst)
+      
+    }
 }

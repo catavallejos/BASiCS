@@ -1,24 +1,25 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
-importFrom("stats", "acf")
 importFrom("Rcpp", "evalCpp")
-importFrom("coda", "HPDinterval")
+importFrom("coda", "HPDinterval", "mcmc")
 importFrom("methods", "Summary")
 importFrom("testthat", "context",
            "test_check")
 import("SingleCellExperiment")
 import("KernSmooth")
+import("ggplot2")
 importFrom("graphics", "abline", "barplot", "legend", "lines", "par",
-             "points", "segments", "smoothScatter")
+             "points", "segments", "smoothScatter", "plot")
+importFrom("grDevices", "colorRampPalette")
 importFrom("data.table", "fread")
-importFrom("graphics", "plot")
 importFrom("methods", "is", "new", "show")
 importFrom("S4Vectors", "metadata")
 importFrom("SummarizedExperiment", "assay")
-importFrom("stats", "median", "model.matrix", "rgamma", "rpois", "runif")
+importFrom("stats", "median", "model.matrix", "rgamma", "rpois", "runif", "acf")
+importFrom("MASS", "mvrnorm")
 importFrom("utils", "packageVersion", "write.table")
-importFrom(matrixStats, rowMeans2, colMeans2,
-                        rowVars, colVars)
+importFrom("matrixStats", "rowMeans2", "colMeans2",
+                        "rowVars", "colVars", "colMedians", "rowMedians")
 
 importMethodsFrom("BiocGenerics", "counts")
 importMethodsFrom("scran", "computeSumFactors")
