@@ -602,6 +602,9 @@ version 0.99.8: (2017-10-10)
 version 0.99.9: (2017-10-16)
 - Updated URL and BugReports in DESCRIPTION
 
+version 0.99.10: (2017-10-17)
+- Updated README with BioC installation instructions and @nturaga acknowledgment
+
 - DEVELOPMENT NOTES (potential future changes):
   * Delete BASiCS_VarianceDecomp? 
   * Change plots to use ggplot2?
