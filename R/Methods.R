@@ -12,6 +12,45 @@ setGeneric("showFit", function(object, ...) standardGeneric("showFit"))
 # Methods for BASiCS_Chain objects
 
 #' @name BASiCS_Chain-methods
+#' @aliases updateObject,BASiCS_Chain-method
+#' 
+#' @title 'updateObject' method for BASiCS_Chain objects
+#' 
+#' @description 'updateObject' method for \code{\linkS4class{BASiCS_Chain}} objects.
+#' 
+#' @param object A \code{\linkS4class{BASiCS_Chain}} object.
+#' 
+#' @return Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
+#' contains all model parameters in a single slot object (list).
+#' 
+#' @examples
+#' 
+#' # Not run
+#' # New_Chain <- updateObject(Old_Chain)
+#' 
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' 
+#' @references 
+#' 
+#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
+#'  
+#' @rdname BASiCS_Chain-methods
+setMethod("updateObject", 
+          signature = "BASiCS_Chain", 
+          definition = function(object, ..., verbose = FALSE) 
+          {
+            #if (!("mu" %in% slotNames(object))){
+            #  stop("Object was not created by an older version of BASiCS")
+            #}
+            
+            New_Chain <- newBASiCS_Chain(parameters = list(mu = object@mu, 
+                                                           delta = object@delta, phi = object@phi,
+                                                           s = object@s, nu = object@nu, theta = object@theta))
+            
+            return(New_Chain)
+          })
+
+#' @name BASiCS_Chain-methods
 #' @aliases show,BASiCS_Chain-method
 #' 
 #' @title 'show' method for BASiCS_Chain objects
