@@ -8,7 +8,7 @@
 \alias{show,BASiCS_Chain-method}
 \title{'updateObject' method for BASiCS_Chain objects}
 \usage{
-\S4method{updateObject}{BASiCS_Chain}(object, ..., verbose = FALSE)
+\S4method{updateObject}{BASiCS_Chain}(object)
 
 \S4method{show}{BASiCS_Chain}(object)
 }

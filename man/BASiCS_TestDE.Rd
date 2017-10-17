@@ -26,11 +26,19 @@ Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 changes in biological over-dispersion (must be a positive real number). 
 Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 
+\item{PsiE}{Minimum distance threshold for detecting 
+changes in residual over-dispersion (must be a positive real number). 
+Default value: \code{PsiE= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).}
+
 \item{ProbThresholdM}{Optional parameter. Probdence threshold for detecting 
 changes in overall expression (must be a positive value, between 0 and 1)}
 
 \item{ProbThresholdD}{Optional parameter. Probdence threshold for detecting 
 changes in cell-to-cell biological over-dispersion 
+(must be a positive value, between 0 and 1)}
+
+\item{ProbThresholdE}{Optional parameter. Probdence threshold for detecting 
+changes in residual over-dispersion 
 (must be a positive value, between 0 and 1)}
 
 \item{OrderVariable}{Ordering variable for output. 
@@ -55,6 +63,9 @@ the comparison of means. Default \code{EFDR_M = 0.10}.}
 
 \item{EFDR_D}{Target for expected false discovery rate related to 
 the comparison of dispersions. Default \code{EFDR_D = 0.10}.}
+
+\item{EFDR_E}{Target for expected false discovery rate related to 
+the comparison of residual over-dispersions. Default \code{EFDR_D = 0.10}.}
 
 \item{GenesSelect}{Optional argument to provide a user-defined list 
 of genes to be considered for the comparison.

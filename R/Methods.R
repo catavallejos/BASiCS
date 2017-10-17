@@ -316,7 +316,7 @@ setMethod("displayChainBASiCS",
           signature = "BASiCS_Chain", 
           definition = function(object, Param = "mu") 
           {
-            if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta", "beta", "sigma2", "lambda", "epsilon"))) 
+            if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta", "beta", "sigma2", "lambda", "eta", "epsilon"))) 
               stop("'Param' argument is invalid")
     
             if (Param == "mu") { return(object@parameters$mu) }
@@ -328,6 +328,7 @@ setMethod("displayChainBASiCS",
             if (Param == "beta") { return(object@parameters$beta) }
             if (Param == "sigma2") { return(object@parameters$sigma2) }
             if (Param == "lambda") { return(object@parameters$lambda) }
+            if (Param == "eta") { return(object@parameters$eta) }
             if (Param == "epsilon") { return(object@parameters$epsilon) }
           })
 
