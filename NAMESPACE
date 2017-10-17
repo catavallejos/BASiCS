@@ -1,5 +1,6 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
+<<<<<<< HEAD
 importFrom("Rcpp", "evalCpp")
 importFrom("coda", "HPDinterval", "mcmc")
 importFrom("methods", "Summary")
@@ -20,13 +21,34 @@ importFrom("MASS", "mvrnorm")
 importFrom("utils", "packageVersion", "write.table")
 importFrom("matrixStats", "rowMeans2", "colMeans2",
                         "rowVars", "colVars", "colMedians", "rowMedians")
+=======
+>>>>>>> master
 
-importMethodsFrom("BiocGenerics", "counts")
-importMethodsFrom("scran", "computeSumFactors")
+import(SingleCellExperiment)
+import(KernSmooth)
 
+importFrom(stats, acf)
+importFrom(Rcpp, evalCpp)
+importFrom(coda, HPDinterval)
+importFrom(methods, Summary)
+importFrom(testthat, context, test_check)
+importFrom(graphics, abline, barplot, legend, lines, par,
+                     points, segments, smoothScatter)
+importFrom(data.table, fread)
+importFrom(graphics, plot)
+importFrom(methods, is, new, show, slotNames, .hasSlot)
+importFrom(S4Vectors, metadata)
+importFrom(SummarizedExperiment, assay)
+importFrom(stats, median, model.matrix, rgamma, rpois, runif)
+importFrom(utils, packageVersion, write.table)
+importFrom(matrixStats, rowMeans2, colMeans2,
+                        rowVars, colVars,
+                        colMedians)
 
+importMethodsFrom(BiocGenerics, counts, updateObject)
+importMethodsFrom(scran, computeSumFactors)
 
-exportClasses("BASiCS_Chain" , "BASiCS_Summary")
+exportClasses(BASiCS_Chain , BASiCS_Summary)
 
 exportMethods(Summary,
               plot,

@@ -82,6 +82,8 @@ BASiCS_DetectHVG <- function(Chain,
   # Safety checks
   HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
                             ProbThreshold, EFDR, OrderVariable, Plot)
+  
+  Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
     
   # Variance decomposition
   VarDecomp <- HiddenVarDecomp(Chain)
@@ -93,9 +95,12 @@ BASiCS_DetectHVG <- function(Chain,
   # Threshold search
   Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
                                             VarThreshold, Prob, EFDR)
-  EFDRgrid <- Aux$EFDRgrid
-  EFNRgrid <- Aux$EFNRgrid
-  ProbThresholds <- Aux$ProbThresholds
+  if(Search) 
+  { 
+    EFDRgrid <- Aux$EFDRgrid
+    EFNRgrid <- Aux$EFNRgrid
+    ProbThresholds <- Aux$ProbThresholds 
+  }
   OptThreshold <- Aux$OptThreshold
     
   # Output preparation
@@ -123,7 +128,6 @@ BASiCS_DetectHVG <- function(Chain,
   if (Plot) 
   {
     args <- list(...)
-    Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
     if (Search) 
     {
       # EFDR / EFNR plot
@@ -162,6 +166,9 @@ BASiCS_DetectLVG <- function(Chain,
   # Safety checks
   HiddenHeaderDetectHVG_LVG(Chain, VarThreshold, 
                               ProbThreshold, EFDR, OrderVariable, Plot)
+  
+  Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
+  
   # Variance decomposition
   VarDecomp <- HiddenVarDecomp(Chain)
     
@@ -172,9 +179,12 @@ BASiCS_DetectLVG <- function(Chain,
   # Threshold search
   Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, 
                                             VarThreshold, Prob, EFDR)
-  EFDRgrid <- Aux$EFDRgrid
-  EFNRgrid <- Aux$EFNRgrid
-  ProbThresholds <- Aux$ProbThresholds
+  if(Search) 
+  { 
+    EFDRgrid <- Aux$EFDRgrid
+    EFNRgrid <- Aux$EFNRgrid
+    ProbThresholds <- Aux$ProbThresholds 
+  }
   OptThreshold <- Aux$OptThreshold
   
   # Output preparation
@@ -202,7 +212,6 @@ BASiCS_DetectLVG <- function(Chain,
   if (Plot) 
   {
     args <- list(...)
-    Search <- ifelse(is.null(ProbThreshold), TRUE, FALSE)
     if (Search) 
     {
       # EFDR / EFNR plot

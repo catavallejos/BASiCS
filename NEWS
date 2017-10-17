@@ -510,7 +510,7 @@ version 0.99.0: (2017-08-28)
 - Minor changes to complete Bioconductor submission checklist
 - Version re-numbered according to Bioconductor guidelines
 
-version 0.99.2: (2017-09-18)
+version 0.99.2: (2017-09-18)- After @nturaga review
 - 'newBASiCS_Data': format + checks moved to `HiddenChecksBASiCS_Data` function
 - `HiddenChecksBASiCS_Data`: use of colMeans2, rowMeans2
 - Format in welcome message
@@ -592,36 +592,49 @@ version 0.99.5: (2017-09-26)
 - Change of default `PriorDelta` value in `BASiCS_MCMC` 
 - Unit tests modified accordingly
 
-No-spikes implementation
-- `makeExampleBASiCS_Data` + `newBASiCS_Data` adapted to no-spikes case
-- Temporary vignette file for no-spikes case has been created
-- `HiddenBASiCS_MCMCcppNoSpikes` updated to recycle vertical integration
-update functions
-- Fixed bug to allow use of stochastic reference
-- Fixed bug in argument order for no-spikes version
-- Spikes version code clean-up
+version 0.99.7: (2017-10-05) - After @nturaga review
+- `inst` folder has been deleted
+- Removal of `...` arg in `segments` - `plot` method for `BASiCS_Summary`
 
-TO-DO
-- Implement Giacomo's suggestion? 
+version 0.99.8: (2017-10-10)
+- version bump to trigger a new Bioconductor build
 
-Summary of constrain types
-- ConstrainType: full or subset of genes 
-  * For the second case, different filter thresholds have been proposed
-- StochasticRef or no 
-- Idea: 
-  * Try StochasticRef with no filter
-  * Try StochasticRef with filter > 0 total counts
-  
-- DEVELOPMENT NOTES (potential future changes):
-  * Delete BASiCS_VarianceDecomp? 
-  * Change plots to use ggplot2?
-  * Should we separate BASiCS_TestDE in two functions? 
-  * In plots, change axis labels to be text (no greek)?
-  * Create 'no longer in use' message for selected functions. 
-  * Implement change suggested by Giacomo Zanella
-  * Store all necessary parameters for chain restart
-  * Convert Rcpp print to messages ?
+version 0.99.9: (2017-10-16)
+- Updated URL and BugReports in DESCRIPTION
 
-  
+version 0.99.10: (2017-10-17)
+- Updated README with BioC installation instructions and @nturaga acknowledgment
+
+version 0.99.12: (2017-10-17) 
+- Update of NEWS with changes by @neling 
+- Small typo fix in class validity from @neling last commit
+- Changes in `BASiCS_Chain` and `BASiCS_Summary` classess to contain a single 
+`list` slot where all parameters are stored. This allows greater flexibility 
+to incorporate ongoing developments of BASiCS but does not affect user interface. 
+- `BASiCS_DenoisedCounts`, `BASiCS_DenoisedRates`, `BASiCS_DetectHVG`, 
+`BASiCS_DetectLVG`, `BASiCS_MCMC`, `BASiCS_TestDE`, `HiddenVarDecomp`, 
+`newBASiCS_Chain` functions and all methods updated accordingly 
+- `ChainSC` and `ChainRNA` example objects updated accordingly
+- Unit tests updated accordingly
+- Wiki page updated accordingly
+- `updateObject` generic method imported from `BiocGenerics` 
+- New generic methods definition moved to AllGenerics.R
+- Change in class definition to store current packageVersion
+- `BASiCS_LoadChain` function updated to deal with old class definition and
+.txt storage.
+- Shorter welcome message. 
+- Sanity checks in `BASiCS_TestDE` moved to separate file. 
+- Updated code indentation in `BASiCS_TestDE`
+- Warning in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` when user provides
+posterior probability thresholds as input
+- Unused argument removed from `HiddenEFDR` and `HiddenEFNR` functions
+- Minor changes to pass R CMD check
+- Check library passes R CMD BiocCheck
+- Tidy up NAMESPACE
+- Tidy up NEWS
+- Merge Devel_class into master branch
+
+version 0.99.13: (2017-10-17)  
+- @neling email added to DESCRIPTION + author contributions
   
   

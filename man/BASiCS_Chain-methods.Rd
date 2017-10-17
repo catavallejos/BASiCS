@@ -6,27 +6,52 @@
 \alias{updateObject,BASiCS_Chain-method}
 \alias{BASiCS_Chain-methods}
 \alias{show,BASiCS_Chain-method}
+<<<<<<< HEAD
 \title{'updateObject' method for BASiCS_Chain objects}
+=======
+\alias{BASiCS_Chain-methods}
+\alias{updateObject,BASiCS_Chain-method}
+\title{'show' method for BASiCS_Chain objects}
+>>>>>>> master
 \usage{
 \S4method{updateObject}{BASiCS_Chain}(object)
 
 \S4method{show}{BASiCS_Chain}(object)
+
+\S4method{updateObject}{BASiCS_Chain}(object, ..., verbose = FALSE)
 }
 \arguments{
 \item{object}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
+<<<<<<< HEAD
 \item{object}{A \code{\linkS4class{BASiCS_Chain}} object.}
+=======
+\item{...}{Additional arguments of \code{\link[BiocGenerics]{updateObject}}
+generic method. Not used within BASiCS.}
+
+\item{verbose}{Additional argument of \code{\link[BiocGenerics]{updateObject}}
+generic method. Not used within BASiCS.}
+>>>>>>> master
 }
 \value{
 Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
 contains all model parameters in a single slot object (list).
 
 Prints a summary of the properties of \code{object}.
+
+Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
+contains all model parameters in a single slot object (list).
 }
 \description{
 'updateObject' method for \code{\linkS4class{BASiCS_Chain}} objects.
 
 'show' method for \code{\linkS4class{BASiCS_Chain}} objects.
+
+'updateObject' method for \code{\linkS4class{BASiCS_Chain}} 
+objects. It is used to convert outdated \code{\linkS4class{BASiCS_Chain}}
+objects into a version that is compatible with the Bioconductor release
+of BASiCS. Do not use this method is \code{\linkS4class{BASiCS_Chain}} 
+already contains a \code{parameters} slot.
 }
 \examples{
 
@@ -36,6 +61,10 @@ Prints a summary of the properties of \code{object}.
 
 Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2)
+
+
+# Not run
+# New_Chain <- updateObject(Old_Chain)
 
 }
 \references{

@@ -238,7 +238,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       EFDR_M = 0.10, EFDR_D = 0.10,
-                      OffSet = TRUE, OffsetPlot = TRUE, Plot = TRUE)
+                      Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
@@ -248,16 +248,24 @@ option: `EpsilonM = EpsilonD = log2(1.5)` (i.e.
 offset correction is performed when `OffSet=TRUE`. 
 This is the recommended default.  
 
-**Note:** due to the confounding between mean and over-dispersion that is 
-typically observed in scRNA-seq datasets, we only assess changes in 
-over-dispersion for those genes in which the mean does not change 
-between the groups.
-
 The resulting output list can be displayed using
 
 ```{r quick-start-DE}
 head(Test$TableMean)
 head(Test$TableDisp)
+```
+
+**Note:** due to the confounding between mean and over-dispersion that is 
+typically observed in scRNA-seq datasets, we only assess changes in 
+over-dispersion for those genes in which the mean does not change 
+between the groups. **Use `EpsilonM = 0` as a conservative option:**
+
+```{r quick-start-TestDE-2, fig.width=10, fig.height=5}
+Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
+                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
+                      EpsilonM = 0, EpsilonD = log2(1.5),
+                      EFDR_M = 0.10, EFDR_D = 0.10,
+                      Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
 # Additional details
