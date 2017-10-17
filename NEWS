@@ -634,6 +634,7 @@ posterior probability thresholds as input
 - Tidy up NEWS
 - Merge Devel_class into master branch
 
-  
+version 0.99.13: (2017-10-17)  
+- @neling email added to DESCRIPTION + author contributions
   
   
