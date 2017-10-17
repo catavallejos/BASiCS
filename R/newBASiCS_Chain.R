@@ -7,7 +7,7 @@
 #' @param parameters List of matrices containing MCMC chains for each model 
 #' parameter. 
 #' \describe{
-##' \item{mu}{MCMC chain for gene-specific mean expression parameters 
+#' \item{mu}{MCMC chain for gene-specific mean expression parameters 
 #' \eqn{\mu_i}, biological genes only 
 #' (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 #' \item{delta}{MCMC chain for gene-specific biological over-dispersion 
@@ -23,7 +23,6 @@
 #' (matrix with \code{n} columns, all elements must be positive numbers)}
 #' \item{theta}{MCMC chain for technical over-dispersion parameter(s) 
 #' \eqn{\theta} (matrix, all elements must be positive, 
-<<<<<<< HEAD
 #' each colum represents 1 batch)}
 #' \item{\code{beta}}{MCMC chain for regression parameters
 #' (matrix with \code{k} columns where k represent the number of chosen basis functions) }
@@ -36,9 +35,6 @@
 #' \item{\code{epsilon}}{MCMC chain for the gene specific regression residue (mean corrected vraribility)
 #' (matrix with \code{q} columns)}
 #' }
-=======
-#' each colum represents 1 batch)}}
->>>>>>> master
 #' 
 #' @return An object of class \code{\linkS4class{BASiCS_Chain}}.
 #'
@@ -61,14 +57,10 @@
 #'
 #' ChainNew <- newBASiCS_Chain(parameters = list(mu = ChainMu, delta = ChainDelta,
 #'                             phi = ChainPhi, s = ChainS, 
-<<<<<<< HEAD
 #'                             nu = ChainNu, theta = ChainTheta,
 #'                             beta = ChainBeta, sigma2 = ChainSigma2,
 #'                             eta = ChainEta, lambda = ChainLambda,
 #'                             epsilon = ChainEpsilon))
-=======
-#'                             nu = ChainNu, theta = ChainTheta))
->>>>>>> master
 #'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
