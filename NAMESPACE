@@ -1,49 +1,26 @@
 useDynLib(BASiCS)
 exportPattern("^[^\\Hidden]") 
-<<<<<<< HEAD
-importFrom("Rcpp", "evalCpp")
-importFrom("coda", "HPDinterval", "mcmc")
-importFrom("methods", "Summary")
-importFrom("testthat", "context",
-           "test_check")
-import("SingleCellExperiment")
-import("KernSmooth")
-import("ggplot2")
-importFrom("graphics", "abline", "barplot", "legend", "lines", "par",
-             "points", "segments", "smoothScatter", "plot")
-importFrom("grDevices", "colorRampPalette")
-importFrom("data.table", "fread")
-importFrom("methods", "is", "new", "show")
-importFrom("S4Vectors", "metadata")
-importFrom("SummarizedExperiment", "assay")
-importFrom("stats", "median", "model.matrix", "rgamma", "rpois", "runif", "acf")
-importFrom("MASS", "mvrnorm")
-importFrom("utils", "packageVersion", "write.table")
-importFrom("matrixStats", "rowMeans2", "colMeans2",
-                        "rowVars", "colVars", "colMedians", "rowMedians")
-=======
->>>>>>> master
 
 import(SingleCellExperiment)
 import(KernSmooth)
 
 importFrom(stats, acf)
 importFrom(Rcpp, evalCpp)
-importFrom(coda, HPDinterval)
-importFrom(methods, Summary)
+importFrom(coda, HPDinterval, mcmc)
+importFrom(methods, Summary, is, new, show, slotNames, .hasSlot)
 importFrom(testthat, context, test_check)
 importFrom(graphics, abline, barplot, legend, lines, par,
-                     points, segments, smoothScatter)
+                     points, segments, smoothScatter, plot)
 importFrom(data.table, fread)
-importFrom(graphics, plot)
-importFrom(methods, is, new, show, slotNames, .hasSlot)
 importFrom(S4Vectors, metadata)
 importFrom(SummarizedExperiment, assay)
-importFrom(stats, median, model.matrix, rgamma, rpois, runif)
+importFrom(stats, median, model.matrix, rgamma, rpois, runif, acf)
 importFrom(utils, packageVersion, write.table)
 importFrom(matrixStats, rowMeans2, colMeans2,
                         rowVars, colVars,
-                        colMedians)
+                        colMedians, rowMedians)
+importFrom(grDevices, colorRampPalette)
+importFrom(MASS, mvrnorm)
 
 importMethodsFrom(BiocGenerics, counts, updateObject)
 importMethodsFrom(scran, computeSumFactors)
@@ -54,7 +31,7 @@ exportMethods(Summary,
               plot,
               displayChainBASiCS,
               displaySummaryBASiCS,
-	      showFit)
+	            showFit)
 
 export(BASiCS_Filter,
        newBASiCS_Data,

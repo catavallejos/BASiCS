@@ -547,15 +547,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     {
         Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))
     }
-<<<<<<< HEAD
-  
-    ChainClass <- newBASiCS_Chain(parameters = Chain)
-
-=======
-    
     ChainClass <- newBASiCS_Chain(parameters = Chain)
     
->>>>>>> master
     OldDir <- getwd()
     
     if (StoreChains) 

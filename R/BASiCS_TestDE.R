@@ -187,82 +187,7 @@ BASiCS_TestDE <- function(Chain1,
   message("-------------------------------------------------------------\n",
           "Log-fold change thresholds are now set in a log2 scale. \n", 
           "Original BASiCS release used a natural logarithm scale.")
-    
-<<<<<<< HEAD
-  # Test compatibility of both BASiCS_Chain objects
-  if (ncol(Chain1@parameters$mu) != ncol(Chain2@parameters$mu)) 
-    stop("The 'BASiCS_Chain' objects contain different number of genes.")
-  if (!identical(colnames(Chain1@parameters$mu), colnames(Chain2@parameters$mu))) 
-    stop("The  'BASiCS_Chain' objects contain genes in different order.")
-    
-  GeneName <- colnames(Chain1@parameters$mu)
-    
-  if (EpsilonM < 0 | !is.finite(EpsilonM)) 
-    stop("'EpsilonM' must be a positive real value")
-  if (EpsilonD < 0 | !is.finite(EpsilonD)) 
-    stop("'EpsilonD' must be a positive real value")
-  if (PsiE < 0 | !is.finite(PsiE)) 
-    stop("'PsiE' must be a positive real value")
-  if (!is.logical(Plot) | length(Plot) != 1) 
-    stop("Please insert TRUE or FALSE for 'Plot' parameter")
-  if (!is.null(ProbThresholdM) | !is.null(ProbThresholdD) | !is.null(ProbThresholdE)) 
-  {
-    if (ProbThresholdM < 0 | ProbThresholdM > 1 | !is.finite(ProbThresholdM)) 
-      stop("'ProbThresholdM' must be contained in (0,1) \n 
-            For automatic threshold search use ProbThresholdM = NULL.")
-    if (ProbThresholdD < 0 | ProbThresholdD > 1 | !is.finite(ProbThresholdD)) 
-      stop("'ProbThresholdD' must be contained in (0,1) \n 
-            For automatic threshold search use ProbThresholdD = NULL.")
-    if (ProbThresholdE < 0 | ProbThresholdE > 1 | !is.finite(ProbThresholdE)) 
-      stop("'ProbThresholdE' must be contained in (0,1) \n 
-           For automatic threshold search use ProbThresholdE = NULL.")
-    }
-    if (!(OrderVariable %in% c("GeneIndex", "GeneName", "Prob"))) 
-      stop("Invalid 'OrderVariable' value")
-    if (!is.character(GroupLabel1) | length(GroupLabel1) > 1) 
-      stop("Invalid value for 'GroupLabel1'")
-    if (!is.character(GroupLabel2) | length(GroupLabel2) > 1) 
-      stop("Invalid value for 'GroupLabel2'")
-    if (!is.null(GenesSelect) & (length(GenesSelect) != length(GeneName))) 
-      stop("Invalid value for 'GenesSelect'")
-    if (!is.null(GenesSelect) & !is.logical(GenesSelect)) 
-      stop("Invalid value for 'GenesSelect'")
-
-    message("Log-fold change thresholds are now set in a log2 scale. \n", 
-            "Original BASiCS release used a natural logarithm scale.")
-    
-    n1 <- ncol(Chain1@parameters$nu)
-    n2 <- ncol(Chain2@parameters$nu)
-    n <- n1 + n2
-    # With offset correction
-    if (OffSet) 
-    {
-      # Calculating iteration-specific offset
-      OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) / 
-                      matrixStats::rowSums2(Chain2@parameters$mu)
-      # Offset point estimate
-      OffsetEst <- median(OffsetChain)
-        
-      # Offset correction
-      Chain1_offset <- Chain1
-      Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
-      Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
-      Chain2_offset <- Chain2  # Chain2 requires no change
-      Summary1 <- Summary(Chain1_offset)
-      Summary2 <- Summary(Chain2_offset)
-        
-      # Pre-offset correction LFC estimates
-      Summary1_old <- Summary(Chain1)
-      Summary2_old <- Summary(Chain2)
-      MuBase_old <- (Summary1_old@parameters$mu[, 1] * n1 + Summary2_old@parameters$mu[, 1] * n2)/n
-      ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
-      MedianTau_old <- matrixStats::colMedians(ChainTau_old)
-        
-      # Offset corrected LFC estimates
-      MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
-      ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
-      MedianTau <- matrixStats::colMedians(ChainTau)
-=======
+  
   n1 <- ncol(Chain1@parameters$nu)
   n2 <- ncol(Chain2@parameters$nu)
   n <- n1 + n2
@@ -289,47 +214,12 @@ BASiCS_TestDE <- function(Chain1,
     MuBase_old <- (Summary1_old@parameters$mu[, 1] * n1 + Summary2_old@parameters$mu[, 1] * n2)/n
     ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
     MedianTau_old <- matrixStats::colMedians(ChainTau_old)
->>>>>>> master
-        
+
     # Offset corrected LFC estimates
     MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
     ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
     MedianTau <- matrixStats::colMedians(ChainTau)
         
-<<<<<<< HEAD
-        par(ask = TRUE)
-        # Offset uncertainty
-        graphics::boxplot(OffsetChain, frame = FALSE, 
-                          main = "Offset MCMC chain", ylab = "Offset estimate")
-        # Mean expression parameters before/after offset correction
-        par(mfrow = c(1, 2))
-        graphics::boxplot(cbind(Summary1_old@parameters$mu[,1], Summary2_old@parameters$mu[,1]), 
-                          frame = FALSE, main = "Before correction", 
-                          names = c(GroupLabel1, GroupLabel2), 
-                          ylab = "Mean expression", log = "y")
-        graphics::boxplot(cbind(Summary1@parameters$mu[, 1], Summary2@parameters$mu[, 1]), 
-                          frame = FALSE, main = "After correction", 
-                          names = c(GroupLabel1, GroupLabel2), 
-                          ylab = "Mean expression", log = "y")
-        # MA plot pre/after offset
-        par(mfrow = c(1, 2))
-        graphics::smoothScatter(log2(MuBase_old), MedianTau_old, bty = "n", 
-                                xlab = "Mean expresssion (log2)", 
-                                ylab = paste("Log2 fold change", GroupLabel1, 
-                                             "vs", GroupLabel2), 
-                                main = "Before correction")
-        abline(h = 0, lty = 2)
-        abline(h = log2(OffsetEst), lty = 1, col = "red")
-        legend('topright', "log2offset", lty = 1, col = "red")
-        graphics::smoothScatter(log2(MuBase), MedianTau, bty = "n", 
-                                xlab = "Mean expresssion (log2)", 
-                                ylab = paste("Log2 fold change", GroupLabel1, 
-                                             "vs", GroupLabel2), 
-                                main = "After correction")
-        abline(h = 0, lty = 2)
-        par(ask = FALSE)
-      }
-=======
     if (!PlotOffset) 
     {
       message("-------------------------------------------------------------\n", 
@@ -337,7 +227,6 @@ BASiCS_TestDE <- function(Chain1,
               "(ratio ", GroupLabel1, " vs ", GroupLabel2, ").\n", 
               "To visualise its effect, please use 'PlotOffset = TRUE'.\n", 
               "-------------------------------------------------------------\n")
->>>>>>> master
     } 
     else 
     {
@@ -395,20 +284,12 @@ BASiCS_TestDE <- function(Chain1,
             "Default offset value set equal to 1.\n", 
             "To perform offset correction, please set 'Offset = TRUE'. \n", 
             "-------------------------------------------------------------\n")
-      
-<<<<<<< HEAD
-      Summary1 <- Summary(Chain1)
-      Summary2 <- Summary(Chain2)
-      MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
-      ChainTau <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
-      MedianTau <- matrixStats::colMedians(ChainTau)
-=======
+    
     Summary1 <- Summary(Chain1)
     Summary2 <- Summary(Chain2)
     MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
     ChainTau <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
     MedianTau <- matrixStats::colMedians(ChainTau)
->>>>>>> master
       
     # Default values when no offset correction is applied
     OffsetEst <- 1
@@ -427,38 +308,7 @@ BASiCS_TestDE <- function(Chain1,
                                          Task = "differential mean")
   ProbM <- AuxMean$Prob
   OptThresholdM <- AuxMean$OptThreshold
-    
-<<<<<<< HEAD
-    # Test results
-    MeanPlus1 <- which(ProbM > OptThresholdM[1] & MedianTau > 0)
-    MeanPlus2 <- which(ProbM > OptThresholdM[1] & MedianTau < 0)
-    ResultDiffMean <- rep("NoDiff", length(MedianTau))
-    ResultDiffMean[MeanPlus1] <- paste0(GroupLabel1, "+")
-    ResultDiffMean[MeanPlus2] <- paste0(GroupLabel2, "+")
-    if (!is.null(GenesSelect)) {
-        ResultDiffMean[!GenesSelect] <- "ExcludedByUser"
-    }
-    # Output table
-    TableMean <- cbind.data.frame(GeneName = GeneName, 
-                                  MeanOverall = as.numeric(MuBase), 
-                                  Mean1 = as.numeric(Summary1@parameters$mu[,1]), 
-                                  Mean2 = as.numeric(Summary2@parameters$mu[,1]), 
-                                  MeanFC = as.numeric(2^(MedianTau)), 
-                                  MeanLog2FC = as.numeric(MedianTau), 
-                                  ProbDiffMean = as.numeric(ProbM), 
-                                  ResultDiffMean = ResultDiffMean, 
-                                  stringsAsFactors = FALSE)
-    # Rounding to 3 decimal points
-    TableMean[, seq(2,7)] <- round(TableMean[, seq(2,7)], 3)
-    
-    # Genes for which mean doesn't change
-    NotDE <- which(ResultDiffMean == "NoDiff")
-    
-    # Changes in over dispersion
-    ChainOmega <- log2(Chain1@parameters$delta[, NotDE] / Chain2@parameters$delta[, NotDE])
-    MedianOmega <- matrixStats::colMedians(ChainOmega)
-    DeltaBase <- (Summary1@parameters$delta[NotDE,1] * n1 + Summary2@parameters$delta[NotDE,1] * n2)/n
-=======
+  
   # Test results
   MeanPlus1 <- which(ProbM > OptThresholdM[1] & MedianTau > 0)
   MeanPlus2 <- which(ProbM > OptThresholdM[1] & MedianTau < 0)
@@ -483,88 +333,19 @@ BASiCS_TestDE <- function(Chain1,
     
   # Genes for which mean doesn't change
   NotDE <- which(ResultDiffMean == "NoDiff")
->>>>>>> master
     
   # Changes in over dispersion
   ChainOmega <- log2(Chain1@parameters$delta[, NotDE] / Chain2@parameters$delta[, NotDE])
   MedianOmega <- matrixStats::colMedians(ChainOmega)
   DeltaBase <- (Summary1@parameters$delta[NotDE,1] * n1 + Summary2@parameters$delta[NotDE,1] * n2)/n
-    
-<<<<<<< HEAD
-    # Test results
-    DispPlus1 <- which(ProbD > OptThresholdD[1] & MedianOmega > 0)
-    DispPlus2 <- which(ProbD > OptThresholdD[1] & MedianOmega < 0)
-    ResultDiffDisp <- rep("NoDiff", length(MedianOmega))
-    ResultDiffDisp[DispPlus1] <- paste0(GroupLabel1, "+")
-    ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
-    # Output table
-    TableDisp <- cbind.data.frame(GeneName = GeneName[NotDE], 
-                                  MeanOverall = as.numeric(MuBase[NotDE]), 
-                                  DispOverall = as.numeric(DeltaBase), 
-                                  Disp1 = as.numeric(Summary1@parameters$delta[NotDE, 1]), 
-                                  Disp2 = as.numeric(Summary2@parameters$delta[NotDE, 1]), 
-                                  DispFC = as.numeric(2^(MedianOmega)), 
-                                  DispLog2FC = as.numeric(MedianOmega), 
-                                  ProbDiffDisp = as.numeric(ProbD), 
-                                  ResultDiffDisp = ResultDiffDisp, 
-                                  stringsAsFactors = FALSE)
-    # Rounding to 3 decimal points
-    TableDisp[, seq(2,8)] <- round(TableDisp[, seq(2,8)], 3)
-    
-    # Changes in residual over-dispersion - if regression approach was used
-    if(!is.null(Chain1@parameters$epsilon)){
-      GenesSelect.epsilon <- !(is.na(Chain1@parameters$epsilon[1,]) | is.na(Chain2@parameters$epsilon[1,]))
-      
-      ChainPsi <- Chain2@parameters$epsilon - Chain1@parameters$epsilon
-      MedianPsi <- matrixStats::colMedians(ChainPsi)
-      EpsilonBase <- (Summary1@parameters$epsilon[,1] * n1 + Summary2@parameters$epsilon[,1] * n2)/n
-    
-      AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, PsiE, 
-                                           ProbThresholdE, GenesSelect & GenesSelect.epsilon, 
-                                           EFDR_E, 
-                                           Task = "Differential residual dispersion")
-      ProbE <- AuxResDisp$Prob
-      OptThresholdE <- AuxResDisp$OptThreshold
-    
-      # Test results
-      ResDispPlus1 <- which(ProbE > OptThresholdE[1] & MedianPsi > 0)
-      ResDispPlus2 <- which(ProbE > OptThresholdE[1] & MedianPsi < 0)
-      ResultDiffResDisp <- rep("NoDiff", length(MedianPsi))
-      ResultDiffResDisp[ResDispPlus1] <- paste0(GroupLabel1, "+")
-      ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
-      # Output table
-      TableResDisp <- cbind.data.frame(GeneName = GeneName, 
-                                    MeanOverall = as.numeric(MuBase), 
-                                    ResDispOverall = as.numeric(EpsilonBase), 
-                                    ResDisp1 = as.numeric(Summary1@parameters$epsilon[, 1]), 
-                                    ResDisp2 = as.numeric(Summary2@parameters$epsilon[, 1]),  
-                                    ResDispDistance = as.numeric(MedianPsi), 
-                                    ProbDiffResDisp = as.numeric(ProbE), 
-                                    ResultDiffResDisp = ResultDiffResDisp, 
-                                    stringsAsFactors = FALSE)
-      # Rounding to 3 decimal points
-      TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)
-      
-      # Reordering the table
-      if (OrderVariable == "GeneIndex") 
-        orderVar = GeneIndex
-      if (OrderVariable == "GeneName") 
-        orderVar = GeneName
-      if (OrderVariable == "Prob") 
-        orderVar = ProbM
-      TableResDisp <- TableResDisp[order(orderVar, decreasing = TRUE), ]
-    }
-    
-    # Update after removing DE genes from Disp table!  Reordering the tables
-    GeneIndex <- seq_len(length(MuBase))
-=======
+
   AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega, EpsilonD, 
-                                          ProbThresholdD, NULL, 
-                                          EFDR_D, 
-                                          Task = "Differential dispersion")
+                                         ProbThresholdD, NULL, 
+                                         EFDR_D, 
+                                         Task = "Differential dispersion")
   ProbD <- AuxDisp$Prob
   OptThresholdD <- AuxDisp$OptThreshold
-    
+  
   # Test results
   DispPlus1 <- which(ProbD > OptThresholdD[1] & MedianOmega > 0)
   DispPlus2 <- which(ProbD > OptThresholdD[1] & MedianOmega < 0)
@@ -584,11 +365,60 @@ BASiCS_TestDE <- function(Chain1,
                                 stringsAsFactors = FALSE)
   # Rounding to 3 decimal points
   TableDisp[, seq(2,8)] <- round(TableDisp[, seq(2,8)], 3)
->>>>>>> master
+  
+  # Changes in residual over-dispersion - if regression approach was used
+  if(!is.null(Chain1@parameters$epsilon)){
+    GenesSelect.epsilon <- !(is.na(Chain1@parameters$epsilon[1,]) | 
+                               is.na(Chain2@parameters$epsilon[1,]))
+      
+    ChainPsi <- Chain2@parameters$epsilon - Chain1@parameters$epsilon
+    MedianPsi <- matrixStats::colMedians(ChainPsi)
+    EpsilonBase <- (Summary1@parameters$epsilon[,1] * n1 + Summary2@parameters$epsilon[,1] * n2)/n
+    
+    AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, PsiE, 
+                                              ProbThresholdE, 
+                                              GenesSelect & GenesSelect.epsilon, 
+                                              EFDR_E, 
+                                              Task = "Differential residual dispersion")
+    ProbE <- AuxResDisp$Prob
+    OptThresholdE <- AuxResDisp$OptThreshold
+    
+    # Test results
+    ResDispPlus1 <- which(ProbE > OptThresholdE[1] & MedianPsi > 0)
+    ResDispPlus2 <- which(ProbE > OptThresholdE[1] & MedianPsi < 0)
+    ResultDiffResDisp <- rep("NoDiff", length(MedianPsi))
+    ResultDiffResDisp[ResDispPlus1] <- paste0(GroupLabel1, "+")
+    ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
+    # Output table
+    TableResDisp <- cbind.data.frame(GeneName = GeneName, 
+                                     MeanOverall = as.numeric(MuBase), 
+                                     ResDispOverall = as.numeric(EpsilonBase), 
+                                     ResDisp1 = as.numeric(Summary1@parameters$epsilon[, 1]), 
+                                     ResDisp2 = as.numeric(Summary2@parameters$epsilon[, 1]),  
+                                     ResDispDistance = as.numeric(MedianPsi), 
+                                     ProbDiffResDisp = as.numeric(ProbE), 
+                                     ResultDiffResDisp = ResultDiffResDisp, 
+                                     stringsAsFactors = FALSE)
+    # Rounding to 3 decimal points
+    TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)
+      
+    # Update after removing DE genes from Disp table!  Reordering the tables
+    GeneIndex <- seq_len(length(MuBase))
+    # Reordering the table
+    if (OrderVariable == "GeneIndex") 
+        orderVar = GeneIndex
+    if (OrderVariable == "GeneName") 
+        orderVar = GeneName
+    if (OrderVariable == "Prob") 
+        orderVar = ProbM
+    
+    TableResDisp <- TableResDisp[order(orderVar, decreasing = TRUE), ]
+  }
+    
     
   # Update after removing DE genes from Disp table!  Reordering the tables
   GeneIndex <- seq_len(length(MuBase))
-    
+  
   if (OrderVariable == "GeneIndex") 
       orderVar = GeneIndex
   if (OrderVariable == "GeneName") 
@@ -709,7 +539,6 @@ BASiCS_TestDE <- function(Chain1,
     par(ask = FALSE)
   }
     
-<<<<<<< HEAD
     nMeanPlus1 <- sum(ResultDiffMean == paste0(GroupLabel1, "+"))
     nMeanPlus2 <- sum(ResultDiffMean == paste0(GroupLabel2, "+"))
     nDispPlus1 <- sum(ResultDiffDisp == paste0(GroupLabel1, "+"))
@@ -722,8 +551,8 @@ BASiCS_TestDE <- function(Chain1,
     if(!is.null(Chain1@parameters$epsilon)){
       message("-------------------------------------------------------------\n", 
             nMeanPlus1 + nMeanPlus2," genes with a change in mean expression:\n", 
-            "- Higher expression in ", GroupLabel1, "samples:", nMeanPlus1, "\n", 
-            "- Higher expression in ", GroupLabel2, "samples:", nMeanPlus2, "\n", 
+            "- Higher expression in ", GroupLabel1, " samples: ", nMeanPlus1, "\n", 
+            "- Higher expression in ", GroupLabel2, " samples: ", nMeanPlus2, "\n", 
             "- Fold change tolerance = ", round(2^(EpsilonM), 2), "% \n",  
             "- Probability threshold = ", OptThresholdM[1], "\n", 
             "- EFDR = ", round(100 * OptThresholdM[2], 2), "% \n", 
@@ -731,8 +560,8 @@ BASiCS_TestDE <- function(Chain1,
             "-------------------------------------------------------------\n\n", 
             "-------------------------------------------------------------\n", 
             nDispPlus1 + nDispPlus2," genes with a change in over dispersion:\n", 
-            "- Higher dispersion in ", GroupLabel1, "samples:", nDispPlus1,"\n", 
-            "- Higher dispersion in ", GroupLabel2, "samples:", nDispPlus2,"\n", 
+            "- Higher dispersion in ", GroupLabel1, " samples: ", nDispPlus1,"\n", 
+            "- Higher dispersion in ", GroupLabel2, " samples: ", nDispPlus2,"\n", 
             "- Fold change tolerance = ", round(2^(EpsilonD), 2), "% \n", 
             "- Probability threshold = ", OptThresholdD[1], "\n", 
             "- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n", 
@@ -742,8 +571,8 @@ BASiCS_TestDE <- function(Chain1,
             "--------------------------------------------------------------\n",
             "-------------------------------------------------------------\n", 
             nResDispPlus1 + nResDispPlus2," genes with a change in residual over dispersion:\n", 
-            "- Higher residual dispersion in ", GroupLabel1, "samples:", nResDispPlus1,"\n", 
-            "- Higher residual dispersion in ", GroupLabel2, "samples:", nResDispPlus2,"\n", 
+            "- Higher residual dispersion in ", GroupLabel1, " samples: ", nResDispPlus1,"\n", 
+            "- Higher residual dispersion in ", GroupLabel2, " samples: ", nResDispPlus2,"\n", 
             "- Distance tolerance = ", round(PsiE, 2), "% \n", 
             "- Probability threshold = ", OptThresholdE[1], "\n", 
             "- EFDR = ", round(100 * OptThresholdE[2], 2), "% \n", 
@@ -770,8 +599,8 @@ BASiCS_TestDE <- function(Chain1,
     else{
       message("-------------------------------------------------------------\n", 
               nMeanPlus1 + nMeanPlus2," genes with a change in mean expression:\n", 
-              "- Higher expression in ", GroupLabel1, "samples:", nMeanPlus1, "\n", 
-              "- Higher expression in ", GroupLabel2, "samples:", nMeanPlus2, "\n", 
+              "- Higher expression in ", GroupLabel1, " samples: ", nMeanPlus1, "\n", 
+              "- Higher expression in ", GroupLabel2, " samples: ", nMeanPlus2, "\n", 
               "- Fold change tolerance = ", round(2^(EpsilonM), 2), "% \n",  
               "- Probability threshold = ", OptThresholdM[1], "\n", 
               "- EFDR = ", round(100 * OptThresholdM[2], 2), "% \n", 
@@ -779,8 +608,8 @@ BASiCS_TestDE <- function(Chain1,
               "-------------------------------------------------------------\n\n", 
               "-------------------------------------------------------------\n", 
               nDispPlus1 + nDispPlus2," genes with a change in over dispersion:\n", 
-              "- Higher dispersion in ", GroupLabel1, "samples:", nDispPlus1,"\n", 
-              "- Higher dispersion in ", GroupLabel2, "samples:", nDispPlus2,"\n", 
+              "- Higher dispersion in ", GroupLabel1, " samples: ", nDispPlus1,"\n", 
+              "- Higher dispersion in ", GroupLabel2, " samples: ", nDispPlus2,"\n", 
               "- Fold change tolerance = ", round(2^(EpsilonD), 2), "% \n", 
               "- Probability threshold = ", OptThresholdD[1], "\n", 
               "- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n", 
@@ -803,44 +632,5 @@ BASiCS_TestDE <- function(Chain1,
            Offset = OffsetEst)
       
     }
-=======
-  nMeanPlus1 <- sum(ResultDiffMean == paste0(GroupLabel1, "+"))
-  nMeanPlus2 <- sum(ResultDiffMean == paste0(GroupLabel2, "+"))
-  nDispPlus1 <- sum(ResultDiffDisp == paste0(GroupLabel1, "+"))
-  nDispPlus2 <- sum(ResultDiffDisp == paste0(GroupLabel2, "+"))
-    
-  message("-------------------------------------------------------------\n", 
-          nMeanPlus1 + nMeanPlus2," genes with a change in mean expression:\n", 
-          "- Higher mean in ", GroupLabel1, " samples: ", nMeanPlus1, "\n", 
-          "- Higher mean in ", GroupLabel2, " samples: ", nMeanPlus2, "\n", 
-          "- Fold change tolerance = ", round(2^(EpsilonM), 2), "% \n",  
-          "- Probability threshold = ", OptThresholdM[1], "\n", 
-          "- EFDR = ", round(100 * OptThresholdM[2], 2), "% \n", 
-          "- EFNR = ", round(100 * OptThresholdM[3], 2), "% \n", 
-          "-------------------------------------------------------------\n\n", 
-          "-------------------------------------------------------------\n", 
-          nDispPlus1 + nDispPlus2," genes with a change in over dispersion:\n", 
-          "- Higher over-dispersion in ", GroupLabel1, " samples: ", nDispPlus1,"\n", 
-          "- Higher over-dispersion in ", GroupLabel2, " samples: ", nDispPlus2,"\n", 
-          "- Fold change tolerance = ", round(2^(EpsilonD), 2), "% \n", 
-          "- Probability threshold = ", OptThresholdD[1], "\n", 
-          "- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n", 
-          "- EFNR = ", round(100 * OptThresholdD[3], 2), "% \n", 
-          "NOTE: differential dispersion assessment only applied to the \n", 
-          length(MedianOmega), " genes for which the mean did not change. \n", 
-          "--------------------------------------------------------------\n")
-    
-  list(TableMean = TableMean, 
-       TableDisp = TableDisp, 
-       DiffMeanSummary = list(ProbThreshold = OptThresholdM[1], 
-                              EFDR = OptThresholdM[2], 
-                              EFNR = OptThresholdM[3]), 
-       DiffDispSummary = list(ProbThreshold = OptThresholdD[1], 
-                              EFDR = OptThresholdD[2], 
-                              EFNR = OptThresholdD[3]), 
-       Chain1_offset = Chain1_offset, 
-       Chain2_offset = Chain2_offset,
-       OffsetChain = OffsetChain, 
-       Offset = OffsetEst)
->>>>>>> master
+
 }
