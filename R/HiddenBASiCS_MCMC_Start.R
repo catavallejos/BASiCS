@@ -50,8 +50,17 @@ HiddenBASiCS_MCMC_Start <- function(Data, ...)
       aux <- metadata(Data)$BatchInfo == B
       phi0[aux] <- sum(aux) * phi0[aux]/sum(phi0[aux])
     }
+    nu0 <- phi0
+    s0 <- NULL
     
-<<<<<<< HEAD
+    # Initialize mu using average 'normalised counts' across cells
+    nCountsBio <- t( t(CountsBio) / phi0 )
+    meansBio <- rowMeans(nCountsBio)
+    # +1 to avoid zeros as starting values
+    meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
+    mu0 <- meansBio
+  }
+  
     # Starting value for delta 
     # Defined by the CV for high- and mid-expressed genes 
     # This is motivated by equation (2) in Vallejos et al (2016)
@@ -108,52 +117,4 @@ HiddenBASiCS_MCMC_Start <- function(Data, ...)
            ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
     }
 }
-=======
-    nu0 <- phi0
-    s0 <- NULL
-    
-    # Initialize mu using average 'normalised counts' across cells
-    nCountsBio <- t( t(CountsBio) / phi0 )
-    meansBio <- rowMeans(nCountsBio)
-    # +1 to avoid zeros as starting values
-    meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
-    mu0 <- meansBio
-  }
-  
-  # Starting value for delta 
-  # Defined by the CV for high- and mid-expressed genes 
-  # This is motivated by equation (2) in Vallejos et al (2016)
-  varsBio <- matrixStats::rowVars(nCountsBio)
-  cv2Bio <- varsBio/(meansBio)^2
-  delta0 <- rgamma(q.bio, 1, 1) + 1
-  Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
-  delta0[Aux] <- cv2Bio[Aux]
-  # 1e-3 added to be coherent with tolerance used within MCMC sampler
-  delta0 <- delta0 + 0.001
-  
-  # Random stating value for theta (within typically observed range)
-  theta0 <- runif(1, min = 0.2, max = 1)
-  
-  # If given, load default values for adaptive proposal variances
-  args <- list(...)
-  ls.mu0 <- ifelse("ls.mu0" %in% names(args), args$ls.mu0, -4)
-  ls.delta0 <- ifelse("ls.delta0" %in% names(args), args$ls.delta0, -2)
-  ls.phi0 <- ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
-  ls.nu0 <- ifelse("ls.nu0" %in% names(args), args$ls.nu0, -10)
-  ls.theta0 <- ifelse("ls.theta0" %in% names(args), args$ls.theta0, -4)
-  
-  # Starting values for the proposal variances 
-  if (length(metadata(Data)$SpikeInput) > 1) { ls.mu0 <- rep(ls.mu0, q) } 
-  else { ls.mu0 <- rep(ls.mu0, q.bio) }
-  ls.delta0 <- rep(ls.delta0, q.bio)
-  ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11) 
-  ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
-  ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
-  
-  list(mu0 = mu0, delta0 = delta0, 
-       phi0 = phi0, s0 = s0, 
-       nu0 = nu0, theta0 = theta0, 
-       ls.mu0 = ls.mu0, ls.delta0 = ls.delta0, 
-       ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
-}
->>>>>>> master
+
