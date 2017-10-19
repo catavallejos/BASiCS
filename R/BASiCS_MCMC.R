@@ -182,7 +182,19 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     
   if (!is(Data, "SingleCellExperiment")) 
     stop("'Data' is not a SingleCellExperiment class object.")
-  # Add extra checks to ensure spike-ins info, etc is provided
+  # The following checks are only relevant when the input data was
+  # not created using the `newBASiCS_Data` function
+  if(!("SpikeInput" %in% names(metadata(Data))))
+    stop("'Data' does not contained all the required information \n",
+         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
+  if(!("BatchInfo" %in% names(metadata(Data))))
+    stop("'Data' does not contained all the required information \n",
+         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
+  errors <- HiddenChecksBASiCS_Data(assay(Data), isSpike(Data), 
+                                    metadata(Data)$SpikeInput, 
+                                    rownames(assay(Data)), 
+                                    metadata(Data)$BatchInfo)
+  if (length(errors) > 0) stop(errors) 
     
   # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
   q <- length(isSpike(Data))
