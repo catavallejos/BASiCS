@@ -3,6 +3,7 @@ exportPattern("^[^\\Hidden]")
 
 import(SingleCellExperiment)
 import(KernSmooth)
+import(ggplot2)
 
 importFrom(stats, acf)
 importFrom(Rcpp, evalCpp)

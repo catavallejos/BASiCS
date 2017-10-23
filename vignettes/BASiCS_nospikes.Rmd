@@ -70,12 +70,12 @@ SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10),
                         "SpikeInput" = SpikeInput)
 
 # With spikes; with batches
-DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo,
-                              BatchInfo = rep(c(1,2), each = 20))
+#DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo,
+#                              BatchInfo = rep(c(1,2), each = 20))
 
 # Without spikes; with batches
-DataExample <- newBASiCS_Data(Counts, Tech, 
-                              BatchInfo = rep(c(1,2), each = 20)) 
+#DataExample <- newBASiCS_Data(Counts, Tech, 
+#                              BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
 
