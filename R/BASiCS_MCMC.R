@@ -437,25 +437,19 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     {
       ConstrainGene <- (1:q.bio) - 1
       NotConstrainGene <- 0
-      Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
     if (ConstrainType == 2) 
     {
       ConstrainGene <- which(colSums(assay(Data)) > 0) - 1
       NotConstrainGene <- which(colSums(assay(Data)) > 0) - 1
-      Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
+    Constrain <- mean(log(mu0[ConstrainGene + 1]))
     
     # Whether or not a stochatic reference is used
+    # If stochastic, range of possible reference values only includes 
+    # the nearest 200 genes located around the constrain
     StochasticRef <- ifelse("StochasticRef" %in% names(args), 
                             args$StochasticRef, FALSE)
-
-    
-    # Auxiliary vector contaning a gene index
-    Index <- (1:q.bio) - 1
-        
-
-        
     if (StochasticRef == TRUE) 
     {
       aux.ref <- cbind(ConstrainGene, 
@@ -471,6 +465,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       RefGene <- ConstrainGene[aux.ref]
       RefGenes <- RefGene
     }
+
+    # Auxiliary vector contaning a gene index
+    Index <- (1:q.bio) - 1
         
     # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
     Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
@@ -497,10 +494,12 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      StopAdapt, 
                                                      as.numeric(PrintProgress), 
                                                      Constrain, 
-                                                     Index, RefGene, RefGenes, 
+                                                     Index, 
+                                                     RefGene, RefGenes, 
                                                      ConstrainGene, 
                                                      NotConstrainGene, 
-                                                     ConstrainType))
+                                                     ConstrainType,
+                                                     as.numeric(StochasticRef)))
   }
     
   Chain$mu <- Chain$mu[, 1:q.bio]
