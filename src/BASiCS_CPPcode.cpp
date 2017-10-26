@@ -2100,11 +2100,8 @@ arma::mat nuUpdateNoSpikes(
   arma::vec const& sum_bygene_all, /* Sum of expression counts by gene (all genes) */
   int const& q0,
   int const& n,
-  arma::vec const& BatchInfo,
-  arma::vec const& BatchIds,
   int const& nBatch,
-  arma::vec const& BatchSizes,
-  arma::vec const& BatchOffSet)
+  arma::vec const& BatchSizes)
 {
   using arma::span;
   
@@ -2182,42 +2179,82 @@ arma::mat HiddenBASiCS_DenoisedRates(
 
 
 /* MCMC sampler 
+ * N: Total number of MCMC draws 
+ * Thin: Thinning period for MCMC chain 
+ * Burn: Burning period for MCMC chain 
+ * Counts: $q \times n$ matrix of expression counts
+ * BatchDesign: Design matrix representing batch information 
+ * (number of columns must be equal to number of batches)
+ * mu0: Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ 
+ * delta0: Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$
+ * phi0: Starting value of $\phi=(\phi_1,...,\phi_n)$'
+ * nu0: Starting value of $\nu=(\nu_1,...,\nu_n)$'
+ * theta0: Starting value of $\theta$ 
+ * s2mu: Prior variance for log-Normal(0, $s^2_{\mu}$) assigned to the 
+ * unconstrained mean expression parameters
+ * adelta: Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
+ * prior assigned to each $\delta_i$ 
+ * bdelta: Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
+ * prior assigned to each $\delta_i$ 
+ * s2delta: Prior variance for log-Normal(0, $s^2_{\delta}$) assigned to each
+ * $\delta_i$
+ * prior_delta: (as in HiddenBASiCS_MCMCcpp)
+ * atheta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
+ * prior assigned to $\theta$
+ * btheta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
+ * prior assigned to $\theta$
+ * ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
+ * LSmu0: Starting value of adaptive proposal variance of 
+ * $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
+ * LSdelta0: Starting value of adaptive proposal variance of 
+ * $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
+ * LSnu0: Starting value of adaptive proposal variance of 
+ * $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
+ * LStheta0: Starting value of adaptive proposal variance of $\theta$ (log-scale) 
+ * sumByCellAll: Sum of expression counts by cell (all genes)
+ * sumByGeneAll: Sum of expression counts by gene (all genes) 
+ * StoreAdapt: (as in HiddenBASiCS_MCMCcpp)
+ * EndAdapt: (as in HiddenBASiCS_MCMCcpp)
+ * PrintProgress: (as in HiddenBASiCS_MCMCcpp)
+ * Constrain:
+ * Index:
+ * RefGene:
+ * RefGenes:
+ * ConstrainGene:
+ * NotConstrainGene:
+ * ConstrainType: 
  */
 // [[Rcpp::export]]
 Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
-    int N, // Total number of MCMC draws 
-    int Thin, // Thinning period for MCMC chain 
-    int Burn, // Burning period for MCMC chain 
-    NumericMatrix Counts, // $q \times n$ matrix of expression counts (technical genes at the bottom) 
-    NumericMatrix BatchDesign, // Design matrix representing batch information (number of columns must be equal to number of batches)
-    NumericVector mu0, // Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ (true mRNA content for technical genes)  
-    NumericVector delta0, // Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$  
-    NumericVector phi0, // Starting value of $\phi=(\phi_1,...,\phi_n)$'$ 
-    NumericVector nu0, // Starting value of $\nu=(\nu_1,...,\nu_n)$'$   
-    double theta0, // Starting value of $\theta$ 
+    int N, 
+    int Thin, 
+    int Burn,  
+    NumericMatrix Counts, 
+    NumericMatrix BatchDesign, 
+    NumericVector mu0, 
+    NumericVector delta0,   
+    NumericVector phi0, 
+    NumericVector nu0,    
+    double theta0,
     double s2mu, 
-    double adelta, // Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
-    double bdelta, // Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
+    double adelta, 
+    double bdelta, 
+    double s2delta,
+    double prior_delta,
     double aphi,
     double bphi,
-    double atheta, // Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$
-    double btheta, // Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$
-    double ar, // Optimal acceptance rate for adaptive Metropolis-Hastings updates
-    NumericVector LSmu0, // Starting value of adaptive proposal variance of $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
-    NumericVector LSdelta0, // Starting value of adaptive proposal variance of $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
-    NumericVector LSnu0, // Starting value of adaptive proposal variance of $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
-    double LStheta0, // Starting value of adaptive proposal variance of $\theta$ (log-scale)  
-    NumericVector sumByCellAll, // Sum of expression counts by cell (all genes)
-    NumericVector sumByGeneAll, // Sum of expression counts by gene (all genes)
+    double atheta, 
+    double btheta, 
+    double ar, 
+    NumericVector LSmu0, 
+    NumericVector LSdelta0, 
+    NumericVector LSnu0, 
+    double LStheta0, 
+    NumericVector sumByCellAll, 
+    NumericVector sumByGeneAll, 
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
-    double s2delta, 
-    double prior_delta,
-    NumericVector BatchInfo,
-    NumericVector BatchIds,
-    NumericVector BatchSizes,
-    NumericVector BatchOffSet,
     double Constrain,
     NumericVector Index,
     int RefGene,
@@ -2233,17 +2270,17 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // TRANSFORMATION TO ARMA ELEMENTS 
   arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
   arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
-  arma::mat Counts_arma = as_arma(Counts); arma::mat BatchDesign_arma = as_arma(BatchDesign);
-  arma::vec BatchInfo_arma = as_arma(BatchInfo);
-  arma::vec BatchIds_arma = as_arma(BatchIds);
-  arma::vec BatchSizes_arma = as_arma(BatchSizes);
-  arma::vec BatchOffSet_arma = as_arma(BatchOffSet);
+  arma::mat Counts_arma = as_arma(Counts); 
+  arma::mat BatchDesign_arma = as_arma(BatchDesign);
   arma::vec mu0_arma = as_arma(mu0);
   arma::vec phi0_arma = as_arma(phi0);
   arma::vec Index_arma = as_arma(Index);
   arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
   arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
   arma::vec RefGenes_arma = as_arma(RefGenes);
+  
+  // OTHER GLOBAL QUANTITIES
+  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = arma::zeros(Naux, q0); 
@@ -2309,7 +2346,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     }
     
     Ibatch++; 
-    
+
+    /*    
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaAux.col(0),
@@ -2318,41 +2356,47 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     // UPDATE OF THETA: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign_arma, BatchSizes_arma,
+                                BatchDesign_arma, BatchSizes,
                                 phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
     PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
 //    Rcpp::Rcout << "theta" << thetaAux.col(0).t() << std::endl;
+
     
-    // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
-    // Additional steps required for ConstrainType = 3 (stochastic reference)
-    if((ConstrainType == 3) | (ConstrainType == 5))
+    // UPDATE OF MU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
+    // If ConstrainType = 3 (stochastic reference) randomly select 1 ref gene
+    if(ConstrainType == 3)
     {
-      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, RefGenes_arma.size()-1) ));
+      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
+                                                           RefGenes_arma.size()-1) ));
       RefGene = RefGenes(RefAux); 
       if(i >= Burn) {RefFreq(RefGene) += 1;}
     }
-    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
-                             nuAux.col(0), sumByCellAll_arma, s2mu, q0, n,
-                             muUpdateAux, indQ, RefGene, ConstrainGene_arma, NotConstrainGene_arma,
+    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, 
+                             deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
+                             s2mu, q0, n, muUpdateAux, indQ, RefGene, 
+                             ConstrainGene_arma, NotConstrainGene_arma,
                              ConstrainType);
     PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}  
 //    Rcpp::Rcout << "mu" << muAux.col(0).t() << std::endl;
     
     // UPDATE OF DELTA: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     deltaAux = deltaUpdateNoSpikes(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
-                           muAux.col(0), nuAux.col(0), adelta, bdelta, q0, n, s2delta, prior_delta);  
+                                   muAux.col(0), nuAux.col(0), adelta, bdelta, 
+                                   q0, n, s2delta, prior_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
-//    Rcpp::Rcout << "delta" << deltaAux.col(0).t() << std::endl;
+
    
     // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     nuAux = nuUpdateNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
                             BatchDesign_arma,
                             muAux.col(0), deltaAux.col(0),
                             phiAux, thetaAux.col(0), sumByGeneAll_arma, q0, n,
-                            BatchInfo_arma, BatchIds_arma, nBatch,
-                            BatchSizes_arma, BatchOffSet_arma); 
+                            nBatch,
+                            BatchSizes); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
-//    Rcpp::Rcout << "nu" << nuAux.col(0).t() << std::endl;
+     */
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt)
@@ -2477,6 +2521,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   }
   
 }
+
 
 
   

@@ -14,7 +14,8 @@
 #' @param SpikeInfo \code{data.frame} whose first and second columns contain 
 #' the gene names assigned to the spike-in genes (they must match the ones in 
 #' \code{rownames(Counts)}) and the associated input number of molecules, 
-#' respectively.
+#' respectively. If \code{SpikeInfo = NULL}, only the horizontal integration
+#' implementation (no spikes) can be run. Default value: \code{SpikeInfo = NULL}.
 #' @param BatchInfo Vector of length \code{n} whose elements indicate batch 
 #' information. Not required if a single batch is present on the data. 
 #' Default value: \code{BatchInfo = NULL}. 

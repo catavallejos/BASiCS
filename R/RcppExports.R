@@ -13,7 +13,7 @@ HiddenBASiCS_DenoisedRates <- function(CountsBio, Mu, TransInvDelta, PhiNu, N, q
     .Call('_BASiCS_HiddenBASiCS_DenoisedRates', PACKAGE = 'BASiCS', CountsBio, Mu, TransInvDelta, PhiNu, N, q0, n)
 }
 
-HiddenBASiCS_MCMCcppNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, s2delta, prior_delta, BatchInfo, BatchIds, BatchSizes, BatchOffSet, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType) {
-    .Call('_BASiCS_HiddenBASiCS_MCMCcppNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, s2delta, prior_delta, BatchInfo, BatchIds, BatchSizes, BatchOffSet, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType)
+HiddenBASiCS_MCMCcppNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType) {
+    .Call('_BASiCS_HiddenBASiCS_MCMCcppNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType)
 }
 

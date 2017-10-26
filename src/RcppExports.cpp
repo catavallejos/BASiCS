@@ -120,8 +120,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // HiddenBASiCS_MCMCcppNoSpikes
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector nu0, double theta0, double s2mu, double adelta, double bdelta, double aphi, double bphi, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSnu0, double LStheta0, NumericVector sumByCellAll, NumericVector sumByGeneAll, int StoreAdapt, int EndAdapt, int PrintProgress, double s2delta, double prior_delta, NumericVector BatchInfo, NumericVector BatchIds, NumericVector BatchSizes, NumericVector BatchOffSet, double Constrain, NumericVector Index, int RefGene, NumericVector RefGenes, NumericVector ConstrainGene, NumericVector NotConstrainGene, int ConstrainType);
-RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcppNoSpikes(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP aphiSEXP, SEXP bphiSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByGeneAllSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP BatchInfoSEXP, SEXP BatchIdsSEXP, SEXP BatchSizesSEXP, SEXP BatchOffSetSEXP, SEXP ConstrainSEXP, SEXP IndexSEXP, SEXP RefGeneSEXP, SEXP RefGenesSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP, SEXP ConstrainTypeSEXP) {
+Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector nu0, double theta0, double s2mu, double adelta, double bdelta, double s2delta, double prior_delta, double aphi, double bphi, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSnu0, double LStheta0, NumericVector sumByCellAll, NumericVector sumByGeneAll, int StoreAdapt, int EndAdapt, int PrintProgress, double Constrain, NumericVector Index, int RefGene, NumericVector RefGenes, NumericVector ConstrainGene, NumericVector NotConstrainGene, int ConstrainType);
+RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcppNoSpikes(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP aphiSEXP, SEXP bphiSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByGeneAllSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP ConstrainSEXP, SEXP IndexSEXP, SEXP RefGeneSEXP, SEXP RefGenesSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP, SEXP ConstrainTypeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -138,6 +138,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type s2mu(s2muSEXP);
     Rcpp::traits::input_parameter< double >::type adelta(adeltaSEXP);
     Rcpp::traits::input_parameter< double >::type bdelta(bdeltaSEXP);
+    Rcpp::traits::input_parameter< double >::type s2delta(s2deltaSEXP);
+    Rcpp::traits::input_parameter< double >::type prior_delta(prior_deltaSEXP);
     Rcpp::traits::input_parameter< double >::type aphi(aphiSEXP);
     Rcpp::traits::input_parameter< double >::type bphi(bphiSEXP);
     Rcpp::traits::input_parameter< double >::type atheta(athetaSEXP);
@@ -152,12 +154,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type StoreAdapt(StoreAdaptSEXP);
     Rcpp::traits::input_parameter< int >::type EndAdapt(EndAdaptSEXP);
     Rcpp::traits::input_parameter< int >::type PrintProgress(PrintProgressSEXP);
-    Rcpp::traits::input_parameter< double >::type s2delta(s2deltaSEXP);
-    Rcpp::traits::input_parameter< double >::type prior_delta(prior_deltaSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type BatchInfo(BatchInfoSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type BatchIds(BatchIdsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type BatchSizes(BatchSizesSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type BatchOffSet(BatchOffSetSEXP);
     Rcpp::traits::input_parameter< double >::type Constrain(ConstrainSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Index(IndexSEXP);
     Rcpp::traits::input_parameter< int >::type RefGene(RefGeneSEXP);
@@ -165,7 +161,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type ConstrainGene(ConstrainGeneSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type NotConstrainGene(NotConstrainGeneSEXP);
     Rcpp::traits::input_parameter< int >::type ConstrainType(ConstrainTypeSEXP);
-    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcppNoSpikes(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, s2delta, prior_delta, BatchInfo, BatchIds, BatchSizes, BatchOffSet, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType));
+    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcppNoSpikes(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -174,7 +170,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcpp", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcpp, 35},
     {"_BASiCS_HiddenBASiCS_MCMCcppReg", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppReg, 41},
     {"_BASiCS_HiddenBASiCS_DenoisedRates", (DL_FUNC) &_BASiCS_HiddenBASiCS_DenoisedRates, 7},
-    {"_BASiCS_HiddenBASiCS_MCMCcppNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppNoSpikes, 40},
+    {"_BASiCS_HiddenBASiCS_MCMCcppNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppNoSpikes, 36},
     {NULL, NULL, 0}
 };
 

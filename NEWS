@@ -639,3 +639,9 @@ version 0.99.13: (2017-10-17)
   
 version 0.99.14: (2017-10-19) 
 - Added checks to ensure input `SingleCellExperiment` object has all info
+
+Devel changes (version number once merged with master)
+- 'ggplot2' added to imports
+- Default value for SpikeInfo changed to NULL in `newBASiCS_Data` function
+- Partial cleaning of no-spikes case (removed unused args)
+

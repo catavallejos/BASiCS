@@ -383,7 +383,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       Chain$lambda[,!genes] <- NA
       }
     }
-    else{
+    else
+    {
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
                                                         as.matrix(assay(Data)), 
@@ -430,58 +431,30 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # 1: Full constrain; 2: Non-zero genes only
     ConstrainType <- ifelse("ConstrainType" %in% names(args), 
                             args$ConstrainType, 2)
-    ConstrainLimit <- ifelse("ConstrainLimit" %in% names(args), 
-                             args$ConstrainLimit, 1)
-    ConstrainAlpha <- ifelse("ConstrainAlpha" %in% names(args), 
-                             args$ConstrainAlpha, 0.05)
-    ConstrainProb <- ifelse("ConstrainProb" %in% names(args), 
-                            args$ConstrainProb, 0.95)
-        
-    BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)
-    BatchSizes <- table(metadata(Data)$BatchInfo)
-    BatchIds <- as.numeric(names(BatchSizes))
-    BatchOffSet <- rep(1, times = nBatch)
-    for (k in 2:nBatch) 
-    {
-      aux1 <- matrixStats::colSums2(assay(Data)[, 
-                                      metadata(Data)$BatchInfo == BatchIds[k]])
-      aux2 <- colSums(assay(Data)[, metadata(Data)$BatchInfo == BatchIds[1]])
-      BatchOffSet[k] <-  median(aux1) / median(aux2)
-    }
-    
-    # Auxiliary vector contaning a gene index
-    Index <- (1:q.bio) - 1
     # In the following '+1' is used as c++ vector indexes vectors setting 
     # '0' as its first element Constrain for gene-specific expression rates
     if (ConstrainType == 1) 
     {
-      # Full constrain Note we use 'ConstrainLimit + 1' as 1 
-      # pseudo-count was added 
-      # when computing 'mu0' (to avoid numerical issues)
       ConstrainGene <- (1:q.bio) - 1
       NotConstrainGene <- 0
       Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
     if (ConstrainType == 2) 
     {
-      # Trimmed constrain based on mean Note we use 'ConstrainLimit + 1' 
-      # as 1 pseudo-count 
-      # was added when computing 'mu0' (to avoid numerical issues)
-      ConstrainGene <- which(mu0 >= ConstrainLimit + 1) - 1
-      NotConstrainGene <- which(mu0 < ConstrainLimit + 1) - 1
+      ConstrainGene <- which(colSums(assay(Data)) > 0) - 1
+      NotConstrainGene <- which(colSums(assay(Data)) > 0) - 1
       Constrain <- mean(log(mu0[ConstrainGene + 1]))
     }
-    if (ConstrainType == 3) 
-    {
-      # Trimmed constrain based on detection
-      Detection <- rowMeans(assay(Data) > 0)
-      ConstrainGene <- which(Detection >= ConstrainLimit) - 1
-      NotConstrainGene <- which(Detection < ConstrainLimit) - 1
-      Constrain <- mean(log(mu0[ConstrainGene + 1]))
-    }
-        
+    
+    # Whether or not a stochatic reference is used
     StochasticRef <- ifelse("StochasticRef" %in% names(args), 
                             args$StochasticRef, FALSE)
+
+    
+    # Auxiliary vector contaning a gene index
+    Index <- (1:q.bio) - 1
+        
+
         
     if (StochasticRef == TRUE) 
     {
@@ -509,6 +482,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      PriorParam$s2.mu, 
                                                      PriorParam$a.delta, 
                                                      PriorParam$b.delta, 
+                                                     PriorParam$s2.delta, 
+                                                     PriorDeltaNum, 
                                                      PriorParam$a.phi, 
                                                      PriorParam$b.phi, 
                                                      PriorParam$a.theta, 
@@ -521,12 +496,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      StoreAdaptNumber, 
                                                      StopAdapt, 
                                                      as.numeric(PrintProgress), 
-                                                     PriorParam$s2.delta, 
-                                                     PriorDeltaNum, 
-                                                     metadata(Data)$BatchInfo, 
-                                                     BatchIds, 
-                                                     as.vector(BatchSizes), 
-                                                     BatchOffSet, Constrain, 
+                                                     Constrain, 
                                                      Index, RefGene, RefGenes, 
                                                      ConstrainGene, 
                                                      NotConstrainGene, 
@@ -536,7 +506,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   Chain$mu <- Chain$mu[, 1:q.bio]
   colnames(Chain$mu) <- rownames(assay(Data))[!isSpike(Data)]
   colnames(Chain$delta) <- rownames(assay(Data))[!isSpike(Data)]
-  if(!is.null(Chain$epsilon) & !is.null(Chain$lambda)) {colnames(Chain$epsilon) = colnames(Chain$lambda) = colnames(Chain$mu)}
+  if(!is.null(Chain$epsilon) & !is.null(Chain$lambda)) 
+    {colnames(Chain$epsilon) = colnames(Chain$lambda) = colnames(Chain$mu)}
   ###################### Change this to keep the cell labels the same
   CellLabels <- paste0("Cell", 1:n, "_Batch", metadata(Data)$BatchInfo)
   colnames(Chain$phi) <- CellLabels

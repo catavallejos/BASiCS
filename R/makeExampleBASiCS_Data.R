@@ -163,7 +163,6 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
         
     Data <- newBASiCS_Data(Counts = Counts.sim, 
                            Tech = rep(FALSE, q.bio), 
-                           SpikeInfo = NULL, 
                            BatchInfo = c(rep(1, 10), rep(2, 10)))
         
   }
