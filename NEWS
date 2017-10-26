@@ -637,4 +637,5 @@ posterior probability thresholds as input
 version 0.99.13: (2017-10-17)  
 - @neling email added to DESCRIPTION + author contributions
   
-  
+version 0.99.14: (2017-10-19) 
+- Added checks to ensure input `SingleCellExperiment` object has all info
