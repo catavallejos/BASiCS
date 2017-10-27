@@ -645,9 +645,8 @@ Devel changes (version number once merged with master)
 - Default value for SpikeInfo changed to NULL in `newBASiCS_Data` function
 - Cleaning of `HiddenBASiCS_MCMCcppNoSpikes` 
 - Cleaning of full conditionals for no-spikes implementation
-
-To-do
-- Add unit test for no-spikes case
-- Check issue with stochastic ref
+- Fixed bug in stochastic reference implementation
+- Added unit test for no-spikes case (estimation)
+- Minor tyle changes to merge regression case
 
 
