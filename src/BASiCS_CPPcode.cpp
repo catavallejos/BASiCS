@@ -2074,70 +2074,70 @@ arma::mat deltaUpdateNoSpikes(
   return join_rows(delta, ind);
 }
 
-/* Auxiliary function required for some of the Metropolis-Hastings updates of nu */
-arma::mat UpdateAux_nuTrick(   
-    arma::vec const& nu, /* Auxiliary variable (function of the current and proposed value of nu) */
-arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-arma::vec const& phi) /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-{
-  arma::mat x = ((phi % nu) * mu.t()).t();
-  x.each_col() += 1/delta;
-  return x;
-}
-
-/* Metropolis-Hastings updates of nu 
- * Updates are implemented simulateaneously for all cells, significantly reducing the computational burden.
+/* Metropolis-Hastings updates of nu (batch case)
+ * Updates are implemented simulateaneously for all cells.
  */
-arma::mat nuUpdateNoSpikes(
-  arma::vec const& nu0, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-  arma::vec const& prop_var, /* Current value of the proposal variances for $\nu=(\nu_1,...,\nu_n)'$ */
-  arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
-  arma::mat const& BatchDesign, 
-  arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-  arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */  
-  arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-  arma::vec const& theta, /* Current value of $\theta$' */
-  arma::vec const& sum_bygene_all, /* Sum of expression counts by gene (all genes) */
-  int const& q0,
-  int const& n,
-  int const& nBatch,
-  arma::vec const& BatchSizes)
+arma::mat nuUpdateBatchNoSpikes(
+    arma::vec const& nu0, 
+    arma::vec const& prop_var, 
+    arma::mat const& Counts,
+    arma::mat const& BatchDesign, 
+    arma::vec const& mu, 
+    arma::vec const& invdelta, 
+    arma::vec const& phi, 
+    arma::vec const& thetaBatch, 
+    arma::vec const& sum_bygene_all, 
+    int const& q0,
+    int const& n,
+    arma::vec & nu1,
+    arma::vec & u,
+    arma::vec & ind)
 {
   using arma::span;
   
-  // CREATING VARIABLES WHERE TO STORE DRAWS
-  arma::vec lognu = log(nu0);
-  arma::vec thetaBatch = BatchDesign * theta; 
-  
   // PROPOSAL STEP    
-  arma::vec y = arma::randn(n) % sqrt(prop_var) + lognu;
-  arma::vec u = arma::randu(n);
+  nu1 = exp(arma::randn(n) % sqrt(prop_var) + log(nu0));
+  u = arma::randu(n);
   
   // ACCEPT/REJECT STEP
-  arma::vec log_aux = (y - lognu) % (sum_bygene_all + 1/thetaBatch);
-  log_aux -= nu0 % (exp(y-lognu)-1)  % (1/(thetaBatch % phi));   
-  arma::mat m = Counts.rows(0, q0 - 1);
-  m.each_col() += 1 / delta;   
-  arma::mat num = UpdateAux_nuTrick(exp(y), mu, delta, arma::ones(n));
-  num /= UpdateAux_nuTrick(nu0,    mu, delta, arma::ones(n));
-  m %= log(num);
-  log_aux -= sum(m, 0).t();
-  arma::umat ind = log(u) < log_aux;
-  // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-  // DEBUG: Print warning message    
-  ind.elem(find_nonfinite(log_aux)).zeros();
-  if(size(find_nonfinite(log_aux),0)>0)
+  arma::vec log_aux = arma::zeros(n);
+  
+  for (int j=0; j < n; j++) 
   {
-    Rcpp::Rcout << "SomeThing went wrong when updating nu" << size(find_nonfinite(log_aux),0) << std::endl;
-    Rcpp::stop("Please consider additional filter of the input dataset.");
+    for (int i=0; i < q0; i++) 
+    {
+      log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
+        log( ( nu1(j)*mu(i) + invdelta(i) ) / 
+        ( nu0(j)*mu(i) + invdelta(i) ));
+    } 
   }
   
-  // CREATING OUTPUT VARIABLE        
-  arma::vec nu = ind % exp(y) + (1 - ind) % nu0;
+  log_aux += (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
+  log_aux -= (nu1 -nu0)  % (1/(thetaBatch % phi));  
+  
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+  * Proposed values are automatically rejected in the following cases:
+  * - If smaller than 1e-5
+  * - If the proposed value is not finite
+  * - When the acceptance rate cannot be numerally computed
+  */  
+  for (int j=0; j < n; j++)
+  {
+    if(arma::is_finite(log_aux(j)) & arma::is_finite(nu1(j)))
+    {
+      if( (log(u(j)) < log_aux(j)) & (nu1(j) > 1e-5) ) { ind(j) = 1; }
+      else {ind(j) = 0; nu1(j) = nu0(j); }
+    }      
+    else
+    {
+      ind(j) = 0; nu1(j) = nu0(j);
+      Rcpp::Rcout << "Error when updating nu " << j+1 << std::endl;
+      Rcpp::warning("Consider additional data filter if error is frequent.");    
+    }
+  }
   
   // OUTPUT
-  return join_rows(nu, arma::conv_to<arma::mat>::from(ind));
+  return join_rows(nu1, ind);
 }
 
 
@@ -2200,7 +2200,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericVector delta0,   
     NumericVector phi0, 
     NumericVector nu0,    
-    double theta0,
+    NumericVector theta0,
     double s2mu, 
     double adelta, 
     double bdelta, 
@@ -2214,7 +2214,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericVector LSmu0, 
     NumericVector LSdelta0, 
     NumericVector LSnu0, 
-    double LStheta0, 
+    NumericVector LStheta0, 
     NumericVector sumByCellAll, 
     NumericVector sumByGeneAll, 
     int StoreAdapt, 
@@ -2229,6 +2229,10 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     int ConstrainType,
     int StochasticRef)
 {
+  using arma::ones;
+  using arma::zeros;
+  using Rcpp::Rcout;
+  
   // NUMBER OF CELLS, GENES AND STORED DRAWS
   int n = Counts.ncol(); int q0 = Counts.nrow(); int Naux = N/Thin - Burn/Thin;
   int nBatch = BatchDesign.ncol();
@@ -2247,11 +2251,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
   
   // OBJECTS WHERE DRAWS WILL BE STORED
-  arma::mat mu = arma::zeros(Naux, q0); 
-  arma::mat delta = arma::zeros(Naux, q0); 
-  arma::mat phi = arma::ones(Naux, n);
-  arma::mat nu = arma::zeros(Naux, n); 
-  arma::mat theta = arma::zeros(Naux, nBatch); 
+  arma::mat mu = zeros(Naux, q0); 
+  arma::mat delta = zeros(Naux, q0); 
+  arma::mat phi = ones(Naux, n);
+  arma::mat nu = zeros(Naux, n); 
+  arma::mat theta = zeros(Naux, nBatch); 
   arma::mat LSmu;
   arma::mat LSdelta;
   arma::mat LSnu;
@@ -2260,36 +2264,36 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // LOG-PROPOSAL VARIANCES 
   if(StoreAdapt == 1)
   {
-    LSmu = arma::zeros(Naux, q0); 
-    LSdelta = arma::zeros(Naux, q0); 
-    LSnu = arma::zeros(Naux, n); 
-    LStheta = arma::zeros(Naux, nBatch);   
+    LSmu = zeros(Naux, q0); 
+    LSdelta = zeros(Naux, q0); 
+    LSnu = zeros(Naux, n); 
+    LStheta = zeros(Naux, nBatch);   
   }
   
   // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
-  arma::vec muAccept = arma::zeros(q0); 
-  arma::vec deltaAccept = arma::zeros(q0); 
-  arma::vec nuAccept = arma::zeros(n); 
-  arma::vec thetaAccept = arma::zeros(nBatch); 
+  arma::vec muAccept = zeros(q0); 
+  arma::vec deltaAccept = zeros(q0); 
+  arma::vec nuAccept = zeros(n); 
+  arma::vec thetaAccept = zeros(nBatch); 
   
-  arma::vec PmuAux = arma::zeros(q0);
-  arma::vec PdeltaAux = arma::zeros(q0);
-  arma::vec PnuAux = arma::zeros(n);
-  arma::vec PthetaAux = arma::zeros(nBatch);
+  arma::vec PmuAux = zeros(q0);
+  arma::vec PdeltaAux = zeros(q0);
+  arma::vec PnuAux = zeros(n);
+  arma::vec PthetaAux = zeros(nBatch);
   
   // INITIALIZATION OF VALUES FOR MCMC RUN
-  arma::mat muAux = arma::zeros(q0,2); muAux.col(0) = as_arma(mu0); 
-  arma::mat deltaAux = arma::zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
   arma::vec phiAux = as_arma(phi0); 
-  arma::mat nuAux = arma::zeros(n,2); nuAux.col(0) = as_arma(nu0); 
-  arma::mat thetaAux = arma::zeros(nBatch, 2); 
-  thetaAux.col(0) = theta0 * arma::ones(nBatch); 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0); 
+  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0); 
+  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
   
   // INITIALIZATION OF ADAPTIVE VARIANCES
   arma::vec LSmuAux = as_arma(LSmu0);
   arma::vec LSdeltaAux = as_arma(LSdelta0); 
   arma::vec LSnuAux = as_arma(LSnu0);
-  arma::vec LSthetaAux = LStheta0 * arma::ones(nBatch);  
+  arma::vec LSthetaAux = as_arma(LStheta0);  
   
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = arma::zeros(q0); arma::vec PdeltaAux0 = arma::zeros(q0);
@@ -2327,11 +2331,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     Ibatch++; 
 
+
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-    phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaAux.col(0),
-                          aphi, bphi, BatchDesign_arma, n, y_n);
-    
+    phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaBatch,
+                          aphi, bphi, BatchDesign_arma, n, y_n); 
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -2339,6 +2343,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                 BatchDesign_arma, BatchSizes,
                                 phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
     PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
 
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -2369,11 +2374,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
-                             BatchDesign_arma,
-                             muAux.col(0), deltaAux.col(0),
-                             phiAux, thetaAux.col(0), sumByGeneAll_arma, q0, n,
-                             nBatch, BatchSizes); 
+    nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
+                                  BatchDesign_arma,
+                                  muAux.col(0), 1/deltaAux.col(0),
+                                  phiAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                                  y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS

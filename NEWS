@@ -644,9 +644,10 @@ Devel changes (version number once merged with master)
 - 'ggplot2' added to imports
 - Default value for SpikeInfo changed to NULL in `newBASiCS_Data` function
 - Cleaning of `HiddenBASiCS_MCMCcppNoSpikes` 
+- Cleaning of full conditionals for no-spikes implementation
 
 To-do
 - Add unit test for no-spikes case
-- Check full conditionals for no-spikes case (replace the one for nu
-by spikes case)
+- Check issue with stochastic ref
+
 

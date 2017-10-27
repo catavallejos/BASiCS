@@ -114,7 +114,8 @@ Summary1 <- Summary(Chain1)
 
 ```{r quick-start-MCMC-horizontal}
 Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-Chain2 <- BASiCS_MCMC(Data = Data2, N = 10000, Thin = 10, Burn = 5000, 
+set.seed(1)
+Chain2 <- BASiCS_MCMC(Data = Data2, N = 20000, Thin = 10, Burn = 10000, 
                       PrintProgress = FALSE, StoreDir = tempdir(),
                       StochasticRef = FALSE)
 plot(Chain2, Param = "phi", Cell = 1)
@@ -122,6 +123,17 @@ plot(Chain2, Param = "theta", Batch = 1)
 plot(Chain2, Param = "mu", Gene = 1)
 plot(Chain2, Param = "delta", Gene = 1)
 Summary2 <- Summary(Chain2)
+
+displaySummaryBASiCS(Summary2, Param = "mu")[1:3,1]
+#6.715068e+56 9.957757e+00 8.502260e+00
+displaySummaryBASiCS(Summary2, Param = "delta")[1:3,1]
+#93.733499  1.103799  1.716109 
+displaySummaryBASiCS(Summary2, Param = "phi")[1:3,1]
+#0.7630283    1.3433084    0.2232954
+displaySummaryBASiCS(Summary2, Param = "nu")[1:3,1]
+#0.6998967    1.4010983    0.1759071
+displaySummaryBASiCS(Summary2, Param = "theta")[,1]
+#0.2010877 0.2460520
 ```
 
 ```{r}
