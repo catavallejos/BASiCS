@@ -201,13 +201,11 @@ setMethod("Summary",
             if("epsilon" %in% names(x@parameters)){
               Beta <- matrixStats::colMedians(x@parameters$beta)
               Sigma2 <- matrixStats::colMedians(x@parameters$sigma2)
-              Eta <- matrixStats::colMedians(x@parameters$eta)
               Lambda <- matrixStats::colMedians(x@parameters$lambda)
               Epsilon <- matrixStats::colMedians(x@parameters$epsilon)
               
               HPDBeta <- coda::HPDinterval(coda::mcmc(x@parameters$beta), prob = prob)
               HPDSigma2 <- coda::HPDinterval(coda::mcmc(x@parameters$sigma2), prob = prob)
-              HPDEta <- coda::HPDinterval(coda::mcmc(x@parameters$eta), prob = prob)
               HPDLambda <- coda::HPDinterval(coda::mcmc(x@parameters$lambda), prob = prob)
               HPDEpsilon <- coda::HPDinterval(coda::mcmc(x@parameters$epsilon), prob = prob)
               
@@ -220,7 +218,6 @@ setMethod("Summary",
                                               theta = cbind(Theta, HPDTheta),
                                               beta = cbind(Beta, HPDBeta),
                                               sigma2 = cbind(Sigma2, HPDSigma2),
-                                              eta = cbind(Eta, HPDEta),
                                               lambda = cbind(Lambda, HPDLambda),
                                               epsilon = cbind(Epsilon, HPDEpsilon))
                             )
