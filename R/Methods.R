@@ -180,56 +180,19 @@ setMethod("updateObject",
 #' @references 
 #' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-setMethod("Summary", 
-          signature = "BASiCS_Chain", 
-          definition = function(x, prob = 0.95) 
-          {
-            Mu <- matrixStats::colMedians(x@parameters$mu)
-            Delta <- matrixStats::colMedians(x@parameters$delta)
-            Phi <- matrixStats::colMedians(x@parameters$phi)
-            S <- matrixStats::colMedians(x@parameters$s)
-            Nu <- matrixStats::colMedians(x@parameters$nu)
-            Theta <- matrixStats::colMedians(x@parameters$theta)
-    
-            HPDMu <- coda::HPDinterval(coda::mcmc(x@parameters$mu), prob = prob)
-            HPDDelta <- coda::HPDinterval(coda::mcmc(x@parameters$delta), prob = prob)
-            HPDPhi <- coda::HPDinterval(coda::mcmc(x@parameters$phi), prob = prob)
-            HPDS <- coda::HPDinterval(coda::mcmc(x@parameters$s), prob = prob)
-            HPDNu <- coda::HPDinterval(coda::mcmc(x@parameters$nu), prob = prob)
-            HPDTheta <- coda::HPDinterval(coda::mcmc(x@parameters$theta), prob = prob)
-    
-            if("epsilon" %in% names(x@parameters)){
-              Beta <- matrixStats::colMedians(x@parameters$beta)
-              Sigma2 <- matrixStats::colMedians(x@parameters$sigma2)
-              Lambda <- matrixStats::colMedians(x@parameters$lambda)
-              Epsilon <- matrixStats::colMedians(x@parameters$epsilon)
-              
-              HPDBeta <- coda::HPDinterval(coda::mcmc(x@parameters$beta), prob = prob)
-              HPDSigma2 <- coda::HPDinterval(coda::mcmc(x@parameters$sigma2), prob = prob)
-              HPDLambda <- coda::HPDinterval(coda::mcmc(x@parameters$lambda), prob = prob)
-              HPDEpsilon <- coda::HPDinterval(coda::mcmc(x@parameters$epsilon), prob = prob)
-              
-              Output <- new("BASiCS_Summary", 
-                            parameters = list(mu = cbind(Mu, HPDMu), 
-                                              delta = cbind(Delta, HPDDelta), 
-                                              phi = cbind(Phi, HPDPhi), 
-                                              s = cbind(S, HPDS), 
-                                              nu = cbind(Nu, HPDNu), 
-                                              theta = cbind(Theta, HPDTheta),
-                                              beta = cbind(Beta, HPDBeta),
-                                              sigma2 = cbind(Sigma2, HPDSigma2),
-                                              lambda = cbind(Lambda, HPDLambda),
-                                              epsilon = cbind(Epsilon, HPDEpsilon))
-                            )
-            }
+setMethod("Summary",
+          signature = "BASiCS_Chain",
+          definition = function(x, prob = 0.95){
             
-            Output <- new("BASiCS_Summary", parameters = list(
-                          mu = cbind(Mu, HPDMu), 
-                          delta = cbind(Delta, HPDDelta), 
-                          phi = cbind(Phi, HPDPhi), 
-                          s = cbind(S, HPDS), 
-                          nu = cbind(Nu, HPDNu), 
-                          theta = cbind(Theta, HPDTheta)))
+            out <- lapply(x@parameters, function(n){
+              HPD <- matrix(data = NA, ncol = 3, nrow = ncol(n), dimnames = list(colnames(n), c("median", "lower", "upper")))
+              HPD[,1] <- colMedians(n)
+              HPD[!is.na(HPD[,1]),2:3] = coda::HPDinterval(coda::mcmc(n[,!is.na(HPD[,1])]), prob=prob)
+              HPD
+            })
+            
+            Output <- new("BASiCS_Summary", 
+                          parameters = out)
             return(Output)
           })
 

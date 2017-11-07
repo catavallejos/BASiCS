@@ -1894,7 +1894,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
         Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma.t(),
+        Rcpp::Named("sigma2")=sigma,
         Rcpp::Named("lambda")=lambda.t(),
         Rcpp::Named("epsilon")=epsilon.t())); 
     

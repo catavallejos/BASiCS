@@ -381,7 +381,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       genes <- apply(assay(Data)[!isSpike(Data),], 1, function(n){length(which(n>0))}) > 1
       
       Chain$epsilon[,!genes] <- NA
-      Chain$lambda[,!genes] <- NA
       }
     }
     else
