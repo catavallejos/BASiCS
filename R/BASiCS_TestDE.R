@@ -352,6 +352,7 @@ BASiCS_TestDE <- function(Chain1,
   ResultDiffDisp <- rep("NoDiff", length(MedianOmega))
   ResultDiffDisp[DispPlus1] <- paste0(GroupLabel1, "+")
   ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
+
   # Output table
   TableDisp <- cbind.data.frame(GeneName = GeneName[NotDE], 
                                 MeanOverall = as.numeric(MuBase[NotDE]), 
@@ -389,6 +390,12 @@ BASiCS_TestDE <- function(Chain1,
     ResultDiffResDisp <- rep("NoDiff", length(MedianPsi))
     ResultDiffResDisp[ResDispPlus1] <- paste0(GroupLabel1, "+")
     ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
+    if (!is.null(GenesSelect.epsilon)) {
+      ResultDiffResDisp[!GenesSelect.epsilon] <- "ExcludedFromRegression"
+    }
+    if (!is.null(GenesSelect)) {
+      ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
+    }
     # Output table
     TableResDisp <- cbind.data.frame(GeneName = GeneName, 
                                      MeanOverall = as.numeric(MuBase), 
