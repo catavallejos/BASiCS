@@ -643,10 +643,10 @@ version 0.99.14: (2017-10-19)
 version 1.0.0: (2017-10-30)
 - Bioconductor 3.6 release
 
+version 1.1.0: (2017-10-30)
+- Version number bump after bioconductor 3.6 release
 
-
-
-Devel changes (version number once merged with master)
+version 1.1.1: (2017-11-08)
 - 'ggplot2' added to imports
 - Default value for SpikeInfo changed to NULL in `newBASiCS_Data` function
 - Cleaning of `HiddenBASiCS_MCMCcppNoSpikes` 
@@ -654,5 +654,8 @@ Devel changes (version number once merged with master)
 - Fixed bug in stochastic reference implementation
 - Added unit test for no-spikes case (estimation)
 - Minor tyle changes to merge regression case
+- 'Eta' parameter removed from `Summary` method (regression case only)
+- Corrected HPD interval calculation for epsilon and sigma2 (regression case)
+- Added mark for 'ExcludedFromRegression' genes in `BASiCS_TestDE`
 
 
