@@ -633,7 +633,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         TableRef <- cbind.data.frame(GeneNames = rownames(assay(Data))[RefGene + 1], 
                                      GeneIndex = RefGene + 1, 
                                      stringsAsFactors = FALSE)
-        write.table(TableRef, paste0("TableRef_", RunName, ".txt"), 
+        write.table(TableRef, file.path(StoreDir, 
+                                        paste0("TableRef_", RunName, ".txt")), 
                     col.names = TRUE, row.names = FALSE)
             
         setwd(OldDir)
@@ -646,7 +647,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                     GeneIndex = RefGenes + 1, 
                                     ReferenceFreq = Chain$RefFreq[RefGenes + 1], 
                                     stringsAsFactors = FALSE)
-        write.table(TableRef, paste0("TableRef_", RunName, ".txt"), 
+        write.table(TableRef, file.path(StoreDir, 
+                                        paste0("TableRef_", RunName, ".txt")), 
                     col.names = TRUE, row.names = FALSE)
             
         setwd(OldDir)

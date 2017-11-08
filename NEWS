@@ -663,3 +663,8 @@ version 1.1.2: (2017-11-08)
 
 version 1.1.3: (2017-11-08)
 - Collapsed sampler implemented (to be tested)
+- Unit tests reverted to original case
+- Version number bump
+
+
+- Store `TableRef` on the `StoreDir` directory (no-spike case only)
