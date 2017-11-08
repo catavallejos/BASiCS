@@ -1171,6 +1171,34 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
 
 }
 
+/*
+arma::vec bessel_k(
+  arma::vec const& x,
+  double const& nu,
+  arma::vec & y)
+{
+  for(int i=0; i < y.size; i++)
+  {
+    y(i) = 0;
+  }
+  return(i)
+}
+ */
+
+arma::vec log_bessel_k_vec(arma::vec const& x,
+                           arma::vec const& nu)
+{
+  arma::vec y = arma::zeros(x.size()); 
+  for(int i = 0; i < x.size(); i++)
+  {
+    y(i) = log(R::bessel_k(x(i), nu(i), 1));
+    if(!arma::is_finite(y(i)))
+    {
+      y(i) = log(R::bessel_k(x(i), nu(i), 2)) - x(i);
+    }
+  }
+  return y;
+}
 
 /* Metropolis-Hastings updates of nu (batch case)
  * Updates are implemented simulateaneously for all cells.
@@ -1215,7 +1243,9 @@ arma::mat nuUpdateBatch_Cata(
   
   // -1 cancels out as proposing in log-scale
   log_aux += (log(nu1) - log(nu0)) % (sum_bygene_all + 0.5 * (as + 1/thetaBatch));
-  log_aux -= (nu1 -nu0)  % SumSpikeInput;  
+  log_aux -= (nu1 - nu0)  * SumSpikeInput;  
+  log_aux += log_bessel_k_vec(2 * sqrt(bs * nu1 / thetaBatch), as - 1/thetaBatch);
+  log_aux -= log_bessel_k_vec(2 * sqrt(bs * nu0 / thetaBatch), as - 1/thetaBatch);
   
   /* CREATING OUTPUT VARIABLE & DEBUG 
    * Proposed values are automatically rejected in the following cases:
@@ -1240,6 +1270,54 @@ arma::mat nuUpdateBatch_Cata(
   
   // OUTPUT
   return join_rows(nu1, ind);
+}
+
+/* Metropolis-Hastings updates of theta 
+ */
+arma::mat thetaUpdateBatch_Cata(
+    arma::vec const& theta0, /* Current value of $\theta$ */
+    arma::vec const& prop_var, /* Current value of the proposal variances for $\theta$ */
+    arma::mat const& BatchDesign,
+    arma::vec const& BatchSizes,
+    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
+    double const& a_theta, /* Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+    double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+    double const& as, 
+    double const& bs, 
+    int const& n,
+    int const& nBatch)
+{
+  using arma::span;
+  
+  // CREATING VARIABLES WHERE TO STORE DRAWS
+  arma::vec logtheta = log(theta0);
+  
+  // PROPOSAL STEP
+  arma::vec y = arma::randn(nBatch) % sqrt(prop_var) + logtheta;
+  arma::vec u = arma::randu(nBatch);
+  
+  arma::mat BatchDesignAux = BatchDesign.cols(0, nBatch - 1);
+  BatchDesignAux.each_col() %= log(nu);
+  
+  // ACCEPT/REJECT STEP
+  arma::vec log_aux = (y-logtheta) * a_theta;
+  log_aux -= b_theta * theta0 % (exp(y-logtheta)-1);
+  log_aux -= BatchSizes % (lgamma_cpp(exp(-y))-lgamma_cpp(1/theta0));
+  log_aux += 0.5 * (exp(-y) - 1/theta0) % sum(BatchDesignAux,0).t();
+  log_aux += BatchSizes % (as + exp(-y)) % log(bs * exp(-y));
+  log_aux -= BatchSizes % (as + 1/theta0) % log(bs / theta0);
+  log_aux += BatchSizes % log_bessel_k_vec(2 * sqrt(bs*nu*exp(-y)), as-exp(-y));
+  log_aux -= BatchSizes % log_bessel_k_vec(2 * sqrt(bs*nu/theta0), as-1/theta0);
+  
+  arma::umat ind = log(u) < log_aux;
+  // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
+  ind %= 0.0001 < exp(y);
+  
+  // CREATING OUTPUT VARIABLE
+  arma::vec theta = ind % exp(y) + (1 - ind) % theta0;
+  
+  // OUTPUT
+  return join_rows(theta, arma::conv_to<arma::mat>::from(ind));
 }
 
 /* MCMC sampler 
@@ -1428,11 +1506,11 @@ Rcpp::List HiddenBASiCS_Cata_MCMCcpp(
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
- //   thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-//                                BatchDesign_arma, BatchSizes,
-//                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
-//    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
-//    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+    thetaAux = thetaUpdateBatch_Cata(thetaAux.col(0), exp(LSthetaAux), 
+                                BatchDesign_arma, BatchSizes,
+                                nuAux.col(0), atheta, btheta, as, bs, n, nBatch);
+    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
     
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -1456,10 +1534,10 @@ Rcpp::List HiddenBASiCS_Cata_MCMCcpp(
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     nuAux = nuUpdateBatch_Cata(nuAux.col(0), exp(LSnuAux), Counts_arma, SumSpikeInput,
-                          BatchDesign_arma,
-                          muAux.col(0), 1/deltaAux.col(0),
-                          phiAux, thetaBatch, sumByGeneAll_arma, as, bs, q0, n,
-                          y_n, u_n, ind_n); 
+                              BatchDesign_arma,
+                              muAux.col(0), 1/deltaAux.col(0),
+                              phiAux, thetaBatch, sumByGeneAll_arma, as, bs, q0, n,
+                              y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS

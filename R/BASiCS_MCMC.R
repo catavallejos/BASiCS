@@ -229,6 +229,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                           args$PrintProgress, TRUE)
   PriorDelta <- ifelse("PriorDelta" %in% names(args), 
                        args$PriorDelta, "log-normal")
+  CollapsedMCMC <- ifelse("CollapsedMCMC" %in% names(args), args$CollapsedMCMC, FALSE)
   
   # This is specific for the regression case
   if("Regression" %in% names(args)){
@@ -386,35 +387,71 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     else
     {
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
-                                                        as.matrix(assay(Data)), 
-                                                        BatchDesign,
-                                                        mu0[(q.bio+1):q],
-                                                        mu0[1:q.bio], delta0, 
-                                                        phi0, s0, 
-                                                        nu0, rep(theta0, nBatch), 
-                                                        PriorParam$s2.mu, 
-                                                        PriorParam$a.delta, 
-                                                        PriorParam$b.delta, 
-                                                        PriorParam$s2.delta,
-                                                        PriorDeltaNum,
-                                                        PriorParam$p.phi, 
-                                                        PriorParam$a.s, 
-                                                        PriorParam$b.s, 
-                                                        PriorParam$a.theta, 
-                                                        PriorParam$b.theta, 
-                                                        AR, 
-                                                        ls.mu0[1:q.bio], 
-                                                        ls.delta0, 
-                                                        ls.phi0, ls.nu0, 
-                                                        rep(ls.theta0, nBatch), 
-                                                        sum.bycell.all, 
-                                                        sum.bycell.bio, 
-                                                        sum.bygene.all, 
-                                                        sum.bygene.bio, 
-                                                        StoreAdaptNumber, 
-                                                        StopAdapt, 
-                                                        as.numeric(PrintProgress)))
+      if(!CollapsedMCMC)
+      {
+        Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
+                                                          as.matrix(assay(Data)), 
+                                                          BatchDesign,
+                                                          mu0[(q.bio+1):q],
+                                                          mu0[1:q.bio], delta0, 
+                                                          phi0, s0, 
+                                                          nu0, rep(theta0, nBatch), 
+                                                          PriorParam$s2.mu, 
+                                                          PriorParam$a.delta, 
+                                                          PriorParam$b.delta, 
+                                                          PriorParam$s2.delta,
+                                                          PriorDeltaNum,
+                                                          PriorParam$p.phi, 
+                                                          PriorParam$a.s, 
+                                                          PriorParam$b.s, 
+                                                          PriorParam$a.theta, 
+                                                          PriorParam$b.theta, 
+                                                          AR, 
+                                                          ls.mu0[1:q.bio], 
+                                                          ls.delta0, 
+                                                          ls.phi0, ls.nu0, 
+                                                          rep(ls.theta0, nBatch), 
+                                                          sum.bycell.all, 
+                                                          sum.bycell.bio, 
+                                                          sum.bygene.all, 
+                                                          sum.bygene.bio, 
+                                                          StoreAdaptNumber, 
+                                                          StopAdapt, 
+                                                          as.numeric(PrintProgress)))       
+      }
+      else
+      {
+        Time <- system.time(Chain <- HiddenBASiCS_Cata_MCMCcpp(N, Thin, Burn, 
+                                                          as.matrix(assay(Data)), 
+                                                          BatchDesign,
+                                                          mu0[(q.bio+1):q],
+                                                          mu0[1:q.bio], delta0, 
+                                                          phi0, 
+                                                          nu0, rep(theta0, nBatch), 
+                                                          PriorParam$s2.mu, 
+                                                          PriorParam$a.delta, 
+                                                          PriorParam$b.delta, 
+                                                          PriorParam$s2.delta,
+                                                          PriorDeltaNum,
+                                                          PriorParam$p.phi, 
+                                                          PriorParam$a.s, 
+                                                          PriorParam$b.s, 
+                                                          PriorParam$a.theta, 
+                                                          PriorParam$b.theta, 
+                                                          AR, 
+                                                          ls.mu0[1:q.bio], 
+                                                          ls.delta0, 
+                                                          ls.phi0, ls.nu0, 
+                                                          rep(ls.theta0, nBatch), 
+                                                          sum.bycell.all, 
+                                                          sum.bycell.bio, 
+                                                          sum.bygene.all, 
+                                                          sum.bygene.bio, 
+                                                          StoreAdaptNumber, 
+                                                          StopAdapt, 
+                                                          as.numeric(PrintProgress)))
+      }
+
     }
   } 
   else 

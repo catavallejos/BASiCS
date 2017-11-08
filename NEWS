@@ -658,4 +658,5 @@ version 1.1.1: (2017-11-08)
 - Corrected HPD interval calculation for epsilon and sigma2 (regression case)
 - Added mark for 'ExcludedFromRegression' genes in `BASiCS_TestDE`
 
-
+version 1.1.2: (2017-11-08)
+- Skeleton for sampler with integrated out s
