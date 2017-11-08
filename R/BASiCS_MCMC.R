@@ -347,6 +347,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # If regression case is chosen
     if("Regression" %in% names(args)){
       if(args$Regression == TRUE){
+        message("Running regression sampler ... \n")
+        
       Time = system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
                                                            as.matrix(assay(Data)), 
                                                            BatchDesign,
@@ -389,6 +391,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
       if(!CollapsedMCMC)
       {
+        message("Running standard sampler ... \n")
+        
         Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
                                                           as.matrix(assay(Data)), 
                                                           BatchDesign,
@@ -421,6 +425,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       }
       else
       {
+        message("Running collapsed sampler ... \n")
         Time <- system.time(Chain <- HiddenBASiCS_Cata_MCMCcpp(N, Thin, Burn, 
                                                           as.matrix(assay(Data)), 
                                                           BatchDesign,
