@@ -1298,6 +1298,9 @@ arma::mat thetaUpdateBatch_Cata(
   
   arma::mat BatchDesignAux = BatchDesign.cols(0, nBatch - 1);
   BatchDesignAux.each_col() %= log(nu);
+  arma::vec aux0Batch = BatchDesign*(1/theta0);
+  arma::vec aux1Batch = BatchDesign*exp(-y);
+  
   
   // ACCEPT/REJECT STEP
   arma::vec log_aux = (y-logtheta) * a_theta;
@@ -1306,8 +1309,13 @@ arma::mat thetaUpdateBatch_Cata(
   log_aux += 0.5 * (exp(-y) - 1/theta0) % sum(BatchDesignAux,0).t();
   log_aux += BatchSizes % (as + exp(-y)) % log(bs * exp(-y));
   log_aux -= BatchSizes % (as + 1/theta0) % log(bs / theta0);
-  log_aux += BatchSizes % log_bessel_k_vec(2 * sqrt(bs*nu*exp(-y)), as-exp(-y));
-  log_aux -= BatchSizes % log_bessel_k_vec(2 * sqrt(bs*nu/theta0), as-1/theta0);
+  BatchDesignAux = BatchDesign.cols(0, nBatch - 1);
+  BatchDesignAux.each_col() %= log_bessel_k_vec(2 * sqrt(bs*nu%aux1Batch), 
+                          as-aux1Batch) - log_bessel_k_vec(2*sqrt(bs*nu%aux0Batch), 
+                          as-aux0Batch);
+  log_aux += sum(BatchDesignAux,0).t();
+//  log_aux += BatchDesign % log_bessel_k_vec(2 * sqrt(bs*nu*exp(-y)), as-exp(-y));
+//  log_aux -= BatchDesign % log_bessel_k_vec(2 * sqrt(bs*nu/theta0), as-1/theta0);
   
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
