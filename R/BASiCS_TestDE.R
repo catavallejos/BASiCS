@@ -305,7 +305,7 @@ BASiCS_TestDE <- function(Chain1,
   AuxMean <- HiddenThresholdSearchTestDE(ChainTau, EpsilonM, 
                                          ProbThresholdM, 
                                          GenesSelect, EFDR_M, 
-                                         Task = "differential mean")
+                                         Task = "Differential mean")
   ProbM <- AuxMean$Prob
   OptThresholdM <- AuxMean$OptThreshold
   
@@ -371,14 +371,25 @@ BASiCS_TestDE <- function(Chain1,
   if(!is.null(Chain1@parameters$epsilon)){
     GenesSelect.epsilon <- !(is.na(Chain1@parameters$epsilon[1,]) | 
                                is.na(Chain2@parameters$epsilon[1,]))
+    
+    # Change NAs to 0 in Chain to avoid failure of EFDR and EFNR grid search
+    Chain1@parameters$epsilon[is.na(Chain1@parameters$epsilon)] <- 0
+    Chain2@parameters$epsilon[is.na(Chain2@parameters$epsilon)] <- 0
       
     ChainPsi <- Chain1@parameters$epsilon - Chain2@parameters$epsilon
     MedianPsi <- matrixStats::colMedians(ChainPsi)
     EpsilonBase <- (Summary1@parameters$epsilon[,1] * n1 + Summary2@parameters$epsilon[,1] * n2)/n
     
+    if(is.null(GenesSelect)){
+      GenesSelect.merged <- GenesSelect.epsilon
+    }
+    else{
+      GenesSelect.merged <- GenesSelect & GenesSelect.epsilon
+    }
+    
     AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, PsiE, 
                                               ProbThresholdE, 
-                                              GenesSelect & GenesSelect.epsilon, 
+                                              GenesSelect.merged, 
                                               EFDR_E, 
                                               Task = "Differential residual dispersion")
     ProbE <- AuxResDisp$Prob
