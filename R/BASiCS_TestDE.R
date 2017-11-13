@@ -413,16 +413,12 @@ BASiCS_TestDE <- function(Chain1,
     # Rounding to 3 decimal points
     TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)
       
-    # Update after removing DE genes from Disp table!  Reordering the tables
-    GeneIndex <- seq_len(length(MuBase))
-    # Reordering the table
     if (OrderVariable == "GeneIndex") 
-        orderVar = GeneIndex
+      orderVar = GeneIndex[NotExcluded]
     if (OrderVariable == "GeneName") 
-        orderVar = GeneName
+      orderVar = GeneName[NotExcluded]
     if (OrderVariable == "Prob") 
-        orderVar = ProbM
-    
+      orderVar = ProbE
     TableResDisp <- TableResDisp[order(orderVar, decreasing = TRUE), ]
   }
     
