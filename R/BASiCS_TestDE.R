@@ -369,27 +369,16 @@ BASiCS_TestDE <- function(Chain1,
   
   # Changes in residual over-dispersion - if regression approach was used
   if(!is.null(Chain1@parameters$epsilon)){
-    GenesSelect.epsilon <- !(is.na(Chain1@parameters$epsilon[1,]) | 
+    NotExcluded <- !(is.na(Chain1@parameters$epsilon[1,]) | 
                                is.na(Chain2@parameters$epsilon[1,]))
-    
-    # Change NAs to 0 in Chain to avoid failure of EFDR and EFNR grid search
-    Chain1@parameters$epsilon[is.na(Chain1@parameters$epsilon)] <- 0
-    Chain2@parameters$epsilon[is.na(Chain2@parameters$epsilon)] <- 0
       
-    ChainPsi <- Chain1@parameters$epsilon - Chain2@parameters$epsilon
+    ChainPsi <- Chain1@parameters$epsilon[,NotExcluded] - Chain2@parameters$epsilon[,NotExcluded]
     MedianPsi <- matrixStats::colMedians(ChainPsi)
-    EpsilonBase <- (Summary1@parameters$epsilon[,1] * n1 + Summary2@parameters$epsilon[,1] * n2)/n
-    
-    if(is.null(GenesSelect)){
-      GenesSelect.merged <- GenesSelect.epsilon
-    }
-    else{
-      GenesSelect.merged <- GenesSelect & GenesSelect.epsilon
-    }
+    EpsilonBase <- (Summary1@parameters$epsilon[NotExcluded,1] * n1 + Summary2@parameters$epsilon[NotExcluded,1] * n2)/n
     
     AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, PsiE, 
                                               ProbThresholdE, 
-                                              GenesSelect.merged, 
+                                              GenesSelect[NotExcluded], 
                                               EFDR_E, 
                                               Task = "Differential residual dispersion")
     ProbE <- AuxResDisp$Prob
@@ -401,22 +390,26 @@ BASiCS_TestDE <- function(Chain1,
     ResultDiffResDisp <- rep("NoDiff", length(MedianPsi))
     ResultDiffResDisp[ResDispPlus1] <- paste0(GroupLabel1, "+")
     ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
-    if (!is.null(GenesSelect.epsilon)) {
-      ResultDiffResDisp[!GenesSelect.epsilon] <- "ExcludedFromRegression"
-    }
+    
     if (!is.null(GenesSelect)) {
-      ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
+      cur_GenesSelect <- GenesSelect[NotExcluded]
+      ResultDiffResDisp[!cur_GenesSelect] <- "ExcludedByUser"
     }
+    else{
+      cur_GenesSelect <- NotExcluded
+    }
+    
     # Output table
-    TableResDisp <- cbind.data.frame(GeneName = GeneName, 
-                                     MeanOverall = as.numeric(MuBase), 
+    TableResDisp <- cbind.data.frame(GeneName = GeneName[NotExcluded], 
+                                     MeanOverall = as.numeric(MuBase[NotExcluded]), 
                                      ResDispOverall = as.numeric(EpsilonBase), 
-                                     ResDisp1 = as.numeric(Summary1@parameters$epsilon[, 1]), 
-                                     ResDisp2 = as.numeric(Summary2@parameters$epsilon[, 1]),  
+                                     ResDisp1 = as.numeric(Summary1@parameters$epsilon[NotExcluded, 1]), 
+                                     ResDisp2 = as.numeric(Summary2@parameters$epsilon[NotExcluded, 1]),  
                                      ResDispDistance = as.numeric(MedianPsi), 
                                      ProbDiffResDisp = as.numeric(ProbE), 
                                      ResultDiffResDisp = ResultDiffResDisp, 
                                      stringsAsFactors = FALSE)
+  
     # Rounding to 3 decimal points
     TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)
       
@@ -595,6 +588,9 @@ BASiCS_TestDE <- function(Chain1,
             "- Probability threshold = ", OptThresholdE[1], "\n", 
             "- EFDR = ", round(100 * OptThresholdE[2], 2), "% \n", 
             "- EFNR = ", round(100 * OptThresholdE[3], 2), "% \n", 
+            "NOTE: differential residual dispersion assessment applied to \n", 
+            sum(cur_GenesSelect), " genes expressed in at least 2 cells per condition \n",
+            "and included for testing. \n",
             "--------------------------------------------------------------\n")
     
       list(TableMean = TableMean, 
