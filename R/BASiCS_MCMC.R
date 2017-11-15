@@ -229,8 +229,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                           args$PrintProgress, TRUE)
   PriorDelta <- ifelse("PriorDelta" %in% names(args), 
                        args$PriorDelta, "log-normal")
-  CollapsedMCMC <- ifelse("CollapsedMCMC" %in% names(args), args$CollapsedMCMC, FALSE)
-  
+
   # This is specific for the regression case
   if("Regression" %in% names(args)){
     if(args$Regression == TRUE){
@@ -389,74 +388,35 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     else
     {
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
-      if(!CollapsedMCMC)
-      {
-        message("Running standard sampler ... \n")
-        
-        Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
-                                                          as.matrix(assay(Data)), 
-                                                          BatchDesign,
-                                                          mu0[(q.bio+1):q],
-                                                          mu0[1:q.bio], delta0, 
-                                                          phi0, s0, 
-                                                          nu0, rep(theta0, nBatch), 
-                                                          PriorParam$s2.mu, 
-                                                          PriorParam$a.delta, 
-                                                          PriorParam$b.delta, 
-                                                          PriorParam$s2.delta,
-                                                          PriorDeltaNum,
-                                                          PriorParam$p.phi, 
-                                                          PriorParam$a.s, 
-                                                          PriorParam$b.s, 
-                                                          PriorParam$a.theta, 
-                                                          PriorParam$b.theta, 
-                                                          AR, 
-                                                          ls.mu0[1:q.bio], 
-                                                          ls.delta0, 
-                                                          ls.phi0, ls.nu0, 
-                                                          rep(ls.theta0, nBatch), 
-                                                          sum.bycell.all, 
-                                                          sum.bycell.bio, 
-                                                          sum.bygene.all, 
-                                                          sum.bygene.bio, 
-                                                          StoreAdaptNumber, 
-                                                          StopAdapt, 
-                                                          as.numeric(PrintProgress)))       
-      }
-      else
-      {
-        message("Running collapsed sampler ... \n")
-        Time <- system.time(Chain <- HiddenBASiCS_Cata_MCMCcpp(N, Thin, Burn, 
-                                                          as.matrix(assay(Data)), 
-                                                          BatchDesign,
-                                                          mu0[(q.bio+1):q],
-                                                          mu0[1:q.bio], delta0, 
-                                                          phi0, 
-                                                          nu0, rep(theta0, nBatch), 
-                                                          PriorParam$s2.mu, 
-                                                          PriorParam$a.delta, 
-                                                          PriorParam$b.delta, 
-                                                          PriorParam$s2.delta,
-                                                          PriorDeltaNum,
-                                                          PriorParam$p.phi, 
-                                                          PriorParam$a.s, 
-                                                          PriorParam$b.s, 
-                                                          PriorParam$a.theta, 
-                                                          PriorParam$b.theta, 
-                                                          AR, 
-                                                          ls.mu0[1:q.bio], 
-                                                          ls.delta0, 
-                                                          ls.phi0, ls.nu0, 
-                                                          rep(ls.theta0, nBatch), 
-                                                          sum.bycell.all, 
-                                                          sum.bycell.bio, 
-                                                          sum.bygene.all, 
-                                                          sum.bygene.bio, 
-                                                          StoreAdaptNumber, 
-                                                          StopAdapt, 
-                                                          as.numeric(PrintProgress)))
-      }
-
+      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
+                                                        as.matrix(assay(Data)), 
+                                                        BatchDesign,
+                                                        mu0[(q.bio+1):q],
+                                                        mu0[1:q.bio], delta0, 
+                                                        phi0, s0, 
+                                                        nu0, rep(theta0, nBatch), 
+                                                        PriorParam$s2.mu, 
+                                                        PriorParam$a.delta, 
+                                                        PriorParam$b.delta, 
+                                                        PriorParam$s2.delta,
+                                                        PriorDeltaNum,
+                                                        PriorParam$p.phi, 
+                                                        PriorParam$a.s, 
+                                                        PriorParam$b.s, 
+                                                        PriorParam$a.theta, 
+                                                        PriorParam$b.theta, 
+                                                        AR, 
+                                                        ls.mu0[1:q.bio], 
+                                                        ls.delta0, 
+                                                        ls.phi0, ls.nu0, 
+                                                        rep(ls.theta0, nBatch), 
+                                                        sum.bycell.all, 
+                                                        sum.bycell.bio, 
+                                                        sum.bygene.all, 
+                                                        sum.bygene.bio, 
+                                                        StoreAdaptNumber, 
+                                                        StopAdapt, 
+                                                        as.numeric(PrintProgress)))       
     }
   } 
   else 
@@ -487,7 +447,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     
     # Whether or not a stochatic reference is used
     # If stochastic, range of possible reference values only includes 
-    # the nearest 200 genes located around the constrain
+    # the nearest 1000 genes located around the constrain
     StochasticRef <- ifelse("StochasticRef" %in% names(args), 
                             args$StochasticRef, TRUE)
     if (StochasticRef == TRUE) 
@@ -497,7 +457,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       aux.ref <- aux.ref[order(aux.ref[, 2]), ]
       # Fix for the code to run on the synthetic small dataset
       # generated by makeExample_BASiCS function (less than 200 genes)
-      if(length(ConstrainGene) > 200) { RefGenes <- aux.ref[1:200, 1] }
+      if(length(ConstrainGene) > 1000) { RefGenes <- aux.ref[seq_len(1000), 1] }
       else { RefGenes <- aux.ref[, 1] }
       RefGene <- RefGenes[1]
     } 
