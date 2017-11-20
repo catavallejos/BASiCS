@@ -349,7 +349,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         message("Running regression sampler ... \n")
         
       Time = system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
-                                                           as.matrix(assay(Data)), 
+                                                           as.matrix(assay(Data))[1:q.bio,], 
                                                            BatchDesign,
                                                            mu0[(q.bio+1):q],
                                                            mu0[1:q.bio], delta0, 
@@ -389,7 +389,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     {
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
-                                                        as.matrix(assay(Data)), 
+                                                        as.matrix(assay(Data))[1:q.bio,], 
                                                         BatchDesign,
                                                         mu0[(q.bio+1):q],
                                                         mu0[1:q.bio], delta0, 

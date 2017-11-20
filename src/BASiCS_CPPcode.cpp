@@ -1,5 +1,5 @@
 /* C++ implementation of BASiCS 
- * Author: Catalina A. Vallejos (cnvallej@uc.cl)
+ * Author: Catalina A. Vallejos (cnvallej@uc.cl) & Nils Eling
  */
 
 #include <math.h>
@@ -1296,10 +1296,9 @@ arma::mat muUpdateReg(
   // This is new due to regression prior on delta
   arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
-  for(int t=0; t < q0; t++)
-  {
-    log_aux(t) -= Rcpp::as<double>(wrap( ( lambda(t) * (pow(log(delta(t))-X_mu1.row(t) * beta,2) -  pow(log(delta(t))-X.row(t) * beta,2)) ) / (2 * sigma2 )));
-  }
+  // REGRESSION RELATED FACTOR
+  // Some terms might cancel out here; check
+  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
   
   /* CREATING OUTPUT VARIABLE & DEBUG 
    * Proposed values are automatically rejected in the following cases:
@@ -1385,13 +1384,10 @@ arma::mat deltaUpdateReg(
   }
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
 
-  // REGRESSION
-  for(int t=0; t < q0; t++)
-  {
-    log_aux(t) -= Rcpp::as<double>(wrap(((lambda(t)/(2 * sigma2)) * (pow(log(delta1(t)) - X.row(t) * beta,2) - pow(log(delta0(t)) - X.row(t) * beta,2)))));
-  }
+  // REGRESSION RELATED FACTOR
+  // Some terms might cancel out here; check
+  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
 
-  
   /* CREATING OUTPUT VARIABLE & DEBUG 
    * Proposed values are automatically rejected in the following cases:
    * - If smaller than 1e-3
@@ -2549,205 +2545,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   
 }
 
-/* Metropolis-Hastings updates of mu (regression + no-spikes)
- */
-arma::mat muUpdateRegNoSpikes(
-    arma::vec const& mu0, 
-    arma::vec const& prop_var, 
-    double const& Constrain,
-    arma::mat const& Counts, 
-    arma::vec const& delta, 
-    arma::vec const& nu, 
-    arma::vec const& sum_bycell_all, 
-    double const& s2_mu,
-    int const& q0,
-    int const& n,
-    arma::vec & mu1,
-    arma::vec & u, 
-    arma::vec & ind,
-    int const& k,
-    arma::vec const& lambda,
-    arma::vec const& beta,
-    arma::mat const& X,
-    double const& sigma2,
-    double variance,
-    int const& RefGene,
-    arma::uvec const& ConstrainGene,
-    arma::uvec const& NotConstrainGene,
-    int const& ConstrainType)
-{
-  
-  /* PROPOSAL STEP */
-  mu1 = exp( arma::randn(q0) % sqrt(prop_var) + log(mu0) );
-  u = arma::randu(q0);
-  
-  /* ACCEPT/REJECT STEP 
-  * Note: there is a -1 factor coming from the log-normal prior. 
-  * However, it cancels out as using log-normal proposals.
-  */
-  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
-      log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
-        log( ( nu(j)*mu1(i) + 1/delta(i) ) / 
-        ( nu(j)*mu0(i) + 1/delta(i) ));
-    }
-  }
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
-  
-  // Step 2: Computing prior component of the acceptance rate 
-  
-  // Design matrix based on the proposed value
-  arma::mat X_mu1 = designMatrix(k, mu1, variance);
-  
-  // Step 2.1: For genes that are under the constrain (excluding the reference one)
-  for (int i=0; i < ConstrainGene.size(); i++)
-  {
-    iAux = ConstrainGene(i);
-    if(iAux != RefGene)
-    {
-      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu(iAux))));
-      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
-      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
-      // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu(iAux) = y(iAux);
-        sumAux += log(mu(iAux)) - log(mu0(iAux)); 
-      }
-      else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
-    }
-  }
-  
-  // Step 2.2: For the reference gene 
-  ind(RefGene) = 1;
-  mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
-  
-  // Step 2.3: For genes that are *not* under the constrain
-  // Only relevant for a trimmed constrain
-  if(ConstrainType == 2)
-  {
-    for (int i=0; i < NotConstrainGene.size(); i++)
-    {
-      iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
-      // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu(iAux) = y(iAux);
-      }
-      else{ind(iAux) = 0; mu(iAux) = mu0(iAux);}
-    }
-  }
-  
-  // EDIT THIS PART
-  for(int t=0; t < q0; t++)
-  {
-    log_aux(t) -= Rcpp::as<double>(wrap( ( lambda(t) * (pow(log(delta(t))-X_mu1.row(t) * beta,2) -  pow(log(delta(t))-X.row(t) * beta,2)) ) / (2 * sigma2 )));
-  }
-  
-  /* CREATING OUTPUT VARIABLE & DEBUG 
-  * Proposed values are automatically rejected in the following cases:
-  * - If smaller than 1e-3
-  * - If the proposed value is not finite
-  * - When the acceptance rate cannot be numerally computed
-  */
-  for (int i=0; i < q0; i++)
-  {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(mu1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (mu1(i) > 1e-3)) { ind(i) = 1; }
-      else{ind(i) = 0; mu1(i) = mu0(i);}            
-    }
-    else
-    {
-      ind(i) = 0; mu1(i) = mu0(i);
-      Rcpp::Rcout << "Error when updating mu " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
-  }
-  /* OUTPUT */
-  return join_rows(mu1, ind);
-}
-
-
-/* Metropolis-Hastings updates of delta (no spikes case)
- */
-arma::mat deltaUpdateRegNoSpikes(
-    arma::vec const& delta0, 
-    arma::vec const& prop_var,  
-    arma::mat const& Counts, 
-    arma::vec const& mu, 
-    arma::vec const& nu, 
-    int const& q0,
-    int const& n,
-    arma::vec & delta1,
-    arma::vec & u, 
-    arma::vec & ind,
-    arma::vec const& lambda,
-    arma::mat const& X,
-    double const& sigma2,
-    arma::vec const& beta)
-{
-  
-  /* PROPOSAL STEP */
-  delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
-  u = arma::randu(q0);
-  
-  /* ACCEPT/REJECT STEP 
-  * Note: there is a -1 factor coming from the log-normal prior. 
-  * However, it cancels out as using log-normal proposals.
-  */
-  arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
-  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
-  
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
-      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
-      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
-      log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( nu(j)*mu(i)+(1/delta1(i)) );
-      log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( nu(j)*mu(i)+(1/delta0(i)) );
-    }
-  }
-  
-  // Component related to the prior (regression case)
-  // CATA TO CHECK: Do we need as<double> and wrap?
-  // CATA TO CHECK: The code below can be factorised
-  for(int i=0; i < q0; i++)
-  {
-    log_aux(i) -= Rcpp::as<double>(wrap(((lambda(i)/(2 * sigma2)) * (pow(log(delta1(i)) - X.row(i) * beta,2) - pow(log(delta0(i)) - X.row(i) * beta,2)))));
-  }
-  
-  
-  /* CREATING OUTPUT VARIABLE & DEBUG 
-  * Proposed values are automatically rejected in the following cases:
-  * - If smaller than 1e-3
-  * - If the proposed value is not finite
-  * - When the acceptance rate cannot be numerally computed
-  */    
-  for (int i=0; i < q0; i++)
-  {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(delta1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (delta1(i) > 1e-3)) { ind(i) = 1; }
-      else { ind(i) = 0; delta1(i) = delta0(i); }
-    }      
-    else
-    {
-      ind(i) = 0; delta1(i) = delta0(i);
-      Rcpp::Rcout << "Error when updating delta " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
-  }
-  
-  // OUTPUT
-  return join_rows(delta1, ind);
-}
-
 /* MCMC sampler 
  * N: Total number of MCMC draws 
  * Thin: Thinning period for MCMC chain 
@@ -3001,18 +2798,20 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                         phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, variance);     
     */
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    //PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // REGRESSION
     // THIS REQUIRES A NEW FULL CONDITIONAL
+    /*
     deltaAux = deltaUpdateRegNoSpikes(deltaAux.col(0), exp(LSdeltaAux), 
                                       Counts_arma, muAux.col(0), 
                                       nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                                       lambdaAux, X, sigma2Aux, betaAux);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
+     */
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
