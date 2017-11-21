@@ -372,20 +372,34 @@ double log_sum_exp_cpp(arma::vec const& x_arma)
   return log(sum(exp(x_arma - offset))) + offset; 
 }
 
+arma::vec DegubInd(arma::vec ind,
+                   int const q,
+                   arma::vec const& u, 
+                   arma::vec const& log_aux,
+                   arma::vec const& y,
+                   double const& threshold,
+                   std::string const& param)
+{
+  for (int i=0; i < q; i++)
+  {
+    if( arma::is_finite(log_aux(i)) & arma::is_finite(y(i)) )
+    {
+      if((log(u(i)) < log_aux(i)) & (y(i) > threshold)) { ind(i) = 1; }
+      else{ind(i) = 0;}            
+    }
+    else
+    {
+      ind(i) = 0; 
+      Rcpp::Rcout << "Error when updating " << param << i+1 << std::endl;
+      Rcpp::warning("Consider additional data filter if error is frequent.");        
+    }
+  }  
+  return ind;
+}
+
+
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes
- * mu0: current value of mu
- * prop_var: current value of the proposal variances for mu
- * Counts: matrix of expression counts
- * delta: current value of delta
- * phi: current value of phi
- * nu: current value of nu
- * sum_bycell_bio: sum of expression counts by cell (biological genes only)
- * s2_mu: prior hyper-variance for mu
- * q0: number of biological genes
- * n: number of cells
- * mu: auxiliary vector for storage
- * ind: auxiliary vector for storage
  */
 arma::mat muUpdate(
   arma::vec const& mu0, 
@@ -411,6 +425,7 @@ arma::mat muUpdate(
    * However, it cancels out as using log-normal proposals.
    */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
+  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
   for (int i=0; i < q0; i++)
   {
     for (int j=0; j < n; j++) 
@@ -420,48 +435,26 @@ arma::mat muUpdate(
                            ( phinu(j)*mu0(i) + invdelta(i) ));
     }
   }
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
 
-  /* CREATING OUTPUT VARIABLE & DEBUG 
+  
+  /* CREATING OUTPUT & DEBUG 
    * Proposed values are automatically rejected in the following cases:
    * - If smaller than 1e-3
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
    */
+  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
   for (int i=0; i < q0; i++)
   {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(mu1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (mu1(i) > 1e-3)) { ind(i) = 1; }
-      else{ind(i) = 0; mu1(i) = mu0(i);}            
-    }
-    else
-    {
-      ind(i) = 0; mu1(i) = mu0(i);
-      Rcpp::Rcout << "Error when updating mu " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
+    if(ind(i) == 0) mu1(i) = mu0(i);  
   }
+
   /* OUTPUT */
   return join_rows(mu1, ind);
 }
 
 /* Metropolis-Hastings updates of delta
  * Updates are implemented simulateaneously for all biological genes.
- * delta: current value of delta
- * prop_var: current value of the proposal variances for delta
- * Counts: matrix of expression counts
- * mu: current value of mu
- * phi: current value of phi
- * nu: current value of nu
- * a_delta: shape prior hyper-parameter for delta (when using a gamma prior)
- * b_delta: rate prior hyper-parameter for delta (when using a gamma prior)
- * s2delta: prior hyper-variance for delta (when using a log-normal prior)
- * q0: number of biological genes
- * n: number of cells
- * prior_delta: whether gamma or log-normal priors are being used
- * delta: auxiliary vector for storage
- * ind: auxiliary vector for storage
  */
 arma::mat deltaUpdate(
   arma::vec const& delta0, 
@@ -489,7 +482,7 @@ arma::mat deltaUpdate(
    * However, it cancels out as using log-normal proposals.
    */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
-  
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   for (int i=0; i < q0; i++)
   {
     for (int j=0; j < n; j++) 
@@ -500,7 +493,6 @@ arma::mat deltaUpdate(
       log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
     }
   }
-  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   // Component related to the prior
   if(prior_delta == 1) 
   {
@@ -516,20 +508,11 @@ arma::mat deltaUpdate(
    * - If smaller than 1e-3
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
-   */    
+   */ 
+  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
   for (int i=0; i < q0; i++)
   {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(delta1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (delta1(i) > 1e-3)) { ind(i) = 1; }
-      else {ind(i) = 0; delta1(i) = delta0(i); }
-    }      
-    else
-    {
-      ind(i) = 0; delta1(i) = delta0(i);
-      Rcpp::Rcout << "Error when updating delta " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
+    if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
   // OUTPUT
@@ -638,22 +621,13 @@ arma::mat nuUpdateBatch(
    * - If smaller than 1e-5
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
-   */  
+   */ 
+  ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
   for (int j=0; j < n; j++)
   {
-    if(arma::is_finite(log_aux(j)) & arma::is_finite(nu1(j)))
-    {
-      if( (log(u(j)) < log_aux(j)) & (nu1(j) > 1e-5) ) { ind(j) = 1; }
-      else {ind(j) = 0; nu1(j) = nu0(j); }
-    }      
-    else
-    {
-      ind(j) = 0; nu1(j) = nu0(j);
-      Rcpp::Rcout << "Error when updating nu " << j+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");    
-    }
+    if(ind(j) == 0) nu1(j) = nu0(j);  
   }
-  
+
   // OUTPUT
   return join_rows(nu1, ind);
 }
@@ -1185,40 +1159,28 @@ arma::vec bessel_k(
 }
  */
 
-arma::vec log_bessel_k_vec(arma::vec const& x,
-                           arma::vec const& nu)
-{
-  arma::vec y = arma::zeros(x.size()); 
-  for(int i = 0; i < x.size(); i++)
-  {
-    y(i) = log(R::bessel_k(x(i), nu(i), 1));
-    if(!arma::is_finite(y(i)))
-    {
-      y(i) = log(R::bessel_k(x(i), nu(i), 2)) - x(i);
-    }
-  }
-  return y;
-}
-
 // Functions for regression case of BASiCS
 
 // Model matrix generation for regression
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
-    arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_n)'$ */
-      double const& variance) 
+    arma::vec const& mu, 
+    double const& variance) 
 {
-  arma::vec x=log(mu);
-  double ran=x.max()-x.min();
-  arma::vec myu=arma::zeros(k-2);
-  myu(0)=x.min();
-  for(int i=1; i<myu.size(); i++){
-    myu(i)=myu(i-1) + ran/(k-3);
+  arma::vec x = log(mu);
+  double ran = x.max() - x.min();
+  arma::vec myu = arma::zeros(k-2);
+  myu(0) = x.min();
+  for(int i=1; i<myu.size(); i++)
+  {
+    myu(i) = myu(i-1) + ran/(k-3);
   }
-  double h=(myu(1)-myu(0))*variance;
-  arma::mat X=arma::ones(x.size(),k);
+  double h = (myu(1)-myu(0)) * variance;
+  // Possibly create this matrix outside
+  arma::mat X = arma::ones(x.size(),k);
   X.col(1) = x;
-  for(int i=0; i<k-2; i++){
+  for(int i=0; i < k-2; i++)
+  {
     X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
     //X.col(i+1) = pow(x,i+1);
   }
@@ -1234,22 +1196,6 @@ arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
 
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes
- * mu0: current value of mu
- * prop_var: current value of the proposal variances for mu
- * Counts: matrix of expression counts
- * delta: current value of inverse delta
- * phinu: current value of phi * nu
- * sum_bycell_bio: sum of expression counts by cell (biological genes only)
- * s2_mu: prior hyper-variance for mu
- * q0: number of biological genes
- * n: number of cells
- * mu: auxiliary vector for storage
- * ind: auxiliary vector for storage
- * k: number of regression components
- * lambda: current values of lambda
- * beta: current value of beta
- * X: current design matrix
- * sigma2: current value of sigma2
  */
 arma::mat muUpdateReg(
     arma::vec const& mu0, 
@@ -1269,8 +1215,7 @@ arma::mat muUpdateReg(
     arma::vec const& beta,
     arma::mat const& X,
     double const& sigma2,
-    double variance
-    )
+    double variance)
 {
   
   /* PROPOSAL STEP */
@@ -1282,6 +1227,7 @@ arma::mat muUpdateReg(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
+  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
   for (int i=0; i < q0; i++)
   {
     for (int j=0; j < n; j++) 
@@ -1291,7 +1237,6 @@ arma::mat muUpdateReg(
         ( phinu(j)*mu0(i) + 1/delta(i) ));
     }
   }
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
   
   // This is new due to regression prior on delta
   arma::mat X_mu1 = designMatrix(k, mu1, variance);
@@ -1306,20 +1251,12 @@ arma::mat muUpdateReg(
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
    */
+  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
   for (int i=0; i < q0; i++)
   {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(mu1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (mu1(i) > 1e-3)) { ind(i) = 1; }
-      else{ind(i) = 0; mu1(i) = mu0(i);}            
-    }
-    else
-    {
-      ind(i) = 0; mu1(i) = mu0(i);
-      Rcpp::Rcout << "Error when updating mu " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
+    if(ind(i) == 0) mu1(i) = mu0(i);  
   }
+  
   /* OUTPUT */
   return join_rows(mu1, ind);
 }
@@ -1394,19 +1331,10 @@ arma::mat deltaUpdateReg(
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
    */    
+  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
   for (int i=0; i < q0; i++)
   {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(delta1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (delta1(i) > 1e-3)) { ind(i) = 1; }
-      else {ind(i) = 0; delta1(i) = delta0(i); }
-    }      
-    else
-    {
-      ind(i) = 0; delta1(i) = delta0(i);
-      Rcpp::Rcout << "Error when updating delta " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
+    if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
   // OUTPUT
@@ -1996,11 +1924,11 @@ arma::mat muUpdateNoSpikes(
       else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
     }
   }
-
+  
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
   mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
-
+  
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
   if(ConstrainType == 2)
@@ -2021,6 +1949,7 @@ arma::mat muUpdateNoSpikes(
   return join_rows(mu, ind);
 }
 
+// TO-DO: FORMAT CODE ACCORDINGLY
 /* Metropolis-Hastings updates of delta
  * Updates are implemented simulateaneously for all biological genes
  */
@@ -2069,29 +1998,11 @@ arma::mat deltaUpdateNoSpikes(
   else {log_aux -= (0.5/s2delta) * (pow(log(y),2) - pow(log(delta0),2));}
 
   // CREATING OUTPUT VARIABLE & DEBUG
+  ind = DegubInd(ind, q0, u, log_aux, y, 1e-3, "delta");
   for (int i=0; i < q0; i++)
   {
-    if((arma::is_finite(log_aux(i))))
-    {
-      if((y(i) > 1e-3) & (log(u(i)) < log_aux(i)))
-      {
-        // DEBUG: Reject very small values to avoid numerical issues
-        if(arma::is_finite(y(i))) {ind(i) = 1; delta(i) = y(i);}
-        else{ind(i) = 0; delta(i) = delta0(i);}            
-      }
-      else{ind(i) = 0; delta(i) = delta0(i);}
-    }      
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
-    else
-    {
-      ind(i) = 0; delta(i) = delta0(i);
-      Rcpp::Rcout << "delta0(i): " << delta0(i) << std::endl;
-      Rcpp::Rcout << "y(i): " << y(i) << std::endl;
-      Rcpp::Rcout << "mu(i): " << mu(i) << std::endl;
-      Rcpp::Rcout << "SomeThing went wrong when updating delta " << i+1 << std::endl;
-      Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
-    }
+    if(ind(i) == 0) delta(i) = delta0(i); 
+    else { delta(i) = y(i); }
   }
   
   // OUTPUT
@@ -2545,6 +2456,175 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   
 }
 
+/* Metropolis-Hastings updates of mu 
+ * Updates are implemented simulateaneously for all biological genes
+ */
+arma::mat muUpdateRegNoSpikes(
+    arma::vec const& mu0, 
+    arma::vec const& prop_var, 
+    double const& Constrain,
+    arma::mat const& Counts,  
+    arma::vec const& delta, 
+    arma::vec const& nu, 
+    arma::vec const& sum_bycell_all, 
+    double const& s2_mu,
+    int const& q0,
+    int const& n,
+    arma::vec & mu1,
+    arma::vec & u,
+    arma::vec & ind,
+    int const& RefGene,
+    arma::uvec const& ConstrainGene,
+    arma::uvec const& NotConstrainGene,
+    int const& ConstrainType,
+    int const& k,
+    arma::vec const& lambda,
+    arma::vec const& beta,
+    arma::mat const& X,
+    double const& sigma2,
+    double variance)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP    
+  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
+  u = arma::randu(q0);
+  
+  // INITIALIZE MU
+  mu1 = mu0 + 1 - 1;
+  double aux; double iAux;
+  double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
+  
+  // ACCEPT/REJECT STEP
+  
+  // Step 1: Computing the likelihood contribution of the acceptance rate 
+  // Calculated in the same way for all genes, 
+  // but the reference one (no need to be sequential)
+  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
+  for (int i=0; i < q0; i++)
+  {
+    if(i != RefGene)
+    {
+      for (int j=0; j < n; j++) 
+      {
+        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
+          log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu0(i)+(1/delta(i)) ));
+      }
+    }
+  }
+  // Revise this part
+  // This is new due to regression prior on delta
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  
+  // REGRESSION RELATED FACTOR
+  // Some terms might cancel out here; check
+  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
+  
+  
+  // Step 2: Computing prior component of the acceptance rate 
+  
+  // Step 2.1: For genes that are under the constrain (excluding the reference one)
+  for (int i=0; i < ConstrainGene.size(); i++)
+  {
+    iAux = ConstrainGene(i);
+    if(iAux != RefGene)
+    {
+      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
+      // ACCEPT REJECT
+      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
+      {
+        ind(iAux) = 1; mu1(iAux) = y(iAux);
+        sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+      }
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
+    }
+  }
+  
+  // Step 2.2: For the reference gene 
+  ind(RefGene) = 1;
+  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  
+  // Step 2.3: For genes that are *not* under the constrain
+  // Only relevant for a trimmed constrain
+  if(ConstrainType == 2)
+  {
+    for (int i=0; i < NotConstrainGene.size(); i++)
+    {
+      iAux = NotConstrainGene(i);
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
+      // ACCEPT REJECT
+      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
+      {
+        ind(iAux) = 1; mu1(iAux) = y(iAux);
+      }
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
+    }
+  }
+  // OUTPUT
+  return join_rows(mu1, ind);
+}
+
+
+/* Metropolis-Hastings updates of delta
+ * Updates are implemented simulateaneously for all biological genes
+ */
+arma::mat deltaUpdateRegNoSpikes(
+    arma::vec const& delta0,
+    arma::vec const& prop_var,  
+    arma::mat const& Counts, 
+    arma::vec const& mu, 
+    arma::vec const& nu, 
+    int const& q0,
+    int const& n,
+    arma::vec & delta1,
+    arma::vec & u, 
+    arma::vec & ind,
+    arma::vec const& lambda,
+    arma::mat const& X,
+    double const& sigma2,
+    arma::vec const& beta)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP
+  delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
+  u = arma::randu(q0);
+  
+  // ACCEPT/REJECT STEP 
+  arma::vec log_aux = - n * (lgamma_cpp(1/delta1)-lgamma_cpp(1/delta0));
+  // +1 should appear because we update log(delta) not delta. 
+  // However, it cancels out with the prior. 
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  
+  // Loop to replace matrix operations, through genes and cells
+  for (int i=0; i < q0; i++)
+  {
+    for (int j=0; j < n; j++) 
+    {
+      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
+      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) -= ( Counts(i,j) + (1/delta1(i)) ) *  log( nu(j)*mu(i)+(1/delta1(i)) );
+      log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
+    } 
+  }
+  
+  // REGRESSION RELATED FACTOR
+  // Some terms might cancel out here; check
+  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
+  
+  // CREATING OUTPUT VARIABLE & DEBUG
+  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
+  for (int i=0; i < q0; i++)
+  {
+    if(ind(i) == 0) delta1(i) = delta0(i);  
+  }
+  
+  // OUTPUT
+  return join_rows(delta1, ind);
+}
+
 /* MCMC sampler 
  * N: Total number of MCMC draws 
  * Thin: Thinning period for MCMC chain 
@@ -2793,26 +2873,26 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // REGRESSION
     // THIS REQUIRES A NEW FULL CONDITIONAL
-    /*
-    muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                        phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, y_q0, u_q0, ind_q0,
-                        k, lambdaAux, betaAux, X, sigma2Aux, variance);     
-    */
-    //PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, 
+                                Counts_arma, deltaAux.col(0), nuAux.col(0), 
+                                sumByCellAll_arma, s2mu, q0, n, 
+                                y_q0, u_q0, ind_q0, RefGene, 
+                                ConstrainGene_arma, NotConstrainGene_arma,
+                                ConstrainType, k, lambdaAux, betaAux, X, 
+                                sigma2Aux, variance);     
+    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // REGRESSION
     // THIS REQUIRES A NEW FULL CONDITIONAL
-    /*
     deltaAux = deltaUpdateRegNoSpikes(deltaAux.col(0), exp(LSdeltaAux), 
                                       Counts_arma, muAux.col(0), 
                                       nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                                       lambdaAux, X, sigma2Aux, betaAux);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
-     */
-    
+
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR

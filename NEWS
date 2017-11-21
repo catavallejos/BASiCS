@@ -684,3 +684,7 @@ version 1.1.7: (2017-11-20)
 - Updated unit test for no-spikes case (changes due to change in stoch ref)
 - Change in `BASiCS_MCMC` so that only biological counts go to C++
 - Added factorizations in `muUpdateReg` and `deltaUpdateReg` (C++ code)
+
+version 1.1.8: (2017-11-20)
+- `muUpdateRegNoSpikes` and `deltaUpdateRegNoSpikes` added to C++ code
+- Clean-up of C++ code (repeated debug checks made into function)
