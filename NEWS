@@ -685,6 +685,10 @@ version 1.1.7: (2017-11-20)
 - Change in `BASiCS_MCMC` so that only biological counts go to C++
 - Added factorizations in `muUpdateReg` and `deltaUpdateReg` (C++ code)
 
-version 1.1.8: (2017-11-20)
+version 1.1.8: (2017-11-20) WIP
 - `muUpdateRegNoSpikes` and `deltaUpdateRegNoSpikes` added to C++ code
 - Clean-up of C++ code (repeated debug checks made into function)
+- `lambdaUpdateReg` created as a separate function
+- Vectorization of calculations related to regression implementation
+- Global quantities (e.g. inv(V0)) taken outside the look (regression case)
+

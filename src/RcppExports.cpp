@@ -51,6 +51,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sigma2UpdateReg
+double sigma2UpdateReg(double const& mInvVm0, double const& sigma2_a0, double const& sigma2_b0, int const& q0);
+RcppExport SEXP _BASiCS_sigma2UpdateReg(SEXP mInvVm0SEXP, SEXP sigma2_a0SEXP, SEXP sigma2_b0SEXP, SEXP q0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double const& >::type mInvVm0(mInvVm0SEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2_a0(sigma2_a0SEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2_b0(sigma2_b0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    rcpp_result_gen = Rcpp::wrap(sigma2UpdateReg(mInvVm0, sigma2_a0, sigma2_b0, q0));
+    return rcpp_result_gen;
+END_RCPP
+}
 // HiddenBASiCS_MCMCcppReg
 Rcpp::List HiddenBASiCS_MCMCcppReg(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector muSpikes, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector s0, NumericVector nu0, NumericVector theta0, double s2mu, NumericVector aphi, double as, double bs, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, double LSphi0, NumericVector LSnu0, NumericVector LStheta0, NumericVector sumByCellAll, NumericVector sumByCellBio, NumericVector sumByGeneAll, NumericVector sumByGeneBio, int StoreAdapt, int EndAdapt, int PrintProgress, int k, NumericVector m0, NumericMatrix V0, double sigma2_a0, double sigma2_b0, NumericVector beta0, double sigma20, double eta0, NumericVector lambda0, double const& variance);
 RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcppReg(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP muSpikesSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP s0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP aphiSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSphi0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByCellBioSEXP, SEXP sumByGeneAllSEXP, SEXP sumByGeneBioSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP kSEXP, SEXP m0SEXP, SEXP V0SEXP, SEXP sigma2_a0SEXP, SEXP sigma2_b0SEXP, SEXP beta0SEXP, SEXP sigma20SEXP, SEXP eta0SEXP, SEXP lambda0SEXP, SEXP varianceSEXP) {
@@ -222,6 +236,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcpp", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcpp, 35},
+    {"_BASiCS_sigma2UpdateReg", (DL_FUNC) &_BASiCS_sigma2UpdateReg, 4},
     {"_BASiCS_HiddenBASiCS_MCMCcppReg", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppReg, 41},
     {"_BASiCS_HiddenBASiCS_MCMCcppNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppNoSpikes, 37},
     {"_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes, 43},

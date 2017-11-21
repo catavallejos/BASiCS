@@ -540,12 +540,11 @@ arma::vec sUpdateBatch(
   double b = 2 * bs;
   
   // GIG draws
-  /* DEBUG: return original value of s0 if input values are not wiThin the appropriate range (to avoid problems related to numerical innacuracy) */
+  // Initialize s1 with s0 (return that for invalid samples)
   
   // Calculating parameter to the passed as input to the Rgig function (specific to each cell)
   arma::vec a = 2 * nu / thetaBatch;
-  int j;
-  for (j=0; j<n; j++) 
+  for (int j = 0; j < n; j++) 
   {
     if(!R_IsNA(p(j))) 
     {
@@ -565,10 +564,8 @@ arma::vec sUpdateBatch(
         {
           s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
         }  
-        else{ s1(j) = s0(j); } 
       }
     }
-    else { s1(j) = s0(j); }
   }
   return s1;     
 }
@@ -608,8 +605,8 @@ arma::mat nuUpdateBatch(
     for (int i=0; i < q0; i++) 
     {
       log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
-        log( ( phi(j)*nu1(j)*mu(i) + invdelta(i) ) / 
-             ( phi(j)*nu0(j)*mu(i) + invdelta(i) ));
+                      log( ( phi(j)*nu1(j)*mu(i) + invdelta(i) ) / 
+                           ( phi(j)*nu0(j)*mu(i) + invdelta(i) ));
     } 
   }
   
@@ -1341,6 +1338,47 @@ arma::mat deltaUpdateReg(
   return join_rows(delta1, ind);
 }
 
+// WORK IN PROGRESS... 
+// [[Rcpp::export]]
+double sigma2UpdateReg(double const& mInvVm0,
+                       double const& sigma2_a0,
+                       double const& sigma2_b0,
+                       int const& q0)
+{
+  double a = sigma2_a0 + q0 / 2;
+  double b = sigma2_b0 + 0.5 * mInvVm0; 
+    
+//    Rcpp::as<double>(wrap(0.5*(m0_arma.t()*inv(V0_arma)*m0_arma + (betaAux - mAux).t()*V1*(betaAux - mAux) - mAux.t()*V1*mAux)));
+//  for(int z=0; z<lambdaAux.size(); z++){
+//    s_bAux += 0.5*(log(dr(z))*lambdaAux(z)*log(dr(z)));
+//  }
+//  
+//  if(s_aAux > 0 & s_bAux > 0){
+//    sigma2Aux = pow(R::rgamma(s_aAux, 1.0/s_bAux),-1);
+//  }
+
+  double sigma2 = pow(R::rgamma(a, 1.0/b),-1);
+  return sigma2; 
+}
+
+arma::vec lambdaUpdateReg(arma::vec const& delta,
+                          arma::mat const& X,
+                          arma::vec const& beta,
+                          double const& sigma2, 
+                          double const& eta, 
+                          int const& q0,
+                          arma::vec lambda1)
+{
+  // Parameter calculations
+  double a = (eta + 1) / 2;
+  arma::vec b = 0.5 * ( eta + ( pow(log(delta) - X*beta,2) / sigma2) );
+  for(int i = 0; i < q0; i++)
+  {
+    lambda1(i) = R::rgamma(a, 1.0 / b(i));
+  } 
+  return lambda1; 
+}
+
 /* MCMC sampler 
  * N: Total number of MCMC draws 
  * Thin: Thinning period for MCMC chain 
@@ -1449,6 +1487,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   // OTHER GLOBAL QUANTITIES
   double SumSpikeInput = sum(muSpikes);
   arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  arma::mat inv_V0 = inv(as_arma(V0));
+  double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t()*inv_V0*as_arma(m0)));
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux); 
@@ -1520,17 +1560,14 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec m0_arma = as_arma(m0);
   arma::mat V0_arma = as_arma(V0);
   arma::vec beta0_arma = as_arma(beta0);
-  arma::vec lambda0_arma = as_arma(lambda0);
   arma::mat beta = arma::zeros(k, Naux);
   arma::mat lambda = arma::zeros(q0, Naux);
   arma::vec sigma = arma::zeros(Naux);
   arma::mat epsilon = arma::zeros(q0, Naux);
-  double lambda_a;
-  double lambda_b;
   
   // INITIALIZATION OF REGRESSION PARAMETERS
   arma::vec mAux = m0_arma; arma::mat VAux = V0_arma; arma::vec betaAux = beta0_arma;
-  arma::vec lambdaAux = lambda0_arma; 
+  arma::vec lambdaAux = as_arma(lambda0); 
   double sigma2Aux = sigma20; double s_aAux = sigma2_a0; double s_bAux = sigma2_b0;
   arma::vec epsilonAux = arma::zeros(q0);
   
@@ -1540,6 +1577,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec mAuxUpdate;
   arma::mat MVRNORM;
   arma::vec betaAuxUpdate;
+  
+  
   
   Rcout << "-------------------------------------------------------------" << std::endl;  
   Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
@@ -1624,7 +1663,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // REGRESSION
     // V, m, beta update
-    arma::mat inv_V0 = inv(V0_arma);
+    
     for(int x=0; x<k; x++){
       for(int y=0; y<k; y++){
         double cur_sum = 0;
@@ -1655,30 +1694,22 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // REGRESSION
     // a, b, sigma2 update
-    s_aAux = sigma2_a0 + lambdaAux.size()/2;
-    s_bAux = sigma2_b0 + Rcpp::as<double>(wrap(0.5*(m0_arma.t()*inv(V0_arma)*m0_arma + (betaAux - mAux).t()*V1*(betaAux - mAux) - mAux.t()*V1*mAux)));
-    for(int z=0; z<lambdaAux.size(); z++){
-      s_bAux += 0.5*(log(dr(z))*lambdaAux(z)*log(dr(z)));
-    }
-    
+    s_aAux = sigma2_a0 + q0/2;
+    s_bAux = sigma2_b0 + Rcpp::as<double>(wrap(0.5*(mInvVm0 + betaAux.t()*V1*betaAux - 2*betaAux.t()*V1*mAux))); 
+    s_bAux += 0.5 * sum( lambdaAux % pow(log(deltaAux.col(0)), 2) ); 
+
     if(s_aAux > 0 & s_bAux > 0){
       sigma2Aux = pow(R::rgamma(s_aAux, 1.0/s_bAux),-1);
     }
     
-    // REGRESSION
-    // lambda update
-    lambda_a=(eta0+1)/2; 
-    for(int t=0; t<lambdaAux.size(); t++){
-      lambda_b = Rcpp::as<double>(wrap(0.5*(eta0+(pow(log(dr(t))-X.row(t)*betaAux,2))/sigma2Aux)));
-      lambdaAux(t)=R::rgamma(lambda_a,1.0/lambda_b);
-    }
+    // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
+    lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
+                                eta0, q0, y_q0);
     
-    // REGRESSION
-    // epsilon update
-    for(int t=0; t<lambdaAux.size(); t++){
-      epsilonAux(t) = Rcpp::as<double>(wrap(log(dr(t))-X.row(t)*betaAux));
-    }
-    
+    // UPDATE OF EPSILON 
+    // Direct calculation conditional on regression related parameters
+    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
+
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt)
     {
@@ -2805,7 +2836,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec m0_arma = as_arma(m0);
   arma::mat V0_arma = as_arma(V0);
   arma::vec beta0_arma = as_arma(beta0);
-  arma::vec lambda0_arma = as_arma(lambda0);
   arma::mat beta = arma::zeros(k, Naux);
   arma::mat lambda = arma::zeros(q0, Naux);
   arma::vec sigma = arma::zeros(Naux);
@@ -2817,7 +2847,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
    
   // INITIALIZATION OF REGRESSION PARAMETERS
   arma::vec mAux = m0_arma; arma::mat VAux = V0_arma; arma::vec betaAux = beta0_arma;
-  arma::vec lambdaAux = lambda0_arma; 
+  arma::vec lambdaAux = as_arma(lambda0); 
   double sigma2Aux = sigma20; double s_aAux = sigma2_a0; double s_bAux = sigma2_b0;
   arma::vec epsilonAux = arma::zeros(q0);
   
