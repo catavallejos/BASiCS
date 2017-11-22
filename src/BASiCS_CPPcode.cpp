@@ -1306,7 +1306,7 @@ arma::mat deltaUpdateReg(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
-  
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   for (int i=0; i < q0; i++)
   {
     for (int j=0; j < n; j++) 
@@ -1317,11 +1317,12 @@ arma::mat deltaUpdateReg(
       log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
     }
   }
-  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
-
+  
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check
-  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
+//  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
+  log_aux -= lambda%(pow(log(delta1),2)-pow(log(delta0),2) - 
+                     2*(log(delta1)-log(delta0))%(X*beta))/(2*sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG 
    * Proposed values are automatically rejected in the following cases:
@@ -1947,66 +1948,6 @@ arma::mat muUpdateNoSpikes(
   return join_rows(mu, ind);
 }
 
-// TO-DO: FORMAT CODE ACCORDINGLY
-/* Metropolis-Hastings updates of delta
- * Updates are implemented simulateaneously for all biological genes
- */
-arma::mat deltaUpdateNoSpikes(
-  arma::vec const& delta0,
-  arma::vec const& prop_var,  
-  arma::mat const& Counts, 
-  arma::vec const& mu, 
-  arma::vec const& nu, 
-  double const& a_delta, 
-  double const& b_delta, 
-  int const& q0,
-  int const& n,
-  double const& s2delta,
-  double const& prior_delta)
-{
-  using arma::span;
-  
-  // CREATING VARIABLES WHERE TO STORE DRAWS
-  arma::vec delta = arma::zeros(q0); 
-  arma::vec ind = arma::zeros(q0);
-  
-  // PROPOSAL STEP
-  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
-  arma::vec u = arma::randu(q0);
-  
-  // ACCEPT/REJECT STEP 
-  arma::vec log_aux = - n * (lgamma_cpp(1/y)-lgamma_cpp(1/delta0));
-  // +1 should appear because we update log(delta) not delta. 
-  // However, it cancels out with the prior. 
-  log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
-
-  // Loop to replace matrix operations, through genes and cells
-  for (int i=0; i < q0; i++)
-  {
-      for (int j=0; j < n; j++) 
-      {
-        log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
-        log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( nu(j)*mu(i)+(1/y(i)) );
-        log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
-      } 
-  }
-  
-  // Component related to the prior
-  if(prior_delta == 1) {log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0);}
-  else {log_aux -= (0.5/s2delta) * (pow(log(y),2) - pow(log(delta0),2));}
-
-  // CREATING OUTPUT VARIABLE & DEBUG
-  ind = DegubInd(ind, q0, u, log_aux, y, 1e-3, "delta");
-  for (int i=0; i < q0; i++)
-  {
-    if(ind(i) == 0) delta(i) = delta0(i); 
-    else { delta(i) = y(i); }
-  }
-  
-  // OUTPUT
-  return join_rows(delta, ind);
-}
-
 /* Metropolis-Hastings updates of nu (batch case)
  * Updates are implemented simulateaneously for all cells.
  */
@@ -2299,9 +2240,10 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    deltaAux = deltaUpdateNoSpikes(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
-                                   muAux.col(0), nuAux.col(0), adelta, bdelta, 
-                                   q0, n, s2delta, prior_delta);  
+    deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
+                           muAux.col(0), nuAux.col(0), 
+                           adelta, bdelta, s2delta, prior_delta, 
+                           q0, n, y_q0, u_q0, ind_q0); 
     PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
    
     // UPDATE OF NU: 
@@ -2515,9 +2457,7 @@ arma::mat muUpdateRegNoSpikes(
   arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
   // REGRESSION RELATED FACTOR
-  // Some terms might cancel out here; check
   log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
-  
   
   // Step 2: Computing prior component of the acceptance rate 
   

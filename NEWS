@@ -697,3 +697,5 @@ version 1.1.8: (2017-11-21)
 
 version 1.1.9: (2017-11-22) - WIP
 - `means` only updated when needed (regression case); unit test updated accordingly
+- `deltaUpdateNoSpikes` + `deltaUpdateRegNoSpikes` removed as no longer required
+- Simplification of terms in `deltaUpdateReg`
