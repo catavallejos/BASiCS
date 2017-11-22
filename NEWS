@@ -694,3 +694,6 @@ version 1.1.8: (2017-11-21)
 - `sigma2UpdateReg` created as a separate function
 - `betaUpdateReg` created as a separate function
 - Fixed typo in sigma2 updates (regression case); unit test updated accordingly
+
+version 1.1.9: (2017-11-22) - WIP
+- `means` only updated when needed (regression case); unit test updated accordingly

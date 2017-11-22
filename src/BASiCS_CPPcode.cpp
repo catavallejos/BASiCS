@@ -1563,9 +1563,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   
   // REGRESSION SPECIFIC SECTION
   
-  // Design matrix for regression
-  arma::mat X = arma::zeros(q0, k);
-  
   // Parameters for regression
   arma::mat beta = arma::zeros(k, Naux);
   arma::mat lambda = arma::zeros(q0, Naux);
@@ -1582,6 +1579,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
+  // Model matrix initialization
+  arma::vec means = muAux(arma::span(0,q0-1),0);
+  arma::mat X = designMatrix(k, means, variance);
 
   Rcout << "-------------------------------------------------------------" << std::endl;  
   Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
@@ -1600,13 +1600,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     }
     
     Ibatch++; 
-    
-    // REGRESSION
-    // Model matrix initialization
-    arma::vec means = muAux(arma::span(0,q0-1),0);
-    if(i==0){
-      X=designMatrix(k, means, variance);
-    }
     
     // UPDATE OF PHI: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -1711,6 +1704,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
+        means = muAux(arma::span(0,q0-1),0);
         X = designMatrix(k, means, variance);
       }
       
@@ -2740,6 +2734,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   
   // OTHER GLOBAL QUANTITIES
   arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  arma::mat inv_V0 = inv(as_arma(V0));
+  double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t()*inv_V0*as_arma(m0)));
+  arma::vec InvVm0 = inv_V0*as_arma(m0);
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux); 
@@ -2801,36 +2798,27 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
   
   // REGRESSION SPECIFIC SECTION
-  
-  // Design matrix for regression
-  arma::mat X = arma::zeros(q0, k);
-  
+
   // Parameters for regression
-  arma::vec m0_arma = as_arma(m0);
-  arma::mat V0_arma = as_arma(V0);
-  arma::vec beta0_arma = as_arma(beta0);
   arma::mat beta = arma::zeros(k, Naux);
   arma::mat lambda = arma::zeros(q0, Naux);
   arma::vec sigma = arma::zeros(Naux);
   arma::mat epsilon = arma::zeros(q0, Naux);
-  double lambda_a;
-  double lambda_b;
-  arma::vec dr;
-  arma::vec means;
-   
+  
   // INITIALIZATION OF REGRESSION PARAMETERS
-  arma::vec mAux = m0_arma; arma::mat VAux = V0_arma; arma::vec betaAux = beta0_arma;
+  arma::vec mAux = as_arma(m0); 
+  arma::mat VAux = as_arma(V0); 
+  arma::vec betaAux = as_arma(beta0);
   arma::vec lambdaAux = as_arma(lambda0); 
-  double sigma2Aux = sigma20; double s_aAux = sigma2_a0; double s_bAux = sigma2_b0;
+  double sigma2Aux = sigma20; 
   arma::vec epsilonAux = arma::zeros(q0);
   
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
-  arma::mat VAuxUpdate;
-  arma::vec mAuxUpdate;
-  arma::mat MVRNORM;
-  arma::vec betaAuxUpdate;
-  
+  // Model matrix initialization
+  arma::vec means = muAux.col(0);
+  arma::mat X = designMatrix(k, means, variance);
+
   Rcout << "-------------------------------------------------------------" << std::endl;  
   Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
   Rcout << "-------------------------------------------------------------" << std::endl;
@@ -2848,15 +2836,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     }
     
     Ibatch++; 
-    
-    // REGRESSION
-    // Model matrix initialization
-    if(i==0)
-    {
-      means = muAux(arma::span(0,q0-1),0);
-      X = designMatrix(k, means, variance);
-    }
-    
+
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaBatch,
@@ -2906,66 +2886,26 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
     
-    // REGRESSION
-    // Save deltas in vector
-    dr = deltaAux.col(0);
-    
-    // REGRESSION
-    // V, m, beta update
-    arma::mat inv_V0 = inv(V0_arma);
-    for(int x=0; x<k; x++){
-      for(int y=0; y<k; y++){
-        double cur_sum = 0;
-        for(int z=0; z < lambdaAux.size(); z++){
-          cur_sum += X(z,x)*lambdaAux(z)*X(z,y);
-        }
-        V1(x,y) = cur_sum + inv_V0(x,y);
-      }
-    }
-    
+    // UPDATES OF REGRESSION RELATED PARAMETERS
+    V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
-    
     if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0))
     {
-      arma::vec mAux_pre = inv(V0_arma)*m0_arma;
-      for(int x=0; x<k; x++){
-        double cur_sum = 0;
-        for(int z=0; z<lambdaAux.size(); z++){
-          cur_sum += X(z,x)*lambdaAux(z)*log(dr(z));
-        }
-        mAux(x) = mAux_pre(x) + cur_sum;
-      }
+      mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
       mAux = VAux*mAux;
       
-      MVRNORM = mvrnormArma(1,mAux,sigma2Aux * VAux);
-      betaAux = MVRNORM.row(0).t();
+      // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
+      betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
+      sigma2Aux = sigma2UpdateReg(deltaAux.col(0), betaAux, lambdaAux, V1, 
+                                  mInvVm0, mAux, sigma2_a0, sigma2_b0, q0);
+      
     }
-    
-    // REGRESSION
-    // a, b, sigma2 update
-    s_aAux = sigma2_a0 + lambdaAux.size()/2;
-    s_bAux = sigma2_b0 + Rcpp::as<double>(wrap(0.5*(m0_arma.t()*inv(V0_arma)*m0_arma + (betaAux - mAux).t()*V1*(betaAux - mAux) - mAux.t()*V1*mAux)));
-    for(int z=0; z<lambdaAux.size(); z++){
-      s_bAux += 0.5*(log(dr(z))*lambdaAux(z)*log(dr(z)));
-    }
-    
-    if(s_aAux > 0 & s_bAux > 0){
-      sigma2Aux = pow(R::rgamma(s_aAux, 1.0/s_bAux),-1);
-    }
-    
-    // REGRESSION
-    // lambda update
-    lambda_a=(eta0+1)/2; 
-    for(int t=0; t<lambdaAux.size(); t++){
-      lambda_b = Rcpp::as<double>(wrap(0.5*(eta0+(pow(log(dr(t))-X.row(t)*betaAux,2))/sigma2Aux)));
-      lambdaAux(t)=R::rgamma(lambda_a,1.0/lambda_b);
-    }
-    
-    // REGRESSION
-    // epsilon update
-    for(int t=0; t<lambdaAux.size(); t++){
-      epsilonAux(t) = Rcpp::as<double>(wrap(log(dr(t))-X.row(t)*betaAux));
-    }
+    // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
+    lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
+                                eta0, q0, y_q0);
+    // UPDATE OF EPSILON 
+    // Direct calculation conditional on regression related parameters
+    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt)
@@ -2992,7 +2932,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux(arma::span(0,q0-1),0);
+        means = muAux.col(0);
         X = designMatrix(k, means, variance);
       }
       
