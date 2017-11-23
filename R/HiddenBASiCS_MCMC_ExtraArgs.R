@@ -1,4 +1,4 @@
-HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Burn, n)
+HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
 {
   # MCMC and storage parameters
   AR <- ifelse("AR" %in% names(Args), Args$AR, 0.44)
@@ -21,6 +21,14 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Burn, n)
   
   # Whether spike-ins are in use
   WithSpikes <- ifelse("WithSpikes" %in% names(Args), Args$WithSpikes, TRUE)
+  # Whether a sthocastic reference is used (no spikes case only)
+  if(WithSpikes == FALSE)
+  {
+    StochasticRef <- ifelse("StochasticRef" %in% names(Args), 
+                            Args$StochasticRef, TRUE)  
+    ConstrainType <- ifelse("ConstrainType" %in% names(Args), 
+                            Args$ConstrainType, 2)
+  } else { StochasticRef <- FALSE; ConstrainType <- NULL }
   
   # Whether the regression case is used
   Regression <- ifelse("Regression" %in% names(Args), Args$Regression, FALSE)
@@ -39,6 +47,10 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Burn, n)
   else {
     k <- NULL; variance <- NULL; eta <- NULL
   }
+  
+  # Starting values for MCMC
+  if ("Start" %in% names(Args)) { Start = Args$Start } 
+  else { Start <- HiddenBASiCS_MCMC_Start(Data, k = k, eta = eta) }
   
   # Validity checks
   if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 & 
@@ -69,6 +81,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Burn, n)
       RunName = RunName, PrintProgress = PrintProgress, 
       PriorParam = PriorParam, PriorDeltaNum = PriorDeltaNum, 
       PriorDelta = PriorDelta,
-      WithSpikes = WithSpikes, Regression = Regression,
-      k = k, variance = variance, eta = eta)
+      WithSpikes = WithSpikes, StochasticRef = StochasticRef,
+      ConstrainType = ConstrainType, 
+      Regression = Regression, k = k, variance = variance, eta = eta,
+      Start = Start)
 }

@@ -6,7 +6,7 @@ test_that("paramater estimations match the given seed",
                                  WithBatch = TRUE)
   set.seed(14)
   Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
-                       PrintProgress = FALSE)
+                       PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary <- Summary(Chain)
             
   # Check if parameter estimates match for the first 5 genes and cells

@@ -94,8 +94,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     }
     
     # Starting values for the proposal variances 
-    if (length(metadata(Data)$SpikeInput) > 1) { ls.mu0 <- rep(ls.mu0, q) } 
-    else { ls.mu0 <- rep(ls.mu0, q.bio) }
+    ls.mu0 <- rep(ls.mu0, q.bio)
     ls.delta0 <- rep(ls.delta0, q.bio)
     ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11) 
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
