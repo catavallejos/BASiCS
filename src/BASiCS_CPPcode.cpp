@@ -338,10 +338,8 @@ arma::mat as_arma(NumericMatrix& x)
 arma::mat lgamma_cpp(arma::mat const& x) 
 {
   arma::mat output = x;
-  for (unsigned int i=0; i<arma::size(x,0); i++)
-  {
-    for(unsigned int j=0; j<arma::size(x,1); j++)
-    {
+  for (unsigned int i=0; i<arma::size(x,0); i++) {
+    for(unsigned int j=0; j<arma::size(x,1); j++) {
       output(i,j) = R::lgammafn(x(i,j));
     }
   }
@@ -354,8 +352,7 @@ arma::mat lgamma_cpp(arma::mat const& x)
 arma::vec lgamma_cpp_vec(arma::vec const& x) 
 {
   arma::vec output = x;
-  for (unsigned int i=0; i < output.size(); i++)
-  {
+  for (unsigned int i=0; i < output.size(); i++) {
       output(i) = R::lgammafn(x(i));
   }
   return output;
@@ -380,15 +377,12 @@ arma::vec DegubInd(arma::vec ind,
                    double const& threshold,
                    std::string const& param)
 {
-  for (int i=0; i < q; i++)
-  {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(y(i)) )
-    {
+  for (int i=0; i < q; i++) {
+    if( arma::is_finite(log_aux(i)) & arma::is_finite(y(i)) ) {
       if((log(u(i)) < log_aux(i)) & (y(i) > threshold)) { ind(i) = 1; }
       else{ind(i) = 0;}            
     }
-    else
-    {
+    else {
       ind(i) = 0; 
       Rcpp::Rcout << "Error when updating " << param << i+1 << std::endl;
       Rcpp::warning("Consider additional data filter if error is frequent.");        
@@ -426,17 +420,14 @@ arma::mat muUpdate(
    */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
   log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *  
                       log( ( phinu(j)*mu1(i) + invdelta(i) ) / 
                            ( phinu(j)*mu0(i) + invdelta(i) ));
     }
   }
 
-  
   /* CREATING OUTPUT & DEBUG 
    * Proposed values are automatically rejected in the following cases:
    * - If smaller than 1e-3
@@ -444,8 +435,7 @@ arma::mat muUpdate(
    * - When the acceptance rate cannot be numerally computed
    */
   ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
-  for (int i=0; i < q0; i++)
-  {
+  for (int i=0; i < q0; i++) {
     if(ind(i) == 0) mu1(i) = mu0(i);  
   }
 
@@ -483,10 +473,8 @@ arma::mat deltaUpdate(
    */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
       log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
@@ -494,12 +482,10 @@ arma::mat deltaUpdate(
     }
   }
   // Component related to the prior
-  if(prior_delta == 1) 
-  {
+  if(prior_delta == 1) {
     log_aux += (log(delta1)-log(delta0))*a_delta - b_delta * (delta1 - delta0);
   }
-  else 
-  { 
+  else { 
     log_aux -= (0.5/s2delta) * (pow(log(delta1),2) - pow(log(delta0),2)); 
   }
 
@@ -510,8 +496,7 @@ arma::mat deltaUpdate(
    * - When the acceptance rate cannot be numerally computed
    */ 
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i=0; i < q0; i++)
-  {
+  for (int i=0; i < q0; i++) {
     if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
@@ -544,26 +529,18 @@ arma::vec sUpdateBatch(
   
   // Calculating parameter to the passed as input to the Rgig function (specific to each cell)
   arma::vec a = 2 * nu / thetaBatch;
-  for (int j = 0; j < n; j++) 
-  {
-    if(!R_IsNA(p(j))) 
-    {
-      if(!R_IsNA(a(j)) & (a(j)>0)) 
-      {
+  for (int j = 0; j < n; j++) {
+    if(!R_IsNA(p(j))) {
+      if(!R_IsNA(a(j)) & (a(j)>0)) {
         s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
         /* DEBUG: break in case of undefined values */
-        if(R_IsNA(s1(j))) 
-        {
+        if(R_IsNA(s1(j))) {
           Rcpp::Rcout << "Error when updating s" << j << std::endl;
           Rcpp::stop("Please consider additional filter of the input dataset.");
         }
       }
-      else 
-      {
-        if(!(a(j)<0) & (p(j)>0)) 
-        {
-          s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
-        }  
+      else {
+        if(!(a(j)<0) & (p(j)>0)) s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
       }
     }
   }
@@ -600,10 +577,8 @@ arma::mat nuUpdateBatch(
   // ACCEPT/REJECT STEP
   arma::vec log_aux = arma::zeros(n);
   
-  for (int j=0; j < n; j++) 
-  {
-    for (int i=0; i < q0; i++) 
-    {
+  for (int j=0; j < n; j++) {
+    for (int i=0; i < q0; i++) {
       log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
                       log( ( phi(j)*nu1(j)*mu(i) + invdelta(i) ) / 
                            ( phi(j)*nu0(j)*mu(i) + invdelta(i) ));
@@ -620,8 +595,7 @@ arma::mat nuUpdateBatch(
    * - When the acceptance rate cannot be numerally computed
    */ 
   ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
-  for (int j=0; j < n; j++)
-  {
+  for (int j=0; j < n; j++) {
     if(ind(j) == 0) nu1(j) = nu0(j);  
   }
 
@@ -678,12 +652,10 @@ arma::vec rDirichlet(
 {
   arma::vec aux = arma::ones(alpha.size());
   unsigned int i;
-  for(i=0; i<alpha.size(); i++)
-  {
+  for(i=0; i<alpha.size(); i++) {
     aux(i) = Rcpp::as<double>(rgamma(1,alpha(i),1));   
   }
-  aux = aux / sum(aux);    
-  return aux;  
+  return aux / sum(aux);  
 }
 
 /* Metropolis-Hastings updates of phi 
@@ -711,18 +683,15 @@ Rcpp::List phiUpdate(
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  
   if(all(prop_var * phi1 < 2.5327372760800758e+305)  & 
      all(prop_var * phi0 < 2.5327372760800758e+305) &
-     all(phi1 > 0) & all(phi0 > 0)) 
-  {
+     all(phi1 > 0) & all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
     double log_aux = sum( (sum_bygene_bio + aphi) % (log(phi1) - log(phi0)));
         
     // Loop to replace matrix operations, through genes and cells
     // There is an extra factor in the prior n^(-n); it cancels out in the ratio
     // There is an extra factor n^(-(sum(aphi) - 1));it cancels out in the ratio
-    for (int j=0; j < n; j++) 
-    {
-      for (int i=0; i < q0; i++) 
-      {
+    for (int j=0; j < n; j++) {
+      for (int i=0; i < q0; i++) {
         log_aux -= ( Counts(i,j) + invdelta(i) ) *  
                       log( (phi1(j)*nu(j)*mu(i) + invdelta(i) ) / 
                            (phi0(j)*nu(j)*mu(i) + invdelta(i) ));
@@ -735,29 +704,25 @@ Rcpp::List phiUpdate(
     // gamma(sum(prop_var * phi0)) / gamma(sum(prop_var * phi1));
     // it cancels out as sum(prop_var*y) = sum(prop_var*phi0)
     log_aux += prop_var * sum(phi1 % log(phi0) - phi0 % log(phi1));
-    log_aux -= sum(lgamma_cpp_vec(prop_var * phi1) - lgamma_cpp_vec(prop_var * phi0));    
+    log_aux -= sum(lgamma_cpp_vec(prop_var*phi1) - lgamma_cpp_vec(prop_var*phi0));    
     
-    if(!R_IsNA(log_aux))
-    {
+    if(!R_IsNA(log_aux)){
         if(log(u) < log_aux) { ind = 1; }
         else {ind = 0; phi1 = phi0;}
     }
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message
-    else
-    {
+    else {
       Rcpp::Rcout << "Error when updating phi" << std::endl;
       Rcpp::stop("Please consider additional filter of the input dataset."); 
       ind = 0; phi1 = phi0;
     }     
   }
-  else
-  {
+  else {
     ind = 0; phi1 = phi0;     
   }      
-  return(Rcpp::List::create(
-         Rcpp::Named("phi") = phi1,
-         Rcpp::Named("ind") = ind)); 
+  return(Rcpp::List::create(Rcpp::Named("phi") = phi1, 
+                            Rcpp::Named("ind") = ind)); 
 }
 
 
@@ -874,8 +839,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::mat LStheta; 
   
   // LOG-PROPOSAL VARIANCES 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     LSmu = zeros(q0, Naux); 
     LSdelta = zeros(q0, Naux); 
     LSphi = ones(Naux);   
@@ -930,8 +894,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn)
-    {
+    if(i==Burn) {
       Rcout << "-------------------------------------------------------------" << std::endl; 
       Rcout << "End of Burn-in period."<< std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl; 
@@ -948,7 +911,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                            y_n); 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) {phiAccept += Rcpp::as<double>(phiAuxList["ind"]);}
+    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -966,7 +929,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                      1/deltaAux.col(0), phiAux % nuAux.col(0), 
                      sumByCellBio_arma, s2mu, q0, n,
                      y_q0, u_q0, ind_q0);     
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -979,7 +942,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                            muAux.col(0), phiAux % nuAux.col(0), 
                            adelta, bdelta, s2delta, prior_delta, 
                            q0, n, y_q0, u_q0, ind_q0);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);} 
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
 
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -989,14 +952,12 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                           muAux.col(0), 1/deltaAux.col(0),
                           phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                           y_n, u_n, ind_n); 
-    PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
+    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt)
-    {
+    if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50)
-      {
+      if(Ibatch==50) {
         PmuAux = PmuAux/50;
         PmuAux = -1 + 2*arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux = LSmuAux + PmuAux*0.1;
@@ -1017,12 +978,10 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
         PphiAux = PphiAux0; 
         PnuAux = PnuAux0; PthetaAux = PthetaAux0; 
       }
-      
     }
         
     // STORAGE OF DRAWS
-    if((i%Thin==0) & (i>=Burn))
-    {      
+    if((i%Thin==0) & (i>=Burn)) {      
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
       phi.col(i/Thin - Burn/Thin) = phiAux;
@@ -1030,8 +989,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);       
       
-      if(StoreAdapt == 1)
-      {
+      if(StoreAdapt == 1) {
         LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
         LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
         LSphi(i/Thin - Burn/Thin) = LSphiAux;
@@ -1041,8 +999,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if((i%(2*Thin) == 0) & (PrintProgress == 1))
-    {
+    if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
         Rcout << "-------------------------------------------------------------" << std::endl;
         Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
         Rcout << "-------------------------------------------------------------" << std::endl;
@@ -1111,8 +1068,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   Rcout << "-------------------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
            Rcpp::Named("mu") = mu.t(),
@@ -1128,8 +1084,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
            Rcpp::Named("ls.theta") = LStheta.t())); 
   }
   
-  else
-  {
+  else {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
            Rcpp::Named("mu") = mu.t(),
@@ -1139,22 +1094,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
            Rcpp::Named("nu") = nu.t(),
            Rcpp::Named("theta") = theta.t())); 
   }
-
 }
-
-/*
-arma::vec bessel_k(
-  arma::vec const& x,
-  double const& nu,
-  arma::vec & y)
-{
-  for(int i=0; i < y.size; i++)
-  {
-    y(i) = 0;
-  }
-  return(i)
-}
- */
 
 // Functions for regression case of BASiCS
 
@@ -1168,16 +1108,16 @@ arma::mat designMatrix(
   double ran = x.max() - x.min();
   arma::vec myu = arma::zeros(k-2);
   myu(0) = x.min();
-  for(int i=1; i<myu.size(); i++)
-  {
+  
+  for(int i=1; i < myu.size(); i++) {
     myu(i) = myu(i-1) + ran/(k-3);
   }
   double h = (myu(1)-myu(0)) * variance;
+  
   // Possibly create this matrix outside
   arma::mat X = arma::ones(x.size(),k);
   X.col(1) = x;
-  for(int i=0; i < k-2; i++)
-  {
+  for(int i=0; i < k-2; i++) {
     X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
     //X.col(i+1) = pow(x,i+1);
   }
@@ -1226,13 +1166,11 @@ arma::mat muUpdateReg(
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
   log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
         log( ( phinu(j)*mu1(i) + 1/delta(i) ) / 
-        ( phinu(j)*mu0(i) + 1/delta(i) ));
+             ( phinu(j)*mu0(i) + 1/delta(i) ));
     }
   }
   
@@ -1250,8 +1188,7 @@ arma::mat muUpdateReg(
    * - When the acceptance rate cannot be numerally computed
    */
   ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
-  for (int i=0; i < q0; i++)
-  {
+  for (int i=0; i < q0; i++) {
     if(ind(i) == 0) mu1(i) = mu0(i);  
   }
   
@@ -1307,10 +1244,8 @@ arma::mat deltaUpdateReg(
   */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
       log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
@@ -1319,7 +1254,7 @@ arma::mat deltaUpdateReg(
   }
   
   // REGRESSION RELATED FACTOR
-  // Some terms might cancel out here; check
+  // The next lines are equivalent; second one a is simplified version
 //  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
   log_aux -= lambda%(pow(log(delta1),2)-pow(log(delta0),2) - 
                      2*(log(delta1)-log(delta0))%(X*beta))/(2*sigma2);
@@ -1331,8 +1266,7 @@ arma::mat deltaUpdateReg(
    * - When the acceptance rate cannot be numerally computed
    */    
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i=0; i < q0; i++)
-  {
+  for (int i=0; i < q0; i++) {
     if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
@@ -1382,8 +1316,7 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
   // Parameter calculations
   double a = (eta + 1) / 2;
   arma::vec b = 0.5 * ( eta + ( pow(log(delta) - X*beta,2) / sigma2) );
-  for(int i = 0; i < q0; i++)
-  {
+  for(int i = 0; i < q0; i++) {
     lambda1(i) = R::rgamma(a, 1.0 / b(i));
   } 
   return lambda1; 
@@ -1515,8 +1448,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat LStheta; 
   
   // LOG-PROPOSAL VARIANCES 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     LSmu = zeros(q0, Naux); 
     LSdelta = zeros(q0, Naux); 
     LSphi = ones(Naux);   
@@ -1593,8 +1525,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn)
-    {
+    if(i==Burn) {
       Rcout << "-------------------------------------------------------------" << std::endl; 
       Rcout << "End of Burn-in period."<< std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl; 
@@ -1611,7 +1542,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                            y_n); 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) {phiAccept += Rcpp::as<double>(phiAuxList["ind"]);}
+    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -1630,7 +1561,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, 
                         y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, variance);     
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -1644,7 +1575,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                               muAux.col(0), 
                               phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                               lambdaAux, X, sigma2Aux, betaAux);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}   
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);  
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -1654,13 +1585,12 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           muAux.col(0), 1/deltaAux.col(0),
                           phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                           y_n, u_n, ind_n); 
-    PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
+    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
-    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0))
-    {
+    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
       mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
       mAux = VAux*mAux;
       
@@ -1678,11 +1608,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     epsilonAux = log(deltaAux.col(0)) - X*betaAux;
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt)
-    {
+    if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50)
-      {
+      if(Ibatch==50) {
         PmuAux = PmuAux/50;
         PmuAux = -1 + 2*arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux = LSmuAux + PmuAux*0.1;
@@ -1708,12 +1636,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         means = muAux(arma::span(0,q0-1),0);
         X = designMatrix(k, means, variance);
       }
-      
     }
     
     // STORAGE OF DRAWS
-    if((i%Thin==0) & (i>=Burn))
-    {      
+    if((i%Thin==0) & (i>=Burn)) {      
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
       phi.col(i/Thin - Burn/Thin) = phiAux;
@@ -1727,8 +1653,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       sigma(i/Thin - Burn/Thin) = sigma2Aux;
       epsilon.col(i/Thin - Burn/Thin) = epsilonAux;
       
-      if(StoreAdapt == 1)
-      {
+      if(StoreAdapt == 1) {
         LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
         LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
         LSphi(i/Thin - Burn/Thin) = LSphiAux;
@@ -1738,8 +1663,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if((i%(2*Thin) == 0) & (PrintProgress == 1))
-    {
+    if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
       Rcout << "-------------------------------------------------------------" << std::endl;
       Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl;
@@ -1812,8 +1736,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   Rcout << "-------------------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
   
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
@@ -1833,9 +1756,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("ls.nu") = LSnu.t(),
         Rcpp::Named("ls.theta") = LStheta.t())); 
   }
-  
-  else
-  {
+  else {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
@@ -1850,7 +1771,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("epsilon")=epsilon.t())); 
     
   }
-  
 }
 
 /* Metropolis-Hastings updates of mu 
@@ -1859,16 +1779,17 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
 arma::mat muUpdateNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
-    double const& Constrain,
     arma::mat const& Counts,  
-    arma::vec const& delta, 
+    arma::vec const& invdelta, 
     arma::vec const& nu, 
     arma::vec const& sum_bycell_all, 
     double const& s2_mu,
     int const& q0,
     int const& n,
-    arma::vec & mu,
+    arma::vec & mu1,
+    arma::vec & u,
     arma::vec & ind,
+    double const& Constrain,
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
@@ -1877,11 +1798,10 @@ arma::mat muUpdateNoSpikes(
   using arma::span;
   
   // PROPOSAL STEP    
-  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
-  arma::vec u = arma::randu(q0);
+  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
+  u = arma::randu(q0);
   
   // INITIALIZE MU
-  mu = mu0 + 1 - 1;
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
   
@@ -1890,15 +1810,13 @@ arma::mat muUpdateNoSpikes(
   // Step 1: Computing the likelihood contribution of the acceptance rate 
   // Calculated in the same way for all genes, 
   // but the reference one (no need to be sequential)
-  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
-  for (int i=0; i < q0; i++)
-  {
-    if(i != RefGene)
-    {
-      for (int j=0; j < n; j++) 
-      {
-        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
-          log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu(i)+(1/delta(i)) ));
+  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+  for (int i=0; i < q0; i++) {
+    if(i != RefGene) {
+      for (int j=0; j < n; j++) {
+        log_aux(i) -= ( Counts(i,j) + invdelta(i) ) * 
+                          log( ( nu(j)*mu1(i) + invdelta(i) ) / 
+                               ( nu(j)*mu0(i) + invdelta(i) ));
       }
     }
   }
@@ -1906,46 +1824,37 @@ arma::mat muUpdateNoSpikes(
   // Step 2: Computing prior component of the acceptance rate 
   
   // Step 2.1: For genes that are under the constrain (excluding the reference one)
-  for (int i=0; i < ConstrainGene.size(); i++)
-  {
+  for (int i=0; i < ConstrainGene.size(); i++) {
     iAux = ConstrainGene(i);
-    if(iAux != RefGene)
-    {
-      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu(iAux))));
-      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+    if(iAux != RefGene) {
+      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2)); 
       log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu(iAux) = y(iAux);
-        sumAux += log(mu(iAux)) - log(mu0(iAux)); 
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+        ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
       }
-      else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
     }
   }
   
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
-  mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
-  if(ConstrainType == 2)
-  {
-    for (int i=0; i < NotConstrainGene.size(); i++)
-    {
+  if(ConstrainType == 2) {
+    for (int i=0; i < NotConstrainGene.size(); i++) {
       iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(mu1(iAux)),2) - pow(log(mu0(iAux)),2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu(iAux) = y(iAux);
-      }
-      else{ind(iAux) = 0; mu(iAux) = mu0(iAux);}
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) { ind(iAux) = 1; }
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
     }
   }
   // OUTPUT
-  return join_rows(mu, ind);
+  return join_rows(mu1, ind);
 }
 
 /* Metropolis-Hastings updates of nu (batch case)
@@ -1974,40 +1883,26 @@ arma::mat nuUpdateBatchNoSpikes(
   u = arma::randu(n);
   
   // ACCEPT/REJECT STEP
-  arma::vec log_aux = arma::zeros(n);
+  arma::vec log_aux = (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
+  log_aux -= (nu1 -nu0)  % (1/(thetaBatch % phi)); 
   
-  for (int j=0; j < n; j++) 
-  {
-    for (int i=0; i < q0; i++) 
-    {
+  for (int j=0; j < n; j++) {
+    for (int i=0; i < q0; i++) {
       log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
         log( ( nu1(j)*mu(i) + invdelta(i) ) / 
-        ( nu0(j)*mu(i) + invdelta(i) ));
+             ( nu0(j)*mu(i) + invdelta(i) ));
     } 
   }
-  
-  log_aux += (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
-  log_aux -= (nu1 -nu0)  % (1/(thetaBatch % phi));  
-  
+
   /* CREATING OUTPUT VARIABLE & DEBUG 
   * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-5
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
   */  
-  for (int j=0; j < n; j++)
-  {
-    if(arma::is_finite(log_aux(j)) & arma::is_finite(nu1(j)))
-    {
-      if( (log(u(j)) < log_aux(j)) & (nu1(j) > 1e-5) ) { ind(j) = 1; }
-      else {ind(j) = 0; nu1(j) = nu0(j); }
-    }      
-    else
-    {
-      ind(j) = 0; nu1(j) = nu0(j);
-      Rcpp::Rcout << "Error when updating nu " << j+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");    
-    }
+  ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
+  for (int j=0; j < n; j++) {
+    if(ind(j) == 0) nu1(j) = nu0(j);  
   }
   
   // OUTPUT
@@ -2136,8 +2031,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::mat LStheta; 
   
   // LOG-PROPOSAL VARIANCES 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     LSmu = zeros(Naux, q0); 
     LSdelta = zeros(Naux, q0); 
     LSnu = zeros(Naux, n); 
@@ -2196,8 +2090,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn)
-    {
+    if(i==Burn) {
       Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
       Rcpp::Rcout << "End of Burn-in period."<< std::endl;
       Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
@@ -2223,18 +2116,17 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // If using stochastic reference, randomly select 1 ref gene
-    if(StochasticRef == 1)
-    {
+    if(StochasticRef == 1) {
       RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
                                                            RefGenes_arma.size()-1) ));
       RefGene = RefGenes(RefAux); 
       if(i >= Burn) {RefFreq(RefGene) += 1;}
     }
-    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, 
-                             deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
-                             s2mu, q0, n, y_q0, ind_q0, RefGene, 
-                             ConstrainGene_arma, NotConstrainGene_arma,
-                             ConstrainType);
+    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts_arma, 
+                             1/deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
+                             s2mu, q0, n, y_q0, u_q0, ind_q0,
+                             Constrain, RefGene, ConstrainGene_arma, 
+                             NotConstrainGene_arma, ConstrainType);
     PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}  
     
     // UPDATE OF DELTA: 
@@ -2257,11 +2149,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt)
-    {
+    if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50)
-      {
+      if(Ibatch==50) {
         PmuAux = PmuAux/(50-RefFreq); 
         PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) + PmuAux.elem(find(Index_arma != RefGene))*0.1; 
@@ -2279,20 +2169,17 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
         PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
         PnuAux = PnuAux0; PthetaAux = PthetaAux0;
       }
-      
     }
     
     // STORAGE OF DRAWS
-    if(i%Thin==0 & i>=Burn)
-    {      
+    if(i%Thin==0 & i>=Burn) {      
       mu.row(i/Thin - Burn/Thin) = muAux.col(0).t(); 
       delta.row(i/Thin - Burn/Thin) = deltaAux.col(0).t(); 
       phi.row(i/Thin - Burn/Thin) = phiAux.t();
       nu.row(i/Thin - Burn/Thin) = nuAux.col(0).t();       
       theta.row(i/Thin - Burn/Thin) = thetaAux.col(0).t();   
       
-      if(StoreAdapt == 1)
-      {
+      if(StoreAdapt == 1) {
         LSmu.row(i/Thin - Burn/Thin) = LSmuAux.t();
         LSdelta.row(i/Thin - Burn/Thin) = LSdeltaAux.t();
         LSnu.row(i/Thin - Burn/Thin) = LSnuAux.t();
@@ -2301,8 +2188,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if(i%(2*Thin) == 0 & PrintProgress == 1)
-    {
+    if(i%(2*Thin) == 0 & PrintProgress == 1) {
       Rcout << "-------------------------------------------------------------" << std::endl;
       Rcpp::Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl;
@@ -2366,8 +2252,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   Rcout << "-------------------------------------------------------------" << std::endl;
   Rcpp::Rcout << " " << std::endl;
   
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu,
@@ -2381,9 +2266,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
         Rcpp::Named("ls.theta") = LStheta,
         Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
   }
-  
-  else
-  {
+  else {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu,
@@ -2393,7 +2276,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
         Rcpp::Named("theta") = theta,
         Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
   }
-  
 }
 
 /* Metropolis-Hastings updates of mu 
@@ -2402,9 +2284,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 arma::mat muUpdateRegNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
-    double const& Constrain,
     arma::mat const& Counts,  
-    arma::vec const& delta, 
+    arma::vec const& delta,
+    arma::vec const& invdelta, 
     arma::vec const& nu, 
     arma::vec const& sum_bycell_all, 
     double const& s2_mu,
@@ -2413,11 +2295,12 @@ arma::mat muUpdateRegNoSpikes(
     arma::vec & mu1,
     arma::vec & u,
     arma::vec & ind,
+    double const& Constrain, /* No-spikes arguments from here */
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
     int const& ConstrainType,
-    int const& k,
+    int const& k, /* Regression arguments from here */
     arma::vec const& lambda,
     arma::vec const& beta,
     arma::mat const& X,
@@ -2427,11 +2310,10 @@ arma::mat muUpdateRegNoSpikes(
   using arma::span;
   
   // PROPOSAL STEP    
-  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
+  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
   
   // INITIALIZE MU
-  mu1 = mu0 + 1 - 1;
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
   
@@ -2440,15 +2322,13 @@ arma::mat muUpdateRegNoSpikes(
   // Step 1: Computing the likelihood contribution of the acceptance rate 
   // Calculated in the same way for all genes, 
   // but the reference one (no need to be sequential)
-  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
-  for (int i=0; i < q0; i++)
-  {
-    if(i != RefGene)
-    {
-      for (int j=0; j < n; j++) 
-      {
-        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
-          log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu0(i)+(1/delta(i)) ));
+  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+  for (int i=0; i < q0; i++) {
+    if(i != RefGene) {
+      for (int j=0; j < n; j++) {
+        log_aux(i) -= ( Counts(i,j) + invdelta(i) ) * 
+                         log( ( nu(j)*mu1(i) + invdelta(i) ) / 
+                              ( nu(j)*mu0(i) + invdelta(i) ));
       }
     }
   }
@@ -2462,21 +2342,17 @@ arma::mat muUpdateRegNoSpikes(
   // Step 2: Computing prior component of the acceptance rate 
   
   // Step 2.1: For genes that are under the constrain (excluding the reference one)
-  for (int i=0; i < ConstrainGene.size(); i++)
-  {
+  for (int i=0; i < ConstrainGene.size(); i++) {
     iAux = ConstrainGene(i);
-    if(iAux != RefGene)
-    {
+    if(iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2)); 
       log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu1(iAux) = y(iAux);
-        sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+        ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
       }
-      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
+      else{ ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
     }
   }
   
@@ -2486,17 +2362,12 @@ arma::mat muUpdateRegNoSpikes(
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
-  if(ConstrainType == 2)
-  {
-    for (int i=0; i < NotConstrainGene.size(); i++)
-    {
+  if(ConstrainType == 2) {
+    for (int i=0; i < NotConstrainGene.size(); i++) {
       iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(mu1(iAux)),2) - pow(log(mu0(iAux)),2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu1(iAux) = y(iAux);
-      }
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) { ind(iAux) = 1; }
       else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
     }
   }
@@ -2537,10 +2408,8 @@ arma::mat deltaUpdateRegNoSpikes(
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   
   // Loop to replace matrix operations, through genes and cells
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
       log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j) + (1/delta1(i)) ) *  log( nu(j)*mu(i)+(1/delta1(i)) );
@@ -2554,8 +2423,7 @@ arma::mat deltaUpdateRegNoSpikes(
   
   // CREATING OUTPUT VARIABLE & DEBUG
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i=0; i < q0; i++)
-  {
+  for (int i=0; i < q0; i++) {
     if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
@@ -2690,8 +2558,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::mat LStheta; 
   
   // LOG-PROPOSAL VARIANCES 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     LSmu = zeros(q0, Naux); 
     LSdelta = zeros(q0, Naux); 
     LSnu = zeros(n, Naux); 
@@ -2768,8 +2635,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn)
-    {
+    if(i==Burn) {
       Rcout << "-------------------------------------------------------------" << std::endl; 
       Rcout << "End of Burn-in period."<< std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl; 
@@ -2788,7 +2654,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
                                 BatchDesign_arma, BatchSizes,
                                 phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
     thetaBatch = BatchDesign_arma * thetaAux.col(0); 
     
     // UPDATE OF MU: 
@@ -2796,14 +2662,16 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // REGRESSION
     // THIS REQUIRES A NEW FULL CONDITIONAL
-    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, 
-                                Counts_arma, deltaAux.col(0), nuAux.col(0), 
+    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
+                                Counts_arma, deltaAux.col(0), 
+                                1/deltaAux.col(0), nuAux.col(0), 
                                 sumByCellAll_arma, s2mu, q0, n, 
-                                y_q0, u_q0, ind_q0, RefGene, 
-                                ConstrainGene_arma, NotConstrainGene_arma,
-                                ConstrainType, k, lambdaAux, betaAux, X, 
+                                y_q0, u_q0, ind_q0, 
+                                Constrain, RefGene, ConstrainGene_arma, 
+                                NotConstrainGene_arma, ConstrainType, 
+                                k, lambdaAux, betaAux, X, 
                                 sigma2Aux, variance);     
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
@@ -2814,7 +2682,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                       Counts_arma, muAux.col(0), 
                                       nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                                       lambdaAux, X, sigma2Aux, betaAux);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
 
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -2824,13 +2692,12 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   muAux.col(0), 1/deltaAux.col(0),
                                   phiAux, thetaBatch, sumByGeneAll_arma, q0, n,
                                   y_n, u_n, ind_n); 
-    PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
+    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
-    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0))
-    {
+    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
       mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
       mAux = VAux*mAux;
       
@@ -2838,7 +2705,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
       sigma2Aux = sigma2UpdateReg(deltaAux.col(0), betaAux, lambdaAux, V1, 
                                   mInvVm0, mAux, sigma2_a0, sigma2_b0, q0);
-      
     }
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
     lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
@@ -2848,11 +2714,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     epsilonAux = log(deltaAux.col(0)) - X*betaAux;
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt)
-    {
+    if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50)
-      {
+      if(Ibatch==50) {
         PmuAux = PmuAux/50;
         PmuAux = -1 + 2*arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux = LSmuAux + PmuAux*0.1;
@@ -2875,12 +2739,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         means = muAux.col(0);
         X = designMatrix(k, means, variance);
       }
-      
     }
     
     // STORAGE OF DRAWS
-    if((i%Thin==0) & (i>=Burn))
-    {      
+    if((i%Thin==0) & (i>=Burn)) {      
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
       phi.col(i/Thin - Burn/Thin) = phiAux;
@@ -2893,8 +2755,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       sigma(i/Thin - Burn/Thin) = sigma2Aux;
       epsilon.col(i/Thin - Burn/Thin) = epsilonAux;
       
-      if(StoreAdapt == 1)
-      {
+      if(StoreAdapt == 1) {
         LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
         LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
         LSnu.col(i/Thin - Burn/Thin) = LSnuAux;
@@ -2903,8 +2764,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if((i%(2*Thin) == 0) & (PrintProgress == 1))
-    {
+    if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
       Rcout << "-------------------------------------------------------------" << std::endl;
       Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl;
@@ -2972,8 +2832,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   Rcout << "-------------------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
   
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
@@ -2991,9 +2850,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("ls.nu") = LSnu.t(),
         Rcpp::Named("ls.theta") = LStheta.t())); 
   }
-  
-  else
-  {
+  else {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
@@ -3005,9 +2862,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("sigma2")=sigma,
         Rcpp::Named("lambda")=lambda.t(),
         Rcpp::Named("epsilon")=epsilon.t())); 
-    
   }
-  
 }
 
 
@@ -3032,8 +2887,8 @@ arma::mat HiddenBASiCS_DenoisedRates(
   // Auxiliary matrices
   arma::mat m1; arma::mat m2;
   
-  for (int i = 0; i<N; i++) 
-  {
+  for (int i = 0; i<N; i++) {
+    
     Rcpp::checkUserInterrupt();
     
     m1 = CountsBio_arma; 

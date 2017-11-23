@@ -695,7 +695,8 @@ version 1.1.8: (2017-11-21)
 - `betaUpdateReg` created as a separate function
 - Fixed typo in sigma2 updates (regression case); unit test updated accordingly
 
-version 1.1.9: (2017-11-22) - WIP
+version 1.1.9: (2017-11-23) - WIP
 - `means` only updated when needed (regression case); unit test updated accordingly
 - `deltaUpdateNoSpikes` + `deltaUpdateRegNoSpikes` removed as no longer required
 - Simplification of terms in `deltaUpdateReg`
+- Small changes to unify code format in C++ file
