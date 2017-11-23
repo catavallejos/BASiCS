@@ -43,18 +43,18 @@ HiddenBASiCS_MCMC_Start <- function(Data, ...)
   } 
   else 
   {
-    phi0 <- size_scran
-    phi0 <- n * phi0 / sum(phi0)
+    s0 <- size_scran
+    s0 <- n * s0 / sum(s0)
     for (B in unique(metadata(Data)$BatchInfo)) 
     {
       aux <- metadata(Data)$BatchInfo == B
-      phi0[aux] <- sum(aux) * phi0[aux]/sum(phi0[aux])
+      s0[aux] <- sum(aux) * s0[aux]/sum(s0[aux])
     }
-    nu0 <- phi0
-    s0 <- NULL
+    nu0 <- s0
+    phi0 <- NULL
     
     # Initialize mu using average 'normalised counts' across cells
-    nCountsBio <- t( t(CountsBio) / phi0 )
+    nCountsBio <- t( t(CountsBio) / s0 )
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
     meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)

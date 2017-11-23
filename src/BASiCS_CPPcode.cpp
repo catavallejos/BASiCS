@@ -1867,7 +1867,7 @@ arma::mat nuUpdateBatchNoSpikes(
     arma::mat const& BatchDesign, 
     arma::vec const& mu, 
     arma::vec const& invdelta, 
-    arma::vec const& phi, 
+    arma::vec const& s, 
     arma::vec const& thetaBatch, 
     arma::vec const& sum_bygene_all, 
     int const& q0,
@@ -1884,7 +1884,7 @@ arma::mat nuUpdateBatchNoSpikes(
   
   // ACCEPT/REJECT STEP
   arma::vec log_aux = (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
-  log_aux -= (nu1 -nu0)  % (1/(thetaBatch % phi)); 
+  log_aux -= (nu1 -nu0)  % (1/(thetaBatch % s)); 
   
   for (int j=0; j < n; j++) {
     for (int i=0; i < q0; i++) {
@@ -1967,7 +1967,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericMatrix BatchDesign, 
     NumericVector mu0, 
     NumericVector delta0,   
-    NumericVector phi0, 
+    NumericVector s0, 
     NumericVector nu0,    
     NumericVector theta0,
     double s2mu, 
@@ -1975,8 +1975,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double bdelta, 
     double s2delta,
     double prior_delta,
-    double aphi,
-    double bphi,
+    double as,
+    double bs,
     double atheta, 
     double btheta, 
     double ar, 
@@ -2022,7 +2022,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(Naux, q0); 
   arma::mat delta = zeros(Naux, q0); 
-  arma::mat phi = ones(Naux, n);
+  arma::mat s = ones(Naux, n);
   arma::mat nu = zeros(Naux, n); 
   arma::mat theta = zeros(Naux, nBatch); 
   arma::mat LSmu;
@@ -2052,7 +2052,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // INITIALIZATION OF VALUES FOR MCMC RUN
   arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
   arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
-  arma::vec phiAux = as_arma(phi0); 
+  arma::vec sAux = as_arma(s0); 
   arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0); 
   arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0); 
   arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
@@ -2101,15 +2101,15 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
 
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-    phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaBatch,
-                          aphi, bphi, BatchDesign_arma, n, y_n); 
+    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
+                        as, bs, BatchDesign_arma, n, y_n); 
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
                                 BatchDesign_arma, BatchSizes,
-                                phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+    PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
     thetaBatch = BatchDesign_arma * thetaAux.col(0); 
 
     // UPDATE OF MU: 
@@ -2120,7 +2120,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
                                                            RefGenes_arma.size()-1) ));
       RefGene = RefGenes(RefAux); 
-      if(i >= Burn) {RefFreq(RefGene) += 1;}
+      if(i >= Burn) RefFreq(RefGene) += 1;
     }
     muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts_arma, 
                              1/deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
@@ -2144,7 +2144,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
                                   BatchDesign_arma,
                                   muAux.col(0), 1/deltaAux.col(0),
-                                  phiAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                                  sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                                   y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
 
@@ -2175,7 +2175,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     if(i%Thin==0 & i>=Burn) {      
       mu.row(i/Thin - Burn/Thin) = muAux.col(0).t(); 
       delta.row(i/Thin - Burn/Thin) = deltaAux.col(0).t(); 
-      phi.row(i/Thin - Burn/Thin) = phiAux.t();
+      s.row(i/Thin - Burn/Thin) = sAux.t();
       nu.row(i/Thin - Burn/Thin) = nuAux.col(0).t();       
       theta.row(i/Thin - Burn/Thin) = thetaAux.col(0).t();   
       
@@ -2195,7 +2195,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       Rcpp::Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
       Rcpp::Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcpp::Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
-      Rcpp::Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
+      Rcpp::Rcout << "s (cell 1): " << sAux(0) << std::endl;
       Rcpp::Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
       Rcpp::Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl;
@@ -2257,7 +2257,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu,
         Rcpp::Named("delta") = delta,
-        Rcpp::Named("phi") = phi,
+        Rcpp::Named("s") = s,
         Rcpp::Named("nu") = nu,
         Rcpp::Named("theta") = theta,
         Rcpp::Named("ls.mu") = LSmu,
@@ -2271,7 +2271,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu,
         Rcpp::Named("delta") = delta,
-        Rcpp::Named("phi") = phi,
+        Rcpp::Named("s") = s,
         Rcpp::Named("nu") = nu,
         Rcpp::Named("theta") = theta,
         Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 

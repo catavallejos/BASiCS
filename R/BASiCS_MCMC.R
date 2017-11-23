@@ -484,15 +484,15 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                      as.matrix(assay(Data)), 
                                                      BatchDesign, 
                                                      mu0, delta0, 
-                                                     phi0, nu0, 
+                                                     s0, nu0, 
                                                      rep(theta0, nBatch), 
                                                      PriorParam$s2.mu, 
                                                      PriorParam$a.delta, 
                                                      PriorParam$b.delta, 
                                                      PriorParam$s2.delta, 
                                                      PriorDeltaNum, 
-                                                     PriorParam$a.phi, 
-                                                     PriorParam$b.phi, 
+                                                     PriorParam$a.s, 
+                                                     PriorParam$b.s, 
                                                      PriorParam$a.theta, 
                                                      PriorParam$b.theta, 
                                                      AR, 
@@ -521,8 +521,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   ###################### Change this to keep the cell labels the same
   CellLabels <- paste0(colnames(assay(Data)), "_Batch", 
                        metadata(Data)$BatchInfo)
-  colnames(Chain$phi) <- CellLabels
-  if (length(metadata(Data)$SpikeInput) > 1) { colnames(Chain$s) <- CellLabels }
+  colnames(Chain$s) <- CellLabels
+  if (length(metadata(Data)$SpikeInput) > 1) { colnames(Chain$phi) <- CellLabels }
   colnames(Chain$nu) <- CellLabels
   colnames(Chain$theta) <- paste0("Batch", unique(metadata(Data)$BatchInfo))
     
@@ -539,7 +539,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
 
     if (length(metadata(Data)$SpikeInput) == 1) 
     {
-        Chain$s <- matrix(1, ncol = ncol(Chain$phi), nrow = nrow(Chain$phi))
+        Chain$phi <- matrix(1, ncol = ncol(Chain$s), nrow = nrow(Chain$s))
     }
     ChainClass <- newBASiCS_Chain(parameters = Chain)
     

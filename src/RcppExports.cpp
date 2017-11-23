@@ -103,8 +103,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // HiddenBASiCS_MCMCcppNoSpikes
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector nu0, NumericVector theta0, double s2mu, double adelta, double bdelta, double s2delta, double prior_delta, double aphi, double bphi, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSnu0, NumericVector LStheta0, NumericVector sumByCellAll, NumericVector sumByGeneAll, int StoreAdapt, int EndAdapt, int PrintProgress, double Constrain, NumericVector Index, int RefGene, NumericVector RefGenes, NumericVector ConstrainGene, NumericVector NotConstrainGene, int ConstrainType, int StochasticRef);
-RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcppNoSpikes(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP aphiSEXP, SEXP bphiSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByGeneAllSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP ConstrainSEXP, SEXP IndexSEXP, SEXP RefGeneSEXP, SEXP RefGenesSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP, SEXP ConstrainTypeSEXP, SEXP StochasticRefSEXP) {
+Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector mu0, NumericVector delta0, NumericVector s0, NumericVector nu0, NumericVector theta0, double s2mu, double adelta, double bdelta, double s2delta, double prior_delta, double as, double bs, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, NumericVector LSnu0, NumericVector LStheta0, NumericVector sumByCellAll, NumericVector sumByGeneAll, int StoreAdapt, int EndAdapt, int PrintProgress, double Constrain, NumericVector Index, int RefGene, NumericVector RefGenes, NumericVector ConstrainGene, NumericVector NotConstrainGene, int ConstrainType, int StochasticRef);
+RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcppNoSpikes(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP s0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByGeneAllSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP ConstrainSEXP, SEXP IndexSEXP, SEXP RefGeneSEXP, SEXP RefGenesSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP, SEXP ConstrainTypeSEXP, SEXP StochasticRefSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -115,7 +115,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type BatchDesign(BatchDesignSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type mu0(mu0SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type delta0(delta0SEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type phi0(phi0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type s0(s0SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type nu0(nu0SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type theta0(theta0SEXP);
     Rcpp::traits::input_parameter< double >::type s2mu(s2muSEXP);
@@ -123,8 +123,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type bdelta(bdeltaSEXP);
     Rcpp::traits::input_parameter< double >::type s2delta(s2deltaSEXP);
     Rcpp::traits::input_parameter< double >::type prior_delta(prior_deltaSEXP);
-    Rcpp::traits::input_parameter< double >::type aphi(aphiSEXP);
-    Rcpp::traits::input_parameter< double >::type bphi(bphiSEXP);
+    Rcpp::traits::input_parameter< double >::type as(asSEXP);
+    Rcpp::traits::input_parameter< double >::type bs(bsSEXP);
     Rcpp::traits::input_parameter< double >::type atheta(athetaSEXP);
     Rcpp::traits::input_parameter< double >::type btheta(bthetaSEXP);
     Rcpp::traits::input_parameter< double >::type ar(arSEXP);
@@ -145,7 +145,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type NotConstrainGene(NotConstrainGeneSEXP);
     Rcpp::traits::input_parameter< int >::type ConstrainType(ConstrainTypeSEXP);
     Rcpp::traits::input_parameter< int >::type StochasticRef(StochasticRefSEXP);
-    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcppNoSpikes(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, phi0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, bphi, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef));
+    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcppNoSpikes(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef));
     return rcpp_result_gen;
 END_RCPP
 }

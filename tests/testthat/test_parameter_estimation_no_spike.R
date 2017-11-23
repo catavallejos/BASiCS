@@ -18,11 +18,11 @@ test_that("paramater estimations match the given seed",
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "delta")[1:5,1],3))
   expect_that(all.equal(DeltaObs, Delta), is_true())
 
-  Phi <- c(0.797, 1.413, 0.222, 0.630, 1.453)
+  Phi <- rep(1, 5)
   PhiObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "phi")[1:5,1],3))
   expect_that(all.equal(PhiObs, Phi), is_true())
             
-  S <- rep(1, 5)
+  S <- c(0.797, 1.413, 0.222, 0.630, 1.453)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
   
