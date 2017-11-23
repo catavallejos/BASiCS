@@ -2483,12 +2483,12 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     NumericMatrix BatchDesign, 
     NumericVector mu0, 
     NumericVector delta0, 
-    NumericVector phi0, 
+    NumericVector s0, 
     NumericVector nu0, 
     NumericVector theta0, 
     double s2mu,
-    double aphi,
-    double bphi,
+    double as,
+    double bs,
     double atheta, 
     double btheta, 
     double ar, 
@@ -2549,7 +2549,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux); 
   arma::mat delta = zeros(q0, Naux); 
-  arma::mat phi = ones(n, Naux);
+  arma::mat s = ones(n, Naux);
   arma::mat nu = zeros(n, Naux); 
   arma::mat theta = zeros(nBatch, Naux); 
   arma::mat LSmu;
@@ -2579,7 +2579,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
   arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
   arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
-  arma::vec phiAux = as_arma(phi0); 
+  arma::vec sAux = as_arma(s0); 
   arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0);
   arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0);
   arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
@@ -2645,15 +2645,15 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
 
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-    phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaBatch,
-                          aphi, bphi, BatchDesign_arma, n, y_n); 
+    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
+                        as, bs, BatchDesign_arma, n, y_n); 
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
                                 BatchDesign_arma, BatchSizes,
-                                phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
+                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
     PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
     thetaBatch = BatchDesign_arma * thetaAux.col(0); 
     
@@ -2690,7 +2690,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
                                   BatchDesign_arma,
                                   muAux.col(0), 1/deltaAux.col(0),
-                                  phiAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                                  sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                                   y_n, u_n, ind_n); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
@@ -2745,7 +2745,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if((i%Thin==0) & (i>=Burn)) {      
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
-      phi.col(i/Thin - Burn/Thin) = phiAux;
+      s.col(i/Thin - Burn/Thin) = sAux;
       nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);  
       
@@ -2771,7 +2771,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
       Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
-      Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
+      Rcout << "s (cell 1): " << sAux(0) << std::endl;
       Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
       Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
       Rcpp::Rcout << "betas: " << betaAux.t() << std::endl;
@@ -2837,14 +2837,14 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("phi") = phi.t(),
+        Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma.t(),
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t(),
-        Rcpp::Named("designMatrix")=X,
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma.t(),
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("designMatrix") = X,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.nu") = LSnu.t(),
@@ -2855,16 +2855,15 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("phi") = phi.t(),
+        Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t())); 
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t())); 
   }
 }
-
 
 // [[Rcpp::export]]
 arma::mat HiddenBASiCS_DenoisedRates(

@@ -178,76 +178,50 @@
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
 #' Vallejos, Richardson and Marioni (2016). Genome Biology.
-BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
-    
-  if (!is(Data, "SingleCellExperiment")) 
-    stop("'Data' is not a SingleCellExperiment class object.")
-  # The following checks are only relevant when the input data was
-  # not created using the `newBASiCS_Data` function
-  if(!("SpikeInput" %in% names(metadata(Data))))
-    stop("'Data' does not contained all the required information \n",
-         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
-  if(!("BatchInfo" %in% names(metadata(Data))))
-    stop("'Data' does not contained all the required information \n",
-         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
-  errors <- HiddenChecksBASiCS_Data(assay(Data), isSpike(Data), 
-                                    metadata(Data)$SpikeInput, 
-                                    rownames(assay(Data)), 
-                                    metadata(Data)$BatchInfo)
-  if (length(errors) > 0) stop(errors) 
-    
-  # SOME QUANTITIES USED THROUGHOUT THE MCMC ALGORITHM
+BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) 
+{
+  # Checks to ensure input arguments are valid
+  HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn)
+
+  # Some global values used throughout the MCMC algorithm and checks
   q <- length(isSpike(Data))
   q.bio <- sum(!isSpike(Data))
   n <- dim(assay(Data))[2]
+  sum.bycell.all <- matrixStats::rowSums2(assay(Data))
+  sum.bygene.all <- matrixStats::colSums2(assay(Data))
     
-  args <- list(...)
-    
-  if (!("PriorDelta" %in% names(args)) & !("Regression" %in% names(args))) 
-  {
+  # Optional arguments. Assignment of default values
+  Args <- list(...)
+  if (!("PriorDelta" %in% names(Args)) & !("Regression" %in% names(Args))) {
     message("-------------------------------------------------------------\n", 
     "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
     "Vallejos et al (2015) used a 'gamma' prior instead.\n", 
             "-------------------------------------------------------------\n")
   }
-    
-  if ("PriorParam" %in% names(args)) { PriorParam <- args$PriorParam } 
-  else 
-  {
+  if ("PriorParam" %in% names(Args)) { PriorParam <- Args$PriorParam } 
+  else {
     PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
                        b.delta = 1, p.phi = rep(1, times = n), 
-                       a.phi = 1, b.phi = 1, a.s = 1, b.s = 1, 
-                       a.theta = 1, b.theta = 1)
+                       a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   }
-  AR <- ifelse("AR" %in% names(args), args$AR, 0.44)
-  StopAdapt <- ifelse("StopAdapt" %in% names(args), args$StopAdapt, Burn)
-  StoreChains <- ifelse("StoreChains" %in% names(args), args$StoreChains, FALSE)
-  StoreAdapt <- ifelse("StoreAdapt" %in% names(args), args$StoreAdapt, FALSE)
-  StoreDir <- ifelse("StoreDir" %in% names(args), args$StoreDir, getwd())
-  RunName <- ifelse("RunName" %in% names(args), args$RunName, "")
-  PrintProgress <- ifelse("PrintProgress" %in% names(args), 
-                          args$PrintProgress, TRUE)
-  PriorDelta <- ifelse("PriorDelta" %in% names(args), 
-                       args$PriorDelta, "log-normal")
-
+  AR <- ifelse("AR" %in% names(Args), Args$AR, 0.44)
+  StopAdapt <- ifelse("StopAdapt" %in% names(Args), Args$StopAdapt, Burn)
+  StoreChains <- ifelse("StoreChains" %in% names(Args), Args$StoreChains, FALSE)
+  StoreAdapt <- ifelse("StoreAdapt" %in% names(Args), Args$StoreAdapt, FALSE)
+  StoreDir <- ifelse("StoreDir" %in% names(Args), Args$StoreDir, getwd())
+  RunName <- ifelse("RunName" %in% names(Args), Args$RunName, "")
+  PrintProgress <- ifelse("PrintProgress" %in% names(Args), Args$PrintProgress, TRUE)
+  PriorDelta <- ifelse("PriorDelta" %in% names(Args), Args$PriorDelta, "log-normal")
+  PriorDeltaNum <- ifelse(PriorDelta == "gamma", 1, 2)
   # This is specific for the regression case
-  if("Regression" %in% names(args)){
-    if(args$Regression == TRUE){
-      k <- ifelse("k" %in% names(args), args$k, 12)
+  if("Regression" %in% names(Args)) {
+    if(Args$Regression == TRUE) {
+      k <- ifelse("k" %in% names(Args), Args$k, 12)
       if(k <= 3) stop("The number of basis functions needs to be >= 4.")
     }
   }
-  variance <- ifelse("Var" %in% names(args), args$Var, 1.2)
-  eta <- ifelse("eta" %in% names(args), args$eta, 5)
-    
-  if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) 
-    stop("Invalid parameter values.")
-  if (!(N%%Thin == 0 & N >= max(4, Thin))) 
-    stop("Please use an integer value for N (N>=4); multiple of thin.")
-  if (!(Thin%%1 == 0 & Thin >= 2)) 
-    stop("Please use an integer value for Thin (Thin>=2).")
-  if (!(Burn%%Thin == 0 & Burn < N & Burn >= 1)) 
-    stop("Please use an integer value for Burn (1<=Burn<N); multiple of thin.")
+  variance <- ifelse("Var" %in% names(Args), Args$Var, 1.2)
+  eta <- ifelse("eta" %in% names(Args), Args$eta, 5)
     
   if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 & 
         PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 & 
@@ -259,7 +233,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
         PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 & 
         PriorParam$b.theta > 0) & length(PriorParam$b.theta) == 1) 
     stop("Invalid prior hyper-parameter values.")
-    
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) 
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   if (!(StopAdapt > 0)) 
@@ -273,24 +246,17 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   if (!(PriorDelta %in% c("gamma", "log-normal"))) 
     stop("Invalid PriorDelta value.")
     
-  PriorDeltaNum <- ifelse(PriorDelta == "gamma", 1, 2)
+  
     
   # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
-  sum.bycell.all <- matrixStats::rowSums2(assay(Data))
   sum.bycell.bio <- matrixStats::rowSums2(assay(Data)[1:q.bio, ])
-  sum.bygene.all <- matrixStats::colSums2(assay(Data))
   sum.bygene.bio <- matrixStats::colSums2(assay(Data)[1:q.bio, ])
     
-  ls.phi0 <- ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
-    
   # GENERATING STARTING VALUES
-  if ("Start" %in% names(args)) { Start = args$Start } 
-  else
-  {
-    if("Regression" %in% names(args))
-    {
-      if(args$Regression == TRUE)
-      {
+  if ("Start" %in% names(Args)) { Start = Args$Start } 
+  else {
+    if("Regression" %in% names(Args)) {
+      if(Args$Regression == TRUE) {
         Start <- HiddenBASiCS_MCMC_Start(Data, k = k, eta = eta)
       }
     }
@@ -313,10 +279,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   ls.theta0 <- as.numeric(Start$ls.theta0)
   
   # Starting values for Regression
-  if("Regression" %in% names(args))
-  {
-    if(args$Regression == TRUE)
-    {
+  if("Regression" %in% names(Args)) {
+    if(Args$Regression == TRUE) {
       m0 <- as.vector(Start$m0); V0 <- as.matrix(Start$V0)
       sigma2.a0 <- Start$sigma2.a0; sigma2.b0 <- Start$sigma2.b0
       beta0 <- Start$beta0; sigma20 <- Start$sigma20
@@ -327,13 +291,10 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   StoreAdaptNumber <- as.numeric(StoreAdapt)
   nBatch <- length(unique(metadata(Data)$BatchInfo))
     
-  if(nBatch > 1)
-  {
+  if(nBatch > 1) {
     BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)  
     BatchInfo <- as.numeric(metadata(Data)$BatchInfo)
-  }
-  else
-  { 
+  } else { 
     # If there are no batches or the user asked to ignore them
     BatchDesign <- matrix(1, nrow = n, ncol = 1) 
     BatchInfo <- rep(1, times = n)
@@ -341,11 +302,10 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
   }
     
   # If spikes are available (stable version)
-  if (length(metadata(Data)$SpikeInput) > 1) 
-  {
+  if (length(metadata(Data)$SpikeInput) > 1) {
     # If regression case is chosen
-    if("Regression" %in% names(args)){
-      if(args$Regression == TRUE){
+    if("Regression" %in% names(Args)) {
+      if(Args$Regression == TRUE) {
         message("Running regression sampler ... \n")
         
       Time = system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
@@ -384,9 +344,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       
       Chain$epsilon[,!genes] <- NA
       }
-    }
-    else
-    {
+    } else {
       # MCMC SAMPLER (FUNCTION IMPLEMENTED IN C++)
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
                                                         as.matrix(assay(Data))[1:q.bio,], 
@@ -418,9 +376,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                                                         StopAdapt, 
                                                         as.numeric(PrintProgress)))       
     }
-  } 
-  else 
-  {
+  } else {
     # If spikes are not available
     message("-------------------------------------------------------------\n",  
             "IMPORTANT: this code is under development. DO NOT USE \n", 
@@ -431,15 +387,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
         
     # 1: Full constrain; 2: Genes with average count >= 1
-    ConstrainType <- ifelse("ConstrainType" %in% names(args), 
-                            args$ConstrainType, 2)
-    if (ConstrainType == 1) 
-    {
+    ConstrainType <- ifelse("ConstrainType" %in% names(Args), 
+                            Args$ConstrainType, 2)
+    if (ConstrainType == 1) {
       ConstrainGene <- (1:q.bio) - 1
       NotConstrainGene <- 0
     }
-    if (ConstrainType == 2) 
-    {
+    if (ConstrainType == 2) {
       ConstrainGene <- which(matrixStats::rowMeans2(assay(Data)) >= 1) - 1
       NotConstrainGene <- which(matrixStats::rowMeans2(assay(Data)) < 1) - 1
     }
@@ -448,10 +402,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     # Whether or not a stochatic reference is used
     # If stochastic, range of possible reference values only includes 
     # the nearest 1000 genes located around the constrain
-    StochasticRef <- ifelse("StochasticRef" %in% names(args), 
-                            args$StochasticRef, TRUE)
-    if (StochasticRef == TRUE) 
-    {
+    StochasticRef <- ifelse("StochasticRef" %in% names(Args), 
+                            Args$StochasticRef, TRUE)
+    if (StochasticRef == TRUE) {
       aux.ref <- cbind(ConstrainGene, 
                        abs(log(mu0[ConstrainGene + 1]) - Constrain))
       aux.ref <- aux.ref[order(aux.ref[, 2]), ]
@@ -460,15 +413,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       # Fix for the code to run on the synthetic small dataset
       # generated by makeExample_BASiCS function (less than 200 genes)
       
-      if(length(ConstrainGene) > TotalConstrain) 
-      { 
+      if(length(ConstrainGene) > TotalConstrain) { 
         RefGenes <- aux.ref[seq_len(TotalConstrain), 1] 
-      }
-      else { RefGenes <- aux.ref[, 1] }
+      } else { RefGenes <- aux.ref[, 1] }
       RefGene <- RefGenes[1]
-    } 
-    else 
-    {
+    } else {
       aux.ref <- which(abs(log(mu0[ConstrainGene + 1]) - Constrain) == 
                          min(abs(log(mu0[ConstrainGene + 1]) - Constrain)))[1]
       RefGene <- ConstrainGene[aux.ref]
@@ -537,16 +486,14 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
           "Output \n",
           "-------------------------------------------------------------\n")
 
-    if (length(metadata(Data)$SpikeInput) == 1) 
-    {
+    if (length(metadata(Data)$SpikeInput) == 1) {
         Chain$phi <- matrix(1, ncol = ncol(Chain$s), nrow = nrow(Chain$s))
     }
     ChainClass <- newBASiCS_Chain(parameters = Chain)
     
     OldDir <- getwd()
     
-    if (StoreChains) 
-    {
+    if (StoreChains) {
       setwd(StoreDir)
         
       message("-------------------------------------------------------------\n", 
@@ -560,8 +507,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
       setwd(OldDir)
     }
     
-    if (StoreAdapt)
-    {
+    if (StoreAdapt) {
       setwd(StoreDir)
         
       message("-------------------------------------------------------------\n", 
@@ -580,15 +526,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
     
     # This 'if' refers to the no-spikes case 
     # Still under development - ignore for now!
-    if (length(metadata(Data)$SpikeInput) == 1) 
-    {
+    if (length(metadata(Data)$SpikeInput) == 1) {
       message("-------------------------------------------------------------\n", 
               paste("BASiCS version", packageVersion("BASiCS"), 
                     ": horizontal integration (no-spikes case)"), "\n", 
               "-------------------------------------------------------------\n", 
               "ConstrainType: ", ConstrainType, "\n")
-      if (length(RefGenes) == 1) 
-      {
+      if (length(RefGenes) == 1) {
         message("Reference gene:", RefGene + 1, "\n", 
                 "Information stored as a .txt file in \n", 
                 "'", StoreDir, "' directory ... \n", 
@@ -604,9 +548,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                     col.names = TRUE, row.names = FALSE)
             
         setwd(OldDir)
-      } 
-      else 
-      {
+      } else {
         setwd(StoreDir)
             
         TableRef = cbind.data.frame(GeneNames = rownames(assay(Data))[RefGenes + 1], 
@@ -625,9 +567,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) {
                 "'", StoreDir, "' directory ... \n", 
                 "-------------------------------------------------------------\n")
       }
-    } 
-    else 
-    {
+    } else {
       message("-------------------------------------------------------------\n", 
               "BASiCS version ", packageVersion("BASiCS"), " : \n", 
               "vertical integration (spikes case) \n", 
