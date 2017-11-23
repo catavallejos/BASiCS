@@ -187,67 +187,24 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   q <- length(isSpike(Data))
   q.bio <- sum(!isSpike(Data))
   n <- dim(assay(Data))[2]
+  nBatch <- length(unique(metadata(Data)$BatchInfo))
   sum.bycell.all <- matrixStats::rowSums2(assay(Data))
   sum.bygene.all <- matrixStats::colSums2(assay(Data))
     
-  # Optional arguments. Assignment of default values
+  # Optional arguments 
   Args <- list(...)
-  if (!("PriorDelta" %in% names(Args)) & !("Regression" %in% names(Args))) {
-    message("-------------------------------------------------------------\n", 
-    "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
-    "Vallejos et al (2015) used a 'gamma' prior instead.\n", 
-            "-------------------------------------------------------------\n")
+  # Assignment of default values
+  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Burn, n)
+  AR = ArgsDef$AR; StopAdapt = ArgsDef$StopAdapt; 
+  StoreChains = ArgsDef$StoreChains; StoreAdapt = ArgsDef$StoreAdapt;
+  StoreDir = ArgsDef$StoreDir; RunName = ArgsDef$RunName;
+  PrintProgress = ArgsDef$PrintProgress; PriorParam = ArgsDef$PriorParam;
+  PriorDeltaNum = ArgsDef$PriorDeltaNum; PriorDelta = ArgsDef$PriorDelta; 
+  Regression = ArgsDef$Regression; WithSpikes = ArgsDef$WithSpikes
+  if(Regression == TRUE) {
+    k = ArgsDef$k; variance = ArgsDef$variance; eta = ArgsDef$eta
   }
-  if ("PriorParam" %in% names(Args)) { PriorParam <- Args$PriorParam } 
-  else {
-    PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                       b.delta = 1, p.phi = rep(1, times = n), 
-                       a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  }
-  AR <- ifelse("AR" %in% names(Args), Args$AR, 0.44)
-  StopAdapt <- ifelse("StopAdapt" %in% names(Args), Args$StopAdapt, Burn)
-  StoreChains <- ifelse("StoreChains" %in% names(Args), Args$StoreChains, FALSE)
-  StoreAdapt <- ifelse("StoreAdapt" %in% names(Args), Args$StoreAdapt, FALSE)
-  StoreDir <- ifelse("StoreDir" %in% names(Args), Args$StoreDir, getwd())
-  RunName <- ifelse("RunName" %in% names(Args), Args$RunName, "")
-  PrintProgress <- ifelse("PrintProgress" %in% names(Args), Args$PrintProgress, TRUE)
-  PriorDelta <- ifelse("PriorDelta" %in% names(Args), Args$PriorDelta, "log-normal")
-  PriorDeltaNum <- ifelse(PriorDelta == "gamma", 1, 2)
-  # This is specific for the regression case
-  if("Regression" %in% names(Args)) {
-    if(Args$Regression == TRUE) {
-      k <- ifelse("k" %in% names(Args), Args$k, 12)
-      if(k <= 3) stop("The number of basis functions needs to be >= 4.")
-    }
-  }
-  variance <- ifelse("Var" %in% names(Args), Args$Var, 1.2)
-  eta <- ifelse("eta" %in% names(Args), Args$eta, 5)
-    
-  if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 & 
-        PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 & 
-        PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 & 
-        PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 1 & 
-        all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == n & 
-        PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 & 
-        PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 & 
-        PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 & 
-        PriorParam$b.theta > 0) & length(PriorParam$b.theta) == 1) 
-    stop("Invalid prior hyper-parameter values.")
-  if (!(AR > 0 & AR < 1 & length(AR) == 1)) 
-    stop("Invalid AR value. Recommended value: AR = 0.44.")
-  if (!(StopAdapt > 0)) 
-    stop("Invalid StopAdapt value.")
-  if (!(is.logical(StoreChains) & length(StoreChains) == 1)) 
-    stop("Invalid StoreChains value.")
-  if (!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) 
-    stop("Invalid StoreAdapt value.")
-  if (!(file.info(StoreDir)["isdir"])) 
-    stop("Invalid StoreDir value.")
-  if (!(PriorDelta %in% c("gamma", "log-normal"))) 
-    stop("Invalid PriorDelta value.")
-    
-  
-    
+
   # SOME SUMS USED THROUGHOUT THE MCMC ALGORITHM
   sum.bycell.bio <- matrixStats::rowSums2(assay(Data)[1:q.bio, ])
   sum.bygene.bio <- matrixStats::colSums2(assay(Data)[1:q.bio, ])
@@ -289,7 +246,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   }
     
   StoreAdaptNumber <- as.numeric(StoreAdapt)
-  nBatch <- length(unique(metadata(Data)$BatchInfo))
+  
     
   if(nBatch > 1) {
     BatchDesign <- model.matrix(~as.factor(metadata(Data)$BatchInfo) - 1)  

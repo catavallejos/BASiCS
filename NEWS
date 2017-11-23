@@ -704,4 +704,5 @@ version 1.1.9: (2017-11-23) - WIP
 - Unit test changed accordingly (no-spike)
 - Minor style changes in `BASiCS_MCMC`
 - `BASiCS_MCMC` function broken into smaller functions (easier to read). This
-creates the following hidden functions: `HiddenBASiCS_MCMC_InputCheck`
+creates the following hidden functions: `HiddenBASiCS_MCMC_InputCheck`,
+`HiddenBASiCS_MCMC_ExtraArgs`

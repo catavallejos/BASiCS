@@ -1,5 +1,7 @@
 # Used in BASiCS_MCMC
-HiddenBASiCS_MCMC_Start <- function(Data, ...) 
+HiddenBASiCS_MCMC_Start <- function(Data, 
+                                    k = NULL, variance = NULL, eta = NULL,
+                                    ...) 
 {
   if (!is(Data, "SingleCellExperiment")) 
     stop("'Data' is not a SingleCellExperiment class object.")
@@ -84,10 +86,10 @@ HiddenBASiCS_MCMC_Start <- function(Data, ...)
     ls.theta0 <- ifelse("ls.theta0" %in% names(args), args$ls.theta0, -4)
     
     # Starting values for regression approach
-    if("k" %in% names(args)){
-      m0 = rep(0, args$k); V0 = diag(args$k); sigma2.a0 = 2; sigma2.b0 = 2
+    if(!is.null(k)){
+      m0 = rep(0, k); V0 = diag(k); sigma2.a0 = 2; sigma2.b0 = 2
       beta0 = mvrnorm(1,m0,V0); sigma20 = rgamma(1,sigma2.a0,sigma2.b0)
-      reg.nu0 = args$eta
+      reg.nu0 = eta
       lambda0 = rgamma(q.bio,shape=reg.nu0/2,rate=reg.nu0/2)
     }
     
@@ -99,7 +101,7 @@ HiddenBASiCS_MCMC_Start <- function(Data, ...)
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
     
-    if("k" %in% names(args)){
+    if(!is.null(k)){
       list(mu0 = mu0, delta0 = delta0, 
            phi0 = phi0, s0 = s0, 
            nu0 = nu0, theta0 = theta0, 
