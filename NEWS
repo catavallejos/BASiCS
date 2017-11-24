@@ -695,7 +695,7 @@ version 1.1.8: (2017-11-21)
 - `betaUpdateReg` created as a separate function
 - Fixed typo in sigma2 updates (regression case); unit test updated accordingly
 
-version 1.1.9: (2017-11-23) - WIP
+version 1.1.9: (2017-11-24) 
 - `means` only updated when needed (regression case); unit test updated accordingly
 - `deltaUpdateNoSpikes` + `deltaUpdateRegNoSpikes` removed as no longer required
 - Simplification of terms in `deltaUpdateReg`
@@ -705,4 +705,6 @@ version 1.1.9: (2017-11-23) - WIP
 - Minor style changes in `BASiCS_MCMC`
 - `BASiCS_MCMC` function broken into smaller functions (easier to read). This
 creates the following hidden functions: `HiddenBASiCS_MCMC_InputCheck`,
-`HiddenBASiCS_MCMC_ExtraArgs`
+`HiddenBASiCS_MCMC_ExtraArgs`, `HiddenBASiCS_MCMC_NoSpikesParams`, 
+`HiddenBASiCS_MCMC_OutputStore` and `HiddenBASiCS_MCMC_RefFreqStore`
+- Merge between no-spikes and regression case completed (code to be tested)

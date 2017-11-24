@@ -2604,6 +2604,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec ind_q0 = zeros(q0); arma::vec ind_n = zeros(n);
   arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
   
+  // INITIALIZATION OF PARAMETERS RELATED TO STOCHASTIC REF
+  arma::vec RefFreq = arma::zeros(q0); 
+  int RefAux;
+  
   // REGRESSION SPECIFIC SECTION
 
   // Parameters for regression
@@ -2660,8 +2664,13 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
-    // REGRESSION
-    // THIS REQUIRES A NEW FULL CONDITIONAL
+    // If using stochastic reference, randomly select 1 ref gene
+    if(StochasticRef == 1) {
+      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
+                                                           RefGenes_arma.size()-1) ));
+      RefGene = RefGenes(RefAux); 
+      if(i >= Burn) RefFreq(RefGene) += 1;
+    }
     muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
                                 Counts_arma, deltaAux.col(0), 
                                 1/deltaAux.col(0), nuAux.col(0), 
@@ -2848,7 +2857,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.nu") = LSnu.t(),
-        Rcpp::Named("ls.theta") = LStheta.t())); 
+        Rcpp::Named("ls.theta") = LStheta.t(),
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
   }
   else {
     // OUTPUT (AS A LIST)
@@ -2861,7 +2871,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("beta") = beta.t(),
         Rcpp::Named("sigma2") = sigma,
         Rcpp::Named("lambda") = lambda.t(),
-        Rcpp::Named("epsilon") = epsilon.t())); 
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
   }
 }
 
