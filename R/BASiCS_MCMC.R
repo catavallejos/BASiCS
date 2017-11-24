@@ -375,8 +375,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     
   # Store reference gene information (no spikes case only)
   if (WithSpikes == FALSE) {
-    HiddenBASiCS_MCMC_RefFreqStore(Data, Chain, RefGenes, ConstrainType,
-                                   StoreDir, RunName) 
+    if(StoreChains == TRUE)
+      HiddenBASiCS_MCMC_RefFreqStore(Data, Chain, RefGenes, ConstrainType,
+                                     StoreDir, RunName) 
   }
   else {
     message("-------------------------------------------------------------\n", 

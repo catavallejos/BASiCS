@@ -708,3 +708,4 @@ creates the following hidden functions: `HiddenBASiCS_MCMC_InputCheck`,
 `HiddenBASiCS_MCMC_ExtraArgs`, `HiddenBASiCS_MCMC_NoSpikesParams`, 
 `HiddenBASiCS_MCMC_OutputStore` and `HiddenBASiCS_MCMC_RefFreqStore`
 - Merge between no-spikes and regression case completed (code to be tested)
+- Minor change in storage of reference frequency (no spikes only)
