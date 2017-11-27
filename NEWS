@@ -715,4 +715,6 @@ version 1.1.10: (2017-11-27)
 - `HiddenBASiCS_MCMC_ExtraArgs` updated to include regression-related hyper-par
 - `BASiCS_MCMC` modified accordingly
 - Storage of adaptive variances fixed for the no-spike case
+
+version 1.1.11: (2017-11-24) 
 - Minor typo in the call to `HiddenBASiCS_MCMCcppNoSpikes` has been resolved
