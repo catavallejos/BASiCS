@@ -322,7 +322,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     else {
       message("Running no spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
-        N, Thin, Burn, as.matrix(assay(Data)), BatchDesign, 
+        N, Thin, Burn, as.matrix(assay(Data))[1:q.bio,], BatchDesign, 
         mu0, delta0, s0, nu0, rep(theta0, nBatch), 
         PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
         PriorParam$s2.delta, PriorDeltaNum, PriorParam$a.s, PriorParam$b.s, 
