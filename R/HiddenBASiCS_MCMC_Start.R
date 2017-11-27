@@ -1,6 +1,6 @@
 # Used in BASiCS_MCMC
 HiddenBASiCS_MCMC_Start <- function(Data, 
-                                    k = NULL, variance = NULL, eta = NULL,
+                                    PriorParam,
                                     ...) 
 {
   if (!is(Data, "SingleCellExperiment")) 
@@ -85,14 +85,6 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     ls.nu0 <- ifelse("ls.nu0" %in% names(args), args$ls.nu0, -10)
     ls.theta0 <- ifelse("ls.theta0" %in% names(args), args$ls.theta0, -4)
     
-    # Starting values for regression approach
-    if(!is.null(k)){
-      m0 = rep(0, k); V0 = diag(k); sigma2.a0 = 2; sigma2.b0 = 2
-      beta0 = mvrnorm(1,m0,V0); sigma20 = rgamma(1,sigma2.a0,sigma2.b0)
-      reg.nu0 = eta
-      lambda0 = rgamma(q.bio,shape=reg.nu0/2,rate=reg.nu0/2)
-    }
-    
     # Starting values for the proposal variances 
     ls.mu0 <- rep(ls.mu0, q.bio)
     ls.delta0 <- rep(ls.delta0, q.bio)
@@ -100,22 +92,21 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
     
-    if(!is.null(k)){
-      list(mu0 = mu0, delta0 = delta0, 
-           phi0 = phi0, s0 = s0, 
-           nu0 = nu0, theta0 = theta0, 
-           ls.mu0 = ls.mu0, ls.delta0 = ls.delta0, 
-           ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0,
-           m0 = m0, V0 = V0, sigma2.a0 = sigma2.a0, sigma2.b0 = sigma2.b0,
-           beta0 = beta0, sigma20 = sigma20,
-           lambda0 = lambda0)
+    # Output list
+    out <- list(mu0 = mu0, delta0 = delta0, 
+                phi0 = phi0, s0 = s0, 
+                nu0 = nu0, theta0 = theta0, 
+                ls.mu0 = ls.mu0, ls.delta0 = ls.delta0, 
+                ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
+    
+    # Starting values for regression-related parameters
+    if(!is.null(PriorParam$eta)) {
+      out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V) 
+      out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
+      out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2, 
+                        rate = PriorParam$eta/2)
     }
-    else{
-      list(mu0 = mu0, delta0 = delta0, 
-           phi0 = phi0, s0 = s0, 
-           nu0 = nu0, theta0 = theta0, 
-           ls.mu0 = ls.mu0, ls.delta0 = ls.delta0, 
-           ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
-    }
+
+    return(out)
 }
 

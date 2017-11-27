@@ -24,8 +24,9 @@ HiddenBASiCS_MCMC_OutputStore <- function(ChainClass, Chain,
             "'", StoreDir, "' directory ... \n", 
             "-------------------------------------------------------------\n")
     ChainLS <- list(ls.mu = Chain$ls.mu, ls.delta = Chain$ls.delta, 
-                    ls.phi = Chain$ls.phi, ls.nu = Chain$ls.nu, 
-                    ls.theta = Chain$ls.theta)
+                    ls.nu = Chain$ls.nu, ls.theta = Chain$ls.theta)
+    if("ls.phi" %in% names(Chain)) ChainLS$ls.phi <- Chain$ls.phi
+
     saveRDS(ChainLS, file = paste0("chain_ls_", RunName, ".Rds"))
   }
   

@@ -709,3 +709,9 @@ creates the following hidden functions: `HiddenBASiCS_MCMC_InputCheck`,
 `HiddenBASiCS_MCMC_OutputStore` and `HiddenBASiCS_MCMC_RefFreqStore`
 - Merge between no-spikes and regression case completed (code to be tested)
 - Minor change in storage of reference frequency (no spikes only)
+
+version 1.1.10: (2017-11-27) 
+- `HiddenBASiCS_MCMC_Start` updated to remove regression-related hyper-params
+- `HiddenBASiCS_MCMC_ExtraArgs` updated to include regression-related hyper-par
+- `BASiCS_MCMC` modified accordingly
+- Storage of adaptive variances fixed for the no-spike case

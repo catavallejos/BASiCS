@@ -201,8 +201,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   PrintProgress <- ArgsDef$PrintProgress; PriorParam <- ArgsDef$PriorParam;
   PriorDeltaNum <- ArgsDef$PriorDeltaNum; PriorDelta <- ArgsDef$PriorDelta; 
   Regression <- ArgsDef$Regression; WithSpikes <- ArgsDef$WithSpikes
-  k <- ArgsDef$k; variance <- ArgsDef$variance; eta <- ArgsDef$eta
-  Start <- ArgsDef$Start; 
+  k <- ArgsDef$k; variance <- ArgsDef$variance; Start <- ArgsDef$Start; 
   StochasticRef <- ArgsDef$StochasticRef; ConstrainType <- ArgsDef$ConstrainType
 
   # Starting values for MCMC chains
@@ -222,10 +221,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   
   # Starting values for Regression
   if(Regression == TRUE) {
-      m0 <- as.vector(Start$m0); V0 <- as.matrix(Start$V0)
-      sigma2.a0 <- Start$sigma2.a0; sigma2.b0 <- Start$sigma2.b0
-      beta0 <- Start$beta0; sigma20 <- Start$sigma20
-      lambda0 <- Start$lambda0
+      beta0 <- Start$beta0; sigma20 <- Start$sigma20; lambda0 <- Start$lambda0
   }
   
   # Parameters associated to the presence of batches
@@ -273,8 +269,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
                 AR, ls.mu0, ls.delta0, ls.phi0, ls.nu0, rep(ls.theta0, nBatch), 
                 sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio, 
                 as.numeric(StoreAdapt), StopAdapt, as.numeric(PrintProgress),
-                k, m0, V0, sigma2.a0, sigma2.b0, 
-                beta0, sigma20, eta, lambda0, variance))
+                k, PriorParam$m, PriorParam$V, 
+                PriorParam$a.sigma2, PriorParam$b.sigma2, 
+                beta0, sigma20, PriorParam$eta, lambda0, variance))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- matrixStats::rowSums2(ifelse(assay(Data)[!isSpike(Data),] > 0, 1, 0)) > 1
@@ -311,8 +308,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
                 AR, ls.mu0, ls.delta0, ls.nu0, rep(ls.theta0, nBatch), 
                 sum.bycell.all, sum.bygene.all, 
                 as.numeric(StoreAdapt), StopAdapt, as.numeric(PrintProgress),
-                k, m0, V0, sigma2.a0, sigma2.b0, 
-                beta0, sigma20, eta, lambda0, variance,
+                k, PriorParam$m, PriorParam$V, 
+                PriorParam$a.sigma2, PriorParam$b.sigma2,  
+                beta0, sigma20, PriorParam$eta, lambda0, variance,
                 Constrain, Index, RefGene, RefGenes, 
                 ConstrainGene, NotConstrainGene, 
                 ConstrainType, as.numeric(StochasticRef)))
