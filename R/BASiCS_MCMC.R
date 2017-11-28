@@ -190,6 +190,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   nBatch <- length(unique(metadata(Data)$BatchInfo))
   sum.bycell.all <- matrixStats::rowSums2(assay(Data))
   sum.bygene.all <- matrixStats::colSums2(assay(Data))
+  sum.bycell.bio <- matrixStats::rowSums2(assay(Data)[!isSpike(Data), ])
+  sum.bygene.bio <- matrixStats::colSums2(assay(Data)[!isSpike(Data), ])
     
   # Optional arguments 
   Args <- list(...)
@@ -238,9 +240,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   # Definition of parameters that are specific to the no-spikes case  
   if(WithSpikes == FALSE)
   {
-    NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(Data, ConstrainType, 
-                                                     StochasticRef, q.bio, 
-                                                     mu0, PriorDelta)
+    NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
+      as.matrix(assay(Data))[!isSpike(Data),], ConstrainType, 
+      StochasticRef, q.bio, mu0[!isSpike(Data)], PriorDelta)
     ConstrainGene <- NoSpikesParam$ConstrainGene
     NotConstrainGene <- NoSpikesParam$NotConstrainGene
     Constrain <- NoSpikesParam$Constrain 
@@ -253,10 +255,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     
     if(length(metadata(Data)$SpikeInput) <= 1) 
       stop("`Data` does not contain spike-in genes information.")
-    
-    # Some global sums used in the MCMC
-    sum.bycell.bio <- matrixStats::rowSums2(assay(Data)[1:q.bio, ])
-    sum.bygene.bio <- matrixStats::colSums2(assay(Data)[1:q.bio, ])
     
     # If regression case is chosen
     if(Regression == TRUE) {
@@ -280,8 +278,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
-                as.matrix(assay(Data))[1:q.bio,], BatchDesign, mu0[(q.bio+1):q],
-                mu0[1:q.bio], delta0, phi0, s0, nu0, rep(theta0, nBatch), 
+                as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, 
+                mu0[isSpike(Data)], mu0[!isSpike(Data)], delta0, phi0, s0, nu0, 
+                rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
                 PriorParam$s2.delta, PriorDeltaNum, PriorParam$p.phi, 
                 PriorParam$a.s, PriorParam$b.s, 
@@ -301,12 +300,12 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     if(Regression == TRUE) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(N, Thin, Burn, 
-                as.matrix(assay(Data))[1:q.bio,], BatchDesign,  
+                as.matrix(assay(Data))[!isSpike(Data),], BatchDesign,  
                 mu0[!isSpike(Data)], delta0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.s, PriorParam$b.s, 
                 PriorParam$a.theta, PriorParam$b.theta, 
                 AR, ls.mu0, ls.delta0, ls.nu0, rep(ls.theta0, nBatch), 
-                sum.bycell.all, sum.bygene.all, 
+                sum.bycell.bio, sum.bygene.bio, 
                 as.numeric(StoreAdapt), StopAdapt, as.numeric(PrintProgress),
                 k, PriorParam$m, PriorParam$V, 
                 PriorParam$a.sigma2, PriorParam$b.sigma2,  
@@ -328,7 +327,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
         PriorParam$s2.delta, PriorDeltaNum, PriorParam$a.s, PriorParam$b.s, 
         PriorParam$a.theta, PriorParam$b.theta, 
         AR, ls.mu0, ls.delta0, ls.nu0, rep(ls.theta0, nBatch), 
-        sum.bycell.all, sum.bygene.all, 
+        sum.bycell.bio, sum.bygene.bio, 
         as.numeric(StoreAdapt), StopAdapt, as.numeric(PrintProgress), 
         Constrain, Index, RefGene, RefGenes, 
         ConstrainGene, NotConstrainGene, 

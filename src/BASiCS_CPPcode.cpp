@@ -2098,11 +2098,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     Ibatch++; 
 
-
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
                         as, bs, BatchDesign_arma, n, y_n); 
+    
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR

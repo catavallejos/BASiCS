@@ -1,4 +1,4 @@
-HiddenBASiCS_MCMC_NoSpikesParam <- function(Data, ConstrainType, StochasticRef, 
+HiddenBASiCS_MCMC_NoSpikesParam <- function(Counts, ConstrainType, StochasticRef, 
                                             q.bio, mu0, PriorDelta)
 {
   if (PriorDelta == "gamma") 
@@ -10,8 +10,8 @@ HiddenBASiCS_MCMC_NoSpikesParam <- function(Data, ConstrainType, StochasticRef,
     NotConstrainGene <- 0
   }
   if (ConstrainType == 2) {
-    ConstrainGene <- which(matrixStats::rowMeans2(assay(Data)) >= 1) - 1
-    NotConstrainGene <- which(matrixStats::rowMeans2(assay(Data)) < 1) - 1
+    ConstrainGene <- which(matrixStats::rowMeans2(Counts) >= 1) - 1
+    NotConstrainGene <- which(matrixStats::rowMeans2(Counts) < 1) - 1
   }
   Constrain <- mean(log(mu0[ConstrainGene + 1]))  
   
