@@ -1,5 +1,5 @@
 HiddenBASiCS_MCMC_RefFreqStore <- function(Data, Chain, 
-                                           RefGenes, ConstrainType, 
+                                           RefGene, RefGenes, ConstrainType, 
                                            StoreDir, RunName)
 {
   # Directory
