@@ -724,3 +724,7 @@ version 1.1.12: (2017-11-28)
 
 version 1.1.13: (2017-11-28) 
 - Fixed storage of `RefGene` in no-spikes when `StochasticRef = FALSE`
+
+version 1.1.14: (2017-11-29)
+- Minor bug resolved for no-spikes case when original data has spikes
+- New unit test to assess that case

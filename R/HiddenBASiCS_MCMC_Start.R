@@ -1,6 +1,7 @@
 # Used in BASiCS_MCMC
 HiddenBASiCS_MCMC_Start <- function(Data, 
                                     PriorParam,
+                                    WithSpikes, 
                                     ...) 
 {
   if (!is(Data, "SingleCellExperiment")) 
@@ -27,7 +28,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   
   size_scran <- scran::computeSumFactors(CountsBio, sizes = sizes.aux)
   
-  if (length(metadata(Data)$SpikeInput) > 1) 
+  if (WithSpikes == TRUE) 
   {
     # Initialize s as the empirical capture efficiency rates
     s0 <- matrixStats::colSums2(CountsTech) / 

@@ -17,7 +17,7 @@ HiddenBASiCS_MCMC_NoSpikesParam <- function(Counts, ConstrainType, StochasticRef
   
   # Whether or not a stochatic reference is used
   # If stochastic, range of possible reference values only includes 
-  # the nearest 1000 genes located around the constrain
+  # the nearest 10% genes located around the constrain
   
   if (StochasticRef == TRUE) {
     aux.ref <- cbind(ConstrainGene, 

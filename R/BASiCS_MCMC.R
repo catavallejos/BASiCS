@@ -207,12 +207,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   StochasticRef <- ArgsDef$StochasticRef; ConstrainType <- ArgsDef$ConstrainType
 
   # Starting values for MCMC chains
-  mu0 <- as.vector(Start$mu0)
+  mu0 <- as.vector(Start$mu0)[1:q.bio]
   delta0 <- as.vector(Start$delta0)
   phi0 <- as.vector(Start$phi0)
   s0 <- as.vector(Start$s0)
   nu0 <- as.vector(Start$nu0)
   theta0 <- as.numeric(Start$theta0)
+  SpikeInput <- as.vector(Start$mu0)[(q.bio+1):q]
   
   # Starting values for adaptive proposal variances
   ls.mu0 <- as.vector(Start$ls.mu0)
@@ -242,7 +243,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   {
     NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
       as.matrix(assay(Data))[!isSpike(Data),], ConstrainType, 
-      StochasticRef, q.bio, mu0[!isSpike(Data)], PriorDelta)
+      StochasticRef, q.bio, mu0, PriorDelta)
     ConstrainGene <- NoSpikesParam$ConstrainGene
     NotConstrainGene <- NoSpikesParam$NotConstrainGene
     Constrain <- NoSpikesParam$Constrain 
@@ -260,7 +261,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     if(Regression == TRUE) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
-                as.matrix(assay(Data))[1:q.bio,], BatchDesign, mu0[(q.bio+1):q], 
+                as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, SpikeInput, 
                 mu0[1:q.bio], delta0, phi0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$p.phi, PriorParam$a.s, 
                 PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, 
@@ -279,7 +280,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
       message("Running with spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
                 as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, 
-                mu0[isSpike(Data)], mu0[!isSpike(Data)], delta0, phi0, s0, nu0, 
+                SpikeInput, mu0, delta0, phi0, s0, nu0, 
                 rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
                 PriorParam$s2.delta, PriorDeltaNum, PriorParam$p.phi, 
@@ -301,7 +302,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
       message("Running no spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(N, Thin, Burn, 
                 as.matrix(assay(Data))[!isSpike(Data),], BatchDesign,  
-                mu0[!isSpike(Data)], delta0, s0, nu0, rep(theta0, nBatch), 
+                mu0, delta0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.s, PriorParam$b.s, 
                 PriorParam$a.theta, PriorParam$b.theta, 
                 AR, ls.mu0, ls.delta0, ls.nu0, rep(ls.theta0, nBatch), 
@@ -315,14 +316,14 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
                 ConstrainType, as.numeric(StochasticRef)))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(assay(Data)[!isSpike(Data),] > 0, 1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(assay(Data) > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     } 
     else {
       message("Running no spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
         N, Thin, Burn, as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, 
-        mu0[!isSpike(Data)], delta0, s0, nu0, rep(theta0, nBatch), 
+        mu0, delta0, s0, nu0, rep(theta0, nBatch), 
         PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
         PriorParam$s2.delta, PriorDeltaNum, PriorParam$a.s, PriorParam$b.s, 
         PriorParam$a.theta, PriorParam$b.theta, 

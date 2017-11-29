@@ -73,7 +73,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
     
   # Starting values for MCMC
   if ("Start" %in% names(Args)) { Start <- Args$Start } 
-  else { Start <- HiddenBASiCS_MCMC_Start(Data, PriorParam) }
+  else { Start <- HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes) }
   
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) 
     stop("Invalid AR value. Recommended value: AR = 0.44.")
