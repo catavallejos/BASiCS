@@ -10,8 +10,8 @@ HiddenBASiCS_MCMC_NoSpikesParam <- function(Counts, ConstrainType, StochasticRef
     NotConstrainGene <- 0
   }
   if (ConstrainType == 2) {
-    ConstrainGene <- which(matrixStats::rowMeans2(Counts) >= 1) - 1
-    NotConstrainGene <- which(matrixStats::rowMeans2(Counts) < 1) - 1
+    ConstrainGene <- which(matrixStats::rowSums2(Counts) >= 1) - 1
+    NotConstrainGene <- which(matrixStats::rowSums2(Counts) < 1) - 1
   }
   Constrain <- mean(log(mu0[ConstrainGene + 1]))  
   
