@@ -316,7 +316,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
                 ConstrainType, as.numeric(StochasticRef)))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(assay(Data) > 0, 1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(assay(Data)[!isSpike(Data),] > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     } 
     else {
