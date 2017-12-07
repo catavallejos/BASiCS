@@ -25,7 +25,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
     StochasticRef <- ifelse("StochasticRef" %in% names(Args), 
                             Args$StochasticRef, TRUE)  
     ConstrainType <- ifelse("ConstrainType" %in% names(Args), 
-                            Args$ConstrainType, 2)
+                            Args$ConstrainType, 1)
   } else { StochasticRef <- FALSE; ConstrainType <- NULL }
   
   # MCMC and storage parameters

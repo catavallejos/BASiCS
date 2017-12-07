@@ -47,12 +47,6 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   else 
   {
     s0 <- size_scran
-    s0 <- n * s0 / sum(s0)
-    for (B in unique(metadata(Data)$BatchInfo)) 
-    {
-      aux <- metadata(Data)$BatchInfo == B
-      s0[aux] <- sum(aux) * s0[aux]/sum(s0[aux])
-    }
     nu0 <- s0
     phi0 <- NULL
     

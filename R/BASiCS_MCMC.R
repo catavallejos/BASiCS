@@ -207,13 +207,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   StochasticRef <- ArgsDef$StochasticRef; ConstrainType <- ArgsDef$ConstrainType
 
   # Starting values for MCMC chains
-  mu0 <- as.vector(Start$mu0)[1:q.bio]
+  mu0 <- as.vector(Start$mu0)[!isSpike(Data)]
   delta0 <- as.vector(Start$delta0)
   phi0 <- as.vector(Start$phi0)
   s0 <- as.vector(Start$s0)
   nu0 <- as.vector(Start$nu0)
   theta0 <- as.numeric(Start$theta0)
-  SpikeInput <- as.vector(Start$mu0)[(q.bio+1):q]
+  if(WithSpikes == TRUE) SpikeInput <- as.vector(Start$mu0)[isSpike(Data)]
   
   # Starting values for adaptive proposal variances
   ls.mu0 <- as.vector(Start$ls.mu0)
@@ -248,7 +248,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     NotConstrainGene <- NoSpikesParam$NotConstrainGene
     Constrain <- NoSpikesParam$Constrain 
     RefGenes <- NoSpikesParam$RefGenes; RefGene <- NoSpikesParam$RefGene
-    Index <- (1:q.bio) - 1    
+    Index <- seq_len(q.bio) - 1    
   }
     
   # If spikes are available 
@@ -262,7 +262,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
       message("Running with spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
                 as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, SpikeInput, 
-                mu0[1:q.bio], delta0, phi0, s0, nu0, rep(theta0, nBatch), 
+                mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$p.phi, PriorParam$a.s, 
                 PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, 
                 AR, ls.mu0, ls.delta0, ls.phi0, ls.nu0, rep(ls.theta0, nBatch), 
