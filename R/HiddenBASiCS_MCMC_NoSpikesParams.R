@@ -22,7 +22,7 @@ HiddenBASiCS_MCMC_NoSpikesParam <- function(Counts, ConstrainType, StochasticRef
   # the nearest 10% genes located around the constrain
   
   if (StochasticRef == TRUE) {
-    aux.ref <- cbind(ConstrainGene, abs(log(mu0[NonZero]) - Constrain))
+    aux.ref <- cbind(ConstrainGene, abs(log(mu0[ConstrainGene+1]) - Constrain))
     aux.ref <- aux.ref[order(aux.ref[, 2]), ]
     # In total 10% of genes to be used as reference candidates
     CandidateRef <- round(0.10 * q.bio)
@@ -35,8 +35,8 @@ HiddenBASiCS_MCMC_NoSpikesParam <- function(Counts, ConstrainType, StochasticRef
     RefGene <- RefGenes[1]
   } 
   else {
-    aux.ref <- which(abs(log(mu0[NonZero]) - Constrain) == 
-                       min(abs(log(mu0[NonZero]) - Constrain)))[1]
+    aux.ref <- which(abs(log(mu0[ConstrainGene+1]) - Constrain) == 
+                       min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
     RefGene <- ConstrainGene[aux.ref]
     RefGenes <- RefGene
   }

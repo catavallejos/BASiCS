@@ -744,3 +744,6 @@ version 1.1.17: (2017-12-07)
 with/without spikes when setting `WithSpikes = FALSE`
 - Modified constrain for no-spikes cases (to deal with non-zero genes)
 - Default value of `ConstrainType` set to 1 in `BASiCS_MCMC` (no-spikes only)
+
+version 1.1.18: (2017-12-08)
+- Minor typo in `HiddenBASiCS_MCMC_NoSpikesParam` resolved
