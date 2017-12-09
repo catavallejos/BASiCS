@@ -61,10 +61,10 @@
 #' \item{\code{k}}{If \code{Regression = TRUE}, \code{k} specifies the number 
 #'       of regression components used to estimated the fit between 
 #'       over-dispersion and mean expression paramters}.
-#' \itme{\code{Var}}{If \code{Regression = TRUE}, \code{Var} specifies the a 
+#' \item{\code{Var}}{If \code{Regression = TRUE}, \code{Var} specifies the a 
 #'       constant to scale the width of the basis functions used to estimated the 
 #'       fit between over-dispersion and mean expression paramters}.
-#' \itme{\code{eta}}{If \code{Regression = TRUE}, \code{eta} specifies the 
+#' \item{\code{eta}}{If \code{Regression = TRUE}, \code{eta} specifies the 
 #'       degress of freedom used for the robust regression. Smaller \code{eta}
 #'       induce more shrinkage towards the trend}.
 #' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings 
