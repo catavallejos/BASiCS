@@ -309,6 +309,9 @@ for testing differential variability.
 
 ## No-spikes version
 
+When technical spike-in genes are not available, BASiCS can be run via the 
+horizontal integration approach. 
+
 ## Regression version
 
 To obtain residual over-dispersion estimates that do not correlate to mean expression
@@ -354,6 +357,10 @@ head(Test$TableResDisp)
 ```
 
 ## No-spike and regression version
+
+The following code chunks explain the usage of sampling when no technical spike-in
+genes are available and when regression between over-dispersion and mean expression
+parameters should be performed.
 
 # Additional details
 

@@ -559,7 +559,8 @@ setMethod("plot",
                                 SmoothPlot = TRUE, ...) 
           {
     
-            if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta"))) 
+            if (!(Param %in% c("mu", "delta", "phi", "s", "nu", "theta", 
+                               "lambda", "epsilon"))) 
               stop("'Param' argument is invalid")
     
             q <- nrow(x@parameters$mu)
@@ -608,6 +609,18 @@ setMethod("plot",
                 object <- x@parameters$theta; Columns <- Batches
                 if (ylab == "") { ylab = expression(theta[b]) }
                 if (xlab == "") { xlab = "Batch" }
+            }
+            if (Param == "lambda") 
+            {
+                object <- x@parameters$lambda; Columns <- Genes
+                if (ylab == "") { ylab = expression(lambda[i]) }
+                if (xlab == "") { xlab = "Gene" }
+            }
+            if (Param == "epsilon") 
+            {
+                object <- x@parameters$epsilon; Columns <- Genes
+                if (ylab == "") { ylab = expression(epsilon[i]) }
+                if (xlab == "") { xlab = "Gene" }
             }
         
             if (ylim == "") 
@@ -743,6 +756,32 @@ setMethod("plot",
               if (xlim == "") { xlim <- c(min(x@parameters$nu[Columns, 1]), 
                                           max(x@parameters$nu[Columns, 1])) }
               plot(x@parameters$nu[Columns, 1], x@parameters$s[Columns, 1], 
+                   xlab = xlab, ylab = ylab, ylim = ylim, 
+                   pch = pch, col = col, bty = bty, ...)
+            }
+            if (Param == "mu" & Param2 == "epsilon") 
+            {
+              ValidCombination <- TRUE; Columns <- Genes
+              if (ylab == "") { ylab <- expression(epsilon[i]) }
+              if (xlab == "") { xlab <- expression(mu[i]) }
+              if (xlim == "") { xlim <- c(min(x@parameters$mu[Columns, 1]), 
+                                          max(x@parameters$mu[Columns, 1])) }
+              if (ylim == "") { ylim <- c(min(x@parameters$epsilon[Columns, 1]), 
+                                          max(x@parameters$epsilon[Columns, 1])) }
+              plot(x@parameters$mu[Columns, 1], x@parameters$epsilon[Columns, 1], 
+                   xlab = xlab, ylab = ylab, ylim = ylim, 
+                   pch = pch, col = col, bty = bty, ...)
+            }
+            if (Param == "mu" & Param2 == "lambda") 
+            {
+              ValidCombination <- TRUE; Columns <- Genes
+              if (ylab == "") { ylab <- expression(delta[i]) }
+              if (xlab == "") { xlab <- expression(mu[i]) }
+              if (xlim == "") { xlim <- c(min(x@parameters$mu[Columns, 1]), 
+                                          max(x@parameters$mu[Columns, 1])) }
+              if (ylim == "") { ylim <- c(min(x@parameters$lambda[Columns, 1]), 
+                                          max(x@parameters$lambda[Columns, 1])) }
+              plot(x@parameters$mu[Columns, 1], x@parameters$lambda[Columns, 1], 
                    xlab = xlab, ylab = ylab, ylim = ylim, 
                    pch = pch, col = col, bty = bty, ...)
             }

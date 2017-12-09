@@ -54,13 +54,24 @@
 #'         parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
 #'
 #' }}
+#' \item{\code{Regression}}{If \code{Regression = TRUE}, BASiCS estimates 
+#'       residual over-dispersion parameters that are independent of
+#'       mean expression. These will be used for differential variability
+#'       testing unbiased by changes in mean expression}.
+#' \item{\code{k}}{If \code{Regression = TRUE}, \code{k} specifies the number 
+#'       of regression components used to estimated the fit between 
+#'       over-dispersion and mean expression paramters}.
+#' \itme{\code{Var}}{If \code{Regression = TRUE}, \code{Var} specifies the a 
+#'       constant to scale the width of the basis functions used to estimated the 
+#'       fit between over-dispersion and mean expression paramters}.
+#' \itme{\code{eta}}{If \code{Regression = TRUE}, \code{eta} specifies the 
+#'       degress of freedom used for the robust regression. Smaller \code{eta}
+#'       induce more shrinkage towards the trend}.
 #' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings 
 #'       updates. It must be a positive number between 0 and 1. Default 
 #'       (and recommended): \code{AR = 0.44}}.
-#'
 #' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer 
 #'       adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
-#'
 #' \item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated 
 #'       \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName} 
 #'       argument used to index the file name). 
@@ -100,6 +111,10 @@
 #' # Longer runs migth be required to reach convergence
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
 #'                      PrintProgress = FALSE)
+#'                      
+#' # To run the regression version of BASiCS, use:
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+#'                      PrintProgress = FALSE, Regression = TRUE)
 #' 
 #' # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 #' # (obtained using the 'BASiCS_MCMC' function)
