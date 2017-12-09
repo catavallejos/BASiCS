@@ -1,29 +1,32 @@
-<!--
-%\VignetteIndexEntry{Introduction to BASiCS}
-%\VignettePackage{BiocStyle}
-%\VignetteEngine{knitr::knitr}
--->
+---
+title: "Introduction to BASiCS"
+package: BASiCS
+date: "`r BiocStyle::doc_date()`"
+author: 
+- name: Catalina Vallejos
+  email: cnvallej@uc.cl
+- name: Nils Eling
+  email: eling@ebi.ac.uk
+output: 
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+    fig_width: 5
+vignette: >
+  %\VignetteIndexEntry{Introduction to BASiCS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
+---
 
-```{r, echo=FALSE, results="hide", message=TRUE}
+```{r, echo=FALSE, results="hide", message=FALSE}
 require(knitr)
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 ```
 
-```{r style, echo=FALSE, results='asis'}
-BiocStyle::markdown()
-```
-
 ```{r library, echo=FALSE}
 library(BASiCS)
+library(BiocStyle)
 ```
-
-# Introduction to BASiCS
-
-Package: `r Biocpkg("BASiCS")` <br />
-Authors: Catalina Vallejos (cnvallej@uc.cl) and Nils Eling (eling@ebi.ac.uk) <br />
-Compilation date: `r Sys.Date()`
-
-***
 
 # Introduction 
 
@@ -68,7 +71,37 @@ sub-populations of cells through clustering.
 
 # Quick start
 
-### The input dataset
+This section introduces the main functionality of BASiCS which include the generation
+of a `r Biocpkg("SingleCellExperiment")` object prior ro running the MCMC sampler. 
+To generate the `SingleCellExperiment` object, it requires a matrix of raw 
+transcript counts `Counts` (columns: cells, rows: genes) 
+after quality control (e.g. removing low quality cells) and filtering of lowly 
+expressed genes. A logical vector `Tech` indicates which row contains technical
+spike-in molecules and a data.frame object `SpikeInfo` contains the names of
+the spike-in molecules in the first column and the absolute number of molecules 
+per well in the second column. Section \@ref(different-sampling-modes) provides 
+details on the case when technical spike-in molecules are not available.
+
+To run the MCMC sampler, a `SingleCellExperiment` object is required as well as 
+an input for the total number of iterations `N`, a thinning constant `Thin` and
+the burn-in period `Burn`. For performing a regression between mean and over-dispersion
+values, the paramter `Regression=TRUE` can be added (see section \@ref(different-sampling-modes)).
+
+To perform differential testing (mean and variance), two `Chain` objects are 
+required. These are obtained by running the sampler on cells from two conditions
+separately.
+
+```{r, eval=FALSE}
+Data = newBASiCS_Data(Counts, Tech, SpikeInfo)
+
+Chain <- BASiCS_MCMC(Data = Data, N = 40000, Thin = 20, Burn = 20000)
+
+Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA)
+```
+
+# Complete workflow
+
+## The input dataset
 
 The input dataset for BASiCS must be stored as an `SingleCellExperiment` 
 object (see `r Biocpkg("SingleCellExperiment")` package). 
@@ -134,7 +167,7 @@ slot via the `isSpike` function.
 Once the additional information is included, 
 the object can be used within BASiCS.
 
-### Running the MCMC sampler
+## Running the MCMC sampler
 
 Parameter estimation is performed using the `BASiCS_MCMC` function. 
 Essential parameters for running this algorithm are: 
@@ -220,7 +253,7 @@ release of BASiCS (where `EviThreshold` was defined such that EFDR = EFNR).
 However, the new choice is more stable (sometimes, it was not posible to 
 find a threshold such that EFDR = EFNR). 
 
-### Analysis for two groups of cells 
+## Analysis for two groups of cells 
 
 To illustrate the use of the differential mean expression and differential 
 over-dispersion tests between two cell populations, we use extracts from the 
@@ -268,9 +301,63 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
+# Different sampling modes
+
+This section provides details on sampling strategies when technical spike-in 
+molecules are not present or when adjusting the mean confounding effect
+for testing differential variability.
+
+## No-spikes version
+
+## Regression version
+
+To obtain residual over-dispersion estimates that do not correlate to mean expression
+parmaters, the following code can be used.
+
+```{r, eval=FALSE}
+Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
+                     PrintProgress = FALSE, Regression = TRUE)
+```
+
+Additional parameters for this sampler include: `k` number of regression components
+(`k`-2 radial basis functions, one intercept and one linear component), `Var` the scale
+parameter influencing the width of the basis functions and `eta` the degrees of freedom.
+
+To visualize the fit between over-dispersion $\delta_i$ and mean expression $\mu_i$
+the following function can be used.
+
+```{r}
+data("ChainRNAReg")
+showFit(ChainRNAReg)
+```
+
+The `BASiCS_TestDE` test function will automatically perform differential variability 
+testing on the residual over-dispersion parameters $\epsilon_i$ when providing two `Chain` objects that were generated by BASiCS' regression case.
+
+```{r}
+data("ChainSCReg")
+Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
+                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
+                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+                      PsiE = log2(1.5)/log2(exp(1)),
+                      EFDR_M = 0.10, EFDR_D = 0.10,
+                      Offset = TRUE, OffsetPlot = FALSE, Plot = FALSE)
+```
+
+This test function outputs an extra slot containing the results for testing 
+differences in residual over-dispersion. Only genes that are expressed in at least 
+2 cells are included in the test. By performing the regression, all genes 
+can be tested for changes in expression variability.
+
+```{r}
+head(Test$TableResDisp)
+```
+
+## No-spike and regression version
+
 # Additional details
 
-### Storing and loading MCMC chains
+## Storing and loading MCMC chains
 
 To externally store the output of `BASiCS_MCMC` (recommended), additional 
 parameters `StoreChains`, `StoreDir` and `RunName` are required. For example:
@@ -430,7 +517,6 @@ structure, red circular nodes relate to unknown model parameters in the top
 layer of hierarchy in our model. Blue, green and grey areas highlight elements 
 that are shared within a biological gene, technical gene or cell, respectively. 
 
-<!-- ![image](./BASiCS_DAG.jpg) -->
 <img src="./BASiCS_DAG.jpg" height="400px" width="600px" />
 \centerline{\includegraphics[height=4in]{./BASiCS_DAG.jpg}}
 

@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.1.18
-Date: : 2017-12-08
+Version: 1.1.19
+Date: : 2017-12-09
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
         role=c("aut"), email="eling@ebi.ac.uk"),  
@@ -51,7 +51,8 @@ Imports:
     utils
 Suggests:
     knitr,
-    BiocStyle
+    BiocStyle,
+    rmarkdown
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
 biocViews: Normalization, Sequencing, RNASeq, Software, 
