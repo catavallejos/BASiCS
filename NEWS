@@ -752,3 +752,6 @@ version 1.1.19: (2017-12-09)
 - extended vignette to describe regression and non-spike case
 - changed markdown to rmarkdown engine to compile vignette to include
 table of contents
+
+version 1.1.20: (2017-12-11)
+- Updated dpi option in vignette 
