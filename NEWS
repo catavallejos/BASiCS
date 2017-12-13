@@ -755,3 +755,6 @@ table of contents
 
 version 1.1.20: (2017-12-11)
 - Updated dpi option in vignette 
+
+version 1.1.21: (2017-12-13)
+- `ConstrainProp` added as an optional argument for `BASiCS_MCMC` (no-spikes)

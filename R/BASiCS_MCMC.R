@@ -212,14 +212,15 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   Args <- list(...)
   # Assignment of default values
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n)
-  AR <- ArgsDef$AR; StopAdapt <- ArgsDef$StopAdapt; 
-  StoreChains <- ArgsDef$StoreChains; StoreAdapt <- ArgsDef$StoreAdapt;
+  AR <- ArgsDef$AR; StopAdapt <- ArgsDef$StopAdapt 
+  StoreChains <- ArgsDef$StoreChains; StoreAdapt <- ArgsDef$StoreAdapt
   StoreDir <- ArgsDef$StoreDir; RunName <- ArgsDef$RunName;
-  PrintProgress <- ArgsDef$PrintProgress; PriorParam <- ArgsDef$PriorParam;
-  PriorDeltaNum <- ArgsDef$PriorDeltaNum; PriorDelta <- ArgsDef$PriorDelta; 
+  PrintProgress <- ArgsDef$PrintProgress; PriorParam <- ArgsDef$PriorParam
+  PriorDeltaNum <- ArgsDef$PriorDeltaNum; PriorDelta <- ArgsDef$PriorDelta
   Regression <- ArgsDef$Regression; WithSpikes <- ArgsDef$WithSpikes
-  k <- ArgsDef$k; variance <- ArgsDef$variance; Start <- ArgsDef$Start; 
-  StochasticRef <- ArgsDef$StochasticRef; ConstrainType <- ArgsDef$ConstrainType
+  k <- ArgsDef$k; variance <- ArgsDef$variance; Start <- ArgsDef$Start 
+  StochasticRef <- ArgsDef$StochasticRef
+  ConstrainType <- ArgsDef$ConstrainType; ConstrainProp <- ArgsDef$ConstrainProp
 
   # Starting values for MCMC chains
   mu0 <- as.vector(Start$mu0)[!isSpike(Data)]
@@ -258,7 +259,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   {
     NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
       as.matrix(assay(Data))[!isSpike(Data),], ConstrainType, 
-      StochasticRef, q.bio, mu0, PriorDelta)
+      StochasticRef, q.bio, mu0, PriorDelta, ConstrainProp)
     ConstrainGene <- NoSpikesParam$ConstrainGene
     NotConstrainGene <- NoSpikesParam$NotConstrainGene
     Constrain <- NoSpikesParam$Constrain 

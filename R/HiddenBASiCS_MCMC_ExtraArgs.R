@@ -26,7 +26,10 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
                             Args$StochasticRef, TRUE)  
     ConstrainType <- ifelse("ConstrainType" %in% names(Args), 
                             Args$ConstrainType, 1)
-  } else { StochasticRef <- FALSE; ConstrainType <- NULL }
+    ConstrainProp <- ifelse("ConstrainProp" %in% names(Args), 
+                            Args$ConstrainProp, 0.10)
+  } 
+  else { StochasticRef <- FALSE; ConstrainType <- NULL; ConstrainProp <- NULL }
   
   # MCMC and storage parameters
   AR <- ifelse("AR" %in% names(Args), Args$AR, 0.44)
@@ -94,7 +97,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
       PriorParam = PriorParam, PriorDeltaNum = PriorDeltaNum, 
       PriorDelta = PriorDelta,
       WithSpikes = WithSpikes, StochasticRef = StochasticRef,
-      ConstrainType = ConstrainType, 
+      ConstrainType = ConstrainType, ConstrainProp = ConstrainProp,
       Regression = Regression, k = k, variance = variance, 
       Start = Start)
 }
