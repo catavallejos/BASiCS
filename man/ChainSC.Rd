@@ -5,7 +5,7 @@
 \alias{ChainSC}
 \title{Extract from the chain obtained in Vallejos et al (2016): single-cell samples}
 \format{An object of class \code{\linkS4class{BASiCS_Chain}} 
-containing 10 MCMC iterations.}
+containing 100 MCMC iterations.}
 \usage{
 ChainSC
 }

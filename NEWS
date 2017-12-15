@@ -758,3 +758,7 @@ version 1.1.20: (2017-12-11)
 
 version 1.1.21: (2017-12-13)
 - `ConstrainProp` added as an optional argument for `BASiCS_MCMC` (no-spikes)
+
+version 1.1.22: (2017-12-15)
+- Documentation on ChainSCReg and ChainRNAReg datasets added
+- Fixed showFit method

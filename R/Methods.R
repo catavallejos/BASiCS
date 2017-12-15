@@ -4,45 +4,6 @@
 # Methods for BASiCS_Chain objects
 
 #' @name BASiCS_Chain-methods
-#' @aliases updateObject,BASiCS_Chain-method
-#' 
-#' @title 'updateObject' method for BASiCS_Chain objects
-#' 
-#' @description 'updateObject' method for \code{\linkS4class{BASiCS_Chain}} objects.
-#' 
-#' @param object A \code{\linkS4class{BASiCS_Chain}} object.
-#' 
-#' @return Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
-#' contains all model parameters in a single slot object (list).
-#' 
-#' @examples
-#' 
-#' # Not run
-#' # New_Chain <- updateObject(Old_Chain)
-#' 
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#' 
-#' @references 
-#' 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-#'  
-#' @rdname BASiCS_Chain-methods
-setMethod("updateObject", 
-          signature = "BASiCS_Chain", 
-          definition = function(object) 
-          {
-            #if (!("mu" %in% slotNames(object))){
-            #  stop("Object was not created by an older version of BASiCS")
-            #}
-            
-            New_Chain <- newBASiCS_Chain(parameters = list(mu = object@mu, 
-                                                           delta = object@delta, phi = object@phi,
-                                                           s = object@s, nu = object@nu, theta = object@theta))
-            
-            return(New_Chain)
-          })
-
-#' @name BASiCS_Chain-methods
 #' @aliases show,BASiCS_Chain-method
 #' 
 #' @title 'show' method for BASiCS_Chain objects
@@ -423,20 +384,20 @@ setMethod("showFit",
                               yhat.upper = yhat.HPD[,2],
                               yhat.lower = yhat.HPD[,1])
             if(smooth == TRUE){
-              plot.out <- ggplot(df[df$included,]) + geom_hex(aes(mu, delta), bins = 100) +
+              plot.out <- ggplot(df[df$included,]) + geom_hex(aes_string(x = "mu", y = "delta"), bins = 100) +
                 scale_fill_gradientn("", colours = colorRampPalette(c("dark blue", "yellow", "dark red"))(100), guide=FALSE) +
-                geom_point(data = df[!df$included,], aes(mu, delta), colour="purple", alpha=0.3) +
+                geom_point(data = df[!df$included,], aes_string(x = "mu", y = "delta"), colour="purple", alpha=0.3) +
                 xlab("log(mu)") + ylab("log(delta)") + theme_minimal(base_size = 15) +
-                geom_line(data = df2, mapping = aes(mu2, yhat), colour = "dark red") +
-                geom_ribbon(data = df2, mapping = aes(x = mu2, ymin = yhat.lower, ymax = yhat.upper),
+                geom_line(data = df2, mapping = aes_string(x = "mu2", y = "yhat"), colour = "dark red") +
+                geom_ribbon(data = df2, mapping = aes_string(x = "mu2", ymin = "yhat.lower", ymax = "yhat.upper"),
                             alpha = 0.5)
             }
             else{
-              plot.out <- ggplot(df[df$included,]) + geom_point(aes(mu, delta), colour = "dark blue") +
-                geom_point(data = df[!df$included,], aes(mu, delta), colour="purple", alpha=0.3) +
+              plot.out <- ggplot(df[df$included,]) + geom_point(aes_string(x = "mu", y = "delta"), colour = "dark blue") +
+                geom_point(data = df[!df$included,], aes(x = "mu", y = "delta"), colour="purple", alpha=0.3) +
                 xlab("log(mu)") + ylab("log(delta)") + theme_minimal(base_size = 15) +
-                geom_line(data = df2, mapping = aes(mu2, yhat), colour = "dark red") + 
-                geom_ribbon(data = df2, mapping = aes(x = mu2, ymin = yhat.lower, ymax = yhat.upper),
+                geom_line(data = df2, mapping = aes_string(x = "mu2", y = "yhat"), colour = "dark red") + 
+                geom_ribbon(data = df2, mapping = aes_string(x = "mu2", ymin = "yhat.lower", ymax = "yhat.upper"),
                             alpha = 0.5)
             }
             return(plot.out)
