@@ -49,16 +49,26 @@ highly (and lowly) variable genes within the group.
 - **For two (or more) groups of cells** [2]: BASiCS allows the identification 
 of differentially expressed genes between the groups. As in traditional 
 differential expression tools, BASiCS can uncover changes in mean expression 
-between the groups. Besides this, BASiCS can also uncover changes in 
-*over-dispersion* --- a measure for the residual cell-to-cell variation that 
-is observed after accounting for technical noise. This feature has led, for 
-example, to novel insights in the context of immune cells across aging [3].
+between the groups. Besides this, BASiCS can also uncover changes in gene 
+expression variability in terms of:
 
-In both cases, a probabilistic output is provided, with posterior probability 
-thresholds calibrated through the expected false discovery rate (EFDR) [4].
+  1. **Over-dispersion** --- a measure for the residual cell-to-cell 
+  variation that is observed after accounting for technical noise. This feature 
+  has led, for example, to novel insights in the context of immune cells across 
+  aging [3]. Due to the confounding effect that is typically observed 
+  
+  2. **Residual over-dispersion** 
+  
+  
+More recently, BASiCS has been extended to account for 
 
-Currently, BASiCS relies on the use of **spike-in genes** --- that are 
-artificially introduced to each cell's lysate --- to perform these analyses. 
+In both cases, a probabilistic output is provided, with a decision rule that is
+calibrated through the expected false discovery rate (EFDR) [4].
+
+The original implementation of BASiCS [1] requires the use of **spike-in** 
+molecules --- that are artificially introduced to each cell's lysate 
+--- to perform these analyses. However, the current release of BASiCS has been
+extended to also address experiments where spikes-in are not available. 
 
 A brief description for the statistical model implemented in BASiCS is 
 provided in the "Methodology" section of this document. 
@@ -303,7 +313,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
-# Alternative implementation mode
+# Alternative implementation modes
 
 This section provides details on sampling strategies when technical spike-in 
 molecules are not present or when adjusting the mean confounding effect
@@ -613,7 +623,12 @@ for single-cell transcriptomics. *Nature Methods* 11 (6), 637-40.
 Normalizing single-cell RNA-sequencing data: challenges and opportunities. 
 *Nature Methods* 14, 565-571.
 
-[7] Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. *Journal of Computational and Graphical Statistics* 18: 349-367. 
+[7] Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. 
+*Journal of Computational and Graphical Statistics* 18: 349-367. 
+
+[8] Eling N, Richard AC, Richardson S, Marioni JC and Vallejos CA (2017).
+Robust expression variability testing reveals heterogeneous T cell responses.
+*Under review*.
 
 # Session information
 
