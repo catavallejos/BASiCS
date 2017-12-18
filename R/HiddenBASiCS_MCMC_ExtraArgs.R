@@ -27,7 +27,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
     ConstrainType <- ifelse("ConstrainType" %in% names(Args), 
                             Args$ConstrainType, 1)
     ConstrainProp <- ifelse("ConstrainProp" %in% names(Args), 
-                            Args$ConstrainProp, 0.10)
+                            Args$ConstrainProp, 0.20)
   } 
   else { StochasticRef <- FALSE; ConstrainType <- NULL; ConstrainProp <- NULL }
   

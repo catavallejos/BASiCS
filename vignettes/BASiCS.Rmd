@@ -46,7 +46,8 @@ analyses:
 - **For a single group of cells** [1]: BASiCS provides a criterion to identify 
 highly (and lowly) variable genes within the group. 
 
-- **For two (or more) groups of cells** [2]: BASiCS allows the identification of differentially expressed genes between the groups. As in traditional 
+- **For two (or more) groups of cells** [2]: BASiCS allows the identification 
+of differentially expressed genes between the groups. As in traditional 
 differential expression tools, BASiCS can uncover changes in mean expression 
 between the groups. Besides this, BASiCS can also uncover changes in 
 *over-dispersion* --- a measure for the residual cell-to-cell variation that 
@@ -302,7 +303,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
 ```
 
-# Different sampling modes
+# Alternative implementation mode
 
 This section provides details on sampling strategies when technical spike-in 
 molecules are not present or when adjusting the mean confounding effect

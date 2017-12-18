@@ -1,7 +1,7 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.1.23
+Version: 1.1.24
 Date: : 2017-12-18
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
@@ -48,7 +48,8 @@ Imports:
     KernSmooth,
     grDevices,
     stats,
-    utils
+    utils,
+    hexbin
 Suggests:
     knitr,
     BiocStyle,

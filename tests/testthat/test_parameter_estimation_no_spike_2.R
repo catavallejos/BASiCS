@@ -10,11 +10,11 @@ test_that("paramater estimations match the given seed",
   expect_that(all.equal(assay(Data1)[!isSpike(Data1),], assay(Data2)), is_true())
 
   set.seed(16)
-  Chain1 <- BASiCS_MCMC(Data1, N = 10000, Thin = 10, Burn = 5000, 
+  Chain1 <- BASiCS_MCMC(Data1, N = 2000, Thin = 10, Burn = 1000, 
                         PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary1 <- Summary(Chain1)
   set.seed(16)
-  Chain2 <- BASiCS_MCMC(Data2, N = 10000, Thin = 10, Burn = 5000, 
+  Chain2 <- BASiCS_MCMC(Data2, N = 2000, Thin = 10, Burn = 1000, 
                         PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary2 <- Summary(Chain2)
             
