@@ -49,7 +49,7 @@
 #' @references 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
-newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)), 
+newBASiCS_Data <- function(Counts, Tech, 
                            SpikeInfo = NULL, BatchInfo = NULL) 
 {
   # Validity checks for SpikeInfo
