@@ -23,7 +23,7 @@ importFrom(matrixStats, rowMeans2, colMeans2,
 importFrom(grDevices, colorRampPalette)
 importFrom(MASS, mvrnorm)
 
-importMethodsFrom(BiocGenerics, counts, updateObject)
+importMethodsFrom(BiocGenerics, counts, updateObject, subset)
 importMethodsFrom(scran, computeSumFactors)
 
 exportClasses(BASiCS_Chain , BASiCS_Summary)

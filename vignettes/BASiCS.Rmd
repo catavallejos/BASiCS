@@ -12,6 +12,7 @@ output:
     toc: true
     toc_depth: 2
     fig_width: 16
+bibliography: library.bib
 vignette: >
   %\VignetteIndexEntry{Introduction to BASiCS}
   %\VignetteEngine{knitr::rmarkdown}
@@ -43,32 +44,33 @@ uncertainty by simultaneously performing data normalisation (global scaling),
 technical noise quantification and two types of **supervised** downstream 
 analyses: 
 
-1. **For a single group of cells** [1]: BASiCS provides a criterion to identify 
-highly (and lowly) variable genes within the group. 
+1. **For a single group of cells** [@vallejos2015basics]: BASiCS provides a 
+criterion to identify highly (and lowly) variable genes within the group. 
 2. **For two (or more) groups of cells**: BASiCS allows the identification 
 of differentially expressed genes between the groups. As in traditional 
 differential expression tools, BASiCS can uncover changes in mean expression 
 between the groups. Besides this, BASiCS can also uncover changes in gene 
 expression variability in terms of: 
-  a. **Over-dispersion** [2] --- a measure for the excess of cell-to-cell 
-  variability (with respect to Poisson sampling) that is observed after 
-  accounting for technical noise. This feature has led, for example, to novel 
-  insights in the context of immune cells across aging [3]. Due to the strong 
-  mean/over-dispersion confounding that is typically observed for scRNA-seq 
-  experiments, the assessment of changes in over-dispersion is restricted to 
-  genes for which mean expression does not change between the groups.
-  b. **Residual over-dispersion** [8] --- a residual measure of variability  
-  given by departures with respect to a global mean/over-dispersion trend. 
-  Positive residual over-dispersion indicates that a gene exhibits more 
+  a. **Over-dispersion** [@vallejos2016beyond] --- a measure for the excess of 
+  cell-to-cell variability (with respect to Poisson sampling) that is observed 
+  after accounting for technical noise. This feature has led, for example, to 
+  novel insights in the context of immune cells across aging 
+  [@martinez2017aging]. Due to the strong mean/over-dispersion confounding that 
+  is typically observed for scRNA-seq experiments, the assessment of changes in 
+  over-dispersion is restricted to genes for which mean expression does not 
+  change between the groups.
+  b. **Residual over-dispersion** [@eling2017robust] --- a residual measure of 
+  variability given by departures with respect to a global mean/over-dispersion 
+  trend. Positive residual over-dispersion indicates that a gene exhibits more 
   variation than expected relative to genes with similar expression levels;
   negative esidual over-dispersion suggests less variation than expected.
 
 In all cases, a probabilistic output is provided, with a decision rule that is
-calibrated through the expected false discovery rate (EFDR) [4].
+calibrated through the expected false discovery rate (EFDR) [@newton2004detecting].
 
 A brief description for the statistical model implemented in BASiCS is 
 provided in Section \@ref(methodology) of this document. While the original 
-implementation of BASiCS [1] requires the use of **spike-in** 
+implementation of BASiCS [@vallejos2015basics] requires the use of **spike-in** 
 molecules --- that are artificially introduced to each cell's lysate 
 --- to perform these analyses. However, the current release of BASiCS has been
 extended to also address experiments for which spikes-ins are not available 
@@ -110,13 +112,19 @@ Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500,
                      PrintProgress = FALSE)
 ```
 
-EDIT HERE!!
+As a default, the code above runs the original implementation mode of BASiCS 
+(spikes without regression; see Section \@ref(alternative-implementation-modes)).
+To use the no-spikes implementation, please add `WithSpikes = FALSE` as an 
+additional parameter. To use the regression implementation, please add 
+`Regression = TRUE` as an additional parameter. 
 
-As a default, the code above runs 
-
-For performing a regression between mean and over-dispersion
-values, the paramter `Regression=TRUE` can be added (see section \@ref(alternative-implementation-modes)).
-
+The `Data` and `Chain` (a `BASiCS_Chain` object) objects created by the code
+above can be use for subsequent downstream analyses. See Section 
+\@ref(analysis-for-a-single-group-of-cells) for highly/lowly variable gene
+detection (single group of cells, see also functions `BASiCS_DetectHVG` and 
+`BASiCS_DetectLVG`) and Section \@ref(analysis-for-two-groups-of-cells) for 
+differential expression analyses (two groups of cells, see also function 
+`BASiCS_TestDE`). 
 
 **Important remarks:**
 
@@ -131,12 +139,6 @@ refer to the 'Convergence assessment' section of this vignette
 Typically, setting `N=20000`, `Thin=20` and `Burn=10000` leads to 
 stable results. 
 
-
-
-
-
-
-
 # Complete workflow
 
 ## The input dataset
@@ -149,7 +151,8 @@ on the following information:
 
 * `Counts`: a matrix of raw expression counts with dimensions $q$ times $n$. 
 Within this matrix, $q_0$ rows must correspond to biological genes and $q-q_0$ 
-rows must correspond to technical spike-in genes. Gene names must be stored as `rownames(Counts)`.
+rows must correspond to technical spike-in genes. Gene names must be stored as 
+`rownames(Counts)`.
 
 * `Tech`: a vector of `TRUE`/`FALSE` elements with length $q$. 
 If `Tech[i] = FALSE` the gene `i` is biological; otherwise the gene is spike-in. 
@@ -169,20 +172,20 @@ For example, the following code simulates a dataset with 50 genes
 
 ```{r ExampleDataTest}
 set.seed(1)
-Counts = Counts = matrix(rpois(50*40, 2), ncol = 40)
+Counts <- matrix(rpois(50*40, 2), ncol = 40)
 rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
-Tech = c(rep(FALSE,40),rep(TRUE,10))
+Tech <- c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
-SpikeInput = rgamma(10,1,1)
+SpikeInput <- rgamma(10,1,1)
 SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), 
                         "SpikeInput" = SpikeInput)
 
 # No batch structure
-DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo)
+DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo)
 
 # With batch structure
-DataExample = newBASiCS_Data(Counts, Tech, SpikeInfo, 
-                             BatchInfo = rep(c(1,2), each = 20)) 
+DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo, 
+                              BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
 Note: scRNA-seq datasets typically require quality control filtering before 
@@ -190,22 +193,21 @@ performing the analysis. This is in order to remove cells and/or transcripts
 with very low expression counts. The function `BASiCS_Filter` can be used to 
 perform this task. For examples, refer to `help(BASiCS_Filter)`.  
 
-Note: the `r Biocpkg("scater")` package provides enhanced functionality for the pre-processing of scRNA-seq datasets. 
+Note: the `r Biocpkg("scater")` package provides enhanced functionality for the 
+pre-processing of scRNA-seq datasets. 
 
 To convert an existing `SingleCellExperiment` object (`Data`) into one that can 
 be used within BASiCS, meta-information must be stored in the object.
 
-* `isSpike(Data, "ERCC")=Tech`: the logical vector indicating 
+* `isSpike(Data, "ERCC") <- Tech`: the logical vector indicating 
 biological/technical genes (see above) must be stored in the `int_metadata` 
 slot via the `isSpike` function.
 
 * `metadata(Data)`: the `SpikeInfo` and `BatchInfo` objects are stored in the 
 `metadata` slot of the `SingleCellExperiment` object: 
-`metadata(Data)=list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. 
+`metadata(Data) <- list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. 
 Once the additional information is included, 
 the object can be used within BASiCS.
-
-
 
 The generation of the input `SingleCellExperiment` object requires a matrix of 
 raw counts `Counts` (columns: cells, rows: genes) after quality control 
@@ -219,11 +221,11 @@ spike-ins are not available, a vector `BatchInfo` containing batch information
 is required. 
 
 
-### Analysis for a single group of cells
+## Analysis for a single group of cells
 
 We illustrate this analysis using a small extract from the MCMC chain obtained 
-in [2] when analysing the single cell samples provided in [5]. This is included 
-within `BASiCS` as the `ChainSC` dataset. 
+in [@vallejos2016beyond] when analysing the single cell samples provided in 
+[@grun2014validation]. This is included within `BASiCS` as the `ChainSC` dataset. 
 
 ```{r LoadSingleData}
 data(ChainSC)
@@ -243,8 +245,9 @@ For each gene, these functions return posterior probabilities as a measure of
 HVG/LVG evidence. A cut-off value for these posterior probabilities is set by 
 controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.10).
 
-```{r quick-start-HVGdetection, fig.height = 16, fig.width = 16}
-par(mfrow = c(2,2))
+```{r quick-start-HVGdetection, fig.height = 20, fig.width = 20}
+par(mfrow = c(2,2), cex.lab = 3)
+par(mar = c(6, 6, 4, 2) + 0.1)
 HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
 LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
 ```
@@ -272,9 +275,10 @@ find a threshold such that EFDR = EFNR).
 
 To illustrate the use of the differential mean expression and differential 
 over-dispersion tests between two cell populations, we use extracts from the 
-MCMC chains obtained in [2] when analysing the [5] dataset (single cells vs 
-pool-and-split samples). These were obtained by independently running the 
-`BASiCS_MCMC` function for each group of cells. 
+MCMC chains obtained in [@vallejos2016beyond] when analysing the 
+[@grun2014validation] dataset (single cells vs pool-and-split samples). These 
+were obtained by independently running the `BASiCS_MCMC` function for each 
+group of cells. 
 
 ```{r quick-start-LoadBothData}
 data(ChainSC)
@@ -286,7 +290,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
+                      Offset = TRUE, PlotOffset = TRUE, Plot = TRUE)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
@@ -313,33 +317,46 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = 0, EpsilonD = log2(1.5),
                       EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, OffsetPlot = TRUE, Plot = TRUE)
+                      Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
 ```
 
 # Alternative implementation modes
 
-This section provides details on sampling strategies when technical spike-in 
-molecules are not present or when adjusting the mean confounding effect
-for testing differential variability.
+Beyond is original implementation, BASiCS has been extended to adress 
+experimental designs in which spike-in molecules are not available as well as 
+to address the confounding that is typically observed between mean and 
+over-dispersion for scRNA-seq datasets [@eling2017robust]. Alternative 
+implementation modes are summarised below:
 
-## No-spikes version
+<img src="./AlternativeModels.png" height="400px" width="600px" />
 
-When technical spike-in genes are not available, BASiCS can be run via the 
-horizontal integration approach. 
+As a default, the `BASiCS_MCMC` function uses `WithSpikes = TRUE` and 
+`Regression = FALSE`.
 
-## Regression version
+## If `WithSpikes = FALSE`
 
-To obtain residual over-dispersion estimates that do not correlate to mean expression
-parmaters, the following code can be used.
+When technical spike-in genes are not available, BASiCS uses a horizontal 
+integration strategy which borrows information across multiple technical 
+replicates. Therefore, `BASiCS_MCMC` will fail to run if a single batch of
+samples is provided. **Note:** batch information must be provided via the 
+`BatchInfo` argument when using the `newBASiCS_Data` function. 
 
-```{r, eval=FALSE}
-Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
-                     PrintProgress = FALSE, Regression = TRUE)
-```
+## If `Regression = TRUE`
 
-Additional parameters for this sampler include: `k` number of regression components
-(`k`-2 radial basis functions, one intercept and one linear component), `Var` the scale
-parameter influencing the width of the basis functions and `eta` the degrees of freedom.
+The *regression* implementation of BASiCS uses an informative prior formulation 
+to account for the relationship between mean and over-dispersion gene-specific 
+parameters. The latter is used to infer a global trend between these parameters
+and, subsequently, to derive a *residual over-dispersion* measure that is 
+derived by departures with respect to this trend. 
+
+This implementation provides additional functionality when performing 
+downstream analyses. These are illustrated below using a small extract from 
+the MCMC chain obtained when analysing the dataset provided in 
+[@grun2014validation] (single cell versus pool-and-split samples). These are 
+included within `BASiCS` as the `ChainSCReg` and `ChainRNAReg` datasets. 
+
+
+
 
 To visualize the fit between over-dispersion $\delta_i$ and mean expression $\mu_i$
 the following function can be used.
@@ -359,7 +376,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       PsiE = log2(1.5)/log2(exp(1)),
                       EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, OffsetPlot = FALSE, Plot = FALSE)
+                      Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
 ```
 
 This test function outputs an extra slot containing the results for testing 
@@ -371,11 +388,9 @@ can be tested for changes in expression variability.
 head(Test$TableResDisp)
 ```
 
-## No-spike and regression version
-
-The following code chunks explain the usage of sampling when no technical spike-in
-genes are available and when regression between over-dispersion and mean expression
-parameters should be performed.
+**Note:** Additional parameters for this sampler include: `k` number of regression components
+(`k`-2 radial basis functions, one intercept and one linear component), `Var` the scale
+parameter influencing the width of the basis functions and `eta` the degrees of freedom.
 
 # Additional details
 
@@ -601,40 +616,14 @@ Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute
 
 ***
 
-# References
-
-[1] Vallejos CA, Marioni JCM and Richardson S (2015) BASiCS: Bayesian analysis 
-of single-cell sequencing data. *PLoS Computational Biology* 11 (6), e1004333.
-
-[2] Vallejos CA, Richardson S and Marioni JCM (2016) Beyond comparisons of 
-means: understanding changes in gene expression at the single-cell level. 
-*Genome Biology* 17 (1), 1-14.
-
-[3] Martinez-Jimenez CP, Eling N, Chen H, Vallejos CA, Kolodziejczyk AA, 
-Connor F, Stojic L, Rayner TF, Stubbington MJT, Teichmann SA, de la Roche M, 
-Marioni JC and Odom DT (2017) Aging increases cell-to-cell transcriptional 
-variability upon immune stimulation. *Science* 355 (6332), 1433-1436.
-
-[4] Newton MA, Noueiry A, Sarkar D, Ahlquist P (2004) Detecting differential 
-gene expression with a semiparametric hierarchical mixture method. 
-*Biostatistics* 5 (2), 155-76.
-
-[5] Gr&uuml;n D, Kester L, van Oudenaarden A (2014) Validation of noise models 
-for single-cell transcriptomics. *Nature Methods* 11 (6), 637-40.
-
-[6] Vallejos CA, Risso D, Scialdone A, Dudoit S and Marioni JCM (2017) 
-Normalizing single-cell RNA-sequencing data: challenges and opportunities. 
-*Nature Methods* 14, 565-571.
-
-[7] Roberts GO and Rosenthal JS (2009). Examples of adaptive MCMC. 
-*Journal of Computational and Graphical Statistics* 18: 349-367. 
-
-[8] Eling N, Richard AC, Richardson S, Marioni JC and Vallejos CA (2017).
-Robust expression variability testing reveals heterogeneous T cell responses.
-*Under review*.
-
 # Session information
 
 ```{r SessionInfo}
 sessionInfo()
 ```
+
+***
+
+# References
+
+

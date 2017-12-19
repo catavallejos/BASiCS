@@ -157,6 +157,92 @@ setMethod("Summary",
             return(Output)
           })
 
+#' @name subset
+#' @aliases subset subset,BASiCS_Chain-method
+#' 
+#' @docType methods
+#' @rdname subset-BASiCS_Chain-method
+#' 
+#' @title A 'subset' method for `BASiCS_Chain`` objects
+#' 
+#' @description This can be used to extract a subset of a `BASiCS_Chain` object.
+#' The subset can contain specific genes, cells or MCMC iterations
+#' 
+#' @param x A \code{\linkS4class{BASiCS_Chain}} object.
+#' @param Genes A vector of characters indicating what genes will be extracted.
+#' @param Cells A vector of characters indicating what cells will be extrated.
+#' @param Iterations Numeric vector of positive integers indicating which MCMC 
+#' iterations will be extracted. The maximum value in \code{Iterations} must be
+#' less or equal than the total number of iterations contained in the original
+#' \code{\linkS4class{BASiCS_Chain}} object.
+#' 
+#' @return An object of class \code{\linkS4class{BASiCS_Chain}}. 
+#' 
+#' @examples 
+#' 
+#' help(BASiCS_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' 
+setMethod("subset",
+          signature = "BASiCS_Chain",
+          definition = function(x, Genes = NULL, 
+                                Cells = NULL, Iterations = NULL){
+            
+            N <- nrow(displayChainBASiCS(x, Param = "mu"))
+            q <- ncol(displayChainBASiCS(x, Param = "mu"))
+            n <- ncol(displayChainBASiCS(x, Param = "nu"))
+            GeneName <- colnames(displayChainBASiCS(x, Param = "mu"))
+            CellName <- colnames(displayChainBASiCS(x, Param = "nu")) 
+            
+            # Checking for valid arguments + assigning default values
+            if(is.null(Iterations)) { Iterations <- seq_len(N) }
+            else {
+              stopifnot( all(Iterations == floor(Iterations)) )  
+              stopifnot(min(Iterations) >= 1, max(Iterations) <= N )
+            }
+            if(is.null(Genes)) { Genes <- GeneName }
+            else {
+              if(sum(!(Genes %in% GeneName)) > 0)
+                stop("Some elements of 'Genes' are not present in the data")
+            }
+            if(is.null(Cells)) { Cells <- CellName }
+            else {
+              if(sum(!(Cells %in% CellName)) > 0)
+                stop("Some elements of 'Cells' are not present in the data")
+            }
+            
+            SelGenes <- GeneName %in% Genes
+            SelCells <- CellName %in% Cells
+            Params <- names(x@parameters)
+            
+            out <- list() 
+            for(p in seq_len(length(Params))) {
+              if(Params[p] %in% c("theta", "beta", "sigma2"))
+              {
+                out[[p]] <- get(Params[p], x@parameters)[Iterations, , drop = FALSE]  
+              }
+              else 
+              {
+                if(Params[p] %in% c("mu", "delta", "lambda", "epsilon")) {
+                  Sel <- SelGenes
+                }
+                if(Params[p] %in% c("phi", "s", "nu"))
+                {
+                  Sel <- SelCells 
+                }
+                out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel] 
+              }
+            }
+            names(out) <- Params
+            
+            # Transform into BASiCS_Chain class object
+            out1 <- newBASiCS_Chain(parameters = out)
+            out1@.__classVersion__$BASiCS_Chain <- x@.__classVersion__$BASiCS_Chain
+  
+            return(out1)
+          })
+
 #' @name plot-BASiCS_Chain-method
 #' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
 #' 

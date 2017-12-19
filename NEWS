@@ -769,8 +769,13 @@ version 1.1.22: (2017-12-15)
 version 1.1.23: (2017-12-18)
 - Minor improvements to documentation 
 
-version 1.1.24: (2017-12-18) - WIP
+version 1.1.24: (2017-12-18)
 - Reduced no of iterations in unit test for quicker testing
 - library `hexbin` added to imports (required for `showFit`)
 - Vignette edits (simplification of Quick Start)
 
+version 1.1.25: (2017-12-19)
+- Vignette bibliography moved to .bib file
+- Added diagram to summarise different implementations
+- Reduced size of example objects
+- `subset` method created for `BASiCS_Chain` objects
