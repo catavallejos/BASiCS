@@ -43,35 +43,36 @@ uncertainty by simultaneously performing data normalisation (global scaling),
 technical noise quantification and two types of **supervised** downstream 
 analyses: 
 
-- **For a single group of cells** [1]: BASiCS provides a criterion to identify 
+1. **For a single group of cells** [1]: BASiCS provides a criterion to identify 
 highly (and lowly) variable genes within the group. 
-
-- **For two (or more) groups of cells** [2]: BASiCS allows the identification 
+2. **For two (or more) groups of cells**: BASiCS allows the identification 
 of differentially expressed genes between the groups. As in traditional 
 differential expression tools, BASiCS can uncover changes in mean expression 
 between the groups. Besides this, BASiCS can also uncover changes in gene 
-expression variability in terms of:
+expression variability in terms of: 
+  a. **Over-dispersion** [2] --- a measure for the excess of cell-to-cell 
+  variability (with respect to Poisson sampling) that is observed after 
+  accounting for technical noise. This feature has led, for example, to novel 
+  insights in the context of immune cells across aging [3]. Due to the strong 
+  mean/over-dispersion confounding that is typically observed for scRNA-seq 
+  experiments, the assessment of changes in over-dispersion is restricted to 
+  genes for which mean expression does not change between the groups.
+  b. **Residual over-dispersion** [8] --- a residual measure of variability  
+  given by departures with respect to a global mean/over-dispersion trend. 
+  Positive residual over-dispersion indicates that a gene exhibits more 
+  variation than expected relative to genes with similar expression levels;
+  negative esidual over-dispersion suggests less variation than expected.
 
-  1. **Over-dispersion** --- a measure for the residual cell-to-cell 
-  variation that is observed after accounting for technical noise. This feature 
-  has led, for example, to novel insights in the context of immune cells across 
-  aging [3]. Due to the confounding effect that is typically observed 
-  
-  2. **Residual over-dispersion** 
-  
-  
-More recently, BASiCS has been extended to account for 
-
-In both cases, a probabilistic output is provided, with a decision rule that is
+In all cases, a probabilistic output is provided, with a decision rule that is
 calibrated through the expected false discovery rate (EFDR) [4].
 
-The original implementation of BASiCS [1] requires the use of **spike-in** 
+A brief description for the statistical model implemented in BASiCS is 
+provided in Section \@ref(methodology) of this document. While the original 
+implementation of BASiCS [1] requires the use of **spike-in** 
 molecules --- that are artificially introduced to each cell's lysate 
 --- to perform these analyses. However, the current release of BASiCS has been
-extended to also address experiments where spikes-in are not available. 
-
-A brief description for the statistical model implemented in BASiCS is 
-provided in the "Methodology" section of this document. 
+extended to also address experiments for which spikes-ins are not available 
+(see Section \@ref(alternative-implementation-modes)).
 
 **Important**: BASiCS has been designed in the context of supervised experiments 
 where the groups of cells (e.g. experimental conditions, cell types) under study 
@@ -83,33 +84,58 @@ sub-populations of cells through clustering.
 
 # Quick start
 
-This section introduces the main functionality of BASiCS which include the generation
-of a `r Biocpkg("SingleCellExperiment")` object prior ro running the MCMC sampler. 
-To generate the `SingleCellExperiment` object, it requires a matrix of raw 
-transcript counts `Counts` (columns: cells, rows: genes) 
-after quality control (e.g. removing low quality cells) and filtering of lowly 
-expressed genes. A logical vector `Tech` indicates which row contains technical
-spike-in molecules and a data.frame object `SpikeInfo` contains the names of
-the spike-in molecules in the first column and the absolute number of molecules 
-per well in the second column. Section \@ref(different-sampling-modes) provides 
-details on the case when technical spike-in molecules are not available.
+Parameter estimation is performed using the `BASiCS_MCMC` function. Downstream
+analyses implemented in BASiCS rely on appropriate post-processing of the 
+output returned by `BASiCS_MCMC`. Essential parameters for running 
+`BASiCS_MCMC` are: 
 
-To run the MCMC sampler, a `SingleCellExperiment` object is required as well as 
-an input for the total number of iterations `N`, a thinning constant `Thin` and
-the burn-in period `Burn`. For performing a regression between mean and over-dispersion
-values, the paramter `Regression=TRUE` can be added (see section \@ref(different-sampling-modes)).
+* `Data`: a `SingleCellExperiment` object created as in Section 
+\@ref(the-input-dataset)
+* `N`: total number of iterations
+* `Thin`: length of the thining period (i.e. only every `Thin` 
+iterations will be stored in the output of the `BASiCS_MCMC`)
+* `Burn`: length of burn-in period (i.e. the initial `Burn` 
+iterations that will be discarded from the output of the `BASiCS_MCMC`)
 
-To perform differential testing (mean and variance), two `Chain` objects are 
-required. These are obtained by running the sampler on cells from two conditions
-separately.
+If the optional parameter `PrintProgress` is set to `TRUE`, the R 
+console will display the progress of the MCMC algorithm. 
+For other optional parameters refer to `help(BASiCS_MCMC)`. 
 
-```{r, eval=FALSE}
-Data <- newBASiCS_Data(Counts, Tech, SpikeInfo)
+Here, we illustrate the usage of `BASiCS_MCMC` using a built-in 
+synthetic dataset.
 
-Chain <- BASiCS_MCMC(Data = Data, N = 40000, Thin = 20, Burn = 20000)
-
-Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA)
+```{r quick-start-MCMC}
+Data <- makeExampleBASiCS_Data()
+Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
+                     PrintProgress = FALSE)
 ```
+
+EDIT HERE!!
+
+As a default, the code above runs 
+
+For performing a regression between mean and over-dispersion
+values, the paramter `Regression=TRUE` can be added (see section \@ref(alternative-implementation-modes)).
+
+
+**Important remarks:**
+
+- Please ensure the acceptance rates displayed in the console output of 
+`BASiCS_MCMC` are around 0.44. If they are too far from this value, you 
+should increase `N` and `Burn`. 
+
+- It is **essential** to assess the convergence of the MCMC algorithm 
+**before** performing downstream analyses. For guidance regarding this step, 
+refer to the 'Convergence assessment' section of this vignette
+
+Typically, setting `N=20000`, `Thin=20` and `Burn=10000` leads to 
+stable results. 
+
+
+
+
+
+
 
 # Complete workflow
 
@@ -179,42 +205,19 @@ slot via the `isSpike` function.
 Once the additional information is included, 
 the object can be used within BASiCS.
 
-## Running the MCMC sampler
 
-Parameter estimation is performed using the `BASiCS_MCMC` function. 
-Essential parameters for running this algorithm are: 
 
-* `N`: total number of iterations
-* `Thin`: length of the thining period (i.e. only every `Thin` 
-iterations will be stored in the output of the `BASiCS_MCMC`)
-* `Burn`: length of burn-in period (i.e. the initial `Burn` 
-iterations that will be discarded from the output of the `BASiCS_MCMC`)
+The generation of the input `SingleCellExperiment` object requires a matrix of 
+raw counts `Counts` (columns: cells, rows: genes) after quality control 
+(e.g. removing low quality cells) and filtering of lowly expressed genes. If 
+spike-in molecules are contained in `Counts`, a logical vector `Tech` is 
+required to indicate which rows contain technical spike-in molecules and a 
+`data.frame` object `SpikeInfo` containing the names of the spike-in molecules 
+in the first column and the absolute number of molecules per well in the second 
+column. More details are provided in section \@ref(the-input-dataset). If 
+spike-ins are not available, a vector `BatchInfo` containing batch information
+is required. 
 
-If the optional parameter `PrintProgress` is set to `TRUE`, the R 
-console will display the progress of the MCMC algorithm. 
-For other optional parameters refer to `help(BASiCS_MCMC)`. 
-
-Here, we illustrate the usage of `BASiCS_MCMC` using a built-in 
-synthetic dataset.
-
-```{r quick-start-MCMC}
-Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
-                     PrintProgress = FALSE)
-```
-
-**Important remarks:**
-
-- Please ensure the acceptance rates displayed in the console output of 
-`BASiCS_MCMC` are around 0.44. If they are too far from this value, you 
-should increase `N` and `Burn`. 
-
-- It is **essential** to assess the convergence of the MCMC algorithm 
-**before** performing downstream analyses. For guidance regarding this step, 
-refer to the 'Convergence assessment' section of this vignette
-
-Typically, setting `N=20000`, `Thin=20` and `Burn=10000` leads to 
-stable results. 
 
 ### Analysis for a single group of cells
 

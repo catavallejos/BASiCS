@@ -49,7 +49,8 @@
 #' @references 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
-newBASiCS_Data <- function(Counts, Tech, SpikeInfo=NULL, BatchInfo = NULL) 
+newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)), 
+                           SpikeInfo = NULL, BatchInfo = NULL) 
 {
   # Validity checks for SpikeInfo
   if(!is.null(SpikeInfo)){
@@ -58,7 +59,7 @@ newBASiCS_Data <- function(Counts, Tech, SpikeInfo=NULL, BatchInfo = NULL)
     if (data.table::is.data.table(SpikeInfo)) 
         stop("'SpikeInfo' must be a 'data.frame'")
   }
-    
+  
   if (is.null(BatchInfo)) { BatchInfo <- rep(1, times = ncol(Counts)) }
     
   # Re-ordering genes

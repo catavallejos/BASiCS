@@ -18,7 +18,8 @@ parameters \eqn{\delta_i}, biological genes only
 (matrix with \code{q.bio} columns, all elements must be positive numbers)}
 \item{phi}{MCMC chain for cell-specific mRNA content normalisation parameters 
 \eqn{\phi_j} (matrix with \code{n} columns, all elements must be positive 
-numbers and the sum of its elements must be equal to \code{n})}
+numbers and the sum of its elements must be equal to \code{n})}.
+This parameter is only used when spike-in genes are available.
 \item{s}{MCMC chain for cell-specific technical normalisation parameters 
 \eqn{s_j} (matrix with \code{n} columns, 
 all elements must be positive numbers)}
