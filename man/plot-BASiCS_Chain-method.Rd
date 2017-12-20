@@ -9,14 +9,16 @@
 \title{'plot' method for BASiCS_Chain objects}
 \usage{
 \S4method{plot}{BASiCS_Chain,ANY}(x, Param = "mu", Gene = NULL,
-  Cell = NULL, Batch = 1, ylab = "", xlab = "", ...)
+  Cell = NULL, Batch = 1, RegressionTerm = NULL, ylab = "", xlab = "",
+  ...)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
 \item{Param}{Name of the slot to be used for the plot. 
 Possible values: \code{'mu'}, \code{'delta'}, 
-\code{'phi'}, \code{'s'}, \code{'nu'} and \code{'theta'}}
+\code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, 
+\code{'beta'}, \code{'sigma2'} and \code{'epsilon'}.}
 
 \item{Gene}{Specifies which gene is requested. 
 Required only if \code{Param = 'mu'} or \code{'delta'}}
@@ -26,6 +28,9 @@ Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
 
 \item{Batch}{Specifies which batch is requested. 
 Required only if \code{Param = 'theta'}}
+
+\item{RegressionTerm}{Specifies which regression coefficient is requested. 
+Required only if \code{Param = 'beta'}}
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 
@@ -45,9 +50,8 @@ A plot object
 help(BASiCS_MCMC)
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

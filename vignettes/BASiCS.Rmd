@@ -259,12 +259,16 @@ head(HVG$Table)
 head(LVG$Table)
 ```
 
+<!---
+
 ```{r quick-start-HVGdetectionPlot, fig.width=8, fig.height=8}
 SummarySC <- Summary(ChainSC)
 plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
 with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
 with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
 ```
+
+--->
 
 **Note**: this criteria for threshold has changed with respect to the original 
 release of BASiCS (where `EviThreshold` was defined such that EFDR = EFNR). 
@@ -290,7 +294,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, PlotOffset = TRUE, Plot = TRUE)
+                      Offset = TRUE, PlotOffset = FALSE, Plot = TRUE)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
@@ -355,9 +359,6 @@ the MCMC chain obtained when analysing the dataset provided in
 [@grun2014validation] (single cell versus pool-and-split samples). These are 
 included within `BASiCS` as the `ChainSCReg` and `ChainRNAReg` datasets. 
 
-
-
-
 To visualize the fit between over-dispersion $\delta_i$ and mean expression $\mu_i$
 the following function can be used.
 
@@ -385,7 +386,7 @@ differences in residual over-dispersion. Only genes that are expressed in at lea
 can be tested for changes in expression variability.
 
 ```{r}
-head(Test$TableResDisp)
+head(Test$TableResDisp, n = 2)
 ```
 
 **Note:** Additional parameters for this sampler include: `k` number of regression components
@@ -423,10 +424,10 @@ For example:
 
 ```{r Traceplots, fig.height = 8, fig.width = 16}
 plot(Chain, Param = "mu", Gene = 1, log = "y")
-plot(Chain, Param = "phi", Cell = 1)
 ```
 
-In the figures above:
+See `help(BASiCS_MCMC)` for example plots associated to other model parameters.
+In the figure above:
 
 - Left panels show traceplots for the chains
 - Right panels show the autocorrelation function (see `?acf`)
@@ -436,7 +437,7 @@ In the figures above:
 To access the MCMC chains associated to individual parameter use the function `displayChainBASiCS`. For example, 
 
 ```{r AccessChains}
-displayChainBASiCS(Chain, Param = "mu")[1:5,1:5]
+displayChainBASiCS(Chain, Param = "mu")[1:2,1:2]
 ```
 
 As a summary of the posterior distribution, the function `Summary` calculates 
@@ -451,7 +452,7 @@ The function `displaySummaryBASiCS` extract posterior summaries for individual
 parameters. For example
 
 ```{r SummaryExample}
-head(displaySummaryBASiCS(ChainSummary, Param = "mu"))
+head(displaySummaryBASiCS(ChainSummary, Param = "mu"), n = 2)
 ```
 
 
@@ -459,14 +460,15 @@ The following figures display posterior medians and the corresponding HPD 95%
 intervals for gene-specific parameters $\mu_i$ (mean) and $\delta_i$ 
 (over-dispersion)
 
-```{r OtherHPD, fig.width = 16, fig.height = 16}
-par(mfrow = c(2,2))
+```{r OtherHPD, fig.width = 16, fig.height = 8}
+par(mfrow = c(1,2))
 plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
-plot(ChainSummary, Param = "mu", Genes = 1:10, main = "First 10 genes")
-plot(ChainSummary, Param = "delta", main = "All genes")
 plot(ChainSummary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
 ```
 
+See `help(BASiCS_MCMC)` for example plots associated to other model parameters.
+
+<!---
 It is also possible to obtain similar summaries for the normalising constants 
 $\phi_j$ and $s_j$. 
 
@@ -475,7 +477,9 @@ par(mfrow = c(1,2))
 plot(ChainSummary, Param = "phi")
 plot(ChainSummary, Param = "s", Cells = 1:5)
 ```
+--->
 
+<!---
 Finally, it is also possible to create a scatterplot of posterior estimates for gene-specific parameters. Typically, this plot will exhibit the confounding 
 effect that is observed between mean and over-dispersion. 
 
@@ -487,6 +491,7 @@ plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE)
 
 The option `SmoothPlot = TRUE` is generally recommended as this plot will 
 contain thousands of genes when analysing real datasets. 
+--->
 
 ## Normalisation and removal of technical variation
 
@@ -502,9 +507,12 @@ $\hat{\phi}_j$ denotes the posterior median of $\phi_j$ and $\hat{\nu}_j$ is
 the posterior median of $\nu_j$.
 
 ```{r DenoisedCounts}
-DenoisedCounts = BASiCS_DenoisedCounts(Data = Data, Chain = Chain)
-DenoisedCounts[1:5, 1:5]
+DenoisedCounts <- BASiCS_DenoisedCounts(Data = Data, Chain = Chain)
+DenoisedCounts[1:2, 1:2]
 ```
+
+**Note: the output of `BASiCS_DenoisedCounts` requires no further 
+data normalisation.**
 
 Alternativelly, the user can compute the normalised and denoised expression 
 rates underlying the expression of all genes across cells using 
@@ -519,16 +527,16 @@ on the MCMC sample of all model parameters).
 ```{r DenoisedProp}
 DenoisedRates <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
                                       Propensities = FALSE)
-DenoisedRates[1:5, 1:5]
+DenoisedRates[1:2, 1:2]
 ```
 
 Alternative, denoised expression propensities $\hat{\rho}_{ij}$ can 
 also be extracted
 
 ```{r DenoisedRates}
-DenoisedProp = BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
+DenoisedProp <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
                                     Propensities = TRUE)
-DenoisedProp[1:5, 1:5]
+DenoisedProp[1:2, 1:2]
 ```
 
 # Methodology
@@ -539,10 +547,13 @@ of cells.
 Throughout, we consider the expression counts of $q$ genes, where $q_0$ are 
 expressed in the population of cells under study (biological genes) and the 
 remaining $q-q_0$ are extrinsic spike-in (technical) genes. Let $X_{ij}$ be a 
-random variable representing the expression count of a gene $i$ in cell $j$  ($i=1,\ldots,q$; $j=1,\ldots,n$). BASiCS is based on the following hierarchical
+random variable representing the expression count of a gene $i$ in cell $j$  
+($i=1,\ldots,q$; $j=1,\ldots,n$). BASiCS is based on the following hierarchical
 model: $$X_{ij}  \big| \mu_i, \phi_j, \nu_j, \rho_{ij} \sim \left\{ \begin{array}{ll} \mbox{Poisson}(\phi_j \nu_j \mu_i \rho_{ij}), \mbox{  for }i=1,\ldots,q_0, j=1,\ldots,n \\ \mbox{Poisson}(\nu_j \mu_i), \mbox{  for }i=q_0+1,\ldots,q, j=1,\ldots,n, \end{array} \right.$$
 
-where $\nu_j$ and $\rho_{ij}$ are mutually independent random effects such that $\nu_j|s_j,\theta \sim \mbox{Gamma}(1/\theta,1/ (s_j \theta))$ and $\rho_{ij} | \delta_i \sim \mbox{Gamma} (1/\delta_i,1/\delta_i)$[^footnoteGamma]. 
+where $\nu_j$ and $\rho_{ij}$ are mutually independent random effects such that 
+$\nu_j|s_j,\theta \sim \mbox{Gamma}(1/\theta,1/ (s_j \theta))$ and 
+$\rho_{ij} | \delta_i \sim \mbox{Gamma} (1/\delta_i,1/\delta_i)$[^footnoteGamma]. 
 
 A graphical representation of this model is displayed below. This is based on 
 the expression counts of 2 genes ($i$: biological and $i'$: technical) at 2 
@@ -554,8 +565,7 @@ structure, red circular nodes relate to unknown model parameters in the top
 layer of hierarchy in our model. Blue, green and grey areas highlight elements 
 that are shared within a biological gene, technical gene or cell, respectively. 
 
-<img src="./BASiCS_DAG.jpg" height="400px" width="600px" />
-\centerline{\includegraphics[height=4in]{./BASiCS_DAG.jpg}}
+<img src="./BASiCS_DAG.jpg" height="320px" width="480px" />
 
 In this setting, the key parameters to be used for downstream analyses are:
 
@@ -573,7 +583,8 @@ Additional (nuisance) parameters are interpreted as follows:
 content (identifiability constrain: $\sum_{j=1}^n \phi_j = n$). 
 
 * $s_j$: cell-specific normalizing parameters related to technical cell-specific 
-biases (for more details regarding this interpretation see [6]).
+biases (for more details regarding this interpretation see 
+[@vallejos2017normalizing]).
 
 * $\theta$: technical over-dispersion parameter, controlling the strenght of 
 cell-to-cell technical variability. 
@@ -583,15 +594,17 @@ this model is extended so that the technical over-dispersion parameter $\theta$
 is batch-specific. This extension allows a different strenght of technical noise 
 to be inferred for each batch of cells.  
 
-[^footnoteGamma]: We parametrize the Gamma distribution such that if $X \sim \mbox{Gamma}(a,b)$, then $\mbox{E}(X)=a/b$ and $\mbox{var}(X)=a/b^2$.
+[^footnoteGamma]: We parametrize the Gamma distribution such that if 
+$X \sim \mbox{Gamma}(a,b)$, then $\mbox{E}(X)=a/b$ and $\mbox{var}(X)=a/b^2$.
 
-In [2], this model has been extended to cases where multiple groups of cells are 
-under study. This is achieved by assuming gene-specific parameters to be also group-specific. Based on this setup, evidence of differential expression is 
-quantified through log2-fold changes of gene-specific parameters 
-(mean and over-dispersion) between the groups. 
+In [@vallejos2016beyond], this model has been extended to cases where multiple 
+groups of cells are under study. This is achieved by assuming gene-specific 
+parameters to be also group-specific. Based on this setup, evidence of 
+differential expression is quantified through log2-fold changes of gene-specific 
+parameters (mean and over-dispersion) between the groups. 
 
 More details regarding the model setup, prior specification and implementation 
-are described in [1] and [2]. 
+are described in [@vallejos2015basics] and [@vallejos2016beyond]. 
 
 ***
 
@@ -599,20 +612,22 @@ are described in [1] and [2].
 
 We thank several members of the Marioni laboratory (EMBL-EBI; CRUK-CI) for 
 support and discussions throughout the development of this R library. 
-In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and 
+In particular, we are grateful to Aaron Lun (LTLA) for advise and 
 support during the preparation the Bioconductor submission. 
 
 We also acknowledge feedback and contributions from (Github aliases provided 
-within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), 
-Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), 
-Jens Preu&szlig;ner (@jenzopr), Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), Simon Anders (@s-andrews), Yongchao Ge and 
-Yuan Cao (@yuancao90), among others. 
+within parenthesis): Ben Dulken (bdulken), Chang Xu (xuchang116), 
+Danilo Horta (Horta), Dmitriy Zhukov (dvzhukov), 
+Jens Preu&szlig;ner (jenzopr), Joanna Dreux (Joannacodes), 
+Kevin Rue-Albrecht (kevinrue), Luke Zappia (lazappi), Simon Anders (s-andrews), 
+Yongchao Ge and Yuan Cao (yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. 
 MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European 
 Bioinformatics Institute (core European Molecular Biology Laboratory funding; 
 Catalina Vallejos, Nils Eling and John Marioni), CRUK Cambridge Institute 
-(core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
+(core CRUK funding; John Marioni) and The Alan Turing Institute (EPSRC grant no. 
+EP/N510129/1; Catalina Vallejos). 
 
 ***
 

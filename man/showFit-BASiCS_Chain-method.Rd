@@ -24,19 +24,20 @@
 
 \item{bty}{As in \code{\link[graphics]{par}}.}
 
-\item{smooth}{Logical to indicate wether the smoothScatter function is used to plot the scatter plot.}
+\item{smooth}{Logical to indicate wether the smoothScatter function is used 
+to plot the scatter plot.}
 
 \item{variance}{Variance used to build GRBFs for regression}
 
 \item{...}{Additional parameters for plotting.}
 }
 \description{
-Plotting the trend after Bayesian regression using a \code{\link[BASiCS]{BASiCS_Chain-class}} object
+Plotting the trend after Bayesian regression using a 
+\code{\link[BASiCS]{BASiCS_Chain-class}} object
 }
 \examples{
-Data = makeExampleBASiCS_Data()
-MCMC_Output <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2, Regression = TRUE)
-showFit(MCMC_Output)
+data(ChainRNAReg)
+showFit(ChainRNAReg)
 
 }
 \references{

@@ -23,9 +23,8 @@ Prints a summary of the properties of \code{object}.
 help(BASiCS_MCMC)
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

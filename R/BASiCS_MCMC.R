@@ -361,7 +361,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   colnames(Chain$mu) <- rownames(assay(Data))[!isSpike(Data)]
   colnames(Chain$delta) <- rownames(assay(Data))[!isSpike(Data)]
   if(Regression == TRUE) { 
-    colnames(Chain$epsilon) = colnames(Chain$lambda) = colnames(Chain$mu) }
+    colnames(Chain$epsilon) <- colnames(Chain$mu) 
+    Chain$lambda <- NULL # Remove to reduce storage
+  }
   CellLabels <- paste0(colnames(assay(Data)), "_Batch", metadata(Data)$BatchInfo)
   colnames(Chain$s) <- CellLabels
   if(WithSpikes == FALSE) colnames(Chain$phi) <- CellLabels 
