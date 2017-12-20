@@ -28,15 +28,14 @@ all elements must be positive numbers)}
 \item{theta}{MCMC chain for technical over-dispersion parameter(s) 
 \eqn{\theta} (matrix, all elements must be positive, 
 each colum represents 1 batch)}
-\item{\code{beta}}{MCMC chain for regression parameters
-(matrix with \code{k} columns where k represent the number of chosen basis functions) }
-\item{\code{sigma2}}{MCMC chain for the variance used during regression
-(matrix with one column, sigma2 represents a gloabl parameter)}
-\item{\code{eta}}{MCMC chain for the degrees of freedom used for regression
-(matrix with one column)}
-\item{\code{lambda}}{MCMC chain for the gene-specific random effect on the regression variance
-(matrix with \code{q} columns)}
-\item{\code{epsilon}}{MCMC chain for the gene specific regression residue (mean corrected vraribility)
+\item{\code{beta}}{Only used for regression model. MCMC chain for regression 
+coefficients (matrix with \code{k} columns, where \code{k} represent the 
+number of chosen basis functions + 2) }
+\item{\code{sigma2}}{Only used for regression model. MCMC chain for the 
+residual variance (matrix with one column, sigma2 represents 
+a global parameter)}
+\item{\code{epsilon}}{Only used for regression model. MCMC chain for the 
+gene specific residual over-dispersion parameter (mean corrected vraribility)
 (matrix with \code{q} columns)}
 }}
 }
@@ -50,7 +49,27 @@ object from pre-computed MCMC chains.
 \examples{
 
 Data <- makeExampleBASiCS_Data()
+
+# No regression model
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5)
+
+ChainMu <- displayChainBASiCS(Chain, 'mu')
+ChainDelta <- displayChainBASiCS(Chain, 'delta')
+ChainPhi <- displayChainBASiCS(Chain, 'phi')
+ChainS <- displayChainBASiCS(Chain, 's')
+ChainNu <- displayChainBASiCS(Chain, 'nu')
+ChainTheta <- displayChainBASiCS(Chain, 'theta')
+
+ChainNew <- newBASiCS_Chain(parameters = list(mu = ChainMu, 
+                                              delta = ChainDelta,
+                                              phi = ChainPhi, 
+                                              s = ChainS, 
+                                              nu = ChainNu, 
+                                              theta = ChainTheta))
+                            
+
+# No regression model
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, Regression = TRUE)
 
 ChainMu <- displayChainBASiCS(Chain, 'mu')
 ChainDelta <- displayChainBASiCS(Chain, 'delta')
@@ -60,24 +79,24 @@ ChainNu <- displayChainBASiCS(Chain, 'nu')
 ChainTheta <- displayChainBASiCS(Chain, 'theta')
 ChainBeta <- displayChainBASiCS(Chain, 'beta')
 ChainSigma2 <- displayChainBASiCS(Chain, 'sigma2')
-ChainEta <- displayChainBASiCS(Chain, 'eta')
-ChainLambda <- displayChainBASiCS(Chain, 'lambda')
 ChainEpsilon <- displayChainBASiCS(Chain, 'epsilon')
 
-ChainNew <- newBASiCS_Chain(parameters = list(mu = ChainMu, delta = ChainDelta,
-                            phi = ChainPhi, s = ChainS, 
-                            nu = ChainNu, theta = ChainTheta,
-                            beta = ChainBeta, sigma2 = ChainSigma2,
-                            eta = ChainEta, lambda = ChainLambda,
-                            epsilon = ChainEpsilon))
+ChainNew <- newBASiCS_Chain(parameters = list(mu = ChainMu, 
+                                              delta = ChainDelta,
+                                              phi = ChainPhi, 
+                                              s = ChainS, 
+                                              nu = ChainNu, 
+                                              theta = ChainTheta,
+                                              beta = ChainBeta, 
+                                              sigma2 = ChainSigma2,
+                                              epsilon = ChainEpsilon))
 
-}
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}, Nils Eling
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

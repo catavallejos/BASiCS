@@ -36,25 +36,19 @@ parameters \eqn{s[j]}}
 (3rd column) limits of technical over-dispersion parameter(s) \eqn{\theta} 
 (each row represents one batch)}
 \item{\code{beta}}{Posterior median (first column), lower (second column) 
-and upper (third column) limits of regression parameters \eqn{\beta}}
+and upper (third column) limits of regression coefficients \eqn{\beta}}
 \item{\code{sigma2}}{Posterior median (first column), lower (second column) 
-and upper (third column) limits of regression variance \eqn{\sigma^2}}
-\item{\code{eta}}{Posterior median (first column), lower (second column) 
-and upper (third column) limits of hype-parameter \eqn{\eta} for random 
-effect on regression variance}
-\item{\code{lambda}}{Posterior median (first column), lower (second column) 
-and upper (third column) limits of random effect \eqn{\lambda} on regression 
-variance}
+and upper (third column) limits of residual variance \eqn{\sigma^2}}
 \item{\code{epsilon}}{Posterior median (first column), lower (second column) 
-and upper (third column) limits of regression residue \eqn{\epsilon} 
-(mean adjusted over-dispersion)}
+and upper (third column) limits of gene-specific residual over-dispersion 
+parameter \eqn{\epsilon} }
 }}
 }}
 
 \examples{
 
 # A BASiCS_Summary object created by the Summary method.
-Data = makeExampleBASiCS_Data()
+Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 ChainSummary <- Summary(Chain)
 

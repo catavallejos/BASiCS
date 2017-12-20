@@ -380,7 +380,7 @@ setMethod("displayChainBASiCS",
           signature = "BASiCS_Chain", 
           definition = function(object, Param = "mu") 
           {
-            if (!(Param %in% names(x@parameters))) 
+            if (!(Param %in% names(object@parameters))) 
               stop("'Param' argument is invalid")
     
             if (Param == "mu") { return(object@parameters$mu) }

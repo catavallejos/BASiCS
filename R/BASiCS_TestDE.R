@@ -15,9 +15,9 @@
 #' @param EpsilonD Minimum fold change tolerance threshold for detecting 
 #' changes in biological over-dispersion (must be a positive real number). 
 #' Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).
-#' @param PsiE Minimum distance threshold for detecting 
+#' @param EpsilonR Minimum distance threshold for detecting 
 #' changes in residual over-dispersion (must be a positive real number). 
-#' Default value: \code{PsiE= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).
+#' Default value: \code{EpsilonR= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).
 #' @param ProbThresholdM Optional parameter. Probdence threshold for detecting 
 #' changes in overall expression (must be a positive value, between 0 and 1)
 #' @param ProbThresholdD Optional parameter. Probdence threshold for detecting 
@@ -181,7 +181,7 @@
 #' Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
 #'                       GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
 #'                       EpsilonM = log2(1.5), EpsilonD = log2(1.5), 
-#'                       PsiE = log2(1.5)/log2(exp(1)),
+#'                       EpsilonR = log2(1.5)/log2(exp(1)),
 #'                       OffSet = TRUE)        
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
@@ -194,7 +194,7 @@ BASiCS_TestDE <- function(Chain1,
                           Chain2, 
                           EpsilonM = log2(1.5), 
                           EpsilonD = log2(1.5), 
-                          PsiE = log2(1.5)/log2(exp(1)),
+                          EpsilonR = log2(1.5)/log2(exp(1)),
                           ProbThresholdM = NULL, 
                           ProbThresholdD = NULL, 
                           ProbThresholdE = NULL,
@@ -419,7 +419,7 @@ BASiCS_TestDE <- function(Chain1,
     MedianPsi <- matrixStats::colMedians(ChainPsi)
     EpsilonBase <- (Summary1@parameters$epsilon[NotExcluded,1] * n1 + Summary2@parameters$epsilon[NotExcluded,1] * n2)/n
     
-    AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, PsiE, 
+    AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, EpsilonR, 
                                               ProbThresholdE, 
                                               GenesSelect[NotExcluded], 
                                               EFDR_E, 
@@ -623,7 +623,7 @@ BASiCS_TestDE <- function(Chain1,
             nResDispPlus1 + nResDispPlus2," genes with a change in residual over dispersion:\n", 
             "- Higher residual dispersion in ", GroupLabel1, " samples: ", nResDispPlus1,"\n", 
             "- Higher residual dispersion in ", GroupLabel2, " samples: ", nResDispPlus2,"\n", 
-            "- Distance tolerance = ", round(PsiE, 2), "\n", 
+            "- Distance tolerance = ", round(EpsilonR, 2), "\n", 
             "- Probability threshold = ", OptThresholdE[1], "\n", 
             "- EFDR = ", round(100 * OptThresholdE[2], 2), "% \n", 
             "- EFNR = ", round(100 * OptThresholdE[3], 2), "% \n", 

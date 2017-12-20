@@ -5,7 +5,7 @@
 \title{Detection of genes with changes in expression}
 \usage{
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-  PsiE = log2(1.5)/log2(exp(1)), ProbThresholdM = NULL,
+  EpsilonR = log2(1.5)/log2(exp(1)), ProbThresholdM = NULL,
   ProbThresholdD = NULL, ProbThresholdE = NULL, OrderVariable = "Prob",
   GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
   PlotOffset = TRUE, Offset = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
@@ -26,9 +26,9 @@ Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 changes in biological over-dispersion (must be a positive real number). 
 Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 
-\item{PsiE}{Minimum distance threshold for detecting 
+\item{EpsilonR}{Minimum distance threshold for detecting 
 changes in residual over-dispersion (must be a positive real number). 
-Default value: \code{PsiE= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).}
+Default value: \code{EpsilonR= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).}
 
 \item{ProbThresholdM}{Optional parameter. Probdence threshold for detecting 
 changes in overall expression (must be a positive value, between 0 and 1)}
@@ -211,7 +211,7 @@ data(ChainRNAReg)
 Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5), 
-                      PsiE = log2(1.5)/log2(exp(1)),
+                      EpsilonR = log2(1.5)/log2(exp(1)),
                       OffSet = TRUE)        
 
 }

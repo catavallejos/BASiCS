@@ -1,7 +1,7 @@
 ---
 title: "Introduction to BASiCS"
 package: BASiCS
-date: "`r BiocStyle::doc_date()`"
+date: "`r Sys.Date()`"
 author: 
 - name: Catalina Vallejos
   email: cnvallej@uc.cl
@@ -246,8 +246,7 @@ HVG/LVG evidence. A cut-off value for these posterior probabilities is set by
 controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.10).
 
 ```{r quick-start-HVGdetection, fig.height = 20, fig.width = 20}
-par(mfrow = c(2,2), cex.lab = 3)
-par(mar = c(6, 6, 4, 2) + 0.1)
+par(mfrow = c(2,2))
 HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
 LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
 ```
@@ -375,7 +374,7 @@ data("ChainSCReg")
 Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      PsiE = log2(1.5)/log2(exp(1)),
+                      EpsilonR = log2(1.5)/log2(exp(1)),
                       EFDR_M = 0.10, EFDR_D = 0.10,
                       Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
 ```

@@ -34,15 +34,14 @@ all elements must be positive numbers)}
 \item{theta}{MCMC chain for technical over-dispersion parameter(s) 
 \eqn{\theta} (matrix, all elements must be positive, 
 each colum represents 1 batch)}
-\item{\code{beta}}{MCMC chain for regression parameters
-(matrix with \code{k} columns where k represent the number of chosen basis functions) }
-\item{\code{sigma2}}{MCMC chain for the variance used during regression
-(matrix with one column, sigma2 represents a gloabl parameter)}
-\item{\code{eta}}{MCMC chain for the degrees of freedom used for regression
-(matrix with one column)}
-\item{\code{lambda}}{MCMC chain for the gene-specific random effect on the regression variance
-(matrix with \code{q} columns)}
-\item{\code{epsilon}}{MCMC chain for the gene specific regression residue (mean corrected vraribility)
+\item{\code{beta}}{Only used for regression model. MCMC chain for regression 
+coefficients (matrix with \code{k} columns, where \code{k} represent the 
+number of chosen basis functions + 2) }
+\item{\code{sigma2}}{Only used for regression model. MCMC chain for the 
+residual variance (matrix with one column, sigma2 represents 
+a global parameter)}
+\item{\code{epsilon}}{Only used for regression model. MCMC chain for the 
+gene-specific residual over-dispersion parameter 
 (matrix with \code{q} columns)}
 }}
 }}
@@ -50,16 +49,17 @@ each colum represents 1 batch)}
 \examples{
 
 # A BASiCS_Chain object created by the BASiCS_MCMC function.
-Data = makeExampleBASiCS_Data()
-MCMC_Output <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+Data <- makeExampleBASiCS_Data()
 
-# To run the model using the regession (mean adjustment of the over-dispersion parameters) use following function:
-MCMC_Output_Reg <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = TRUE, k = 12)
+# To run the model without regression
+Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 
-}
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
+# To run the model using the regression model
+ChainReg <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = TRUE)
+
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}, Nils Eling \email{eling@ebi.ac.uk}
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }
