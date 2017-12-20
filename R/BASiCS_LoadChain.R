@@ -27,12 +27,9 @@
 #'
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}, Nils Eling
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
-#' @references 
-#' 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-#' 
 BASiCS_LoadChain <- function(RunName, 
                              StoreDir = getwd(), 
                              StoreUpdatedChain = FALSE) 

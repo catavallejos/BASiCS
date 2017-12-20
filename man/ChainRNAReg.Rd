@@ -3,15 +3,16 @@
 \docType{data}
 \name{ChainRNAReg}
 \alias{ChainRNAReg}
-\title{Extract from the chain obtained from the regression model: pool-and-split samples}
+\title{Extract from the chain obtained for the Grun et al (2014) data: 
+pool-and-split samples (regression model)}
 \format{An object of class \code{\linkS4class{BASiCS_Chain}} 
-containing 10 MCMC iterations.}
+containing 75 MCMC iterations.}
 \usage{
 ChainRNAReg
 }
 \description{
-Small extract (10 MCMC iterations, 1000 randomly selected genes) from the 
-chain obtained by the regression model, related to pool-and-split samples 
+Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+chain obtained for the pool-and-split samples 
 (this corresponds to the RNA 2i samples in Grun et al, 2014).
 }
 \references{

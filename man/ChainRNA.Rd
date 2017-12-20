@@ -3,20 +3,18 @@
 \docType{data}
 \name{ChainRNA}
 \alias{ChainRNA}
-\title{Extract from the chain obtained in Vallejos et al (2016): pool-and-split samples}
+\title{Extract from the chain obtained for the Grun et al (2014) data: pool-and-split samples}
 \format{An object of class \code{\linkS4class{BASiCS_Chain}} 
-containing 100 MCMC iterations.}
+containing 75 MCMC iterations.}
 \usage{
 ChainRNA
 }
 \description{
-Small extract (100 MCMC iterations, 500 randomly selected genes) from the 
-chain obtained in Vallejos et al (2016), related to pool-and-split samples 
+Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+chain obtained for the pool-and-split samples
 (this corresponds to the RNA 2i samples in Grun et al, 2014).
 }
 \references{
-Vallejos, Richardson and Marioni (2016). Genome Biology.
-
 Grun, Kester and van Oudenaarden (2014). Nature Methods.
 }
 \keyword{datasets}

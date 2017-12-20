@@ -56,6 +56,8 @@ A list of 2 elements
 cells pass a pre-defined inclusion criteria. The output of this 
 function can be combined with \code{newBASiCS_Data} to generate a 
 the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
+For more systematic tools for quality control, please refer to the
+\code{scater} Bioconductor package.
 }
 \examples{
 
@@ -76,11 +78,6 @@ Filter = BASiCS_Filter(Counts, Tech, SpikeInput,
 SpikeInfoFilter <- SpikeInfo[SpikeInfo$SpikeID \%in\% rownames(Filter$Counts),]
 FilterData <- newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 
-}
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-
-Vallejos, Richardson and Marioni (2016). Genome Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

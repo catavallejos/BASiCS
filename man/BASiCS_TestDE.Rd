@@ -6,10 +6,10 @@
 \usage{
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
   EpsilonR = log2(1.5)/log2(exp(1)), ProbThresholdM = NULL,
-  ProbThresholdD = NULL, ProbThresholdE = NULL, OrderVariable = "Prob",
+  ProbThresholdD = NULL, ProbThresholdR = NULL, OrderVariable = "Prob",
   GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
   PlotOffset = TRUE, Offset = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
-  EFDR_E = 0.1, GenesSelect = NULL, ...)
+  EFDR_R = 0.1, GenesSelect = NULL, ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}} 
@@ -37,7 +37,7 @@ changes in overall expression (must be a positive value, between 0 and 1)}
 changes in cell-to-cell biological over-dispersion 
 (must be a positive value, between 0 and 1)}
 
-\item{ProbThresholdE}{Optional parameter. Probdence threshold for detecting 
+\item{ProbThresholdR}{Optional parameter. Probdence threshold for detecting 
 changes in residual over-dispersion 
 (must be a positive value, between 0 and 1)}
 
@@ -63,7 +63,7 @@ the comparison of means. Default \code{EFDR_M = 0.10}.}
 \item{EFDR_D}{Target for expected false discovery rate related to 
 the comparison of dispersions. Default \code{EFDR_D = 0.10}.}
 
-\item{EFDR_E}{Target for expected false discovery rate related to 
+\item{EFDR_R}{Target for expected false discovery rate related to 
 the comparison of residual over-dispersions. Default \code{EFDR_D = 0.10}.}
 
 \item{GenesSelect}{Optional argument to provide a user-defined list 
@@ -215,9 +215,8 @@ Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       OffSet = TRUE)        
 
 }
-\references{
-Vallejos, Richardson and Marioni (2016). Genome Biology.
-}
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

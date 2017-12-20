@@ -23,7 +23,7 @@
 #' @param ProbThresholdD Optional parameter. Probdence threshold for detecting 
 #' changes in cell-to-cell biological over-dispersion 
 #' (must be a positive value, between 0 and 1)
-#' @param ProbThresholdE Optional parameter. Probdence threshold for detecting 
+#' @param ProbThresholdR Optional parameter. Probdence threshold for detecting 
 #' changes in residual over-dispersion 
 #' (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output. 
@@ -40,7 +40,7 @@
 #' the comparison of means. Default \code{EFDR_M = 0.10}.
 #' @param EFDR_D Target for expected false discovery rate related to 
 #' the comparison of dispersions. Default \code{EFDR_D = 0.10}.
-#' @param EFDR_E Target for expected false discovery rate related to 
+#' @param EFDR_R Target for expected false discovery rate related to 
 #' the comparison of residual over-dispersions. Default \code{EFDR_D = 0.10}.
 #' @param GenesSelect Optional argument to provide a user-defined list 
 #' of genes to be considered for the comparison.
@@ -184,10 +184,8 @@
 #'                       EpsilonR = log2(1.5)/log2(exp(1)),
 #'                       OffSet = TRUE)        
 #' 
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
-#' 
-#' @references 
-#' Vallejos, Richardson and Marioni (2016). Genome Biology.
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_TestDE
 BASiCS_TestDE <- function(Chain1, 
@@ -197,7 +195,7 @@ BASiCS_TestDE <- function(Chain1,
                           EpsilonR = log2(1.5)/log2(exp(1)),
                           ProbThresholdM = NULL, 
                           ProbThresholdD = NULL, 
-                          ProbThresholdE = NULL,
+                          ProbThresholdR = NULL,
                           OrderVariable = "Prob", 
                           GroupLabel1 = "Group1", 
                           GroupLabel2 = "Group2", 
@@ -206,7 +204,7 @@ BASiCS_TestDE <- function(Chain1,
                           Offset = TRUE, 
                           EFDR_M = 0.1, 
                           EFDR_D = 0.1, 
-                          EFDR_E = 0.1, 
+                          EFDR_R = 0.1, 
                           GenesSelect = NULL, ...) 
 {
   
@@ -420,9 +418,9 @@ BASiCS_TestDE <- function(Chain1,
     EpsilonBase <- (Summary1@parameters$epsilon[NotExcluded,1] * n1 + Summary2@parameters$epsilon[NotExcluded,1] * n2)/n
     
     AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, EpsilonR, 
-                                              ProbThresholdE, 
+                                              ProbThresholdR, 
                                               GenesSelect[NotExcluded], 
-                                              EFDR_E, 
+                                              EFDR_R, 
                                               Task = "Differential residual dispersion")
     ProbE <- AuxResDisp$Prob
     OptThresholdE <- AuxResDisp$OptThreshold

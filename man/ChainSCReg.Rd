@@ -3,15 +3,16 @@
 \docType{data}
 \name{ChainSCReg}
 \alias{ChainSCReg}
-\title{Extract from the chain obtained from the regression model: single-cell samples}
+\title{Extract from the chain obtained for the Grun et al (2014) data: 
+single-cell samples (regression model)}
 \format{An object of class \code{\linkS4class{BASiCS_Chain}} 
-containing 10 MCMC iterations.}
+containing 75 MCMC iterations.}
 \usage{
 ChainSCReg
 }
 \description{
-Small extract (10 MCMC iterations, 1000 randomly selected genes) from the 
-chain obtained by the regression model, related to single-cell samples 
+Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+chain obtained for the pool-and-split samples
 (this corresponds to the SC 2i samples in Grun et al, 2014).
 }
 \references{

@@ -44,12 +44,10 @@
 #'
 #' @seealso \code{\linkS4class{SingleCellExperiment}}
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
-#' @references 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-#' 
-newBASiCS_Data <- function(Counts, Tech, 
+newBASiCS_Data <- function(Counts, Tech = NULL, 
                            SpikeInfo = NULL, BatchInfo = NULL) 
 {
   # Validity checks for SpikeInfo

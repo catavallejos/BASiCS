@@ -1,7 +1,7 @@
 ---
 title: "Introduction to BASiCS"
-package: BASiCS
-date: "`r Sys.Date()`"
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('BASiCS')`"
 author: 
 - name: Catalina Vallejos
   email: cnvallej@uc.cl
