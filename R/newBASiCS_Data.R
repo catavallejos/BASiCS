@@ -14,7 +14,8 @@
 #' @param SpikeInfo \code{data.frame} whose first and second columns contain 
 #' the gene names assigned to the spike-in genes (they must match the ones in 
 #' \code{rownames(Counts)}) and the associated input number of molecules, 
-#' respectively.
+#' respectively. If \code{SpikeInfo = NULL}, only the horizontal integration
+#' implementation (no spikes) can be run. Default value: \code{SpikeInfo = NULL}.
 #' @param BatchInfo Vector of length \code{n} whose elements indicate batch 
 #' information. Not required if a single batch is present on the data. 
 #' Default value: \code{BatchInfo = NULL}. 
@@ -43,19 +44,20 @@
 #'
 #' @seealso \code{\linkS4class{SingleCellExperiment}}
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
-#' @references 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-#' 
-newBASiCS_Data <- function(Counts, Tech, SpikeInfo, BatchInfo = NULL) 
+newBASiCS_Data <- function(Counts, Tech = NULL, 
+                           SpikeInfo = NULL, BatchInfo = NULL) 
 {
   # Validity checks for SpikeInfo
-  if (!is.data.frame(SpikeInfo)) 
-      stop("'SpikeInfo' must be a 'data.frame'")
-  if (data.table::is.data.table(SpikeInfo)) 
-      stop("'SpikeInfo' must be a 'data.frame'")
-    
+  if(!is.null(SpikeInfo)){
+    if (!is.data.frame(SpikeInfo)) 
+        stop("'SpikeInfo' must be a 'data.frame'")
+    if (data.table::is.data.table(SpikeInfo)) 
+        stop("'SpikeInfo' must be a 'data.frame'")
+  }
+  
   if (is.null(BatchInfo)) { BatchInfo <- rep(1, times = ncol(Counts)) }
     
   # Re-ordering genes

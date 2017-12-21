@@ -14,7 +14,8 @@
 
 \item{Param}{Name of the slot to be used for the accessed. 
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'}, 
-\code{'s'}, \code{'nu'} and \code{'theta'}}
+\code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'}, 
+\code{'sigma2'} and \code{'epsilon'}.}
 }
 \value{
 The requested slot of a \code{\linkS4class{BASiCS_Summary}} object
@@ -29,12 +30,11 @@ object
 help(BASiCS_MCMC)
   
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \seealso{
 \code{\linkS4class{BASiCS_Summary}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

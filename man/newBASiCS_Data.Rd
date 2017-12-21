@@ -5,7 +5,7 @@
 \title{Creates a SingleCellExperiment object from a matrix of expression 
 counts and experimental information about spike-in genes}
 \usage{
-newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo = NULL)
+newBASiCS_Data(Counts, Tech = NULL, SpikeInfo = NULL, BatchInfo = NULL)
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements 
@@ -19,7 +19,8 @@ gene is biological; otherwise the gene is spike-in.}
 \item{SpikeInfo}{\code{data.frame} whose first and second columns contain 
 the gene names assigned to the spike-in genes (they must match the ones in 
 \code{rownames(Counts)}) and the associated input number of molecules, 
-respectively.}
+respectively. If \code{SpikeInfo = NULL}, only the horizontal integration
+implementation (no spikes) can be run. Default value: \code{SpikeInfo = NULL}.}
 
 \item{BatchInfo}{Vector of length \code{n} whose elements indicate batch 
 information. Not required if a single batch is present on the data. 
@@ -54,12 +55,11 @@ BatchInfo <- c(rep(1, 5), rep(2, 5))
 DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \seealso{
 \code{\linkS4class{SingleCellExperiment}}
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

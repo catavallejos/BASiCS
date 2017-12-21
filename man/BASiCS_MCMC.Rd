@@ -60,15 +60,28 @@ All elements must be positive real numbers.
   \item{\code{b.theta}}{Rate hyper-parameter for the 
         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise 
         parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
+ \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta} 
+      specifies the degress of freedom for the residual term. 
+      Default: \code{eta = 5}.}.
 
 }}
+\item{\code{WithSpikes}}{If \code{WithSpikes = FALSE}, the no-spikes 
+      model will be fitted. Default: \code{WithSpikes = TRUE}. }
+\item{\code{Regression}}{If \code{Regression = TRUE}, BASiCS uses a 
+      correlated prior formulation to estimate residual over-dispersion 
+      parameters that are not confounded with mean expression. Default:
+      \code{Regression = FALSE}. }
+\item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies 
+      the number of regression Gaussian Radial Basis Functions (GRBF) used 
+      within the correlated prior adopted for gene-specific over-dispersion 
+      and mean expression paramters. Default: \code{k = 12}. }
+\item{\code{Var}}{Only used when \code{Regression = TRUE}. \code{Var} 
+      specifies the GRBF scaling parameter. Default: \code{Var = 1.2}. }
 \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings 
       updates. It must be a positive number between 0 and 1. Default 
       (and recommended): \code{AR = 0.44}}.
-
 \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer 
       adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
-
 \item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated 
       \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName} 
       argument used to index the file name). 
@@ -84,9 +97,6 @@ All elements must be positive real numbers.
       and/or adaptive proposal variances.}
 \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based 
       progress report is suppressed.}
-\item{\code{ls.phi0}}{Starting value for the adaptive concentration parameter 
-      of the Metropolis proposals for 
-      \eqn{\phi = (\phi_1, \ldots, \phi_n)'}.}
 \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to 
       specify this argument. Default options have been tuned to facilitate 
       convergence. If changed, it must be a list containing the following 
@@ -113,6 +123,10 @@ Data = makeExampleBASiCS_Data()
 # Longer runs migth be required to reach convergence
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
                      PrintProgress = FALSE)
+                     
+# To run the regression version of BASiCS, use:
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+                     PrintProgress = FALSE, Regression = TRUE)
 
 # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 # (obtained using the 'BASiCS_MCMC' function)
@@ -190,7 +204,11 @@ help(BASiCS_TestDE)
 Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 
 Vallejos, Richardson and Marioni (2016). Genome Biology.
+
+Eling et al (2017). bioRxiv
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

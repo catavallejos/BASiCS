@@ -55,8 +55,8 @@ BASiCS_VarianceDecomp <- function(Chain,
   if (!is(Chain, "BASiCS_Chain")) 
     stop("'Chain' is not a BASiCS_Chain class object.")
     
-  q.bio <- ncol(Chain@delta)
-  UniqueBatch <- colnames(Chain@theta)
+  q.bio <- ncol(Chain@parameters$delta)
+  UniqueBatch <- colnames(Chain@parameters$theta)
   nBatch <- length(UniqueBatch)
     
   # Calculating variance decomposition
@@ -68,7 +68,7 @@ BASiCS_VarianceDecomp <- function(Chain,
   ShotNoiseGlobal <- 1 - BioVarGlobal - TechVarGlobal
     
   Genes <- seq_len(q.bio)
-  GeneName <- colnames(Chain@mu)
+  GeneName <- colnames(Chain@parameters$mu)
     
   if (nBatch > 1) 
   {

@@ -27,10 +27,7 @@
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#'
-#' @references 
-#' 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_DenoisedRates
 BASiCS_DenoisedRates = function(Data, 

@@ -60,7 +60,7 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
     }
     else
     {
-      message("EFDR calibration failed for ", Task, "task. \n",
+      message("EFDR calibration failed for ", Task, " task. \n",
               "Probability threshold automatically set equal to 0.90 \n")
       OptThreshold <- c(0.9, NA, NA)  
     }

@@ -37,12 +37,11 @@ Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
 ChainLoad <- BASiCS_LoadChain(RunName = 'Test', StoreDir = tempdir())
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}
 }
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl}, Nils Eling
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

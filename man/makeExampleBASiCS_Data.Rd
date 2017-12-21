@@ -31,11 +31,8 @@ Data <- makeExampleBASiCS_Data()
 is(Data, 'SingleCellExperiment')
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-
-Vallejos, Marioni and Richardson (2016). Genome Biology.
-}
 \author{
-Catalina A. Vallejos \email{cnvallej@uc.cl} and Nils Eling
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

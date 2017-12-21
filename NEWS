@@ -639,3 +639,164 @@ version 0.99.13: (2017-10-17)
   
 version 0.99.14: (2017-10-19) 
 - Added checks to ensure input `SingleCellExperiment` object has all info
+
+version 1.0.0: (2017-10-30)
+- Bioconductor 3.6 release
+
+version 1.1.0: (2017-10-30)
+- Version number bump after bioconductor 3.6 release
+
+version 1.1.1: (2017-11-08)
+- 'ggplot2' added to imports
+- Default value for SpikeInfo changed to NULL in `newBASiCS_Data` function
+- Cleaning of `HiddenBASiCS_MCMCcppNoSpikes` 
+- Cleaning of full conditionals for no-spikes implementation
+- Fixed bug in stochastic reference implementation
+- Added unit test for no-spikes case (estimation)
+- Minor tyle changes to merge regression case
+- 'Eta' parameter removed from `Summary` method (regression case only)
+- Corrected HPD interval calculation for epsilon and sigma2 (regression case)
+- Added mark for 'ExcludedFromRegression' genes in `BASiCS_TestDE`
+
+version 1.1.2: (2017-11-08)
+- Skeleton for sampler with integrated out s
+
+version 1.1.3: (2017-11-08)
+- Collapsed sampler implemented (to be tested)
+- Unit tests reverted to original case
+- Version number bump
+- Store `TableRef` on the `StoreDir` directory (no-spike case only)
+
+version 1.1.4: (2017-11-12)
+- Only include genes that are expressed in at least 2 cells per condition for
+differential residual dispersion testing (regression case only)
+
+version 1.1.5: (2017-11-15)
+- Removal of collapsed sampler prototype (from C++ and R) - moved to 
+`CollapsedSampler` branch
+- Number of genes used for stochastic reference increased to 10% of genes (no spikes only)
+
+version 1.1.6: (2017-11-15)
+- Added prototype for regression + no-spikes sampler
+
+version 1.1.7: (2017-11-20)
+- Nils added as author in cpp file
+- Updated unit test for no-spikes case (changes due to change in stoch ref)
+- Change in `BASiCS_MCMC` so that only biological counts go to C++
+- Added factorizations in `muUpdateReg` and `deltaUpdateReg` (C++ code)
+
+version 1.1.8: (2017-11-21) 
+- `muUpdateRegNoSpikes` and `deltaUpdateRegNoSpikes` added to C++ code
+- Clean-up of C++ code (repeated debug checks made into function)
+- `lambdaUpdateReg` created as a separate function
+- Vectorization of calculations related to regression implementation
+- Global quantities (e.g. inv(V0)) taken outside the look (regression case)
+- `sigma2UpdateReg` created as a separate function
+- `betaUpdateReg` created as a separate function
+- Fixed typo in sigma2 updates (regression case); unit test updated accordingly
+
+version 1.1.9: (2017-11-24) 
+- `means` only updated when needed (regression case); unit test updated accordingly
+- `deltaUpdateNoSpikes` + `deltaUpdateRegNoSpikes` removed as no longer required
+- Simplification of terms in `deltaUpdateReg`
+- Small changes to unify code format in C++ file
+- Notation change: `phi` replaced by `s` in no-spikes implementation
+- Unit test changed accordingly (no-spike)
+- Minor style changes in `BASiCS_MCMC`
+- `BASiCS_MCMC` function broken into smaller functions (easier to read). This
+creates the following hidden functions: `HiddenBASiCS_MCMC_InputCheck`,
+`HiddenBASiCS_MCMC_ExtraArgs`, `HiddenBASiCS_MCMC_NoSpikesParams`, 
+`HiddenBASiCS_MCMC_OutputStore` and `HiddenBASiCS_MCMC_RefFreqStore`
+- Merge between no-spikes and regression case completed (code to be tested)
+- Minor change in storage of reference frequency (no spikes only)
+
+version 1.1.10: (2017-11-27) 
+- `HiddenBASiCS_MCMC_Start` updated to remove regression-related hyper-params
+- `HiddenBASiCS_MCMC_ExtraArgs` updated to include regression-related hyper-par
+- `BASiCS_MCMC` modified accordingly
+- Storage of adaptive variances fixed for the no-spike case
+
+version 1.1.11: (2017-11-24) 
+- Minor typo in the call to `HiddenBASiCS_MCMCcppNoSpikes` has been resolved
+
+version 1.1.12: (2017-11-28) 
+- Additional changes to improve usage of no-spikes case
+
+version 1.1.13: (2017-11-28) 
+- Fixed storage of `RefGene` in no-spikes when `StochasticRef = FALSE`
+
+version 1.1.14: (2017-11-29)
+- Minor bug resolved for no-spikes case when original data has spikes
+- New unit test to assess that case
+
+version 1.1.15: (2017-11-29)
+- Typo fixed in `AtLeast2Cells` (`BASiCS_MCMC` function)ndefinition for 
+no-spikes + regression case when original data has spikes
+
+version 1.1.16: (2017-11-29)
+- Change in `BASiCS_MCMC` no-spikes so that only genes with zero total
+counts are excluded from the identifiability constrain
+
+version 1.1.17: (2017-12-07)
+- Stop scaling of size factors for no-spikes case (`HiddenBASiCS_MCMC_Start`)
+- Unit testing updated accordingly 
+- Extra unit test to ensure that no-spikes results match for objects 
+with/without spikes when setting `WithSpikes = FALSE`
+- Modified constrain for no-spikes cases (to deal with non-zero genes)
+- Default value of `ConstrainType` set to 1 in `BASiCS_MCMC` (no-spikes only)
+
+version 1.1.18: (2017-12-08)
+- Minor typo in `HiddenBASiCS_MCMC_NoSpikesParam` resolved
+
+version 1.1.19: (2017-12-09)
+- extended vignette to describe regression and non-spike case
+- changed markdown to rmarkdown engine to compile vignette to include
+table of contents
+
+version 1.1.20: (2017-12-11)
+- Updated dpi option in vignette 
+
+version 1.1.21: (2017-12-13)
+- `ConstrainProp` added as an optional argument for `BASiCS_MCMC` (no-spikes)
+
+version 1.1.22: (2017-12-15)
+- Documentation on ChainSCReg and ChainRNAReg datasets added
+- Fixed showFit method
+- Updated dpi option in vignette to reduce .html size
+- Default value for `ConstrainProp` set to 0.20 (no-spikes)
+- Unit tests updated accordingly (no-spikes)
+
+version 1.1.23: (2017-12-18)
+- Minor improvements to documentation 
+
+version 1.1.24: (2017-12-18)
+- Reduced no of iterations in unit test for quicker testing
+- library `hexbin` added to imports (required for `showFit`)
+- Vignette edits (simplification of Quick Start)
+
+version 1.1.26: (2017-12-20)
+- Vignette bibliography moved to .bib file
+- Added diagram to summarise different implementations
+- Reduced size of example objects
+- Unit tests updated accordingly
+- `subset` method created for `BASiCS_Chain` objects
+- Removal of parameter `lambda` from `BASiCS_Chain` objects (for storage)
+- R/Methods.R + R/Classes.R updated accordingly
+- `newBASiCS_Chain` updated accordingly. 
+- Code format for `showFit`
+
+version 1.1.27: (2017-12-20)
+- Minor typo resolved in `displayChainBASiCS` method
+- Reduced size of example objects 
+- Unit tests updated accordingly
+- In `BASiCS_TestDE` function: `PsiE` argument renamed as `EpsilonR`
+
+version 1.1.28: (2017-12-20)
+- Vignette header as in BiocStyle
+- In `BASiCS_TestDE` function: `ProbThresholdE` argument renamed as `ProbThresholdR`
+- In `BASiCS_TestDE` function: `ProbThresholdE` argument renamed as `ProbThresholdR`
+- Updated documentation for example `BASiCS_Chain` objects
+- Minor additional changes to the documentation
+
+version 1.1.29: (2017-12-21)
+- `showFit` generic renamed as `BASiCS_showFit` (to avoids potential conflicts)

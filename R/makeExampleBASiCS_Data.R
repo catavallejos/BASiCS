@@ -22,14 +22,9 @@
 #' Data <- makeExampleBASiCS_Data()
 #' is(Data, 'SingleCellExperiment')
 #'
-#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} and Nils Eling
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
-#' @references 
-#' 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
-#' 
-#' Vallejos, Marioni and Richardson (2016). Genome Biology.
-#' 
 makeExampleBASiCS_Data <- function(WithBatch = FALSE, 
                                    WithSpikes = TRUE) 
 {
@@ -163,7 +158,6 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
         
     Data <- newBASiCS_Data(Counts = Counts.sim, 
                            Tech = rep(FALSE, q.bio), 
-                           SpikeInfo = 1, 
                            BatchInfo = c(rep(1, 10), rep(2, 10)))
         
   }

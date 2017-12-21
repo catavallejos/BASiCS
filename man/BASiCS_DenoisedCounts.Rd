@@ -20,7 +20,8 @@ posterior medians.
 }
 \description{
 Calculates denoised expression counts by removing 
-cell-specific technical variation.
+cell-specific technical variation. The latter includes global-scaling
+normalisation and therefore no further normalisation is required.
 }
 \details{
 See vignette
@@ -34,12 +35,11 @@ Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000,
 DC <- BASiCS_DenoisedCounts(Data, Chain)
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \seealso{
 \code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

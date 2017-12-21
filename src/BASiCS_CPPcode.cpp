@@ -1,5 +1,5 @@
 /* C++ implementation of BASiCS 
- * Author: Catalina A. Vallejos (cnvallej@uc.cl)
+ * Author: Catalina A. Vallejos (cnvallej@uc.cl) & Nils Eling
  */
 
 #include <math.h>
@@ -338,10 +338,8 @@ arma::mat as_arma(NumericMatrix& x)
 arma::mat lgamma_cpp(arma::mat const& x) 
 {
   arma::mat output = x;
-  for (unsigned int i=0; i<arma::size(x,0); i++)
-  {
-    for(unsigned int j=0; j<arma::size(x,1); j++)
-    {
+  for (unsigned int i=0; i<arma::size(x,0); i++) {
+    for(unsigned int j=0; j<arma::size(x,1); j++) {
       output(i,j) = R::lgammafn(x(i,j));
     }
   }
@@ -354,8 +352,7 @@ arma::mat lgamma_cpp(arma::mat const& x)
 arma::vec lgamma_cpp_vec(arma::vec const& x) 
 {
   arma::vec output = x;
-  for (unsigned int i=0; i < output.size(); i++)
-  {
+  for (unsigned int i=0; i < output.size(); i++) {
       output(i) = R::lgammafn(x(i));
   }
   return output;
@@ -372,20 +369,31 @@ double log_sum_exp_cpp(arma::vec const& x_arma)
   return log(sum(exp(x_arma - offset))) + offset; 
 }
 
+arma::vec DegubInd(arma::vec ind,
+                   int const q,
+                   arma::vec const& u, 
+                   arma::vec const& log_aux,
+                   arma::vec const& y,
+                   double const& threshold,
+                   std::string const& param)
+{
+  for (int i=0; i < q; i++) {
+    if( arma::is_finite(log_aux(i)) & arma::is_finite(y(i)) ) {
+      if((log(u(i)) < log_aux(i)) & (y(i) > threshold)) { ind(i) = 1; }
+      else{ind(i) = 0;}            
+    }
+    else {
+      ind(i) = 0; 
+      Rcpp::Rcout << "Error when updating " << param << i+1 << std::endl;
+      Rcpp::warning("Consider additional data filter if error is frequent.");        
+    }
+  }  
+  return ind;
+}
+
+
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes
- * mu0: current value of mu
- * prop_var: current value of the proposal variances for mu
- * Counts: matrix of expression counts
- * delta: current value of delta
- * phi: current value of phi
- * nu: current value of nu
- * sum_bycell_bio: sum of expression counts by cell (biological genes only)
- * s2_mu: prior hyper-variance for mu
- * q0: number of biological genes
- * n: number of cells
- * mu: auxiliary vector for storage
- * ind: auxiliary vector for storage
  */
 arma::mat muUpdate(
   arma::vec const& mu0, 
@@ -411,57 +419,32 @@ arma::mat muUpdate(
    * However, it cancels out as using log-normal proposals.
    */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *  
                       log( ( phinu(j)*mu1(i) + invdelta(i) ) / 
                            ( phinu(j)*mu0(i) + invdelta(i) ));
     }
   }
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
 
-  /* CREATING OUTPUT VARIABLE & DEBUG 
+  /* CREATING OUTPUT & DEBUG 
    * Proposed values are automatically rejected in the following cases:
    * - If smaller than 1e-3
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
    */
-  for (int i=0; i < q0; i++)
-  {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(mu1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (mu1(i) > 1e-3)) { ind(i) = 1; }
-      else{ind(i) = 0; mu1(i) = mu0(i);}            
-    }
-    else
-    {
-      ind(i) = 0; mu1(i) = mu0(i);
-      Rcpp::Rcout << "Error when updating mu " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
+  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
+  for (int i=0; i < q0; i++) {
+    if(ind(i) == 0) mu1(i) = mu0(i);  
   }
+
   /* OUTPUT */
   return join_rows(mu1, ind);
 }
 
 /* Metropolis-Hastings updates of delta
  * Updates are implemented simulateaneously for all biological genes.
- * delta: current value of delta
- * prop_var: current value of the proposal variances for delta
- * Counts: matrix of expression counts
- * mu: current value of mu
- * phi: current value of phi
- * nu: current value of nu
- * a_delta: shape prior hyper-parameter for delta (when using a gamma prior)
- * b_delta: rate prior hyper-parameter for delta (when using a gamma prior)
- * s2delta: prior hyper-variance for delta (when using a log-normal prior)
- * q0: number of biological genes
- * n: number of cells
- * prior_delta: whether gamma or log-normal priors are being used
- * delta: auxiliary vector for storage
- * ind: auxiliary vector for storage
  */
 arma::mat deltaUpdate(
   arma::vec const& delta0, 
@@ -489,25 +472,20 @@ arma::mat deltaUpdate(
    * However, it cancels out as using log-normal proposals.
    */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
-  
-  for (int i=0; i < q0; i++)
-  {
-    for (int j=0; j < n; j++) 
-    {
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
       log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
       log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
       log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
     }
   }
-  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   // Component related to the prior
-  if(prior_delta == 1) 
-  {
+  if(prior_delta == 1) {
     log_aux += (log(delta1)-log(delta0))*a_delta - b_delta * (delta1 - delta0);
   }
-  else 
-  { 
+  else { 
     log_aux -= (0.5/s2delta) * (pow(log(delta1),2) - pow(log(delta0),2)); 
   }
 
@@ -516,20 +494,10 @@ arma::mat deltaUpdate(
    * - If smaller than 1e-3
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
-   */    
-  for (int i=0; i < q0; i++)
-  {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(delta1(i)) )
-    {
-      if((log(u(i)) < log_aux(i)) & (delta1(i) > 1e-3)) { ind(i) = 1; }
-      else {ind(i) = 0; delta1(i) = delta0(i); }
-    }      
-    else
-    {
-      ind(i) = 0; delta1(i) = delta0(i);
-      Rcpp::Rcout << "Error when updating delta " << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");        
-    }
+   */ 
+  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
+  for (int i=0; i < q0; i++) {
+    if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
   // OUTPUT
@@ -557,35 +525,24 @@ arma::vec sUpdateBatch(
   double b = 2 * bs;
   
   // GIG draws
-  /* DEBUG: return original value of s0 if input values are not wiThin the appropriate range (to avoid problems related to numerical innacuracy) */
+  // Initialize s1 with s0 (return that for invalid samples)
   
   // Calculating parameter to the passed as input to the Rgig function (specific to each cell)
   arma::vec a = 2 * nu / thetaBatch;
-  int j;
-  for (j=0; j<n; j++) 
-  {
-    if(!R_IsNA(p(j))) 
-    {
-      if(!R_IsNA(a(j)) & (a(j)>0)) 
-      {
+  for (int j = 0; j < n; j++) {
+    if(!R_IsNA(p(j))) {
+      if(!R_IsNA(a(j)) & (a(j)>0)) {
         s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
         /* DEBUG: break in case of undefined values */
-        if(R_IsNA(s1(j))) 
-        {
+        if(R_IsNA(s1(j))) {
           Rcpp::Rcout << "Error when updating s" << j << std::endl;
           Rcpp::stop("Please consider additional filter of the input dataset.");
         }
       }
-      else 
-      {
-        if(!(a(j)<0) & (p(j)>0)) 
-        {
-          s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
-        }  
-        else{ s1(j) = s0(j); } 
+      else {
+        if(!(a(j)<0) & (p(j)>0)) s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
       }
     }
-    else { s1(j) = s0(j); }
   }
   return s1;     
 }
@@ -620,13 +577,11 @@ arma::mat nuUpdateBatch(
   // ACCEPT/REJECT STEP
   arma::vec log_aux = arma::zeros(n);
   
-  for (int j=0; j < n; j++) 
-  {
-    for (int i=0; i < q0; i++) 
-    {
+  for (int j=0; j < n; j++) {
+    for (int i=0; i < q0; i++) {
       log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
-        log( ( phi(j)*nu1(j)*mu(i) + invdelta(i) ) / 
-             ( phi(j)*nu0(j)*mu(i) + invdelta(i) ));
+                      log( ( phi(j)*nu1(j)*mu(i) + invdelta(i) ) / 
+                           ( phi(j)*nu0(j)*mu(i) + invdelta(i) ));
     } 
   }
   
@@ -638,22 +593,12 @@ arma::mat nuUpdateBatch(
    * - If smaller than 1e-5
    * - If the proposed value is not finite
    * - When the acceptance rate cannot be numerally computed
-   */  
-  for (int j=0; j < n; j++)
-  {
-    if(arma::is_finite(log_aux(j)) & arma::is_finite(nu1(j)))
-    {
-      if( (log(u(j)) < log_aux(j)) & (nu1(j) > 1e-5) ) { ind(j) = 1; }
-      else {ind(j) = 0; nu1(j) = nu0(j); }
-    }      
-    else
-    {
-      ind(j) = 0; nu1(j) = nu0(j);
-      Rcpp::Rcout << "Error when updating nu " << j+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");    
-    }
+   */ 
+  ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
+  for (int j=0; j < n; j++) {
+    if(ind(j) == 0) nu1(j) = nu0(j);  
   }
-  
+
   // OUTPUT
   return join_rows(nu1, ind);
 }
@@ -707,12 +652,10 @@ arma::vec rDirichlet(
 {
   arma::vec aux = arma::ones(alpha.size());
   unsigned int i;
-  for(i=0; i<alpha.size(); i++)
-  {
+  for(i=0; i<alpha.size(); i++) {
     aux(i) = Rcpp::as<double>(rgamma(1,alpha(i),1));   
   }
-  aux = aux / sum(aux);    
-  return aux;  
+  return aux / sum(aux);  
 }
 
 /* Metropolis-Hastings updates of phi 
@@ -740,18 +683,15 @@ Rcpp::List phiUpdate(
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  
   if(all(prop_var * phi1 < 2.5327372760800758e+305)  & 
      all(prop_var * phi0 < 2.5327372760800758e+305) &
-     all(phi1 > 0) & all(phi0 > 0)) 
-  {
+     all(phi1 > 0) & all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
     double log_aux = sum( (sum_bygene_bio + aphi) % (log(phi1) - log(phi0)));
         
     // Loop to replace matrix operations, through genes and cells
     // There is an extra factor in the prior n^(-n); it cancels out in the ratio
     // There is an extra factor n^(-(sum(aphi) - 1));it cancels out in the ratio
-    for (int j=0; j < n; j++) 
-    {
-      for (int i=0; i < q0; i++) 
-      {
+    for (int j=0; j < n; j++) {
+      for (int i=0; i < q0; i++) {
         log_aux -= ( Counts(i,j) + invdelta(i) ) *  
                       log( (phi1(j)*nu(j)*mu(i) + invdelta(i) ) / 
                            (phi0(j)*nu(j)*mu(i) + invdelta(i) ));
@@ -764,29 +704,25 @@ Rcpp::List phiUpdate(
     // gamma(sum(prop_var * phi0)) / gamma(sum(prop_var * phi1));
     // it cancels out as sum(prop_var*y) = sum(prop_var*phi0)
     log_aux += prop_var * sum(phi1 % log(phi0) - phi0 % log(phi1));
-    log_aux -= sum(lgamma_cpp_vec(prop_var * phi1) - lgamma_cpp_vec(prop_var * phi0));    
+    log_aux -= sum(lgamma_cpp_vec(prop_var*phi1) - lgamma_cpp_vec(prop_var*phi0));    
     
-    if(!R_IsNA(log_aux))
-    {
+    if(!R_IsNA(log_aux)){
         if(log(u) < log_aux) { ind = 1; }
         else {ind = 0; phi1 = phi0;}
     }
     // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
     // DEBUG: Print warning message
-    else
-    {
+    else {
       Rcpp::Rcout << "Error when updating phi" << std::endl;
       Rcpp::stop("Please consider additional filter of the input dataset."); 
       ind = 0; phi1 = phi0;
     }     
   }
-  else
-  {
+  else {
     ind = 0; phi1 = phi0;     
   }      
-  return(Rcpp::List::create(
-         Rcpp::Named("phi") = phi1,
-         Rcpp::Named("ind") = ind)); 
+  return(Rcpp::List::create(Rcpp::Named("phi") = phi1, 
+                            Rcpp::Named("ind") = ind)); 
 }
 
 
@@ -903,8 +839,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::mat LStheta; 
   
   // LOG-PROPOSAL VARIANCES 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     LSmu = zeros(q0, Naux); 
     LSdelta = zeros(q0, Naux); 
     LSphi = ones(Naux);   
@@ -959,8 +894,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn)
-    {
+    if(i==Burn) {
       Rcout << "-------------------------------------------------------------" << std::endl; 
       Rcout << "End of Burn-in period."<< std::endl;
       Rcout << "-------------------------------------------------------------" << std::endl; 
@@ -977,7 +911,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                            y_n); 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) {phiAccept += Rcpp::as<double>(phiAuxList["ind"]);}
+    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -995,7 +929,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                      1/deltaAux.col(0), phiAux % nuAux.col(0), 
                      sumByCellBio_arma, s2mu, q0, n,
                      y_q0, u_q0, ind_q0);     
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -1008,7 +942,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                            muAux.col(0), phiAux % nuAux.col(0), 
                            adelta, bdelta, s2delta, prior_delta, 
                            q0, n, y_q0, u_q0, ind_q0);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);} 
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
 
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -1018,18 +952,16 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                           muAux.col(0), 1/deltaAux.col(0),
                           phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
                           y_n, u_n, ind_n); 
-    PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
+    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt)
-    {
+    if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50)
-      {
+      if(Ibatch==50) {
         PmuAux = PmuAux/50;
         PmuAux = -1 + 2*arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux = LSmuAux + PmuAux*0.1;
-        PdeltaAux=PdeltaAux/50; 
+        PdeltaAux = PdeltaAux/50; 
         PdeltaAux = -1 + 2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
         LSdeltaAux = LSdeltaAux + PdeltaAux*0.1;
         PphiAux = PphiAux/50; PphiAux = -1 + 2*(PphiAux>ar); 
@@ -1046,12 +978,10 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
         PphiAux = PphiAux0; 
         PnuAux = PnuAux0; PthetaAux = PthetaAux0; 
       }
-      
     }
         
     // STORAGE OF DRAWS
-    if((i%Thin==0) & (i>=Burn))
-    {      
+    if((i%Thin==0) & (i>=Burn)) {      
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
       phi.col(i/Thin - Burn/Thin) = phiAux;
@@ -1059,8 +989,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);       
       
-      if(StoreAdapt == 1)
-      {
+      if(StoreAdapt == 1) {
         LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
         LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
         LSphi(i/Thin - Burn/Thin) = LSphiAux;
@@ -1070,8 +999,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     }
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if((i%(2*Thin) == 0) & (PrintProgress == 1))
-    {
+    if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
         Rcout << "-------------------------------------------------------------" << std::endl;
         Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
         Rcout << "-------------------------------------------------------------" << std::endl;
@@ -1140,8 +1068,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   Rcout << "-------------------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
 
-  if(StoreAdapt == 1)
-  {
+  if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
            Rcpp::Named("mu") = mu.t(),
@@ -1157,8 +1084,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
            Rcpp::Named("ls.theta") = LStheta.t())); 
   }
   
-  else
-  {
+  else {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
            Rcpp::Named("mu") = mu.t(),
@@ -1168,7 +1094,683 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
            Rcpp::Named("nu") = nu.t(),
            Rcpp::Named("theta") = theta.t())); 
   }
+}
 
+// Functions for regression case of BASiCS
+
+// Model matrix generation for regression
+arma::mat designMatrix(
+    int const& k, /* Number of Gaussian radial basis functions to use for regression */
+    arma::vec const& mu, 
+    double const& variance) 
+{
+  arma::vec x = log(mu);
+  double ran = x.max() - x.min();
+  arma::vec myu = arma::zeros(k-2);
+  myu(0) = x.min();
+  
+  for(int i=1; i < myu.size(); i++) {
+    myu(i) = myu(i-1) + ran/(k-3);
+  }
+  double h = (myu(1)-myu(0)) * variance;
+  
+  // Possibly create this matrix outside
+  arma::mat X = arma::ones(x.size(),k);
+  X.col(1) = x;
+  for(int i=0; i < k-2; i++) {
+    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
+    //X.col(i+1) = pow(x,i+1);
+  }
+  return X;
+}
+
+// CHECK THIS ONE
+// Multivariate normal distribution
+arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma) {
+  int ncols = sigma.n_cols;
+  arma::mat Y = arma::randn(n, ncols);
+  return arma::repmat(mu, 1, n).t() + Y * arma::chol(sigma);
+}
+
+/* Metropolis-Hastings updates of mu 
+ * Updates are implemented simulateaneously for all biological genes
+ */
+arma::mat muUpdateReg(
+    arma::vec const& mu0, 
+    arma::vec const& prop_var, 
+    arma::mat const& Counts, 
+    arma::vec const& delta, 
+    arma::vec const& phinu, 
+    arma::vec const& sum_bycell_bio, 
+    double const& s2_mu,
+    int const& q0,
+    int const& n,
+    arma::vec & mu1,
+    arma::vec & u, 
+    arma::vec & ind,
+    int const& k,
+    arma::vec const& lambda,
+    arma::vec const& beta,
+    arma::mat const& X,
+    double const& sigma2,
+    double variance)
+{
+  
+  /* PROPOSAL STEP */
+  mu1 = exp( arma::randn(q0) % sqrt(prop_var) + log(mu0) );
+  u = arma::randu(q0);
+  
+  /* ACCEPT/REJECT STEP 
+  * Note: there is a -1 factor coming from the log-normal prior. 
+  * However, it cancels out as using log-normal proposals.
+  */
+  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
+  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
+      log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
+        log( ( phinu(j)*mu1(i) + 1/delta(i) ) / 
+             ( phinu(j)*mu0(i) + 1/delta(i) ));
+    }
+  }
+  
+  // This is new due to regression prior on delta
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  
+  // REGRESSION RELATED FACTOR
+  // Some terms might cancel out here; check
+  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
+  
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+   * Proposed values are automatically rejected in the following cases:
+   * - If smaller than 1e-3
+   * - If the proposed value is not finite
+   * - When the acceptance rate cannot be numerally computed
+   */
+  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
+  for (int i=0; i < q0; i++) {
+    if(ind(i) == 0) mu1(i) = mu0(i);  
+  }
+  
+  /* OUTPUT */
+  return join_rows(mu1, ind);
+}
+
+/* Metropolis-Hastings updates of delta
+ * Updates are implemented simulateaneously for all biological genes.
+ * delta: current value of delta
+ * prop_var: current value of the proposal variances for delta
+ * Counts: matrix of expression counts
+ * mu: current value of mu
+ * phi: current value of phi
+ * nu: current value of nu
+ * a_delta: shape prior hyper-parameter for delta (when using a gamma prior)
+ * b_delta: rate prior hyper-parameter for delta (when using a gamma prior)
+ * s2delta: prior hyper-variance for delta (when using a log-normal prior)
+ * q0: number of biological genes
+ * n: number of cells
+ * prior_delta: whether gamma or log-normal priors are being used
+ * delta: auxiliary vector for storage
+ * ind: auxiliary vector for storage
+ * lambda: current value of lambda
+ * X: current design matrix
+ * sigma2: current value of sigma2
+ * beta: current value of beta
+ */
+arma::mat deltaUpdateReg(
+    arma::vec const& delta0, 
+    arma::vec const& prop_var,  
+    arma::mat const& Counts, 
+    arma::vec const& mu, 
+    arma::vec const& phinu, 
+    int const& q0,
+    int const& n,
+    arma::vec & delta1,
+    arma::vec & u, 
+    arma::vec & ind,
+    arma::vec const& lambda,
+    arma::mat const& X,
+    double const& sigma2,
+    arma::vec const& beta)
+{
+  
+  /* PROPOSAL STEP */
+  delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
+  u = arma::randu(q0);
+  
+  /* ACCEPT/REJECT STEP 
+  * Note: there is a -1 factor coming from the log-normal prior. 
+  * However, it cancels out as using log-normal proposals.
+  */
+  arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
+      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
+      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
+      log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
+    }
+  }
+  
+  // REGRESSION RELATED FACTOR
+  // The next lines are equivalent; second one a is simplified version
+//  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
+  log_aux -= lambda%(pow(log(delta1),2)-pow(log(delta0),2) - 
+                     2*(log(delta1)-log(delta0))%(X*beta))/(2*sigma2);
+
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+   * Proposed values are automatically rejected in the following cases:
+   * - If smaller than 1e-3
+   * - If the proposed value is not finite
+   * - When the acceptance rate cannot be numerally computed
+   */    
+  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
+  for (int i=0; i < q0; i++) {
+    if(ind(i) == 0) delta1(i) = delta0(i);  
+  }
+  
+  // OUTPUT
+  return join_rows(delta1, ind);
+}
+
+arma::vec betaUpdateReg(double const& sigma2,
+                        arma::mat const& VAux,
+                        arma::vec const& mAux)
+{
+  arma::mat MVRNORM = mvrnormArma(1,mAux,sigma2 * VAux);
+  arma::vec beta = MVRNORM.row(0).t();
+  return beta;
+}
+
+double sigma2UpdateReg(arma::vec const& delta,
+                       arma::vec const& beta,
+                       arma::vec const& lambda, 
+                       arma::mat const& V1,
+                       double const& mInvVm0,
+                       arma::vec const& m,
+                       double const& sigma2_a0,
+                       double const& sigma2_b0,
+                       int const& q0)
+{
+  double a = sigma2_a0 + (q0 + beta.n_elem) / 2;
+  double b = sigma2_b0 + 0.5 * mInvVm0; 
+  b += 0.5 * Rcpp::as<double>(wrap(beta.t()*V1*beta - 2*beta.t()*V1*m));
+  b += 0.5 * sum( lambda % pow(log(delta), 2) ); 
+
+  // CV: 'if' condition removed as always truth
+  // if((a > 0) & (b > 0))  
+  double sigma2 = pow(R::rgamma(a, 1.0/b),-1);
+
+  return sigma2; 
+}
+
+arma::vec lambdaUpdateReg(arma::vec const& delta,
+                          arma::mat const& X,
+                          arma::vec const& beta,
+                          double const& sigma2, 
+                          double const& eta, 
+                          int const& q0,
+                          arma::vec lambda1)
+{
+  // Parameter calculations
+  double a = (eta + 1) / 2;
+  arma::vec b = 0.5 * ( eta + ( pow(log(delta) - X*beta,2) / sigma2) );
+  for(int i = 0; i < q0; i++) {
+    lambda1(i) = R::rgamma(a, 1.0 / b(i));
+  } 
+  return lambda1; 
+}
+
+/* MCMC sampler 
+ * N: Total number of MCMC draws 
+ * Thin: Thinning period for MCMC chain 
+ * Burn: Burning period for MCMC chain 
+ * Counts: Matrix of expression counts
+ * BatchDesign: Design matrix representing batch information
+ * muSpikes: mu values for spike-in genes
+ * mu0: Starting value for mu
+ * delta0: Starting value for delta
+ * phi0: Starting value for phi
+ * s0: Starting value for s
+ * nu0: Starting value for nu
+ * theta0: Starting value for theta
+ * s2mu: prior variance for mu
+ * aphi: Dirichlet hyper-parameter for phi
+ * as: prior shape for s 
+ * bs: prior rate for s 
+ * atheta: prior shape for theta
+ * btheta: prior rate for theta 
+ * ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
+ * LSmu0: Starting value of adaptive proposal variance of mu (log-scale)
+ * LSdelta0: Starting value of adaptive proposal variance of delta (log-scale)
+ * LSphi0: Starting value of adaptive proposal precision of phi (log-scale)
+ * LSnu0: Starting value of adaptive proposal variance of nu (log-scale)
+ * LStheta0: Starting value of adaptive proposal variance of theta (log-scale)  
+ * sumByCellAll: Sum of expression counts by cell (all genes)
+ * sumByCellBio:  Sum of expression counts by cell (biological genes only)
+ * sumByGeneAll: Sum of expression counts by gene (all genes)
+ * sumByGeneBio: Sum of expression counts by gene (biological genes only)
+ * StoreAdapt: whether to store adaptive variances 
+ * EndAdapt: when to stop the adaptation
+ * PrintProgress: whether to print progress report 
+ * k: Number of regression components; k-2 Gaussian radial basis functions (GRBFs)
+ * m0: Starting values for locations of GRBFs
+ * V0: Starting value for covariance matrix 
+ * sigma2_a0: Prior shape for Gamma distribution
+ * sigma2_b0: Prior rate for Gamma distribution
+ * beta0: Starting values for regression parameters (weights)
+ * sigma20: Starting value for regression variance
+ * eta0: Fixed value for degrees of freedom
+ * lambda0: Starting values for gene-wise error term
+ * variance: Fixed width (scale) for GRBFs
+ */
+// [[Rcpp::export]]
+Rcpp::List HiddenBASiCS_MCMCcppReg(
+    int N, 
+    int Thin, 
+    int Burn,  
+    NumericMatrix Counts,  
+    NumericMatrix BatchDesign, 
+    NumericVector muSpikes, 
+    NumericVector mu0, 
+    NumericVector delta0, 
+    NumericVector phi0, 
+    NumericVector s0,
+    NumericVector nu0, 
+    NumericVector theta0, 
+    double s2mu,
+    NumericVector aphi, 
+    double as, 
+    double bs,   
+    double atheta, 
+    double btheta, 
+    double ar, 
+    NumericVector LSmu0, 
+    NumericVector LSdelta0, 
+    double LSphi0, 
+    NumericVector LSnu0, 
+    NumericVector LStheta0, 
+    NumericVector sumByCellAll, 
+    NumericVector sumByCellBio,
+    NumericVector sumByGeneAll, 
+    NumericVector sumByGeneBio,
+    int StoreAdapt, 
+    int EndAdapt,
+    int PrintProgress,
+    int k,
+    NumericVector m0, 
+    NumericMatrix V0, 
+    double sigma2_a0, 
+    double sigma2_b0,
+    NumericVector beta0, 
+    double sigma20, 
+    double eta0, 
+    NumericVector lambda0, 
+    double const& variance) 
+{
+  using arma::ones;
+  using arma::zeros;
+  using Rcpp::Rcout; 
+  
+  // NUMBER OF CELLS, GENES AND STORED DRAWS
+  int n = Counts.ncol(); 
+  int nBatch = BatchDesign.ncol();
+  int q0 = delta0.size();
+  int Naux = N/Thin - Burn/Thin;
+  
+  // TRANSFORMATION TO ARMA ELEMENTS 
+  arma::vec sumByCellAll_arma = as_arma(sumByCellAll); 
+  arma::vec sumByCellBio_arma = as_arma(sumByCellBio);
+  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); 
+  arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
+  arma::mat Counts_arma = as_arma(Counts);
+  arma::mat BatchDesign_arma = as_arma(BatchDesign);
+  
+  // OTHER GLOBAL QUANTITIES
+  double SumSpikeInput = sum(muSpikes);
+  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  arma::mat inv_V0 = inv(as_arma(V0));
+  double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t()*inv_V0*as_arma(m0)));
+  arma::vec InvVm0 = inv_V0*as_arma(m0);
+  
+  // OBJECTS WHERE DRAWS WILL BE STORED
+  arma::mat mu = zeros(q0, Naux); 
+  arma::mat delta = zeros(q0, Naux); 
+  arma::mat phi = ones(n, Naux);
+  arma::mat s = zeros(n, Naux);  
+  arma::mat nu = zeros(n, Naux); 
+  arma::mat theta = zeros(nBatch, Naux); 
+  arma::mat LSmu;
+  arma::mat LSdelta;
+  arma::vec LSphi;
+  arma::mat LSnu;
+  arma::mat LStheta; 
+  
+  // LOG-PROPOSAL VARIANCES 
+  if(StoreAdapt == 1) {
+    LSmu = zeros(q0, Naux); 
+    LSdelta = zeros(q0, Naux); 
+    LSphi = ones(Naux);   
+    LSnu = zeros(n, Naux); 
+    LStheta = zeros(nBatch, Naux);   
+  }
+  
+  // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
+  arma::vec muAccept = zeros(q0); arma::vec PmuAux = zeros(q0);
+  arma::vec deltaAccept = zeros(q0); arma::vec PdeltaAux = zeros(q0);
+  double phiAccept = 0; double PphiAux = 0;
+  arma::vec nuAccept = zeros(n); arma::vec PnuAux = zeros(n);
+  arma::vec thetaAccept = zeros(nBatch); arma::vec PthetaAux = zeros(nBatch);
+  
+  // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
+  arma::vec phiAux = as_arma(phi0); Rcpp::List phiAuxList;
+  arma::vec sAux = as_arma(s0); 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0);
+  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0);
+  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
+  
+  // INITIALIZATION OF ADAPTIVE VARIANCES
+  arma::vec LSmuAux = as_arma(LSmu0);
+  arma::vec LSdeltaAux = as_arma(LSdelta0); 
+  double LSphiAux = LSphi0; 
+  arma::vec LSnuAux = as_arma(LSnu0);
+  arma::vec LSthetaAux = as_arma(LStheta0);  
+  
+  // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
+  arma::vec PmuAux0 = zeros(q0); arma::vec PdeltaAux0 = zeros(q0);
+  double PphiAux0 = 0; 
+  arma::vec PnuAux0 = zeros(n); arma::vec PthetaAux0 = zeros(nBatch);
+  
+  // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES 
+  // (RE-INITIALIZE EVERY 50 ITERATIONS)
+  int Ibatch = 0; 
+  
+  // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
+  // To avoid repeated initialisation
+  arma::vec y_q0 = ones(q0); arma::vec y_n = ones(n); 
+  arma::vec ind_q0 = zeros(q0); arma::vec ind_n = zeros(n);
+  arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
+  
+  // REGRESSION SPECIFIC SECTION
+  
+  // Parameters for regression
+  arma::mat beta = arma::zeros(k, Naux);
+  arma::mat lambda = arma::zeros(q0, Naux);
+  arma::vec sigma = arma::zeros(Naux);
+  arma::mat epsilon = arma::zeros(q0, Naux);
+  
+  // INITIALIZATION OF REGRESSION PARAMETERS
+  arma::vec mAux = as_arma(m0); 
+  arma::mat VAux = as_arma(V0); 
+  arma::vec betaAux = as_arma(beta0);
+  arma::vec lambdaAux = as_arma(lambda0); 
+  double sigma2Aux = sigma20; 
+  arma::vec epsilonAux = arma::zeros(q0);
+  
+  // OTHER PARAMETERS FOR REGRESSION
+  arma::mat V1 = arma::zeros(k,k);
+  // Model matrix initialization
+  arma::vec means = muAux(arma::span(0,q0-1),0);
+  arma::mat X = designMatrix(k, means, variance);
+
+  Rcout << "-------------------------------------------------------------" << std::endl;  
+  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  
+  // START OF MCMC LOOP
+  for (int i=0; i<N; i++) {
+    
+    Rcpp::checkUserInterrupt();
+    
+    if(i==Burn) {
+      Rcout << "-------------------------------------------------------------" << std::endl; 
+      Rcout << "End of Burn-in period."<< std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl; 
+    }
+    
+    Ibatch++; 
+    
+    // UPDATE OF PHI: 
+    // 1st ELEMENT IS THE UPDATE, 
+    // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts_arma, 
+                           muAux.col(0), 1/deltaAux.col(0),
+                           nuAux.col(0), aphi, sumByGeneBio_arma, q0,n, 
+                           y_n); 
+    phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
+    PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
+    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    
+    // UPDATE OF THETA: 
+    // 1st ELEMENT IS THE UPDATE, 
+    // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
+                                BatchDesign_arma, BatchSizes,
+                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+    
+    // UPDATE OF MU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
+    // REGRESSION
+    muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
+                        phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, 
+                        y_q0, u_q0, ind_q0,
+                        k, lambdaAux, betaAux, X, sigma2Aux, variance);     
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    
+    // UPDATE OF S
+    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
+                        as, bs, BatchDesign_arma, n, y_n); 
+    
+    // UPDATE OF DELTA: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    // REGRESSION
+    deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
+                              muAux.col(0), 
+                              phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
+                              lambdaAux, X, sigma2Aux, betaAux);  
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);  
+    
+    // UPDATE OF NU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts_arma, SumSpikeInput,
+                          BatchDesign_arma,
+                          muAux.col(0), 1/deltaAux.col(0),
+                          phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                          y_n, u_n, ind_n); 
+    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
+    
+    // UPDATES OF REGRESSION RELATED PARAMETERS
+    V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
+    VAux = inv(V1);
+    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
+      mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
+      mAux = VAux*mAux;
+      
+      // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
+      betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
+      sigma2Aux = sigma2UpdateReg(deltaAux.col(0), betaAux, lambdaAux, V1, 
+                                  mInvVm0, mAux, sigma2_a0, sigma2_b0, q0);
+      
+    }
+    // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
+    lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
+                                eta0, q0, y_q0);
+    // UPDATE OF EPSILON 
+    // Direct calculation conditional on regression related parameters
+    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
+
+    // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
+    if(i < EndAdapt) {
+      // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
+      if(Ibatch==50) {
+        PmuAux = PmuAux/50;
+        PmuAux = -1 + 2*arma::conv_to<arma::mat>::from(PmuAux>ar);
+        LSmuAux = LSmuAux + PmuAux*0.1;
+        PdeltaAux = PdeltaAux/50; 
+        PdeltaAux = -1 + 2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
+        LSdeltaAux = LSdeltaAux + PdeltaAux*0.1;
+        PphiAux = PphiAux/50; PphiAux = -1 + 2*(PphiAux>ar); 
+        LSphiAux = LSphiAux - PphiAux*0.1;  
+        PnuAux = PnuAux/50; 
+        PnuAux = -1 + 2*arma::conv_to<arma::mat>::from(PnuAux>ar);
+        LSnuAux = LSnuAux + PnuAux*0.1;
+        PthetaAux = PthetaAux/50; 
+        PthetaAux = -1 + 2*arma::conv_to<arma::mat>::from(PthetaAux>ar);
+        LSthetaAux = LSthetaAux + PthetaAux*0.1;
+        
+        Ibatch = 0; 
+        PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
+        PphiAux = PphiAux0; 
+        PnuAux = PnuAux0; PthetaAux = PthetaAux0; 
+        
+        // REGRESSION
+        // Update of model matrix every 50 iterations during Burn in period
+        means = muAux(arma::span(0,q0-1),0);
+        X = designMatrix(k, means, variance);
+      }
+    }
+    
+    // STORAGE OF DRAWS
+    if((i%Thin==0) & (i>=Burn)) {      
+      mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
+      delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
+      phi.col(i/Thin - Burn/Thin) = phiAux;
+      s.col(i/Thin - Burn/Thin) = sAux;
+      nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
+      theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);  
+      
+      // Regression
+      beta.col(i/Thin - Burn/Thin) = betaAux;
+      lambda.col(i/Thin - Burn/Thin) = lambdaAux;
+      sigma(i/Thin - Burn/Thin) = sigma2Aux;
+      epsilon.col(i/Thin - Burn/Thin) = epsilonAux;
+      
+      if(StoreAdapt == 1) {
+        LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
+        LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
+        LSphi(i/Thin - Burn/Thin) = LSphiAux;
+        LSnu.col(i/Thin - Burn/Thin) = LSnuAux;
+        LStheta.col(i/Thin - Burn/Thin) = LSthetaAux; 
+      }
+    }
+    
+    // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
+    if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
+      Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
+      Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
+      Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
+      Rcout << "s (cell 1): " << sAux(0) << std::endl;
+      Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
+      Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
+      Rcpp::Rcout << "betas: " << betaAux.t() << std::endl;
+      Rcpp::Rcout << "sigma: " << sigma2Aux << std::endl; 
+      Rcpp::Rcout << "lambda (gene 1): " << lambdaAux(0) << std::endl;
+      Rcpp::Rcout << "epsilon (gene 1): " << epsilonAux(0) << std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
+      Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
+      Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
+      Rcout << "LSphi: " << LSphiAux << std::endl;
+      Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
+      Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
+    }    
+  }
+  
+  // ACCEPTANCE RATE CONSOLE OUTPUT
+  Rcout << " " << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  // ACCEPTANCE RATE CONSOLE OUTPUT
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  
+  Rcout << "Minimum acceptance rate among mu[i]'s: " << 
+    min(muAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among mu[i]'s: " << 
+    mean(muAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among mu[i]'s: " << 
+    max(muAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Minimum acceptance rate among delta[i]'s: " << 
+    min(deltaAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among delta[i]'s: " << 
+    mean(deltaAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among delta[i]'s: " << 
+    max(deltaAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Acceptance rate for phi (joint): " << 
+    phiAccept/(N-Burn) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Minimum acceptance rate among nu[j]'s: " << 
+    min(nuAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among nu[j]'s: " << 
+    mean(nuAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among nu[j]'s: " << 
+    max(nuAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Minimum acceptance rate among theta[k]'s: " << 
+    min(thetaAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among theta[k]'s: " << 
+    mean(thetaAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among theta[k]'s: " << 
+    max(thetaAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  
+  if(StoreAdapt == 1) {
+    // OUTPUT (AS A LIST)
+    return(Rcpp::List::create(
+        Rcpp::Named("mu") = mu.t(),
+        Rcpp::Named("delta") = delta.t(),
+        Rcpp::Named("phi") = phi.t(),
+        Rcpp::Named("s") = s.t(),
+        Rcpp::Named("nu") = nu.t(),
+        Rcpp::Named("theta") = theta.t(),
+        Rcpp::Named("beta")=beta.t(),
+        Rcpp::Named("sigma2")=sigma.t(),
+        Rcpp::Named("lambda")=lambda.t(),
+        Rcpp::Named("epsilon")=epsilon.t(),
+        Rcpp::Named("designMatrix")=X,
+        Rcpp::Named("ls.mu") = LSmu.t(),
+        Rcpp::Named("ls.delta") = LSdelta.t(),
+        Rcpp::Named("ls.phi") = LSphi,
+        Rcpp::Named("ls.nu") = LSnu.t(),
+        Rcpp::Named("ls.theta") = LStheta.t())); 
+  }
+  else {
+    // OUTPUT (AS A LIST)
+    return(Rcpp::List::create(
+        Rcpp::Named("mu") = mu.t(),
+        Rcpp::Named("delta") = delta.t(),
+        Rcpp::Named("phi") = phi.t(),
+        Rcpp::Named("s") = s.t(),
+        Rcpp::Named("nu") = nu.t(),
+        Rcpp::Named("theta") = theta.t(),
+        Rcpp::Named("beta")=beta.t(),
+        Rcpp::Named("sigma2")=sigma,
+        Rcpp::Named("lambda")=lambda.t(),
+        Rcpp::Named("epsilon")=epsilon.t())); 
+    
+  }
 }
 
 /* Metropolis-Hastings updates of mu 
@@ -1177,16 +1779,17 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
 arma::mat muUpdateNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
-    double const& Constrain,
     arma::mat const& Counts,  
-    arma::vec const& delta, 
+    arma::vec const& invdelta, 
     arma::vec const& nu, 
     arma::vec const& sum_bycell_all, 
     double const& s2_mu,
     int const& q0,
     int const& n,
-    arma::vec & mu,
+    arma::vec & mu1,
+    arma::vec & u,
     arma::vec & ind,
+    double const& Constrain,
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
@@ -1195,10 +1798,10 @@ arma::mat muUpdateNoSpikes(
   using arma::span;
   
   // PROPOSAL STEP    
-  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
-  arma::vec u = arma::randu(q0);
+  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
+  u = arma::randu(q0);
+  
   // INITIALIZE MU
-  mu = mu0 + 1 - 1;
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
   
@@ -1207,15 +1810,13 @@ arma::mat muUpdateNoSpikes(
   // Step 1: Computing the likelihood contribution of the acceptance rate 
   // Calculated in the same way for all genes, 
   // but the reference one (no need to be sequential)
-  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
-  for (int i=0; i < q0; i++)
-  {
-    if(i != RefGene)
-    {
-      for (int j=0; j < n; j++) 
-      {
-        log_aux(i) -= ( Counts(i,j) + (1/delta(i)) ) * 
-          log( ( nu(j)*y(i)+(1/delta(i)) ) / ( nu(j)*mu(i)+(1/delta(i)) ));
+  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+  for (int i=0; i < q0; i++) {
+    if(i != RefGene) {
+      for (int j=0; j < n; j++) {
+        log_aux(i) -= ( Counts(i,j) + invdelta(i) ) * 
+                          log( ( nu(j)*mu1(i) + invdelta(i) ) / 
+                               ( nu(j)*mu0(i) + invdelta(i) ));
       }
     }
   }
@@ -1223,191 +1824,1056 @@ arma::mat muUpdateNoSpikes(
   // Step 2: Computing prior component of the acceptance rate 
   
   // Step 2.1: For genes that are under the constrain (excluding the reference one)
-  for (int i=0; i < ConstrainGene.size(); i++)
-  {
+  for (int i=0; i < ConstrainGene.size(); i++) {
     iAux = ConstrainGene(i);
-    if(iAux != RefGene)
-    {
-      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu(iAux))));
-      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+    if(iAux != RefGene) {
+      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2)); 
       log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu(iAux) = y(iAux);
-        sumAux += log(mu(iAux)) - log(mu0(iAux)); 
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+        ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
       }
-      else{ind(iAux) = 0; mu(iAux) = mu0(iAux); }      
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
     }
   }
-
+  
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
-  mu(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
-
+  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  
   // Step 2.3: For genes that are *not* under the constrain
-  if(ConstrainType != 1)
-  {
-    for (int i=0; i < NotConstrainGene.size(); i++)
-    {
+  // Only relevant for a trimmed constrain
+  if(ConstrainType == 2) {
+    for (int i=0; i < NotConstrainGene.size(); i++) {
       iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(mu1(iAux)),2) - pow(log(mu0(iAux)),2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) 
-      {
-        ind(iAux) = 1; mu(iAux) = y(iAux);
-      }
-      else{ind(iAux) = 0; mu(iAux) = mu0(iAux);}
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) { ind(iAux) = 1; }
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
     }
   }
   // OUTPUT
-  return join_rows(mu, ind);
+  return join_rows(mu1, ind);
 }
+
+/* Metropolis-Hastings updates of nu (batch case)
+ * Updates are implemented simulateaneously for all cells.
+ */
+arma::mat nuUpdateBatchNoSpikes(
+    arma::vec const& nu0, 
+    arma::vec const& prop_var, 
+    arma::mat const& Counts,
+    arma::mat const& BatchDesign, 
+    arma::vec const& mu, 
+    arma::vec const& invdelta, 
+    arma::vec const& s, 
+    arma::vec const& thetaBatch, 
+    arma::vec const& sum_bygene_all, 
+    int const& q0,
+    int const& n,
+    arma::vec & nu1,
+    arma::vec & u,
+    arma::vec & ind)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP    
+  nu1 = exp(arma::randn(n) % sqrt(prop_var) + log(nu0));
+  u = arma::randu(n);
+  
+  // ACCEPT/REJECT STEP
+  arma::vec log_aux = (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
+  log_aux -= (nu1 -nu0)  % (1/(thetaBatch % s)); 
+  
+  for (int j=0; j < n; j++) {
+    for (int i=0; i < q0; i++) {
+      log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
+        log( ( nu1(j)*mu(i) + invdelta(i) ) / 
+             ( nu0(j)*mu(i) + invdelta(i) ));
+    } 
+  }
+
+  /* CREATING OUTPUT VARIABLE & DEBUG 
+  * Proposed values are automatically rejected in the following cases:
+  * - If smaller than 1e-5
+  * - If the proposed value is not finite
+  * - When the acceptance rate cannot be numerally computed
+  */  
+  ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
+  for (int j=0; j < n; j++) {
+    if(ind(j) == 0) nu1(j) = nu0(j);  
+  }
+  
+  // OUTPUT
+  return join_rows(nu1, ind);
+}
+
+
+
+/* MCMC sampler 
+ * N: Total number of MCMC draws 
+ * Thin: Thinning period for MCMC chain 
+ * Burn: Burning period for MCMC chain 
+ * Counts: $q \times n$ matrix of expression counts
+ * BatchDesign: Design matrix representing batch information 
+ * (number of columns must be equal to number of batches)
+ * mu0: Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ 
+ * delta0: Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$
+ * phi0: Starting value of $\phi=(\phi_1,...,\phi_n)$'
+ * nu0: Starting value of $\nu=(\nu_1,...,\nu_n)$'
+ * theta0: Starting value of $\theta$ 
+ * s2mu: Prior variance for log-Normal(0, $s^2_{\mu}$) assigned to the 
+ * unconstrained mean expression parameters
+ * adelta: Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
+ * prior assigned to each $\delta_i$ 
+ * bdelta: Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
+ * prior assigned to each $\delta_i$ 
+ * s2delta: Prior variance for log-Normal(0, $s^2_{\delta}$) assigned to each
+ * $\delta_i$
+ * prior_delta: (as in HiddenBASiCS_MCMCcpp)
+ * atheta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
+ * prior assigned to $\theta$
+ * btheta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
+ * prior assigned to $\theta$
+ * ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
+ * LSmu0: Starting value of adaptive proposal variance of 
+ * $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
+ * LSdelta0: Starting value of adaptive proposal variance of 
+ * $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
+ * LSnu0: Starting value of adaptive proposal variance of 
+ * $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
+ * LStheta0: Starting value of adaptive proposal variance of $\theta$ (log-scale) 
+ * sumByCellAll: Sum of expression counts by cell (all genes)
+ * sumByGeneAll: Sum of expression counts by gene (all genes) 
+ * StoreAdapt: (as in HiddenBASiCS_MCMCcpp)
+ * EndAdapt: (as in HiddenBASiCS_MCMCcpp)
+ * PrintProgress: (as in HiddenBASiCS_MCMCcpp)
+ * Constrain:
+ * Index:
+ * RefGene:
+ * RefGenes:
+ * ConstrainGene:
+ * NotConstrainGene:
+ * ConstrainType: 
+ * StochasticRef: 
+ */
+// [[Rcpp::export]]
+Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
+    int N, 
+    int Thin, 
+    int Burn,  
+    NumericMatrix Counts, 
+    NumericMatrix BatchDesign, 
+    NumericVector mu0, 
+    NumericVector delta0,   
+    NumericVector s0, 
+    NumericVector nu0,    
+    NumericVector theta0,
+    double s2mu, 
+    double adelta, 
+    double bdelta, 
+    double s2delta,
+    double prior_delta,
+    double as,
+    double bs,
+    double atheta, 
+    double btheta, 
+    double ar, 
+    NumericVector LSmu0, 
+    NumericVector LSdelta0, 
+    NumericVector LSnu0, 
+    NumericVector LStheta0, 
+    NumericVector sumByCellAll, 
+    NumericVector sumByGeneAll, 
+    int StoreAdapt, 
+    int EndAdapt,
+    int PrintProgress,
+    double Constrain,
+    NumericVector Index,
+    int RefGene,
+    NumericVector RefGenes,
+    NumericVector ConstrainGene,
+    NumericVector NotConstrainGene,
+    int ConstrainType,
+    int StochasticRef)
+{
+  using arma::ones;
+  using arma::zeros;
+  using Rcpp::Rcout;
+  
+  // NUMBER OF CELLS, GENES AND STORED DRAWS
+  int n = Counts.ncol(); int q0 = Counts.nrow(); int Naux = N/Thin - Burn/Thin;
+  int nBatch = BatchDesign.ncol();
+  
+  // TRANSFORMATION TO ARMA ELEMENTS 
+  arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
+  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
+  arma::mat Counts_arma = as_arma(Counts); 
+  arma::mat BatchDesign_arma = as_arma(BatchDesign);
+  arma::vec Index_arma = as_arma(Index);
+  arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
+  arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
+  arma::vec RefGenes_arma = as_arma(RefGenes);
+  
+  // OTHER GLOBAL QUANTITIES
+  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  
+  // OBJECTS WHERE DRAWS WILL BE STORED
+  arma::mat mu = zeros(Naux, q0); 
+  arma::mat delta = zeros(Naux, q0); 
+  arma::mat s = ones(Naux, n);
+  arma::mat nu = zeros(Naux, n); 
+  arma::mat theta = zeros(Naux, nBatch); 
+  arma::mat LSmu;
+  arma::mat LSdelta;
+  arma::mat LSnu;
+  arma::mat LStheta; 
+  
+  // LOG-PROPOSAL VARIANCES 
+  if(StoreAdapt == 1) {
+    LSmu = zeros(Naux, q0); 
+    LSdelta = zeros(Naux, q0); 
+    LSnu = zeros(Naux, n); 
+    LStheta = zeros(Naux, nBatch);   
+  }
+  
+  // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
+  arma::vec muAccept = zeros(q0); 
+  arma::vec deltaAccept = zeros(q0); 
+  arma::vec nuAccept = zeros(n); 
+  arma::vec thetaAccept = zeros(nBatch); 
+  
+  arma::vec PmuAux = zeros(q0);
+  arma::vec PdeltaAux = zeros(q0);
+  arma::vec PnuAux = zeros(n);
+  arma::vec PthetaAux = zeros(nBatch);
+  
+  // INITIALIZATION OF VALUES FOR MCMC RUN
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
+  arma::vec sAux = as_arma(s0); 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0); 
+  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0); 
+  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
+  
+  // INITIALIZATION OF ADAPTIVE VARIANCES
+  arma::vec LSmuAux = as_arma(LSmu0);
+  arma::vec LSdeltaAux = as_arma(LSdelta0); 
+  arma::vec LSnuAux = as_arma(LSnu0);
+  arma::vec LSthetaAux = as_arma(LStheta0);  
+  
+  // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
+  arma::vec PmuAux0 = arma::zeros(q0); arma::vec PdeltaAux0 = arma::zeros(q0);
+  arma::vec PnuAux0 = arma::zeros(n); arma::vec PthetaAux0 = arma::ones(nBatch);
+  
+  // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES 
+  // (RE-INITIALIZE EVERY 50 ITERATIONS)
+  int Ibatch = 0; int i;
+  
+  // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
+  // To avoid repeated initialisation
+  arma::vec y_q0 = arma::ones(q0); arma::vec y_n = arma::ones(n); 
+  arma::vec ind_q0 = arma::zeros(q0); arma::vec ind_n = arma::zeros(n);
+  arma::vec u_q0 = arma::zeros(q0); arma::vec u_n = arma::zeros(n);
+  
+  // INITIALIZATION OF PARAMETERS RELATED TO STOCHASTIC REF
+  arma::vec RefFreq = arma::zeros(q0); 
+  int RefAux;
+  
+  Rcout << "-------------------------------------------------------------" << std::endl;  
+  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  
+  // START OF MCMC LOOP
+  for (i=0; i<N; i++) {
+    
+    Rcpp::checkUserInterrupt();
+    
+    if(i==Burn) {
+      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
+      Rcpp::Rcout << "End of Burn-in period."<< std::endl;
+      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
+    }
+    
+    Ibatch++; 
+
+    // UPDATE OF PHI
+    // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
+    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
+                        as, bs, BatchDesign_arma, n, y_n); 
+    
+    // UPDATE OF THETA: 
+    // 1st ELEMENT IS THE UPDATE, 
+    // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
+                                BatchDesign_arma, BatchSizes,
+                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+    PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
+    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+
+    // UPDATE OF MU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
+    // If using stochastic reference, randomly select 1 ref gene
+    if(StochasticRef == 1) {
+      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
+                                                           RefGenes_arma.size()-1) ));
+      RefGene = RefGenes(RefAux); 
+      if(i >= Burn) RefFreq(RefGene) += 1;
+    }
+    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts_arma, 
+                             1/deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
+                             s2mu, q0, n, y_q0, u_q0, ind_q0,
+                             Constrain, RefGene, ConstrainGene_arma, 
+                             NotConstrainGene_arma, ConstrainType);
+    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}  
+    
+    // UPDATE OF DELTA: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
+                           muAux.col(0), nuAux.col(0), 
+                           adelta, bdelta, s2delta, prior_delta, 
+                           q0, n, y_q0, u_q0, ind_q0); 
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
+   
+    // UPDATE OF NU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
+                                  BatchDesign_arma,
+                                  muAux.col(0), 1/deltaAux.col(0),
+                                  sAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                                  y_n, u_n, ind_n); 
+    PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
+
+    // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
+    if(i < EndAdapt) {
+      // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
+      if(Ibatch==50) {
+        PmuAux = PmuAux/(50-RefFreq); 
+        PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
+        LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) + PmuAux.elem(find(Index_arma != RefGene))*0.1; 
+        PdeltaAux = PdeltaAux/50; 
+        PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
+        LSdeltaAux = LSdeltaAux+PdeltaAux*0.1;                
+        PnuAux = PnuAux/50; 
+        PnuAux = -1+2*arma::conv_to<arma::mat>::from(PnuAux>ar);
+        LSnuAux = LSnuAux+PnuAux*0.1; 
+        PthetaAux = PthetaAux/50; 
+        PthetaAux = -1+2*arma::conv_to<arma::mat>::from(PthetaAux>ar); 
+        LSthetaAux = LSthetaAux + PthetaAux*0.1;
+        
+        Ibatch = 0; 
+        PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
+        PnuAux = PnuAux0; PthetaAux = PthetaAux0;
+      }
+    }
+    
+    // STORAGE OF DRAWS
+    if(i%Thin==0 & i>=Burn) {      
+      mu.row(i/Thin - Burn/Thin) = muAux.col(0).t(); 
+      delta.row(i/Thin - Burn/Thin) = deltaAux.col(0).t(); 
+      s.row(i/Thin - Burn/Thin) = sAux.t();
+      nu.row(i/Thin - Burn/Thin) = nuAux.col(0).t();       
+      theta.row(i/Thin - Burn/Thin) = thetaAux.col(0).t();   
+      
+      if(StoreAdapt == 1) {
+        LSmu.row(i/Thin - Burn/Thin) = LSmuAux.t();
+        LSdelta.row(i/Thin - Burn/Thin) = LSdeltaAux.t();
+        LSnu.row(i/Thin - Burn/Thin) = LSnuAux.t();
+        LStheta.row(i/Thin - Burn/Thin) = LSthetaAux.t(); 
+      }
+    }
+    
+    // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
+    if(i%(2*Thin) == 0 & PrintProgress == 1) {
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcpp::Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcpp::Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
+      Rcpp::Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
+      Rcpp::Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
+      Rcpp::Rcout << "s (cell 1): " << sAux(0) << std::endl;
+      Rcpp::Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
+      Rcpp::Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcpp::Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
+      Rcpp::Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
+      Rcpp::Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
+      Rcpp::Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
+      Rcpp::Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
+    }    
+  }
+  
+  // ACCEPTANCE RATE CONSOLE OUTPUT
+  Rcpp::Rcout << " " << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcpp::Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcpp::Rcout << " " << std::endl;
+  // ACCEPTANCE RATE CONSOLE OUTPUT
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcpp::Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcpp::Rcout << " " << std::endl;
+
+  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << 
+    min(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << 
+    mean(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << 
+    max(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
+  
+  Rcpp::Rcout << " " << std::endl;
+  Rcpp::Rcout << "Minimum acceptance rate among delta[i]'s: " << 
+    min(deltaAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << 
+    mean(deltaAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << 
+    max(deltaAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << " " << std::endl;
+  Rcpp::Rcout << "Minimum acceptance rate among nu[jk]'s: " << 
+    min(nuAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among nu[jk]'s: " << 
+    mean(nuAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Maximum acceptance rate among nu[jk]'s: " << 
+    max(nuAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << " " << std::endl;
+  Rcpp::Rcout << "Minimum acceptance rate among theta[k]'s: " << 
+    min(thetaAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Average acceptance rate among theta[k]'s: " << 
+    mean(thetaAccept/(N-Burn)) << std::endl;
+  Rcpp::Rcout << "Maximum acceptance rate among theta[k]'s: " << 
+    max(thetaAccept/(N-Burn)) << std::endl;  
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcpp::Rcout << " " << std::endl;
+  
+  if(StoreAdapt == 1) {
+    // OUTPUT (AS A LIST)
+    return(Rcpp::List::create(
+        Rcpp::Named("mu") = mu,
+        Rcpp::Named("delta") = delta,
+        Rcpp::Named("s") = s,
+        Rcpp::Named("nu") = nu,
+        Rcpp::Named("theta") = theta,
+        Rcpp::Named("ls.mu") = LSmu,
+        Rcpp::Named("ls.delta") = LSdelta,
+        Rcpp::Named("ls.nu") = LSnu,
+        Rcpp::Named("ls.theta") = LStheta,
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+  }
+  else {
+    // OUTPUT (AS A LIST)
+    return(Rcpp::List::create(
+        Rcpp::Named("mu") = mu,
+        Rcpp::Named("delta") = delta,
+        Rcpp::Named("s") = s,
+        Rcpp::Named("nu") = nu,
+        Rcpp::Named("theta") = theta,
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+  }
+}
+
+/* Metropolis-Hastings updates of mu 
+ * Updates are implemented simulateaneously for all biological genes
+ */
+arma::mat muUpdateRegNoSpikes(
+    arma::vec const& mu0, 
+    arma::vec const& prop_var, 
+    arma::mat const& Counts,  
+    arma::vec const& delta,
+    arma::vec const& invdelta, 
+    arma::vec const& nu, 
+    arma::vec const& sum_bycell_all, 
+    double const& s2_mu,
+    int const& q0,
+    int const& n,
+    arma::vec & mu1,
+    arma::vec & u,
+    arma::vec & ind,
+    double const& Constrain, /* No-spikes arguments from here */
+    int const& RefGene,
+    arma::uvec const& ConstrainGene,
+    arma::uvec const& NotConstrainGene,
+    int const& ConstrainType,
+    int const& k, /* Regression arguments from here */
+    arma::vec const& lambda,
+    arma::vec const& beta,
+    arma::mat const& X,
+    double const& sigma2,
+    double variance)
+{
+  using arma::span;
+  
+  // PROPOSAL STEP    
+  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
+  u = arma::randu(q0);
+  
+  // INITIALIZE MU
+  double aux; double iAux;
+  double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
+  
+  // ACCEPT/REJECT STEP
+  
+  // Step 1: Computing the likelihood contribution of the acceptance rate 
+  // Calculated in the same way for all genes, 
+  // but the reference one (no need to be sequential)
+  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+  for (int i=0; i < q0; i++) {
+    if(i != RefGene) {
+      for (int j=0; j < n; j++) {
+        log_aux(i) -= ( Counts(i,j) + invdelta(i) ) * 
+                         log( ( nu(j)*mu1(i) + invdelta(i) ) / 
+                              ( nu(j)*mu0(i) + invdelta(i) ));
+      }
+    }
+  }
+  // Revise this part
+  // This is new due to regression prior on delta
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  
+  // REGRESSION RELATED FACTOR
+  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
+  
+  // Step 2: Computing prior component of the acceptance rate 
+  
+  // Step 2.1: For genes that are under the constrain (excluding the reference one)
+  for (int i=0; i < ConstrainGene.size(); i++) {
+    iAux = ConstrainGene(i);
+    if(iAux != RefGene) {
+      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2)); 
+      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
+      // ACCEPT REJECT
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+        ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+      }
+      else{ ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
+    }
+  }
+  
+  // Step 2.2: For the reference gene 
+  ind(RefGene) = 1;
+  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  
+  // Step 2.3: For genes that are *not* under the constrain
+  // Only relevant for a trimmed constrain
+  if(ConstrainType == 2) {
+    for (int i=0; i < NotConstrainGene.size(); i++) {
+      iAux = NotConstrainGene(i);
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(mu1(iAux)),2) - pow(log(mu0(iAux)),2));
+      // ACCEPT REJECT
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) { ind(iAux) = 1; }
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
+    }
+  }
+  // OUTPUT
+  return join_rows(mu1, ind);
+}
+
 
 /* Metropolis-Hastings updates of delta
  * Updates are implemented simulateaneously for all biological genes
  */
-arma::mat deltaUpdateNoSpikes(
-  arma::vec const& delta0,
-  arma::vec const& prop_var,  
-  arma::mat const& Counts, 
-  arma::vec const& mu, 
-  arma::vec const& nu, 
-  double const& a_delta, 
-  double const& b_delta, 
-  int const& q0,
-  int const& n,
-  double const& s2delta,
-  double const& prior_delta)
+arma::mat deltaUpdateRegNoSpikes(
+    arma::vec const& delta0,
+    arma::vec const& prop_var,  
+    arma::mat const& Counts, 
+    arma::vec const& mu, 
+    arma::vec const& nu, 
+    int const& q0,
+    int const& n,
+    arma::vec & delta1,
+    arma::vec & u, 
+    arma::vec & ind,
+    arma::vec const& lambda,
+    arma::mat const& X,
+    double const& sigma2,
+    arma::vec const& beta)
 {
   using arma::span;
-  
-  // CREATING VARIABLES WHERE TO STORE DRAWS
-  arma::vec delta = arma::zeros(q0); 
-  arma::vec ind = arma::zeros(q0);
   
   // PROPOSAL STEP
-  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
-  arma::vec u = arma::randu(q0);
+  delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
+  u = arma::randu(q0);
   
   // ACCEPT/REJECT STEP 
-  arma::vec log_aux = - n * (lgamma_cpp(1/y)-lgamma_cpp(1/delta0));
+  arma::vec log_aux = - n * (lgamma_cpp(1/delta1)-lgamma_cpp(1/delta0));
   // +1 should appear because we update log(delta) not delta. 
   // However, it cancels out with the prior. 
-  log_aux -= n * ( (log(y)/y) - (log(delta0)/delta0) );
-
+  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  
   // Loop to replace matrix operations, through genes and cells
-  for (int i=0; i < q0; i++)
-  {
-      for (int j=0; j < n; j++) 
-      {
-        log_aux(i) += R::lgammafn(Counts(i,j) + (1/y(i))) - R::lgammafn(Counts(i,j) + (1/delta0(i)));
-        log_aux(i) -= ( Counts(i,j) + (1/y(i)) ) *  log( nu(j)*mu(i)+(1/y(i)) );
-        log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
-      } 
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
+      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
+      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) -= ( Counts(i,j) + (1/delta1(i)) ) *  log( nu(j)*mu(i)+(1/delta1(i)) );
+      log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
+    } 
   }
   
-  // Component related to the prior
-  if(prior_delta == 1) {log_aux += (log(y) - log(delta0)) * a_delta - b_delta * (y - delta0);}
-  else {log_aux -= (0.5/s2delta) * (pow(log(y),2) - pow(log(delta0),2));}
-
+  // REGRESSION RELATED FACTOR
+  // Some terms might cancel out here; check
+  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
+  
   // CREATING OUTPUT VARIABLE & DEBUG
-  for (int i=0; i < q0; i++)
-  {
-    if((arma::is_finite(log_aux(i))))
-    {
-      if((y(i) > 1e-3) & (log(u(i)) < log_aux(i)))
-      {
-        // DEBUG: Reject very small values to avoid numerical issues
-        if(arma::is_finite(y(i))) {ind(i) = 1; delta(i) = y(i);}
-        else{ind(i) = 0; delta(i) = delta0(i);}            
-      }
-      else{ind(i) = 0; delta(i) = delta0(i);}
-    }      
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Reject values such that the proposed value is not finite (due no numerical innacuracies)
-    else
-    {
-      ind(i) = 0; delta(i) = delta0(i);
-      Rcpp::Rcout << "delta0(i): " << delta0(i) << std::endl;
-      Rcpp::Rcout << "y(i): " << y(i) << std::endl;
-      Rcpp::Rcout << "mu(i): " << mu(i) << std::endl;
-      Rcpp::Rcout << "SomeThing went wrong when updating delta " << i+1 << std::endl;
-      Rcpp::warning("If this error repeats often, please consider additional filter of the input dataset or use a smaller value for s2mu.");        
-    }
+  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
+  for (int i=0; i < q0; i++) {
+    if(ind(i) == 0) delta1(i) = delta0(i);  
   }
   
   // OUTPUT
-  return join_rows(delta, ind);
+  return join_rows(delta1, ind);
 }
 
-/* Auxiliary function required for some of the Metropolis-Hastings updates of nu */
-arma::mat UpdateAux_nuTrick(   
-    arma::vec const& nu, /* Auxiliary variable (function of the current and proposed value of nu) */
-arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */
-arma::vec const& phi) /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-{
-  arma::mat x = ((phi % nu) * mu.t()).t();
-  x.each_col() += 1/delta;
-  return x;
-}
-
-/* Metropolis-Hastings updates of nu 
- * Updates are implemented simulateaneously for all cells, significantly reducing the computational burden.
+/* MCMC sampler 
+ * N: Total number of MCMC draws 
+ * Thin: Thinning period for MCMC chain 
+ * Burn: Burning period for MCMC chain 
+ * Counts: Matrix of expression counts
+ * BatchDesign: Design matrix representing batch information
+ * muSpikes: mu values for spike-in genes
+ * mu0: Starting value for mu
+ * delta0: Starting value for delta
+ * phi0: Starting value for phi
+ * s0: Starting value for s
+ * nu0: Starting value for nu
+ * theta0: Starting value for theta
+ * s2mu: prior variance for mu
+ * aphi: Dirichlet hyper-parameter for phi
+ * as: prior shape for s 
+ * bs: prior rate for s 
+ * atheta: prior shape for theta
+ * btheta: prior rate for theta 
+ * ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
+ * LSmu0: Starting value of adaptive proposal variance of mu (log-scale)
+ * LSdelta0: Starting value of adaptive proposal variance of delta (log-scale)
+ * LSphi0: Starting value of adaptive proposal precision of phi (log-scale)
+ * LSnu0: Starting value of adaptive proposal variance of nu (log-scale)
+ * LStheta0: Starting value of adaptive proposal variance of theta (log-scale)  
+ * sumByCellAll: Sum of expression counts by cell (all genes)
+ * sumByCellBio:  Sum of expression counts by cell (biological genes only)
+ * sumByGeneAll: Sum of expression counts by gene (all genes)
+ * sumByGeneBio: Sum of expression counts by gene (biological genes only)
+ * StoreAdapt: whether to store adaptive variances 
+ * EndAdapt: when to stop the adaptation
+ * PrintProgress: whether to print progress report 
+ * k: Number of regression components; k-2 Gaussian radial basis functions (GRBFs)
+ * m0: Starting values for locations of GRBFs
+ * V0: Starting value for covariance matrix 
+ * sigma2_a0: Prior shape for Gamma distribution
+ * sigma2_b0: Prior rate for Gamma distribution
+ * beta0: Starting values for regression parameters (weights)
+ * sigma20: Starting value for regression variance
+ * eta0: Fixed value for degrees of freedom
+ * lambda0: Starting values for gene-wise error term
+ * variance: Fixed width (scale) for GRBFs
  */
-arma::mat nuUpdateNoSpikes(
-  arma::vec const& nu0, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-  arma::vec const& prop_var, /* Current value of the proposal variances for $\nu=(\nu_1,...,\nu_n)'$ */
-  arma::mat const& Counts, /* $q \times n$ matrix of expression counts (technical genes at the bottom) */
-  arma::mat const& BatchDesign, 
-  arma::vec const& mu, /* Current value of $\mu=(\mu_1,...,\mu_q)'$ */
-  arma::vec const& delta, /* Current value of $\delta=(\delta_1,...,\delta_{q_0})'$ */  
-  arma::vec const& phi, /* Current value of $\phi=(\phi_1,...,\phi_n)$' */
-  arma::vec const& theta, /* Current value of $\theta$' */
-  arma::vec const& sum_bygene_all, /* Sum of expression counts by gene (all genes) */
-  int const& q0,
-  int const& n,
-  arma::vec const& BatchInfo,
-  arma::vec const& BatchIds,
-  int const& nBatch,
-  arma::vec const& BatchSizes,
-  arma::vec const& BatchOffSet)
+// [[Rcpp::export]]
+Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
+    int N, 
+    int Thin, 
+    int Burn,  
+    NumericMatrix Counts,  
+    NumericMatrix BatchDesign, 
+    NumericVector mu0, 
+    NumericVector delta0, 
+    NumericVector s0, 
+    NumericVector nu0, 
+    NumericVector theta0, 
+    double s2mu,
+    double as,
+    double bs,
+    double atheta, 
+    double btheta, 
+    double ar, 
+    NumericVector LSmu0, 
+    NumericVector LSdelta0, 
+    NumericVector LSnu0, 
+    NumericVector LStheta0, 
+    NumericVector sumByCellAll, 
+    NumericVector sumByGeneAll, 
+    int StoreAdapt, 
+    int EndAdapt,
+    int PrintProgress,
+    int k,
+    NumericVector m0, 
+    NumericMatrix V0, 
+    double sigma2_a0, 
+    double sigma2_b0,
+    NumericVector beta0, 
+    double sigma20, 
+    double eta0, 
+    NumericVector lambda0, 
+    double const& variance,
+    double Constrain,
+    NumericVector Index,
+    int RefGene,
+    NumericVector RefGenes,
+    NumericVector ConstrainGene,
+    NumericVector NotConstrainGene,
+    int ConstrainType,
+    int StochasticRef) 
 {
-  using arma::span;
+  using arma::ones;
+  using arma::zeros;
+  using Rcpp::Rcout; 
   
-  // CREATING VARIABLES WHERE TO STORE DRAWS
-  arma::vec lognu = log(nu0);
-  arma::vec thetaBatch = BatchDesign * theta; 
+  // NUMBER OF CELLS, GENES AND STORED DRAWS
+  int n = Counts.ncol(); 
+  int nBatch = BatchDesign.ncol();
+  int q0 = delta0.size();
+  int Naux = N/Thin - Burn/Thin;
   
-  // PROPOSAL STEP    
-  arma::vec y = arma::randn(n) % sqrt(prop_var) + lognu;
-  arma::vec u = arma::randu(n);
+  // TRANSFORMATION TO ARMA ELEMENTS 
+  arma::vec sumByCellAll_arma = as_arma(sumByCellAll); 
+  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); 
+  arma::mat Counts_arma = as_arma(Counts);
+  arma::mat BatchDesign_arma = as_arma(BatchDesign);
+  arma::vec Index_arma = as_arma(Index);
+  arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
+  arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
+  arma::vec RefGenes_arma = as_arma(RefGenes);
   
-  // ACCEPT/REJECT STEP
-  arma::vec log_aux = (y - lognu) % (sum_bygene_all + 1/thetaBatch);
-  log_aux -= nu0 % (exp(y-lognu)-1)  % (1/(thetaBatch % phi));   
-  arma::mat m = Counts.rows(0, q0 - 1);
-  m.each_col() += 1 / delta;   
-  arma::mat num = UpdateAux_nuTrick(exp(y), mu, delta, arma::ones(n));
-  num /= UpdateAux_nuTrick(nu0,    mu, delta, arma::ones(n));
-  m %= log(num);
-  log_aux -= sum(m, 0).t();
-  arma::umat ind = log(u) < log_aux;
-  // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-  // DEBUG: Print warning message    
-  ind.elem(find_nonfinite(log_aux)).zeros();
-  if(size(find_nonfinite(log_aux),0)>0)
-  {
-    Rcpp::Rcout << "SomeThing went wrong when updating nu" << size(find_nonfinite(log_aux),0) << std::endl;
-    Rcpp::stop("Please consider additional filter of the input dataset.");
+  // OTHER GLOBAL QUANTITIES
+  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  arma::mat inv_V0 = inv(as_arma(V0));
+  double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t()*inv_V0*as_arma(m0)));
+  arma::vec InvVm0 = inv_V0*as_arma(m0);
+  
+  // OBJECTS WHERE DRAWS WILL BE STORED
+  arma::mat mu = zeros(q0, Naux); 
+  arma::mat delta = zeros(q0, Naux); 
+  arma::mat s = ones(n, Naux);
+  arma::mat nu = zeros(n, Naux); 
+  arma::mat theta = zeros(nBatch, Naux); 
+  arma::mat LSmu;
+  arma::mat LSdelta;
+  arma::mat LSnu;
+  arma::mat LStheta; 
+  
+  // LOG-PROPOSAL VARIANCES 
+  if(StoreAdapt == 1) {
+    LSmu = zeros(q0, Naux); 
+    LSdelta = zeros(q0, Naux); 
+    LSnu = zeros(n, Naux); 
+    LStheta = zeros(nBatch, Naux);   
   }
   
-  // CREATING OUTPUT VARIABLE        
-  arma::vec nu = ind % exp(y) + (1 - ind) % nu0;
+  // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
+  arma::vec muAccept = zeros(q0); 
+  arma::vec deltaAccept = zeros(q0); 
+  arma::vec nuAccept = zeros(n); 
+  arma::vec thetaAccept = zeros(nBatch); 
   
-  // OUTPUT
-  return join_rows(nu, arma::conv_to<arma::mat>::from(ind));
+  arma::vec PmuAux = zeros(q0);
+  arma::vec PdeltaAux = zeros(q0);
+  arma::vec PnuAux = zeros(n);
+  arma::vec PthetaAux = zeros(nBatch);
+  
+  // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
+  arma::vec sAux = as_arma(s0); 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0);
+  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0);
+  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
+  
+  // INITIALIZATION OF ADAPTIVE VARIANCES
+  arma::vec LSmuAux = as_arma(LSmu0);
+  arma::vec LSdeltaAux = as_arma(LSdelta0); 
+  arma::vec LSnuAux = as_arma(LSnu0);
+  arma::vec LSthetaAux = as_arma(LStheta0);  
+  
+  // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
+  arma::vec PmuAux0 = zeros(q0); arma::vec PdeltaAux0 = zeros(q0);
+  arma::vec PnuAux0 = zeros(n); arma::vec PthetaAux0 = zeros(nBatch);
+  
+  // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES 
+  // (RE-INITIALIZE EVERY 50 ITERATIONS)
+  int Ibatch = 0; 
+  
+  // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
+  // To avoid repeated initialisation
+  arma::vec y_q0 = ones(q0); arma::vec y_n = ones(n); 
+  arma::vec ind_q0 = zeros(q0); arma::vec ind_n = zeros(n);
+  arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
+  
+  // INITIALIZATION OF PARAMETERS RELATED TO STOCHASTIC REF
+  arma::vec RefFreq = arma::zeros(q0); 
+  int RefAux;
+  
+  // REGRESSION SPECIFIC SECTION
+
+  // Parameters for regression
+  arma::mat beta = arma::zeros(k, Naux);
+  arma::mat lambda = arma::zeros(q0, Naux);
+  arma::vec sigma = arma::zeros(Naux);
+  arma::mat epsilon = arma::zeros(q0, Naux);
+  
+  // INITIALIZATION OF REGRESSION PARAMETERS
+  arma::vec mAux = as_arma(m0); 
+  arma::mat VAux = as_arma(V0); 
+  arma::vec betaAux = as_arma(beta0);
+  arma::vec lambdaAux = as_arma(lambda0); 
+  double sigma2Aux = sigma20; 
+  arma::vec epsilonAux = arma::zeros(q0);
+  
+  // OTHER PARAMETERS FOR REGRESSION
+  arma::mat V1 = arma::zeros(k,k);
+  // Model matrix initialization
+  arma::vec means = muAux.col(0);
+  arma::mat X = designMatrix(k, means, variance);
+
+  Rcout << "-------------------------------------------------------------" << std::endl;  
+  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  
+  // START OF MCMC LOOP
+  for (int i=0; i<N; i++) {
+    
+    Rcpp::checkUserInterrupt();
+    
+    if(i==Burn) {
+      Rcout << "-------------------------------------------------------------" << std::endl; 
+      Rcout << "End of Burn-in period."<< std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl; 
+    }
+    
+    Ibatch++; 
+
+    // UPDATE OF PHI
+    // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
+    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
+                        as, bs, BatchDesign_arma, n, y_n); 
+    
+    // UPDATE OF THETA: 
+    // 1st ELEMENT IS THE UPDATE, 
+    // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
+                                BatchDesign_arma, BatchSizes,
+                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+    PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
+    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+    
+    // UPDATE OF MU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
+    // If using stochastic reference, randomly select 1 ref gene
+    if(StochasticRef == 1) {
+      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
+                                                           RefGenes_arma.size()-1) ));
+      RefGene = RefGenes(RefAux); 
+      if(i >= Burn) RefFreq(RefGene) += 1;
+    }
+    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
+                                Counts_arma, deltaAux.col(0), 
+                                1/deltaAux.col(0), nuAux.col(0), 
+                                sumByCellAll_arma, s2mu, q0, n, 
+                                y_q0, u_q0, ind_q0, 
+                                Constrain, RefGene, ConstrainGene_arma, 
+                                NotConstrainGene_arma, ConstrainType, 
+                                k, lambdaAux, betaAux, X, 
+                                sigma2Aux, variance);     
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    
+    // UPDATE OF DELTA: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    // REGRESSION
+    // THIS REQUIRES A NEW FULL CONDITIONAL
+    deltaAux = deltaUpdateRegNoSpikes(deltaAux.col(0), exp(LSdeltaAux), 
+                                      Counts_arma, muAux.col(0), 
+                                      nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
+                                      lambdaAux, X, sigma2Aux, betaAux);  
+    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
+
+    // UPDATE OF NU: 
+    // 1st COLUMN IS THE UPDATE, 
+    // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+    nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
+                                  BatchDesign_arma,
+                                  muAux.col(0), 1/deltaAux.col(0),
+                                  sAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                                  y_n, u_n, ind_n); 
+    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
+    
+    // UPDATES OF REGRESSION RELATED PARAMETERS
+    V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
+    VAux = inv(V1);
+    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
+      mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
+      mAux = VAux*mAux;
+      
+      // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
+      betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
+      sigma2Aux = sigma2UpdateReg(deltaAux.col(0), betaAux, lambdaAux, V1, 
+                                  mInvVm0, mAux, sigma2_a0, sigma2_b0, q0);
+    }
+    // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
+    lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
+                                eta0, q0, y_q0);
+    // UPDATE OF EPSILON 
+    // Direct calculation conditional on regression related parameters
+    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
+    
+    // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
+    if(i < EndAdapt) {
+      // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
+      if(Ibatch==50) {
+        PmuAux = PmuAux/50;
+        PmuAux = -1 + 2*arma::conv_to<arma::mat>::from(PmuAux>ar);
+        LSmuAux = LSmuAux + PmuAux*0.1;
+        PdeltaAux=PdeltaAux/50; 
+        PdeltaAux = -1 + 2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
+        LSdeltaAux = LSdeltaAux + PdeltaAux*0.1;
+        PnuAux = PnuAux/50; 
+        PnuAux = -1 + 2*arma::conv_to<arma::mat>::from(PnuAux>ar);
+        LSnuAux = LSnuAux + PnuAux*0.1;
+        PthetaAux = PthetaAux/50; 
+        PthetaAux = -1 + 2*arma::conv_to<arma::mat>::from(PthetaAux>ar);
+        LSthetaAux = LSthetaAux + PthetaAux*0.1;
+        
+        Ibatch = 0; 
+        PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
+        PnuAux = PnuAux0; PthetaAux = PthetaAux0; 
+        
+        // REGRESSION
+        // Update of model matrix every 50 iterations during Burn in period
+        means = muAux.col(0);
+        X = designMatrix(k, means, variance);
+      }
+    }
+    
+    // STORAGE OF DRAWS
+    if((i%Thin==0) & (i>=Burn)) {      
+      mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
+      delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
+      s.col(i/Thin - Burn/Thin) = sAux;
+      nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
+      theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);  
+      
+      // Regression
+      beta.col(i/Thin - Burn/Thin) = betaAux;
+      lambda.col(i/Thin - Burn/Thin) = lambdaAux;
+      sigma(i/Thin - Burn/Thin) = sigma2Aux;
+      epsilon.col(i/Thin - Burn/Thin) = epsilonAux;
+      
+      if(StoreAdapt == 1) {
+        LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
+        LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
+        LSnu.col(i/Thin - Burn/Thin) = LSnuAux;
+        LStheta.col(i/Thin - Burn/Thin) = LSthetaAux; 
+      }
+    }
+    
+    // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
+    if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
+      Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
+      Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
+      Rcout << "s (cell 1): " << sAux(0) << std::endl;
+      Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
+      Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
+      Rcpp::Rcout << "betas: " << betaAux.t() << std::endl;
+      Rcpp::Rcout << "sigma: " << sigma2Aux << std::endl; 
+      Rcpp::Rcout << "lambda (gene 1): " << lambdaAux(0) << std::endl;
+      Rcpp::Rcout << "epsilon (gene 1): " << epsilonAux(0) << std::endl;
+      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
+      Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
+      Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
+      Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
+      Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
+    }    
+  }
+  
+  // ACCEPTANCE RATE CONSOLE OUTPUT
+  Rcout << " " << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  // ACCEPTANCE RATE CONSOLE OUTPUT
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  
+  Rcout << "Minimum acceptance rate among mu[i]'s: " << 
+    min(muAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among mu[i]'s: " << 
+    mean(muAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among mu[i]'s: " << 
+    max(muAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Minimum acceptance rate among delta[i]'s: " << 
+    min(deltaAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among delta[i]'s: " << 
+    mean(deltaAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among delta[i]'s: " << 
+    max(deltaAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Minimum acceptance rate among nu[j]'s: " << 
+    min(nuAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among nu[j]'s: " << 
+    mean(nuAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among nu[j]'s: " << 
+    max(nuAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "Minimum acceptance rate among theta[k]'s: " << 
+    min(thetaAccept/(N-Burn)) << std::endl;
+  Rcout << "Average acceptance rate among theta[k]'s: " << 
+    mean(thetaAccept/(N-Burn)) << std::endl;
+  Rcout << "Maximum acceptance rate among theta[k]'s: " << 
+    max(thetaAccept/(N-Burn)) << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  
+  if(StoreAdapt == 1) {
+    // OUTPUT (AS A LIST)
+    return(Rcpp::List::create(
+        Rcpp::Named("mu") = mu.t(),
+        Rcpp::Named("delta") = delta.t(),
+        Rcpp::Named("s") = s.t(),
+        Rcpp::Named("nu") = nu.t(),
+        Rcpp::Named("theta") = theta.t(),
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma.t(),
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("designMatrix") = X,
+        Rcpp::Named("ls.mu") = LSmu.t(),
+        Rcpp::Named("ls.delta") = LSdelta.t(),
+        Rcpp::Named("ls.nu") = LSnu.t(),
+        Rcpp::Named("ls.theta") = LStheta.t(),
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+  }
+  else {
+    // OUTPUT (AS A LIST)
+    return(Rcpp::List::create(
+        Rcpp::Named("mu") = mu.t(),
+        Rcpp::Named("delta") = delta.t(),
+        Rcpp::Named("s") = s.t(),
+        Rcpp::Named("nu") = nu.t(),
+        Rcpp::Named("theta") = theta.t(),
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+  }
 }
 
 // [[Rcpp::export]]
@@ -1431,8 +2897,8 @@ arma::mat HiddenBASiCS_DenoisedRates(
   // Auxiliary matrices
   arma::mat m1; arma::mat m2;
   
-  for (int i = 0; i<N; i++) 
-  {
+  for (int i = 0; i<N; i++) {
+    
     Rcpp::checkUserInterrupt();
     
     m1 = CountsBio_arma; 
@@ -1442,308 +2908,6 @@ arma::mat HiddenBASiCS_DenoisedRates(
     Rho += m1 / m2; 
   } 
   return(Rho / N);
-}
-
-
-
-/* IGNORE CODE FROM HERE ONWARDS */
-
-
-/* MCMC sampler 
- */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
-    int N, // Total number of MCMC draws 
-    int Thin, // Thinning period for MCMC chain 
-    int Burn, // Burning period for MCMC chain 
-    NumericMatrix Counts, // $q \times n$ matrix of expression counts (technical genes at the bottom) 
-    NumericMatrix BatchDesign, // Design matrix representing batch information (number of columns must be equal to number of batches)
-    NumericVector mu0, // Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ (true mRNA content for technical genes)  
-    NumericVector delta0, // Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$  
-    NumericVector phi0, // Starting value of $\phi=(\phi_1,...,\phi_n)$'$ 
-    NumericVector nu0, // Starting value of $\nu=(\nu_1,...,\nu_n)$'$   
-    double theta0, // Starting value of $\theta$ 
-    double s2mu, 
-    double adelta, // Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
-    double bdelta, // Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) prior assigned to each $\delta_i$ 
-    double aphi,
-    double bphi,
-    double atheta, // Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$
-    double btheta, // Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$
-    double ar, // Optimal acceptance rate for adaptive Metropolis-Hastings updates
-    NumericVector LSmu0, // Starting value of adaptive proposal variance of $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
-    NumericVector LSdelta0, // Starting value of adaptive proposal variance of $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
-    NumericVector LSnu0, // Starting value of adaptive proposal variance of $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
-    double LStheta0, // Starting value of adaptive proposal variance of $\theta$ (log-scale)  
-    NumericVector sumByCellAll, // Sum of expression counts by cell (all genes)
-    NumericVector sumByGeneAll, // Sum of expression counts by gene (all genes)
-    int StoreAdapt, 
-    int EndAdapt,
-    int PrintProgress,
-    double s2delta, 
-    double prior_delta,
-    NumericVector BatchInfo,
-    NumericVector BatchIds,
-    NumericVector BatchSizes,
-    NumericVector BatchOffSet,
-    double Constrain,
-    NumericVector Index,
-    int RefGene,
-    NumericVector RefGenes,
-    NumericVector ConstrainGene,
-    NumericVector NotConstrainGene,
-    int ConstrainType)
-{
-  // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.ncol(); int q0 = Counts.nrow(); int Naux = N/Thin - Burn/Thin;
-  int nBatch = BatchDesign.ncol();
-  
-  // TRANSFORMATION TO ARMA ELEMENTS 
-  arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
-  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
-  arma::mat Counts_arma = as_arma(Counts); arma::mat BatchDesign_arma = as_arma(BatchDesign);
-  arma::vec BatchInfo_arma = as_arma(BatchInfo);
-  arma::vec BatchIds_arma = as_arma(BatchIds);
-  arma::vec BatchSizes_arma = as_arma(BatchSizes);
-  arma::vec BatchOffSet_arma = as_arma(BatchOffSet);
-  arma::vec mu0_arma = as_arma(mu0);
-  arma::vec phi0_arma = as_arma(phi0);
-  arma::vec Index_arma = as_arma(Index);
-  arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
-  arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
-  arma::vec RefGenes_arma = as_arma(RefGenes);
-  
-  // OBJECTS WHERE DRAWS WILL BE STORED
-  arma::mat mu = arma::zeros(Naux, q0); 
-  arma::mat delta = arma::zeros(Naux, q0); 
-  arma::mat phi = arma::ones(Naux, n);
-  arma::mat nu = arma::zeros(Naux, n); 
-  arma::mat theta = arma::zeros(Naux, nBatch); 
-  arma::mat LSmu;
-  arma::mat LSdelta;
-  arma::mat LSnu;
-  arma::mat LStheta; 
-  
-  // LOG-PROPOSAL VARIANCES 
-  if(StoreAdapt == 1)
-  {
-    LSmu = arma::zeros(Naux, q0); 
-    LSdelta = arma::zeros(Naux, q0); 
-    LSnu = arma::zeros(Naux, n); 
-    LStheta = arma::zeros(Naux, nBatch);   
-  }
-  // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
-  arma::vec muAccept = arma::zeros(q0); arma::vec PmuAux = arma::zeros(q0);
-  arma::vec deltaAccept = arma::zeros(q0); arma::vec PdeltaAux = arma::zeros(q0);
-  arma::vec nuAccept = arma::zeros(n); arma::vec PnuAux = arma::zeros(n);
-  arma::vec thetaAccept = arma::zeros(nBatch); arma::vec PthetaAux = arma::zeros(nBatch);
-  // INITIALIZATION OF VALUES FOR MCMC RUN
-  arma::mat muAux = arma::zeros(q0,2); muAux.col(0)=as_arma(mu0); arma::vec LSmuAux = as_arma(LSmu0);
-  arma::mat deltaAux = arma::zeros(q0,2); deltaAux.col(0)=as_arma(delta0); arma::vec LSdeltaAux = as_arma(LSdelta0); 
-  arma::vec phiAux = phi0_arma; 
-  arma::mat nuAux = arma::zeros(n,2); nuAux.col(0)=as_arma(nu0); arma::vec LSnuAux = as_arma(LSnu0);
-  arma::mat thetaAux = arma::zeros(nBatch, 2); thetaAux.col(0) = theta0 * arma::ones(nBatch); 
-  arma::vec LSthetaAux = LStheta0 * arma::ones(nBatch);  
-  // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
-  arma::vec PmuAux0 = arma::zeros(q0); arma::vec PdeltaAux0 = arma::zeros(q0);
-  arma::vec PnuAux0 = arma::zeros(n); arma::vec PthetaAux0 = arma::ones(nBatch);
-  
-  // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES (RE-INITIALIZE EVERY 50 ITERATIONS)
-  int Ibatch = 0; int i;
-  
-  // INITIALIZATION OF PARAMETERS TO RETURN IN UPDATE FUNCTIONS
-  arma::vec muUpdateAux = arma::ones(q0);
-  arma::vec indQ = arma::zeros(q0);
-  double LSmuAuxExtra = 0;
-  arma::vec RefFreq = arma::zeros(q0); 
-  int RefAux;
-  
-  arma::vec y_n = arma::ones(n); 
-  
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;  
-  Rcpp::Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  
-  // START OF MCMC LOOP
-  for (i=0; i<N; i++) {
-    
-    Rcpp::checkUserInterrupt();
-    
-    if(i==Burn)
-    {
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
-      Rcpp::Rcout << "End of Burn-in period."<< std::endl;
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
-    }
-    
-    Ibatch++; 
-    
-    // UPDATE OF PHI
-    // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-    phiAux = sUpdateBatch(phiAux, nuAux.col(0), thetaAux.col(0),
-                          aphi, bphi, BatchDesign_arma, n, y_n);
-//    Rcpp::Rcout << "phi" << phiAux.t() << std::endl;
-    
-    // UPDATE OF THETA: 1st ELEMENT IS THE UPDATE, 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign_arma, BatchSizes_arma,
-                                phiAux, nuAux.col(0), atheta, btheta, n, nBatch);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
-//    Rcpp::Rcout << "theta" << thetaAux.col(0).t() << std::endl;
-    
-    // UPDATE OF MU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
-    // Additional steps required for ConstrainType = 3 (stochastic reference)
-    if((ConstrainType == 3) | (ConstrainType == 5))
-    {
-      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, RefGenes_arma.size()-1) ));
-      RefGene = RefGenes(RefAux); 
-      if(i >= Burn) {RefFreq(RefGene) += 1;}
-    }
-    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Constrain, Counts_arma, deltaAux.col(0), 
-                             nuAux.col(0), sumByCellAll_arma, s2mu, q0, n,
-                             muUpdateAux, indQ, RefGene, ConstrainGene_arma, NotConstrainGene_arma,
-                             ConstrainType);
-    PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}  
-//    Rcpp::Rcout << "mu" << muAux.col(0).t() << std::endl;
-    
-    // UPDATE OF DELTA: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    deltaAux = deltaUpdateNoSpikes(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
-                           muAux.col(0), nuAux.col(0), adelta, bdelta, q0, n, s2delta, prior_delta);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) {deltaAccept += deltaAux.col(1);}
-//    Rcpp::Rcout << "delta" << deltaAux.col(0).t() << std::endl;
-   
-    // UPDATE OF NU: 1st COLUMN IS THE UPDATE, 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
-                            BatchDesign_arma,
-                            muAux.col(0), deltaAux.col(0),
-                            phiAux, thetaAux.col(0), sumByGeneAll_arma, q0, n,
-                            BatchInfo_arma, BatchIds_arma, nBatch,
-                            BatchSizes_arma, BatchOffSet_arma); 
-    PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
-//    Rcpp::Rcout << "nu" << nuAux.col(0).t() << std::endl;
-
-    // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt)
-    {
-      // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50)
-      {
-        PmuAux=PmuAux/(50-RefFreq); PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);//
-        LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) + PmuAux.elem(find(Index_arma != RefGene))*0.1; 
-        PdeltaAux=PdeltaAux/50; PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
-        LSdeltaAux=LSdeltaAux+PdeltaAux*0.1;                
-        PnuAux=PnuAux/50; PnuAux = -1+2*arma::conv_to<arma::mat>::from(PnuAux>ar);
-        LSnuAux=LSnuAux+PnuAux*0.1; 
-        PthetaAux=PthetaAux/50; PthetaAux = -1+2*arma::conv_to<arma::mat>::from(PthetaAux>ar); 
-        LSthetaAux= LSthetaAux + PthetaAux*0.1;
-        
-        Ibatch = 0; 
-        PmuAux = PmuAux0; PdeltaAux = PdeltaAux0; 
-        PnuAux = PnuAux0; PthetaAux = PthetaAux0;
-      }
-      
-    }
-    
-    // STORAGE OF DRAWS
-    if(i%Thin==0 & i>=Burn)
-    {      
-      mu.row(i/Thin - Burn/Thin) = muAux.col(0).t(); 
-      delta.row(i/Thin - Burn/Thin) = deltaAux.col(0).t(); 
-      phi.row(i/Thin - Burn/Thin) = phiAux.t();
-      nu.row(i/Thin - Burn/Thin) = nuAux.col(0).t();       
-      theta.row(i/Thin - Burn/Thin) = thetaAux.col(0).t();   
-      
-      if(StoreAdapt == 1)
-      {
-        LSmu.row(i/Thin - Burn/Thin) = LSmuAux.t();
-        LSdelta.row(i/Thin - Burn/Thin) = LSdeltaAux.t();
-        LSnu.row(i/Thin - Burn/Thin) = LSnuAux.t();
-        LStheta.row(i/Thin - Burn/Thin) = LSthetaAux.t(); 
-      }
-    }
-    
-    // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
-    if(i%(2*Thin) == 0 & PrintProgress == 1)
-    {
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-      Rcpp::Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-      Rcpp::Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
-      Rcpp::Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
-      Rcpp::Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
-      Rcpp::Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
-      Rcpp::Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
-      Rcpp::Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-      Rcpp::Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
-      Rcpp::Rcout << "LSmu (gene 1): " << LSmuAuxExtra + LSmuAux(0) << std::endl;
-      Rcpp::Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
-      Rcpp::Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
-      Rcpp::Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
-    }    
-  }
-  
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-
-  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << min(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << mean(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << max(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
-  
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "Minimum acceptance rate among delta[i]'s: " << min(deltaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << mean(deltaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << max(deltaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "Minimum acceptance rate among nu[jk]'s: " << min(nuAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among nu[jk]'s: " << mean(nuAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among nu[jk]'s: " << max(nuAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "Minimum acceptance rate among theta[k]'s: " << min(thetaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among theta[k]'s: " << mean(thetaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among theta[k]'s: " << max(thetaAccept/(N-Burn)) << std::endl;  
-  Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  
-  if(StoreAdapt == 1)
-  {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu,
-        Rcpp::Named("delta") = delta,
-        Rcpp::Named("phi") = phi,
-        Rcpp::Named("nu") = nu,
-        Rcpp::Named("theta") = theta,
-        Rcpp::Named("ls.mu") = LSmu,
-        Rcpp::Named("ls.delta") = LSdelta,
-        Rcpp::Named("ls.nu") = LSnu,
-        Rcpp::Named("ls.theta") = LStheta,
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
-  }
-  
-  else
-  {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu,
-        Rcpp::Named("delta") = delta,
-        Rcpp::Named("phi") = phi,
-        Rcpp::Named("nu") = nu,
-        Rcpp::Named("theta") = theta,
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
-  }
-  
 }
 
 

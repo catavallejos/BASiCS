@@ -7,9 +7,9 @@
 \title{The BASiCS_Summary class}
 \description{
 Container of a summary of a \code{\linkS4class{BASiCS_Chain}} 
-object. In each slot, first column contains posterior medians; second and 
-third columns respectively contain the lower and upper limits of an high 
-posterior density interval (for a given probability).
+object. In each element of the \code{parameters} slot, first column contains 
+posterior medians; second and third columns respectively contain the lower 
+and upper limits of an high posterior density interval (for a given probability).
 }
 \section{Slots}{
 
@@ -35,14 +35,22 @@ parameters \eqn{s[j]}}
 \item{theta}{Posterior median (1st column), lower (2nd column) and upper 
 (3rd column) limits of technical over-dispersion parameter(s) \eqn{\theta} 
 (each row represents one batch)}
+\item{\code{beta}}{Posterior median (first column), lower (second column) 
+and upper (third column) limits of regression coefficients \eqn{\beta}}
+\item{\code{sigma2}}{Posterior median (first column), lower (second column) 
+and upper (third column) limits of residual variance \eqn{\sigma^2}}
+\item{\code{epsilon}}{Posterior median (first column), lower (second column) 
+and upper (third column) limits of gene-specific residual over-dispersion 
+parameter \eqn{\epsilon} }
 }}
 }}
 
 \examples{
 
 # A BASiCS_Summary object created by the Summary method.
-Data = makeExampleBASiCS_Data()
+Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
 ChainSummary <- Summary(Chain)
+
 
 }

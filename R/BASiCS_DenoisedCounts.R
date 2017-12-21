@@ -3,7 +3,8 @@
 #' @title Calculates denoised expression expression counts
 #'
 #' @description Calculates denoised expression counts by removing 
-#' cell-specific technical variation.
+#' cell-specific technical variation. The latter includes global-scaling
+#' normalisation and therefore no further normalisation is required.
 #'
 #' @param Data an object of class \code{\linkS4class{SingleCellExperiment}}
 #' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}} 
@@ -27,10 +28,7 @@
 #' @seealso \code{\linkS4class{BASiCS_Chain}} 
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#' 
-#' @references 
-#' 
-#' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_DenoisedCounts
 BASiCS_DenoisedCounts = function(Data, Chain) 

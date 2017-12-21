@@ -35,12 +35,11 @@ Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000,
 DR <- BASiCS_DenoisedRates(Data, Chain)
 
 }
-\references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
-}
 \seealso{
 \code{\linkS4class{BASiCS_Chain}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }
