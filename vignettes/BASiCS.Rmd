@@ -363,7 +363,7 @@ the following function can be used.
 
 ```{r, fig.height = 8, fig.width = 8}
 data("ChainRNAReg")
-showFit(ChainRNAReg)
+BASiCS_showFit(ChainRNAReg)
 ```
 
 The `BASiCS_TestDE` test function will automatically perform differential variability 

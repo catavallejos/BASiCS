@@ -413,9 +413,11 @@ BASiCS_TestDE <- function(Chain1,
     NotExcluded <- !(is.na(Chain1@parameters$epsilon[1,]) | 
                                is.na(Chain2@parameters$epsilon[1,]))
       
-    ChainPsi <- Chain1@parameters$epsilon[,NotExcluded] - Chain2@parameters$epsilon[,NotExcluded]
+    ChainPsi <- Chain1@parameters$epsilon[,NotExcluded] - 
+                    Chain2@parameters$epsilon[,NotExcluded]
     MedianPsi <- matrixStats::colMedians(ChainPsi)
-    EpsilonBase <- (Summary1@parameters$epsilon[NotExcluded,1] * n1 + Summary2@parameters$epsilon[NotExcluded,1] * n2)/n
+    EpsilonBase <- (Summary1@parameters$epsilon[NotExcluded,1] * n1 + 
+                      Summary2@parameters$epsilon[NotExcluded,1] * n2)/n
     
     AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, EpsilonR, 
                                               ProbThresholdR, 
@@ -442,14 +444,14 @@ BASiCS_TestDE <- function(Chain1,
     
     # Output table
     TableResDisp <- cbind.data.frame(GeneName = GeneName[NotExcluded], 
-                                     MeanOverall = as.numeric(MuBase[NotExcluded]), 
-                                     ResDispOverall = as.numeric(EpsilonBase), 
-                                     ResDisp1 = as.numeric(Summary1@parameters$epsilon[NotExcluded, 1]), 
-                                     ResDisp2 = as.numeric(Summary2@parameters$epsilon[NotExcluded, 1]),  
-                                     ResDispDistance = as.numeric(MedianPsi), 
-                                     ProbDiffResDisp = as.numeric(ProbE), 
-                                     ResultDiffResDisp = ResultDiffResDisp, 
-                                     stringsAsFactors = FALSE)
+      MeanOverall = as.numeric(MuBase[NotExcluded]), 
+      ResDispOverall = as.numeric(EpsilonBase), 
+      ResDisp1 = as.numeric(Summary1@parameters$epsilon[NotExcluded, 1]), 
+      ResDisp2 = as.numeric(Summary2@parameters$epsilon[NotExcluded, 1]),  
+      ResDispDistance = as.numeric(MedianPsi), 
+      ProbDiffResDisp = as.numeric(ProbE), 
+      ResultDiffResDisp = ResultDiffResDisp, 
+      stringsAsFactors = FALSE)
   
     # Rounding to 3 decimal points
     TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)

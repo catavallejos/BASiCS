@@ -32,7 +32,7 @@ exportMethods(Summary,
               plot,
               displayChainBASiCS,
               displaySummaryBASiCS,
-	            showFit)
+	            BASiCS_showFit)
 
 export(BASiCS_Filter,
        newBASiCS_Data,

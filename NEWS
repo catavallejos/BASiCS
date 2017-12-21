@@ -797,3 +797,6 @@ version 1.1.28: (2017-12-20)
 - In `BASiCS_TestDE` function: `ProbThresholdE` argument renamed as `ProbThresholdR`
 - Updated documentation for example `BASiCS_Chain` objects
 - Minor additional changes to the documentation
+
+version 1.1.29: (2017-12-21)
+- `showFit` generic renamed as `BASiCS_showFit` (to avoids potential conflicts)

@@ -394,11 +394,11 @@ setMethod("displayChainBASiCS",
             if (Param == "epsilon") { return(object@parameters$epsilon) }
           })
 
-#' @name showFit-BASiCS_Chain-method
-#' @aliases showFit showFit,BASiCS_Chain-method
+#' @name BASiCS_showFit-BASiCS_Chain-method
+#' @aliases BASiCS_showFit BASiCS_showFit,BASiCS_Chain-method
 #' 
 #' @docType methods
-#' @rdname showFit-BASiCS_Chain-method
+#' @rdname BASiCS_showFit-BASiCS_Chain-method
 #' 
 #' @title Plotting the trend after Bayesian regression
 #' 
@@ -418,13 +418,13 @@ setMethod("displayChainBASiCS",
 #'  
 #' @examples
 #' data(ChainRNAReg)
-#' showFit(ChainRNAReg)
+#' BASiCS_showFit(ChainRNAReg)
 #' 
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' @author Catalina Vallejos \email{cnvallej@@uc.cl}
 #' 
 #' @references New reference
-setMethod("showFit",
+setMethod("BASiCS_showFit",
           signature = "BASiCS_Chain",
           definition = function(object,  
                                 xlab = "log(mu[i])",

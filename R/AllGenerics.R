@@ -4,4 +4,5 @@ setGeneric("displayChainBASiCS",
            function(object, ...) standardGeneric("displayChainBASiCS"))
 setGeneric("displaySummaryBASiCS", 
            function(object, ...) standardGeneric("displaySummaryBASiCS"))
-setGeneric("showFit", function(object, ...) standardGeneric("showFit"))
+setGeneric("BASiCS_showFit", function(object, ...) 
+  standardGeneric("BASiCS_showFit"))
