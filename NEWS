@@ -803,3 +803,6 @@ version 1.1.29: (2017-12-21)
 
 version 1.1.30: (2018-01-22)
 - Commit to triger a new built
+
+version 1.1.31: (2018-01-22)
+- Updated documentation for `BASiCS_showFit` method
