@@ -31,6 +31,9 @@ to plot the scatter plot.}
 
 \item{...}{Additional parameters for plotting.}
 }
+\value{
+A plot object
+}
 \description{
 Plotting the trend after Bayesian regression using a 
 \code{\link[BASiCS]{BASiCS_Chain-class}} object
