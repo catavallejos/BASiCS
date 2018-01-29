@@ -420,6 +420,8 @@ setMethod("displayChainBASiCS",
 #' data(ChainRNAReg)
 #' BASiCS_showFit(ChainRNAReg)
 #' 
+#' @return A plot object
+#' 
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' @author Catalina Vallejos \email{cnvallej@@uc.cl}
 #' 
