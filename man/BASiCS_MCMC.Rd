@@ -115,7 +115,7 @@ mRNA sequencing datasets using the model described in Vallejos et al (2015).
 \examples{
 
 # Built-in simulated dataset
-Data = makeExampleBASiCS_Data()
+Data <- makeExampleBASiCS_Data()
 # To analyse real data, please refer to the instructions in: 
 # https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
 

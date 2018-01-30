@@ -110,6 +110,8 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     rownames(Counts.sim) <- paste0("Gene", seq_len(q))
     SpikeInfo <- data.frame(paste0("Gene", seq(q.bio+1, q)), 
                             Mu[seq(q.bio+1, q)])
+    
+    colnames(Counts.sim) <- paste0("Cell", seq_len(n))
         
     if (!WithBatch) 
     {

@@ -235,6 +235,55 @@ setMethod("subset",
             return(out1)
           })
 
+
+#' @name colnames
+#' @aliases colnames colnames,BASiCS_Chain-method
+#' 
+#' @docType methods
+#' @rdname colnames-BASiCS_Chain-method
+#' 
+#' @title 'colnames' method for BASiCS_Chain objects
+#' 
+#' @description Returns the labels of cell-specific BASiCS parameters
+#' 
+#' @param x A \code{\linkS4class{BASiCS_Chain}} object.
+#' 
+#' @return An vector of labels
+#' 
+#' @examples 
+#' 
+#' help(BASiCS_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' 
+setMethod("colnames",
+          signature = "BASiCS_Chain",
+          definition = function(x) { return(colnames(x@parameters$s)) })
+
+#' @name rownames
+#' @aliases rownames rownames,BASiCS_Chain-method
+#' 
+#' @docType methods
+#' @rdname rownames-BASiCS_Chain-method
+#' 
+#' @title 'rownames' method for BASiCS_Chain objects
+#' 
+#' @description Returns the labels of gene-specific BASiCS parameters
+#' 
+#' @param x A \code{\linkS4class{BASiCS_Chain}} object.
+#' 
+#' @return An vector of labels
+#' 
+#' @examples 
+#' 
+#' help(BASiCS_MCMC)
+#' 
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' 
+setMethod("rownames",
+          signature = "BASiCS_Chain",
+          definition = function(x) { return(colnames(x@parameters$mu)) })
+
 #' @name plot-BASiCS_Chain-method
 #' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
 #' 

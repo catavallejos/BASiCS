@@ -102,7 +102,7 @@
 #' @examples
 #'
 #' # Built-in simulated dataset
-#' Data = makeExampleBASiCS_Data()
+#' Data <- makeExampleBASiCS_Data()
 #' # To analyse real data, please refer to the instructions in: 
 #' # https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
 #'
@@ -368,7 +368,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   }
   CellLabels <- paste0(colnames(assay(Data)), "_Batch", metadata(Data)$BatchInfo)
   colnames(Chain$s) <- CellLabels
-  if(WithSpikes == FALSE) colnames(Chain$phi) <- CellLabels 
+  if(WithSpikes == TRUE) colnames(Chain$phi) <- CellLabels 
   colnames(Chain$nu) <- CellLabels
   colnames(Chain$theta) <- paste0("Batch", unique(metadata(Data)$BatchInfo))
     
