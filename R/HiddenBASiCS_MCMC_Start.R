@@ -27,6 +27,15 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (n < 40) { sizes.aux <- c(10) }
   
   size_scran <- scran::computeSumFactors(CountsBio, sizes = sizes.aux)
+  if( (min(size_scran) <= 0) | sum(is.na(size_scran) > 0))
+  {
+    message("-------------------------------------------------------------\n",
+            "There was an issue when applying `scran` normalization  \n",
+            "`positive = TRUE` has been added to `computeSumFactors` call \n",
+            "-------------------------------------------------------------\n")
+    size_scran <- scran::computeSumFactors(CountsBio, sizes = sizes.aux,
+                                           positive = TRUE)  
+  }
   
   if (WithSpikes == TRUE) 
   {

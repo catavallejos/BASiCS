@@ -101,6 +101,21 @@ setClass("BASiCS_Chain",
               {
                 errors <- c(errors, "Some parameters contain NA/Inf values")
               }
+
+              ### TO BE ADAPTED FOR THE REGRESSION / NO SPIKES CASES             
+#              if(sum(!all.equal(colnames(object@parameters$phi),
+#                                colnames(object@parameters$s))) > 0 |
+#                 sum(!all.equal(colnames(object@parameters$phi),
+#                                colnames(object@parameters$nu))) > 0)
+#              {
+#                errors <- c(errors,"Cell-specific parameter labels don't match")
+#              }
+              
+              if(sum(!all.equal(colnames(object@parameters$mu),
+                                colnames(object@parameters$delta))) > 0)
+              {
+                errors <- c(errors,"Gene-specific parameter labels don't match")
+              }
               
               if (length(errors) == 0) 
                 TRUE else errors  
