@@ -126,8 +126,8 @@ We also acknowledge feedback and/or contributions from (Github aliases provided
 within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), 
 Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), 
 Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), 
-Nitesh Turaga (@nturaga), Luke Zappia (@lazappi), Simon Anders (@s-andrews), 
-Yongchao Ge and Yuan Cao (@yuancao90), among others. 
+Mike Morgan (@MikeDMorgan), Nitesh Turaga (@nturaga), Luke Zappia (@lazappi), 
+Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. 
 MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), 

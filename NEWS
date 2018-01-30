@@ -814,3 +814,8 @@ version 1.1.32: (2018-01-29)
 - Extended validity test for `BASiCS_Chain` class
 - `rownames` and `colnames` methods created for `BASiCS_Chain` class
 - Added example and unit test for `BASiCS_VarianceDecomp` function
+
+version 1.1.33: (2018-01-30)
+- In `HiddenBASiCS_MCMC_Start`, `positive = TRUE` added to 
+`scran::computeSumFactors` when estimated size factor contain invalid values.
+Thanks to Mike Morgan for suggesting this solution.
