@@ -806,3 +806,16 @@ version 1.1.30: (2018-01-22)
 
 version 1.1.31: (2018-01-22)
 - Updated documentation for `BASiCS_showFit` method
+
+version 1.1.32: (2018-01-29)
+- Fix to ensure that `BASiCS_MCMC` function adds cell labels for $\phi$
+- `makeExampleBASiCS_Data` now produces valid `colnames` (cell labels)
+- Fixed colnames of $\phi$ parameter in all data examples
+- Extended validity test for `BASiCS_Chain` class
+- `rownames` and `colnames` methods created for `BASiCS_Chain` class
+- Added example and unit test for `BASiCS_VarianceDecomp` function
+
+version 1.1.33: (2018-01-30)
+- In `HiddenBASiCS_MCMC_Start`, `positive = TRUE` added to 
+`scran::computeSumFactors` when estimated size factor contain invalid values.
+Thanks to Mike Morgan for suggesting this solution.

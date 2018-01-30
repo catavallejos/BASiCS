@@ -44,8 +44,11 @@ See vignette
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+# For illustration purposes we load a built-in 'BASiCS_Chain' object 
+# (obtained using the 'BASiCS_MCMC' function)
+data(ChainSC)
+
+VD <- BASiCS_VarianceDecomp(ChainSC)
 
 }
 \references{
