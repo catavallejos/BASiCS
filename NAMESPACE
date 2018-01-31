@@ -27,12 +27,9 @@ importMethodsFrom(BiocGenerics, counts, updateObject, subset,
                   colnames, rownames)
 importMethodsFrom(scran, computeSumFactors)
 
-exportClasses(BASiCS_Chain , BASiCS_Summary)
+exportClasses(BASiCS_Chain, BASiCS_Summary)
 
-exportMethods(Summary,
-              plot,
-              displayChainBASiCS,
-              displaySummaryBASiCS,
+exportMethods(Summary, plot, displayChainBASiCS, displaySummaryBASiCS,
 	            BASiCS_showFit)
 
 export(BASiCS_Filter,

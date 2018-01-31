@@ -503,7 +503,7 @@ setMethod("BASiCS_showFit",
             
             B <- matrix(1,length(grid.mu),n)
             B[,2] <- grid.mu
-            for (j in 1:(n-2)){
+            for (j in seq_len(n-2)){
               B[,j+2] = exp(-0.5*(grid.mu-myu[j])^2/(h[1]^2))
             }
             

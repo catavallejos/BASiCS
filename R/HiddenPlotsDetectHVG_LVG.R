@@ -7,7 +7,7 @@ HiddenPlot1DetectHVG_LVG <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
   lines(ProbThresholds, EFNRgrid, lty = 2, lwd = 2)
   abline(h = EFDR, col = "blue", lwd = 2, lty = 1)
   legend("topleft", c("EFDR", "EFNR", "Target EFDR"), 
-         lty = c(1:2, 1), col = c("black", "black", "blue"), 
+         lty = c(1, 2, 1), col = c("black", "black", "blue"), 
          bty = "n", lwd = 2)
 }
 

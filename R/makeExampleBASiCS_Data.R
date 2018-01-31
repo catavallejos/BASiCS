@@ -55,8 +55,8 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
   S <- c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37, 
          0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
     
-  Mu <- c(Mu[1:50], Mu[101:120])
-  Delta <- Delta[1:50]
+  Mu <- c(Mu[seq_len(50)], Mu[seq_len(20)+100])
+  Delta <- Delta[seq_len(50)]
     
   q <- length(Mu)
   q.bio <- length(Delta)
