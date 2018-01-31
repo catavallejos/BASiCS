@@ -18,23 +18,16 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   CountsTech <- as.matrix(assay(Data)[isSpike(Data), , drop = FALSE])
   
   # Initialize normalization as the 'scran' estimates
-  # Change default pool sizes for small sample size
-  sizes.aux <- c(20, 40, 60, 80, 100)
-  if (n < 200) { sizes.aux <- c(20, 40, 60, 80) }
-  if (n < 160) { sizes.aux <- c(20, 40, 60) }
-  if (n < 120) { sizes.aux <- c(20, 40) }
-  if (n < 80) { sizes.aux <- c(20) }
-  if (n < 40) { sizes.aux <- c(10) }
-  
-  size_scran <- scran::computeSumFactors(CountsBio, sizes = sizes.aux)
+  suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
+  # Fix for cases in which 'scran' normalisation has invalid output
   if( (min(size_scran) <= 0) | sum(is.na(size_scran) > 0))
   {
     message("-------------------------------------------------------------\n",
             "There was an issue when applying `scran` normalization  \n",
             "`positive = TRUE` has been added to `computeSumFactors` call \n",
             "-------------------------------------------------------------\n")
-    size_scran <- scran::computeSumFactors(CountsBio, sizes = sizes.aux,
-                                           positive = TRUE)  
+    suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio, 
+                                                            positive = TRUE))
   }
   
   if (WithSpikes == TRUE) 

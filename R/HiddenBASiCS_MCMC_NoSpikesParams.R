@@ -7,7 +7,7 @@ HiddenBASiCS_MCMC_NoSpikesParam <- function(Counts, ConstrainType,
   
   # 1: Full constrain; 2: Genes with average count >= 1
   if (ConstrainType == 1) {
-    ConstrainGene <- (1:q.bio) - 1
+    ConstrainGene <- seq_len(q.bio) - 1
     NotConstrainGene <- 0
     NonZero <- which(matrixStats::rowSums2(Counts) > 0)
   }

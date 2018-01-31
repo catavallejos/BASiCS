@@ -143,7 +143,7 @@ BASiCS_VarianceDecomp <- function(Chain,
       else { names.arg <- c("Overall") } 
     }
         
-    outmat <- 100 * matrix(apply(out[, -c(1:2)], 2, mean), 
+    outmat <- 100 * matrix(apply(out[, -c(1,2)], 2, mean), 
                            nrow = 3, byrow = FALSE)
     barplot(outmat, beside = beside, main = main, 
             ylab = ylab, col = col, 

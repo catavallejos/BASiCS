@@ -524,7 +524,7 @@ BASiCS_TestDE <- function(Chain1,
       lines(ProbThresholds, AuxMean$EFNRgrid, lty = 2)
       abline(h = EFDR_M, col = "blue", lwd = 2, lty = 1)
       abline(v = OptThresholdM[1], col = "red", lwd = 2, lty = 1)
-      legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2, 1), 
+      legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1, 2, 1), 
              col = c("black", "black", "blue"), bty = "n")
       plot(ProbThresholds, AuxDisp$EFDRgrid, type = "l", lty = 1, bty = "n", 
            ylab = "Error rate", xlab = "Probdence threshold", 
@@ -532,7 +532,7 @@ BASiCS_TestDE <- function(Chain1,
       lines(ProbThresholds, AuxDisp$EFNRgrid, lty = 2)
       abline(h = EFDR_D, col = "blue", lwd = 2, lty = 1)
       abline(v = OptThresholdD[1], col = "red", lwd = 2, lty = 1)
-      legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1:2, 1), 
+      legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1, 2, 1), 
              col = c("black", "black", "blue"), bty = "n")
     }
         

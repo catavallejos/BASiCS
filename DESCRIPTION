@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.1.33
-Date: : 2018-01-30
+Version: 1.1.34
+Date: : 2018-01-31
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
         role=c("aut"), email="eling@ebi.ac.uk"),  
@@ -11,47 +11,34 @@ Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
 Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  heterogeneity in gene expression levels in seemingly homogeneous populations 
- of cells. However, these experiments are prone to high levels of technical noise, 
- creating new challenges for identifying genes that show genuine heterogeneous 
- expression within the population of cells under study. BASiCS (Bayesian Analysis 
- of Single-Cell Sequencing data) is an integrated Bayesian hierarchical model to 
- perform statistical analyses of single-cell RNA sequencing datasets in the context 
- of supervised experiments (where the groups of cells of interest are known a priori, 
- e.g. experimental conditions or cell types). BASiCS performs built-in data normalisation 
- (global scaling) and technical noise quantification (based on spike-in genes). 
- BASiCS provides an intuitive detection criterion for highly (or lowly) 
- variable genes within a single group of cells. Additionally, BASiCS can 
- compare gene expression patterns between two or more pre-specified groups of cells. 
- Unlike traditional differential expression tools, BASiCS quantifies changes 
- in expression that lie beyond comparisons of means, also allowing the study 
- of changes in cell-to-cell heterogeneity. The latter are quantified via a 
- biological over-dispersion parameter that measures residual over-dispersion 
- (with respect to Poisson sampling) after normalisation and technical noise removal. 
+ of cells. However, these experiments are prone to high levels of technical 
+ noise, creating new challenges for identifying genes that show genuine 
+ heterogeneous expression within the population of cells under study. BASiCS 
+ (Bayesian Analysis of Single-Cell Sequencing data) is an integrated Bayesian 
+ hierarchical model to perform statistical analyses of single-cell RNA 
+ sequencing datasets in the context of supervised experiments (where the groups 
+ of cells of interest are known a priori, e.g. experimental conditions or cell 
+ types). BASiCS performs built-in data normalisation (global scaling) and 
+ technical noise quantification (based on spike-in genes). BASiCS provides an 
+ intuitive detection criterion for highly (or lowly) variable genes within a 
+ single group of cells. Additionally, BASiCS can compare gene expression 
+ patterns between two or more pre-specified groups of cells. Unlike traditional 
+ differential expression tools, BASiCS quantifies changes in expression that lie 
+ beyond comparisons of means, also allowing the study of changes in cell-to-cell 
+ heterogeneity. The latter are quantified via a biological over-dispersion 
+ parameter that measures residual over-dispersion (with respect to Poisson 
+ sampling) after normalisation and technical noise removal. 
 License: GPL (>= 2)
 Depends:
-    R (>= 3.4),
+    R (>= 3.5),
     SingleCellExperiment
 Imports:
-    SummarizedExperiment,
-    S4Vectors,
-    BiocGenerics,
-    Rcpp (>= 0.11.3),
-    methods,
-    coda,
-    scran,
-    ggplot2,
-    testthat,
-    data.table,
-    matrixStats,
-    MASS,
-    graphics,
-    KernSmooth,
-    grDevices,
-    stats,
-    utils
+    BiocGenerics, methods, coda, data.table, ggplot2, graphics, 
+    grDevices, KernSmooth, MASS, matrixStats, Rcpp (>= 0.11.3), 
+    S4Vectors, scran, stats, SummarizedExperiment, testthat, utils
 Suggests:
-    knitr,
     BiocStyle,
+    knitr,
     rmarkdown
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr

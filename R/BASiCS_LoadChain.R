@@ -44,7 +44,7 @@ BASiCS_LoadChain <- function(RunName,
         message("`BASiCS_Chain` class definition was outdated. \n",
                 "Object updated to be compatible with BASiCS version ",
                 utils::packageVersion("BASiCS"), ".\n",
-                "To save updated object, please set 'StoreUpdatedChain' = TRUE.\n",
+                "Set 'StoreUpdatedChain' = TRUE to save updated object.\n",
                 "(this overwrites original input file).\n") 
         Chain <- updateObject(Chain)
         if(StoreUpdatedChain == TRUE)
@@ -62,7 +62,8 @@ BASiCS_LoadChain <- function(RunName,
       Mu <- data.table::fread(file.path(StoreDir, 
                                         paste0("chain_mu_", RunName, ".txt")))
       Delta <- data.table::fread(file.path(StoreDir, 
-                                           paste0("chain_delta_", RunName, ".txt")))
+                                           paste0("chain_delta_", 
+                                                  RunName, ".txt")))
       Phi <- data.table::fread(file.path(StoreDir, 
                                          paste0("chain_phi_", RunName, ".txt")))
       # Add-hoc fix for the no-spikes case
@@ -76,7 +77,8 @@ BASiCS_LoadChain <- function(RunName,
       Nu <- data.table::fread(file.path(StoreDir, 
                                         paste0("chain_nu_", RunName, ".txt")))
       Theta <- data.table::fread(file.path(StoreDir, 
-                                           paste0("chain_theta_", RunName, ".txt")))  
+                                           paste0("chain_theta_", 
+                                                  RunName, ".txt")))  
       
       Chain <- newBASiCS_Chain(list("mu" = as.matrix(Mu), 
                                     "delta" = as.matrix(Delta), 
@@ -89,7 +91,7 @@ BASiCS_LoadChain <- function(RunName,
       message("`BASiCS_Chain` class definition was outdated. \n",
               "Object updated to be compatible with BASiCS version ",
               utils::packageVersion("BASiCS"), ".\n",
-              "To save updated object, please set 'StoreUpdatedChain' = TRUE.\n") 
+              "Set 'StoreUpdatedChain' = TRUE to save updated object.\n") 
       
       if(StoreUpdatedChain == TRUE)
       {

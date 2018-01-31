@@ -37,15 +37,17 @@
 #'         prior that is shared by all gene-specific biological over-dispersion 
 #'         hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.}
 #'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all 
-#'         (scaled by \code{n}) cell-specific mRNA content normalising constants 
-#'         \eqn{\phi_j / n}. Default: \code{p.phi} \code{= rep(1, n)}.}
+#'         (scaled by \code{n}) cell-specific mRNA content normalising 
+#'         constants \eqn{\phi_j / n}. 
+#'         Default: \code{p.phi} \code{= rep(1, n)}.}
 #'   \item{\code{a.s}}{Shape hyper-parameter for the 
 #'         Gamma(\code{a.s},\code{b.s}) prior that is shared by all 
 #'         cell-specific capture efficiency normalising constants \eqn{s_j}.
 #'         Default: \code{a.s = 1}.}
-#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},\code{b.s}) 
-#'         prior that is shared by all cell-specific capture efficiency 
-#'         normalising constants \eqn{s_j}. Default: \code{b.s = 1}.}
+#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},
+#'         \code{b.s}) prior that is shared by all cell-specific capture 
+#'         efficiency normalising constants \eqn{s_j}. 
+#'         Default: \code{b.s = 1}.}
 #'   \item{\code{a.theta}}{Shape hyper-parameter for the 
 #'         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise 
 #'         parameter \eqn{\theta}. Default: \code{a.theta = 1}.}
@@ -89,8 +91,8 @@
 #'       and/or adaptive proposal variances.}
 #' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based 
 #'       progress report is suppressed.}
-#' \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise to 
-#'       specify this argument. Default options have been tuned to facilitate 
+#' \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise 
+#'       to use this argument. Default options have been tuned to facilitate 
 #'       convergence. If changed, it must be a list containing the following 
 #'       elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0}, 
 #'       \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, 
@@ -131,7 +133,7 @@
 #' # Calculating posterior medians and 95% HPD intervals
 #' ChainSummary <- Summary(ChainSC)
 #' 
-#' # `displaySummaryBASiCS` can be used to extract information from this output. 
+#' # `displaySummaryBASiCS` can be used to extract information from this output 
 #' # For example:
 #' head(displaySummaryBASiCS(ChainSummary, Param = 'mu'))
 #'
@@ -222,7 +224,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   Regression <- ArgsDef$Regression; WithSpikes <- ArgsDef$WithSpikes
   k <- ArgsDef$k; variance <- ArgsDef$variance; Start <- ArgsDef$Start 
   StochasticRef <- ArgsDef$StochasticRef
-  ConstrainType <- ArgsDef$ConstrainType; ConstrainProp <- ArgsDef$ConstrainProp
+  ConstrainType <- ArgsDef$ConstrainType
+  ConstrainProp <- ArgsDef$ConstrainProp
 
   # Starting values for MCMC chains
   mu0 <- as.vector(Start$mu0)[!isSpike(Data)]
@@ -279,8 +282,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     if(Regression == TRUE) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
-                as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, SpikeInput, 
-                mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch), 
+                as.matrix(assay(Data))[!isSpike(Data),], BatchDesign, 
+                SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$p.phi, PriorParam$a.s, 
                 PriorParam$b.s, PriorParam$a.theta, PriorParam$b.theta, 
                 AR, ls.mu0, ls.delta0, ls.phi0, ls.nu0, rep(ls.theta0, nBatch), 
