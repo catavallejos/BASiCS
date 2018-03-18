@@ -639,3 +639,7 @@ version 0.99.13: (2017-10-17)
   
 version 0.99.14: (2017-10-19) 
 - Added checks to ensure input `SingleCellExperiment` object has all info
+
+version 1.0.1: (2018-03-18) - build error fix
+- New unit tests (more modular): example data, starting values MCMC, MCMC 
+sampler for fixed starting values 
