@@ -826,3 +826,7 @@ parameter values in `scran::computeSumFactors` call
 - Unit tests updated accordingly
 - Imports/Suggests packages are now in alphabetic order
 - Minor style changes suggested by BiocCheck
+
+version 1.1.35: (2018-03-18)
+- New unit tests (more modular): example data, starting values MCMC, MCMC 
+sampler for fixed starting values (spikes/no-spikes; regression/no-regression)

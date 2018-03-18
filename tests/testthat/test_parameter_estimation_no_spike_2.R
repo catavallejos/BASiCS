@@ -1,6 +1,7 @@
-context("Parameter estimation (no spike case), original data has spikes\n")
+context("Parameter estimation (no-spikes), 
+        original data has have spikes\n")
 
-test_that("paramater estimations match the given seed", 
+test_that("Estimates match (no-spikes)", 
 {
   Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                   WithBatch = TRUE)
@@ -10,11 +11,11 @@ test_that("paramater estimations match the given seed",
   expect_that(all.equal(assay(Data1)[!isSpike(Data1),], assay(Data2)), is_true())
 
   set.seed(16)
-  Chain1 <- BASiCS_MCMC(Data1, N = 2000, Thin = 10, Burn = 1000, 
+  Chain1 <- BASiCS_MCMC(Data1, N = 1000, Thin = 10, Burn = 500, 
                         PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary1 <- Summary(Chain1)
   set.seed(16)
-  Chain2 <- BASiCS_MCMC(Data2, N = 2000, Thin = 10, Burn = 1000, 
+  Chain2 <- BASiCS_MCMC(Data2, N = 1000, Thin = 10, Burn = 500, 
                         PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary2 <- Summary(Chain2)
             

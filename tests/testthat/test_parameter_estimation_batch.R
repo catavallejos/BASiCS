@@ -1,34 +1,68 @@
-context("Parameter estimation (batch case)\n")
+context("Parameter estimation and denoised data (spikes+batch)\n")
 
-test_that("paramater estimations match the given seed", 
+test_that("Estimates match the given seed (spikes+batch)",
 {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                  WithBatch = TRUE)
+  # Fixing starting values
+  n <- ncol(Data)
+  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+                     b.delta = 1, p.phi = rep(1, times = n), 
+                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+  set.seed(2018)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  # Running the samples
   set.seed(18)
-  Chain <- BASiCS_MCMC(Data, N = 2000, Thin = 10, Burn = 1000, 
-                       PrintProgress = FALSE)
+  Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+                       PrintProgress = FALSE, 
+                       Start = Start, PriorParam = PriorParam)
+  # Calculating a posterior summary
   PostSummary <- Summary(Chain)
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(7.214,  4.810,  4.281,  5.236, 18.632)
+  Mu <- c(6.943,  4.975,  4.015,  4.975, 17.778)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   expect_that(all.equal(MuObs, Mu), is_true())
             
-  Delta <- c(1.122, 2.076, 0.645, 1.496, 0.640)
+  Delta <- c(1.314, 1.811, 0.660, 1.505, 0.682)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
                                                    "delta")[1:5,1],3))
   expect_that(all.equal(DeltaObs, Delta), is_true())
 
-  Phi <- c(1.097, 1.126, 0.826, 0.985, 0.913)
+  Phi <- c(1.038, 1.005, 0.588, 0.979, 0.865)
   PhiObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "phi")[1:5,1],3))
   expect_that(all.equal(PhiObs, Phi), is_true())
             
-  S <- c(0.309, 0.599, 0.087, 0.220, 0.501)
+  S <- c(0.304, 0.537, 0.134, 0.270, 0.546)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
   
-  Theta <- c(0.489, 0.480)
+  Theta <- c(0.729, 0.341)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   expect_that(all.equal(ThetaObs, Theta), is_true())
+  
+  # Obtaining denoised counts     
+  DC <- BASiCS_DenoisedCounts(Data, Chain)
+  
+  # Checks for 2 arbitrary sets of genes / cells
+  DCcheck0 <- c(0.000, 0.000, 0.000, 5.075, 5.075)
+  DCcheck <- as.vector(round(DC[1:5,1], 3))
+  expect_that(all.equal(DCcheck, DCcheck0), is_true())
+  
+  DCcheck0 <- c(0.00, 2.272, 0.00, 0.00, 2.760)
+  DCcheck <- as.vector(round(DC[10,1:5], 3))
+  expect_that(all.equal(DCcheck, DCcheck0), is_true())
+  
+  # Obtaining denoised rates
+  DR <- BASiCS_DenoisedRates(Data, Chain)
+  
+  # Checks for 2 arbitrary sets of genes / cells
+  DRcheck0 <- c(2.617, 1.858, 2.612, 4.965, 8.702)
+  DRcheck <- as.vector(round(DR[1:5,1], 3))
+  expect_that(all.equal(DRcheck, DRcheck0), is_true())
+  
+  DRcheck0 <- c(2.482, 3.213, 4.134, 2.890, 3.675)
+  DRcheck <- as.vector(round(DR[10,1:5], 3))
+  expect_that(all.equal(DRcheck, DRcheck0), is_true())
 })
 

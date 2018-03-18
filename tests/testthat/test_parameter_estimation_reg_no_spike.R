@@ -1,20 +1,32 @@
-context("Parameter estimation no spikes BASiCS sampler (regression case)\n")
+context("Parameter estimation and denoised data (no-spikes+regression)\n")
 
-test_that("paramater estimations match the given seed", 
+test_that("Estimates match the given seed (no-spikes+regression)", 
 {
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
+  n <- ncol(Data); k <- 12
+  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+                     b.delta = 1, p.phi = rep(1, times = n), 
+                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+  PriorParam$m <- rep(0, k); PriorParam$V <- diag(k) 
+  PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
+  PriorParam$eta <- 5
+  set.seed(2018)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, 
+                                            WithSpikes = FALSE)
+  
   set.seed(14)
-  Chain <- BASiCS_MCMC(Data, N = 2000, Thin = 10, Burn = 1000, 
+  Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                        PrintProgress = FALSE, WithSpikes = FALSE,
-                       Regression = TRUE)
+                       Regression = TRUE, 
+                       Start = Start, PriorParam = PriorParam)
   PostSummary <- Summary(Chain)
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(15.848, 10.990,  8.662, 11.752, 32.162)
+  Mu <- c(16.482, 11.091,  8.765, 12.476, 33.748)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   expect_that(all.equal(MuObs, Mu), is_true())
             
-  Delta <- c(1.276, 1.314, 1.766, 1.154, 0.485)
+  Delta <- c(1.294, 1.175, 1.783, 1.209, 0.442)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
                                                    "delta")[1:5,1],3))
   expect_that(all.equal(DeltaObs, Delta), is_true())
@@ -23,12 +35,20 @@ test_that("paramater estimations match the given seed",
   PhiObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "phi")[1:5,1],3))
   expect_that(all.equal(PhiObs, Phi), is_true())
             
-  S <- c(0.786, 1.340, 0.227, 0.633, 1.215)
+  S <- c(0.657, 1.407, 0.208, 0.614, 1.348)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
   
-  Theta <- c(0.269, 0.303)
+  Theta <- c(0.072, 0.235)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   expect_that(all.equal(ThetaObs, Theta), is_true())
+  
+  Beta <- c(0.151, -0.264,  0.225,  0.293,  0.476)
+  BetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "beta")[1:5,1],3))
+  expect_that(all.equal(BetaObs, Beta), is_true())
+  
+  Sigma2 <- 0.358
+  Sigma2Obs <- round(displaySummaryBASiCS(PostSummary, "sigma2")[1],3)
+  expect_that(all.equal(Sigma2Obs, Sigma2), is_true())
 })
 
