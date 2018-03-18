@@ -830,3 +830,8 @@ parameter values in `scran::computeSumFactors` call
 version 1.1.35: (2018-03-18)
 - New unit tests (more modular): example data, starting values MCMC, MCMC 
 sampler for fixed starting values (spikes/no-spikes; regression/no-regression)
+
+version 1.1.36: (2018-03-18)
+- Fixed bug in `newBASiCS_Data` to define a default value for `Tech` when
+spike-ins are not available. Thanks to Muad Abd El Hay (@Cumol) for pointing 
+out this issue.

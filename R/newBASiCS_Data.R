@@ -10,7 +10,8 @@
 #' (including biological and technical spike-in genes). Gene names must be 
 #' stored as \code{rownames(Counts)}.
 #' @param Tech Logical vector of length \code{q}. If \code{Tech = FALSE} the 
-#' gene is biological; otherwise the gene is spike-in.
+#' gene is biological; otherwise the gene is spike-in. Defaul value: 
+#' \code{Tech = rep(FALSE, nrow(Counts))}.
 #' @param SpikeInfo \code{data.frame} whose first and second columns contain 
 #' the gene names assigned to the spike-in genes (they must match the ones in 
 #' \code{rownames(Counts)}) and the associated input number of molecules, 
@@ -23,31 +24,44 @@
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
 #' @examples
+#' 
+#' ## Data with spike-ins
+#' 
 #' # Expression counts
 #' set.seed(1)
 #' Counts <- matrix(rpois(50*10, 2), ncol = 10)
 #' rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
-#'
 #' # Technical information
 #' Tech <- c(rep(FALSE,40),rep(TRUE,10))
-#'
 #' # Spikes input number of molecules
 #' set.seed(2)
 #' SpikeInfo <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
 #'
 #' # Creating a BASiCS_Data object (no batch effect)
-#' DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo)
+#' DataExample <- newBASiCS_Data(Counts, Tech = Tech, SpikeInfo = SpikeInfo)
 #'
 #' # Creating a BASiCS_Data object (with batch effect)
 #' BatchInfo <- c(rep(1, 5), rep(2, 5))
-#' DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
+#' DataExample <- newBASiCS_Data(Counts, Tech = Tech, 
+#'                               SpikeInfo = SpikeInfo, BatchInfo = BatchInfo)
+#' 
+#' ## Data without spike-ins (BatchInfo is required)
+#' 
+#' # Expression counts
+#' set.seed(1)
+#' Counts <- matrix(rpois(50*10, 2), ncol = 10)
+#' rownames(Counts) <- paste0('Gene', 1:50)
+#' BatchInfo <- c(rep(1, 5), rep(2, 5))
+#'
+#' # Creating a BASiCS_Data object (with batch effect)
+#' DataExample <- newBASiCS_Data(Counts, BatchInfo = BatchInfo)
 #'
 #' @seealso \code{\linkS4class{SingleCellExperiment}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
-newBASiCS_Data <- function(Counts, Tech = NULL, 
+newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)), 
                            SpikeInfo = NULL, BatchInfo = NULL) 
 {
   # Validity checks for SpikeInfo
@@ -59,23 +73,30 @@ newBASiCS_Data <- function(Counts, Tech = NULL,
   }
   
   if (is.null(BatchInfo)) { BatchInfo <- rep(1, times = ncol(Counts)) }
+  
+  GeneName <- rownames(Counts)
+  if (!is.null(SpikeInfo)) 
+  {
+    if(sum(Tech) == 0)
+      stop("'SpikeInfo' was provided by no genes were marked as technical spikes \n",
+           "Revise the input value provided for 'Tech'")
+    # Extracting spike-in input molecules in the correct order
+    if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) 
+      stop("'SpikeInfo' is missing information for some of the spikes")
+    if (sum(!(SpikeInfo[, 1] %in% GeneName[Tech])) > 0) 
+      stop("'SpikeInfo' includes spikes that are not in 'Counts'")
+    matching <- match(GeneName[Tech], SpikeInfo[, 1])
+    SpikeInput <- SpikeInfo[matching, 2]
+  } 
+  else 
+  { 
+    SpikeInput <- 1; Tech <- rep(FALSE, nrow(Counts)) 
+    message("The data does not contain spike-in genes")
+  }
     
   # Re-ordering genes
   Counts <- as.matrix(rbind(Counts[!Tech, ], Counts[Tech, ]))
   Tech <- c(Tech[!Tech], Tech[Tech])
-  GeneName <- rownames(Counts)
-    
-  if (!is.null(SpikeInfo)) 
-  {
-    # Extracting spike-in input molecules in the correct order
-    if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) 
-        stop("'SpikeInfo' is missing information for some of the spikes")
-    if (sum(!(SpikeInfo[, 1] %in% GeneName[Tech])) > 0) 
-        stop("'SpikeInfo' includes spikes that are not in 'Counts'")
-    matching <- match(GeneName[Tech], SpikeInfo[, 1])
-    SpikeInput <- SpikeInfo[matching, 2]
-  } 
-  else { SpikeInput <- 1 }
     
   # Checks to assess if the data contains the required information
   errors <- HiddenChecksBASiCS_Data(Counts, Tech, SpikeInput, 
@@ -86,7 +107,7 @@ newBASiCS_Data <- function(Counts, Tech = NULL,
   Data <- SingleCellExperiment::SingleCellExperiment(
                 assays = list(Counts = as.matrix(Counts)), 
                 metadata = list(SpikeInput = SpikeInput, 
-                BatchInfo = BatchInfo))
+                                BatchInfo = BatchInfo))
   isSpike(Data, "ERCC") <- Tech
     
   message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 

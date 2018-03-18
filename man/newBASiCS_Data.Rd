@@ -5,7 +5,8 @@
 \title{Creates a SingleCellExperiment object from a matrix of expression 
 counts and experimental information about spike-in genes}
 \usage{
-newBASiCS_Data(Counts, Tech = NULL, SpikeInfo = NULL, BatchInfo = NULL)
+newBASiCS_Data(Counts, Tech = rep(FALSE, nrow(Counts)), SpikeInfo = NULL,
+  BatchInfo = NULL)
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements 
@@ -14,7 +15,8 @@ contain the expression counts to be analyses
 stored as \code{rownames(Counts)}.}
 
 \item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} the 
-gene is biological; otherwise the gene is spike-in.}
+gene is biological; otherwise the gene is spike-in. Defaul value: 
+\code{Tech = rep(FALSE, nrow(Counts))}.}
 
 \item{SpikeInfo}{\code{data.frame} whose first and second columns contain 
 the gene names assigned to the spike-in genes (they must match the ones in 
@@ -35,24 +37,37 @@ An object of class \code{\linkS4class{SingleCellExperiment}}.
 counts and experimental information about spike-in genes.
 }
 \examples{
+
+## Data with spike-ins
+
 # Expression counts
 set.seed(1)
 Counts <- matrix(rpois(50*10, 2), ncol = 10)
 rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
-
 # Technical information
 Tech <- c(rep(FALSE,40),rep(TRUE,10))
-
 # Spikes input number of molecules
 set.seed(2)
 SpikeInfo <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
 
 # Creating a BASiCS_Data object (no batch effect)
-DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo)
+DataExample <- newBASiCS_Data(Counts, Tech = Tech, SpikeInfo = SpikeInfo)
 
 # Creating a BASiCS_Data object (with batch effect)
 BatchInfo <- c(rep(1, 5), rep(2, 5))
-DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo, BatchInfo)
+DataExample <- newBASiCS_Data(Counts, Tech = Tech, 
+                              SpikeInfo = SpikeInfo, BatchInfo = BatchInfo)
+
+## Data without spike-ins (BatchInfo is required)
+
+# Expression counts
+set.seed(1)
+Counts <- matrix(rpois(50*10, 2), ncol = 10)
+rownames(Counts) <- paste0('Gene', 1:50)
+BatchInfo <- c(rep(1, 5), rep(2, 5))
+
+# Creating a BASiCS_Data object (with batch effect)
+DataExample <- newBASiCS_Data(Counts, BatchInfo = BatchInfo)
 
 }
 \seealso{
