@@ -125,8 +125,8 @@ support during the preparation the Bioconductor submission.
 We also acknowledge feedback and/or contributions from (Github aliases provided 
 within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), 
 Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), 
-Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), 
-Mike Morgan (@MikeDMorgan), Nitesh Turaga (@nturaga), Luke Zappia (@lazappi), 
+Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), 
+Mike Morgan (@MikeDMorgan), Muad Abd El Hay (@Cumol), Nitesh Turaga (@nturaga), 
 Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. 
@@ -134,7 +134,7 @@ MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson),
 EMBL European Bioinformatics Institute (core European Molecular Biology 
 Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), 
 CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing 
-nitesInstitute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
+Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
 
 ## References
 
