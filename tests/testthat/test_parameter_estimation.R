@@ -48,7 +48,6 @@ test_that("Estimates match the given seed (spikes)",
   
   # Obtaining denoised counts     
   DC <- BASiCS_DenoisedCounts(Data, Chain)
-  
   # Checks for an arbitrary set of genes / cells
   DCcheck0 <- c(0.000, 0.000, 0.000, 4.935, 4.935)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
@@ -56,7 +55,6 @@ test_that("Estimates match the given seed (spikes)",
   
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
-  
   # Checks for an arbitrary set of genes / cells
   DRcheck0 <- c(2.107, 2.918, 3.661, 2.517, 3.406)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
