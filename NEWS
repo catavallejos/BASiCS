@@ -846,3 +846,8 @@ version 1.1.38: (2018-03-20)
 This accounts for different parameter configurations
 - `Summary` method to exclude `RefFreq` for the no-spikes case
 - Unit tests fo no-spikes case updated accordingly
+
+version 1.1.39: (2018-03-20)
+- Denoised counts/rates added to unit test for regression case
+- `BASiCS_DenoisedCounts` adapted for no-spikes case
+- `BASiCS_DenoisedRates` adapted for no-spikes case

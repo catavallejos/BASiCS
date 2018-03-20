@@ -42,11 +42,25 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
   n <- ncol(Chain@parameters$phi)
 
   CountsBio <- assay(Data)[!isSpike(Data),]
-  Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
-                                    Chain@parameters$mu, 
-                                    t(1/Chain@parameters$delta),
-                                    Chain@parameters$phi*Chain@parameters$nu,
-                                    N, q.bio, n)
+  if("phi" %in% names(Chain@parameters))
+  {
+    # Spikes case
+    Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
+                                      Chain@parameters$mu, 
+                                      t(1/Chain@parameters$delta),
+                                      Chain@parameters$phi*Chain@parameters$nu,
+                                      N, q.bio, n)    
+  }
+  else
+  {
+    # No spikes case
+    Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
+                                      Chain@parameters$mu, 
+                                      t(1/Chain@parameters$delta),
+                                      Chain@parameters$nu,
+                                      N, q.bio, n)        
+  }
+
 
   if (Propensities) { out <- Rho } 
   else { out <- Rho * matrixStats::colMedians(Chain@parameters$mu) }

@@ -57,5 +57,21 @@ test_that("Estimates match the given seed (spikes+regression)",
   Sigma2 <- 0.279
   Sigma2Obs <- round(displaySummaryBASiCS(PostSummary, "sigma2")[1],3)
   expect_that(all.equal(Sigma2Obs, Sigma2), is_true())
+  
+  # Obtaining denoised counts     
+  DC <- BASiCS_DenoisedCounts(Data, Chain)
+  
+  # Checks for an arbitrary set of genes / cells
+  DCcheck0 <- c(0.000, 0.000, 0.000, 4.968, 4.968)
+  DCcheck <- as.vector(round(DC[1:5,1], 3))
+  expect_that(all.equal(DCcheck, DCcheck0), is_true())
+  
+  # Obtaining denoised rates
+  DR <- BASiCS_DenoisedRates(Data, Chain)
+  
+  # Checks for an arbitrary set of genes / cells
+  DRcheck0 <- c(2.291, 2.808, 3.986, 2.669, 3.558)
+  DRcheck <- as.vector(round(DR[10,1:5], 3))
+  expect_that(all.equal(DRcheck, DRcheck0), is_true())
 })
 
