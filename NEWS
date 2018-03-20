@@ -851,3 +851,7 @@ version 1.1.39: (2018-03-20)
 - Denoised counts/rates added to unit test for regression case
 - `BASiCS_DenoisedCounts` adapted for no-spikes case
 - `BASiCS_DenoisedRates` adapted for no-spikes case
+
+version 1.1.40: (2018-03-20)
+- Fixes small bug in `BASiCS_DenoisedRates`, no-spikes case
+- Adds denoised rates/counts check to unit tests for no-spikes case

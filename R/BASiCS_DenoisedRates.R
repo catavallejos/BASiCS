@@ -39,7 +39,7 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
     
   N <- nrow(Chain@parameters$delta)
   q.bio <- ncol(Chain@parameters$delta)
-  n <- ncol(Chain@parameters$phi)
+  n <- ncol(Chain@parameters$s)
 
   CountsBio <- assay(Data)[!isSpike(Data),]
   if("phi" %in% names(Chain@parameters))
