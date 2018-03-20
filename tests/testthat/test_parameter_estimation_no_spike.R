@@ -43,5 +43,19 @@ test_that("Estimates match the given seed (no-spikes)",
   Theta <- c(0.396, 0.238)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   expect_that(all.equal(ThetaObs, Theta), is_true())
+  
+  # Obtaining denoised counts     
+  DC <- BASiCS_DenoisedCounts(Data, Chain)
+  # Checks for an arbitrary set of genes / cells
+  DCcheck0 <- c(4.007, 1.336, 0.000, 8.015, 9.350)
+  DCcheck <- as.vector(round(DC[1:5,1], 3))
+  expect_that(all.equal(DCcheck, DCcheck0), is_true())
+  
+  # Obtaining denoised rates
+  DR <- BASiCS_DenoisedRates(Data, Chain)
+  # Checks for an arbitrary set of genes / cells
+  DRcheck0 <- c(5.014,  3.281, 10.541,  1.805,  4.769)
+  DRcheck <- as.vector(round(DR[10,1:5], 3))
+  expect_that(all.equal(DRcheck, DRcheck0), is_true())
 })
 

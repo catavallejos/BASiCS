@@ -860,3 +860,9 @@ version 1.1.41: (2018-03-20)
 - `BASiCS_MCMC`: Default value for `WithSpikes` set as FALSE when there are
 no spike-ins in available in the data
 
+version 1.1.42: (2018-03-20)
+- `OrderVariable` default value set as "GeneIndex" in `BASiCS_TestDE`
+- Fixed usage of `OrderVariable` in `BASiCS_TestDE` regression case
+- Associated unit test updated accordingly
+- Missing denoised rates/counts check added to unit tests for no-spikes case
+- CITATION file has been added

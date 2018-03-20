@@ -196,7 +196,7 @@ BASiCS_TestDE <- function(Chain1,
                           ProbThresholdM = NULL, 
                           ProbThresholdD = NULL, 
                           ProbThresholdR = NULL,
-                          OrderVariable = "Prob", 
+                          OrderVariable = "GeneIndex", 
                           GroupLabel1 = "Group1", 
                           GroupLabel2 = "Group2", 
                           Plot = TRUE, 
@@ -223,7 +223,9 @@ BASiCS_TestDE <- function(Chain1,
                       Plot, 
                       PlotOffset,
                       Offset)
+  
   GeneName <- colnames(Chain1@parameters$mu)
+  GeneIndex <- seq_len(length(GeneName))
   
   message("-------------------------------------------------------------\n",
           "Log-fold change thresholds are now set in a log2 scale. \n", 
@@ -457,33 +459,29 @@ BASiCS_TestDE <- function(Chain1,
     TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)
       
     if (OrderVariable == "GeneIndex") 
-      orderVar = GeneIndex[NotExcluded]
+      orderVar <- order(GeneIndex[NotExcluded], decreasing = FALSE)
     if (OrderVariable == "GeneName") 
-      orderVar = GeneName[NotExcluded]
+      orderVar <- order(GeneName[NotExcluded], decreasing = TRUE)
     if (OrderVariable == "Prob") 
-      orderVar = ProbE
-    TableResDisp <- TableResDisp[order(orderVar, decreasing = TRUE), ]
+      orderVar <- order(ProbE[NotExcluded], decreasing = TRUE)
+    TableResDisp <- TableResDisp[orderVar, ]
   }
-    
-    
-  # Update after removing DE genes from Disp table!  Reordering the tables
-  GeneIndex <- seq_len(length(MuBase))
   
   if (OrderVariable == "GeneIndex") 
-      orderVar = GeneIndex
+      orderVar <- order(GeneIndex, decreasing = FALSE)
   if (OrderVariable == "GeneName") 
-      orderVar = GeneName
+    orderVar <- order(GeneName, decreasing = TRUE)
   if (OrderVariable == "Prob") 
-      orderVar = ProbM
-  TableMean <- TableMean[order(orderVar, decreasing = TRUE), ]
+    orderVar <- order(ProbM, decreasing = TRUE)
+  TableMean <- TableMean[orderVar, ]
     
   if (OrderVariable == "GeneIndex") 
-      orderVar = GeneIndex[NotDE]
+    orderVar <- order(GeneIndex[NotDE], decreasing = FALSE)
   if (OrderVariable == "GeneName") 
-      orderVar = GeneName[NotDE]
+    orderVar <- order(GeneName[NotDE], decreasing = TRUE)
   if (OrderVariable == "Prob") 
-      orderVar = ProbD
-  TableDisp <- TableDisp[order(orderVar, decreasing = TRUE), ]
+    orderVar <- order(ProbD[NotDE], decreasing = TRUE)
+  TableDisp <- TableDisp[orderVar, ]
     
   if (!is.null(GenesSelect)) 
   {
