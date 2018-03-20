@@ -2,7 +2,9 @@ context("Parameter estimation and denoised data (spikes+regression)\n")
 
 test_that("Estimates match the given seed (spikes+regression)", 
 {
+  # Data example
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
+  # Fixing starting values
   n <- ncol(Data); k <- 12
   PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
                      b.delta = 1, p.phi = rep(1, times = n), 
@@ -10,15 +12,21 @@ test_that("Estimates match the given seed (spikes+regression)",
   PriorParam$m <- rep(0, k); PriorParam$V <- diag(k) 
   PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
   PriorParam$eta <- 5
-  
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
-  
+  # Running the sampler
   set.seed(12)
   Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                        PrintProgress = FALSE, Regression = TRUE,
                        Start = Start, PriorParam = PriorParam)
+  # Calculating a posterior summary
   PostSummary <- Summary(Chain)
+  
+  # Checking parameter names
+  ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
+                  "beta", "sigma2", "epsilon")
+  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true())
+  expect_that(all.equal(names(PostSummary@parameters), ParamNames), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c( 7.411,  4.917,  4.147,  4.609, 19.603)

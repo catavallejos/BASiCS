@@ -69,7 +69,6 @@ setClass("BASiCS_Chain",
             {
               if (length(object@parameters$mu) == 0 | 
                   length(object@parameters$delta) == 0 | 
-                  length(object@parameters$phi) == 0 | 
                   length(object@parameters$s) == 0 | 
                   length(object@parameters$nu) ==  0 | 
                   length(object@parameters$theta) == 0) 
@@ -79,9 +78,8 @@ setClass("BASiCS_Chain",
               }
               
               N <- nrow(object@parameters$mu)
-              n <- ncol(object@parameters$phi)
+              n <- ncol(object@parameters$s)
               if (nrow(object@parameters$delta) != N | 
-                  nrow(object@parameters$phi) != N | 
                   nrow(object@parameters$s) != N | 
                   nrow(object@parameters$nu) != N | 
                   nrow(object@parameters$theta) != N | 
@@ -94,7 +92,6 @@ setClass("BASiCS_Chain",
               
               if (sum(!is.finite(object@parameters$mu)) + 
                   sum(!is.finite(object@parameters$delta)) + 
-                  sum(!is.finite(object@parameters$phi)) + 
                   sum(!is.finite(object@parameters$s)) + 
                   sum(!is.finite(object@parameters$nu)) + 
                   sum(!is.finite(object@parameters$theta))) 
@@ -185,7 +182,6 @@ setClass("BASiCS_Summary",
         {
           if (sum(!is.finite(object@parameters$mu)) > 0 | 
               sum(!is.finite(object@parameters$delta)) > 0 | 
-              sum(!is.finite(object@parameters$phi)) > 0 | 
               sum(!is.finite(object@parameters$s)) > 0 | 
               sum(!is.finite(object@parameters$nu)) > 0 | 
               sum(!is.finite(object@parameters$theta)) > 0) 

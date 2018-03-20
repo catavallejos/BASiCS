@@ -27,10 +27,6 @@ test_that("Estimates match (no-spikes)",
   Delta1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "delta")[,1],3))
   Delta2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "delta")[,1],3))
   expect_that(all.equal(Delta1, Delta2), is_true())
-
-  Phi1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "phi")[,1],3))
-  Phi2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "phi")[,1],3))
-  expect_that(all.equal(Phi1, Phi2), is_true())
             
   S1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "s")[,1],3))
   S2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "s")[,1],3))

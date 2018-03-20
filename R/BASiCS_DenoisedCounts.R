@@ -31,7 +31,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_DenoisedCounts
-BASiCS_DenoisedCounts = function(Data, Chain) 
+BASiCS_DenoisedCounts <- function(Data, Chain) 
 {
     if (!is(Data, "SingleCellExperiment")) 
         stop("'Data' is not a SingleCellExperiment class object.")
