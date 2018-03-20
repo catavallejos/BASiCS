@@ -22,25 +22,25 @@ test_that("Differential test is correct",
             
   # Posterior probabilities
             
-  ProbMean0 <- c(1.00, 1.00, 1.00, 1.00, 1.00, 
-                 0.99, 0.99, 0.97, 0.97, 0.97)
+  ProbMean0 <- c(0.00, 0.01, 0.87, 0.48, 0.28, 
+                 0.00, 0.07, 0.28, 0.09, 0.01)
   ProbMean <- round(Test$TableMean$ProbDiffMean[1:10], 2)
   expect_that(all.equal(ProbMean, ProbMean0), is_true())
             
-  ProbDisp0 <- c(0.39, 0.39, 0.37, 0.37, 0.37, 
-                 0.37, 0.36, 0.35, 0.33, 0.31)
+  ProbDisp0 <- c(0.83, 0.69, 0.93, 0.75, 0.71, 
+                 0.59, 0.56, 0.88, 0.60, 0.64)
   ProbDisp <- round(tail(Test$TableDisp$ProbDiffDisp, 10), 2)
   expect_that(all.equal(ProbDisp, ProbDisp0), is_true())
             
   # Log2 fold changes
             
-  Lfc2Mean0 <- c( 0.72, -4.21,  0.90, -1.12, -1.49, 
-                 -1.28,  1.45, -0.88,  0.87, -1.47)
+  Lfc2Mean0 <- c(-0.22, -0.08, -0.84, -0.57, -0.38,  
+                  0.01, -0.02,  0.48, -0.32,  0.13)
   Lfc2Mean <- round(Test$TableMean$MeanLog2FC[1:10], 2)
   expect_that(all.equal(Lfc2Mean, Lfc2Mean0), is_true())
             
-  Lfc2Disp0 <- c( 0.41,  0.16,  0.22,  0.11, -0.16, 
-                  0.30, -0.01,  0.13, -0.05,  0.08)
+  Lfc2Disp0 <- c( 1.18, -0.82,  2.17,  0.96, -0.98,  
+                  0.72,  0.59,  1.74,  0.52,  0.69)
   Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 10),2)
   expect_that(all.equal(Lfc2Disp, Lfc2Disp0), is_true())
             
