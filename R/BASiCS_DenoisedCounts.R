@@ -23,7 +23,7 @@
 #' normalisation strategies, these are defined as \eqn{X_{ij}/(\phi_j \nu_j)} 
 #' for biological genes and \eqn{X_{ij}/(\nu_j)} for spike-in genes. For this
 #' calculation \eqn{\phi_j} \eqn{\nu_j} are estimated by their corresponding
-#' posterior medians.
+#' posterior medians. If spike-ins are not used, \eqn{\phi_j} is set equal to 1. 
 #'
 #' @seealso \code{\linkS4class{BASiCS_Chain}} 
 #'
@@ -42,12 +42,23 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
     q.bio <- ncol(Chain@parameters$delta)
     n <- nrow(Chain@parameters$phi)
     
-    Phi <- matrixStats::colMedians(Chain@parameters$phi)
     Nu <- matrixStats::colMedians(Chain@parameters$nu)
     
-    out1 <- t(t(assay(Data)[!isSpike(Data), ])/(Phi * Nu))
-    out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu)
-    out <- rbind(out1, out2)
-    
+    if("phi" %in% names(Chain@parameters))
+    {
+      # Spikes case
+      Phi <- matrixStats::colMedians(Chain@parameters$phi)
+      out1 <- t(t(assay(Data)[!isSpike(Data), ])/(Phi * Nu))
+      out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu)      
+    }
+    else
+    {
+      # No spikes case
+      out1 <- t(t(assay(Data)[!isSpike(Data), ])/Nu)
+      out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu)       
+    }
+
+    out <- rbind(out1, out2)     
+ 
     return(out)
 }
