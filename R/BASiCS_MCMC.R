@@ -313,11 +313,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     }
   } 
   else {
-    # If spikes are not available
-    message("-------------------------------------------------------------\n",  
-            "IMPORTANT: this code is under development. DO NOT USE \n", 
-            "This part of the code is just a place-holder \n", 
-            "-------------------------------------------------------------\n")
+#    # If spikes are not available
+#    message("-------------------------------------------------------------\n",  
+#            "IMPORTANT: this code is under development. DO NOT USE \n", 
+#            "This part of the code is just a place-holder \n", 
+#            "-------------------------------------------------------------\n")
     
     if(Regression == TRUE) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
@@ -357,11 +357,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
     }
   }
   
-  # Fill up phi for the no spikes case (remove this eventually)
-#  if (WithSpikes == FALSE) {
-#    Chain$phi <- matrix(1, ncol = ncol(Chain$s), nrow = nrow(Chain$s))
-#  }
-    
   # Format column names of MCMC chains
   colnames(Chain$mu) <- rownames(assay(Data))[!isSpike(Data)]
   colnames(Chain$delta) <- rownames(assay(Data))[!isSpike(Data)]
