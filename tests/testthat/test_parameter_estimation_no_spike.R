@@ -22,8 +22,9 @@ test_that("Estimates match the given seed (no-spikes)",
   
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta", "RefFreq")
+  ParamNames1 <- c("mu", "delta", "s", "nu", "theta")
   expect_that(all.equal(names(Chain@parameters), ParamNames), is_true())
-  expect_that(all.equal(names(PostSummary@parameters), ParamNames), is_true())
+  expect_that(all.equal(names(PostSummary@parameters), ParamNames1), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(18.712, 10.029, 9.246, 10.668, 32.484)

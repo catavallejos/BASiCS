@@ -144,6 +144,7 @@ setMethod("Summary",
                                                 prob=prob)
   HPD
   })
+  if("RefFreq" %in% names(out)) { out$RefFreq <- NULL }
             
   Output <- new("BASiCS_Summary", parameters = out)
   return(Output)
