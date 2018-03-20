@@ -67,47 +67,57 @@ setClass("BASiCS_Chain",
             }
             else
             {
-              if (length(object@parameters$mu) == 0 | 
-                  length(object@parameters$delta) == 0 | 
-                  length(object@parameters$s) == 0 | 
-                  length(object@parameters$nu) ==  0 | 
-                  length(object@parameters$theta) == 0) 
-              {
-                errors <- c(errors, "One or more parameters are missing")
-                return(errors)
-              }
+              ValidNames <- c("mu", "delta", "phi", "s", "nu", "theta",
+                              "beta", "sigma2", "epsilon", "RefFreq")
+              ReqNames <- c("mu", "delta", "s", "nu", "theta")
+              
+              # Check whether all elements of `parameters` are valid
+              if(sum(!(names(object@parameters) %in% ValidNames) > 0) > 0)
+                errors <- c(errors, "Invalid elemens in `parameters` slot")
+              
+              # Check whether all minimum `parameters` are present
+              if(sum(names(object@parameters) %in% ReqNames) != 5)
+                errors <- c(errors, "One or more parameters are missing")     
+              
+              # Check for infinite values and NAs
+              if(sum(lapply(object@parameters, 
+                            function(x) sum(!is.finite(x))) > 0) > 0)
+                errors <- c(errors, "Some parameters contain NA/Inf values")
               
               N <- nrow(object@parameters$mu)
+              q <- ncol(object@parameters$mu)
               n <- ncol(object@parameters$s)
-              if (nrow(object@parameters$delta) != N | 
-                  nrow(object@parameters$s) != N | 
-                  nrow(object@parameters$nu) != N | 
-                  nrow(object@parameters$theta) != N | 
-                  ncol(object@parameters$mu) != ncol(object@parameters$delta) | 
-                  ncol(object@parameters$s) != n | 
-                  ncol(object@parameters$nu) != n) 
-              {
-                errors <- c(errors, "Parameters' dimensions are not compatible")
-              }
               
-              if (sum(!is.finite(object@parameters$mu)) + 
-                  sum(!is.finite(object@parameters$delta)) + 
-                  sum(!is.finite(object@parameters$s)) + 
-                  sum(!is.finite(object@parameters$nu)) + 
-                  sum(!is.finite(object@parameters$theta))) 
+              # Check number of iterations per element of `parameters`
+              if(sum(lapply(object@parameters, nrow) != N) > 0)
+                errors <- c(errors, "Different numbers of iterations")
+              # Check dimensions for basic gene-specific parameters
+              if(sum(lapply(object@parameters[c("mu", "delta")], ncol) != q) > 0)
+                errors <- c(errors, 
+                            "Parameters' dimensions are not compatible (genes)")
+              # Check dimensions for basic cell-specific parameters
+              if(sum(lapply(object@parameters[c("s", "nu")], ncol) != n) > 0)
+                errors <- c(errors, 
+                            "Parameters' dimensions are not compatible (cells)")
+              # Check dimensions for optional gene-specific parameters
+              if("epsilon" %in% names(object@parameters))
               {
-                errors <- c(errors, "Some parameters contain NA/Inf values")
+                if((nrow(object@parameters$epsilon) != N) |
+                   (ncol(object@parameters$epsilon) != q) |
+                   (sum(!is.finite(object@parameters$epsilon)) > 0))
+                  errors <- c(errors, 
+                              "Invalid dimensions for `epsilon`")                  
               }
-
-              ### TO BE ADAPTED FOR THE REGRESSION / NO SPIKES CASES             
-#              if(sum(!all.equal(colnames(object@parameters$phi),
-#                                colnames(object@parameters$s))) > 0 |
-#                 sum(!all.equal(colnames(object@parameters$phi),
-#                                colnames(object@parameters$nu))) > 0)
-#              {
-#                errors <- c(errors,"Cell-specific parameter labels don't match")
-#              }
-              
+              # Check dimensions for optional cell-specific parameters
+              if("phi" %in% names(object@parameters))
+              {
+                if((nrow(object@parameters$phi) != N) |
+                   (ncol(object@parameters$phi) != n) |
+                   (sum(!is.finite(object@parameters$phi)) > 0))
+                  errors <- c(errors, 
+                              "Invalid dimensions for `phi`")                  
+              }
+              # Check labels for gene-specific params
               if(sum(!all.equal(colnames(object@parameters$mu),
                                 colnames(object@parameters$delta))) > 0)
               {
@@ -180,12 +190,22 @@ setClass("BASiCS_Summary",
          contains="Versioned",
          validity = function(object) 
         {
-          if (sum(!is.finite(object@parameters$mu)) > 0 | 
-              sum(!is.finite(object@parameters$delta)) > 0 | 
-              sum(!is.finite(object@parameters$s)) > 0 | 
-              sum(!is.finite(object@parameters$nu)) > 0 | 
-              sum(!is.finite(object@parameters$theta)) > 0) 
-                return("Invalid slots") else { TRUE }
+           errors <- character()
+           
+           ValidNames <- c("mu", "delta", "phi", "s", "nu", "theta",
+                           "beta", "sigma2", "epsilon")
+           ReqNames <- c("mu", "delta", "s", "nu", "theta")
+           
+           # Check whether all elements of `parameters` are valid
+           if(sum(!(names(object@parameters) %in% ValidNames) > 0) > 0)
+             errors <- c(errors, "Invalid elemens in `parameters` slot")
+           
+           # Check whether all minimum `parameters` are present
+           if(sum(names(object@parameters) %in% ReqNames) != 5)
+             errors <- c(errors, "One or more parameters are missing")     
+           
+           if (length(errors) == 0) 
+             TRUE else errors 
       },
       prototype = prototype(new("Versioned",
                                 versions = c("BASiCS_Summary" = 

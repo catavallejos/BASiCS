@@ -840,3 +840,9 @@ version 1.1.37: (2018-03-20)
 - `phi` removed from the output of `BASiCS_MCMC` for no-spikes case
 - Unit tests updated accordingly
 - Checks for parameter names added to unit tests
+
+version 1.1.38: (2018-03-20)
+- Validity checks updated for `BASiCS_Chain` and `BASiCS_Summary` classes.
+This accounts for different parameter configurations
+- `Summary` method to exclude `RefFreq` for the no-spikes case
+- Unit tests fo no-spikes case updated accordingly
