@@ -30,9 +30,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_DenoisedRates
-BASiCS_DenoisedRates = function(Data, 
-                                Chain, 
-                                Propensities = FALSE) 
+BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE) 
 {
   if (!is(Data, "SingleCellExperiment")) 
     stop("'Data' is not a SingleCellExperiment class object.")
@@ -45,7 +43,8 @@ BASiCS_DenoisedRates = function(Data,
 
   CountsBio <- assay(Data)[!isSpike(Data),]
   Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
-                                    Chain@parameters$mu, t(1/Chain@parameters$delta),
+                                    Chain@parameters$mu, 
+                                    t(1/Chain@parameters$delta),
                                     Chain@parameters$phi*Chain@parameters$nu,
                                     N, q.bio, n)
 

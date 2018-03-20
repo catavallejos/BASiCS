@@ -18,6 +18,11 @@ test_that("Estimates match the given seed (spikes+batch)",
                        Start = Start, PriorParam = PriorParam)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
+  
+  # Checking parameter names
+  ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta")
+  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true())
+  expect_that(all.equal(names(PostSummary@parameters), ParamNames), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(6.943,  4.975,  4.015,  4.975, 17.778)
@@ -44,23 +49,15 @@ test_that("Estimates match the given seed (spikes+batch)",
   # Obtaining denoised counts     
   DC <- BASiCS_DenoisedCounts(Data, Chain)
   
-  # Checks for 2 arbitrary sets of genes / cells
+  # Checks for an arbitrary set of genes / cells
   DCcheck0 <- c(0.000, 0.000, 0.000, 5.075, 5.075)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
-  expect_that(all.equal(DCcheck, DCcheck0), is_true())
-  
-  DCcheck0 <- c(0.00, 2.272, 0.00, 0.00, 2.760)
-  DCcheck <- as.vector(round(DC[10,1:5], 3))
   expect_that(all.equal(DCcheck, DCcheck0), is_true())
   
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
   
-  # Checks for 2 arbitrary sets of genes / cells
-  DRcheck0 <- c(2.617, 1.858, 2.612, 4.965, 8.702)
-  DRcheck <- as.vector(round(DR[1:5,1], 3))
-  expect_that(all.equal(DRcheck, DRcheck0), is_true())
-  
+  # Checks for an arbitrary set of genes / cells
   DRcheck0 <- c(2.482, 3.213, 4.134, 2.890, 3.675)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   expect_that(all.equal(DRcheck, DRcheck0), is_true())
