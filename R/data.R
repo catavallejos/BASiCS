@@ -1,6 +1,6 @@
 #' Extract from the chain obtained for the Grun et al (2014) data: pool-and-split samples
 #'
-#' Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+#' Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 #' chain obtained for the pool-and-split samples
 #' (this corresponds to the RNA 2i samples in Grun et al, 2014).
 #' 
@@ -15,7 +15,7 @@
 
 #' Extract from the chain obtained for the Grun et al (2014) data: single-cell samples
 #'
-#' Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+#' Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 #' chain obtained for the pool-and-split samples
 #' (this corresponds to the SC 2i samples in Grun et al, 2014). 
 #' 
@@ -31,7 +31,7 @@
 #' Extract from the chain obtained for the Grun et al (2014) data: 
 #' pool-and-split samples (regression model)
 #'
-#' Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+#' Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 #' chain obtained for the pool-and-split samples 
 #' (this corresponds to the RNA 2i samples in Grun et al, 2014). 
 #' 
@@ -47,7 +47,7 @@
 #' Extract from the chain obtained for the Grun et al (2014) data: 
 #' single-cell samples (regression model)
 #'
-#' Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+#' Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 #' chain obtained for the pool-and-split samples
 #' (this corresponds to the SC 2i samples in Grun et al, 2014). 
 #' 
