@@ -208,21 +208,13 @@ BASiCS_TestDE <- function(Chain1,
                           GenesSelect = NULL, ...) 
 {
   
-  HiddenHeaderTest_DE(Chain1, 
-                      Chain2,
-                      EpsilonM, 
-                      EpsilonD,
-                      EFDR_M,
-                      EFDR_D, 
-                      ProbThresholdM, 
-                      ProbThresholdD,
+  HiddenHeaderTest_DE(Chain1, Chain2,
+                      EpsilonM, EpsilonD,
+                      EFDR_M, EFDR_D, 
+                      ProbThresholdM, ProbThresholdD,
                       OrderVariable,
-                      GroupLabel1,
-                      GroupLabel2,
-                      GenesSelect,
-                      Plot, 
-                      PlotOffset,
-                      Offset)
+                      GroupLabel1, GroupLabel2,
+                      GenesSelect, Plot, PlotOffset, Offset)
   
   GeneName <- colnames(Chain1@parameters$mu)
   GeneIndex <- seq_len(length(GeneName))
