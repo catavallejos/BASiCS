@@ -64,6 +64,9 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
 
   if (Propensities) { out <- Rho } 
   else { out <- Rho * matrixStats::colMedians(Chain@parameters$mu) }
+  
+  rownames(out) <- rownames(Data)[!SingleCellExperiment::isSpike(Data)]
+  colnames(out) <- colnames(Data)
     
   return(out)
     

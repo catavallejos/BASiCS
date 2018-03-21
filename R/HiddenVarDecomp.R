@@ -8,13 +8,21 @@ HiddenVarDecomp <- function(Chain)
   q.bio <- ncol(Chain@parameters$delta)
   UniqueBatch <- colnames(Chain@parameters$theta)
   nBatch <- length(UniqueBatch)
-  CellName <- colnames(Chain@parameters$phi)
+  CellName <- colnames(Chain@parameters$s)
     
   if (nBatch > 1) { Theta <- matrixStats::rowMedians(Chain@parameters$theta) } 
   else { Theta <- as.vector(Chain@parameters$theta) }
     
   # To store global values (uses median values across all cells)
-  PhiS <- matrixStats::rowMedians(Chain@parameters$phi * Chain@parameters$s)
+  if("phi" %in% names(Chain@parameters))
+  {
+    PhiS <- matrixStats::rowMedians(Chain@parameters$phi * Chain@parameters$s)
+  }
+  else
+  {
+    PhiS <- matrixStats::rowMedians(Chain@parameters$s)
+  }
+  
   Aux <- (1/(PhiS * Chain@parameters$mu)) + Chain@parameters$delta * (Theta + 1)
   TechVarGlobal <- Theta/(Aux + Theta)
   BioVarGlobal <- (Chain@parameters$delta * (Theta + 1))/(Aux + Theta)
@@ -27,15 +35,24 @@ HiddenVarDecomp <- function(Chain)
   {
     for (Batch in seq_len(nBatch)) 
     {
-      PhiBatch <- Chain@parameters$phi[, grep(UniqueBatch[Batch], CellName)]
       SBatch <- Chain@parameters$s[, grep(UniqueBatch[Batch], CellName)]
-      PhiSBatch <- matrixStats::rowMedians(PhiBatch * SBatch)
-      
+      if("phi" %in% names(Chain@parameters))
+      {
+        PhiBatch <- Chain@parameters$phi[, grep(UniqueBatch[Batch], CellName)]
+        PhiSBatch <- matrixStats::rowMedians(PhiBatch * SBatch)
+      }
+      else
+      {
+        PhiSBatch <- matrixStats::rowMedians(SBatch)
+      }
+   
       Aux <- (1/(PhiSBatch * Chain@parameters$mu)) + 
                 Chain@parameters$delta * (Chain@parameters$theta[,Batch] + 1)
-      TechVarBatch[,,Batch] <- Chain@parameters$theta[,Batch] / (Aux + Chain@parameters$theta[,Batch])
-      BioVarBatch[,,Batch] <- (Chain@parameters$delta * (Chain@parameters$theta[,Batch] + 1)) / 
-                                    (Aux + Chain@parameters$theta[,Batch])
+      TechVarBatch[,,Batch] <- 
+        Chain@parameters$theta[,Batch] / (Aux + Chain@parameters$theta[,Batch])
+      BioVarBatch[,,Batch] <- 
+        (Chain@parameters$delta * (Chain@parameters$theta[,Batch] + 1)) / 
+        (Aux + Chain@parameters$theta[,Batch])
     }
   }
     
