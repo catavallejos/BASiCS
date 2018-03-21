@@ -874,3 +874,10 @@ This facilitates data subsetting.
 - `BASiCS_MCMC` and `HiddenBASiCS_MCMC_InputCheck` updated accordingly
 - `SummarizedExperiment::colData` and `S4Vectors::DataFrame` added as
 imports in NAMESPACE
+
+version 1.1.44: (2018-03-21)
+- `HiddenVarDecomp` adapted to no-spikes case
+- Unit test for `BASiCS_VarDecomp` expanded accordingly
+- Specification of `colnames` and `rownames` added to `newBASiCS_Data`
+- `colnames` and `rownames` are now specified as part of the output of 
+`BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates`

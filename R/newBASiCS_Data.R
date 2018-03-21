@@ -110,6 +110,8 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   SingleCellExperiment::isSpike(Data, "ERCC") <- Tech
   SummarizedExperiment::colData(Data) <- 
     S4Vectors::DataFrame("BatchInfo" = BatchInfo)
+  colnames(Data) <- colnames(Counts)
+  rownames(Data) <- rownames(Counts)
     
   message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 
             "    - You must remove poor quality cells before hand \n", 

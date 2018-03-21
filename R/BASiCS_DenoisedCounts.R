@@ -38,12 +38,7 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
     if (!is(Chain, "BASiCS_Chain")) 
         stop("'Chain' is not a BASiCS_Chain class object.")
     
-    N <- nrow(Chain@parameters$delta)
-    q.bio <- ncol(Chain@parameters$delta)
-    n <- nrow(Chain@parameters$phi)
-    
     Nu <- matrixStats::colMedians(Chain@parameters$nu)
-    
     if("phi" %in% names(Chain@parameters))
     {
       # Spikes case
@@ -58,7 +53,9 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
       out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu)       
     }
 
-    out <- rbind(out1, out2)     
- 
+    out <- rbind(out1, out2) 
+    rownames(out) <- rownames(Data)
+    colnames(out) <- colnames(Data)
+    
     return(out)
 }
