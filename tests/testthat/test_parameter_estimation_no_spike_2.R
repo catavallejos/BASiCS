@@ -7,7 +7,7 @@ test_that("Estimates match (no-spikes)",
                                   WithBatch = TRUE)
   Data2 <- newBASiCS_Data(Counts = assay(Data1)[!isSpike(Data1),],
                           Tech = isSpike(Data1)[!isSpike(Data1)],
-                          BatchInfo = metadata(Data1)$BatchInfo)
+                          BatchInfo = colData(Data1)$BatchInfo)
   expect_that(all.equal(assay(Data1)[!isSpike(Data1),], assay(Data2)), is_true())
 
   set.seed(16)
