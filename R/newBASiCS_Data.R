@@ -106,9 +106,10 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   # Create a SingleCellExperiment data object
   Data <- SingleCellExperiment::SingleCellExperiment(
                 assays = list(Counts = as.matrix(Counts)), 
-                metadata = list(SpikeInput = SpikeInput, 
-                                BatchInfo = BatchInfo))
-  isSpike(Data, "ERCC") <- Tech
+                metadata = list(SpikeInput = SpikeInput))
+  SingleCellExperiment::isSpike(Data, "ERCC") <- Tech
+  SummarizedExperiment::colData(Data) <- 
+    S4Vectors::DataFrame("BatchInfo" = BatchInfo)
     
   message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 
             "    - You must remove poor quality cells before hand \n", 

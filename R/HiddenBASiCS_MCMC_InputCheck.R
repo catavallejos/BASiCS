@@ -7,13 +7,13 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin, Burn)
   if(!("SpikeInput" %in% names(metadata(Data))))
     stop("'Data' does not contained all the required information \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
-  if(!("BatchInfo" %in% names(metadata(Data))))
+  if(!("BatchInfo" %in% names(colData(Data))))
     stop("'Data' does not contained all the required information \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   errors <- HiddenChecksBASiCS_Data(assay(Data), isSpike(Data), 
                                     metadata(Data)$SpikeInput, 
                                     rownames(assay(Data)), 
-                                    metadata(Data)$BatchInfo)
+                                    colData(Data)$BatchInfo)
   if (length(errors) > 0) stop(errors) 
   
   if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) 
