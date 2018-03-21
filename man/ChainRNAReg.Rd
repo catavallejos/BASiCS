@@ -11,7 +11,7 @@ containing 75 MCMC iterations.}
 ChainRNAReg
 }
 \description{
-Small extract (75 MCMC iterations, 400 randomly selected genes) from the 
+Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 chain obtained for the pool-and-split samples 
 (this corresponds to the RNA 2i samples in Grun et al, 2014).
 }
