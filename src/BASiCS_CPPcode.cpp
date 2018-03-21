@@ -316,6 +316,55 @@ double RgigDouble(const double lambda, const double chi, const double psi)
 
 /* END OF ADAPTED CODE*/
 
+void StartSampler(int const& N)
+{
+  Rcout << "-----------------------------------------------------" << std::endl;  
+  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;  
+}
+
+void EndBurn()
+{
+  Rcout << "-----------------------------------------------------" << std::endl; 
+  Rcout << "End of Burn-in period."<< std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl; 
+}
+
+void CurrentIter(int const& i, int const& N)
+{
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << "Iteration " << i << " out of " << N << " has been completed." << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << "Current draws for selected parameters are displayed below." << std::endl;
+}  
+
+void EndSampler(int const& N)
+{
+  Rcout << " " << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << " " << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+  Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
+}
+
+void ReportAR(arma::vec const& AR, 
+              std::string const& Param)
+{
+  Rcout << " " << std::endl;  
+  Rcout << "Minimum acceptance rate among " << 
+    Param << ": " << min(AR) << std::endl;
+  Rcout << "Average acceptance rate among " << 
+    Param << ": " << mean(AR) << std::endl;
+  Rcout << "Maximum acceptance rate among " << 
+    Param << ": " << max(AR) << std::endl;
+  Rcout << " " << std::endl;  
+}
+
 /* Auxiliary function that converts Rcpp::NumericVector 
  * objects into arma::vec objects
  */ 
@@ -885,20 +934,14 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec ind_q0 = zeros(q0); arma::vec ind_n = zeros(n);
   arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
   
-  Rcout << "-------------------------------------------------------------" << std::endl;  
-  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  StartSampler(N);
   
   // START OF MCMC LOOP
   for (int i=0; i<N; i++) {
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) {
-      Rcout << "-------------------------------------------------------------" << std::endl; 
-      Rcout << "End of Burn-in period."<< std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl; 
-    }
+    if(i==Burn) EndBurn();
 
     Ibatch++; 
     
@@ -1000,72 +1043,35 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
     if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
-        Rcout << "-------------------------------------------------------------" << std::endl;
-        Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
-        Rcout << "-------------------------------------------------------------" << std::endl;
-        Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
-        Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
-        Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
-        Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
-        Rcout << "s (cell 1): " << sAux(0) << std::endl;
-        Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
-        Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
-        Rcout << "-------------------------------------------------------------" << std::endl;
-        Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
-        Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
-        Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
-        Rcout << "LSphi: " << LSphiAux << std::endl;
-        Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
-        Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
+      CurrentIter(i, N);
+      Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
+      Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
+      Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
+      Rcout << "s (cell 1): " << sAux(0) << std::endl;
+      Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
+      Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
+      Rcout << "-----------------------------------------------------" << std::endl;
+      Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
+      Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
+      Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
+      Rcout << "LSphi: " << LSphiAux << std::endl;
+      Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
+      Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
     }    
   }
   
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << " " << std::endl;
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << " " << std::endl;
-  
-  Rcout << "Minimum acceptance rate among mu[i]'s: " << 
-    min(muAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among mu[i]'s: " << 
-    mean(muAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among mu[i]'s: " << 
-    max(muAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among delta[i]'s: " << 
-    min(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among delta[i]'s: " << 
-    mean(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among delta[i]'s: " << 
-    max(deltaAccept/(N-Burn)) << std::endl;
+  // END OF MCMC SAMPLER AND ACCEPTANCE RATE CONSOLE OUTPUT
+  EndSampler(N); 
+  ReportAR(muAccept/(N-Burn), "mu[i]'s");
+  ReportAR(deltaAccept/(N-Burn), "delta[i]'s");  
   Rcout << " " << std::endl;
   Rcout << "Acceptance rate for phi (joint): " << 
     phiAccept/(N-Burn) << std::endl;
   Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among nu[j]'s: " << 
-    min(nuAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among nu[j]'s: " << 
-    mean(nuAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among nu[j]'s: " << 
-    max(nuAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among theta[k]'s: " << 
-    min(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among theta[k]'s: " << 
-    mean(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among theta[k]'s: " << 
-    max(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  ReportAR(nuAccept/(N-Burn), "nu[j]'s");  
+  ReportAR(thetaAccept/(N-Burn), "theta[k]'s");  
+
+  Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
 
   if(StoreAdapt == 1) {
@@ -1516,20 +1522,14 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec means = muAux(arma::span(0,q0-1),0);
   arma::mat X = designMatrix(k, means, variance);
 
-  Rcout << "-------------------------------------------------------------" << std::endl;  
-  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  StartSampler(N);
   
   // START OF MCMC LOOP
   for (int i=0; i<N; i++) {
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) {
-      Rcout << "-------------------------------------------------------------" << std::endl; 
-      Rcout << "End of Burn-in period."<< std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl; 
-    }
+    if(i==Burn) EndBurn();
     
     Ibatch++; 
     
@@ -1664,10 +1664,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
     if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
-      Rcout << "-------------------------------------------------------------" << std::endl;
-      Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl;
-      Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
+      CurrentIter(i, N);
       Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
       Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
@@ -1678,7 +1675,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       Rcpp::Rcout << "sigma: " << sigma2Aux << std::endl; 
       Rcpp::Rcout << "lambda (gene 1): " << lambdaAux(0) << std::endl;
       Rcpp::Rcout << "epsilon (gene 1): " << epsilonAux(0) << std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "-----------------------------------------------------" << std::endl;
       Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
       Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
       Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
@@ -1688,52 +1685,18 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     }    
   }
   
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << " " << std::endl;
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << " " << std::endl;
-  
-  Rcout << "Minimum acceptance rate among mu[i]'s: " << 
-    min(muAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among mu[i]'s: " << 
-    mean(muAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among mu[i]'s: " << 
-    max(muAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among delta[i]'s: " << 
-    min(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among delta[i]'s: " << 
-    mean(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among delta[i]'s: " << 
-    max(deltaAccept/(N-Burn)) << std::endl;
+  // END OF MCMC SAMPLER AND ACCEPTANCE RATE CONSOLE OUTPUT
+  EndSampler(N); 
+  ReportAR(muAccept/(N-Burn), "mu[i]'s");
+  ReportAR(deltaAccept/(N-Burn), "delta[i]'s");  
   Rcout << " " << std::endl;
   Rcout << "Acceptance rate for phi (joint): " << 
     phiAccept/(N-Burn) << std::endl;
   Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among nu[j]'s: " << 
-    min(nuAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among nu[j]'s: " << 
-    mean(nuAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among nu[j]'s: " << 
-    max(nuAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among theta[k]'s: " << 
-    min(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among theta[k]'s: " << 
-    mean(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among theta[k]'s: " << 
-    max(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  ReportAR(nuAccept/(N-Burn), "nu[j]'s");  
+  ReportAR(thetaAccept/(N-Burn), "theta[k]'s");  
+  
+  Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
   
   if(StoreAdapt == 1) {
@@ -2081,20 +2044,14 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec RefFreq = arma::zeros(q0); 
   int RefAux;
   
-  Rcout << "-------------------------------------------------------------" << std::endl;  
-  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  StartSampler(N);
   
   // START OF MCMC LOOP
   for (i=0; i<N; i++) {
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) {
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
-      Rcpp::Rcout << "End of Burn-in period."<< std::endl;
-      Rcpp::Rcout << "--------------------------------------------------------------------" << std::endl; 
-    }
+    if(i==Burn) EndBurn();
     
     Ibatch++; 
 
@@ -2189,16 +2146,13 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
     if(i%(2*Thin) == 0 & PrintProgress == 1) {
-      Rcout << "-------------------------------------------------------------" << std::endl;
-      Rcpp::Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl;
-      Rcpp::Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
+      CurrentIter(i, N);      
       Rcpp::Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcpp::Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
       Rcpp::Rcout << "s (cell 1): " << sAux(0) << std::endl;
       Rcpp::Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
       Rcpp::Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "-----------------------------------------------------" << std::endl;
       Rcpp::Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
       Rcpp::Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
       Rcpp::Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
@@ -2207,49 +2161,14 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     }    
   }
   
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcpp::Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcpp::Rcout << " " << std::endl;
+  // END OF MCMC SAMPLER AND ACCEPTANCE RATE CONSOLE OUTPUT
+  EndSampler(N);   
+  ReportAR(muAccept/(N-Burn), "mu[i]'s");
+  ReportAR(deltaAccept/(N-Burn), "delta[i]'s");  
+  ReportAR(nuAccept/(N-Burn), "nu[jk]'s");  
+  ReportAR(thetaAccept/(N-Burn), "theta[k]'s");  
 
-  Rcpp::Rcout << "Minimum acceptance rate among mu[i]'s: " << 
-    min(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among mu[i]'s: " << 
-    mean(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among mu[i]'s: " << 
-    max(muAccept.elem(find(Index_arma != RefGene))/(N-Burn)) << std::endl;
-  
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "Minimum acceptance rate among delta[i]'s: " << 
-    min(deltaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << 
-    mean(deltaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among delta[i]'s: " << 
-    max(deltaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "Minimum acceptance rate among nu[jk]'s: " << 
-    min(nuAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among nu[jk]'s: " << 
-    mean(nuAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among nu[jk]'s: " << 
-    max(nuAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << " " << std::endl;
-  Rcpp::Rcout << "Minimum acceptance rate among theta[k]'s: " << 
-    min(thetaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Average acceptance rate among theta[k]'s: " << 
-    mean(thetaAccept/(N-Burn)) << std::endl;
-  Rcpp::Rcout << "Maximum acceptance rate among theta[k]'s: " << 
-    max(thetaAccept/(N-Burn)) << std::endl;  
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
   Rcpp::Rcout << " " << std::endl;
   
   if(StoreAdapt == 1) {
@@ -2630,20 +2549,14 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec means = muAux.col(0);
   arma::mat X = designMatrix(k, means, variance);
 
-  Rcout << "-------------------------------------------------------------" << std::endl;  
-  Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  StartSampler(N);
   
   // START OF MCMC LOOP
   for (int i=0; i<N; i++) {
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) {
-      Rcout << "-------------------------------------------------------------" << std::endl; 
-      Rcout << "End of Burn-in period."<< std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl; 
-    }
+    if(i==Burn) EndBurn();
     
     Ibatch++; 
 
@@ -2666,8 +2579,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // If using stochastic reference, randomly select 1 ref gene
     if(StochasticRef == 1) {
-      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
-                                                           RefGenes_arma.size()-1) ));
+      RefAux = as_scalar(arma::randi(1, 
+                                     arma::distr_param(0,RefGenes_arma.size()-1) ));
       RefGene = RefGenes(RefAux); 
       if(i >= Burn) RefFreq(RefGene) += 1;
     }
@@ -2774,10 +2687,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
     if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
-      Rcout << "-------------------------------------------------------------" << std::endl;
-      Rcout << "MCMC iteration " << i << " out of " << N << " has been completed." << std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl;
-      Rcout << "Current draws of some selected parameters are displayed below." << std::endl;
+      CurrentIter(i, N);
       Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
       Rcout << "s (cell 1): " << sAux(0) << std::endl;
@@ -2787,7 +2697,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       Rcpp::Rcout << "sigma: " << sigma2Aux << std::endl; 
       Rcpp::Rcout << "lambda (gene 1): " << lambdaAux(0) << std::endl;
       Rcpp::Rcout << "epsilon (gene 1): " << epsilonAux(0) << std::endl;
-      Rcout << "-------------------------------------------------------------" << std::endl;
+      Rcout << "-----------------------------------------------------" << std::endl;
       Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
       Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
       Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
@@ -2796,49 +2706,15 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     }    
   }
   
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "All " << N << " MCMC iterations have been completed." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << " " << std::endl;
-  // ACCEPTANCE RATE CONSOLE OUTPUT
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << "Please see below a summary of the overall acceptance rates." << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
-  Rcout << " " << std::endl;
+  // END OF MCMC SAMPLER AND ACCEPTANCE RATE CONSOLE OUTPUT
+  EndSampler(N); 
+  ReportAR(muAccept/(N-Burn), "mu[i]'s");
+  ReportAR(deltaAccept/(N-Burn), "delta[i]'s");  
+  ReportAR(nuAccept/(N-Burn), "nu[jk]'s");  
+  ReportAR(thetaAccept/(N-Burn), "theta[k]'s");  
   
-  Rcout << "Minimum acceptance rate among mu[i]'s: " << 
-    min(muAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among mu[i]'s: " << 
-    mean(muAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among mu[i]'s: " << 
-    max(muAccept/(N-Burn)) << std::endl;
   Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among delta[i]'s: " << 
-    min(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among delta[i]'s: " << 
-    mean(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among delta[i]'s: " << 
-    max(deltaAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among nu[j]'s: " << 
-    min(nuAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among nu[j]'s: " << 
-    mean(nuAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among nu[j]'s: " << 
-    max(nuAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "Minimum acceptance rate among theta[k]'s: " << 
-    min(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << "Average acceptance rate among theta[k]'s: " << 
-    mean(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << "Maximum acceptance rate among theta[k]'s: " << 
-    max(thetaAccept/(N-Burn)) << std::endl;
-  Rcout << " " << std::endl;
-  Rcout << "-------------------------------------------------------------" << std::endl;
+  Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
   
   if(StoreAdapt == 1) {

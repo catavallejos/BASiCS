@@ -881,3 +881,6 @@ version 1.1.44: (2018-03-21)
 - Specification of `colnames` and `rownames` added to `newBASiCS_Data`
 - `colnames` and `rownames` are now specified as part of the output of 
 `BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates`
+
+version 1.1.45: (2018-03-21)
+- Messages within C++ code moved to functions 
