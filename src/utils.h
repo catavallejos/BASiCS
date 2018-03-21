@@ -124,7 +124,7 @@ arma::mat thetaUpdateBatch(
     double const& a_theta, 
     double const& b_theta, 
     int const& n,
-    int const& nBatch)
+    int const& nBatch);
   
   /* Declarations for functions used by the MCMC sampler for the regression case
    * Stored in: utils_MCMCcppReg.cpp
@@ -174,6 +174,16 @@ arma::mat deltaUpdateReg(
 arma::vec betaUpdateReg(double const& sigma2,
                         arma::mat const& VAux,
                         arma::vec const& mAux);
+
+double sigma2UpdateReg(arma::vec const& delta,
+                       arma::vec const& beta,
+                       arma::vec const& lambda, 
+                       arma::mat const& V1,
+                       double const& mInvVm0,
+                       arma::vec const& m,
+                       double const& sigma2_a0,
+                       double const& sigma2_b0,
+                       int const& q0);
 
 arma::vec lambdaUpdateReg(arma::vec const& delta,
                           arma::mat const& X,
@@ -269,4 +279,4 @@ arma::mat deltaUpdateRegNoSpikes(
     double const& sigma2,
     arma::vec const& beta);
   
-  
+#endif
