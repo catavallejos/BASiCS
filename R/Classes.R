@@ -80,8 +80,9 @@ setClass("BASiCS_Chain",
                 errors <- c(errors, "One or more parameters are missing")     
               
               # Check for infinite values and NAs
-              if(sum(lapply(object@parameters, 
-                            function(x) sum(!is.finite(x))) > 0) > 0)
+              if(sum(lapply(
+                object@parameters[names(object@parameters) != "epsilon"], 
+                function(x) sum(!is.finite(x))) > 0) > 0)
                 errors <- c(errors, "Some parameters contain NA/Inf values")
               
               N <- nrow(object@parameters$mu)
@@ -89,7 +90,9 @@ setClass("BASiCS_Chain",
               n <- ncol(object@parameters$s)
               
               # Check number of iterations per element of `parameters`
-              if(sum(lapply(object@parameters, nrow) != N) > 0)
+              if(sum(lapply(
+                object@parameters[names(object@parameters) != "RefFreq"], 
+                nrow) != N) > 0)
                 errors <- c(errors, "Different numbers of iterations")
               # Check dimensions for basic gene-specific parameters
               if(sum(lapply(object@parameters[c("mu", "delta")], ncol) != q) > 0)
@@ -103,8 +106,7 @@ setClass("BASiCS_Chain",
               if("epsilon" %in% names(object@parameters))
               {
                 if((nrow(object@parameters$epsilon) != N) |
-                   (ncol(object@parameters$epsilon) != q) |
-                   (sum(!is.finite(object@parameters$epsilon)) > 0))
+                   (ncol(object@parameters$epsilon) != q))
                   errors <- c(errors, 
                               "Invalid dimensions for `epsilon`")                  
               }
