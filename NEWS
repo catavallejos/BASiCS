@@ -894,3 +894,7 @@ version 1.1.47: (2018-03-21)
 - Reduced number of genes in data examples 
 - Unit test updated accordingly
 - Nils added as maintainer in DESCRIPTION
+
+version 1.1.48: (2018-03-22)
+- Excluded epsilon object and RefFreq object from validity test 
+in Chain Class
