@@ -12,7 +12,7 @@
   smooth = TRUE, variance = 1.2, ...)
 }
 \arguments{
-\item{object}{an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}}
+\item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
 \item{xlab}{As in \code{\link[graphics]{par}}.}
 
@@ -36,7 +36,7 @@ A plot object
 }
 \description{
 Plotting the trend after Bayesian regression using a 
-\code{\link[BASiCS]{BASiCS_Chain-class}} object
+\code{\linkS4class{BASiCS_Chain}} object
 }
 \examples{
 data(ChainRNAReg)
