@@ -453,9 +453,9 @@ setMethod("displayChainBASiCS",
 #' @title Plotting the trend after Bayesian regression
 #' 
 #' @description Plotting the trend after Bayesian regression using a 
-#' \code{\link[BASiCS]{BASiCS_Chain-class}} object
+#' \code{\linkS4class{BASiCS_Chain}} object
 #' 
-#' @param object an object of class \code{\link[BASiCS]{BASiCS_Chain-class}}
+#' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param xlab As in \code{\link[graphics]{par}}. 
 #' @param ylab As in \code{\link[graphics]{par}}.
 #' @param pch As in \code{\link[graphics]{par}}. 
