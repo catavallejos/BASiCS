@@ -238,7 +238,7 @@ BASiCS_TestDE <- function(Chain1,
     # Offset correction
     Chain1_offset <- Chain1
     Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
-    Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
+    #Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
     Chain2_offset <- Chain2  # Chain2 requires no change
     Summary1 <- Summary(Chain1_offset)
     Summary2 <- Summary(Chain2_offset)
