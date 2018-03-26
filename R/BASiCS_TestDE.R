@@ -398,10 +398,11 @@ BASiCS_TestDE <- function(Chain1,
   ResultDiffDisp <- rep("NoDiff", length(MedianOmega))
   ResultDiffDisp[DispPlus1] <- paste0(GroupLabel1, "+")
   ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
+  
+  ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
   if (!is.null(GenesSelect)) {
     ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
   }
-  ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
   
   # Output table
   TableDisp <- cbind.data.frame(GeneName = GeneName, 
@@ -451,10 +452,10 @@ BASiCS_TestDE <- function(Chain1,
     ResultDiffResDisp[ResDispPlus1] <- paste0(GroupLabel1, "+")
     ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
     
+    ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"
     if (!is.null(GenesSelect)) {
       ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
     }
-    ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"
     
     # Output table
     TableResDisp <- cbind.data.frame(GeneName = GeneName, 
