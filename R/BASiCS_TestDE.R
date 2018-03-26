@@ -96,11 +96,12 @@
 #'    \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion 
 #'          difference between the first and second groups of cells.}
 #'    \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher 
-#'          over-dispersion in the first or second groups of cells.}
+#'          over-dispersion in the first or second groups of cells. Genes 
+#'          labelled with "ExcludedFromTest" were detected as showing 
+#'          differential mean expression.}
 #'    }}
 #' \item{\code{TableResDisp}}{A \code{\link[base]{data.frame}} containing the 
-#'       results of the differential residual over-dispersion test 
-#'       (excludes genes that are not expressed in at least 2 cells).
+#'       results of the differential residual over-dispersion test.
 #'    \describe{
 #'    \item{\code{GeneName}}{Gene name}
 #'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression 
@@ -121,7 +122,9 @@
 #'          over-dispersion difference between the first and second groups of 
 #'          cells.}
 #'    \item{\code{ResultDiffResDisp}}{Indicator if a gene has a higher 
-#'          residual over-dispersion in the first or second groups of cells.}
+#'          residual over-dispersion in the first or second groups of cells. 
+#'          Genes labelled with "ExcludedFromTest" were not expressed in
+#'          at least 2 cells per condition.}
 #'    }}
 #'  \item{\code{DiffMeanSummary}}{A list containing the following information 
 #'        for the differential mean expression test:
