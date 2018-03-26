@@ -366,8 +366,8 @@ BASiCS_TestDE <- function(Chain1,
   # Rounding to 3 decimal points
   TableMean[, seq(2,7)] <- round(TableMean[, seq(2,7)], 3)
     
-  # Genes for which mean doesn't change
-  NotDE <- which(ResultDiffMean == "NoDiff")
+  # Genes with no change in mean expression
+  NotDE <- ResultDiffMean == "NoDiff"
     
   # Changes in over dispersion
   ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
@@ -468,11 +468,11 @@ BASiCS_TestDE <- function(Chain1,
     TableResDisp[, seq(2,7)] <- round(TableResDisp[, seq(2,7)], 3)
       
     if (OrderVariable == "GeneIndex") 
-      orderVar <- order(GeneIndex[NotExcluded], decreasing = FALSE)
+      orderVar <- order(GeneIndex, decreasing = FALSE)
     if (OrderVariable == "GeneName") 
-      orderVar <- order(GeneName[NotExcluded], decreasing = TRUE)
+      orderVar <- order(GeneName, decreasing = TRUE)
     if (OrderVariable == "Prob") 
-      orderVar <- order(ProbE[NotExcluded], decreasing = TRUE)
+      orderVar <- order(ProbE, decreasing = TRUE)
     TableResDisp <- TableResDisp[orderVar, ]
   }
   
@@ -485,11 +485,11 @@ BASiCS_TestDE <- function(Chain1,
   TableMean <- TableMean[orderVar, ]
     
   if (OrderVariable == "GeneIndex") 
-    orderVar <- order(GeneIndex[NotDE], decreasing = FALSE)
+    orderVar <- order(GeneIndex, decreasing = FALSE)
   if (OrderVariable == "GeneName") 
-    orderVar <- order(GeneName[NotDE], decreasing = TRUE)
+    orderVar <- order(GeneName, decreasing = TRUE)
   if (OrderVariable == "Prob") 
-    orderVar <- order(ProbD[NotDE], decreasing = TRUE)
+    orderVar <- order(ProbD, decreasing = TRUE)
   TableDisp <- TableDisp[orderVar, ]
     
   if (!is.null(GenesSelect)) 
