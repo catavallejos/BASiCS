@@ -370,12 +370,20 @@ BASiCS_TestDE <- function(Chain1,
   NotDE <- which(ResultDiffMean == "NoDiff")
     
   # Changes in over dispersion
-  ChainOmega <- log2(Chain1@parameters$delta[, NotDE] / Chain2@parameters$delta[, NotDE])
+  ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
   MedianOmega <- matrixStats::colMedians(ChainOmega)
-  DeltaBase <- (Summary1@parameters$delta[NotDE,1] * n1 + Summary2@parameters$delta[NotDE,1] * n2)/n
+  DeltaBase <- (Summary1@parameters$delta[,1] * n1 + Summary2@parameters$delta[,1] * n2)/n
 
+  # Genes to calibrate EFDR
+  if(!is.null(GenesSelect)){
+    select <- NotDE & GenesSelect
+  }
+  else{
+    select <- NotDE
+  }
+  
   AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega, EpsilonD, 
-                                         ProbThresholdD, NULL, 
+                                         ProbThresholdD, select, 
                                          EFDR_D, 
                                          Task = "Differential dispersion")
   ProbD <- AuxDisp$Prob
@@ -387,13 +395,17 @@ BASiCS_TestDE <- function(Chain1,
   ResultDiffDisp <- rep("NoDiff", length(MedianOmega))
   ResultDiffDisp[DispPlus1] <- paste0(GroupLabel1, "+")
   ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
-
+  if (!is.null(GenesSelect)) {
+    ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
+  }
+  ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
+  
   # Output table
-  TableDisp <- cbind.data.frame(GeneName = GeneName[NotDE], 
-                                MeanOverall = as.numeric(MuBase[NotDE]), 
+  TableDisp <- cbind.data.frame(GeneName = GeneName, 
+                                MeanOverall = as.numeric(MuBase), 
                                 DispOverall = as.numeric(DeltaBase), 
-                                Disp1 = as.numeric(Summary1@parameters$delta[NotDE, 1]), 
-                                Disp2 = as.numeric(Summary2@parameters$delta[NotDE, 1]), 
+                                Disp1 = as.numeric(Summary1@parameters$delta[, 1]), 
+                                Disp2 = as.numeric(Summary2@parameters$delta[, 1]), 
                                 DispFC = as.numeric(2^(MedianOmega)), 
                                 DispLog2FC = as.numeric(MedianOmega), 
                                 ProbDiffDisp = as.numeric(ProbD), 
@@ -407,15 +419,23 @@ BASiCS_TestDE <- function(Chain1,
     NotExcluded <- !(is.na(Chain1@parameters$epsilon[1,]) | 
                                is.na(Chain2@parameters$epsilon[1,]))
       
-    ChainPsi <- Chain1@parameters$epsilon[,NotExcluded] - 
-                    Chain2@parameters$epsilon[,NotExcluded]
+    ChainPsi <- Chain1@parameters$epsilon - 
+                    Chain2@parameters$epsilon
     MedianPsi <- matrixStats::colMedians(ChainPsi)
-    EpsilonBase <- (Summary1@parameters$epsilon[NotExcluded,1] * n1 + 
-                      Summary2@parameters$epsilon[NotExcluded,1] * n2)/n
+    EpsilonBase <- (Summary1@parameters$epsilon[,1] * n1 + 
+                      Summary2@parameters$epsilon[,1] * n2)/n
+    
+    # Genes to calibrate EFDR
+    if(!is.null(GenesSelect)){
+      select <- NotExcluded & GenesSelect
+    }
+    else{
+      select <- NotExcluded
+    }
     
     AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi, EpsilonR, 
                                               ProbThresholdR, 
-                                              GenesSelect[NotExcluded], 
+                                              select, 
                                               EFDR_R, 
                                               Task = "Differential residual dispersion")
     ProbE <- AuxResDisp$Prob
@@ -429,19 +449,16 @@ BASiCS_TestDE <- function(Chain1,
     ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
     
     if (!is.null(GenesSelect)) {
-      cur_GenesSelect <- GenesSelect[NotExcluded]
-      ResultDiffResDisp[!cur_GenesSelect] <- "ExcludedByUser"
+      ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
     }
-    else{
-      cur_GenesSelect <- NotExcluded
-    }
+    ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"
     
     # Output table
-    TableResDisp <- cbind.data.frame(GeneName = GeneName[NotExcluded], 
-      MeanOverall = as.numeric(MuBase[NotExcluded]), 
+    TableResDisp <- cbind.data.frame(GeneName = GeneName, 
+      MeanOverall = as.numeric(MuBase), 
       ResDispOverall = as.numeric(EpsilonBase), 
-      ResDisp1 = as.numeric(Summary1@parameters$epsilon[NotExcluded, 1]), 
-      ResDisp2 = as.numeric(Summary2@parameters$epsilon[NotExcluded, 1]),  
+      ResDisp1 = as.numeric(Summary1@parameters$epsilon[, 1]), 
+      ResDisp2 = as.numeric(Summary2@parameters$epsilon[, 1]),  
       ResDispDistance = as.numeric(MedianPsi), 
       ProbDiffResDisp = as.numeric(ProbE), 
       ResultDiffResDisp = ResultDiffResDisp, 
@@ -607,7 +624,8 @@ BASiCS_TestDE <- function(Chain1,
             "- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n", 
             "- EFNR = ", round(100 * OptThresholdD[3], 2), "% \n", 
             "NOTE: differential dispersion assessment only applied to the \n", 
-            length(MedianOmega), " genes for which the mean did not change. \n", 
+            sum(NotDE), " genes for which the mean did not change. \n", 
+            "and that were included for testing. \n",
             "--------------------------------------------------------------\n",
             "-------------------------------------------------------------\n", 
             nResDispPlus1 + nResDispPlus2," genes with a change in residual over dispersion:\n", 
@@ -618,8 +636,8 @@ BASiCS_TestDE <- function(Chain1,
             "- EFDR = ", round(100 * OptThresholdE[2], 2), "% \n", 
             "- EFNR = ", round(100 * OptThresholdE[3], 2), "% \n", 
             "NOTE: differential residual dispersion assessment applied to \n", 
-            sum(cur_GenesSelect), " genes expressed in at least 2 cells per condition \n",
-            "and included for testing. \n",
+            sum(NotExcluded), " genes expressed in at least 2 cells per condition \n",
+            "and that were included for testing. \n",
             "--------------------------------------------------------------\n")
     
       list(TableMean = TableMean, 
@@ -658,7 +676,8 @@ BASiCS_TestDE <- function(Chain1,
               "- EFDR = ", round(100 * OptThresholdD[2], 2), "% \n", 
               "- EFNR = ", round(100 * OptThresholdD[3], 2), "% \n", 
               "NOTE: differential dispersion assessment only applied to the \n", 
-              length(MedianOmega), " genes for which the mean did not change. \n", 
+              sum(NotDE), " genes for which the mean did not change. \n", 
+              "and that were included for testing. \n",
               "--------------------------------------------------------------\n")
       
       list(TableMean = TableMean, 
