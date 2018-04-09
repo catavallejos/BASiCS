@@ -344,7 +344,9 @@ When technical spike-in genes are not available, BASiCS uses a horizontal
 integration strategy which borrows information across multiple technical 
 replicates. Therefore, `BASiCS_MCMC` will fail to run if a single batch of
 samples is provided. **Note:** batch information must be provided via the 
-`BatchInfo` argument when using the `newBASiCS_Data` function. 
+`BatchInfo` argument when using the `newBASiCS_Data` function. Additionally,
+when creating the `BASiCS_Data` object, the `SpikeInfo` slot has to be set as
+`SpikeInfo = NULL`.
 
 ## If `Regression = TRUE`
 
