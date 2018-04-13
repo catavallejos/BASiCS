@@ -911,3 +911,8 @@ version 1.1.51: (2018-03-26)
 version 1.1.52: (2018-04-09)
 - Added extra sentence to vignette describing the BASiCS_Data generation when SpikeInfo
 is not available
+
+version 1.1.53: (2018-04-13)
+- Fixed bug in plotting for TestDE function
+- Added extra code in vignette to construct BASiCS_Data with no spikes
+- Added plots to show changes in residual variability during testing
