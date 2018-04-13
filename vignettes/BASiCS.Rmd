@@ -368,7 +368,7 @@ derived by departures with respect to this trend.
 ```{r, fig.height = 8, fig.width = 8}
 DataRegression <- newBASiCS_Data(Counts, Tech, SpikeInfo, 
                               BatchInfo = rep(c(1,2), each = 20))
-ChainNoSpikes <- BASiCS_MCMC(Data = DataNoSpikes, N = 1000, 
+ChainRegression <- BASiCS_MCMC(Data = DataRegression, N = 1000, 
                              Thin = 10, Burn = 500, 
                              Regression = TRUE, 
                              PrintProgress = FALSE)
