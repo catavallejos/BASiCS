@@ -568,7 +568,8 @@ BASiCS_TestDE <- function(Chain1,
                                               GroupLabel1, "vs", 
                                               GroupLabel2), 
                                  main = "Differential dispersion"))
-    with(TableDisp[TableDisp$ResultDiffDisp != "NoDiff", ],
+    with(TableDisp[!(TableDisp$ResultDiffDisp %in% 
+                       c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
         points(log2(MeanOverall), DispLog2FC, pch = 16, col = "red"))
         abline(h = c(-EpsilonD, EpsilonD), lty = 2)
         
@@ -585,7 +586,8 @@ BASiCS_TestDE <- function(Chain1,
                      c("ExcludedByUser", "NoDiff")), ], 
          points(MeanLog2FC, ProbDiffMean, pch = 16, col = "red"))
     abline(v = c(-EpsilonM, EpsilonM), lty = 2)
-    with(TableDisp, 
+    with(TableDisp[!(TableDisp$ResultDiffDisp %in% 
+                       c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ], 
          graphics::smoothScatter(DispLog2FC, ProbDiffDisp, 
                                  bty = "n", ylim = c(0, 1), 
                                  ylab = "Posterior probability", 
