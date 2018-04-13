@@ -348,13 +348,31 @@ samples is provided. **Note:** batch information must be provided via the
 when creating the `BASiCS_Data` object, the `SpikeInfo` slot has to be set as
 `SpikeInfo = NULL`.
 
+```{r, fig.height = 8, fig.width = 8}
+DataNoSpikes <- newBASiCS_Data(Counts, Tech, SpikeInfo = NULL, 
+                              BatchInfo = rep(c(1,2), each = 20))
+ChainNoSpikes <- BASiCS_MCMC(Data = DataNoSpikes, N = 1000, 
+                             Thin = 10, Burn = 500, 
+                             WithSpikes = FALSE, 
+                             PrintProgress = FALSE)
+```
+
 ## If `Regression = TRUE`
 
 The *regression* implementation of BASiCS uses an informative prior formulation 
 to account for the relationship between mean and over-dispersion gene-specific 
 parameters. The latter is used to infer a global trend between these parameters
 and, subsequently, to derive a *residual over-dispersion* measure that is 
-derived by departures with respect to this trend. 
+derived by departures with respect to this trend.
+
+```{r, fig.height = 8, fig.width = 8}
+DataRegression <- newBASiCS_Data(Counts, Tech, SpikeInfo, 
+                              BatchInfo = rep(c(1,2), each = 20))
+ChainNoSpikes <- BASiCS_MCMC(Data = DataNoSpikes, N = 1000, 
+                             Thin = 10, Burn = 500, 
+                             Regression = TRUE, 
+                             PrintProgress = FALSE)
+```
 
 This implementation provides additional functionality when performing 
 downstream analyses. These are illustrated below using a small extract from 
