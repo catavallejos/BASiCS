@@ -18,12 +18,12 @@
 #' @param EpsilonR Minimum distance threshold for detecting 
 #' changes in residual over-dispersion (must be a positive real number). 
 #' Default value: \code{EpsilonR= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).
-#' @param ProbThresholdM Optional parameter. Probdence threshold for detecting 
+#' @param ProbThresholdM Optional parameter. Probability threshold for detecting 
 #' changes in overall expression (must be a positive value, between 0 and 1)
-#' @param ProbThresholdD Optional parameter. Probdence threshold for detecting 
+#' @param ProbThresholdD Optional parameter. Probability threshold for detecting 
 #' changes in cell-to-cell biological over-dispersion 
 #' (must be a positive value, between 0 and 1)
-#' @param ProbThresholdR Optional parameter. Probdence threshold for detecting 
+#' @param ProbThresholdR Optional parameter. Probability threshold for detecting 
 #' changes in residual over-dispersion 
 #' (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output. 
@@ -535,7 +535,7 @@ BASiCS_TestDE <- function(Chain1,
       }
       ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
       plot(ProbThresholds, AuxMean$EFDRgrid, type = "l", lty = 1, bty = "n", 
-           ylab = "Error rate", xlab = "Probdence threshold", 
+           ylab = "Error rate", xlab = "Probability threshold", 
            ylim = c(0, 1), main = "Differential mean")
       lines(ProbThresholds, AuxMean$EFNRgrid, lty = 2)
       abline(h = EFDR_M, col = "blue", lwd = 2, lty = 1)
@@ -543,7 +543,7 @@ BASiCS_TestDE <- function(Chain1,
       legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1, 2, 1), 
              col = c("black", "black", "blue"), bty = "n")
       plot(ProbThresholds, AuxDisp$EFDRgrid, type = "l", lty = 1, bty = "n", 
-           ylab = "Error rate", xlab = "Probdence threshold", 
+           ylab = "Error rate", xlab = "Probability threshold", 
            ylim = c(0, 1), main = "Differential dispersion")
       lines(ProbThresholds, AuxDisp$EFNRgrid, lty = 2)
       abline(h = EFDR_D, col = "blue", lwd = 2, lty = 1)
@@ -552,7 +552,7 @@ BASiCS_TestDE <- function(Chain1,
              col = c("black", "black", "blue"), bty = "n")
       if(!is.null(Chain1@parameters$epsilon)){
         plot(ProbThresholds, AuxResDisp$EFDRgrid, type = "l", lty = 1, bty = "n", 
-             ylab = "Error rate", xlab = "Probdence threshold", 
+             ylab = "Error rate", xlab = "Probability threshold", 
              ylim = c(0, 1), main = "Differential residual dispersion")
         lines(ProbThresholds, AuxResDisp$EFNRgrid, lty = 2)
         abline(h = EFDR_R, col = "blue", lwd = 2, lty = 1)
@@ -594,7 +594,7 @@ BASiCS_TestDE <- function(Chain1,
         points(log2(MeanOverall), DispLog2FC, pch = 16, col = "red"))
     abline(h = c(-EpsilonD, EpsilonD), lty = 2)
     if(!is.null(Chain1@parameters$epsilon)){
-      with(TableResDisp[TableResDisp$ResultResDiffDisp != "ExcludedFromTesting", ], 
+      with(TableResDisp[TableResDisp$ResultDiffResDisp != "ExcludedFromTesting", ], 
            graphics::smoothScatter(log2(MeanOverall), ResDispDistance, 
                                    bty = "n", 
                                    xlab = "Mean expresssion (log2)", 
@@ -602,7 +602,7 @@ BASiCS_TestDE <- function(Chain1,
                                                 GroupLabel1, "vs", 
                                                 GroupLabel2), 
                                    main = "Differential residual dispersion"))
-      with(TableDisp[!(TableResDisp$ResultDiffResDisp %in% 
+      with(TableResDisp[!(TableResDisp$ResultDiffResDisp %in% 
                          c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
            points(log2(MeanOverall), ResDispDistance, pch = 16, col = "red"))
       abline(h = c(-EpsilonR, EpsilonR), lty = 2)
@@ -640,7 +640,7 @@ BASiCS_TestDE <- function(Chain1,
          points(DispLog2FC, ProbDiffDisp, pch = 16, col = "red"))
     abline(v = c(-EpsilonD, EpsilonD), lty = 2)
     if(!is.null(Chain1@parameters$epsilon)){
-      with(TableResDisp[TableResDisp$ResultResDiffDisp != "ExcludedFromTesting", ], 
+      with(TableResDisp[TableResDisp$ResultDiffResDisp != "ExcludedFromTesting", ], 
            graphics::smoothScatter(ResDispDistance, ProbDiffResDisp, 
                                    bty = "n", ylim = c(0, 1), 
                                    ylab = "Posterior probability", 
@@ -648,7 +648,7 @@ BASiCS_TestDE <- function(Chain1,
                                                 GroupLabel1, "vs", 
                                                 GroupLabel2), 
                                    main = "Differential residual dispersion test"))
-      with(TableDisp[!(TableResDisp$ResultDiffResDisp %in% 
+      with(TableResDisp[!(TableResDisp$ResultDiffResDisp %in% 
                          c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ], 
            points(ResDispDistance, ProbDiffResDisp, pch = 16, col = "red"))
       abline(v = c(-EpsilonR, EpsilonR), lty = 2)
