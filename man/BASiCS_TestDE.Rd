@@ -30,14 +30,14 @@ Default value: \code{EpsilonM = log2(1.5)} (i.e. 50\% increase).}
 changes in residual over-dispersion (must be a positive real number). 
 Default value: \code{EpsilonR= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).}
 
-\item{ProbThresholdM}{Optional parameter. Probdence threshold for detecting 
+\item{ProbThresholdM}{Optional parameter. Probability threshold for detecting 
 changes in overall expression (must be a positive value, between 0 and 1)}
 
-\item{ProbThresholdD}{Optional parameter. Probdence threshold for detecting 
+\item{ProbThresholdD}{Optional parameter. Probability threshold for detecting 
 changes in cell-to-cell biological over-dispersion 
 (must be a positive value, between 0 and 1)}
 
-\item{ProbThresholdR}{Optional parameter. Probdence threshold for detecting 
+\item{ProbThresholdR}{Optional parameter. Probability threshold for detecting 
 changes in residual over-dispersion 
 (must be a positive value, between 0 and 1)}
 
@@ -122,11 +122,12 @@ when the user decides to exclude some genes from the comparison.}
    \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion 
          difference between the first and second groups of cells.}
    \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher 
-         over-dispersion in the first or second groups of cells.}
+         over-dispersion in the first or second groups of cells. Genes 
+         labelled with "ExcludedFromTest" were detected as showing 
+         differential mean expression.}
    }}
 \item{\code{TableResDisp}}{A \code{\link[base]{data.frame}} containing the 
-      results of the differential residual over-dispersion test 
-      (excludes genes that are not expressed in at least 2 cells).
+      results of the differential residual over-dispersion test.
    \describe{
    \item{\code{GeneName}}{Gene name}
    \item{\code{MeanOverall}}{For each gene, the estimated mean expression 
@@ -147,7 +148,9 @@ when the user decides to exclude some genes from the comparison.}
          over-dispersion difference between the first and second groups of 
          cells.}
    \item{\code{ResultDiffResDisp}}{Indicator if a gene has a higher 
-         residual over-dispersion in the first or second groups of cells.}
+         residual over-dispersion in the first or second groups of cells. 
+         Genes labelled with "ExcludedFromTest" were not expressed in
+         at least 2 cells per condition.}
    }}
  \item{\code{DiffMeanSummary}}{A list containing the following information 
        for the differential mean expression test:
