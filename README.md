@@ -19,15 +19,22 @@ highly (and lowly) variable genes within the group.
 of differentially expressed genes between the groups. As in traditional 
 differential expression tools, BASiCS can uncover changes in mean expression 
 between the groups. Besides this, BASiCS can also uncover changes in 
-*over-dispersion* --- a measure for the residual cell-to-cell variation that is 
+*over-dispersion* --- a measure for the excess cell-to-cell variation that is 
 observed after accounting for technical noise. This feature has led, 
-for example, to novel insights in the context of immune cells across aging [3].
+for example, to novel insights in the context of immune cells across aging [3]. 
+More recently, the BASiCS model has been extended to address the confounding
+between mean and variability that is typically observed in scRNA-seq datasets.
+This is achieved by introducing a *residual over-dispersion* parameter that 
+is not confounded by mean expression [4]. 
 
 In both cases, a probabilistic output is provided, with posterior probability 
-thresholds calibrated through the expected false discovery rate (EFDR) [4].
+thresholds calibrated through the expected false discovery rate (EFDR) [5].
 
-Currently, BASiCS relies on the use of **spike-in genes** --- that are 
-artificially introduced to each cell's lysate --- to perform these analyses. 
+The original implementation of BASiCS relies on the use of **spike-in genes** 
+--- that are artificially introduced to each cell's lysate --- to perform these 
+analyses. However, our latest work has extended the BASiCS model to datasets
+in which spike-ins are not available (multiple *batches* are required) [4].
+
 
 **Important: BASiCS has been designed in the context of supervised experiments where the groups of cells (e.g. experimental conditions, cell types) under study are known a priori (e.g. case-control studies). Therefore, we DO NOT advise the use of BASiCS in unsupervised settings where the aim is to uncover sub-populations of cells through clustering.**
 
@@ -141,4 +148,5 @@ Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos).
 - [1] <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). PLoS Computational Biology. </a>
 - [2] <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Genome Biology. </a>
 - [3] <a href="http://science.sciencemag.org/content/355/6332/1433">Martinez-Jimenes <em>et al.</em> (2017). Science. </a>
-- [4] <a href="https://www.ncbi.nlm.nih.gov/pubmed/15054023">Newton <em>et al.</em> (2004). Biostatistics. </a>
+- [4] <a href="https://www.biorxiv.org/content/early/2017/12/21/237214">Eling <em>et al.</em> (2017). bioRxiv. </a>
+- [5] <a href="https://www.ncbi.nlm.nih.gov/pubmed/15054023">Newton <em>et al.</em> (2004). Biostatistics. </a>
