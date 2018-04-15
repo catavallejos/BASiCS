@@ -916,3 +916,6 @@ version 1.1.53: (2018-04-13)
 - Fixed bug in plotting for TestDE function
 - Added extra code in vignette to construct BASiCS_Data with no spikes
 - Added plots to show changes in residual variability during testing
+
+version 1.1.54: (2018-04-15)
+- CITATION file updated to include latest BASiCS bioRxiv preprint

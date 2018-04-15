@@ -27,3 +27,16 @@ citEntry(
 	at the single-cell level. Genome Biology 17(1), 70"
 )
 
+citEntry(
+	entry = "article",
+	author = "Nils Eling and Arianne C Richard and Sylvia Richardson and 
+	John C Marioni and Catalina A Vallejos", 
+	title = "Robust expression variability testing reveals heterogeneous T 
+	cell responses", 
+	year = 2017,
+	journal = "bioRxiv",
+	number = "237214",
+	textVersion = "Eling N, Richard AC, Richardson S, Marioni JC and Vallejos CA 
+	(2017). Robust expression variability testing reveals heterogeneous T 
+	cell responses. bioRxiv"
+)
