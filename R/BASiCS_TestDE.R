@@ -243,18 +243,23 @@ BASiCS_TestDE <- function(Chain1,
     Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
     #Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
     Chain2_offset <- Chain2  # Chain2 requires no change
-    Summary1 <- Summary(Chain1_offset)
-    Summary2 <- Summary(Chain2_offset)
+    Mu1 <- matrixStats::colMedians(Chain1_offset@parameters$mu)
+    Mu2 <- matrixStats::colMedians(Chain2_offset@parameters$mu)
+    Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
+    Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
+#    Summary1 <- Summary(Chain1_offset)
+#    Summary2 <- Summary(Chain2_offset)
         
     # Pre-offset correction LFC estimates
-    Summary1_old <- Summary(Chain1)
-    Summary2_old <- Summary(Chain2)
-    MuBase_old <- (Summary1_old@parameters$mu[, 1] * n1 + Summary2_old@parameters$mu[, 1] * n2)/n
+#    Summary1_old <- Summary(Chain1)
+#    Summary2_old <- Summary(Chain2)
+    Mu1_old <- matrixStats::colMedians(Chain1@parameters$mu)
+    MuBase_old <- (Mu1_old * n1 + Mu2 * n2)/n
     ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
     MedianTau_old <- matrixStats::colMedians(ChainTau_old)
 
     # Offset corrected LFC estimates
-    MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
+    MuBase <- (Mu1 * n1 + Mu2 * n2)/n
     ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
     MedianTau <- matrixStats::colMedians(ChainTau)
         
@@ -287,11 +292,11 @@ BASiCS_TestDE <- function(Chain1,
                         main = "Offset MCMC chain", ylab = "Offset estimate")
       # Mean expression parameters before/after offset correction
       par(mfrow = c(1, 2))
-      graphics::boxplot(cbind(Summary1_old@parameters$mu[,1], Summary2_old@parameters$mu[,1]), 
+      graphics::boxplot(cbind(Mu1_old, Mu2), 
                         frame = FALSE, main = "Before correction", 
                         names = c(GroupLabel1, GroupLabel2), 
                         ylab = "Mean expression", log = "y")
-      graphics::boxplot(cbind(Summary1@parameters$mu[, 1], Summary2@parameters$mu[, 1]), 
+      graphics::boxplot(cbind(Mu1, Mu2), 
                         frame = FALSE, main = "After correction", 
                         names = c(GroupLabel1, GroupLabel2), 
                         ylab = "Mean expression", log = "y")
@@ -323,9 +328,13 @@ BASiCS_TestDE <- function(Chain1,
             "To perform offset correction, please set 'Offset = TRUE'. \n", 
             "-------------------------------------------------------------\n")
     
-    Summary1 <- Summary(Chain1)
-    Summary2 <- Summary(Chain2)
-    MuBase <- (Summary1@parameters$mu[, 1] * n1 + Summary2@parameters$mu[, 1] * n2)/n
+#    Summary1 <- Summary(Chain1)
+#    Summary2 <- Summary(Chain2)
+    Mu1 <- matrixStats::colMedians(Chain1@parameters$mu)
+    Mu2 <- matrixStats::colMedians(Chain2@parameters$mu)
+    Delta1 <- matrixStats::colMedians(Chain1@parameters$delta)
+    Delta2 <- matrixStats::colMedians(Chain2@parameters$delta)
+    MuBase <- (Mu1 * n1 + Mu2 * n2)/n
     ChainTau <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
     MedianTau <- matrixStats::colMedians(ChainTau)
       
@@ -359,8 +368,8 @@ BASiCS_TestDE <- function(Chain1,
   # Output table
   TableMean <- cbind.data.frame(GeneName = GeneName, 
                                 MeanOverall = as.numeric(MuBase), 
-                                Mean1 = as.numeric(Summary1@parameters$mu[,1]), 
-                                Mean2 = as.numeric(Summary2@parameters$mu[,1]), 
+                                Mean1 = Mu1, 
+                                Mean2 = Mu2, 
                                 MeanFC = as.numeric(2^(MedianTau)), 
                                 MeanLog2FC = as.numeric(MedianTau), 
                                 ProbDiffMean = as.numeric(ProbM), 
@@ -375,7 +384,7 @@ BASiCS_TestDE <- function(Chain1,
   # Changes in over dispersion
   ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
   MedianOmega <- matrixStats::colMedians(ChainOmega)
-  DeltaBase <- (Summary1@parameters$delta[,1] * n1 + Summary2@parameters$delta[,1] * n2)/n
+  DeltaBase <- (Delta1 * n1 + Delta2 * n2)/n
 
   # Genes to calibrate EFDR
   if(!is.null(GenesSelect)){
@@ -408,8 +417,8 @@ BASiCS_TestDE <- function(Chain1,
   TableDisp <- cbind.data.frame(GeneName = GeneName, 
                                 MeanOverall = as.numeric(MuBase), 
                                 DispOverall = as.numeric(DeltaBase), 
-                                Disp1 = as.numeric(Summary1@parameters$delta[, 1]), 
-                                Disp2 = as.numeric(Summary2@parameters$delta[, 1]), 
+                                Disp1 = Delta1, 
+                                Disp2 = Delta2, 
                                 DispFC = as.numeric(2^(MedianOmega)), 
                                 DispLog2FC = as.numeric(MedianOmega), 
                                 ProbDiffDisp = as.numeric(ProbD), 
@@ -426,8 +435,9 @@ BASiCS_TestDE <- function(Chain1,
     ChainPsi <- Chain1@parameters$epsilon - 
                     Chain2@parameters$epsilon
     MedianPsi <- matrixStats::colMedians(ChainPsi)
-    EpsilonBase <- (Summary1@parameters$epsilon[,1] * n1 + 
-                      Summary2@parameters$epsilon[,1] * n2)/n
+    Epsilon1 <- matrixStats::colMedians(Chain1@parameters$epsilon)
+    Epsilon2 <- matrixStats::colMedians(Chain2@parameters$epsilon)
+    EpsilonBase <- (Epsilon1 * n1 + Epsilon2 * n2)/n
     
     # Genes to calibrate EFDR
     if(!is.null(GenesSelect)){
@@ -461,8 +471,8 @@ BASiCS_TestDE <- function(Chain1,
     TableResDisp <- cbind.data.frame(GeneName = GeneName, 
       MeanOverall = as.numeric(MuBase), 
       ResDispOverall = as.numeric(EpsilonBase), 
-      ResDisp1 = as.numeric(Summary1@parameters$epsilon[, 1]), 
-      ResDisp2 = as.numeric(Summary2@parameters$epsilon[, 1]),  
+      ResDisp1 = Epsilon1, 
+      ResDisp2 = Epsilon2,  
       ResDispDistance = as.numeric(MedianPsi), 
       ProbDiffResDisp = as.numeric(ProbE), 
       ResultDiffResDisp = ResultDiffResDisp, 
