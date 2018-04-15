@@ -903,14 +903,15 @@ version 1.1.49: (2018-03-22)
 - Fixed link to `BASiCS_Chain` documentation in `BASiCS_showFit` doc
 
 version 1.1.50: (2018-03-26)
-- Removed OffSet correction (regression case) (@test_differenfor phi in the BASiCS_TestDE function
+- Removed OffSet correction (regression case) (@test_differenfor phi in the 
+BASiCS_TestDE function
 
 version 1.1.51: (2018-03-26)
 - Adjusted BASiCS_TestDE function to output data.frames containing same genes.i
 
 version 1.1.52: (2018-04-09)
-- Added extra sentence to vignette describing the BASiCS_Data generation when SpikeInfo
-is not available
+- Added extra sentence to vignette describing the BASiCS_Data generation when 
+SpikeInfo is not available
 
 version 1.1.53: (2018-04-13)
 - Fixed bug in plotting for TestDE function
@@ -919,3 +920,6 @@ version 1.1.53: (2018-04-13)
 
 version 1.1.54: (2018-04-15)
 - CITATION file updated to include latest BASiCS bioRxiv preprint
+
+version 1.1.55: (2018-04-16)
+- Speed-up of `BASiCS_TestDE` by avoiding unnecessary calculations
