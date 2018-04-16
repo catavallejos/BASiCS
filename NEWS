@@ -923,3 +923,6 @@ version 1.1.54: (2018-04-15)
 
 version 1.1.55: (2018-04-16)
 - Speed-up of `BASiCS_TestDE` by avoiding unnecessary calculations
+
+version 1.1.56: (2018-04-16)
+- Minor changes in `BASiCS_MCMCcppNoSpikes.cpp` to avoid warnings in BioC
