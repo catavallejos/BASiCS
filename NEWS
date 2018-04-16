@@ -730,7 +730,7 @@ version 1.1.14: (2017-11-29)
 - New unit test to assess that case
 
 version 1.1.15: (2017-11-29)
-- Typo fixed in `AtLeast2Cells` (`BASiCS_MCMC` function)ndefinition for 
+- Typo fixed in `AtLeast2Cells` (`BASiCS_MCMC` function) definition for 
 no-spikes + regression case when original data has spikes
 
 version 1.1.16: (2017-11-29)
@@ -785,7 +785,7 @@ version 1.1.26: (2017-12-20)
 - `newBASiCS_Chain` updated accordingly. 
 - Code format for `showFit`
 
-versiosion case) (@test_differen 1.1.27: (2017-12-20)
+version 1.1.27: (2017-12-20)
 - Minor typo resolved in `displayChainBASiCS` method
 - Reduced size of example objects 
 - Unit tests updated accordingly
@@ -842,7 +842,7 @@ version 1.1.37: (2018-03-20)
 - Checks for parameter names added to unit tests
 
 version 1.1.38: (2018-03-20)
-- Validity checks updated foegression case) (@test_differenr `BASiCS_Chain` and `BASiCS_Summary` classes.
+- Validity checks updated for `BASiCS_Chain` and `BASiCS_Summary` classes.
 This accounts for different parameter configurations
 - `Summary` method to exclude `RefFreq` for the no-spikes case
 - Unit tests fo no-spikes case updated accordingly
@@ -886,7 +886,7 @@ version 1.1.45: (2018-03-21)
 - Messages within C++ code moved to functions
 
 version 1.1.46: (2018-03-21)
-- Split C++ code into indiviegression case) (@test_differendual functions
+- Split C++ code into individual functions
 - One file per main function and individual files for utility function
 - Created header files for main functions and utility functions 
 
@@ -903,11 +903,11 @@ version 1.1.49: (2018-03-22)
 - Fixed link to `BASiCS_Chain` documentation in `BASiCS_showFit` doc
 
 version 1.1.50: (2018-03-26)
-- Removed OffSet correction (regression case) (@test_differenfor phi in the 
+- Removed OffSet correction for phi in the 
 BASiCS_TestDE function
 
 version 1.1.51: (2018-03-26)
-- Adjusted BASiCS_TestDE function to output data.frames containing same genes.i
+- Adjusted BASiCS_TestDE function to output data.frames containing same genes.
 
 version 1.1.52: (2018-04-09)
 - Added extra sentence to vignette describing the BASiCS_Data generation when 
@@ -926,3 +926,6 @@ version 1.1.55: (2018-04-16)
 
 version 1.1.56: (2018-04-16)
 - Minor changes in `BASiCS_MCMCcppNoSpikes.cpp` to avoid warnings in BioC
+
+version 1.1.57: (2018-04-16)
+- Minor changes in NEWS file
