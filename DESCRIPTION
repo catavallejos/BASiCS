@@ -1,7 +1,7 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.1.59
+Version: 1.1.60
 Date: : 2018-04-19
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
@@ -25,9 +25,13 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  patterns between two or more pre-specified groups of cells. Unlike traditional 
  differential expression tools, BASiCS quantifies changes in expression that lie 
  beyond comparisons of means, also allowing the study of changes in cell-to-cell 
- heterogeneity. The latter are quantified via a biological over-dispersion 
- parameter that measures residual over-dispersion (with respect to Poisson 
- sampling) after normalisation and technical noise removal. 
+ heterogeneity. The latter can be quantified via a biological over-dispersion 
+ parameter that measures the excess of variability that is observed with respect 
+ to Poisson sampling noise, after normalisation and technical noise removal. 
+ Due to the strong mean/over-dispersion confounding that is typically observed 
+ for scRNA-seq datasets, BASiCS also tests for changes in residual 
+ over-dispersion, defined by residual values with respect to a global 
+ mean/over-dispersion trend. 
 License: GPL (>= 2)
 Depends:
     R (>= 3.5),
