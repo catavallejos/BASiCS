@@ -929,3 +929,7 @@ version 1.1.56: (2018-04-16)
 
 version 1.1.57: (2018-04-16)
 - Minor changes in NEWS file
+
+version 1.1.58: (2018-04-19)
+- Updates in vignette to fully incorporate the regression and non-spike
+BASiCS models.
