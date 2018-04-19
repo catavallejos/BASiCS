@@ -47,34 +47,37 @@ analyses:
 1. **For a single group of cells** [@vallejos2015basics]: BASiCS provides a 
 criterion to identify highly (and lowly) variable genes within the group. 
 2. **For two (or more) groups of cells**: BASiCS allows the identification 
-of differentially expressed genes between the groups. As in traditional 
+of changes in gene expression between the groups. As in traditional 
 differential expression tools, BASiCS can uncover changes in mean expression 
 between the groups. Besides this, BASiCS can also uncover changes in gene 
 expression variability in terms of: 
   a. **Over-dispersion** [@vallejos2016beyond] --- a measure for the excess of 
-  cell-to-cell variability (with respect to Poisson sampling) that is observed 
+  cell-to-cell variability that is observed with respect to Poisson sampling, 
   after accounting for technical noise. This feature has led, for example, to 
   novel insights in the context of immune cells across aging 
-  [@martinez2017aging]. Due to the strong mean/over-dispersion confounding that 
-  is typically observed for scRNA-seq experiments, the assessment of changes in 
-  over-dispersion is restricted to genes for which mean expression does not 
-  change between the groups.
+  [@martinez2017aging]. However, due to the strong mean/over-dispersion 
+  confounding that is typically observed for scRNA-seq datasets, the assessment 
+  of changes in over-dispersion is restricted to genes for which mean expression 
+  does not change between the groups. 
   b. **Residual over-dispersion** [@eling2017robust] --- a residual measure of 
   variability given by departures with respect to a global mean/over-dispersion 
   trend. Positive residual over-dispersion indicates that a gene exhibits more 
   variation than expected relative to genes with similar expression levels;
-  negative esidual over-dispersion suggests less variation than expected.
+  negative residual over-dispersion suggests less variation than expected.
+  To use this feature, please set `Regression = TRUE` as a function parameter 
+  in `BASiCS_MCMC`. 
 
-In all cases, a probabilistic output is provided, with a decision rule that is
-calibrated through the expected false discovery rate (EFDR) [@newton2004detecting].
+In all cases, a probabilistic output is provided and a decision rule is
+calibrated using the expected false discovery rate (EFDR) [@newton2004detecting].
 
 A brief description for the statistical model implemented in BASiCS is 
-provided in Section \@ref(methodology) of this document. While the original 
+provided in Section \@ref(methodology) of this document. The original 
 implementation of BASiCS [@vallejos2015basics] requires the use of **spike-in** 
 molecules --- that are artificially introduced to each cell's lysate 
---- to perform these analyses. However, the current release of BASiCS has been
-extended to also address experiments for which spikes-ins are not available 
-(see Section \@ref(alternative-implementation-modes)).
+--- to perform these analyses. More recently, @eling2017robust extendeded BASiCS 
+to also address datasets for which spikes-ins are not available 
+(see Section \@ref(alternative-implementation-modes)). To use this feature, 
+please set `WithSpikes = FALSE` as a function parameter in `BASiCS_MCMC`. 
 
 **Important**: BASiCS has been designed in the context of supervised experiments 
 where the groups of cells (e.g. experimental conditions, cell types) under study 
@@ -98,8 +101,14 @@ output returned by `BASiCS_MCMC`. Essential parameters for running
 iterations will be stored in the output of the `BASiCS_MCMC`)
 * `Burn`: length of burn-in period (i.e. the initial `Burn` 
 iterations that will be discarded from the output of the `BASiCS_MCMC`)
+* `Regression`: if this parameter is set equal to `TRUE`, the regression 
+BASiCS model will be used [@eling2017robust]. The latter infers a global 
+regression trend between mean expression and over-dispersion parameters. This
+trend is subsequently used to derive a *residual over-dispersion* measure that 
+is defined as departures with respect to this trend. **This is now the 
+recommended default setting for BASiCS***.
 
-If the optional parameter `PrintProgress` is set to `TRUE`, the R 
+If the optional parameter `PrintProgress` is set to `TRUE`, the R
 console will display the progress of the MCMC algorithm. 
 For other optional parameters refer to `help(BASiCS_MCMC)`. 
 
@@ -109,14 +118,14 @@ synthetic dataset.
 ```{r quick-start-MCMC}
 Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
-                     PrintProgress = FALSE)
+                     PrintProgress = FALSE, Regression = TRUE)
 ```
 
 As a default, the code above runs the original implementation mode of BASiCS 
 (spikes without regression; see Section \@ref(alternative-implementation-modes)).
-To use the no-spikes implementation, please add `WithSpikes = FALSE` as an 
-additional parameter. To use the regression implementation, please add 
-`Regression = TRUE` as an additional parameter. 
+To use the regression BASiCS model [@eling2017robust], please set 
+`Regression = TRUE`. To use the no-spikes implementation of BASiCS, please add 
+`WithSpikes = FALSE` as an additional parameter. 
 
 The `Data` and `Chain` (a `BASiCS_Chain` object) objects created by the code
 above can be use for subsequent downstream analyses. See Section 
@@ -154,8 +163,8 @@ Within this matrix, $q_0$ rows must correspond to biological genes and $q-q_0$
 rows must correspond to technical spike-in genes. Gene names must be stored as 
 `rownames(Counts)`.
 
-* `Tech`: a vector of `TRUE`/`FALSE` elements with length $q$. 
-If `Tech[i] = FALSE` the gene `i` is biological; otherwise the gene is spike-in. 
+* `Tech`: a logical vector (`TRUE`/`FALSE`) with $q$ elements. If 
+`Tech[i] = FALSE` the gene `i` is biological; otherwise the gene is spike-in. 
 This vector must be specified in the same order of genes as in the 
 `Counts` matrix. 
 
@@ -167,7 +176,7 @@ must contain the input number of molecules for the spike-in genes
 * `BatchInfo` (optional): vector of length $n$ to indicate batch structure 
 (whenever cells have been processed using multiple batches). 
 
-For example, the following code simulates a dataset with 50 genes 
+For example, the following code generates a synthetic dataset with 50 genes 
 (40 biological and 10 spike-in) and 40 cells. 
 
 ```{r ExampleDataTest}
@@ -188,13 +197,15 @@ DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo,
                               BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
-Note: scRNA-seq datasets typically require quality control filtering before 
-performing the analysis. This is in order to remove cells and/or transcripts 
-with very low expression counts. The function `BASiCS_Filter` can be used to 
-perform this task. For examples, refer to `help(BASiCS_Filter)`.  
+Note: BASiCS assumes that a pre-processing quality control step has been applied 
+to remove cells with poor quality data and/or lowly expressed genes that were
+undetected through sequencing. When analysing multiple groups of cells, the gene
+filtering step must be jointly applied across all groups to ensure the same 
+genes are retained. 
 
-Note: the `r Biocpkg("scater")` package provides enhanced functionality for the 
-pre-processing of scRNA-seq datasets. 
+The function `BASiCS_Filter` can be used to perform this task. For examples, 
+refer to `help(BASiCS_Filter)`. Moreover, the `r Biocpkg("scater")` package 
+provides enhanced functionality for the pre-processing of scRNA-seq datasets. 
 
 To convert an existing `SingleCellExperiment` object (`Data`) into one that can 
 be used within BASiCS, meta-information must be stored in the object.
@@ -232,7 +243,7 @@ data(ChainSC)
 ```
 
 The following code is used to identify **highly variable genes (HVG)** and 
-**lowly variable genes (LVG)** within these cells. The `VarThreshold` parameter 
+**lowly variable genes (LVG)** among these cells. The `VarThreshold` parameter 
 sets a lower threshold for the proportion of variability that is assigned to 
 the biological component (`Sigma`). In the examples below:
 
@@ -243,7 +254,7 @@ variability is attributed to the biological variability component.
 
 For each gene, these functions return posterior probabilities as a measure of 
 HVG/LVG evidence. A cut-off value for these posterior probabilities is set by 
-controlling EFDR (defaul option: `EviThreshold` defined such that EFDR = 0.10).
+controlling the EFDR (as a default option, EFDR is set as 0.10).
 
 ```{r quick-start-HVGdetection, fig.height = 20, fig.width = 20}
 par(mfrow = c(2,2))
@@ -269,10 +280,10 @@ with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
 
 --->
 
-**Note**: this criteria for threshold has changed with respect to the original 
-release of BASiCS (where `EviThreshold` was defined such that EFDR = EFNR). 
-However, the new choice is more stable (sometimes, it was not posible to 
-find a threshold such that EFDR = EFNR). 
+**Note**: this decision rule implemented in this function has changed with 
+respect to the original release of BASiCS (where `EviThreshold` was defined 
+such that EFDR = EFNR). However, the new choice is more stable (sometimes, it 
+was not posible to find a threshold such that EFDR = EFNR). 
 
 ## Analysis for two groups of cells 
 
@@ -298,10 +309,10 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
 ($\mu$) and `EpsilonD` the log2FC in over-dispersion ($\delta$). As a default 
-option: `EpsilonM = EpsilonD = log2(1.5)` (i.e. 
-50\% increase). To adjust for differences in overall RNA content, an internal 
-offset correction is performed when `OffSet=TRUE`. 
-This is the recommended default.  
+option: `EpsilonM = EpsilonD = log2(1.5)` (i.e. the test is set to detect 
+absolute increases of 50\% or above). To adjust for differences in overall mRNA 
+content, an internal offset correction is performed when `OffSet=TRUE`. 
+This is the recommended default setting.   
 
 The resulting output list can be displayed using
 
@@ -310,12 +321,15 @@ head(Test$TableMean)
 head(Test$TableDisp)
 ```
 
-**Note:** due to the confounding between mean and over-dispersion that is 
-typically observed in scRNA-seq datasets, we only assess changes in 
-over-dispersion for those genes in which the mean does not change 
-between the groups. **Use `EpsilonM = 0` as a conservative option:**
-The genes for which mean expression changes are marked as `ExcludedFromTesting`
-in the `Test$TableDisp$ResultDiffDisp` slot.
+Due to the confounding between mean and over-dispersion that is 
+typically observed in scRNA-seq datasets, the non-regression BASiCS model
+(run using `Regression = FALSE` as a function parameter in `BASiCS_MCMC`)
+can only be used to assess changes in over-dispersion for those genes in which 
+the mean expression does not change between the groups. In this case, we 
+recommend users to use `EpsilonM = 0` as a conservative option to avoid
+changes in over-dispersion to be confounded by mean expression (the genes for 
+which mean expression changes are marked as `ExcludedFromTesting` in the 
+`Test$TableDisp$ResultDiffDisp` slot). 
 
 ```{r quick-start-TestDE-2, fig.width=16, fig.height=8}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
@@ -325,9 +339,15 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
 ```
 
+**Note**: If the regression BASiCS model has been
+used (`Regression = TRUE` as a function parameter in `BASiCS_MCMC`), 
+`BASiCS_TestDE` will also report changes in residual over-dispersion 
+(not confounded by mean expression) between the groups (see Section
+\@ref(alternative-implementation-modes) in this vignette). 
+
 # Alternative implementation modes
 
-Beyond is original implementation, BASiCS has been extended to adress 
+Beyond its original implementation, BASiCS has been extended to adress 
 experimental designs in which spike-in molecules are not available as well as 
 to address the confounding that is typically observed between mean and 
 over-dispersion for scRNA-seq datasets [@eling2017robust]. Alternative 
@@ -335,43 +355,42 @@ implementation modes are summarised below:
 
 <img src="./AlternativeModels.png" height="400px" width="600px" />
 
-As a default, the `BASiCS_MCMC` function uses `WithSpikes = TRUE` and 
-`Regression = FALSE`.
+As a default, the `BASiCS_MCMC` function uses `WithSpikes = TRUE`.
 
 ## If `WithSpikes = FALSE`
 
 When technical spike-in genes are not available, BASiCS uses a horizontal 
 integration strategy which borrows information across multiple technical 
-replicates. Therefore, `BASiCS_MCMC` will fail to run if a single batch of
-samples is provided. **Note:** batch information must be provided via the 
-`BatchInfo` argument when using the `newBASiCS_Data` function. Additionally,
-when creating the `BASiCS_Data` object, the `SpikeInfo` slot has to be set as
-`SpikeInfo = NULL`.
+replicates [@eling2017robust]. Therefore, `BASiCS_MCMC` will fail to run if a 
+single batch of samples is provided. **Note:** batch information must be 
+provided via the `BatchInfo` argument when using the `newBASiCS_Data` function. 
+Additionally, when creating the `BASiCS_Data` object, the `SpikeInfo` slot must 
+be set as `SpikeInfo = NULL`.
 
 ```{r, fig.height = 8, fig.width = 8}
 DataNoSpikes <- newBASiCS_Data(Counts, Tech, SpikeInfo = NULL, 
                               BatchInfo = rep(c(1,2), each = 20))
 ChainNoSpikes <- BASiCS_MCMC(Data = DataNoSpikes, N = 1000, 
                              Thin = 10, Burn = 500, 
-                             WithSpikes = FALSE, 
+                             WithSpikes = FALSE,  Regression = TRUE,
                              PrintProgress = FALSE)
 ```
 
 ## If `Regression = TRUE`
 
-The *regression* implementation of BASiCS uses an informative prior formulation 
-to account for the relationship between mean and over-dispersion gene-specific 
-parameters. The latter is used to infer a global trend between these parameters
-and, subsequently, to derive a *residual over-dispersion* measure that is 
-derived by departures with respect to this trend.
+The BASiCS model uses a joint informative prior formulation to account for the 
+relationship between mean and over-dispersion gene-specific parameters. The 
+latter is used to infer a global regression trend between these parameters and, 
+subsequently, to derive a *residual over-dispersion* measure that is 
+defined as departures with respect to this trend.
 
 ```{r, fig.height = 8, fig.width = 8}
 DataRegression <- newBASiCS_Data(Counts, Tech, SpikeInfo, 
                               BatchInfo = rep(c(1,2), each = 20))
 ChainRegression <- BASiCS_MCMC(Data = DataRegression, N = 1000, 
-                             Thin = 10, Burn = 500, 
-                             Regression = TRUE, 
-                             PrintProgress = FALSE)
+                               Thin = 10, Burn = 500, 
+                               Regression = TRUE, 
+                               PrintProgress = FALSE)
 ```
 
 This implementation provides additional functionality when performing 
@@ -380,17 +399,18 @@ the MCMC chain obtained when analysing the dataset provided in
 [@grun2014validation] (single cell versus pool-and-split samples). These are 
 included within `BASiCS` as the `ChainSCReg` and `ChainRNAReg` datasets. 
 
-To visualize the fit between over-dispersion $\delta_i$ and mean expression $\mu_i$
-the following function can be used.
+To visualize the fit between over-dispersion $\delta_i$ and mean expression $
+\mu_i$ the following function can be used.
 
 ```{r, fig.height = 8, fig.width = 8}
 data("ChainRNAReg")
 BASiCS_showFit(ChainRNAReg)
 ```
 
-The `BASiCS_TestDE` test function will automatically perform differential variability 
-testing on the residual over-dispersion parameters $\epsilon_i$ when providing 
-two `Chain` objects that were generated by BASiCS' regression case.
+The `BASiCS_TestDE` test function will automatically perform differential 
+variability testing based on the residual over-dispersion parameters 
+$\epsilon_i$ when its output includes two `Chain` objects that were generated 
+by the regression BASiCS model.
 
 ```{r, fig.height = 8, fig.width = 16}
 data("ChainSCReg")
@@ -402,11 +422,11 @@ Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
 ```
 
-This test function outputs an extra slot containing the results for testing 
-differences in residual over-dispersion. Only genes that are expressed in at 
-least 2 cells are included in the test. Genes that are not expressed in at 
-least 2 cells per condition are marked as `ExcludedFromRegression` in the 
-`Test$TableResDisp$ResultDiffResDisp` slot. By performing the regression, 
+This test function outputs an extra slot containing the results of the 
+differential testing residual over-dispersion test. Only genes that are 
+expressed in at least 2 cells (in both groups) are included in the test. 
+Genes that do not satisfy this condition are marked as `ExcludedFromRegression` 
+in the `Test$TableResDisp$ResultDiffResDisp` slot. By performing the regression, 
 all genes can be tested for changes in expression variability independent of 
 changes in mean expression.
 
@@ -414,9 +434,11 @@ changes in mean expression.
 head(Test$TableResDisp, n = 2)
 ```
 
-**Note:** Additional parameters for this sampler include: `k` number of regression components
-(`k`-2 radial basis functions, one intercept and one linear component), `Var` the scale
-parameter influencing the width of the basis functions and `eta` the degrees of freedom.
+**Note:** Additional parameters for this sampler include: `k` number of 
+regression components (`k`-2 radial basis functions, one intercept and one 
+linear component), `Var` the scale parameter influencing the width of the basis 
+functions and `eta` the degrees of freedom. For additional details about these
+choices, please refer to @eling2017robust. 
 
 # Additional details
 
@@ -427,7 +449,7 @@ parameters `StoreChains`, `StoreDir` and `RunName` are required. For example:
 
 ```{r MCMCNotRun}
 Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, Regression = TRUE,
                      PrintProgress = FALSE, StoreChains = TRUE, 
                      StoreDir = tempdir(), RunName = "Example")
 ```
@@ -459,7 +481,8 @@ In the figure above:
 
 ## Summarising the posterior distribution
 
-To access the MCMC chains associated to individual parameter use the function `displayChainBASiCS`. For example, 
+To access the MCMC chains associated to individual parameter use the function 
+`displayChainBASiCS`. For example, 
 
 ```{r AccessChains}
 displayChainBASiCS(Chain, Param = "mu")[1:2,1:2]
@@ -488,7 +511,8 @@ intervals for gene-specific parameters $\mu_i$ (mean) and $\delta_i$
 ```{r OtherHPD, fig.width = 16, fig.height = 8}
 par(mfrow = c(1,2))
 plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
-plot(ChainSummary, Param = "delta", Genes = c(2,5,10,50), main = "5 customized genes")
+plot(ChainSummary, Param = "delta", 
+     Genes = c(2,5,10,50), main = "5 customized genes")
 ```
 
 See `help(BASiCS_MCMC)` for example plots associated to other model parameters.
@@ -622,14 +646,17 @@ to be inferred for each batch of cells.
 [^footnoteGamma]: We parametrize the Gamma distribution such that if 
 $X \sim \mbox{Gamma}(a,b)$, then $\mbox{E}(X)=a/b$ and $\mbox{var}(X)=a/b^2$.
 
-In [@vallejos2016beyond], this model has been extended to cases where multiple 
+In @vallejos2016beyond, this model has been extended to cases where multiple 
 groups of cells are under study. This is achieved by assuming gene-specific 
 parameters to be also group-specific. Based on this setup, evidence of 
 differential expression is quantified through log2-fold changes of gene-specific 
-parameters (mean and over-dispersion) between the groups. 
+parameters (mean and over-dispersion) between the groups. Moreover,
+@eling2017robust further extended this model by addressing the
+mean/over-dispersion confounding that is characteristic of scRNA-seq datasets
+as well as experimental designs where spike-ins are not available. 
 
 More details regarding the model setup, prior specification and implementation 
-are described in [@vallejos2015basics] and [@vallejos2016beyond]. 
+are described in @vallejos2015basics, @vallejos2016beyond and @eling2017robust. 
 
 ***
 
