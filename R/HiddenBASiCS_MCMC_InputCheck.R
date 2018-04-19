@@ -1,4 +1,4 @@
-HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin, Burn)
+HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin, Burn, Regression)
 {
   if (!is(Data, "SingleCellExperiment")) 
     stop("'Data' is not a SingleCellExperiment class object.")
@@ -24,4 +24,6 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin, Burn)
     stop("Please use an integer value for Thin (Thin>=2).")
   if (!(Burn%%Thin == 0 & Burn < N & Burn >= 1)) 
     stop("Please use an integer value for Burn (1<=Burn<N); multiple of thin.")
+  if (!is.logical(Regression)) 
+    stop("Please use a logical value for the Regression parameter.")  
 }

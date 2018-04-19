@@ -14,7 +14,7 @@ test_that("Estimates match the given seed (spikes+batch)",
   # Running the samples
   set.seed(18)
   Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
-                       PrintProgress = FALSE, 
+                       Regression = FALSE, PrintProgress = FALSE, 
                        Start = Start, PriorParam = PriorParam)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
