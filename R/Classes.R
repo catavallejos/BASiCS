@@ -27,15 +27,21 @@
 #' \item{theta}{MCMC chain for technical over-dispersion parameter(s) 
 #' \eqn{\theta} (matrix, all elements must be positive, 
 #' each colum represents 1 batch)}
-#' \item{\code{beta}}{Only used for regression model. MCMC chain for regression 
-#' coefficients (matrix with \code{k} columns, where \code{k} represent the 
-#' number of chosen basis functions + 2) }
-#' \item{\code{sigma2}}{Only used for regression model. MCMC chain for the 
-#' residual variance (matrix with one column, sigma2 represents 
-#' a global parameter)}
-#' \item{\code{epsilon}}{Only used for regression model. MCMC chain for the 
-#' gene-specific residual over-dispersion parameter 
+#' \item{\code{beta}}{Only relevant for regression BASiCS model (Eling et al, 
+#' 2017). MCMC chain for regression coefficients (matrix with \code{k} columns, 
+#' where \code{k} represent the number of chosen basis functions + 2) }
+#' \item{\code{sigma2}}{Only relevant for regression BASiCS model (Eling et al, 
+#' 2017). MCMC chain for the residual variance (matrix with one column, sigma2 
+#' represents a global parameter)}
+#' \item{\code{epsilon}}{Only relevant for regression BASiCS model (Eling et al, 
+#' 2017). MCMC chain for the gene-specific residual over-dispersion parameter 
 #' (matrix with \code{q} columns)}
+#' \item{\code{RefFreq}}{Only relevant for no-spikes BASiCS model (Eling et al, 
+#' 2017). For each biological gene, this vector displays the proportion of 
+#' times for which each gene was used as a reference (within the MCMC 
+#' algorithm), when using the stochastic reference choice described in 
+#' (Eling et al, 2017). This information has been kept as it is useful for the
+#' developers of this library. However, we do not expect users to need it. }
 #' }
 #' 
 #' @examples
