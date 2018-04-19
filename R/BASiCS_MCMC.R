@@ -10,6 +10,10 @@
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
 #' @param Burn Burn-in period for the MCMC sampler. Use \code{Burn>=1}, 
 #' \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.
+#' @param Regression  If \code{Regression = TRUE}, BASiCS exploits a joint prior 
+#' formulation for mean and over-dispersion parameters to estimate a measure of
+#' residual over-dispersion is not confounded by mean expression. Recommended
+#' setting is \code{Regression = TRUE}
 #' @param ... Optional parameters.
 #' \describe{
 #' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. 
@@ -61,10 +65,6 @@
 #' }}
 #' \item{\code{WithSpikes}}{If \code{WithSpikes = FALSE}, the no-spikes 
 #'       model will be fitted. Default: \code{WithSpikes = TRUE}. }
-#' \item{\code{Regression}}{If \code{Regression = TRUE}, BASiCS uses a 
-#'       correlated prior formulation to estimate residual over-dispersion 
-#'       parameters that are not confounded with mean expression. Default:
-#'       \code{Regression = FALSE}. }
 #' \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies 
 #'       the number of regression Gaussian Radial Basis Functions (GRBF) used 
 #'       within the correlated prior adopted for gene-specific over-dispersion 
@@ -110,11 +110,11 @@
 #'
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs migth be required to reach convergence
-#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
 #'                      PrintProgress = FALSE)
 #'                      
 #' # To run the regression version of BASiCS, use:
-#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
 #'                      PrintProgress = FALSE, Regression = TRUE)
 #' 
 #' # For illustration purposes we load a built-in 'BASiCS_Chain' object 
@@ -197,10 +197,10 @@
 #' Vallejos, Richardson and Marioni (2016). Genome Biology.
 #' 
 #' Eling et al (2017). bioRxiv 
-BASiCS_MCMC <- function(Data, N, Thin, Burn, ...) 
+BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, ...) 
 {
   # Checks to ensure input arguments are valid
-  HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn)
+  HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression)
 
   # Some global values used throughout the MCMC algorithm and checks
   q <- length(SingleCellExperiment::isSpike(Data))
@@ -217,13 +217,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, ...)
   # Optional arguments 
   Args <- list(...)
   # Assignment of default values
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n)
+  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n, Regression)
   AR <- ArgsDef$AR; StopAdapt <- ArgsDef$StopAdapt 
   StoreChains <- ArgsDef$StoreChains; StoreAdapt <- ArgsDef$StoreAdapt
   StoreDir <- ArgsDef$StoreDir; RunName <- ArgsDef$RunName;
   PrintProgress <- ArgsDef$PrintProgress; PriorParam <- ArgsDef$PriorParam
   PriorDeltaNum <- ArgsDef$PriorDeltaNum; PriorDelta <- ArgsDef$PriorDelta
-  Regression <- ArgsDef$Regression; WithSpikes <- ArgsDef$WithSpikes
+  WithSpikes <- ArgsDef$WithSpikes
   k <- ArgsDef$k; variance <- ArgsDef$variance; Start <- ArgsDef$Start 
   StochasticRef <- ArgsDef$StochasticRef
   ConstrainType <- ArgsDef$ConstrainType

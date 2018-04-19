@@ -1,7 +1,6 @@
-HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
+HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n, Regression)
 {
-  # Whether the regression case is used
-  Regression <- ifelse("Regression" %in% names(Args), Args$Regression, FALSE)
+
   if (!("PriorDelta" %in% names(Args)) & Regression == FALSE) {
     message("-------------------------------------------------------------\n", 
             "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
@@ -105,6 +104,6 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n)
       PriorDelta = PriorDelta,
       WithSpikes = WithSpikes, StochasticRef = StochasticRef,
       ConstrainType = ConstrainType, ConstrainProp = ConstrainProp,
-      Regression = Regression, k = k, variance = variance, 
+      k = k, variance = variance, 
       Start = Start)
 }
