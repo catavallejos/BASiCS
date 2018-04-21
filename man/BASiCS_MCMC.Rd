@@ -4,7 +4,7 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, ...)
+BASiCS_MCMC(Data, N, Thin, Burn, Regression, ...)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object. 
@@ -17,6 +17,11 @@ Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
 
 \item{Burn}{Burn-in period for the MCMC sampler. Use \code{Burn>=1}, 
 \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.}
+
+\item{Regression}{If \code{Regression = TRUE}, BASiCS exploits a joint prior 
+formulation for mean and over-dispersion parameters to estimate a measure of
+residual over-dispersion is not confounded by mean expression. Recommended
+setting is \code{Regression = TRUE}}
 
 \item{...}{Optional parameters.
 \describe{
@@ -69,10 +74,6 @@ All elements must be positive real numbers.
 }}
 \item{\code{WithSpikes}}{If \code{WithSpikes = FALSE}, the no-spikes 
       model will be fitted. Default: \code{WithSpikes = TRUE}. }
-\item{\code{Regression}}{If \code{Regression = TRUE}, BASiCS uses a 
-      correlated prior formulation to estimate residual over-dispersion 
-      parameters that are not confounded with mean expression. Default:
-      \code{Regression = FALSE}. }
 \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies 
       the number of regression Gaussian Radial Basis Functions (GRBF) used 
       within the correlated prior adopted for gene-specific over-dispersion 
@@ -123,12 +124,12 @@ Data <- makeExampleBASiCS_Data()
 
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence
-Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = FALSE,
                      PrintProgress = FALSE)
                      
 # To run the regression version of BASiCS, use:
-Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, 
-                     PrintProgress = FALSE, Regression = TRUE)
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
+                     PrintProgress = FALSE)
 
 # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 # (obtained using the 'BASiCS_MCMC' function)

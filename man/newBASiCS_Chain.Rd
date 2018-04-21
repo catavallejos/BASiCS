@@ -51,7 +51,7 @@ object from pre-computed MCMC chains.
 Data <- makeExampleBASiCS_Data()
 
 # No regression model
-Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5)
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, Regression = FALSE)
 
 ChainMu <- displayChainBASiCS(Chain, 'mu')
 ChainDelta <- displayChainBASiCS(Chain, 'delta')

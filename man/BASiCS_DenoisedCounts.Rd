@@ -30,7 +30,7 @@ See vignette
 
 Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
 Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
-                     PrintProgress = FALSE)
+                     Regression = FALSE, PrintProgress = FALSE)
 
 DC <- BASiCS_DenoisedCounts(Data, Chain)
 

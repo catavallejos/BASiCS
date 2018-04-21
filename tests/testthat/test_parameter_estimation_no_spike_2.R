@@ -12,11 +12,13 @@ test_that("Estimates match (no-spikes)",
 
   set.seed(16)
   Chain1 <- BASiCS_MCMC(Data1, N = 1000, Thin = 10, Burn = 500, 
+                        Regression = FALSE, 
                         PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary1 <- Summary(Chain1)
   set.seed(16)
-  Chain2 <- BASiCS_MCMC(Data2, N = 1000, Thin = 10, Burn = 500, 
-                        PrintProgress = FALSE, WithSpikes = FALSE)
+  Chain2 <- BASiCS_MCMC(Data2, N = 1000, Thin = 10, Burn = 500,
+                        Regression = FALSE, 
+                        PrintProgress = FALSE)
   PostSummary2 <- Summary(Chain2)
             
   # Check if parameter estimates match for the first 5 genes and cells
