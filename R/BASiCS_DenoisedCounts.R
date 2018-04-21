@@ -13,7 +13,7 @@
 #'
 #' Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
 #' Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
-#'                      PrintProgress = FALSE)
+#'                      Regression = FALSE, PrintProgress = FALSE)
 #'
 #' DC <- BASiCS_DenoisedCounts(Data, Chain)
 #'
@@ -44,16 +44,15 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
       # Spikes case
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
       out1 <- t(t(assay(Data)[!isSpike(Data), ])/(Phi * Nu))
-      out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu)      
+      out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu) 
+      out <- rbind(out1, out2) 
     }
     else
     {
       # No spikes case
-      out1 <- t(t(assay(Data)[!isSpike(Data), ])/Nu)
-      out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu)       
+      out <- t(t(assay(Data))/Nu)
     }
 
-    out <- rbind(out1, out2) 
     rownames(out) <- rownames(Data)
     colnames(out) <- colnames(Data)
     

@@ -20,7 +20,7 @@
 #' @examples
 #'
 #' Data <- makeExampleBASiCS_Data()
-#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5,
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, Regression = FALSE,
 #'                      StoreChains = TRUE, StoreDir = tempdir(), 
 #'                      RunName = 'Test')
 #' ChainLoad <- BASiCS_LoadChain(RunName = 'Test', StoreDir = tempdir())

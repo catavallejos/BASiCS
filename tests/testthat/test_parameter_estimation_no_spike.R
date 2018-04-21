@@ -16,6 +16,7 @@ test_that("Estimates match the given seed (no-spikes)",
   # Running the sampler
   set.seed(14)
   Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+                       Regression = FALSE,
                        PrintProgress = FALSE, WithSpikes = FALSE)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)

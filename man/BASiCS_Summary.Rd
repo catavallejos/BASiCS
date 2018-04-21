@@ -49,7 +49,7 @@ parameter \eqn{\epsilon} }
 
 # A BASiCS_Summary object created by the Summary method.
 Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = FALSE)
 ChainSummary <- Summary(Chain)
 
 

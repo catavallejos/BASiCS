@@ -50,7 +50,7 @@
 #' Data <- makeExampleBASiCS_Data()
 #' 
 #' # To run the model without regression
-#' Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+#' Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = FALSE)
 #' 
 #' # To run the model using the regression model
 #' ChainReg <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = TRUE)
@@ -187,7 +187,7 @@ setClass("BASiCS_Chain",
 #' 
 #' # A BASiCS_Summary object created by the Summary method.
 #' Data <- makeExampleBASiCS_Data()
-#' Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2)
+#' Chain <- BASiCS_MCMC(Data, N = 100, Thin = 2, Burn = 2, Regression = FALSE)
 #' ChainSummary <- Summary(Chain)
 #' 
 #' 

@@ -943,3 +943,11 @@ version 1.1.60: (2018-04-19)
 version 1.1.61: (2018-04-19) - INCOMPLETE WORK
 - `Regression` is now a compulsory parameter in `BASiCS_MCMC`, hidden
 functions and SOME unit tests updated accordingly. 
+
+version 1.1.62: (2018-04-21) 
+- `Regression` is now a compulsory parameter in `BASiCS_MCMC`, hidden
+functions, documentation and unit tests updated accordingly.
+- Minor updates in vignette to clarify default parameter in `newBASiCS_Data`
+- `BASiCS_Filter` adapted to no-spikes case and minor bug resolved
+- Added unit test for `BASiCS_Filter`
+- Minor bug fixed for no-spikes case in `BASiCS_DenoisedCounts`

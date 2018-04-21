@@ -110,12 +110,12 @@
 #'
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs migth be required to reach convergence
-#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
+#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = FALSE,
 #'                      PrintProgress = FALSE)
 #'                      
 #' # To run the regression version of BASiCS, use:
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
-#'                      PrintProgress = FALSE, Regression = TRUE)
+#'                      PrintProgress = FALSE)
 #' 
 #' # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 #' # (obtained using the 'BASiCS_MCMC' function)

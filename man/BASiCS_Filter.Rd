@@ -4,8 +4,8 @@
 \alias{BASiCS_Filter}
 \title{Filter for input datasets}
 \usage{
-BASiCS_Filter(Counts, Tech, SpikeInput, BatchInfo = NULL,
-  MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
+BASiCS_Filter(Counts, Tech = rep(FALSE, nrow(Counts)), SpikeInput = NULL,
+  BatchInfo = NULL, MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
   MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
 }
 \arguments{
@@ -70,11 +70,11 @@ SpikeInput <- rgamma(10,1,1)
 SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10), 
                         'SpikeInput' = SpikeInput)
 
-Filter = BASiCS_Filter(Counts, Tech, SpikeInput,
-                       MinTotalCountsPerCell = 2, 
-                       MinTotalCountsPerGene = 2,
-                       MinCellsWithExpression = 2, 
-                       MinAvCountsPerCellsWithExpression = 2)
+Filter <- BASiCS_Filter(Counts, Tech, SpikeInput,
+                        MinTotalCountsPerCell = 2, 
+                        MinTotalCountsPerGene = 2,
+                        MinCellsWithExpression = 2, 
+                        MinAvCountsPerCellsWithExpression = 2)
 SpikeInfoFilter <- SpikeInfo[SpikeInfo$SpikeID \%in\% rownames(Filter$Counts),]
 FilterData <- newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 
