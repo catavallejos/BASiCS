@@ -20,11 +20,12 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
   # Fix for cases in which 'scran' normalisation has invalid output
-  if( (min(size_scran) <= 0) | sum(is.na(size_scran) > 0))
+  if( (min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0) )
   {
     message("-------------------------------------------------------------\n",
             "There was an issue when applying `scran` normalization  \n",
             "`positive = TRUE` has been added to `computeSumFactors` call \n",
+            "Please consider a more stringent quality control criteria. \n",
             "-------------------------------------------------------------\n")
     suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio, 
                                                             positive = TRUE))
