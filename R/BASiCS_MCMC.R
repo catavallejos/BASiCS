@@ -236,8 +236,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, ...)
   s0 <- as.vector(Start$s0)
   nu0 <- as.vector(Start$nu0)
   theta0 <- as.numeric(Start$theta0)
-  if(WithSpikes == TRUE) 
-    SpikeInput <- as.vector(Start$mu0)[SingleCellExperiment::isSpike(Data)]
+  
+  if(WithSpikes == TRUE) SpikeInput <- metadata(Data)$SpikeInput
   
   # Starting values for adaptive proposal variances
   ls.mu0 <- as.vector(Start$ls.mu0)
@@ -309,8 +309,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, ...)
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
                 as.matrix(assay(Data))[!SingleCellExperiment::isSpike(Data),], 
                 BatchDesign, 
-                SpikeInput, mu0, delta0, phi0, s0, nu0, 
-                rep(theta0, nBatch), 
+                SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
                 PriorParam$s2.delta, PriorDeltaNum, PriorParam$p.phi, 
                 PriorParam$a.s, PriorParam$b.s, 

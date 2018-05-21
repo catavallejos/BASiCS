@@ -219,6 +219,39 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Hidden_rDirichlet
+arma::vec Hidden_rDirichlet(arma::vec alpha);
+RcppExport SEXP _BASiCS_Hidden_rDirichlet(SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(Hidden_rDirichlet(alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Hidden_muUpdate
+arma::mat Hidden_muUpdate(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& invdelta, arma::vec const& phinu, arma::vec const& sum_bycell_bio, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind);
+RcppExport SEXP _BASiCS_Hidden_muUpdate(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP invdeltaSEXP, SEXP phinuSEXP, SEXP sum_bycell_bioSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type invdelta(invdeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type phinu(phinuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bycell_bio(sum_bycell_bioSEXP);
+    Rcpp::traits::input_parameter< double const& >::type s2_mu(s2_muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type mu1(mu1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    rcpp_result_gen = Rcpp::wrap(Hidden_muUpdate(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_DenoisedRates", (DL_FUNC) &_BASiCS_HiddenBASiCS_DenoisedRates, 7},
@@ -226,6 +259,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcppNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppNoSpikes, 37},
     {"_BASiCS_HiddenBASiCS_MCMCcppReg", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppReg, 41},
     {"_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes, 43},
+    {"_BASiCS_Hidden_rDirichlet", (DL_FUNC) &_BASiCS_Hidden_rDirichlet, 1},
+    {"_BASiCS_Hidden_muUpdate", (DL_FUNC) &_BASiCS_Hidden_muUpdate, 12},
     {NULL, NULL, 0}
 };
 

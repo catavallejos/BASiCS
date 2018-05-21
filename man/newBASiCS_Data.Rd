@@ -6,7 +6,7 @@
 counts and experimental information about spike-in genes}
 \usage{
 newBASiCS_Data(Counts, Tech = rep(FALSE, nrow(Counts)), SpikeInfo = NULL,
-  BatchInfo = NULL)
+  BatchInfo = NULL, SpikeType = "ERCC")
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements 
@@ -27,6 +27,11 @@ implementation (no spikes) can be run. Default value: \code{SpikeInfo = NULL}.}
 \item{BatchInfo}{Vector of length \code{n} whose elements indicate batch 
 information. Not required if a single batch is present on the data. 
 Default value: \code{BatchInfo = NULL}.}
+
+\item{SpikeType}{Character to indicate what type of spike-ins are in use.
+For more details see argument `type` in 
+`help(isSpike, package = "SingleCellExperiment")`. Default value: 
+\code{SpikeType = "ERCC"}.}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}}.
@@ -43,12 +48,13 @@ counts and experimental information about spike-in genes.
 # Expression counts
 set.seed(1)
 Counts <- matrix(rpois(50*10, 2), ncol = 10)
-rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
+rownames(Counts) <- c(paste0('Gene', 1:40), paste0('ERCC', 1:10))
 # Technical information
-Tech <- c(rep(FALSE,40),rep(TRUE,10))
+Tech <- grepl("ERCC", rownames(Counts))
 # Spikes input number of molecules
 set.seed(2)
-SpikeInfo <- data.frame(gene=rownames(Counts)[Tech],amount=rgamma(10,1,1))
+SpikeInfo <- data.frame(gene = rownames(Counts)[Tech], 
+                        amount = rgamma(10, 1, 1))
 
 # Creating a BASiCS_Data object (no batch effect)
 DataExample <- newBASiCS_Data(Counts, Tech = Tech, SpikeInfo = SpikeInfo)

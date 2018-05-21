@@ -36,14 +36,16 @@ arma::vec DegubInd(arma::vec ind,
                    arma::vec const& y,
                    double const& threshold,
                    std::string const& param);
-arma::vec rDirichlet(arma::vec alpha);
+
+// [[Rcpp::export]]
+arma::vec Hidden_rDirichlet(arma::vec alpha);
 arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma);
 
 /* Declarations for functions used by the main MCMC sampler
  * Stored in: utils_MCMCcpp.cpp
  */
-
-arma::mat muUpdate(
+// [[Rcpp::export]]
+arma::mat Hidden_muUpdate(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
     arma::mat const& Counts, 

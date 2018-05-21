@@ -21,3 +21,11 @@ HiddenBASiCS_MCMCcppRegNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, 
     .Call('_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, s2mu, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef)
 }
 
+Hidden_rDirichlet <- function(alpha) {
+    .Call('_BASiCS_Hidden_rDirichlet', PACKAGE = 'BASiCS', alpha)
+}
+
+Hidden_muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind) {
+    .Call('_BASiCS_Hidden_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind)
+}
+
