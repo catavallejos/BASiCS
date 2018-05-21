@@ -107,8 +107,9 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
       }
     }
     
-    rownames(Counts.sim) <- paste0("Gene", seq_len(q))
-    SpikeInfo <- data.frame(paste0("Gene", seq(q.bio+1, q)), 
+    rownames(Counts.sim) <- c(paste0("Gene", seq_len(q.bio)), 
+                              paste0("ERCC", seq_len(q-q.bio)))
+    SpikeInfo <- data.frame(paste0("ERCC", seq_len(q-q.bio)), 
                             Mu[seq(q.bio+1, q)])
     
     colnames(Counts.sim) <- paste0("Cell", seq_len(n))
@@ -116,16 +117,14 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     if (!WithBatch) 
     {
       Data <- newBASiCS_Data(Counts = Counts.sim, 
-                             Tech = ifelse(seq_len(q) > q.bio, 
-                                           TRUE, FALSE), 
+                             Tech = grepl("ERCC", rownames(Counts.sim)), 
                              SpikeInfo = SpikeInfo, 
                              BatchInfo = rep(1, 20))
     } 
     else 
     {
       Data <- newBASiCS_Data(Counts = Counts.sim, 
-                             Tech = ifelse(seq_len(q) > q.bio, 
-                                           TRUE, FALSE), 
+                             Tech = grepl("ERCC", rownames(Counts.sim)), 
                              SpikeInfo = SpikeInfo, 
                              BatchInfo = c(rep(1, 10), rep(2, 10)))
     }

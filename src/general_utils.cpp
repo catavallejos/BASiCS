@@ -426,13 +426,15 @@ arma::vec DegubInd(arma::vec ind,
 }
 
 /*Dirichlet sampler*/
-arma::vec rDirichlet(
+arma::vec Hidden_rDirichlet(
     arma::vec alpha)
 {
   arma::vec aux = arma::ones(alpha.size());
   unsigned int i;
   for(i=0; i<alpha.size(); i++) {
-    aux(i) = Rcpp::as<double>(rgamma(1,alpha(i),1));   
+    // shape = alpha(i) ; scale = 1
+    // See https://en.wikipedia.org/wiki/Dirichlet_distribution#Random_number_generation
+    aux(i) = R::rgamma(alpha(i),1);   
   }
   return aux / sum(aux);  
 }
