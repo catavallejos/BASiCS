@@ -17,6 +17,7 @@ test_that("Generated data does not match given seed (spikes case)", {
   TechCount0 <- c( 8181,    64, 257,  511,   15, 2013, 279, 234, 244, 507,
                   31945, 32292,  32, 1041, 1986,   65, 124, 957,  27, 136)
   TechCount <- matrixStats::rowSums2(assay(Data)[isSpike(Data, "ERCC"),])
+  expect_that(all.equal(TechCount0, TechCount), is_true())
 })
 
 test_that("Generated data does not match given seed (no spikes case)", {
