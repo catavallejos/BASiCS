@@ -46,8 +46,9 @@ BASiCS is available in [Bioconductor](https://bioconductor.org/packages/BASiCS).
 To install the current release use:
 
 ```R
-source("https://bioconductor.org/biocLite.R")
-biocLite("BASiCS")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("BASiCS")
 ```
 
 Repeat using the [devel](https://bioconductor.org/developers/how-to/useDevel/) 
