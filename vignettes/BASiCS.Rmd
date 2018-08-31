@@ -59,7 +59,7 @@ expression variability in terms of:
   confounding that is typically observed for scRNA-seq datasets, the assessment 
   of changes in over-dispersion is restricted to genes for which mean expression 
   does not change between the groups. 
-  b. **Residual over-dispersion** [@eling2017robust] --- a residual measure of 
+  b. **Residual over-dispersion** [@eling2018correcting] --- a residual measure of 
   variability given by departures with respect to a global mean/over-dispersion 
   trend. Positive residual over-dispersion indicates that a gene exhibits more 
   variation than expected relative to genes with similar expression levels;
@@ -74,8 +74,8 @@ A brief description for the statistical model implemented in BASiCS is
 provided in Section \@ref(methodology) of this document. The original 
 implementation of BASiCS [@vallejos2015basics] requires the use of **spike-in** 
 molecules --- that are artificially introduced to each cell's lysate 
---- to perform these analyses. More recently, @eling2017robust extendeded BASiCS 
-to also address datasets for which spikes-ins are not available 
+--- to perform these analyses. More recently, @eling2018correcting extendeded 
+BASiCS to also address datasets for which spikes-ins are not available 
 (see Section \@ref(alternative-implementation-modes)). To use this feature, 
 please set `WithSpikes = FALSE` as a function parameter in `BASiCS_MCMC`. 
 
@@ -102,7 +102,7 @@ iterations will be stored in the output of the `BASiCS_MCMC`)
 * `Burn`: length of burn-in period (i.e. the initial `Burn` 
 iterations that will be discarded from the output of the `BASiCS_MCMC`)
 * `Regression`: if this parameter is set equal to `TRUE`, the regression 
-BASiCS model will be used [@eling2017robust]. The latter infers a global 
+BASiCS model will be used [@eling2018correcting]. The latter infers a global 
 regression trend between mean expression and over-dispersion parameters. This
 trend is subsequently used to derive a *residual over-dispersion* measure that 
 is defined as departures with respect to this trend. **This is now the 
@@ -123,7 +123,7 @@ Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500,
 
 As a default, the code above runs the original implementation mode of BASiCS 
 (spikes without regression; see Section \@ref(alternative-implementation-modes)).
-To use the regression BASiCS model [@eling2017robust], please set 
+To use the regression BASiCS model [@eling2018correcting], please set 
 `Regression = TRUE`. To use the no-spikes implementation of BASiCS, please add 
 `WithSpikes = FALSE` as an additional parameter. 
 
@@ -355,7 +355,7 @@ used (`Regression = TRUE` as a function parameter in `BASiCS_MCMC`),
 Beyond its original implementation, BASiCS has been extended to adress 
 experimental designs in which spike-in molecules are not available as well as 
 to address the confounding that is typically observed between mean and 
-over-dispersion for scRNA-seq datasets [@eling2017robust]. Alternative 
+over-dispersion for scRNA-seq datasets [@eling2018correcting]. Alternative 
 implementation modes are summarised below:
 
 <img src="./AlternativeModels.png" height="400px" width="600px" />
@@ -366,7 +366,7 @@ As a default, the `BASiCS_MCMC` function uses `WithSpikes = TRUE`.
 
 When technical spike-in genes are not available, BASiCS uses a horizontal 
 integration strategy which borrows information across multiple technical 
-replicates [@eling2017robust]. Therefore, `BASiCS_MCMC` will fail to run if a 
+replicates [@eling2018correcting]. Therefore, `BASiCS_MCMC` will fail to run if a 
 single batch of samples is provided. **Note:** batch information must be 
 provided via the `BatchInfo` argument when using the `newBASiCS_Data` function. 
 Additionally, when creating the `BASiCS_Data` object, the `SpikeInfo` slot must 
@@ -443,7 +443,7 @@ head(Test$TableResDisp, n = 2)
 regression components (`k`-2 radial basis functions, one intercept and one 
 linear component), `Var` the scale parameter influencing the width of the basis 
 functions and `eta` the degrees of freedom. For additional details about these
-choices, please refer to @eling2017robust. 
+choices, please refer to @eling2018correcting. 
 
 # Additional details
 
@@ -656,12 +656,12 @@ groups of cells are under study. This is achieved by assuming gene-specific
 parameters to be also group-specific. Based on this setup, evidence of 
 differential expression is quantified through log2-fold changes of gene-specific 
 parameters (mean and over-dispersion) between the groups. Moreover,
-@eling2017robust further extended this model by addressing the
+@eling2018correcting further extended this model by addressing the
 mean/over-dispersion confounding that is characteristic of scRNA-seq datasets
 as well as experimental designs where spike-ins are not available. 
 
 More details regarding the model setup, prior specification and implementation 
-are described in @vallejos2015basics, @vallejos2016beyond and @eling2017robust. 
+are described in @vallejos2015basics, @vallejos2016beyond and @eling2018correcting. 
 
 ***
 
