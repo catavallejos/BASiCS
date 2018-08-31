@@ -208,7 +208,7 @@ Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 
 Vallejos, Richardson and Marioni (2016). Genome Biology.
 
-Eling et al (2017). bioRxiv
+Eling et al (2018). Cell Systems
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
