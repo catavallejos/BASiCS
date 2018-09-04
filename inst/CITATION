@@ -31,12 +31,10 @@ citEntry(
 	entry = "article",
 	author = "Nils Eling and Arianne C Richard and Sylvia Richardson and 
 	John C Marioni and Catalina A Vallejos", 
-	title = "Robust expression variability testing reveals heterogeneous T 
-	cell responses", 
-	year = 2017,
-	journal = "bioRxiv",
-	number = "237214",
+	title = "Correcting the mean-variance dependency for differential variability testing using single-cell RNA sequencing data", 
+	year = 2018,
+	journal = "Cell Systems",
+	number = "In press",
 	textVersion = "Eling N, Richard AC, Richardson S, Marioni JC and Vallejos CA 
-	(2017). Robust expression variability testing reveals heterogeneous T 
-	cell responses. bioRxiv"
+	(2018). Correcting the mean-variance dependency for differential variability testing using single-cell RNA sequencing data. Cell Systems"
 )
