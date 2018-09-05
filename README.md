@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/catavallejos/BASiCS.svg?branch=master)](https://travis-ci.org/catavallejos/BASiCS) 
+[![codecov.io Code Coverage](https://codecov.io/gh/catavallejos/BASiCS/branch/master/graph/badge.svg)]
+
 # BASiCS
 
 Single-cell mRNA sequencing can uncover novel cell-to-cell heterogeneity in gene 
@@ -131,11 +134,12 @@ In particular, we are grateful to Aaron Lun (@LTLA, CRUK-CI) for advise and
 support during the preparation the Bioconductor submission. 
 
 We also acknowledge feedback and/or contributions from (Github aliases provided 
-within parenthesis): Ben Dulken (@bdulken), Chang Xu (@xuchang116), 
-Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), Jens Preußner (@jenzopr), 
-Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht (@kevinrue), Luke Zappia (@lazappi), 
-Mike Morgan (@MikeDMorgan), Muad Abd El Hay (@Cumol), Nitesh Turaga (@nturaga), 
-Simon Anders (@s-andrews), Yongchao Ge and Yuan Cao (@yuancao90), among others. 
+within parenthesis): Alan O'Callaghan (@Alanocallaghan), Ben Dulken (@bdulken), 
+Chang Xu (@xuchang116), Danilo Horta (@Horta), Dmitriy Zhukov (@dvzhukov), 
+Jens Preußner (@jenzopr), Joanna Dreux (@Joannacodes), Kevin Rue-Albrecht 
+(@kevinrue), Luke Zappia (@lazappi), Mike Morgan (@MikeDMorgan), Muad Abd El Hay 
+(@Cumol), Nitesh Turaga (@nturaga), Simon Anders (@s-andrews), Yongchao Ge and 
+Yuan Cao (@yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. 
 MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), 
@@ -149,5 +153,5 @@ Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos).
 - [1] <a href="http://dx.doi.org/10.1371/journal.pcbi.1004333">Vallejos <em>et al.</em> (2015). PLoS Computational Biology. </a>
 - [2] <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em> (2016). Genome Biology. </a>
 - [3] <a href="http://science.sciencemag.org/content/355/6332/1433">Martinez-Jimenes <em>et al.</em> (2017). Science. </a>
-- [4] <a href="https://www.biorxiv.org/content/early/2017/12/21/237214">Eling <em>et al.</em> (2017). bioRxiv. </a>
+- [4] <a href="https://www.cell.com/cell-systems/fulltext/S2405-4712(18)30278-3">Eling <em>et al.</em> (2018). Cell Systems. </a>
 - [5] <a href="https://www.ncbi.nlm.nih.gov/pubmed/15054023">Newton <em>et al.</em> (2004). Biostatistics. </a>
