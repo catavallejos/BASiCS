@@ -4,10 +4,9 @@
 \alias{BASiCS_Filter}
 \title{Filter for input datasets}
 \usage{
-BASiCS_Filter(Counts, Tech = rep(FALSE, nrow(Counts)),
-  SpikeInput = NULL, BatchInfo = NULL, MinTotalCountsPerCell = 2,
-  MinTotalCountsPerGene = 2, MinCellsWithExpression = 2,
-  MinAvCountsPerCellsWithExpression = 2)
+BASiCS_Filter(Counts, Tech = rep(FALSE, nrow(Counts)), SpikeInput = NULL,
+  BatchInfo = NULL, MinTotalCountsPerCell = 2, MinTotalCountsPerGene = 2,
+  MinCellsWithExpression = 2, MinAvCountsPerCellsWithExpression = 2)
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements 

@@ -4,6 +4,7 @@
 \alias{BASiCS_VarThresholdSearchHVG}
 \alias{BASiCS_VarThresholdSearchHVG_LVG}
 \alias{BASiCS_VarThresholdSearchLVG}
+\alias{BASiCS_VarThresholdSearchHVG_LVG}
 \title{Detection method for highly and lowly variable genes using 
 a grid of variance contribution thresholds}
 \usage{
