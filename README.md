@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/catavallejos/BASiCS.svg?branch=master)](https://travis-ci.org/catavallejos/BASiCS) 
-[![codecov.io Code Coverage](https://codecov.io/gh/catavallejos/BASiCS/branch/master/graph/badge.svg)]
+![codecov.io Code Coverage](https://codecov.io/gh/catavallejos/BASiCS/branch/master/graph/badge.svg)
 
 # BASiCS
 
