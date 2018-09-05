@@ -9,8 +9,8 @@
 \title{'plot' method for BASiCS_Chain objects}
 \usage{
 \S4method{plot}{BASiCS_Chain,ANY}(x, Param = "mu", Gene = NULL,
-  Cell = NULL, Batch = 1, RegressionTerm = NULL, ylab = "",
-  xlab = "", ...)
+  Cell = NULL, Batch = 1, RegressionTerm = NULL, ylab = "", xlab = "",
+  ...)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}

@@ -4,13 +4,12 @@
 \alias{BASiCS_TestDE}
 \title{Detection of genes with changes in expression}
 \usage{
-BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
-  EpsilonD = log2(1.5), EpsilonR = log2(1.5)/log2(exp(1)),
-  ProbThresholdM = NULL, ProbThresholdD = NULL,
-  ProbThresholdR = NULL, OrderVariable = "GeneIndex",
-  GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
-  PlotOffset = TRUE, Offset = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
-  EFDR_R = 0.1, GenesSelect = NULL, ...)
+BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+  EpsilonR = log2(1.5)/log2(exp(1)), ProbThresholdM = NULL,
+  ProbThresholdD = NULL, ProbThresholdR = NULL,
+  OrderVariable = "GeneIndex", GroupLabel1 = "Group1",
+  GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE, Offset = TRUE,
+  EFDR_M = 0.1, EFDR_D = 0.1, EFDR_R = 0.1, GenesSelect = NULL, ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}} 
