@@ -73,13 +73,33 @@ setClass("BASiCS_Chain",
             }
             else
             {
-              ValidNames <- c("mu", "delta", "phi", "s", "nu", "theta",
-                              "beta", "sigma2", "epsilon", "RefFreq")
-              ReqNames <- c("mu", "delta", "s", "nu", "theta")
+              ValidNames <- c("mu",
+                              "delta",
+                              "phi",
+                              "s",
+                              "nu",
+                              "theta",
+                              "beta",
+                              "sigma2",
+                              "epsilon",
+                              "RefFreq",
+                              "designMatrix",
+                              "ls.mu",
+                              "ls.delta",
+                              "ls.nu",
+                              "ls.theta")
+              ReqNames <- c("mu",
+                            "delta",
+                            "s",
+                            "nu",
+                            "theta")
               
               # Check whether all elements of `parameters` are valid
               if(sum(!(names(object@parameters) %in% ValidNames) > 0) > 0)
-                errors <- c(errors, "Invalid elemens in `parameters` slot")
+                errors <- c(errors,
+                  paste("Invalid elements",
+                    paste(setdiff(names(object@parameters), ValidNames), collapse = ", "),
+                    "in `parameters` slot"))
               
               # Check whether all minimum `parameters` are present
               if(sum(names(object@parameters) %in% ReqNames) != 5)
@@ -97,8 +117,8 @@ setClass("BASiCS_Chain",
               
               # Check number of iterations per element of `parameters`
               if(sum(lapply(
-                object@parameters[names(object@parameters) != "RefFreq"], 
-                nrow) != N) > 0)
+                  object@parameters[setdiff(names(object@parameters), c("RefFreq", "designMatrix"))],
+                  nrow) != N) > 0)
                 errors <- c(errors, "Different numbers of iterations")
               # Check dimensions for basic gene-specific parameters
               if(sum(lapply(object@parameters[c("mu", "delta")], ncol) != q) > 0)
