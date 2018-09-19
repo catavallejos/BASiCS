@@ -86,6 +86,7 @@ setClass("BASiCS_Chain",
                               "designMatrix",
                               "ls.mu",
                               "ls.delta",
+                              "ls.phi",
                               "ls.nu",
                               "ls.theta")
               ReqNames <- c("mu",
