@@ -58,6 +58,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' 
+#' @export
 setClass("BASiCS_Chain", 
          representation = representation(
            parameters = "list"), 
@@ -212,6 +213,7 @@ setClass("BASiCS_Chain",
 #' ChainSummary <- Summary(Chain)
 #' 
 #' 
+#' @export
 setClass("BASiCS_Summary", 
          representation = representation(
            parameters = "list"

@@ -131,7 +131,7 @@ setMethod("updateObject",
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' 
+#' @export
 setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95) {
@@ -425,7 +425,7 @@ setMethod("plot",
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' 
-#' 
+#' @export
 setMethod("displayChainBASiCS", 
           signature = "BASiCS_Chain", 
           definition = function(object, Param = "mu") 
@@ -475,7 +475,10 @@ setMethod("displayChainBASiCS",
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' @author Catalina Vallejos \email{cnvallej@@uc.cl}
 #' 
-#' @references New reference
+#' @references 
+#' Eling et al (2018). Cell Systems 
+#' https://doi.org/10.1016/j.cels.2018.06.011
+#' @export
 setMethod("BASiCS_showFit",
           signature = "BASiCS_Chain",
           definition = function(object,  
@@ -615,6 +618,11 @@ setMethod("show",
                 " Parameters: ", names(object@parameters), "\n")   
           })
 
+#' @export
+setGeneric("plot")
+#' @export
+setMethod("plot", signature = "ANY", graphics::plot)
+
 
 #' @name plot-BASiCS_Summary-method
 #' @aliases plot,BASiCS_Summary-method, plot,BASiCS_Summary,ANY-method
@@ -666,6 +674,7 @@ setMethod("show",
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' 
+#' @export
 setMethod("plot", 
           signature = "BASiCS_Summary", 
           definition = function(x, Param = "mu", Param2 = NULL, 
@@ -681,7 +690,7 @@ setMethod("plot",
     
             q <- nrow(x@parameters$mu)
             q.bio <- nrow(x@parameters$delta)
-            n <- nrow(x@parameters$phi)
+            n <- nrow(x@parameters$s)
             nBatch <- nrow(x@parameters$theta)
     
             if (is.null(Genes)) { Genes <- seq_len(q.bio) }
@@ -937,6 +946,7 @@ setMethod("plot",
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' 
+#' @export
 setMethod("displaySummaryBASiCS", 
           signature = "BASiCS_Summary", 
           definition = function(object, Param = "mu") 

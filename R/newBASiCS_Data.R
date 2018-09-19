@@ -66,6 +66,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
+#' @export
 newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)), 
                            SpikeInfo = NULL, BatchInfo = NULL, 
                            SpikeType = "ERCC") 
