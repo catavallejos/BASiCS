@@ -12,12 +12,16 @@
 #' @examples
 #'
 #' Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-#' Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+#' ## The N and Burn parameters used here are optimised for speed
+#' ## and should not be used in regular use.
+#' ## For more useful parameters,
+#' ## see the vignette (\code{browseVignettes("roxygen2")})
+#' Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
 #'                      Regression = FALSE, PrintProgress = FALSE)
 #'
 #' DC <- BASiCS_DenoisedCounts(Data, Chain)
 #'
-#' @details See vignette
+#' @details See vignette \code{browseVignettes("roxygen2")}
 #'
 #' @return A matrix of denoised expression counts. In line with global scaling
 #' normalisation strategies, these are defined as \eqn{X_{ij}/(\phi_j \nu_j)} 
@@ -31,6 +35,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_DenoisedCounts
+#' @export
 BASiCS_DenoisedCounts <- function(Data, Chain) 
 {
     if (!is(Data, "SingleCellExperiment")) 

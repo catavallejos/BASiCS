@@ -41,6 +41,7 @@
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
+#' @export
 BASiCS_VarThresholdSearchHVG = function(Chain, 
                                         VarThresholdsGrid, 
                                         EFDR = 0.1, 
@@ -81,6 +82,7 @@ BASiCS_VarThresholdSearchHVG = function(Chain,
 #' @name BASiCS_VarThresholdSearchLVG
 #' @aliases BASiCS_VarThresholdSearchLVG BASiCS_VarThresholdSearchHVG_LVG
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
+#' @export
 BASiCS_VarThresholdSearchLVG <- function(Chain, 
                                          VarThresholdsGrid, 
                                          EFDR = 0.1, 

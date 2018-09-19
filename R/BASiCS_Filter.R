@@ -62,6 +62,7 @@
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
+#' @export
 BASiCS_Filter <- function(Counts, 
                           Tech = rep(FALSE, nrow(Counts)), 
                           SpikeInput = NULL, 

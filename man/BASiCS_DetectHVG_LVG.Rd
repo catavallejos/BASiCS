@@ -4,7 +4,6 @@
 \alias{BASiCS_DetectHVG}
 \alias{BASiCS_DetectHVG_LVG}
 \alias{BASiCS_DetectLVG}
-\alias{BASiCS_DetectHVG_LVG}
 \title{Detection method for highly and lowly variable genes}
 \usage{
 BASiCS_DetectHVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
