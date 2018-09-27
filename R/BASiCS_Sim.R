@@ -34,8 +34,8 @@
 #' Theta <- 0.39
 #'
 #' Data <- BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
-#' head(assay(Data))
-#' dim(assay(Data))
+#' head(counts(Data))
+#' dim(counts(Data))
 #' metadata(Data)$SpikeInput
 #' isSpike(Data)
 #'
