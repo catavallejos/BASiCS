@@ -25,7 +25,7 @@ test_that("Estimates match the given seed (spikes)",
   expect_that(all.equal(names(PostSummary@parameters), ParamNames), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(7.379,  4.397,  4.316,  5.398, 17.860)
+  Mu <- c(7.828,  7.290,  4.166,  5.286, 20.882)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   expect_that(all.equal(MuObs, Mu, tolerance = 1, scale = 1), is_true())
             
