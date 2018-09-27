@@ -111,7 +111,7 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     
   # Create a SingleCellExperiment data object
   Data <- SingleCellExperiment::SingleCellExperiment(
-                assays = list(Counts = as.matrix(Counts)), 
+                assays = list(counts = as.matrix(Counts)), 
                 metadata = list(SpikeInput = SpikeInput))
   SingleCellExperiment::isSpike(Data, SpikeType) <- Tech
   SummarizedExperiment::colData(Data) <- 

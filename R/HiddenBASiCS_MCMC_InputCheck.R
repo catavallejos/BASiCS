@@ -10,9 +10,13 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin, Burn, Regression)
   if(!("BatchInfo" %in% names(colData(Data))))
     stop("'Data' does not contained all the required information \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
-  errors <- HiddenChecksBASiCS_Data(assay(Data), isSpike(Data), 
+  if(!("counts" %in% names(assays(Data))))
+    stop("'Data' does not contain a 'counts' slot. \n",
+         "Please make sure to include the raw data in the SingleCellExperiment object under the name 'countss' \n",
+         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
+  errors <- HiddenChecksBASiCS_Data(counts(Data), isSpike(Data), 
                                     metadata(Data)$SpikeInput, 
-                                    rownames(assay(Data)), 
+                                    rownames(counts(Data)), 
                                     colData(Data)$BatchInfo)
   if (length(errors) > 0) stop(errors) 
   

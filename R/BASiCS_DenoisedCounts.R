@@ -43,14 +43,14 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
     {
       # Spikes case
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
-      out1 <- t(t(assay(Data)[!isSpike(Data), ])/(Phi * Nu))
-      out2 <- t(t(assay(Data)[isSpike(Data), ])/Nu) 
+      out1 <- t(t(counts(Data)[!isSpike(Data), ])/(Phi * Nu))
+      out2 <- t(t(counts(Data)[isSpike(Data), ])/Nu) 
       out <- rbind(out1, out2) 
     }
     else
     {
       # No spikes case
-      out <- t(t(assay(Data))/Nu)
+      out <- t(t(counts(Data))/Nu)
     }
 
     rownames(out) <- rownames(Data)
