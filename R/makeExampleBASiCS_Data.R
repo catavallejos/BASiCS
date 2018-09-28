@@ -15,8 +15,8 @@
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}, with
 #' synthetic data simulated from the model implemented in BASiCS.
 #' If \code{WithSpikes = TRUE}, it contains 70 genes (50 biological and 
-#' 20 spike-in) and 20 cells. Alternatively, it contains 50 biological 
-#' genes and 20 cells. 
+#' 20 spike-in) and 30 cells. Alternatively, it contains 50 biological 
+#' genes and 30 cells. 
 #'
 #' @examples
 #' Data <- makeExampleBASiCS_Data()
@@ -52,8 +52,10 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
              0.84, 0.81, 2.75, 0.53, 2.23, 0.45, 1.87, 0.74, 0.53, 0.58, 
              0.94, 0.72, 2.61, 1.56, 0.37, 0.07, 0.90, 0.12, 0.76, 1.45)
   Phi <- c(1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97, 
+           1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97,
            1.09, 1.16, 1.19, 1.14, 0.87, 1.10, 0.48, 1.06, 0.94, 0.97)
   S <- c(0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37, 
+         0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37,
          0.38, 0.40, 0.38, 0.39, 0.34, 0.39, 0.31, 0.39, 0.40, 0.37)
     
   Mu <- c(Mu[seq_len(50)], Mu[seq_len(20)+100])
@@ -120,14 +122,14 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
       Data <- newBASiCS_Data(Counts = Counts.sim, 
                              Tech = grepl("ERCC", rownames(Counts.sim)), 
                              SpikeInfo = SpikeInfo, 
-                             BatchInfo = rep(1, 20))
+                             BatchInfo = rep(1, 30))
     } 
     else 
     {
       Data <- newBASiCS_Data(Counts = Counts.sim, 
                              Tech = grepl("ERCC", rownames(Counts.sim)), 
                              SpikeInfo = SpikeInfo, 
-                             BatchInfo = c(rep(1, 10), rep(2, 10)))
+                             BatchInfo = c(rep(1, 15), rep(2, 15)))
     }
   } 
   else 
@@ -161,7 +163,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
         
     Data <- newBASiCS_Data(Counts = Counts.sim, 
                            Tech = rep(FALSE, q.bio), 
-                           BatchInfo = c(rep(1, 10), rep(2, 10)))
+                           BatchInfo = c(rep(1, 15), rep(2, 15)))
         
   }
   return(Data)

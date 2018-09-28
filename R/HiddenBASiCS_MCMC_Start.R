@@ -11,11 +11,11 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   q <- length(isSpike(Data))
   q.bio <- sum(!isSpike(Data))
   # Number of cells
-  n <- dim(assay(Data))[2]
+  n <- dim(counts(Data))[2]
   
   # Separating spike-ins from the rest of genes
-  CountsBio <- as.matrix(assay(Data)[!isSpike(Data), , drop = FALSE]) 
-  CountsTech <- as.matrix(assay(Data)[isSpike(Data), , drop = FALSE])
+  CountsBio <- as.matrix(counts(Data)[!isSpike(Data), , drop = FALSE]) 
+  CountsTech <- as.matrix(counts(Data)[isSpike(Data), , drop = FALSE])
   
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))

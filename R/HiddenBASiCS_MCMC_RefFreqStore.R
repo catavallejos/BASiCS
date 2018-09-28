@@ -19,7 +19,7 @@ HiddenBASiCS_MCMC_RefFreqStore <- function(Data, Chain,
             "'", StoreDir, "' directory ... \n", 
             "-------------------------------------------------------------\n")
     
-    TableRef <- cbind.data.frame(GeneNames = rownames(assay(Data))[RefGene + 1], 
+    TableRef <- cbind.data.frame(GeneNames = rownames(counts(Data))[RefGene + 1], 
                                  GeneIndex = RefGene + 1, 
                                  stringsAsFactors = FALSE)
     write.table(TableRef, file.path(StoreDir, 
@@ -34,7 +34,7 @@ HiddenBASiCS_MCMC_RefFreqStore <- function(Data, Chain,
             "'", StoreDir, "' directory ... \n", 
             "-------------------------------------------------------------\n")
 
-    TableRef <- cbind.data.frame(GeneNames = rownames(assay(Data))[RefGenes + 1], 
+    TableRef <- cbind.data.frame(GeneNames = rownames(counts(Data))[RefGenes + 1], 
                                 GeneIndex = RefGenes + 1, 
                                 ReferenceFreq = Chain$RefFreq[RefGenes + 1], 
                                 stringsAsFactors = FALSE)

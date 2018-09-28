@@ -36,7 +36,7 @@ test_that("Spikes + no regression", {
                                   s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
                                   mu1 =  mu1, u = uGene, ind = indGene)
   
-  mu1 <- c(14.47,  7.19,  5.20,  9.90, 19.82)
+  mu1 <- c(11.12,  10.38,  5.44,  8.78, 22.06)
   mu1Obs <- round(Aux[1:5,1],2) 
   expect_that(all.equal(mu1, mu1Obs), is_true())
 

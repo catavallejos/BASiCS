@@ -28,6 +28,7 @@ exportPattern("^[^\\Hidden]")
 import(KernSmooth)
 import(SingleCellExperiment)
 import(ggplot2)
+
 importFrom(MASS,mvrnorm)
 importFrom(Rcpp,evalCpp)
 importFrom(S4Vectors,DataFrame)
