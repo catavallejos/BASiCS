@@ -25,6 +25,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
+#' @export
 makeExampleBASiCS_Data <- function(WithBatch = FALSE, 
                                    WithSpikes = TRUE) 
 {

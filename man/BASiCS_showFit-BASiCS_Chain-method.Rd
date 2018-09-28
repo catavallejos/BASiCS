@@ -44,7 +44,8 @@ BASiCS_showFit(ChainRNAReg)
 
 }
 \references{
-New reference
+Eling et al (2018). Cell Systems 
+https://doi.org/10.1016/j.cels.2018.06.011
 }
 \author{
 Nils Eling \email{eling@ebi.ac.uk}

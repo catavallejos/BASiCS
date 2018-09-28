@@ -197,6 +197,7 @@
 #' Vallejos, Richardson and Marioni (2016). Genome Biology.
 #' 
 #' Eling et al (2018). Cell Systems 
+#' @export
 BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, ...) 
 {
   # Checks to ensure input arguments are valid
