@@ -6,7 +6,7 @@
 #' @importFrom graphics abline barplot legend lines par points segments smoothScatter plot
 #' @importFrom data.table fread
 #' @importFrom S4Vectors metadata DataFrame
-#' @importFrom SummarizedExperiment assay colData 
+#' @importFrom SummarizedExperiment assay colData assayNames 
 #' @importFrom SingleCellExperiment isSpike
 #' @importFrom stats median model.matrix rgamma rpois runif acf
 #' @importFrom utils packageVersion write.table

@@ -8,7 +8,7 @@
 #' used to illustrate BASiCS in some of the package and vignette examples.
 #'
 #' @param WithBatch If \code{TRUE}, 2 batches are generated (each of them 
-#' containing 10 cells). Default: \code{WithBatch = FALSE}.
+#' containing 15 cells). Default: \code{WithBatch = FALSE}.
 #' @param WithSpikes If \code{TRUE}, the simulated dataset contains 20 spike-in 
 #' genes. Default: \code{WithSpikes} \code{= TRUE}.
 #'
