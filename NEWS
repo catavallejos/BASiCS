@@ -982,7 +982,12 @@ version 1.3.7: (2018-09-05)
 version 1.3.8: (2018-09-05)
 - Updated README.md (Travis/codecov badges) + updated citation to Cell Systems
 
-version 1.3.8: (2018-09-05)
+version 1.3.9: (2018-09-27)
 - Changed raw data accessor to 'counts' instead of 'assay'
 - makeExampleBASiCS_Data now generates 30 cells instead of 20
 - Updated unit tests to match these 30 cells
+
+version 1.3.10: (2018-09-28)
+- Prevent BASiCS_Chain from crashing when StoreAdapt=TRUE for the regression case
+- Prevent plot function errors
+- Updated documentation using roxygen2
