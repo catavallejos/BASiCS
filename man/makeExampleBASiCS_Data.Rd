@@ -9,7 +9,7 @@ makeExampleBASiCS_Data(WithBatch = FALSE, WithSpikes = TRUE)
 }
 \arguments{
 \item{WithBatch}{If \code{TRUE}, 2 batches are generated (each of them 
-containing 10 cells). Default: \code{WithBatch = FALSE}.}
+containing 15 cells). Default: \code{WithBatch = FALSE}.}
 
 \item{WithSpikes}{If \code{TRUE}, the simulated dataset contains 20 spike-in 
 genes. Default: \code{WithSpikes} \code{= TRUE}.}
@@ -18,8 +18,8 @@ genes. Default: \code{WithSpikes} \code{= TRUE}.}
 An object of class \code{\linkS4class{SingleCellExperiment}}, with
 synthetic data simulated from the model implemented in BASiCS.
 If \code{WithSpikes = TRUE}, it contains 70 genes (50 biological and 
-20 spike-in) and 20 cells. Alternatively, it contains 50 biological 
-genes and 20 cells.
+20 spike-in) and 30 cells. Alternatively, it contains 50 biological 
+genes and 30 cells.
 }
 \description{
 A synthetic \code{\linkS4class{SingleCellExperiment}} object is 
