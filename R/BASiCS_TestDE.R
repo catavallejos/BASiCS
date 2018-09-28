@@ -191,6 +191,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_TestDE
+#' @export
 BASiCS_TestDE <- function(Chain1, 
                           Chain2, 
                           EpsilonM = log2(1.5), 

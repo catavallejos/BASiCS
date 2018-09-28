@@ -35,11 +35,25 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
 License: GPL (>= 2)
 Depends:
     R (>= 3.5),
-    SingleCellExperiment
+    SingleCellExperiment,
+    KernSmooth,
+    ggplot2
 Imports:
-    BiocGenerics, methods, coda, data.table, ggplot2, graphics, 
-    grDevices, KernSmooth, MASS, matrixStats, Rcpp (>= 0.11.3), 
-    S4Vectors, scran, stats, SummarizedExperiment, testthat, utils
+    BiocGenerics, 
+    methods, 
+    coda, 
+    data.table,
+    graphics, 
+    grDevices,
+    MASS, 
+    matrixStats, 
+    Rcpp (>= 0.11.3), 
+    S4Vectors, 
+    scran, 
+    stats,
+    SummarizedExperiment, 
+    testthat, 
+    utils
 Suggests:
     BiocStyle,
     knitr,

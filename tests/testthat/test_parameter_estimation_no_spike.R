@@ -60,3 +60,23 @@ test_that("Estimates match the given seed (no-spikes)",
   expect_that(all.equal(DRcheck, DRcheck0), is_true())
 })
 
+
+test_that("Chain creation works when StoreAdapt=TRUE (no spikes)", 
+{
+  # Data example
+  Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, 
+                                 WithBatch = TRUE)
+  # Fixing starting values
+  n <- ncol(Data)
+  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+                     b.delta = 1, p.phi = rep(1, times = n), 
+                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+  set.seed(2018)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  # Running the sampler
+  set.seed(14)
+  Chain <- BASiCS_MCMC(Data, N = 50, Thin = 10, Burn = 10,
+                       Regression = FALSE, StoreAdapt=TRUE,
+                       PrintProgress = FALSE, WithSpikes = FALSE)
+  expect_s4_class(Chain, "BASiCS_Chain")
+})

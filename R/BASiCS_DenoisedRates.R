@@ -15,7 +15,11 @@
 #' @examples
 #'
 #' Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-#' Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+#' ## The N and Burn parameters used here are optimised for speed
+#' ## and should not be used in regular use.
+#' ## For more useful parameters,
+#' ## see the vignette (\code{browseVignettes("roxygen2")})
+#' Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
 #'                      Regression = FALSE, PrintProgress = FALSE)
 #'
 #' DR <- BASiCS_DenoisedRates(Data, Chain)
@@ -30,6 +34,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_DenoisedRates
+#' @export
 BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE) 
 {
   if (!is(Data, "SingleCellExperiment")) 
