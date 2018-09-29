@@ -15,13 +15,13 @@
 #' ## The N and Burn parameters used here are optimised for speed
 #' ## and should not be used in regular use.
 #' ## For more useful parameters,
-#' ## see the vignette (\code{browseVignettes("roxygen2")})
+#' ## see the vignette (\code{browseVignettes("BASiCS")})
 #' Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
 #'                      Regression = FALSE, PrintProgress = FALSE)
 #'
 #' DC <- BASiCS_DenoisedCounts(Data, Chain)
 #'
-#' @details See vignette \code{browseVignettes("roxygen2")}
+#' @details See vignette \code{browseVignettes("BASiCS")}
 #'
 #' @return A matrix of denoised expression counts. In line with global scaling
 #' normalisation strategies, these are defined as \eqn{X_{ij}/(\phi_j \nu_j)} 

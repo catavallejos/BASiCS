@@ -18,7 +18,7 @@
 #' ## The N and Burn parameters used here are optimised for speed
 #' ## and should not be used in regular use.
 #' ## For more useful parameters,
-#' ## see the vignette (\code{browseVignettes("roxygen2")})
+#' ## see the vignette (\code{browseVignettes("BASiCS")})
 #' Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
 #'                      Regression = FALSE, PrintProgress = FALSE)
 #'
