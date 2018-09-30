@@ -70,9 +70,10 @@ installed. If so, please run the following lines and repeat the installation.
 
 ```R
 #library(devtools)
-#source("http://bioconductor.org/biocLite.R")
-#biocLite("BiocGenerics")
-#biocLite("scran")
+#if (!requireNamespace("BiocManager", quietly=TRUE))
+    #install.packages("BiocManager")
+#BiocManager::install("BiocGenerics")
+#BiocManager::install("scran")
 #install.packages("Rcpp")
 ```
 
