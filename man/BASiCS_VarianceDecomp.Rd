@@ -4,8 +4,8 @@
 \alias{BASiCS_VarianceDecomp}
 \title{Decomposition of gene expression variability according to BASiCS}
 \usage{
-BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal", Plot = TRUE,
-  ...)
+BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal",
+  Plot = TRUE, ...)
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}

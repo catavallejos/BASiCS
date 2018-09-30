@@ -66,6 +66,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl} 
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
+#' @export
 newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)), 
                            SpikeInfo = NULL, BatchInfo = NULL, 
                            SpikeType = "ERCC") 
@@ -111,7 +112,7 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     
   # Create a SingleCellExperiment data object
   Data <- SingleCellExperiment::SingleCellExperiment(
-                assays = list(Counts = as.matrix(Counts)), 
+                assays = list(counts = as.matrix(Counts)), 
                 metadata = list(SpikeInput = SpikeInput))
   SingleCellExperiment::isSpike(Data, SpikeType) <- Tech
   SummarizedExperiment::colData(Data) <- 

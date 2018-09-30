@@ -24,12 +24,16 @@ cell-specific technical variation. The latter includes global-scaling
 normalisation and therefore no further normalisation is required.
 }
 \details{
-See vignette
+See vignette \code{browseVignettes("roxygen2")}
 }
 \examples{
 
 Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-Chain <- BASiCS_MCMC(Data, N = 10000, Thin = 10, Burn = 5000, 
+## The N and Burn parameters used here are optimised for speed
+## and should not be used in regular use.
+## For more useful parameters,
+## see the vignette (\\code{browseVignettes("roxygen2")})
+Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                      Regression = FALSE, PrintProgress = FALSE)
 
 DC <- BASiCS_DenoisedCounts(Data, Chain)

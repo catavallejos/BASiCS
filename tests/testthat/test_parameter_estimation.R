@@ -25,7 +25,7 @@ test_that("Estimates match the given seed (spikes)",
   expect_that(all.equal(names(PostSummary@parameters), ParamNames), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(7.379,  4.397,  4.316,  5.398, 17.860)
+  Mu <- c(7.828,  7.290,  4.166,  5.286, 20.882)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   expect_that(all.equal(MuObs, Mu, tolerance = 1, scale = 1), is_true())
             
@@ -61,3 +61,22 @@ test_that("Estimates match the given seed (spikes)",
   expect_that(all.equal(DRcheck, DRcheck0, tolerance = 1.5, scale = 1), is_true())
 })
 
+test_that("Chain creation works when StoreAdapt=TRUE (spikes)", 
+{
+  # Data example
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+  # Fixing starting values
+  n <- ncol(Data)
+  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+                     b.delta = 1, p.phi = rep(1, times = n), 
+                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+  set.seed(2018)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  # Running the samples
+  set.seed(18)
+  Chain <- BASiCS_MCMC(Data, N = 50, Thin = 10, Burn = 10,
+                       Regression = FALSE, PrintProgress = FALSE, 
+                       StoreAdapt = TRUE,
+                       Start = Start, PriorParam = PriorParam)
+  expect_s4_class(Chain, "BASiCS_Chain")
+})

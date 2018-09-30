@@ -34,8 +34,8 @@
 #' Theta <- 0.39
 #'
 #' Data <- BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
-#' head(assay(Data))
-#' dim(assay(Data))
+#' head(counts(Data))
+#' dim(counts(Data))
 #' metadata(Data)$SpikeInput
 #' isSpike(Data)
 #'
@@ -45,6 +45,7 @@
 #' 
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #' 
+#' @export
 BASiCS_Sim <- function(Mu, Mu_spikes, Delta, Phi, S, Theta) 
 {
   # Number of cells

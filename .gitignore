@@ -7,3 +7,5 @@ src/*.dll
 inst/doc
 ..Rcheck
 */.DS_Store
+tests/testthat/*.Rds
+
