@@ -72,6 +72,7 @@
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_DetectHVG_LVG
+#' @export
 BASiCS_DetectHVG <- function(Chain, 
                              VarThreshold, 
                              ProbThreshold = NULL, 
@@ -156,6 +157,7 @@ BASiCS_DetectHVG <- function(Chain,
 #' @name BASiCS_DetectLVG
 #' @aliases BASiCS_DetectLVG BASiCS_DetectHVG_LVG
 #' @rdname BASiCS_DetectHVG_LVG
+#' @export
 BASiCS_DetectLVG <- function(Chain, 
                              VarThreshold, 
                              ProbThreshold = NULL, 

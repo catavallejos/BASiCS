@@ -30,6 +30,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
+#' @export
 BASiCS_LoadChain <- function(RunName, 
                              StoreDir = getwd(), 
                              StoreUpdatedChain = FALSE) 

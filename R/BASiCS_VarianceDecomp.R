@@ -48,6 +48,7 @@
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
 #'
 #' @rdname BASiCS_VarianceDecomp
+#' @export
 BASiCS_VarianceDecomp <- function(Chain, 
                                   OrderVariable = "BioVarGlobal", 
                                   Plot = TRUE, ...) 

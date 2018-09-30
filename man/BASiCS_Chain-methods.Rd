@@ -4,7 +4,6 @@
 \name{BASiCS_Chain-methods}
 \alias{BASiCS_Chain-methods}
 \alias{show,BASiCS_Chain-method}
-\alias{BASiCS_Chain-methods}
 \alias{updateObject,BASiCS_Chain-method}
 \title{'show' method for BASiCS_Chain objects}
 \usage{
