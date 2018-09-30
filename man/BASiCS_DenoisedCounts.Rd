@@ -24,7 +24,7 @@ cell-specific technical variation. The latter includes global-scaling
 normalisation and therefore no further normalisation is required.
 }
 \details{
-See vignette \code{browseVignettes("roxygen2")}
+See vignette \code{browseVignettes("BASiCS")}
 }
 \examples{
 
@@ -32,7 +32,7 @@ Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
 ## The N and Burn parameters used here are optimised for speed
 ## and should not be used in regular use.
 ## For more useful parameters,
-## see the vignette (\\code{browseVignettes("roxygen2")})
+## see the vignette (\\code{browseVignettes("BASiCS")})
 Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                      Regression = FALSE, PrintProgress = FALSE)
 
