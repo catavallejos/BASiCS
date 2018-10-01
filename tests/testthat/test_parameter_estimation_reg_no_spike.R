@@ -35,42 +35,42 @@ test_that("Estimates match the given seed (no-spikes+regression)",
   expect_that(all.equal(names(PostSummary@parameters), ParamNames1), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(14.366, 9.307,  6.169, 9.981, 26.731)
+  Mu <- c(13.298, 9.793,  5.545, 10.147, 27.744)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   expect_that(all.equal(MuObs, Mu), is_true())
             
-  Delta <- c(1.342, 1.197, 1.899, 1.580, 0.461)
+  Delta <- c(1.413, 1.093, 1.866, 1.467, 0.461)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
                                                    "delta")[1:5,1],3))
   expect_that(all.equal(DeltaObs, Delta), is_true())
             
-  S <- c(0.931, 1.483, 0.225, 0.750, 1.592)
+  S <- c(0.919, 1.381, 0.273, 0.758, 1.594)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
   
-  Theta <- c(0.083, 0.362)
+  Theta <- c(0.267, 0.207)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   expect_that(all.equal(ThetaObs, Theta), is_true())
   
-  Beta <- c(0.445, -0.386,  0.369,  0.105,  0.348)
+  Beta <- c(0.223, -0.376,  0.493,  0.451,  0.216)
   BetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "beta")[1:5,1],3))
   expect_that(all.equal(BetaObs, Beta), is_true())
   
-  Sigma2 <- 0.343
+  Sigma2 <- 0.311
   Sigma2Obs <- round(displaySummaryBASiCS(PostSummary, "sigma2")[1],3)
   expect_that(all.equal(Sigma2Obs, Sigma2), is_true())
   
   # Obtaining denoised counts     
   DC <- BASiCS_DenoisedCounts(Data, Chain)
   # Checks for an arbitrary set of genes / cells
-  DCcheck0 <- c(3.313,  1.104,  0.000,  6.627, 7.731)
+  DCcheck0 <- c(3.390,  1.130,  0.000,  6.781, 7.911)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   expect_that(all.equal(DCcheck, DCcheck0), is_true())
   
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
   # Checks for an arbitrary set of genes / cells
-  DRcheck0 <- c(4.243,  2.980, 9.177,  1.371,  3.810)
+  DRcheck0 <- c(3.993,  3.061, 10.078,  1.228,  3.657)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   expect_that(all.equal(DRcheck, DRcheck0), is_true())
 })

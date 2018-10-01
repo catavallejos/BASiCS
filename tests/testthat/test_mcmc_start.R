@@ -9,15 +9,15 @@ test_that("Generated starting values do not match given seed (spikes case)", {
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
 
-  Check0 <- c(11.566, 10.377,  6.010,  8.245, 25.929)
+  Check0 <- c(11.197, 9.506,  5.707,  8.421, 25.548)
   Check <- as.vector(round(Start$mu0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(1.769, 2.282, 2.876, 2.243, 0.858)
+  Check0 <- c(1.482, 1.814, 3.042, 2.390, 0.805)
   Check <- as.vector(round(Start$delta0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(1.109, 1.102, 1.202, 0.758, 0.651)
+  Check0 <- c(1.289, 1.324, 1.275, 0.936, 0.909)
   Check <- as.vector(round(Start$phi0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
@@ -63,11 +63,11 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
   
-  Check0 <- c(11.945, 9.542,  5.265, 10.529, 32.230)
+  Check0 <- c(12.099, 9.693,  5.303, 10.449, 31.918)
   Check <- as.vector(round(Start$mu0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(1.231, 1.015, 1.711, 1.547, 0.571)
+  Check0 <- c(1.517, 1.056, 1.711, 1.570, 0.699)
   Check <- as.vector(round(Start$delta0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
@@ -75,11 +75,11 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   Check <- Start$phi0
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(0.978, 1.479, 0.152, 0.436, 2.060)
+  Check0 <- c(0.789, 1.365, 0.213, 0.536, 1.638)
   Check <- as.vector(round(Start$s0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(0.978, 1.479, 0.152, 0.436, 2.060)
+  Check0 <- c(0.789, 1.365, 0.213, 0.536, 1.638)
   Check <- as.vector(round(Start$nu0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
@@ -99,7 +99,7 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   Check <- round(Start$ls.phi0, 3)
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(-10.000, -9.701)
+  Check0 <- c(-10, -10)
   Check <- as.vector(round(Start$ls.nu0[1:2], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
