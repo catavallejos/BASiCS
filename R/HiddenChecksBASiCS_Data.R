@@ -13,19 +13,24 @@ HiddenChecksBASiCS_Data <- function(Counts,
   if (sum(Counts%%1) > 0) 
     errors <- c(errors, "Invalid 'Counts' (must be positive integers)")
   
-  if (!(is.logical(Tech))) 
+  if (!(is.null(Tech)) & !(is.logical(Tech))) 
     errors <- c(errors, "Invalid value for 'Tech'")
   
-  if (!(is.numeric(SpikeInput) & all(SpikeInput > 0) & 
+  if (!(is.null(SpikeInput)) & !(is.numeric(SpikeInput) & all(SpikeInput > 0) & 
         sum(!is.finite(SpikeInput)) == 0)) 
     errors <- c(errors, "Invalid value for 'SpikeInput'.")
   
   q <- nrow(Counts)
-  q.bio <- q - length(SpikeInput)
+  if(!is.null(SpikeInput)){
+    q.bio <- q - length(SpikeInput)
+  }
+  else{
+    q.bio <- q
+  }
   n <- ncol(Counts)
   
   # Checks valid for datasets with spikes only
-  if (length(SpikeInput) > 1) 
+  if (!is.null(SpikeInput)) 
   {
     if (!(length(Tech) == q & sum(!Tech) == q.bio)) 
       errors <- c(errors, "Argument's dimensions are not compatible.")
@@ -61,7 +66,7 @@ HiddenChecksBASiCS_Data <- function(Counts,
   }
   
   # Checks valid for any data
-  if (length(Tech) != q) 
+  if (!is.null(Tech) & length(Tech) != q) 
     errors <- c(errors, "Argument's dimensions are not compatible.")
   
   if (length(GeneNames) != q) 
@@ -72,7 +77,7 @@ HiddenChecksBASiCS_Data <- function(Counts,
             "If comparing 2 groups, use `PriorDelta = 'log-normal' in BASiCS_MCMC.\n",
             "If not, please remove those genes.")
   
-  if (length(BatchInfo) != n) 
+  if (!is.null(BatchInfo) & length(BatchInfo) != n) 
     errors <- c(errors, "BatchInfo slot is not compatible with the number of 
                 cells contained in Counts slot.")
   

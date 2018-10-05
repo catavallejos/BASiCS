@@ -1,4 +1,5 @@
-HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n, Regression)
+HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, 
+                                        n, Regression, WithSpikes)
 {
 
   if (!("PriorDelta" %in% names(Args)) & Regression == FALSE) {
@@ -19,7 +20,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, n, Regression)
   # Whether spike-ins are in use
   WithSpikes <- ifelse("WithSpikes" %in% names(Args), Args$WithSpikes, TRUE)
   # Set WithSpikes = FALSE as default when data does not have spikes
-  if(sum(isSpike(Data)) == 0)
+  if(is.null(isSpike(Data)))
   {
     WithSpikes <- FALSE
     message("Data does not contain spike-ins. 'WithSpikes' set as FALSE.")
