@@ -8,7 +8,7 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
   
   # If SpikeInput slot is missing and WithSpikes == TRUE
   if(!is.null(isSpikes(Data)) & WithSpikes & 
-     !("SpikeInput" %in% names(metadata(Data))))
+     is.null(metadata(Data)$SpikeInput))
     stop("'Data' does not contain the 'SpikeInput' slot. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
@@ -20,7 +20,7 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
   # If BatchInfo slot is missing and WithSpikes == FALSE
-  if(!WithSpikes & !("BatchInfo" %in% names(colData(Data))))
+  if(!WithSpikes & is.null(colData(Data)$BatchInfo))
     stop("'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 
          "Please assign the batch information to: 'colData(Data)$BatchInfo = BatchInfo'. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")

@@ -217,9 +217,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   if(!is.null(isSpike(Data))){
     q <- nrow(Data)
     q.bio <- sum(!SingleCellExperiment::isSpike(Data))
+    spikes <- SingleCellExperiment::isSpike(Data)
   }
   else{
     q.bio <- q <- nrow(Data)
+    spikes <- rep(FALSE, q)
   }
   
   n <- dim(counts(Data))[2]
@@ -235,27 +237,33 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   sum.bycell.all <- matrixStats::rowSums2(counts(Data))
   sum.bygene.all <- matrixStats::colSums2(counts(Data))
   sum.bycell.bio <- 
-    matrixStats::rowSums2(counts(Data)[!SingleCellExperiment::isSpike(Data), ])
+    matrixStats::rowSums2(counts(Data)[!spikes, ])
   sum.bygene.bio <- 
-    matrixStats::colSums2(counts(Data)[!SingleCellExperiment::isSpike(Data), ])
+    matrixStats::colSums2(counts(Data)[!spikes, ])
     
   # Optional arguments 
   Args <- list(...)
   # Assignment of default values
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n, Regression)
-  AR <- ArgsDef$AR; StopAdapt <- ArgsDef$StopAdapt 
-  StoreChains <- ArgsDef$StoreChains; StoreAdapt <- ArgsDef$StoreAdapt
-  StoreDir <- ArgsDef$StoreDir; RunName <- ArgsDef$RunName;
-  PrintProgress <- ArgsDef$PrintProgress; PriorParam <- ArgsDef$PriorParam
-  PriorDeltaNum <- ArgsDef$PriorDeltaNum; PriorDelta <- ArgsDef$PriorDelta
-  WithSpikes <- ArgsDef$WithSpikes
-  k <- ArgsDef$k; variance <- ArgsDef$variance; Start <- ArgsDef$Start 
+  AR <- ArgsDef$AR
+  StopAdapt <- ArgsDef$StopAdapt 
+  StoreChains <- ArgsDef$StoreChains
+  StoreAdapt <- ArgsDef$StoreAdapt
+  StoreDir <- ArgsDef$StoreDir
+  RunName <- ArgsDef$RunName
+  PrintProgress <- ArgsDef$PrintProgress
+  PriorParam <- ArgsDef$PriorParam
+  PriorDeltaNum <- ArgsDef$PriorDeltaNum
+  PriorDelta <- ArgsDef$PriorDelta
+  k <- ArgsDef$k
+  variance <- ArgsDef$variance
+  Start <- ArgsDef$Start 
   StochasticRef <- ArgsDef$StochasticRef
   ConstrainType <- ArgsDef$ConstrainType
   ConstrainProp <- ArgsDef$ConstrainProp
 
   # Starting values for MCMC chains
-  mu0 <- as.vector(Start$mu0)[!SingleCellExperiment::isSpike(Data)]
+  mu0 <- as.vector(Start$mu0)[!spikes]
   delta0 <- as.vector(Start$delta0)
   phi0 <- as.vector(Start$phi0)
   s0 <- as.vector(Start$s0)
@@ -273,7 +281,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   
   # Starting values for Regression
   if(Regression == TRUE) {
-      beta0 <- Start$beta0; sigma20 <- Start$sigma20; lambda0 <- Start$lambda0
+      beta0 <- Start$beta0
+      sigma20 <- Start$sigma20
+      lambda0 <- Start$lambda0
   }
   
   # Parameters associated to the presence of batches
@@ -291,7 +301,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   if(WithSpikes == FALSE)
   {
     NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
-      as.matrix(counts(Data))[!SingleCellExperiment::isSpike(Data),], 
+      as.matrix(counts(Data))[!spikes,], 
       ConstrainType, 
       StochasticRef, q.bio, mu0, PriorDelta, ConstrainProp)
     ConstrainGene <- NoSpikesParam$ConstrainGene
@@ -304,14 +314,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   # If spikes are available 
   if (WithSpikes == TRUE) {
     
-    if(length(metadata(Data)$SpikeInput) <= 1) 
-      stop("`Data` does not contain spike-in genes information.")
-    
     # If regression case is chosen
     if(Regression == TRUE) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn, 
-                as.matrix(counts(Data))[!SingleCellExperiment::isSpike(Data),], 
+                as.matrix(counts(Data))[!spikes,], 
                 BatchDesign, 
                 SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$p.phi, PriorParam$a.s, 
@@ -325,14 +332,14 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- 
-        matrixStats::rowSums2(ifelse(counts(Data)[!SingleCellExperiment::isSpike(Data),] > 0, 
+        matrixStats::rowSums2(ifelse(counts(Data)[!spikes,] > 0, 
                                      1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     } 
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn, 
-                as.matrix(counts(Data))[!SingleCellExperiment::isSpike(Data),], 
+                as.matrix(counts(Data))[!spikes,], 
                 BatchDesign, 
                 SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
@@ -354,7 +361,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
     if(Regression == TRUE) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(N, Thin, Burn, 
-                as.matrix(counts(Data))[!SingleCellExperiment::isSpike(Data),], 
+                as.matrix(counts(Data))[!spikes),], 
                 BatchDesign,  
                 mu0, delta0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.s, PriorParam$b.s, 
@@ -377,7 +384,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
       message("Running no spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
         N, Thin, Burn, 
-        as.matrix(counts(Data))[!SingleCellExperiment::isSpike(Data),], 
+        as.matrix(counts(Data))[!spikes,], 
         BatchDesign, 
         mu0, delta0, s0, nu0, rep(theta0, nBatch), 
         PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta, 
@@ -394,18 +401,18 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   
   # Format column names of MCMC chains
   colnames(Chain$mu) <- 
-    rownames(counts(Data))[!SingleCellExperiment::isSpike(Data)]
+    rownames(counts(Data))[!spikes]
   colnames(Chain$delta) <- 
-    rownames(counts(Data))[!SingleCellExperiment::isSpike(Data)]
+    rownames(counts(Data))[!spikes]
   if(Regression == TRUE) { 
     colnames(Chain$epsilon) <- colnames(Chain$mu) 
     Chain$lambda <- NULL # Remove to reduce storage
   }
-  CellLabels <- paste0(colnames(counts(Data)), "_Batch", colData(Data)$BatchInfo)
+  CellLabels <- paste0(colnames(counts(Data)), "_Batch", BatchInfo)
   colnames(Chain$s) <- CellLabels
   if(WithSpikes == TRUE) colnames(Chain$phi) <- CellLabels 
   colnames(Chain$nu) <- CellLabels
-  colnames(Chain$theta) <- paste0("Batch", unique(colData(Data)$BatchInfo))
+  colnames(Chain$theta) <- paste0("Batch", unique(BatchInfo))
     
   message("-------------------------------------------------------------\n",
           "MCMC running time \n",
