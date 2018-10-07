@@ -7,13 +7,13 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
   # not created using the `newBASiCS_Data` function
   
   # If SpikeInput slot is missing and WithSpikes == TRUE
-  if(!is.null(isSpikes(Data)) & WithSpikes & 
+  if(!is.null(isSpike(Data)) & WithSpikes & 
      is.null(metadata(Data)$SpikeInput))
     stop("'Data' does not contain the 'SpikeInput' slot. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
   # If isSpike slot is missing and WithSpikes == TRUE
-  if(is.null(isSpikes(Data)) & WithSpikes)
+  if(is.null(isSpike(Data)) & WithSpikes)
     stop("'Data' does not contain a logical vector to indicate \n", 
          "technical spike-in genes. Please indicate in 'isSpike(Data)' which \n",
          "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
@@ -25,13 +25,14 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
          "Please assign the batch information to: 'colData(Data)$BatchInfo = BatchInfo'. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
-  
+  # Checking how counts are stored
   if(!("counts" %in% assayNames(Data)))
     stop("'Data' does not contain a 'counts' slot. \n",
          "Please make sure to include the raw data in the \n", "
          SingleCellExperiment object under the name 'counts' \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
+  # Further checks on input 
   
   errors <- HiddenChecksBASiCS_Data(counts(Data), isSpike(Data), 
                                     metadata(Data)$SpikeInput, 

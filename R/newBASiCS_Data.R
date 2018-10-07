@@ -22,7 +22,7 @@
 #' Default value: \code{BatchInfo = NULL}. 
 #' @param SpikeType Character to indicate what type of spike-ins are in use.
 #' For more details see argument `type` in 
-#' `help(isSpike, package = "SingleCellExperiment")`. Default value: 
+#' `help(ke, package = "SingleCellExperiment")`. Default value: 
 #' \code{SpikeType = "ERCC"}. 
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
@@ -85,7 +85,7 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   if (!is.null(SpikeInfo)) 
   {
     if(sum(Tech) == 0)
-      stop("'SpikeInfo' was provided by no genes were marked as technical spikes \n",
+      stop("'SpikeInfo' was provided but no genes were marked as technical spikes \n",
            "Revise the input value provided for 'Tech'")
     # Extracting spike-in input molecules in the correct order
     if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) 
