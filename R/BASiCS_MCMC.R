@@ -361,7 +361,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
     if(Regression == TRUE) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(N, Thin, Burn, 
-                as.matrix(counts(Data))[!spikes),], 
+                as.matrix(counts(Data))[!spikes,], 
                 BatchDesign,  
                 mu0, delta0, s0, nu0, rep(theta0, nBatch), 
                 PriorParam$s2.mu, PriorParam$a.s, PriorParam$b.s, 
@@ -377,7 +377,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 ConstrainType, as.numeric(StochasticRef)))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(counts(Data)[!isSpike(Data),] > 0, 1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(counts(Data)[!spikes,] > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     } 
     else {
