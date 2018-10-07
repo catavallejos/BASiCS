@@ -17,15 +17,6 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn,
     k <- NULL; variance <- NULL; eta <- NULL
   }
   
-  # Whether spike-ins are in use
-  WithSpikes <- ifelse("WithSpikes" %in% names(Args), Args$WithSpikes, TRUE)
-  # Set WithSpikes = FALSE as default when data does not have spikes
-  if(is.null(isSpike(Data)))
-  {
-    WithSpikes <- FALSE
-    message("Data does not contain spike-ins. 'WithSpikes' set as FALSE.")
-  }
-  
   # Whether a sthocastic reference is used (no spikes case only)
   if(WithSpikes == FALSE)
   {
