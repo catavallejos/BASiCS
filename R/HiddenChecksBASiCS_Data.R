@@ -2,7 +2,8 @@ HiddenChecksBASiCS_Data <- function(Counts,
                                     Tech, 
                                     SpikeInput, 
                                     GeneNames,
-                                    BatchInfo)
+                                    BatchInfo,
+                                    WithSpikes)
 {
   # Checks for creating the SingleCellExperiment class
   errors <- character()
@@ -21,7 +22,7 @@ HiddenChecksBASiCS_Data <- function(Counts,
     errors <- c(errors, "Invalid value for 'SpikeInput'.")
   
   q <- nrow(Counts)
-  if(!is.null(SpikeInput)){
+  if(WithSpikes){
     q.bio <- q - length(SpikeInput)
   }
   else{
@@ -30,20 +31,18 @@ HiddenChecksBASiCS_Data <- function(Counts,
   n <- ncol(Counts)
   
   # Checks valid for datasets with spikes only
-  if (!is.null(SpikeInput)) 
+  if (WithSpikes) 
   {
     if (!(length(Tech) == q & sum(!Tech) == q.bio)) 
-      errors <- c(errors, "Argument's dimensions are not compatible.")
+      errors <- c(errors, "Spike-in assignment is not compatible with data.")
     
     if (sum(matrixStats::colSums2(Counts[Tech, ]) == 0) > 0) 
       errors <- c(errors, "Some cells have zero reads mapping back to the 
-                  spike-in genes. Please remove them before creating the 
-                  SingleCellExperiment object.")
+                  spike-in genes. Please remove these before running the MCMC.")
     
     if (sum(matrixStats::colSums2(Counts[!Tech, ]) == 0) > 0) 
       errors <- c(errors, "Some cells have zero reads mapping back to the 
-                  intrinsic genes. Please remove them before creating the 
-                  SingleCellExperiment object.")
+                  intrinsic genes. Please remove them before running the MCMC.")
     
     if (!(sum(Tech[seq_len(q.bio)]) == 0 & 
           sum(Tech[seq(q.bio + 1, q)]) == q - q.bio)) 
@@ -56,8 +55,7 @@ HiddenChecksBASiCS_Data <- function(Counts,
     
     if (sum(matrixStats::colSums2(Counts) == 0) > 0) 
       errors <- c(errors, "Some cells have zero reads mapping back to the 
-                  intrinsic genes. Please remove them before creating the 
-                  SingleCellExperiment object.")
+                  intrinsic genes. Please remove them before running the MCMC.")
     
     if (length(unique(BatchInfo)) == 1) 
       errors <- c(errors, "If spike-in genes are not available, BASiCS 

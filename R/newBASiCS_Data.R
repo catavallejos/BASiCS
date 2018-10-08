@@ -94,11 +94,13 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
       stop("'SpikeInfo' includes spikes that are not in 'Counts'")
     matching <- match(GeneName[Tech], SpikeInfo[, 1])
     SpikeInput <- SpikeInfo[matching, 2]
+    WithSpikes <- TRUE
   } 
   else 
   { 
     SpikeInput <- 1; Tech <- rep(FALSE, nrow(Counts)) 
     message("The data does not contain spike-in genes")
+    WithSpikes <- FALSE
   }
     
   # Re-ordering genes
@@ -107,7 +109,7 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     
   # Checks to assess if the data contains the required information
   errors <- HiddenChecksBASiCS_Data(Counts, Tech, SpikeInput, 
-                                    GeneName, BatchInfo)
+                                    GeneName, BatchInfo, WithSpikes)
   if (length(errors) > 0) stop(errors) 
     
   # Create a SingleCellExperiment data object
