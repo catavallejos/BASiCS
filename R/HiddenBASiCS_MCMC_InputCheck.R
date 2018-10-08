@@ -37,7 +37,7 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
   errors <- HiddenChecksBASiCS_Data(counts(Data), isSpike(Data), 
                                     metadata(Data)$SpikeInput, 
                                     rownames(counts(Data)), 
-                                    colData(Data)$BatchInfo)
+                                    colData(Data)$BatchInfo, WithSpikes)
   if (length(errors) > 0) stop(errors) 
   
   if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) 

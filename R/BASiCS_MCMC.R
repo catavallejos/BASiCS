@@ -244,7 +244,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   # Optional arguments 
   Args <- list(...)
   # Assignment of default values
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n, Regression)
+  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n, 
+                                         Regression, WithSpikes = WithSpikes)
   AR <- ArgsDef$AR
   StopAdapt <- ArgsDef$StopAdapt 
   StoreChains <- ArgsDef$StoreChains
