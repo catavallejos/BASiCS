@@ -19,6 +19,13 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
          "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
+  # If isSpike slot does not contain spikes and WithSpikes == TRUE
+  if(sum(isSpike(Data)) == 0 & WithSpikes)
+    stop("'isSpike(Data)' does not contain TRUE values, meaning the sce object \n",
+         "does not contain spikes. Please indicate in 'isSpike(Data)' which \n",
+         "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
+         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
+  
   # If BatchInfo slot is missing and WithSpikes == FALSE
   if(!WithSpikes & is.null(colData(Data)$BatchInfo))
     stop("'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 

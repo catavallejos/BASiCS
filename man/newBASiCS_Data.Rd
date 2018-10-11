@@ -30,7 +30,7 @@ Default value: \code{BatchInfo = NULL}.}
 
 \item{SpikeType}{Character to indicate what type of spike-ins are in use.
 For more details see argument `type` in 
-`help(isSpike, package = "SingleCellExperiment")`. Default value: 
+`help(ke, package = "SingleCellExperiment")`. Default value: 
 \code{SpikeType = "ERCC"}.}
 }
 \value{
