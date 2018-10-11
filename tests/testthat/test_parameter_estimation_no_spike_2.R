@@ -1,5 +1,5 @@
 context("Parameter estimation (no-spikes), 
-        original data has have spikes\n")
+        original data has spikes\n")
 
 test_that("Estimates match (no-spikes)", 
 {
@@ -17,7 +17,7 @@ test_that("Estimates match (no-spikes)",
   PostSummary1 <- Summary(Chain1)
   set.seed(16)
   Chain2 <- BASiCS_MCMC(Data2, N = 1000, Thin = 10, Burn = 500,
-                        Regression = FALSE, 
+                        Regression = FALSE, WithSpikes = FALSE, 
                         PrintProgress = FALSE)
   PostSummary2 <- Summary(Chain2)
             

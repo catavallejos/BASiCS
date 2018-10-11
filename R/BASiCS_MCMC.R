@@ -15,8 +15,8 @@
 #' formulation for mean and over-dispersion parameters to estimate a measure of
 #' residual over-dispersion is not confounded by mean expression. Recommended
 #' setting is \code{Regression = TRUE}.
-#' @param WithSpike  If \code{WithSpike = TRUE}, BASiCS will use reads from
-#' added spike-ins to estimate technical variability. If \code{WithSpikes = FALSE},
+#' @param WithSpikes  If \code{WithSpikes = TRUE}, BASiCS will use reads from
+#' added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE},
 #' BASiCS depends on replicated experiments (batches) to estimate 
 #' technical variability. In this case, please supply the BatchInfo vector 
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
@@ -115,14 +115,15 @@
 #' # Only a short run of the MCMC algorithm for illustration purposes
 #' # Longer runs migth be required to reach convergence
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = FALSE,
-#'                      PrintProgress = FALSE)
+#'                      PrintProgress = FALSE, WithSpikes = TRUE)
 #'                      
 #' # To run the regression version of BASiCS, use:
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
-#'                      PrintProgress = FALSE)
+#'                      PrintProgress = FALSE, WithSpikes = TRUE)
 #'
-#' # To run the non-spike version use:
-#' Data <- makeExampleBASiCS_Data()
+#' # To run the non-spike version BASiCS requires the data to contain at least
+#' # 2 batches:
+#' Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
 #'                      PrintProgress = FALSE, WithSpikes = FALSE)
 #'                      

@@ -4,11 +4,12 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, Regression, ...)
+BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object. 
-This MUST be formatted to include the spike-ins information (see vignette).}
+If \code{WithSpikes = TRUE}, this MUST be formatted to include 
+the spike-ins information (see vignette).}
 
 \item{N}{Total number of iterations for the MCMC sampler. 
 Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
@@ -21,7 +22,13 @@ Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
 \item{Regression}{If \code{Regression = TRUE}, BASiCS exploits a joint prior 
 formulation for mean and over-dispersion parameters to estimate a measure of
 residual over-dispersion is not confounded by mean expression. Recommended
-setting is \code{Regression = TRUE}}
+setting is \code{Regression = TRUE}.}
+
+\item{WithSpikes}{If \code{WithSpikes = TRUE}, BASiCS will use reads from
+added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE},
+BASiCS depends on replicated experiments (batches) to estimate 
+technical variability. In this case, please supply the BatchInfo vector 
+in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
 \item{...}{Optional parameters.
 \describe{
@@ -72,8 +79,6 @@ All elements must be positive real numbers.
       Default: \code{eta = 5}.}.
 
 }}
-\item{\code{WithSpikes}}{If \code{WithSpikes = FALSE}, the no-spikes 
-      model will be fitted. Default: \code{WithSpikes = TRUE}. }
 \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies 
       the number of regression Gaussian Radial Basis Functions (GRBF) used 
       within the correlated prior adopted for gene-specific over-dispersion 
@@ -125,12 +130,18 @@ Data <- makeExampleBASiCS_Data()
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = FALSE,
-                     PrintProgress = FALSE)
+                     PrintProgress = FALSE, WithSpikes = TRUE)
                      
 # To run the regression version of BASiCS, use:
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
-                     PrintProgress = FALSE)
+                     PrintProgress = FALSE, WithSpikes = TRUE)
 
+# To run the non-spike version BASiCS requires the data to contain at least
+# 2 batches:
+Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
+Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
+                     PrintProgress = FALSE, WithSpikes = FALSE)
+                     
 # For illustration purposes we load a built-in 'BASiCS_Chain' object 
 # (obtained using the 'BASiCS_MCMC' function)
 data(ChainSC)
