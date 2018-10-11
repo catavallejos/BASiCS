@@ -63,11 +63,11 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
   
-  Check0 <- c(11.945, 9.542,  5.265, 10.529, 32.230)
+  Check0 <- c(14.378, 11.894,  6.418, 10.961, 36.917)
   Check <- as.vector(round(Start$mu0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(1.231, 1.015, 1.711, 1.547, 0.571)
+  Check0 <- c(1.204, 1.281, 1.958, 1.448, 0.654)
   Check <- as.vector(round(Start$delta0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
@@ -75,11 +75,11 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   Check <- Start$phi0
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(0.978, 1.479, 0.152, 0.436, 2.060)
+  Check0 <- c(0.943, 1.295, 0.181, 0.410, 1.781)
   Check <- as.vector(round(Start$s0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(0.978, 1.479, 0.152, 0.436, 2.060)
+  Check0 <- c(0.943, 1.295, 0.181, 0.410, 1.781)
   Check <- as.vector(round(Start$nu0[1:5], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
@@ -99,7 +99,7 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   Check <- round(Start$ls.phi0, 3)
   expect_that(all.equal(Check0, Check), is_true())
   
-  Check0 <- c(-10.000, -9.701)
+  Check0 <- c(-10, -10)
   Check <- as.vector(round(Start$ls.nu0[1:2], 3))
   expect_that(all.equal(Check0, Check), is_true())
   
