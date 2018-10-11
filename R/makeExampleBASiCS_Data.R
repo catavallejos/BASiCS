@@ -10,7 +10,8 @@
 #' @param WithBatch If \code{TRUE}, 2 batches are generated (each of them 
 #' containing 15 cells). Default: \code{WithBatch = FALSE}.
 #' @param WithSpikes If \code{TRUE}, the simulated dataset contains 20 spike-in 
-#' genes. Default: \code{WithSpikes} \code{= TRUE}.
+#' genes. If \code{WithSpikes = FALSE}, \code{WithBatch} is automatically set
+#' to \code{TRUE}. Default: \code{WithSpikes = TRUE}
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}, with
 #' synthetic data simulated from the model implemented in BASiCS.
@@ -71,7 +72,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     # 2 batches, 10 cells each
     Theta1 <- 0.50
     Theta2 <- 0.75
-    Theta <- ifelse(seq_len(n) <= 10, Theta1, Theta2)
+    Theta <- ifelse(seq_len(n) <= 15, Theta1, Theta2)
   }
     
   if (WithSpikes) 
@@ -139,7 +140,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     # Matrix where gene-cell specific simulated random effects will be stored
     Rho <- matrix(1, ncol = n, nrow = q.bio)
     # Simulated cell-specific random effects
-    Phi[seq_len(10)] <- 2 * Phi[seq_len(10)]
+    Phi[seq_len(15)] <- 2 * Phi[seq_len(15)]
     if (all(Theta > 0)) 
     {
       set.seed(1000)
