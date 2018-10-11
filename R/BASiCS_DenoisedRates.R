@@ -46,10 +46,10 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
   q.bio <- ncol(Chain@parameters$delta)
   n <- ncol(Chain@parameters$s)
 
-  CountsBio <- counts(Data)[!isSpike(Data),]
   if("phi" %in% names(Chain@parameters))
   {
     # Spikes case
+    CountsBio <- counts(Data)[!isSpike(Data),]
     Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
                                       Chain@parameters$mu, 
                                       t(1/Chain@parameters$delta),
@@ -59,6 +59,7 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
   else
   {
     # No spikes case
+    CountsBio <- counts(Data)
     Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
                                       Chain@parameters$mu, 
                                       t(1/Chain@parameters$delta),
@@ -70,7 +71,12 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
   if (Propensities) { out <- Rho } 
   else { out <- Rho * matrixStats::colMedians(Chain@parameters$mu) }
   
-  rownames(out) <- rownames(Data)[!SingleCellExperiment::isSpike(Data)]
+  if("phi" %in% names(Chain@parameters)){
+    rownames(out) <- rownames(Data)[!SingleCellExperiment::isSpike(Data)]
+  }
+  else{
+    rownames(out) <- rownames(Data)
+  }
   colnames(out) <- colnames(Data)
     
   return(out)
