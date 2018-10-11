@@ -35,8 +35,8 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
   # Checking how counts are stored
   if(!("counts" %in% assayNames(Data)))
     stop("'Data' does not contain a 'counts' slot. \n",
-         "Please make sure to include the raw data in the \n", "
-         SingleCellExperiment object under the name 'counts' \n",
+         "Please make sure to include the raw data in the \n", 
+         "SingleCellExperiment object under the name 'counts'. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
   # Further checks on input 

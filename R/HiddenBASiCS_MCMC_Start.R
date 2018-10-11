@@ -7,15 +7,24 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (!is(Data, "SingleCellExperiment")) 
     stop("'Data' is not a SingleCellExperiment class object.")
   
-  # Number of instrinsic genes
-  q <- length(isSpike(Data))
-  q.bio <- sum(!isSpike(Data))
   # Number of cells
   n <- dim(counts(Data))[2]
   
-  # Separating spike-ins from the rest of genes
-  CountsBio <- as.matrix(counts(Data)[!isSpike(Data), , drop = FALSE]) 
-  CountsTech <- as.matrix(counts(Data)[isSpike(Data), , drop = FALSE])
+  # Number of instrinsic genes
+  if(!is.null(isSpike(Data))){
+    q <- length(isSpike(Data))
+    q.bio <- sum(!isSpike(Data))
+    
+    # Separating spike-ins from the rest of genes
+    CountsBio <- as.matrix(counts(Data)[!isSpike(Data), , drop = FALSE]) 
+    CountsTech <- as.matrix(counts(Data)[isSpike(Data), , drop = FALSE])
+  }
+  else{
+    q.bio <- q <- nrow(Data)
+    
+    CountsBio <- as.matrix(counts(Data))
+  }
+
   
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
