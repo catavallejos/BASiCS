@@ -1006,3 +1006,9 @@ version 1.3.16: (2018-10-08)
 
 version 1.3.17: (2018-10-11)
 - New unit tests for different argument settings for the BASiCS_MCMC function
+
+version 1.3.18: (2018-10-15)
+- `BASiCS_D_TestDE` has been deprecated (replaced by `BASiCS_TestDE`)
+- `SingleCellExperiment::` added to all calls of `isSpike`
+- Extra input check in `BASiCS_MCMC` to avoid issues due to multiple types of
+spike-ins being present in the data. 

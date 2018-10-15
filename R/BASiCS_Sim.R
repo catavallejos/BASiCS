@@ -37,7 +37,7 @@
 #' head(counts(Data))
 #' dim(counts(Data))
 #' metadata(Data)$SpikeInput
-#' isSpike(Data)
+#' SingleCellExperiment::isSpike(Data)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}, Nils Eling
 #'

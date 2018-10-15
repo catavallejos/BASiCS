@@ -208,14 +208,15 @@
 #' 
 #' Eling et al (2018). Cell Systems 
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...) 
+BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, 
+                        WithSpikes = TRUE, ...) 
 {
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
   # If data contains spike-ins
-  if(!is.null(isSpike(Data))){
+  if(!is.null(SingleCellExperiment::isSpike(Data))){
     q <- nrow(Data)
     q.bio <- sum(!SingleCellExperiment::isSpike(Data))
     spikes <- SingleCellExperiment::isSpike(Data)
@@ -246,7 +247,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   Args <- list(...)
   # Assignment of default values
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n, 
-                                         Regression, WithSpikes = WithSpikes)
+                                         Regression, 
+                                         WithSpikes = WithSpikes)
   AR <- ArgsDef$AR
   StopAdapt <- ArgsDef$StopAdapt 
   StoreChains <- ArgsDef$StoreChains

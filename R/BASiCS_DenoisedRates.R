@@ -49,7 +49,7 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
   if("phi" %in% names(Chain@parameters))
   {
     # Spikes case
-    CountsBio <- counts(Data)[!isSpike(Data),]
+    CountsBio <- counts(Data)[!SingleCellExperiment::isSpike(Data),]
     Rho <- HiddenBASiCS_DenoisedRates(CountsBio, 
                                       Chain@parameters$mu, 
                                       t(1/Chain@parameters$delta),

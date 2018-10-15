@@ -47,9 +47,10 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
     if("phi" %in% names(Chain@parameters))
     {
       # Spikes case
+      Spikes <- SingleCellExperiment::isSpike(Data)
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
-      out1 <- t(t(counts(Data)[!isSpike(Data), ])/(Phi * Nu))
-      out2 <- t(t(counts(Data)[isSpike(Data), ])/Nu) 
+      out1 <- t(t(counts(Data)[!Spikes, ])/(Phi * Nu))
+      out2 <- t(t(counts(Data)[Spikes, ])/Nu) 
       out <- rbind(out1, out2) 
     }
     else
