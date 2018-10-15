@@ -12,7 +12,8 @@ makeExampleBASiCS_Data(WithBatch = FALSE, WithSpikes = TRUE)
 containing 15 cells). Default: \code{WithBatch = FALSE}.}
 
 \item{WithSpikes}{If \code{TRUE}, the simulated dataset contains 20 spike-in 
-genes. Default: \code{WithSpikes} \code{= TRUE}.}
+genes. If \code{WithSpikes = FALSE}, \code{WithBatch} is automatically set
+to \code{TRUE}. Default: \code{WithSpikes = TRUE}}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}}, with

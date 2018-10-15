@@ -3,24 +3,32 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
 {
   if (!is(Data, "SingleCellExperiment")) 
     stop("'Data' is not a SingleCellExperiment class object.")
+  
   # The following checks are only relevant when the input data was
   # not created using the `newBASiCS_Data` function
   
+  # Check if `Data` contains more than one type of types
+  if( (length(SingleCellExperiment::spikeNames(Data)) > 1))
+    stop("'Data' contains more than one type of spike-ins but only one is allowed. \n",
+         "Please remove unwanted spike-in types using. See help(isSpike). ")
+    
   # If SpikeInput slot is missing and WithSpikes == TRUE
-  if(!is.null(isSpike(Data)) & WithSpikes & 
+  
+  Spikes <- SingleCellExperiment::isSpike(Data)
+  if(!is.null(Spikes) & WithSpikes & 
      is.null(metadata(Data)$SpikeInput))
     stop("'Data' does not contain the 'SpikeInput' slot. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
   # If isSpike slot is missing and WithSpikes == TRUE
-  if(is.null(isSpike(Data)) & WithSpikes)
+  if(is.null(Spikes) & WithSpikes)
     stop("'Data' does not contain a logical vector to indicate \n", 
          "technical spike-in genes. Please indicate in 'isSpike(Data)' which \n",
          "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation")
   
   # If isSpike slot does not contain spikes and WithSpikes == TRUE
-  if(sum(isSpike(Data)) == 0 & WithSpikes)
+  if(sum(Spikes) == 0 & WithSpikes)
     stop("'isSpike(Data)' does not contain TRUE values, meaning the sce object \n",
          "does not contain spikes. Please indicate in 'isSpike(Data)' which \n",
          "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
@@ -41,7 +49,7 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
   
   # Further checks on input 
   
-  errors <- HiddenChecksBASiCS_Data(counts(Data), isSpike(Data), 
+  errors <- HiddenChecksBASiCS_Data(counts(Data), Spikes, 
                                     metadata(Data)$SpikeInput, 
                                     rownames(counts(Data)), 
                                     colData(Data)$BatchInfo, WithSpikes)
