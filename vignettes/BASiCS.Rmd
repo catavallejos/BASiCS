@@ -678,7 +678,7 @@ Danilo Horta (Horta), Dmitriy Zhukov (dvzhukov),
 Jens Preu&szlig;ner (jenzopr), Joanna Dreux (Joannacodes), 
 Kevin Rue-Albrecht (kevinrue), Luke Zappia (lazappi), Nitesh Turaga (nturaga),
 Mike Morgan (MikeDMorgan), Muad Abd El Hay (Cumol), Simon Anders (s-andrews), 
-Yongchao Ge and Yuan Cao (yuancao90), among others. 
+Shian Su (Shians), Yongchao Ge and Yuan Cao (yuancao90), among others. 
 
 This work has been funded by the MRC Biostatistics Unit (MRC grant no. 
 MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), EMBL European 
