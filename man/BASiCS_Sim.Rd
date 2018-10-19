@@ -51,7 +51,7 @@ Data <- BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
 head(counts(Data))
 dim(counts(Data))
 metadata(Data)$SpikeInput
-isSpike(Data)
+SingleCellExperiment::isSpike(Data)
 
 }
 \references{

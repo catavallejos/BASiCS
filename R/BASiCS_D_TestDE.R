@@ -25,7 +25,7 @@
 #' @rdname BASiCS_D_TestDE
 #' @export
 BASiCS_D_TestDE <- function(...) {
-    message("This function is no longer in use. \n",
-            "It will be removed in future releases. \n",
-            "Please use `BASiCS_TestDE` instead.")
+  
+    .Deprecated("BASiCS_TestDE")
+
 }
