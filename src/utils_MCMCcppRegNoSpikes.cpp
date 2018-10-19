@@ -132,8 +132,8 @@ arma::mat deltaUpdateRegNoSpikes(
   // Loop to replace matrix operations, through genes and cells
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
-      log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
-      log_aux(i) -= std::lgamma(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
+      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j) + (1/delta1(i)) ) *  log( nu(j)*mu(i)+(1/delta1(i)) );
       log_aux(i) += ( Counts(i,j) + (1/delta0(i)) ) *  log( nu(j)*mu(i)+(1/delta0(i)) );
     } 
