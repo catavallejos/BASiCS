@@ -10,14 +10,16 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   # Number of cells
   n <- dim(counts(Data))[2]
   
+  Spikes <- SingleCellExperiment::isSpike(Data)
+  
   # Number of instrinsic genes
-  if(!is.null(isSpike(Data))){
-    q <- length(isSpike(Data))
-    q.bio <- sum(!isSpike(Data))
+  if(!is.null(Spikes)){
+    q <- length(Spikes)
+    q.bio <- sum(!Spikes)
     
     # Separating spike-ins from the rest of genes
-    CountsBio <- as.matrix(counts(Data)[!isSpike(Data), , drop = FALSE]) 
-    CountsTech <- as.matrix(counts(Data)[isSpike(Data), , drop = FALSE])
+    CountsBio <- as.matrix(counts(Data)[!Spikes, , drop = FALSE]) 
+    CountsTech <- as.matrix(counts(Data)[Spikes, , drop = FALSE])
   }
   else{
     q.bio <- q <- nrow(Data)
