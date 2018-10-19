@@ -98,7 +98,8 @@ double zeroin_gig(double ax,double bx,
   if( fabs(prev_step) >= tol_act	/* If prev_step was large enough*/
   && fabs(fa) > fabs(fb) )	/* and was in true direction,	*/
   {					/* Interpolatiom may be tried	*/
-  register double t1,cb,t2;
+  //register 
+  double t1,cb,t2;
     cb = c-b;
     if( a==c )			/* If we have only two distinct	*/
     {				/* points linear interpolation 	*/
@@ -374,7 +375,7 @@ arma::mat lgamma_cpp(arma::mat const& x)
   arma::mat output = x;
   for (unsigned int i=0; i<arma::size(x,0); i++) {
     for(unsigned int j=0; j<arma::size(x,1); j++) {
-      output(i,j) = R::lgammafn(x(i,j));
+      output(i,j) = std::lgamma(x(i,j));
     }
   }
   return output;
@@ -387,7 +388,7 @@ arma::vec lgamma_cpp_vec(arma::vec const& x)
 {
   arma::vec output = x;
   for (unsigned int i=0; i < output.size(); i++) {
-    output(i) = R::lgammafn(x(i));
+    output(i) = std::lgamma(x(i));
   }
   return output;
 }
