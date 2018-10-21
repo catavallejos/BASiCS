@@ -157,6 +157,19 @@ stable results.
 The input dataset for BASiCS must be stored as an `SingleCellExperiment` 
 object (see `r Biocpkg("SingleCellExperiment")` package). 
 
+The generation of the input `SingleCellExperiment` object requires a matrix of 
+raw counts `Counts` (columns: cells, rows: genes) after quality control 
+(e.g. removing low quality cells) and filtering of lowly expressed genes. If 
+spike-in molecules are contained in `Counts`, a logical vector `Tech` is 
+required to indicate which rows contain technical spike-in molecules and a 
+`data.frame` object `SpikeInfo` containing the names of the spike-in molecules 
+in the first column and the absolute number of molecules per well in the second 
+column. More details are provided in section \@ref(the-input-dataset). If 
+spike-ins are not available, a vector `BatchInfo` containing batch information
+is required. 
+
+### With spike-in genes
+
 The `newBASiCS_Data` function can be used to create the input data object based 
 on the following information:
 
@@ -204,6 +217,39 @@ DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo,
                               BatchInfo = rep(c(1,2), each = 20)) 
 ```
 
+To convert an existing `SingleCellExperiment` object (`Data`) into one that can 
+be used within BASiCS, meta-information must be stored in the object.
+
+* `isSpike(Data, "ERCC") <- Tech`: the logical vector indicating 
+biological/technical genes (see above) must be stored in the `int_metadata` 
+slot via the `isSpike` function.
+
+* `metadata(Data)`: the `SpikeInfo` object is stored in the 
+`metadata` slot of the `SingleCellExperiment` object: 
+`metadata(Data) <- list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. 
+
+* `colData(Data)$BatchInfo`: the `BatchInfo` object is stored in the 
+`colData` slot of the `SingleCellExperiment` object.
+
+Once the additional information is included, 
+the object can be used within BASiCS.
+
+### Without spike-in genes
+
+To run BASiCS without incorporating reads from technical spike-in genes, 
+and existing `SingleCellExperiment` object can be used. The only modification 
+to the existing object is to assign the `colData(Data)$BatchInfo` slot.
+
+```{r ExampleDataNoSpikes}
+set.seed(1)
+CountsNoSpikes <- matrix(rpois(50*40, 2), ncol = 40)
+rownames(CountsNoSpikes) <- paste0("Gene", 1:50)
+
+# With batch structure
+DataExampleNoSpikes <- SingleCellExperiment(assays = list(counts = CountsNoSpikes), 
+                      colData = data.frame(BatchInfo = rep(c(1,2), each = 20))) 
+```
+
 Note: BASiCS assumes that a pre-processing quality control step has been applied 
 to remove cells with poor quality data and/or lowly expressed genes that were
 undetected through sequencing. When analysing multiple groups of cells, the gene
@@ -213,31 +259,6 @@ genes are retained.
 The function `BASiCS_Filter` can be used to perform this task. For examples, 
 refer to `help(BASiCS_Filter)`. Moreover, the `r Biocpkg("scater")` package 
 provides enhanced functionality for the pre-processing of scRNA-seq datasets. 
-
-To convert an existing `SingleCellExperiment` object (`Data`) into one that can 
-be used within BASiCS, meta-information must be stored in the object.
-
-* `isSpike(Data, "ERCC") <- Tech`: the logical vector indicating 
-biological/technical genes (see above) must be stored in the `int_metadata` 
-slot via the `isSpike` function.
-
-* `metadata(Data)`: the `SpikeInfo` and `BatchInfo` objects are stored in the 
-`metadata` slot of the `SingleCellExperiment` object: 
-`metadata(Data) <- list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. 
-Once the additional information is included, 
-the object can be used within BASiCS.
-
-The generation of the input `SingleCellExperiment` object requires a matrix of 
-raw counts `Counts` (columns: cells, rows: genes) after quality control 
-(e.g. removing low quality cells) and filtering of lowly expressed genes. If 
-spike-in molecules are contained in `Counts`, a logical vector `Tech` is 
-required to indicate which rows contain technical spike-in molecules and a 
-`data.frame` object `SpikeInfo` containing the names of the spike-in molecules 
-in the first column and the absolute number of molecules per well in the second 
-column. More details are provided in section \@ref(the-input-dataset). If 
-spike-ins are not available, a vector `BatchInfo` containing batch information
-is required. 
-
 
 ## Analysis for a single group of cells
 
@@ -370,13 +391,18 @@ When technical spike-in genes are not available, BASiCS uses a horizontal
 integration strategy which borrows information across multiple technical 
 replicates [@eling2018correcting]. Therefore, `BASiCS_MCMC` will fail to run if a 
 single batch of samples is provided. **Note:** batch information must be 
-provided via the `BatchInfo` argument when using the `newBASiCS_Data` function. 
-Additionally, when creating the `BASiCS_Data` object, the `SpikeInfo` slot must 
-be set as `SpikeInfo = NULL`.
+provided via the `BatchInfo` argument when using the `newBASiCS_Data` function
+or `BatchInfo` must be stored as a slot in `colData(Data)` when using an 
+existing `SingleCellExperiment` object. 
 
 ```{r, fig.height = 8, fig.width = 8}
 DataNoSpikes <- newBASiCS_Data(Counts, Tech, SpikeInfo = NULL, 
                               BatchInfo = rep(c(1,2), each = 20))
+
+# Alternatively
+DataNoSpikes <- SingleCellExperiment(assays = list(counts = Counts), 
+                      colData = data.frame(BatchInfo = rep(c(1,2), each = 20))) 
+
 ChainNoSpikes <- BASiCS_MCMC(Data = DataNoSpikes, N = 1000, 
                              Thin = 10, Burn = 500, 
                              WithSpikes = FALSE,  Regression = TRUE,
@@ -509,7 +535,6 @@ parameters. For example
 ```{r SummaryExample}
 head(displaySummaryBASiCS(ChainSummary, Param = "mu"), n = 2)
 ```
-
 
 The following figures display posterior medians and the corresponding HPD 95% 
 intervals for gene-specific parameters $\mu_i$ (mean) and $\delta_i$ 
