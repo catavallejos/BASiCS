@@ -98,7 +98,8 @@ double zeroin_gig(double ax,double bx,
   if( fabs(prev_step) >= tol_act	/* If prev_step was large enough*/
   && fabs(fa) > fabs(fb) )	/* and was in true direction,	*/
   {					/* Interpolatiom may be tried	*/
-  register double t1,cb,t2;
+  //register 
+  double t1,cb,t2;
     cb = c-b;
     if( a==c )			/* If we have only two distinct	*/
     {				/* points linear interpolation 	*/
