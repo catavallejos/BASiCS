@@ -83,8 +83,8 @@ arma::mat deltaUpdate(
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
-      log_aux(i) += R::lgammafn(Counts(i,j) + (1/delta1(i)));
-      log_aux(i) -= R::lgammafn(Counts(i,j) + (1/delta0(i)));
+      log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
+      log_aux(i) -= std::lgamma(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
       log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
     }
