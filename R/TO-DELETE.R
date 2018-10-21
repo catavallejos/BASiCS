@@ -1,15 +1,17 @@
 
 library(mvtnorm)
 
+library(mvnfast)
+
 my.fun <- function(q) {
   x <- rep(0, q) 
-  x[seq_len(q-1)] <- rmvnorm(1, mean = rep(0, q-1), 
-                             sigma = diag(q-1) - 1/q)
+  x[seq_len(q-1)] <- rmvn(n = 1, mu = rep(0, q-1), 
+                          sigma = diag(q-1) - 1/q, ncores = 3)
   x[q] <- 0 * q - sum(x[seq_len(q-1)] ) 
   return(x)
 }
 
-nRep <- 100
+nRep <- 500
 
 q <- 5
 set.seed(q)
@@ -91,4 +93,34 @@ lines(c(var(A5[1,]), var(A10[1,]), var(A100[1,]), var(A1000[1,])),
       type = "b", col = "red")
 abline(h = 0, col = "blue")
 
-hist()
+par(mfrow = c(2,2))
+hist(apply(A5, 1, mean))
+abline(v = mean(A5[5,]), col = "red")
+hist(apply(A10, 1, mean))
+abline(v = mean(A10[10,]), col = "red")
+hist(apply(A100, 1, mean))
+abline(v = mean(A100[100,]), col = "red")
+hist(apply(A1000, 1, mean))
+abline(v = mean(A1000[1000,]), col = "red")
+
+par(mfrow = c(2,2))
+hist(apply(A5, 1, var))
+abline(v = var(A5[5,]), col = "red")
+hist(apply(A10, 1, var))
+abline(v = var(A10[10,]), col = "red")
+hist(apply(A100, 1, var))
+abline(v = var(A100[100,]), col = "red")
+hist(apply(A1000, 1, var))
+abline(v = var(A1000[1000,]), col = "red")
+
+plot(density(A1000[1,]), xlim = c(-0.1, 0.1))
+lines(density(A1000[10,]))
+lines(density(A1000[1000,]))
+
+library(corrplot)
+corrplot(var(t(A5)), is.corr = FALSE)
+corrplot(cor(t(A10)))
+corrplot(cor(t(A100)))
+
+## I need to show that the generated random variables are iid,
+## but that iid somehow breaks when we have too many variables
