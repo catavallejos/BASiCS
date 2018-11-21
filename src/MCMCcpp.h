@@ -52,7 +52,9 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     NumericVector sumByGeneBio,
     int StoreAdapt, 
     int EndAdapt,
-    int PrintProgress);
+    int PrintProgress,
+    double geneExponent,
+    double cellExponent);
 
 // MCMC sampler for regression case
 Rcpp::List HiddenBASiCS_MCMCcppReg(
