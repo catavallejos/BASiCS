@@ -100,10 +100,13 @@ setMethod("updateObject",
               stop("Object was not created by an older version of BASiCS. \n")
             }
 
-            New_Chain <- newBASiCS_Chain(parameters = list(mu = object@mu,
-                                          delta = object@delta, phi = object@phi,
-                                          s = object@s, nu = object@nu,
-                                          theta = object@theta))
+            New_Chain <- newBASiCS_Chain(parameters = list(
+                                            mu = object@mu,
+                                            delta = object@delta,
+                                            phi = object@phi,
+                                            s = object@s,
+                                            nu = object@nu,
+                                            theta = object@theta))
 
             return(New_Chain)
           })
@@ -341,58 +344,34 @@ setMethod("plot",
             if (Param %in% c("beta") & is.null(RegressionTerm))
               stop("'RegressionTerm' value is required")
 
-            xlab <- ifelse(xlab == "", "Iteration", xlab)
+            geneParams <- c("mu", "delta", "epsilon")
+            cellParams <- c("s", "phi", "nu")
+            batchParams <- "theta"
+            regressionParams <- "beta"
 
-            if (Param == "mu")
-            {
-              object <- x@parameters$mu; Column <- Gene
-              if (ylab == "") { ylab <- bquote(mu[.(Column)]) }
+            if (Param %in% geneParams) {
+              Column <- Gene
+            } else if (Param %in% cellParams) {
+              Column <- Cell
+            } else if (Param %in% batchParams) {
+              Column <- Batch
+            } else if (Param %in% regressionParams) {
+              Column <- RegressionTerm
             }
-            if (Param == "delta")
-            {
-              object <- x@parameters$delta; Column <- Gene
-              if (ylab == "") { ylab = bquote(delta[.(Column)]) }
+            if(xlab == "") {
+              xlab <- "Iteration"
             }
-            if (Param == "phi")
-            {
-              object <- x@parameters$phi; Column <- Cell
-              if (ylab == "") { ylab = bquote(phi[.(Column)]) }
-            }
-            if (Param == "s")
-            {
-              object <- x@parameters$s; Column <- Cell
-              if (ylab == "") { ylab <- bquote(s[.(Column)]) }
-            }
-            if (Param == "nu")
-            {
-              object <- x@parameters$nu; Column <- Cell
-              if (ylab == "") { ylab <- bquote(nu[.(Column)]) }
-            }
-            if (Param == "theta")
-            {
-              object <- x@parameters$theta; Column <- Batch
-              if (ylab == "") { ylab <- bquote(theta[.(Column)]) }
-            }
-            if (Param == "epsilon")
-            {
-              object <- x@parameters$epsilon; Column <- Gene
-              if (ylab == "") { ylab <- bquote(epsilon[.(Column)]) }
-            }
-            if (Param == "beta")
-            {
-              object <- x@parameters$beta; Column <- RegressionTerm
-              if (ylab == "") { ylab <- bquote(beta[.(Column)]) }
-            }
-            if (Param == "sigma2")
-            {
-              object <- x@parameters$sigma2; Column <- 1
-              if (ylab == "") { ylab <- bquote(sigma^2) }
+            if (ylab == "") {
+              ylab <- bquote(.(Param)[.(Column)])
             }
 
             par(mfrow = c(1, 2))
-            plot(object[, Column],
-                 type = "l", xlab = xlab, ylab = ylab,
-                 main = colnames(object)[Column], ...)
+            plot(x@parameters[[Param]][, Column],
+                 type = "l",
+                 xlab = xlab,
+                 ylab = ylab,
+                 main = colnames(object)[Column],
+                 ...)
             stats::acf(object[, Column], main = "Autocorrelation")
           })
 
@@ -432,16 +411,7 @@ setMethod("displayChainBASiCS",
           {
             if (!(Param %in% names(object@parameters)))
               stop("'Param' argument is invalid")
-
-            if (Param == "mu") { return(object@parameters$mu) }
-            if (Param == "delta") { return(object@parameters$delta) }
-            if (Param == "phi") { return(object@parameters$phi) }
-            if (Param == "s") { return(object@parameters$s) }
-            if (Param == "nu") { return(object@parameters$nu) }
-            if (Param == "theta") { return(object@parameters$theta) }
-            if (Param == "beta") { return(object@parameters$beta) }
-            if (Param == "sigma2") { return(object@parameters$sigma2) }
-            if (Param == "epsilon") { return(object@parameters$epsilon) }
+            object@parameters[[Param]]
           })
 
 #' @name BASiCS_showFit-BASiCS_Chain-method
@@ -459,8 +429,6 @@ setMethod("displayChainBASiCS",
 #' @param xlab As in \code{\link[graphics]{par}}.
 #' @param ylab As in \code{\link[graphics]{par}}.
 #' @param pch As in \code{\link[graphics]{par}}.
-#' @param col As in \code{\link[graphics]{par}}.
-#' @param bty As in \code{\link[graphics]{par}}.
 #' @param smooth Logical to indicate wether the smoothScatter function is used
 #' to plot the scatter plot.
 #' @param variance Variance used to build GRBFs for regression
@@ -482,11 +450,9 @@ setMethod("displayChainBASiCS",
 setMethod("BASiCS_showFit",
           signature = "BASiCS_Chain",
           definition = function(object,
-                                xlab = "log(mu[i])",
-                                ylab = "log(delta[i])",
+                                xlab = "log(mu)",
+                                ylab = "log(delta)",
                                 pch = 16,
-                                col = "blue",
-                                bty = "n",
                                 smooth = TRUE,
                                 variance = 1.2,
                                 ...){
@@ -523,42 +489,40 @@ setMethod("BASiCS_showFit",
                               yhat = rowMedians(yhat),
                               yhat.upper = yhat.HPD[,2],
                               yhat.lower = yhat.HPD[,1])
-            if(smooth == TRUE){
-              plot.out <- ggplot(df[df$included,]) +
-                geom_hex(aes_string(x = "mu", y = "delta"), bins = 100) +
-                scale_fill_gradientn("",
-                                     colours = colorRampPalette(c("dark blue",
-                                                    "yellow", "dark red"))(100),
-                                     guide=FALSE) +
-                geom_point(data = df[!df$included,],
-                           aes_string(x = "mu", y = "delta"),
-                           colour="purple", alpha=0.3) +
-                xlab("log(mu)") + ylab("log(delta)") +
-                theme_minimal(base_size = 15) +
-                geom_line(data = df2,
-                          mapping = aes_string(x = "mu2", y = "yhat"),
-                          colour = "dark red") +
-                geom_ribbon(data = df2,
-                            mapping = aes_string(x = "mu2", ymin = "yhat.lower",
-                                                 ymax = "yhat.upper"),
-                            alpha = 0.5)
+            plot.out <- ggplot(df[df$included,],
+                               aes_string(x = "mu", y = "delta")) +
+              xlab(xlab) + ylab(ylab) +
+              theme_minimal(base_size = 15) +
+              geom_line(data = df2,
+                        inherit.aes = FALSE,
+                        mapping = aes_string(x = "mu2", y = "yhat"),
+                        colour = "dark red") +
+              geom_ribbon(data = df2,
+                          inherit.aes = FALSE,
+                          mapping = aes_string(x = "mu2",
+                                               ymin = "yhat.lower",
+                                               ymax = "yhat.upper"),
+                          alpha = 0.5)
+
+            if (smooth){
+              plot.out <- plot.out
+                geom_hex(bins = 100) +
+                scale_fill_gradientn(name = "",
+                                     colours = colorRampPalette(
+                                      c("dark blue", "yellow", "dark red"))(100),
+                                     guide = FALSE) +
+                geom_point(shape = pch,
+                           colour = "purple",
+                           alpha = 0.3)
             }
             else{
-              plot.out <- ggplot(df[df$included,]) +
-                geom_point(aes_string(x = "mu", y = "delta"),
+              plot.out <- plot.out +
+                geom_point(shape = pch,
                            colour = "dark blue") +
                 geom_point(data = df[!df$included,],
-                           aes(x = "mu", y = "delta"),
-                           colour="purple", alpha=0.3) +
-                xlab("log(mu)") + ylab("log(delta)") +
-                theme_minimal(base_size = 15) +
-                geom_line(data = df2,
-                          mapping = aes_string(x = "mu2", y = "yhat"),
-                          colour = "dark red") +
-                geom_ribbon(data = df2,
-                            mapping = aes_string(x = "mu2", ymin = "yhat.lower",
-                                                 ymax = "yhat.upper"),
-                            alpha = 0.5)
+                           shape = pch,
+                           colour = "purple",
+                           alpha = 0.3)
             }
             return(plot.out)
           })
@@ -770,7 +734,9 @@ setMethod("plot",
                  pch = pch,
                  col = col,
                  bty = bty,
-                 ...)
+                 ...
+            )
+
             # Add HPD interval
             for (Column in Columns) {
               BarLength <- ifelse(length(Columns) <= 10,
@@ -872,16 +838,8 @@ setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
           definition = function(object, Param = "mu")
           {
-            if (!(Param %in% names(object@parameters)))
+            if (!(Param %in% names(object@parameters))) {
               stop("'Param' argument is invalid")
-
-            if (Param == "mu") { return(object@parameters$mu) }
-            if (Param == "delta") { return(object@parameters$delta) }
-            if (Param == "phi") { return(object@parameters$phi) }
-            if (Param == "s") { return(object@parameters$s) }
-            if (Param == "nu") { return(object@parameters$nu) }
-            if (Param == "theta") { return(object@parameters$theta) }
-            if (Param == "beta") { return(object@parameters$beta) }
-            if (Param == "sigma2") { return(object@parameters$sigma2) }
-            if (Param == "epsilon") { return(object@parameters$epsilon) }
+            }
+            Param@parameters[[Param]]
           })

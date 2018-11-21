@@ -27,7 +27,6 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   }
   else{
     q.bio <- q <- nrow(Data)
-
     CountsBio <- as.matrix(counts(Data))
   }
 

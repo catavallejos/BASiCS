@@ -220,6 +220,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     q <- nrow(Data)
     q.bio <- sum(!SingleCellExperiment::isSpike(Data))
     spikes <- SingleCellExperiment::isSpike(Data)
+    BioCounts <- counts(Data)[!spikes, ]
   }
   else{
     q.bio <- q <- nrow(Data)
@@ -239,9 +240,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   sum.bycell.all <- matrixStats::rowSums2(counts(Data))
   sum.bygene.all <- matrixStats::colSums2(counts(Data))
 
-  # Optional arguments
-  sum.bycell.bio <- matrixStats::rowSums2(counts(Data)[!spikes, ])
-  sum.bygene.bio <- matrixStats::colSums2(counts(Data)[!spikes, ])
+  sum.bycell.bio <- matrixStats::rowSums2(BioCounts)
+  sum.bygene.bio <- matrixStats::colSums2(BioCounts)
 
   # Assignment of default values
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data, Burn, n,
@@ -304,7 +304,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   if(WithSpikes == FALSE)
   {
     NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
-      as.matrix(counts(Data))[!spikes,],
+      as.matrix(BioCounts),
       ConstrainType,
       StochasticRef, q.bio, mu0, PriorDelta, ConstrainProp)
     ConstrainGene <- NoSpikesParam$ConstrainGene
@@ -321,7 +321,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     if(Regression == TRUE) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(N, Thin, Burn,
-                as.matrix(counts(Data))[!spikes,],
+                as.matrix(BioCounts),
                 BatchDesign,
                 SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch),
                 PriorParam$s2.mu, PriorParam$p.phi, PriorParam$a.s,
@@ -334,15 +334,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 beta0, sigma20, PriorParam$eta, lambda0, variance))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <-
-        matrixStats::rowSums2(ifelse(counts(Data)[!spikes,] > 0,
-                                     1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn,
-                as.matrix(counts(Data))[!spikes,],
+                as.matrix(BioCounts),
                 BatchDesign,
                 SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch),
                 PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta,
@@ -364,7 +362,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     if(Regression == TRUE) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(N, Thin, Burn,
-                as.matrix(counts(Data))[!spikes,],
+                as.matrix(BioCounts),
                 BatchDesign,
                 mu0, delta0, s0, nu0, rep(theta0, nBatch),
                 PriorParam$s2.mu, PriorParam$a.s, PriorParam$b.s,
@@ -380,14 +378,14 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 ConstrainType, as.numeric(StochasticRef)))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(counts(Data)[!spikes,] > 0, 1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {
       message("Running no spikes BASiCS sampler (no regression) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
         N, Thin, Burn,
-        as.matrix(counts(Data))[!spikes,],
+        as.matrix(BioCounts),
         BatchDesign,
         mu0, delta0, s0, nu0, rep(theta0, nBatch),
         PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta,
@@ -403,10 +401,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   }
 
   # Format column names of MCMC chains
-  colnames(Chain$mu) <-
-    rownames(counts(Data))[!spikes]
-  colnames(Chain$delta) <-
-    rownames(counts(Data))[!spikes]
+  colnames(Chain$mu) <- colnames(Chain$delta) <- rownames(BioCounts)
   if(Regression == TRUE) {
     colnames(Chain$epsilon) <- colnames(Chain$mu)
     Chain$lambda <- NULL # Remove to reduce storage
