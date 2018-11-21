@@ -1013,6 +1013,22 @@ version 1.3.18: (2018-10-15)
 - Extra input check in `BASiCS_MCMC` to avoid issues due to multiple types of
 spike-ins being present in the data. 
 
-version 1.3.19: (2018-10-16)
+version 1.3.19: (2018-10-18)
 - Replacement of `R::lgammafn` by `std::lgamma` in c++ code 
 (great speed-up! with thanks to Shian Su (@Shians))
+
+version 1.3.20: (2018-10-18)
+- Minor updates to README and vignette (e.g. to include BASiCS sticker)
+
+version 1.3.21: (2018-10-19)
+- Restores use of `R::lgammafn` due to errors in Bioconductor build report
+
+version 1.3.22: (2018-10-19)
+- Update of DESCRIPTION to require C++11
+- Once again, replacement of `R::lgammafn` by `std::lgamma` in c++ code 
+
+version 1.3.23: (2018-10-18)
+- Updated vignette to include simple SCE example without spike-in information
+
+version 1.3.24: (2018-10-21)
+- Version bump to trigger new build

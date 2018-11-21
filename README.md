@@ -109,13 +109,15 @@ Individual topics are summarized in the BASiCS wiki:
 
 - [Input preparation](https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation)
 
-- [MCMC convergence](https://github.com/catavallejos/BASiCS/wiki/3.-MCMC-convergence)
+- [Running the MCMC](https://github.com/catavallejos/BASiCS/wiki/3.-Running-the-MCMC)
 
-- [Posterior summary](https://github.com/catavallejos/BASiCS/wiki/4.-Posterior-summary)
+- [MCMC convergence](https://github.com/catavallejos/BASiCS/wiki/4.-MCMC-convergence)
 
-- [HVL & LVG detection](https://github.com/catavallejos/BASiCS/wiki/5.-HVG-&-LVG-detection) for a single group of cells
+- [Posterior summary](https://github.com/catavallejos/BASiCS/wiki/5.-Posterior-summary)
 
-- [Differential analysis](https://github.com/catavallejos/BASiCS/wiki/6.-Differential-analysis) between 2 groups of cells (mean and over-dispersion)
+- [HVL & LVG detection](https://github.com/catavallejos/BASiCS/wiki/6.-HVG-&-LVG-detection) for a single group of cells
+
+- [Differential analysis](https://github.com/catavallejos/BASiCS/wiki/7.-Differential-analysis) between 2 groups of cells (mean and over-dispersion)
 
 
 <!---- To detect changes whose expression changes between 2 or more populations of cells (mean and over-dispersion), please refer to the supplementary material related to <a href="http://dx.doi.org/10.1186/s13059-016-0930-3">Vallejos <em>et al.</em>, 2016</a> TODO: a quick start for BASiCS. Like vignette("some-stuff") ---> 
