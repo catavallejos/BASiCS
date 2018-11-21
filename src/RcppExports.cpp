@@ -24,8 +24,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // HiddenBASiCS_MCMCcpp
-Rcpp::List HiddenBASiCS_MCMCcpp(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector muSpikes, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector s0, NumericVector nu0, NumericVector theta0, double s2mu, double adelta, double bdelta, double s2delta, double prior_delta, NumericVector aphi, double as, double bs, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, double LSphi0, NumericVector LSnu0, NumericVector LStheta0, NumericVector sumByCellAll, NumericVector sumByCellBio, NumericVector sumByGeneAll, NumericVector sumByGeneBio, int StoreAdapt, int EndAdapt, int PrintProgress);
-RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcpp(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP muSpikesSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP s0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP aphiSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSphi0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByCellBioSEXP, SEXP sumByGeneAllSEXP, SEXP sumByGeneBioSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP) {
+Rcpp::List HiddenBASiCS_MCMCcpp(int N, int Thin, int Burn, NumericMatrix Counts, NumericMatrix BatchDesign, NumericVector muSpikes, NumericVector mu0, NumericVector delta0, NumericVector phi0, NumericVector s0, NumericVector nu0, NumericVector theta0, double s2mu, double adelta, double bdelta, double s2delta, double prior_delta, NumericVector aphi, double as, double bs, double atheta, double btheta, double ar, NumericVector LSmu0, NumericVector LSdelta0, double LSphi0, NumericVector LSnu0, NumericVector LStheta0, NumericVector sumByCellAll, NumericVector sumByCellBio, NumericVector sumByGeneAll, NumericVector sumByGeneBio, int StoreAdapt, int EndAdapt, int PrintProgress, double geneExponent, double sampleExponent);
+RcppExport SEXP _BASiCS_HiddenBASiCS_MCMCcpp(SEXP NSEXP, SEXP ThinSEXP, SEXP BurnSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP muSpikesSEXP, SEXP mu0SEXP, SEXP delta0SEXP, SEXP phi0SEXP, SEXP s0SEXP, SEXP nu0SEXP, SEXP theta0SEXP, SEXP s2muSEXP, SEXP adeltaSEXP, SEXP bdeltaSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP aphiSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP athetaSEXP, SEXP bthetaSEXP, SEXP arSEXP, SEXP LSmu0SEXP, SEXP LSdelta0SEXP, SEXP LSphi0SEXP, SEXP LSnu0SEXP, SEXP LStheta0SEXP, SEXP sumByCellAllSEXP, SEXP sumByCellBioSEXP, SEXP sumByGeneAllSEXP, SEXP sumByGeneBioSEXP, SEXP StoreAdaptSEXP, SEXP EndAdaptSEXP, SEXP PrintProgressSEXP, SEXP geneExponentSEXP, SEXP sampleExponentSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -64,7 +64,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type StoreAdapt(StoreAdaptSEXP);
     Rcpp::traits::input_parameter< int >::type EndAdapt(EndAdaptSEXP);
     Rcpp::traits::input_parameter< int >::type PrintProgress(PrintProgressSEXP);
-    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcpp(N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress));
+    Rcpp::traits::input_parameter< double >::type geneExponent(geneExponentSEXP);
+    Rcpp::traits::input_parameter< double >::type sampleExponent(sampleExponentSEXP);
+    rcpp_result_gen = Rcpp::wrap(HiddenBASiCS_MCMCcpp(N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress, geneExponent, sampleExponent));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -231,8 +233,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // Hidden_muUpdate
-arma::mat Hidden_muUpdate(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& invdelta, arma::vec const& phinu, arma::vec const& sum_bycell_bio, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind);
-RcppExport SEXP _BASiCS_Hidden_muUpdate(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP invdeltaSEXP, SEXP phinuSEXP, SEXP sum_bycell_bioSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP) {
+arma::mat Hidden_muUpdate(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& invdelta, arma::vec const& phinu, arma::vec const& sum_bycell_bio, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind, double exponent);
+RcppExport SEXP _BASiCS_Hidden_muUpdate(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP invdeltaSEXP, SEXP phinuSEXP, SEXP sum_bycell_bioSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP exponentSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -248,19 +250,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type mu1(mu1SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
-    rcpp_result_gen = Rcpp::wrap(Hidden_muUpdate(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind));
+    Rcpp::traits::input_parameter< double >::type exponent(exponentSEXP);
+    rcpp_result_gen = Rcpp::wrap(Hidden_muUpdate(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind, exponent));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_DenoisedRates", (DL_FUNC) &_BASiCS_HiddenBASiCS_DenoisedRates, 7},
-    {"_BASiCS_HiddenBASiCS_MCMCcpp", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcpp, 35},
+    {"_BASiCS_HiddenBASiCS_MCMCcpp", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcpp, 37},
     {"_BASiCS_HiddenBASiCS_MCMCcppNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppNoSpikes, 37},
     {"_BASiCS_HiddenBASiCS_MCMCcppReg", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppReg, 41},
     {"_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes, 43},
     {"_BASiCS_Hidden_rDirichlet", (DL_FUNC) &_BASiCS_Hidden_rDirichlet, 1},
-    {"_BASiCS_Hidden_muUpdate", (DL_FUNC) &_BASiCS_Hidden_muUpdate, 12},
+    {"_BASiCS_Hidden_muUpdate", (DL_FUNC) &_BASiCS_Hidden_muUpdate, 13},
     {NULL, NULL, 0}
 };
 

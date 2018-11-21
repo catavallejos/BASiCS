@@ -5,32 +5,32 @@
 
 #' @name BASiCS_Chain-methods
 #' @aliases show,BASiCS_Chain-method
-#' 
+#'
 #' @title 'show' method for BASiCS_Chain objects
-#' 
+#'
 #' @description 'show' method for \code{\linkS4class{BASiCS_Chain}} objects.
-#' 
+#'
 #' @param object A \code{\linkS4class{BASiCS_Chain}} object.
-#' 
+#'
 #' @return Prints a summary of the properties of \code{object}.
-#' 
+#'
 #' @examples
-#' 
+#'
 #' Data <- makeExampleBASiCS_Data()
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2, Regression = FALSE)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#'   
+#'
 #' @rdname BASiCS_Chain-methods
-setMethod("show", 
-          signature = "BASiCS_Chain", 
-          definition = function(object) 
+setMethod("show",
+          signature = "BASiCS_Chain",
+          definition = function(object)
           {
             N <- nrow(object@parameters$mu)
             q.bio <- ncol(object@parameters$delta)
             n <- ncol(object@parameters$phi)
             nBatch <- ncol(object@parameters$theta)
-            cat("An object of class ", class(object), "\n", 
+            cat("An object of class ", class(object), "\n",
                 " ", N, " MCMC samples.\n", sep = "")
             if(!("parameters" %in% methods::slotNames(object)))
             {
@@ -42,16 +42,16 @@ setMethod("show",
               q.bio <- ncol(object@parameters$delta)
               n <- ncol(object@parameters$phi)
               nBatch <- ncol(object@parameters$theta)
-              cat("An object of class ", class(object), "\n", 
+              cat("An object of class ", class(object), "\n",
                   " ", N, " MCMC samples.\n", sep = "")
-              if (nBatch > 1) 
+              if (nBatch > 1)
               {
-                cat(" Dataset contains ", q.bio, " biological genes and ", 
+                cat(" Dataset contains ", q.bio, " biological genes and ",
                     n, " cells (", nBatch, " batches). \n", sep = "")
-              } 
-              else 
+              }
+              else
               {
-                cat(" Dataset contains ", q.bio, " biological genes and ", 
+                cat(" Dataset contains ", q.bio, " biological genes and ",
                     n, " cells (1 batch). \n", sep = "")
               }
               ChainVersion <- object@.__classVersion__$BASiCS_Chain
@@ -59,139 +59,139 @@ setMethod("show",
                                      ChainVersion[2], ".",
                                      ChainVersion[3])
               cat(" Object stored using BASiCS version: ", ChainVersion, "\n",
-                  "Parameters: ", names(object@parameters), "\n")              
+                  "Parameters: ", names(object@parameters), "\n")
             }
           })
 
 #' @name BASiCS_Chain-methods
 #' @aliases updateObject,BASiCS_Chain-method
-#' 
+#'
 #' @title 'updateObject' method for BASiCS_Chain objects
-#' 
-#' @description 'updateObject' method for \code{\linkS4class{BASiCS_Chain}} 
+#'
+#' @description 'updateObject' method for \code{\linkS4class{BASiCS_Chain}}
 #' objects. It is used to convert outdated \code{\linkS4class{BASiCS_Chain}}
 #' objects into a version that is compatible with the Bioconductor release
-#' of BASiCS. Do not use this method is \code{\linkS4class{BASiCS_Chain}} 
-#' already contains a \code{parameters} slot. 
-#' 
+#' of BASiCS. Do not use this method is \code{\linkS4class{BASiCS_Chain}}
+#' already contains a \code{parameters} slot.
+#'
 #' @param ... Additional arguments of \code{\link[BiocGenerics]{updateObject}}
-#' generic method. Not used within BASiCS. 
+#' generic method. Not used within BASiCS.
 #' @param verbose Additional argument of \code{\link[BiocGenerics]{updateObject}}
-#' generic method. Not used within BASiCS. 
-#' 
-#' @return Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
+#' generic method. Not used within BASiCS.
+#'
+#' @return Returns an updated \code{\linkS4class{BASiCS_Chain}} object that
 #' contains all model parameters in a single slot object (list).
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # Not run
 #' # New_Chain <- updateObject(Old_Chain)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' 
+#'
 #' @rdname BASiCS_Chain-methods
-setMethod("updateObject", 
-          signature = "BASiCS_Chain", 
-          definition = function(object, ..., verbose = FALSE) 
+setMethod("updateObject",
+          signature = "BASiCS_Chain",
+          definition = function(object, ..., verbose = FALSE)
           {
             if(is.null(object@mu))
             {
               stop("Object was not created by an older version of BASiCS. \n")
             }
-            
-            New_Chain <- newBASiCS_Chain(parameters = list(mu = object@mu, 
+
+            New_Chain <- newBASiCS_Chain(parameters = list(mu = object@mu,
                                           delta = object@delta, phi = object@phi,
-                                          s = object@s, nu = object@nu, 
+                                          s = object@s, nu = object@nu,
                                           theta = object@theta))
-            
+
             return(New_Chain)
           })
 
 #' @name Summary
 #' @aliases Summary Summary,BASiCS_Chain-method
-#' 
+#'
 #' @docType methods
 #' @rdname Summary-BASiCS_Chain-method
-#' 
+#'
 #' @title 'Summary' method for BASiCS_Chain objects
-#' 
-#' @description For each of the BASiCS parameters (see Vallejos et al 2015), 
-#' \code{Summary} returns the corresponding postior medians and limits of 
+#'
+#' @description For each of the BASiCS parameters (see Vallejos et al 2015),
+#' \code{Summary} returns the corresponding postior medians and limits of
 #' the high posterior density interval (probabilty equal to \code{prob})
-#' 
+#'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
-#' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}} function. 
-#' 
-#' @return An object of class \code{\linkS4class{BASiCS_Summary}}. 
-#' 
-#' @examples 
-#' 
+#' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}} function.
+#'
+#' @return An object of class \code{\linkS4class{BASiCS_Summary}}.
+#'
+#' @examples
+#'
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' @export
 setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95) {
-            
+
   out <- lapply(x@parameters, function(n) {
-  HPD <- matrix(data = NA, ncol = 3, nrow = ncol(n), 
+  HPD <- matrix(data = NA, ncol = 3, nrow = ncol(n),
                 dimnames = list(colnames(n), c("median", "lower", "upper")))
   HPD[,1] <- colMedians(n)
-  HPD[!is.na(HPD[,1]),2:3] <- coda::HPDinterval(coda::mcmc(n[,!is.na(HPD[,1])]), 
+  HPD[!is.na(HPD[,1]),2:3] <- coda::HPDinterval(coda::mcmc(n[,!is.na(HPD[,1])]),
                                                 prob=prob)
   HPD
   })
   if("RefFreq" %in% names(out)) { out$RefFreq <- NULL }
-            
+
   Output <- new("BASiCS_Summary", parameters = out)
   return(Output)
 })
 
 #' @name subset
 #' @aliases subset subset,BASiCS_Chain-method
-#' 
+#'
 #' @docType methods
 #' @rdname subset-BASiCS_Chain-method
-#' 
+#'
 #' @title A 'subset' method for `BASiCS_Chain`` objects
-#' 
+#'
 #' @description This can be used to extract a subset of a `BASiCS_Chain` object.
 #' The subset can contain specific genes, cells or MCMC iterations
-#' 
+#'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
 #' @param Genes A vector of characters indicating what genes will be extracted.
 #' @param Cells A vector of characters indicating what cells will be extrated.
-#' @param Iterations Numeric vector of positive integers indicating which MCMC 
+#' @param Iterations Numeric vector of positive integers indicating which MCMC
 #' iterations will be extracted. The maximum value in \code{Iterations} must be
 #' less or equal than the total number of iterations contained in the original
 #' \code{\linkS4class{BASiCS_Chain}} object.
-#' 
-#' @return An object of class \code{\linkS4class{BASiCS_Chain}}. 
-#' 
-#' @examples 
-#' 
+#'
+#' @return An object of class \code{\linkS4class{BASiCS_Chain}}.
+#'
+#' @examples
+#'
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#' 
+#'
 setMethod("subset",
           signature = "BASiCS_Chain",
-          definition = function(x, Genes = NULL, 
+          definition = function(x, Genes = NULL,
                                 Cells = NULL, Iterations = NULL){
-            
+
             N <- nrow(displayChainBASiCS(x, Param = "mu"))
             q <- ncol(displayChainBASiCS(x, Param = "mu"))
             n <- ncol(displayChainBASiCS(x, Param = "nu"))
             GeneName <- colnames(displayChainBASiCS(x, Param = "mu"))
-            CellName <- colnames(displayChainBASiCS(x, Param = "nu")) 
-            
+            CellName <- colnames(displayChainBASiCS(x, Param = "nu"))
+
             # Checking for valid arguments + assigning default values
             if(is.null(Iterations)) { Iterations <- seq_len(N) }
             else {
-              stopifnot( all(Iterations == floor(Iterations)) )  
+              stopifnot( all(Iterations == floor(Iterations)) )
               stopifnot(min(Iterations) >= 1, max(Iterations) <= N )
             }
             if(is.null(Genes)) { Genes <- GeneName }
@@ -204,194 +204,194 @@ setMethod("subset",
               if(sum(!(Cells %in% CellName)) > 0)
                 stop("Some elements of 'Cells' are not present in the data")
             }
-            
+
             SelGenes <- GeneName %in% Genes
             SelCells <- CellName %in% Cells
             Params <- names(x@parameters)
-            
-            out <- list() 
+
+            out <- list()
             for(p in seq_len(length(Params))) {
               if(Params[p] %in% c("theta", "beta", "sigma2"))
               {
-                out[[p]] <- get(Params[p], x@parameters)[Iterations, , drop = FALSE]  
+                out[[p]] <- get(Params[p], x@parameters)[Iterations, , drop = FALSE]
               }
-              else 
+              else
               {
                 if(Params[p] %in% c("mu", "delta", "epsilon")) {
                   Sel <- SelGenes
                 }
                 if(Params[p] %in% c("phi", "s", "nu"))
                 {
-                  Sel <- SelCells 
+                  Sel <- SelCells
                 }
-                out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel] 
+                out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel]
               }
             }
             names(out) <- Params
-            
+
             # Transform into BASiCS_Chain class object
             out1 <- newBASiCS_Chain(parameters = out)
             out1@.__classVersion__$BASiCS_Chain <- x@.__classVersion__$BASiCS_Chain
-  
+
             return(out1)
           })
 
 
 #' @name colnames
 #' @aliases colnames colnames,BASiCS_Chain-method
-#' 
+#'
 #' @docType methods
 #' @rdname colnames-BASiCS_Chain-method
-#' 
+#'
 #' @title 'colnames' method for BASiCS_Chain objects
-#' 
+#'
 #' @description Returns the labels of cell-specific BASiCS parameters
-#' 
+#'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
-#' 
+#'
 #' @return An vector of labels
-#' 
-#' @examples 
-#' 
+#'
+#' @examples
+#'
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#' 
+#'
 setMethod("colnames",
           signature = "BASiCS_Chain",
           definition = function(x) { return(colnames(x@parameters$s)) })
 
 #' @name rownames
 #' @aliases rownames rownames,BASiCS_Chain-method
-#' 
+#'
 #' @docType methods
 #' @rdname rownames-BASiCS_Chain-method
-#' 
+#'
 #' @title 'rownames' method for BASiCS_Chain objects
-#' 
+#'
 #' @description Returns the labels of gene-specific BASiCS parameters
-#' 
+#'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
-#' 
+#'
 #' @return An vector of labels
-#' 
-#' @examples 
-#' 
+#'
+#' @examples
+#'
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#' 
+#'
 setMethod("rownames",
           signature = "BASiCS_Chain",
           definition = function(x) { return(colnames(x@parameters$mu)) })
 
 #' @name plot-BASiCS_Chain-method
 #' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
-#' 
+#'
 #' @docType methods
 #' @rdname plot-BASiCS_Chain-method
-#' 
+#'
 #' @title 'plot' method for BASiCS_Chain objects
-#' 
+#'
 #' @description 'plot' method for \code{\linkS4class{BASiCS_Chain}} objects
-#' 
+#'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
-#' @param Param Name of the slot to be used for the plot. 
-#' Possible values: \code{'mu'}, \code{'delta'}, 
-#' \code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, 
+#' @param Param Name of the slot to be used for the plot.
+#' Possible values: \code{'mu'}, \code{'delta'},
+#' \code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'},
 #' \code{'beta'}, \code{'sigma2'} and \code{'epsilon'}.
-#' @param Gene Specifies which gene is requested. 
-#' Required only if \code{Param = 'mu'} or \code{'delta'} 
-#' @param Cell Specifies which cell is requested. 
+#' @param Gene Specifies which gene is requested.
+#' Required only if \code{Param = 'mu'} or \code{'delta'}
+#' @param Cell Specifies which cell is requested.
 #' Required only if \code{Param = 'phi', 's'} or \code{'nu'}
-#' @param Batch Specifies which batch is requested. 
+#' @param Batch Specifies which batch is requested.
 #' Required only if \code{Param = 'theta'}
-#' @param RegressionTerm Specifies which regression coefficient is requested. 
+#' @param RegressionTerm Specifies which regression coefficient is requested.
 #' Required only if \code{Param = 'beta'}
-#' @param ylab As in \code{\link[graphics]{par}}. 
-#' @param xlab As in \code{\link[graphics]{par}}. 
+#' @param ylab As in \code{\link[graphics]{par}}.
+#' @param xlab As in \code{\link[graphics]{par}}.
 #' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
-#' 
+#'
 #' @return A plot object
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # See
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' 
-setMethod("plot", 
-          signature = "BASiCS_Chain", 
-          definition = function(x, 
-                                Param = "mu", 
-                                Gene = NULL, Cell = NULL, Batch = 1, 
-                                RegressionTerm = NULL, 
-                                ylab = "", xlab = "", ...) 
+#'
+setMethod("plot",
+          signature = "BASiCS_Chain",
+          definition = function(x,
+                                Param = "mu",
+                                Gene = NULL, Cell = NULL, Batch = 1,
+                                RegressionTerm = NULL,
+                                ylab = "", xlab = "", ...)
           {
-            if (!(Param %in% names(x@parameters))) 
+            if (!(Param %in% names(x@parameters)))
               stop("'Param' argument is invalid")
-            if (Param %in% c("mu", "delta", "epsilon") & is.null(Gene)) 
+            if (Param %in% c("mu", "delta", "epsilon") & is.null(Gene))
               stop("'Gene' value is required")
-            if (Param %in% c("phi", "s", "nu") & is.null(Cell)) 
+            if (Param %in% c("phi", "s", "nu") & is.null(Cell))
               stop("'Cell' value is required")
-            if (Param %in% c("theta") & is.null(Batch)) 
+            if (Param %in% c("theta") & is.null(Batch))
               stop("'Batch' value is required")
-            if (Param %in% c("beta") & is.null(RegressionTerm)) 
+            if (Param %in% c("beta") & is.null(RegressionTerm))
               stop("'RegressionTerm' value is required")
-    
+
             xlab <- ifelse(xlab == "", "Iteration", xlab)
-    
-            if (Param == "mu") 
+
+            if (Param == "mu")
             {
               object <- x@parameters$mu; Column <- Gene
               if (ylab == "") { ylab <- bquote(mu[.(Column)]) }
             }
-            if (Param == "delta") 
+            if (Param == "delta")
             {
               object <- x@parameters$delta; Column <- Gene
               if (ylab == "") { ylab = bquote(delta[.(Column)]) }
             }
-            if (Param == "phi") 
+            if (Param == "phi")
             {
               object <- x@parameters$phi; Column <- Cell
               if (ylab == "") { ylab = bquote(phi[.(Column)]) }
             }
-            if (Param == "s") 
+            if (Param == "s")
             {
               object <- x@parameters$s; Column <- Cell
               if (ylab == "") { ylab <- bquote(s[.(Column)]) }
             }
-            if (Param == "nu") 
+            if (Param == "nu")
             {
               object <- x@parameters$nu; Column <- Cell
               if (ylab == "") { ylab <- bquote(nu[.(Column)]) }
             }
-            if (Param == "theta") 
+            if (Param == "theta")
             {
               object <- x@parameters$theta; Column <- Batch
               if (ylab == "") { ylab <- bquote(theta[.(Column)]) }
             }
-            if (Param == "epsilon") 
+            if (Param == "epsilon")
             {
               object <- x@parameters$epsilon; Column <- Gene
               if (ylab == "") { ylab <- bquote(epsilon[.(Column)]) }
             }
-            if (Param == "beta") 
+            if (Param == "beta")
             {
               object <- x@parameters$beta; Column <- RegressionTerm
               if (ylab == "") { ylab <- bquote(beta[.(Column)]) }
             }
-            if (Param == "sigma2") 
+            if (Param == "sigma2")
             {
               object <- x@parameters$sigma2; Column <- 1
               if (ylab == "") { ylab <- bquote(sigma^2) }
             }
-    
+
             par(mfrow = c(1, 2))
-            plot(object[, Column], 
-                 type = "l", xlab = xlab, ylab = ylab, 
+            plot(object[, Column],
+                 type = "l", xlab = xlab, ylab = ylab,
                  main = colnames(object)[Column], ...)
             stats::acf(object[, Column], main = "Autocorrelation")
           })
@@ -399,40 +399,40 @@ setMethod("plot",
 
 #' @name displayChainBASiCS-BASiCS_Chain-method
 #' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_Chain-method
-#' 
+#'
 #' @docType methods
 #' @rdname displayChainBASiCS-BASiCS_Chain-method
-#' 
+#'
 #' @title Accessors for the slots of a BASiCS_Chain object
-#' 
+#'
 #' @description Accessors for the slots of a \code{\linkS4class{BASiCS_Chain}}
-#' 
+#'
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param Param Name of the slot to be used for the accessed. 
-#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'}, 
-#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'}, 
+#' @param Param Name of the slot to be used for the accessed.
+#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
+#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
-#' 
-#' @return The requested slot of a \code{\linkS4class{BASiCS_Chain}} object 
-#' 
+#'
+#' @return The requested slot of a \code{\linkS4class{BASiCS_Chain}} object
+#'
 #' @examples
-#' 
+#'
 #' # See
 #' help(BASiCS_MCMC)
-#'   
+#'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' 
+#'
 #' @export
-setMethod("displayChainBASiCS", 
-          signature = "BASiCS_Chain", 
-          definition = function(object, Param = "mu") 
+setMethod("displayChainBASiCS",
+          signature = "BASiCS_Chain",
+          definition = function(object, Param = "mu")
           {
-            if (!(Param %in% names(object@parameters))) 
+            if (!(Param %in% names(object@parameters)))
               stop("'Param' argument is invalid")
-    
+
             if (Param == "mu") { return(object@parameters$mu) }
             if (Param == "delta") { return(object@parameters$delta) }
             if (Param == "phi") { return(object@parameters$phi) }
@@ -446,79 +446,79 @@ setMethod("displayChainBASiCS",
 
 #' @name BASiCS_showFit-BASiCS_Chain-method
 #' @aliases BASiCS_showFit BASiCS_showFit,BASiCS_Chain-method
-#' 
+#'
 #' @docType methods
 #' @rdname BASiCS_showFit-BASiCS_Chain-method
-#' 
+#'
 #' @title Plotting the trend after Bayesian regression
-#' 
-#' @description Plotting the trend after Bayesian regression using a 
+#'
+#' @description Plotting the trend after Bayesian regression using a
 #' \code{\linkS4class{BASiCS_Chain}} object
-#' 
+#'
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param xlab As in \code{\link[graphics]{par}}. 
+#' @param xlab As in \code{\link[graphics]{par}}.
 #' @param ylab As in \code{\link[graphics]{par}}.
-#' @param pch As in \code{\link[graphics]{par}}. 
-#' @param col As in \code{\link[graphics]{par}}. 
-#' @param bty As in \code{\link[graphics]{par}}. 
-#' @param smooth Logical to indicate wether the smoothScatter function is used 
+#' @param pch As in \code{\link[graphics]{par}}.
+#' @param col As in \code{\link[graphics]{par}}.
+#' @param bty As in \code{\link[graphics]{par}}.
+#' @param smooth Logical to indicate wether the smoothScatter function is used
 #' to plot the scatter plot.
 #' @param variance Variance used to build GRBFs for regression
 #' @param ... Additional parameters for plotting.
-#'  
+#'
 #' @examples
 #' data(ChainRNAReg)
 #' BASiCS_showFit(ChainRNAReg)
-#' 
+#'
 #' @return A plot object
-#' 
+#'
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' @author Catalina Vallejos \email{cnvallej@@uc.cl}
-#' 
-#' @references 
-#' Eling et al (2018). Cell Systems 
+#'
+#' @references
+#' Eling et al (2018). Cell Systems
 #' https://doi.org/10.1016/j.cels.2018.06.011
 #' @export
 setMethod("BASiCS_showFit",
           signature = "BASiCS_Chain",
-          definition = function(object,  
+          definition = function(object,
                                 xlab = "log(mu[i])",
                                 ylab = "log(delta[i])",
-                                pch = 16, 
+                                pch = 16,
                                 col = "blue",
                                 bty = "n",
                                 smooth = TRUE,
                                 variance = 1.2,
                                 ...){
-            
-            if(!("beta" %in% names(object@parameters))) 
+
+            if(!("beta" %in% names(object@parameters)))
                 stop("'beta' is missing. Regression was not performed.")
-            
-            
+
+
             m <- log(object@parameters$mu[1,])
-            grid.mu <- seq(round(min(m), digits = 2), 
+            grid.mu <- seq(round(min(m), digits = 2),
                            round(max(m), digits = 2), length.out = 1000)
-            
+
             # Create design matrix across the grid
             n <- ncol(object@parameters$beta)
             range <- diff(range(grid.mu))
             myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
             h <- diff(myu)*variance
-            
+
             B <- matrix(1,length(grid.mu),n)
             B[,2] <- grid.mu
             for (j in seq_len(n-2)){
               B[,j+2] = exp(-0.5*(grid.mu-myu[j])^2/(h[1]^2))
             }
-            
+
             # Calculate yhat = X*beta
             yhat <- apply(object@parameters$beta, 1, function(n){B%*%n})
             yhat.HPD <- HPDinterval(mcmc(t(yhat)), 0.95)
-            
+
             df <- data.frame(mu = log(colMedians(object@parameters$mu)),
                              delta = log(colMedians(object@parameters$delta)),
                              included = !is.na(object@parameters$epsilon[1,]))
-            
+
             df2 <- data.frame(mu2 = grid.mu,
                               yhat = rowMedians(yhat),
                               yhat.upper = yhat.HPD[,2],
@@ -526,37 +526,37 @@ setMethod("BASiCS_showFit",
             if(smooth == TRUE){
               plot.out <- ggplot(df[df$included,]) +
                 geom_hex(aes_string(x = "mu", y = "delta"), bins = 100) +
-                scale_fill_gradientn("", 
-                                     colours = colorRampPalette(c("dark blue", 
-                                                    "yellow", "dark red"))(100), 
+                scale_fill_gradientn("",
+                                     colours = colorRampPalette(c("dark blue",
+                                                    "yellow", "dark red"))(100),
                                      guide=FALSE) +
-                geom_point(data = df[!df$included,], 
-                           aes_string(x = "mu", y = "delta"), 
+                geom_point(data = df[!df$included,],
+                           aes_string(x = "mu", y = "delta"),
                            colour="purple", alpha=0.3) +
-                xlab("log(mu)") + ylab("log(delta)") + 
+                xlab("log(mu)") + ylab("log(delta)") +
                 theme_minimal(base_size = 15) +
-                geom_line(data = df2, 
-                          mapping = aes_string(x = "mu2", y = "yhat"), 
+                geom_line(data = df2,
+                          mapping = aes_string(x = "mu2", y = "yhat"),
                           colour = "dark red") +
-                geom_ribbon(data = df2, 
-                            mapping = aes_string(x = "mu2", ymin = "yhat.lower", 
+                geom_ribbon(data = df2,
+                            mapping = aes_string(x = "mu2", ymin = "yhat.lower",
                                                  ymax = "yhat.upper"),
                             alpha = 0.5)
             }
             else{
-              plot.out <- ggplot(df[df$included,]) + 
-                geom_point(aes_string(x = "mu", y = "delta"), 
+              plot.out <- ggplot(df[df$included,]) +
+                geom_point(aes_string(x = "mu", y = "delta"),
                            colour = "dark blue") +
-                geom_point(data = df[!df$included,], 
-                           aes(x = "mu", y = "delta"), 
+                geom_point(data = df[!df$included,],
+                           aes(x = "mu", y = "delta"),
                            colour="purple", alpha=0.3) +
-                xlab("log(mu)") + ylab("log(delta)") + 
+                xlab("log(mu)") + ylab("log(delta)") +
                 theme_minimal(base_size = 15) +
-                geom_line(data = df2, 
-                          mapping = aes_string(x = "mu2", y = "yhat"), 
-                          colour = "dark red") + 
-                geom_ribbon(data = df2, 
-                            mapping = aes_string(x = "mu2", ymin = "yhat.lower", 
+                geom_line(data = df2,
+                          mapping = aes_string(x = "mu2", y = "yhat"),
+                          colour = "dark red") +
+                geom_ribbon(data = df2,
+                            mapping = aes_string(x = "mu2", ymin = "yhat.lower",
                                                  ymax = "yhat.upper"),
                             alpha = 0.5)
             }
@@ -568,46 +568,46 @@ setMethod("BASiCS_showFit",
 
 #' @name BASiCS_Summary-methods
 #' @aliases show,BASiCS_Summary-method
-#' 
+#'
 #' @title 'show' method for BASiCS_Summary objects
-#' 
+#'
 #' @description 'show' method for \code{\linkS4class{BASiCS_Summary}} objects.
-#' 
+#'
 #' @param object A \code{\linkS4class{BASiCS_Summary}} object.
-#' 
+#'
 #' @return Prints a summary of the properties of \code{object}.
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # See
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_Summary-methods
-setMethod("show", 
-          signature = "BASiCS_Summary", 
-          definition = function(object) 
+setMethod("show",
+          signature = "BASiCS_Summary",
+          definition = function(object)
           {
             q <- nrow(object@parameters$mu)
             q.bio <- nrow(object@parameters$delta)
             n <- nrow(object@parameters$phi)
             nBatch <- nrow(object@parameters$theta)
             cat("An object of class ", class(object), "\n",
-                " Contains posterior medians and the limits of the \n", 
+                " Contains posterior medians and the limits of the \n",
                 " HPD interval for all BASiCS model parameters.\n")
-    
-            if (nBatch > 1) 
-            {
-              cat("  Dataset contains ", q, " genes ", 
-                  "(", q.bio, " biological and ", q-q.bio, " technical) \n",
-                  "  and ", n, " cells (", nBatch, " batches). \n", sep = "")
-            } 
-            else 
+
+            if (nBatch > 1)
             {
               cat("  Dataset contains ", q, " genes ",
-                  "(", q.bio, " biological and ", q-q.bio, " technical) \n", 
+                  "(", q.bio, " biological and ", q-q.bio, " technical) \n",
+                  "  and ", n, " cells (", nBatch, " batches). \n", sep = "")
+            }
+            else
+            {
+              cat("  Dataset contains ", q, " genes ",
+                  "(", q.bio, " biological and ", q-q.bio, " technical) \n",
                   "  and ", n, " cells (1 batch). \n", sep = "")
             }
             ChainVersion <- object@.__classVersion__$BASiCS_Summary
@@ -615,7 +615,7 @@ setMethod("show",
                                    ChainVersion[2], ".",
                                    ChainVersion[3])
             cat("  Object stored using BASiCS version: ", ChainVersion, "\n",
-                " Parameters: ", names(object@parameters), "\n")   
+                " Parameters: ", names(object@parameters), "\n")
           })
 
 #' @export
@@ -626,292 +626,213 @@ setMethod("plot", signature = "ANY", graphics::plot)
 
 #' @name plot-BASiCS_Summary-method
 #' @aliases plot,BASiCS_Summary-method, plot,BASiCS_Summary,ANY-method
-#' 
+#'
 #' @docType methods
 #' @rdname plot-BASiCS_Summary-method
-#' 
+#'
 #' @title 'plot' method for BASiCS_Summary objects
-#' 
+#'
 #' @description 'plot' method for \code{\linkS4class{BASiCS_Summary}} objects
-#' 
+#'
 #' @param x A \code{\linkS4class{BASiCS_Summary}} object.
-#' @param Param Name of the slot to be used for the plot. 
-#' Possible values: \code{'mu'}, \code{'delta'}, 
-#' \code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'}, 
+#' @param Param Name of the slot to be used for the plot.
+#' Possible values: \code{'mu'}, \code{'delta'},
+#' \code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
-#' @param Param2 Name of the second slot to be used for the plot. 
+#' @param Param2 Name of the second slot to be used for the plot.
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'epsilon'},
-#' \code{'phi'}, \code{'s'} and \code{'nu'} 
-#' (combinations between gene-specific and 
+#' \code{'phi'}, \code{'s'} and \code{'nu'}
+#' (combinations between gene-specific and
 #' cell-specific parameters are not admitted).
-#' @param Genes Specifies which genes are requested. 
+#' @param Genes Specifies which genes are requested.
 #' Required only if \code{Param = 'mu'}, \code{'delta'} or \code{'epsilon'}.
-#' @param Cells Specifies which cells are requested. 
+#' @param Cells Specifies which cells are requested.
 #' Required only if \code{Param = 'phi', 's'} or \code{'nu'}
-#' @param Batches Specifies which batches are requested. 
+#' @param Batches Specifies which batches are requested.
 #' Required only if \code{Param = 'theta'}
-#' @param RegressionTerms Specifies which regression coefficients are requested. 
+#' @param RegressionTerms Specifies which regression coefficients are requested.
 #' Required only if \code{Param = 'beta'}
-#' 
-#' @param xlab As in \code{\link[graphics]{par}}. 
+#'
+#' @param xlab As in \code{\link[graphics]{par}}.
 #' @param ylab As in \code{\link[graphics]{par}}.
-#' @param xlim As in \code{\link[graphics]{par}}.  
-#' @param ylim As in \code{\link[graphics]{par}}. 
-#' @param pch As in \code{\link[graphics]{par}}. 
-#' @param col As in \code{\link[graphics]{par}}. 
-#' @param bty As in \code{\link[graphics]{par}}. 
-#' @param SmoothPlot Logical parameter. If \code{TRUE}, 
-#' transparency will be added to the color of the dots. 
+#' @param xlim As in \code{\link[graphics]{par}}.
+#' @param ylim As in \code{\link[graphics]{par}}.
+#' @param pch As in \code{\link[graphics]{par}}.
+#' @param col As in \code{\link[graphics]{par}}.
+#' @param bty As in \code{\link[graphics]{par}}.
+#' @param SmoothPlot Logical parameter. If \code{TRUE},
+#' transparency will be added to the color of the dots.
 #' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
-#' 
+#'
 #' @return A plot object
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # See
 #' help(BASiCS_MCMC)
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' 
+#'
 #' @export
-setMethod("plot", 
-          signature = "BASiCS_Summary", 
-          definition = function(x, Param = "mu", Param2 = NULL, 
-                                Genes = NULL, Cells = NULL, Batches = NULL, 
+setMethod("plot",
+          signature = "BASiCS_Summary",
+          definition = function(x, Param = "mu", Param2 = NULL,
+                                Genes = NULL, Cells = NULL, Batches = NULL,
                                 RegressionTerms = NULL,
-                                xlab = "", ylab = "", xlim = "", ylim = "", 
-                                pch = 16, col = "blue", bty = "n", 
-                                SmoothPlot = TRUE, ...) 
+                                xlab = "", ylab = "", xlim = "", ylim = NULL,
+                                pch = 16, col = "blue", bty = "n",
+                                SmoothPlot = TRUE, ...)
           {
-    
-            if (!(Param %in% names(x@parameters))) 
+
+            if (!(Param %in% names(x@parameters))) {
               stop("'Param' argument is invalid")
-    
+            }
+
             q <- nrow(x@parameters$mu)
             q.bio <- nrow(x@parameters$delta)
             n <- nrow(x@parameters$s)
             nBatch <- nrow(x@parameters$theta)
-    
-            if (is.null(Genes)) { Genes <- seq_len(q.bio) }
-            if (is.null(Cells)) { Cells <- seq_len(n) }
-            if (is.null(Batches)) { Batches <- seq_len(nBatch) }
-            
-            if("beta" %in% names(x@parameters)) {
-              k <- nrow(x@parameters$beta)
-              if (is.null(RegressionTerms)) { RegressionTerms <- seq_len(k) }
+
+            if (is.null(Genes)) {
+              Genes <- seq_len(q.bio)
             }
-               
-            if (is.null(Param2)) 
-            {
-              if (Param == "mu") 
-              {
-                object <- x@parameters$mu; Columns <- Genes
-                if (ylab == "") { ylab <- expression(mu[i]) }
-                if (xlab == "") { xlab <- "Gene" }
-              }
-              if (Param == "delta") 
-              {
-                object <- x@parameters$delta; Columns <- Genes
-                if (ylab == "") { ylab <- expression(delta[i]) }
-                if (xlab == "") { xlab <- "Gene" }
-              }
-              if (Param == "phi") 
-              {
-                  object <- x@parameters$phi; Columns <- Cells
-                  if (ylab == "") { ylab <- expression(phi[j]) }
-                  if (xlab == "") { xlab <- "Cell" }
-              }
-              if (Param == "s") 
-              {
-                  object <- x@parameters$s; Columns <- Cells
-                  if (ylab == "") { ylab <- expression(s[j]) }
-                  if (xlab == "") { xlab <- "Cell" }
-              }
-              if (Param == "nu") 
-              {
-                  object <- x@parameters$nu; Columns <- Cells
-                  if (ylab == "") { ylab <- expression(nu[j]) }
-                  if (xlab == "") { xlab <- "Cell" }
-              }
-              if (Param == "theta") 
-              {
-                  object <- x@parameters$theta; Columns <- Batches
-                  if (ylab == "") { ylab <- expression(theta[b]) }
-                  if (xlab == "") { xlab <- "Batch" }
-              }
-              if (Param == "beta") 
-              {
-                object <- x@parameters$beta; Columns <- RegressionTerms
-                if (ylab == "") { ylab <- expression(beta[k]) }
-                if (xlab == "") { xlab <- "Regression term" }
-              }
-              if (Param == "sigma2") 
-              {
-                object <- x@parameters$sigma2; Columns <- 1
-                if (ylab == "") { ylab <- expression(epsilon[i]) }
-                if (xlab == "") { xlab <- "Gene" }
-              }
-              if (Param == "epsilon") 
-              {
-                  object <- x@parameters$epsilon; Columns <- Genes
-                  if (ylab == "") { ylab <- expression(epsilon[i]) }
-                  if (xlab == "") { xlab <- "Gene" }
-              }
-        
-            if (ylim == "") 
-            {
-              ylim = c(min(object[Columns, 2]), max(object[Columns, 3]))
+            if (is.null(Cells)) {
+              Cells <- seq_len(n)
             }
-        
-            # Point estimates
-            plot(Columns, object[Columns, 1], 
-                 xlab = xlab, ylab = ylab, ylim = ylim, 
-                 pch = pch, col = col, bty = bty, ...)
-            # Add HPD interval
-            for (Column in Columns) 
-            {
-              BarLength = ifelse(length(Columns) <= 10, 0.1, 2/length(Columns))
-              segments(x0 = Column, y0 = object[Column, 2], 
-                       y1 = object[Column, 3], col = col)
-              segments(x0 = Column - BarLength, y0 = object[Column, 2], 
-                       x1 = Column + BarLength, col = col)
-              segments(x0 = Column - BarLength, y0 = object[Column, 3], 
-                       x1 = Column + BarLength, col = col)
-            }
-          } 
-          else 
-          {
-            args <- list(...); ValidCombination <- FALSE
-            if (SmoothPlot) 
-            {
-              col = grDevices::rgb(grDevices::col2rgb(col)[1], 
-                                   grDevices::col2rgb(col)[2], 
-                                   grDevices::col2rgb(col)[3], 
-                                   50, maxColorValue = 255)
-            }
-        
-            if (Param == "mu" & Param2 == "delta") 
-            {
-              ValidCombination <- TRUE; Columns <- Genes
-              if (ylab == "") { ylab <- expression(delta[i]) }
-              if (xlab == "") { xlab <- expression(mu[i]) }
-              if (xlim == "") { xlim <- c(min(x@parameters$mu[Columns, 1]), 
-                                          max(x@parameters$mu[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@parameters$delta[Columns, 1]), 
-                                          max(x@parameters$delta[Columns, 1])) }
-              plot(x@parameters$mu[Columns, 1], x@parameters$delta[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "delta" & Param2 == "mu") 
-            {
-              ValidCombination <- TRUE; Columns <- Genes
-              if (ylab == "") { ylab <- expression(mu[i]) }
-              if (xlab == "") { xlab <- expression(delta[i]) }
-              if (ylim == "") { ylim <- c(min(x@parameters$mu[Columns, 1]), 
-                                          max(x@parameters$mu[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@parameters$delta[Columns, 1]), 
-                                          max(x@parameters$delta[Columns, 1])) }
-              plot(x@parameters$delta[Columns, 1], x@parameters$mu[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "phi" & Param2 == "s") 
-            {
-              ValidCombination <- TRUE; Columns <- Cells
-              if (ylab == "") { ylab <- expression(s[j]) }
-              if (xlab == "") { xlab <- expression(phi[j]) }
-              if (xlim == "") { xlim <- c(min(x@parameters$phi[Columns, 1]), 
-                                          max(x@parameters$phi[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@parameters$s[Columns, 1]), 
-                                          max(x@parameters$s[Columns, 1])) }
-              plot(x@parameters$phi[Columns, 1], x@parameters$s[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "s" & Param2 == "phi") 
-            {
-              ValidCombination <- TRUE; Columns <- Cells
-              if (ylab == "") { ylab <- expression(phi[j]) }
-              if (xlab == "") { xlab <- expression(s[j]) }
-              if (ylim == "") { ylim <- c(min(x@parameters$phi[Columns, 1]), 
-                                          max(x@parameters$phi[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@parameters$s[Columns, 1]),
-                                          max(x@parameters$s[Columns, 1])) }
-              plot(x@parameters$s[Columns, 1], x@parameters$phi[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "phi" & Param2 == "nu") 
-            {
-              ValidCombination <- TRUE; Columns <- Cells
-              if (ylab == "") { ylab <- expression(nu[j]) }
-              if (xlab == "") { xlab <- expression(phi[j]) }
-              if (xlim == "") { xlim <- c(min(x@parameters$phi[Columns, 1]), 
-                                          max(x@parameters$phi[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@parameters$nu[Columns, 1]), 
-                                          max(x@parameters$nu[Columns, 1])) }
-              plot(x@parameters$phi[Columns, 1], x@parameters$nu[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "nu" & Param2 == "phi") 
-            {
-              ValidCombination <- TRUE; Columns <- Cells
-              if (ylab == "") { ylab <- expression(phi[j]) }
-              if (xlab == "") { xlab <- expression(nu[j]) }
-              if (ylim == "") { ylim <- c(min(x@parameters$phi[Columns, 1]), 
-                                          max(x@parameters$phi[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@parameters$nu[Columns, 1]), 
-                                          max(x@parameters$nu[Columns, 1])) }
-              plot(x@parameters$nu[Columns, 1], x@parameters$phi[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "s" & Param2 == "nu") 
-            {
-              ValidCombination <- TRUE; Columns <- Cells
-              if (ylab == "") { ylab <- expression(nu[j]) }
-              if (xlab == "") { xlab <- expression(s[j]) }
-              if (xlim == "") { xlim <- c(min(x@parameters$s[Columns, 1]), 
-                                          max(x@parameters$s[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@parameters$nu[Columns, 1]), 
-                                          max(x@parameters$nu[Columns, 1])) }
-              plot(x@parameters$s[Columns, 1], x@parameters$nu[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "nu" & Param2 == "s") 
-            {
-              ValidCombination <- TRUE; Columns <- Cells
-              if (ylab == "") { ylab <- expression(s[j]) }
-              if (xlab == "") { xlab <- expression(nu[j]) }
-              if (ylim == "") { ylim <- c(min(x@parameters$s[Columns, 1]), 
-                                          max(x@parameters$s[Columns, 1])) }
-              if (xlim == "") { xlim <- c(min(x@parameters$nu[Columns, 1]), 
-                                          max(x@parameters$nu[Columns, 1])) }
-              plot(x@parameters$nu[Columns, 1], x@parameters$s[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
-            }
-            if (Param == "mu" & Param2 == "epsilon") 
-            {
-              ValidCombination <- TRUE; Columns <- Genes
-              if (ylab == "") { ylab <- expression(epsilon[i]) }
-              if (xlab == "") { xlab <- expression(mu[i]) }
-              if (xlim == "") { xlim <- c(min(x@parameters$mu[Columns, 1]), 
-                                          max(x@parameters$mu[Columns, 1])) }
-              if (ylim == "") { ylim <- c(min(x@parameters$epsilon[Columns, 1]), 
-                                          max(x@parameters$epsilon[Columns, 1])) }
-              plot(x@parameters$mu[Columns, 1], x@parameters$epsilon[Columns, 1], 
-                   xlab = xlab, ylab = ylab, ylim = ylim, 
-                   pch = pch, col = col, bty = bty, ...)
+            if (is.null(Batches)) {
+              Batches <- seq_len(nBatch)
             }
 
-            if (ValidCombination == FALSE) 
-            {
+            if("beta" %in% names(x@parameters)) {
+              k <- nrow(x@parameters$beta)
+              if (is.null(RegressionTerms)) {
+                RegressionTerms <- seq_len(k)
+              }
+            }
+
+            batchParams <- c("theta")
+            geneParams <- c("mu", "delta", "epsilon")
+            cellParams <- c("phi", "s", "nu")
+
+            if (is.null(Param2)) {
+              if (ylab == "") {
+                ylab <- bquote(.(Param)[i])
+              }
+              object <- x@parameters[[Param]]
+
+              if (Param %in% geneParams) {
+                Columns <- Genes
+                if (xlab == "") {
+                  xlab <- "Gene"
+                }
+              } else if (Param %in% cellParams) {
+                Columns <- Cells
+                if (xlab == "") {
+                  xlab <- "Cell"
+                }
+              } else if (Param %in% batchParams) {
+                  Columns <- Batches
+                  if (ylab == "") {
+                    ylab <- bquote(.(Param)[b])
+                  }
+                  if (xlab == "") {
+                    xlab <- "Batch"
+                  }
+              } else if (Param == "beta") {
+                Columns <- RegressionTerms
+                if (ylab == "") {
+                  ylab <- expression(beta[k])
+                }
+                if (xlab == "") {
+                  xlab <- "Regression term"
+                }
+              } else if (Param == "sigma2") {
+                object <- x@parameters$sigma2
+                Columns <- 1
+                if (ylab == "") {
+                  ylab <- expression(sigma[i])
+                }
+                if (xlab == "") {
+                  xlab <- "Gene"
+                }
+              }
+            if (is.null(ylim)) {
+              ylim = c(min(object[Columns, 2]), max(object[Columns, 3]))
+            }
+
+            # Point estimates
+            plot(x = Columns,
+                 y = object[Columns, 1],
+                 xlab = xlab,
+                 ylab = ylab,
+                 ylim = ylim,
+                 pch = pch,
+                 col = col,
+                 bty = bty,
+                 ...)
+            # Add HPD interval
+            for (Column in Columns) {
+              BarLength <- ifelse(length(Columns) <= 10,
+                                  0.1,
+                                  2 / length(Columns))
+
+              segments(x0 = Column,
+                       y0 = object[Column, 2],
+                       y1 = object[Column, 3],
+                       col = col)
+              segments(x0 = Column - BarLength,
+                       y0 = object[Column, 2],
+                       x1 = Column + BarLength,
+                       col = col)
+              segments(x0 = Column - BarLength,
+                       y0 = object[Column, 3],
+                       x1 = Column + BarLength,
+                       col = col)
+            }
+
+          } else {
+            ValidCombination <- FALSE
+            if (SmoothPlot) {
+              col <- grDevices::rgb(grDevices::col2rgb(col)[1],
+                                    grDevices::col2rgb(col)[2],
+                                    grDevices::col2rgb(col)[3],
+                                    50,
+                                    maxColorValue = 255)
+            }
+            if (Param %in% geneParams) {
+              Columns <- Genes
+              if (!Param2 %in% geneParams) {
+                ValidCombination <- FALSE
+              }
+            }
+            if (Param %in% cellParams) {
+              Columns <- Cells
+              if (!Param2 %in% cellParams) {
+                ValidCombination <- FALSE
+              }
+            }
+            if (!ValidCombination) {
               stop("Invalid combination for Param and Param2. \n")
+            } else {
+              plot(
+                x@parameters[[Param]][Columns, 1],
+                x@parameters[[Param2]][Columns, 1],
+                xlab = bquote(.(Param)[i]),
+                ylab = bquote(.(Param2)[i]),
+                xlim = c(
+                  min(x@parameters[[Param]][Columns, 1]),
+                  max(x@parameters[[Param]][Columns, 1])
+                ),
+                ylim = c(
+                  min(x@parameters[[Param2]][Columns, 1]),
+                  max(x@parameters[[Param2]][Columns, 1])
+                ),
+                pch = pch,
+                col = col,
+                bty = bty,
+                ...
+              )
             }
           }
         })
@@ -919,41 +840,41 @@ setMethod("plot",
 
 #' @name displaySummaryBASiCS-BASiCS_Summary-method
 #' @aliases displaySummaryBASiCS displaySummaryBASiCS,BASiCS_Summary-method
-#' 
+#'
 #' @docType methods
 #' @rdname displaySummaryBASiCS-BASiCS_Summary-method
-#' 
+#'
 #' @title Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}} object
-#' 
+#'
 #' @description Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}}
 #' object
-#' 
+#'
 #' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
-#' @param Param Name of the slot to be used for the accessed. 
-#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'}, 
-#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'}, 
+#' @param Param Name of the slot to be used for the accessed.
+#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
+#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
-#'  
+#'
 #' @return The requested slot of a \code{\linkS4class{BASiCS_Summary}} object
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # See
 #' help(BASiCS_MCMC)
-#'   
+#'
 #' @seealso \code{\linkS4class{BASiCS_Summary}}
-#' 
+#'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' 
+#'
 #' @export
-setMethod("displaySummaryBASiCS", 
-          signature = "BASiCS_Summary", 
-          definition = function(object, Param = "mu") 
+setMethod("displaySummaryBASiCS",
+          signature = "BASiCS_Summary",
+          definition = function(object, Param = "mu")
           {
-            if (!(Param %in% names(object@parameters))) 
+            if (!(Param %in% names(object@parameters)))
               stop("'Param' argument is invalid")
-    
+
             if (Param == "mu") { return(object@parameters$mu) }
             if (Param == "delta") { return(object@parameters$delta) }
             if (Param == "phi") { return(object@parameters$phi) }
