@@ -24,7 +24,7 @@
 
 \item{bty}{As in \code{\link[graphics]{par}}.}
 
-\item{smooth}{Logical to indicate wether the smoothScatter function is used 
+\item{smooth}{Logical to indicate wether the smoothScatter function is used
 to plot the scatter plot.}
 
 \item{variance}{Variance used to build GRBFs for regression}
@@ -35,7 +35,7 @@ to plot the scatter plot.}
 A plot object
 }
 \description{
-Plotting the trend after Bayesian regression using a 
+Plotting the trend after Bayesian regression using a
 \code{\linkS4class{BASiCS_Chain}} object
 }
 \examples{
@@ -44,7 +44,7 @@ BASiCS_showFit(ChainRNAReg)
 
 }
 \references{
-Eling et al (2018). Cell Systems 
+Eling et al (2018). Cell Systems
 https://doi.org/10.1016/j.cels.2018.06.011
 }
 \author{

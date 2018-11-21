@@ -23,16 +23,16 @@ generic method. Not used within BASiCS.}
 \value{
 Prints a summary of the properties of \code{object}.
 
-Returns an updated \code{\linkS4class{BASiCS_Chain}} object that 
+Returns an updated \code{\linkS4class{BASiCS_Chain}} object that
 contains all model parameters in a single slot object (list).
 }
 \description{
 'show' method for \code{\linkS4class{BASiCS_Chain}} objects.
 
-'updateObject' method for \code{\linkS4class{BASiCS_Chain}} 
+'updateObject' method for \code{\linkS4class{BASiCS_Chain}}
 objects. It is used to convert outdated \code{\linkS4class{BASiCS_Chain}}
 objects into a version that is compatible with the Bioconductor release
-of BASiCS. Do not use this method is \code{\linkS4class{BASiCS_Chain}} 
+of BASiCS. Do not use this method is \code{\linkS4class{BASiCS_Chain}}
 already contains a \code{parameters} slot.
 }
 \examples{

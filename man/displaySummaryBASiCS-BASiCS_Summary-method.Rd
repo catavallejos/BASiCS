@@ -12,9 +12,9 @@
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Param}{Name of the slot to be used for the accessed. 
-Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'}, 
-\code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'}, 
+\item{Param}{Name of the slot to be used for the accessed.
+Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
+\code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}.}
 }
 \value{
@@ -28,7 +28,7 @@ object
 
 # See
 help(BASiCS_MCMC)
-  
+
 }
 \seealso{
 \code{\linkS4class{BASiCS_Summary}}
