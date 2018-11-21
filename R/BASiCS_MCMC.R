@@ -243,12 +243,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   sum.bycell.bio <- matrixStats::rowSums2(counts(Data)[!spikes, ])
   sum.bygene.bio <- matrixStats::colSums2(counts(Data)[!spikes, ])
 
-  # Optional arguments
-  Args <- list(...)
   # Assignment of default values
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n,
+  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data, Burn, n,
                                          Regression,
-                                         WithSpikes = WithSpikes)
+                                         WithSpikes = WithSpikes,
+                                         ...)
   AR <- ArgsDef$AR
   StopAdapt <- ArgsDef$StopAdapt
   StoreChains <- ArgsDef$StoreChains
@@ -342,7 +341,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     }
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
-<<<<<<< Updated upstream
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn,
                 as.matrix(counts(Data))[!spikes,],
                 BatchDesign,
@@ -354,47 +352,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 AR, ls.mu0, ls.delta0, ls.phi0, ls.nu0, rep(ls.theta0, nBatch),
                 sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
                 as.numeric(StoreAdapt), StopAdapt, as.numeric(PrintProgress)))
-=======
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(
-        N = N,
-        Thin = Thin,
-        Burn = Burn,
-        Counts = as.matrix(counts(Data))[!spikes, ],
-        BatchDesign = BatchDesign,
-        muSpikes = SpikeInput,
-        mu0 = mu0,
-        delta0 = delta0,
-        phi0 = phi0,
-        s0 = s0,
-        nu0 = nu0,
-        theta0 = rep(theta0, nBatch),
-        s2mu = PriorParam$s2.mu,
-        adelta = PriorParam$a.delta,
-        bdelta = PriorParam$b.delta,
-        s2delta = PriorParam$s2.delta,
-        prior_delta = PriorDeltaNum,
-        aphi = PriorParam$p.phi,
-        as = PriorParam$a.s,
-        bs = PriorParam$b.s,
-        atheta = PriorParam$a.theta,
-        btheta = PriorParam$b.theta,
-        ar = AR,
-        LSmu0 = ls.mu0,
-        LSdelta0 = ls.delta0,
-        LSphi0 = ls.phi0,
-        LSnu0 = ls.nu0,
-        LStheta0 = rep(ls.theta0, nBatch),
-        sumByCellAll = sum.bycell.all,
-        sumByCellBio = sum.bycell.bio ,
-        sumByGeneAll = sum.bygene.all,
-        sumByGeneBio = sum.bygene.bio,,
-        StoreAdapt = as.numeric(StoreAdapt),
-        EndAdapt = StopAdapt,
-        PrintProgress = as.numeric(PrintProgress),
-        geneExponent = geneExponent,
-        sampleExponent = geneExponent
-      ))
->>>>>>> Stashed changes
     }
   }
   else {

@@ -5,8 +5,8 @@ HiddenBASiCS_DenoisedRates <- function(CountsBio, Mu, TransInvDelta, PhiNu, N, q
     .Call('_BASiCS_HiddenBASiCS_DenoisedRates', PACKAGE = 'BASiCS', CountsBio, Mu, TransInvDelta, PhiNu, N, q0, n)
 }
 
-HiddenBASiCS_MCMCcpp <- function(N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress) {
-    .Call('_BASiCS_HiddenBASiCS_MCMCcpp', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress)
+HiddenBASiCS_MCMCcpp <- function(N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress, geneExponent, sampleExponent) {
+    .Call('_BASiCS_HiddenBASiCS_MCMCcpp', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, aphi, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellAll, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress, geneExponent, sampleExponent)
 }
 
 HiddenBASiCS_MCMCcppNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, s2mu, adelta, bdelta, s2delta, prior_delta, as, bs, atheta, btheta, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef) {
@@ -25,7 +25,7 @@ Hidden_rDirichlet <- function(alpha) {
     .Call('_BASiCS_Hidden_rDirichlet', PACKAGE = 'BASiCS', alpha)
 }
 
-Hidden_muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind) {
-    .Call('_BASiCS_Hidden_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind)
+Hidden_muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind, exponent) {
+    .Call('_BASiCS_Hidden_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind, exponent)
 }
 
