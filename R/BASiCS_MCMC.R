@@ -208,20 +208,26 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
-                        WithSpikes = TRUE, ...)
+BASiCS_MCMC <- function(Data,
+                        N,
+                        Thin,
+                        Burn,
+                        Regression,
+                        WithSpikes = TRUE,
+                        NGenePartition = 1,
+                        NCellPartition = 1,
+                        ...)
 {
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
   # If data contains spike-ins
-  if(!is.null(SingleCellExperiment::isSpike(Data))){
+  if(!is.null(SingleCellExperiment::isSpike(Data))) {
     q <- nrow(Data)
     q.bio <- sum(!SingleCellExperiment::isSpike(Data))
     spikes <- SingleCellExperiment::isSpike(Data)
-  }
-  else{
+  } else {
     q.bio <- q <- nrow(Data)
     spikes <- rep(FALSE, q)
   }
@@ -231,22 +237,23 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   # If Data contains batches
   if(!is.null(colData(Data)$BatchInfo)){
     nBatch <- length(unique(colData(Data)$BatchInfo))
-  }
-  else{
+  } else {
     nBatch <- 1
   }
 
   sum.bycell.all <- matrixStats::rowSums2(counts(Data))
   sum.bygene.all <- matrixStats::colSums2(counts(Data))
 
-  # Optional arguments
   sum.bycell.bio <- matrixStats::rowSums2(counts(Data)[!spikes, ])
   sum.bygene.bio <- matrixStats::colSums2(counts(Data)[!spikes, ])
 
   # Optional arguments
   Args <- list(...)
   # Assignment of default values
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args, Data, Burn, n,
+  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Args,
+                                         Data,
+                                         Burn,
+                                         n,
                                          Regression,
                                          WithSpikes = WithSpikes)
   AR <- ArgsDef$AR
@@ -342,19 +349,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     }
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
-<<<<<<< Updated upstream
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(N, Thin, Burn,
-                as.matrix(counts(Data))[!spikes,],
-                BatchDesign,
-                SpikeInput, mu0, delta0, phi0, s0, nu0, rep(theta0, nBatch),
-                PriorParam$s2.mu, PriorParam$a.delta, PriorParam$b.delta,
-                PriorParam$s2.delta, PriorDeltaNum, PriorParam$p.phi,
-                PriorParam$a.s, PriorParam$b.s,
-                PriorParam$a.theta, PriorParam$b.theta,
-                AR, ls.mu0, ls.delta0, ls.phi0, ls.nu0, rep(ls.theta0, nBatch),
-                sum.bycell.all, sum.bycell.bio, sum.bygene.all, sum.bygene.bio,
-                as.numeric(StoreAdapt), StopAdapt, as.numeric(PrintProgress)))
-=======
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(
         N = N,
         Thin = Thin,
@@ -391,10 +385,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
         StoreAdapt = as.numeric(StoreAdapt),
         EndAdapt = StopAdapt,
         PrintProgress = as.numeric(PrintProgress),
-        geneExponent = geneExponent,
-        sampleExponent = geneExponent
+        geneExponent = NGenePartition,
+        cellExponent = NCellPartition
       ))
->>>>>>> Stashed changes
     }
   }
   else {

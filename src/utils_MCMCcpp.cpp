@@ -29,9 +29,9 @@ arma::mat Hidden_muUpdate(
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
   // prior ratio
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2));
-  for (int i=0; i < q0; i++) {
-    for (int j=0; j < n; j++) {
+  log_aux -= ((0.5/s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) / exponent;
+  for (int i = 0; i < q0; i++) {
+    for (int j = 0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *
         log( ( phinu(j)*mu1(i) + invdelta(i) ) /
         ( phinu(j)*mu0(i) + invdelta(i) ));
@@ -45,7 +45,7 @@ arma::mat Hidden_muUpdate(
   * - When the acceptance rate cannot be numerally computed
   */
   ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
-  for (int i=0; i < q0; i++) {
+  for (int i = 0; i < q0; i++) {
     if(ind(i) == 0) mu1(i) = mu0(i);
   }
 
@@ -84,8 +84,8 @@ arma::mat deltaUpdate(
   */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
-  for (int i=0; i < q0; i++) {
-    for (int j=0; j < n; j++) {
+  for (int i = 0; i < q0; i++) {
+    for (int j = 0; j < n; j++) {
       log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
       log_aux(i) -= std::lgamma(Counts(i,j) + (1/delta0(i)));
       log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
@@ -93,11 +93,10 @@ arma::mat deltaUpdate(
     }
   }
   // Component related to the prior
-  if(prior_delta == 1) {
-    log_aux += (log(delta1)-log(delta0))*a_delta - b_delta * (delta1 - delta0);
-  }
-  else {
-    log_aux -= (0.5/s2delta) * ((pow(log(delta1),2) - pow(log(delta0),2)) / exponent);
+  if (prior_delta == 1) {
+    log_aux += ((log(delta1)-log(delta0))*a_delta - b_delta * (delta1 - delta0)) / exponent;
+  } else {
+    log_aux -= ((0.5/s2delta) * (pow(log(delta1),2) - pow(log(delta0),2))) / exponent;
   }
 
   /* CREATING OUTPUT VARIABLE & DEBUG
@@ -107,8 +106,8 @@ arma::mat deltaUpdate(
   * - When the acceptance rate cannot be numerally computed
   */
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i=0; i < q0; i++) {
-    if(ind(i) == 0) delta1(i) = delta0(i);
+  for (int i = 0; i < q0; i++) {
+    if (ind(i) == 0) delta1(i) = delta0(i);
   }
 
   // OUTPUT
@@ -137,23 +136,24 @@ Rcpp::List phiUpdate(
 
   // PROPOSAL STEP
   phi1 = n * Hidden_rDirichlet(prop_var * phi0);
-  double u = R::runif(0,1);
+  double u = R::runif(0, 1);
 
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)
-  if(all(prop_var * phi1 < 2.5327372760800758e+305) &
+  if (all(prop_var * phi1 < 2.5327372760800758e+305) &
      all(prop_var * phi0 < 2.5327372760800758e+305) &
      all(phi1 > 0) & all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
-    double log_aux = sum( (sum_bygene_bio + aphi) % (log(phi1) - log(phi0)));
+    double log_aux = sum((sum_bygene_bio + aphi / exponent) % (log(phi1) - log(phi0)));
 
     // Loop to replace matrix operations, through genes and cells
     // There is an extra factor in the prior n^(-n); it cancels out in the ratio
     // There is an extra factor n^(-(sum(aphi) - 1));it cancels out in the ratio
-    for (int j=0; j < n; j++) {
-      for (int i=0; i < q0; i++) {
-        log_aux -= ( Counts(i,j) + invdelta(i) ) *
-          log( (phi1(j)*nu(j)*mu(i) + invdelta(i) ) /
-          (phi0(j)*nu(j)*mu(i) + invdelta(i) ));
+    for (int j = 0; j < n; j++) {
+      for (int i = 0; i < q0; i++) {
+        log_aux -= (Counts(i,j) + invdelta(i)) *
+          log(
+            (phi1(j) * nu(j) * mu(i) + invdelta(i)) /
+            (phi0(j) * nu(j) * mu(i) + invdelta(i)));
       }
     }
     // There is an extra factor
@@ -165,19 +165,21 @@ Rcpp::List phiUpdate(
     log_aux += prop_var * sum(phi1 % log(phi0) - phi0 % log(phi1));
     log_aux -= sum(lgamma_cpp_vec(prop_var*phi1) - lgamma_cpp_vec(prop_var*phi0));
 
-    if(!R_IsNA(log_aux)){
-      if(log(u) < log_aux) { ind = 1; }
-      else {ind = 0; phi1 = phi0;}
-    }
-    // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
-    // DEBUG: Print warning message
-    else {
+    if (!R_IsNA(log_aux)) {
+      if (log(u) < log_aux) {
+        ind = 1;
+      } else {
+        ind = 0;
+        phi1 = phi0;
+      }
+    } else {
+      // DEBUG: Reject values such that acceptance rate cannot be computed (due no numerical innacuracies)
+      // DEBUG: Print warning message
       Rcpp::Rcout << "Error when updating phi" << std::endl;
       Rcpp::stop("Please consider additional filter of the input dataset.");
       ind = 0; phi1 = phi0;
     }
-  }
-  else {
+  } else {
     ind = 0; phi1 = phi0;
   }
   return(Rcpp::List::create(Rcpp::Named("phi") = phi1,
@@ -202,26 +204,40 @@ arma::vec sUpdateBatch(
 {
 
   // Calculating parameters to the passed as input to the Rgig function (common for all cells)
-  arma::vec p = as - 1 / thetaBatch;
-  double b = 2 * bs;
+  arma::vec lambda;
+  double psi = 2 * bs;
+  if (exponent == 1) {
+    lambda = as - 1 / thetaBatch;
+  } else {
+    lambda = ((as - 1) / exponent) - (1 / thetaBatch) + 1;
+    psi /= exponent;
+  }
 
   // GIG draws
   // Initialize s1 with s0 (return that for invalid samples)
 
   // Calculating parameter to the passed as input to the Rgig function (specific to each cell)
-  arma::vec a = 2 * nu / thetaBatch;
+  arma::vec chi = 2 * nu / thetaBatch;
   for (int j = 0; j < n; j++) {
-    if(!R_IsNA(p(j))) {
-      if(!R_IsNA(a(j)) & (a(j)>0)) {
-        s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
+
+    if (!R_IsNA(lambda(j))) {
+
+      if (!R_IsNA(chi(j)) & (chi(j) > 0)) {
+
+        s1(j) = Rcpp::as<double>(Rgig(1, lambda(j), chi(j), psi));
         /* DEBUG: break in case of undefined values */
-        if(R_IsNA(s1(j))) {
+        if (R_IsNA(s1(j))) {
           Rcpp::Rcout << "Error when updating s" << j << std::endl;
           Rcpp::stop("Please consider additional filter of the input dataset.");
         }
+
       }
       else {
-        if(!(a(j)<0) & (p(j)>0)) s1(j) = Rcpp::as<double>(Rgig(1, p(j), a(j), b));
+
+        if ((chi(j) >= 0) & (lambda(j) > 0)) {
+          s1(j) = Rcpp::as<double>(Rgig(1, lambda(j), chi(j), psi));
+        };
+
       }
     }
   }
@@ -259,16 +275,16 @@ arma::mat nuUpdateBatch(
   // ACCEPT/REJECT STEP
   arma::vec log_aux = arma::zeros(n);
 
-  for (int j=0; j < n; j++) {
-    for (int i=0; i < q0; i++) {
-      log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *
-        log( ( phi(j)*nu1(j)*mu(i) + invdelta(i) ) /
-        ( phi(j)*nu0(j)*mu(i) + invdelta(i) ));
+  for (int j = 0; j < n; j++) {
+    for (int i = 0; i < q0; i++) {
+      log_aux(j) -= (Counts(i,j) + invdelta(i)) *
+        log((phi(j)*nu1(j)*mu(i) + invdelta(i)) /
+            (phi(j)*nu0(j)*mu(i) + invdelta(i)));
     }
   }
 
-  log_aux += (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
-  log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1/(thetaBatch % s)));
+  log_aux += (log(nu1) - log(nu0)) % ((sum_bygene_all + 1 / thetaBatch) / exponent);
+  log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1/(thetaBatch % s * exponent)));
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
@@ -277,8 +293,10 @@ arma::mat nuUpdateBatch(
   * - When the acceptance rate cannot be numerally computed
   */
   ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
-  for (int j=0; j < n; j++) {
-    if(ind(j) == 0) nu1(j) = nu0(j);
+  for (int j = 0; j < n; j++) {
+    if (ind(j) == 0) {
+      nu1(j) = nu0(j);
+    }
   }
 
   // OUTPUT
@@ -315,11 +333,21 @@ arma::mat thetaUpdateBatch(
   BatchDesignAux.each_col() %= log(nu / s) - (nu / s);
 
   // ACCEPT/REJECT STEP
-  arma::vec log_aux = (y-logtheta) * a_theta;
-  log_aux -= BatchSizes % (logtheta/theta0) % ((y/logtheta) % exp(-y+logtheta)-1);
-  log_aux -= BatchSizes % (lgamma_cpp(exp(-y))-lgamma_cpp(1/theta0));
-  log_aux += ((exp(-y+logtheta)-1)/theta0) % sum(BatchDesignAux,0).t();
-  log_aux -= b_theta * theta0 % (exp(y-logtheta)-1);
+  // Theta ^ (a - n/theta - 1)
+  arma::vec log_aux = (y - logtheta);
+  if (exponent == 1) {
+    log_aux *= a_theta;
+    log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta) % exp(-y + logtheta) - 1);
+  } else {
+    log_aux *= a_theta - 1 / exponent;
+    log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta));
+  }
+  // Gamma component
+  log_aux -= BatchSizes % (lgamma_cpp(exp(-y)) - lgamma_cpp(1 / theta0));
+  // nu / s component
+  log_aux += ((exp(-y + logtheta) - 1) / theta0) % sum(BatchDesignAux, 0).t();
+  // exponential component
+  log_aux -= (b_theta / exponent) * theta0 % (exp(y - logtheta) - 1);
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
   ind %= 0.0001 < exp(y);

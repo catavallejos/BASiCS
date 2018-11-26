@@ -138,7 +138,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericVector ConstrainGene,
     NumericVector NotConstrainGene,
     int ConstrainType,
-    int StochasticRef);
+    int StochasticRef,
+    double geneExponent,
+    double cellExponent);
 
 // MCMC sampler for regression and non-spikes case
 Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
@@ -184,7 +186,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     NumericVector ConstrainGene,
     NumericVector NotConstrainGene,
     int ConstrainType,
-    int StochasticRef);
+    int StochasticRef,
+    double geneExponent,
+    double cellExponent);
 
 // Function to cumpute denoised rates
 arma::mat HiddenBASiCS_DenoisedRates(
