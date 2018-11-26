@@ -148,7 +148,7 @@ arma::mat deltaUpdateRegNoSpikes(
 
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check
-  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
+  log_aux -= lambda % (pow(log(delta1) - X * beta, 2) - pow(log(delta0) - X * beta, 2)) / (2 * sigma2);
 
   // CREATING OUTPUT VARIABLE & DEBUG
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
