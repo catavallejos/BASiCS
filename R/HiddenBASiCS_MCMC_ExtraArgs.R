@@ -47,7 +47,9 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
             "-------------------------------------------------------------\n")
   }
   if (Regression) {
-    if(k <= 3) stop("The number of basis functions needs to be >= 4.")
+    if (k <= 3) {
+      stop("The number of basis functions needs to be >= 4.")
+    }
   }
 
   if (Regression) {
@@ -67,26 +69,33 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
         PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
         PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 ))
     stop("Invalid prior hyper-parameter values.")
-  if(Regression) {
-    if(!(length(PriorParam$m) == k &
+  if (Regression) {
+    if (!(length(PriorParam$m) == k &
          ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &
          PriorParam$a.sigma2 > 0 & length(PriorParam$a.sigma2) == 1 &
-         PriorParam$b.sigma2 > 0 & length(PriorParam$b.sigma2) == 1 ))
+         PriorParam$b.sigma2 > 0 & length(PriorParam$b.sigma2) == 1 )) {
       stop("Invalid prior hyper-parameter values.")
+    }
   }
 
-  if (!(AR > 0 & AR < 1 & length(AR) == 1))
+  if (!(AR > 0 & AR < 1 & length(AR) == 1)) {
     stop("Invalid AR value. Recommended value: AR = 0.44.")
-  if (!(StopAdapt > 0))
+  }
+  if (!(StopAdapt > 0)) {
     stop("Invalid StopAdapt value.")
-  if (!(is.logical(StoreChains) & length(StoreChains) == 1))
+  }
+  if (!(is.logical(StoreChains) & length(StoreChains) == 1)) {
     stop("Invalid StoreChains value.")
-  if (!(is.logical(StoreAdapt) & length(StoreAdapt) == 1))
+  }
+  if (!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) {
     stop("Invalid StoreAdapt value.")
-  if (!(file.info(StoreDir)["isdir"]))
+  }
+  if (!(file.info(StoreDir)["isdir"])) {
     stop("Invalid StoreDir value.")
-  if (!(PriorDelta %in% c("gamma", "log-normal")))
+  }
+  if (!(PriorDelta %in% c("gamma", "log-normal"))) {
     stop("Invalid PriorDelta value.")
+  }
 
  list(AR = AR, StopAdapt = StopAdapt, StoreChains = StoreChains,
       StoreAdapt = StoreAdapt, StoreDir = StoreDir,

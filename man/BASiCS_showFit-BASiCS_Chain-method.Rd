@@ -7,9 +7,9 @@
 \alias{BASiCS_showFit,BASiCS_Chain-method}
 \title{Plotting the trend after Bayesian regression}
 \usage{
-\S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu[i])",
-  ylab = "log(delta[i])", pch = 16, col = "blue", bty = "n",
-  smooth = TRUE, variance = 1.2, ...)
+\S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu)",
+  ylab = "log(delta)", pch = 16, smooth = TRUE, variance = 1.2,
+  ...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
@@ -19,10 +19,6 @@
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 
 \item{pch}{As in \code{\link[graphics]{par}}.}
-
-\item{col}{As in \code{\link[graphics]{par}}.}
-
-\item{bty}{As in \code{\link[graphics]{par}}.}
 
 \item{smooth}{Logical to indicate wether the smoothScatter function is used
 to plot the scatter plot.}

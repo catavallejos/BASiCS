@@ -65,10 +65,12 @@ BASiCS_VarianceDecomp <- function(Chain,
                                   ...)
 {
   if (!(OrderVariable %in% c("GeneName", "BioVarGlobal",
-                             "TechVarGlobal", "ShotNoise")))
+                             "TechVarGlobal", "ShotNoise"))) {
     stop("Invalid 'OrderVariable' value.")
-  if (!is(Chain, "BASiCS_Chain"))
+  }
+  if (!is(Chain, "BASiCS_Chain")) {
     stop("'Chain' is not a BASiCS_Chain class object.")
+  }
 
   q.bio <- ncol(Chain@parameters$delta)
   UniqueBatch <- colnames(Chain@parameters$theta)
@@ -85,12 +87,10 @@ BASiCS_VarianceDecomp <- function(Chain,
   Genes <- seq_len(q.bio)
   GeneName <- colnames(Chain@parameters$mu)
 
-  if (nBatch > 1)
-  {
+  if (nBatch > 1) {
     VarDecompBatch <- NULL
 
-    for (Batch in seq_len(nBatch))
-    {
+    for (Batch in seq_len(nBatch)) {
       BioVarAux <- matrixStats::colMedians(VarDecomp$BioVarBatch[, , Batch])
       TechVarAux <- matrixStats::colMedians(VarDecomp$TechVarBatch[, , Batch])
       VarDecompBatch <- cbind(VarDecompBatch, BioVarAux,
@@ -109,8 +109,7 @@ BASiCS_VarianceDecomp <- function(Chain,
                             ShotNoiseGlobal = ShotNoiseGlobal,
                             VarDecompBatch, stringsAsFactors = FALSE)
   }
-  else
-  {
+  else {
     out <- cbind.data.frame(GeneIndex = Genes, GeneName = GeneName,
                             BioVarGlobal = BioVarGlobal,
                             TechVarGlobal = TechVarGlobal,
@@ -120,16 +119,22 @@ BASiCS_VarianceDecomp <- function(Chain,
   rownames(out) <- Genes
 
   # Re-order before output
-  if (OrderVariable == "GeneName") { orderVar <- GeneName }
-  if (OrderVariable == "BioVarGlobal") { orderVar <- BioVarGlobal }
-  if (OrderVariable == "TechVarGlobal") { orderVar <- TechVarGlobal }
-  if (OrderVariable == "ShotNoiseGlobal")
+  if (OrderVariable == "GeneName") {
+    orderVar <- GeneName
+  }
+  if (OrderVariable == "BioVarGlobal") {
+    orderVar <- BioVarGlobal
+  }
+  if (OrderVariable == "TechVarGlobal") {
+    orderVar <- TechVarGlobal
+  }
+  if (OrderVariable == "ShotNoiseGlobal") {
     orderVar <- 1 - BioVarGlobal - TechVarGlobal
+  }
 
   out <- out[order(orderVar, decreasing = TRUE), ]
 
-  if (Plot)
-  {
+  if (Plot) {
     outmat <- 100 * matrix(apply(out[, -c(1,2)], 2, mean),
                            nrow = 3, byrow = FALSE)
     barplot(outmat, beside = beside, main = main,

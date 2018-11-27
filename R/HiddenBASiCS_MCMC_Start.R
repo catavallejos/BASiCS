@@ -8,8 +8,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
                                     ls.nu0 = -10,
                                     ls.theta0 = -4)
 {
-  if (!is(Data, "SingleCellExperiment"))
+  if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.")
+  }
 
   # Number of cells
   n <- dim(counts(Data))[2]
@@ -17,7 +18,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   Spikes <- SingleCellExperiment::isSpike(Data)
 
   # Number of instrinsic genes
-  if(!is.null(Spikes)){
+  if (!is.null(Spikes)) {
     q <- length(Spikes)
     q.bio <- sum(!Spikes)
 
@@ -25,7 +26,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     CountsBio <- as.matrix(counts(Data)[!Spikes, , drop = FALSE])
     CountsTech <- as.matrix(counts(Data)[Spikes, , drop = FALSE])
   }
-  else{
+  else {
     q.bio <- q <- nrow(Data)
     CountsBio <- as.matrix(counts(Data))
   }
@@ -34,8 +35,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
   # Fix for cases in which 'scran' normalisation has invalid output
-  if( (min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0) )
-  {
+  if ((min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0)) {
     message("-------------------------------------------------------------\n",
             "There was an issue when applying `scran` normalization  \n",
             "`positive = TRUE` has been added to `computeSumFactors` call \n",
@@ -45,8 +45,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
                                                             positive = TRUE))
   }
 
-  if (WithSpikes == TRUE)
-  {
+  if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
     s0 <- matrixStats::colSums2(CountsTech) /
       sum(metadata(Data)$SpikeInput)
@@ -61,8 +60,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     # +1 to avoid zeros as starting values
     mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
   }
-  else
-  {
+  else {
     s0 <- size_scran
     nu0 <- s0
     phi0 <- NULL
@@ -79,7 +77,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     # Defined by the CV for high- and mid-expressed genes
     # This is motivated by equation (2) in Vallejos et al (2016)
     varsBio <- matrixStats::rowVars(nCountsBio)
-    cv2Bio <- varsBio/(meansBio)^2
+    cv2Bio <- varsBio / (meansBio)^2
     delta0 <- rgamma(q.bio, 1, 1) + 1
     Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
     delta0[Aux] <- cv2Bio[Aux]
@@ -104,7 +102,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
                 ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
 
     # Starting values for regression-related parameters
-    if(!is.null(PriorParam$eta)) {
+    if (!is.null(PriorParam$eta)) {
       out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V)
       out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
       out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2,

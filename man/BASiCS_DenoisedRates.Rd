@@ -11,8 +11,8 @@ BASiCS_DenoisedRates(Data, Chain, Propensities = FALSE)
 
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
-\item{Propensities}{If \code{TRUE}, returns underlying 
-expression propensitites \eqn{\rho_{ij}}. 
+\item{Propensities}{If \code{TRUE}, returns underlying
+expression propensitites \eqn{\rho_{ij}}.
 Otherwise, denoised rates \eqn{\mu_i \rho_{ij}} are returned.
 Default: \code{Propensities = FALSE}.}
 }
@@ -20,7 +20,7 @@ Default: \code{Propensities = FALSE}.}
 A matrix of denoised expression rates (biological genes only)
 }
 \description{
-Calculates normalised and denoised expression rates, by 
+Calculates normalised and denoised expression rates, by
 removing the effect of technical variation.
 }
 \details{
@@ -33,7 +33,7 @@ Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
 ## and should not be used in regular use.
 ## For more useful parameters,
 ## see the vignette (\\code{browseVignettes("BASiCS")})
-Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500,
                      Regression = FALSE, PrintProgress = FALSE)
 
 DR <- BASiCS_DenoisedRates(Data, Chain)
