@@ -302,8 +302,8 @@ head(LVG$Table)
 ```{r quick-start-HVGdetectionPlot, fig.width=8, fig.height=8}
 SummarySC <- Summary(ChainSC)
 plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
-with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
-with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
+with(HVG$Table[HVG$Table$HVG,], points(Mu, Delta))
+with(LVG$Table[LVG$Table$LVG,], points(Mu, Delta))
 ```
 
 --->
