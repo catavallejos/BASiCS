@@ -375,7 +375,7 @@ used (`Regression = TRUE` as a function parameter in `BASiCS_MCMC`),
 
 # Alternative implementation modes
 
-Beyond its original implementation, BASiCS has been extended to adress 
+Beyond its original implementation, BASiCS has been extended to address 
 experimental designs in which spike-in molecules are not available as well as 
 to address the confounding that is typically observed between mean and 
 over-dispersion for scRNA-seq datasets [@eling2018correcting]. Alternative 

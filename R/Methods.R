@@ -378,9 +378,9 @@ setMethod("plot",
                  type = "l",
                  xlab = xlab,
                  ylab = ylab,
-                 main = colnames(object)[Column],
+                 main = colnames(x@parameters)[Column],
                  ...)
-            stats::acf(object[, Column], main = "Autocorrelation")
+            stats::acf(x@parameters[[Param]][, Column], main = "Autocorrelation")
           })
 
 
@@ -512,27 +512,24 @@ setMethod("BASiCS_showFit",
                           mapping = aes_string(x = "mu2",
                                                ymin = "yhat.lower",
                                                ymax = "yhat.upper"),
-                          alpha = 0.5)
+                          alpha = 0.5) +
+              geom_point(data = df[!df$included, ],
+                         shape = pch,
+                         colour = "purple",
+                         alpha = 0.3)
 
             if (smooth) {
-              plot.out <- plot.out
+              plot.out <- plot.out +
                 geom_hex(bins = 100) +
                 scale_fill_gradientn(name = "",
                                      colours = colorRampPalette(
                                       c("dark blue", "yellow", "dark red"))(100),
-                                     guide = FALSE) +
-                geom_point(shape = pch,
-                           colour = "purple",
-                           alpha = 0.3)
+                                     guide = FALSE)
             }
             else {
               plot.out <- plot.out +
                 geom_point(shape = pch,
-                           colour = "dark blue") +
-                geom_point(data = df[!df$included,],
-                           shape = pch,
-                           colour = "purple",
-                           alpha = 0.3)
+                           colour = "dark blue")
             }
             return(plot.out)
           })
@@ -688,84 +685,85 @@ setMethod("plot",
             cellParams <- c("phi", "s", "nu")
 
             if (is.null(Param2)) {
-              if (ylab == "") {
-                ylab <- bquote(.(Param)[i])
-              }
               object <- x@parameters[[Param]]
 
               if (Param %in% geneParams) {
                 Columns <- Genes
+                ylabInd <- "i"
                 if (xlab == "") {
                   xlab <- "Gene"
                 }
               } else if (Param %in% cellParams) {
                 Columns <- Cells
+                ylabInd <- "j"
                 if (xlab == "") {
                   xlab <- "Cell"
                 }
               } else if (Param %in% batchParams) {
-                  Columns <- Batches
-                  if (ylab == "") {
-                    ylab <- bquote(.(Param)[b])
-                  }
-                  if (xlab == "") {
-                    xlab <- "Batch"
-                  }
+                Columns <- Batches
+                ylabInd <- "b"
+                if (xlab == "") {
+                  xlab <- "Batch"
+                }
               } else if (Param == "beta") {
                 Columns <- RegressionTerms
-                if (ylab == "") {
-                  ylab <- expression(beta[k])
-                }
+                ylabInd <- "k"
                 if (xlab == "") {
                   xlab <- "Regression term"
                 }
               } else if (Param == "sigma2") {
                 object <- x@parameters$sigma2
                 Columns <- 1
-                if (ylab == "") {
-                  ylab <- expression(sigma[i])
-                }
+                ylabInd <- "i"
                 if (xlab == "") {
                   xlab <- "Gene"
                 }
               }
-            if (is.null(ylim)) {
-              ylim = c(min(object[Columns, 2]), max(object[Columns, 3]))
-            }
 
-            # Point estimates
-            plot(x = Columns,
-                 y = object[Columns, 1],
-                 xlab = xlab,
-                 ylab = ylab,
-                 ylim = ylim,
-                 pch = pch,
-                 col = col,
-                 bty = bty,
-                 ...
-            )
+              if (ylab == "") {
+                ylab <- bquote(.(Param)[.(ylabInd)])
+              }
+              if (is.null(ylim)) {
+                ylim = c(min(object[Columns, 2]), max(object[Columns, 3]))
+              }
 
-            # Add HPD interval
-            for (Column in Columns) {
-              BarLength <- ifelse(length(Columns) <= 10,
-                                  0.1,
-                                  2 / length(Columns))
+              # Point estimates
+              plot(x = Columns,
+                   y = object[Columns, 1],
+                   xlab = xlab,
+                   ylab = ylab,
+                   ylim = ylim,
+                   pch = pch,
+                   col = col,
+                   bty = bty,
+                   ...
+              )
 
-              segments(x0 = Column,
-                       y0 = object[Column, 2],
-                       y1 = object[Column, 3],
-                       col = col)
-              segments(x0 = Column - BarLength,
-                       y0 = object[Column, 2],
-                       x1 = Column + BarLength,
-                       col = col)
-              segments(x0 = Column - BarLength,
-                       y0 = object[Column, 3],
-                       x1 = Column + BarLength,
-                       col = col)
-            }
+              # Add HPD interval
+              for (Column in Columns) {
+                BarLength <- ifelse(length(Columns) <= 10,
+                                    0.1,
+                                    2 / length(Columns))
+
+                segments(x0 = Column,
+                         y0 = object[Column, 2],
+                         y1 = object[Column, 3],
+                         col = col)
+                segments(x0 = Column - BarLength,
+                         y0 = object[Column, 2],
+                         x1 = Column + BarLength,
+                         col = col)
+                segments(x0 = Column - BarLength,
+                         y0 = object[Column, 3],
+                         x1 = Column + BarLength,
+                         col = col)
+              }
 
           } else {
+            if (!Param2 %in% names(x@parameters)) {
+              stop("'Param2' is not a parameter in this BASiCS_Summary object")
+            }
+
             ValidCombination <- FALSE
             if (SmoothPlot) {
               col <- grDevices::rgb(grDevices::col2rgb(col)[1],
@@ -776,15 +774,13 @@ setMethod("plot",
             }
             if (Param %in% geneParams) {
               Columns <- Genes
-              if (!Param2 %in% geneParams) {
-                ValidCombination <- FALSE
-              }
+              ValidCombination <- Param2 %in% geneParams
+              ylabInd <- "i"
             }
             if (Param %in% cellParams) {
               Columns <- Cells
-              if (!Param2 %in% cellParams) {
-                ValidCombination <- FALSE
-              }
+              ValidCombination <- Param2 %in% cellParams
+              ylabInd <- "j"
             }
             if (!ValidCombination) {
               stop("Invalid combination for Param and Param2. \n")
@@ -792,8 +788,8 @@ setMethod("plot",
               plot(
                 x@parameters[[Param]][Columns, 1],
                 x@parameters[[Param2]][Columns, 1],
-                xlab = bquote(.(Param)[i]),
-                ylab = bquote(.(Param2)[i]),
+                xlab = bquote(.(Param)[.(ylabInd)]),
+                ylab = bquote(.(Param2)[.(ylabInd)]),
                 xlim = c(
                   min(x@parameters[[Param]][Columns, 1]),
                   max(x@parameters[[Param]][Columns, 1])
@@ -849,5 +845,5 @@ setMethod("displaySummaryBASiCS",
             if (!(Param %in% names(object@parameters))) {
               stop("'Param' argument is invalid")
             }
-            Param@parameters[[Param]]
+            object@parameters[[Param]]
           })
