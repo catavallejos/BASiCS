@@ -223,6 +223,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     BioCounts <- counts(Data)[!spikes, ]
   }
   else {
+    BioCounts <- counts(Data)
     q.bio <- q <- nrow(Data)
     spikes <- rep(FALSE, q)
   }
