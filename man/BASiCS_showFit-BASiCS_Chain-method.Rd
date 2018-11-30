@@ -7,9 +7,9 @@
 \alias{BASiCS_showFit,BASiCS_Chain-method}
 \title{Plotting the trend after Bayesian regression}
 \usage{
-\S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu[i])",
-  ylab = "log(delta[i])", pch = 16, col = "blue", bty = "n",
-  smooth = TRUE, variance = 1.2, ...)
+\S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu)",
+  ylab = "log(delta)", pch = 16, smooth = TRUE, variance = 1.2,
+  ...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
@@ -20,11 +20,7 @@
 
 \item{pch}{As in \code{\link[graphics]{par}}.}
 
-\item{col}{As in \code{\link[graphics]{par}}.}
-
-\item{bty}{As in \code{\link[graphics]{par}}.}
-
-\item{smooth}{Logical to indicate wether the smoothScatter function is used 
+\item{smooth}{Logical to indicate wether the smoothScatter function is used
 to plot the scatter plot.}
 
 \item{variance}{Variance used to build GRBFs for regression}
@@ -35,7 +31,7 @@ to plot the scatter plot.}
 A plot object
 }
 \description{
-Plotting the trend after Bayesian regression using a 
+Plotting the trend after Bayesian regression using a
 \code{\linkS4class{BASiCS_Chain}} object
 }
 \examples{
@@ -44,7 +40,7 @@ BASiCS_showFit(ChainRNAReg)
 
 }
 \references{
-Eling et al (2018). Cell Systems 
+Eling et al (2018). Cell Systems
 https://doi.org/10.1016/j.cels.2018.06.011
 }
 \author{
