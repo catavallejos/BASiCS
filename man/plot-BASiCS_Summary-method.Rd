@@ -10,33 +10,33 @@
 \S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,
   Genes = NULL, Cells = NULL, Batches = NULL,
   RegressionTerms = NULL, xlab = "", ylab = "", xlim = "",
-  ylim = "", pch = 16, col = "blue", bty = "n",
+  ylim = NULL, pch = 16, col = "blue", bty = "n",
   SmoothPlot = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Summary}} object.}
 
-\item{Param}{Name of the slot to be used for the plot. 
-Possible values: \code{'mu'}, \code{'delta'}, 
-\code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'}, 
+\item{Param}{Name of the slot to be used for the plot.
+Possible values: \code{'mu'}, \code{'delta'},
+\code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}.}
 
-\item{Param2}{Name of the second slot to be used for the plot. 
+\item{Param2}{Name of the second slot to be used for the plot.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'epsilon'},
-\code{'phi'}, \code{'s'} and \code{'nu'} 
-(combinations between gene-specific and 
+\code{'phi'}, \code{'s'} and \code{'nu'}
+(combinations between gene-specific and
 cell-specific parameters are not admitted).}
 
-\item{Genes}{Specifies which genes are requested. 
+\item{Genes}{Specifies which genes are requested.
 Required only if \code{Param = 'mu'}, \code{'delta'} or \code{'epsilon'}.}
 
-\item{Cells}{Specifies which cells are requested. 
+\item{Cells}{Specifies which cells are requested.
 Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
 
-\item{Batches}{Specifies which batches are requested. 
+\item{Batches}{Specifies which batches are requested.
 Required only if \code{Param = 'theta'}}
 
-\item{RegressionTerms}{Specifies which regression coefficients are requested. 
+\item{RegressionTerms}{Specifies which regression coefficients are requested.
 Required only if \code{Param = 'beta'}}
 
 \item{xlab}{As in \code{\link[graphics]{par}}.}
@@ -53,7 +53,7 @@ Required only if \code{Param = 'beta'}}
 
 \item{bty}{As in \code{\link[graphics]{par}}.}
 
-\item{SmoothPlot}{Logical parameter. If \code{TRUE}, 
+\item{SmoothPlot}{Logical parameter. If \code{TRUE},
 transparency will be added to the color of the dots.}
 
 \item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}

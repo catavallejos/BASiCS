@@ -6,41 +6,41 @@
 \alias{BASiCS_Summary-class}
 \title{The BASiCS_Summary class}
 \description{
-Container of a summary of a \code{\linkS4class{BASiCS_Chain}} 
-object. In each element of the \code{parameters} slot, first column contains 
-posterior medians; second and third columns respectively contain the lower 
+Container of a summary of a \code{\linkS4class{BASiCS_Chain}}
+object. In each element of the \code{parameters} slot, first column contains
+posterior medians; second and third columns respectively contain the lower
 and upper limits of an high posterior density interval (for a given probability).
 }
 \section{Slots}{
 
 \describe{
-\item{\code{parameters}}{List of parameters in which each entry contains a matrix: 
-first column contains posterior medians, second column contains the 
-lower limits of an high posterior density interval and third column 
-contains the upper limits of high posterior density intervals. 
+\item{\code{parameters}}{List of parameters in which each entry contains a matrix:
+first column contains posterior medians, second column contains the
+lower limits of an high posterior density interval and third column
+contains the upper limits of high posterior density intervals.
 \describe{
-\item{mu}{Posterior medians (1st column), lower (2nd column) and upper 
+\item{mu}{Posterior medians (1st column), lower (2nd column) and upper
 (3rd column) limits of gene-specific mean expression parameters \eqn{\mu_i}.}
-\item{delta}{Posterior medians (1st column), lower (2nd column) and upper 
-(3rd column) limits of gene-specific biological over-dispersion parameters 
+\item{delta}{Posterior medians (1st column), lower (2nd column) and upper
+(3rd column) limits of gene-specific biological over-dispersion parameters
 \eqn{\delta_i}, biological genes only }
-\item{phi}{Posterior medians (1st column), lower (2nd column) and upper 
-(3rd column) limits of cell-specific mRNA content normalisation 
+\item{phi}{Posterior medians (1st column), lower (2nd column) and upper
+(3rd column) limits of cell-specific mRNA content normalisation
 parameters \eqn{\phi_j}}
-\item{s}{Posterior medians (1st column), lower (2nd column) and upper 
-(3rd column) limits of cell-specific technical normalisation 
+\item{s}{Posterior medians (1st column), lower (2nd column) and upper
+(3rd column) limits of cell-specific technical normalisation
 parameters \eqn{s[j]}}
-\item{nu}{Posterior medians (1st column), lower (2nd column) and upper 
+\item{nu}{Posterior medians (1st column), lower (2nd column) and upper
 (3rd column) limits of cell-specific random effects \eqn{\nu_j}}
-\item{theta}{Posterior median (1st column), lower (2nd column) and upper 
-(3rd column) limits of technical over-dispersion parameter(s) \eqn{\theta} 
+\item{theta}{Posterior median (1st column), lower (2nd column) and upper
+(3rd column) limits of technical over-dispersion parameter(s) \eqn{\theta}
 (each row represents one batch)}
-\item{\code{beta}}{Posterior median (first column), lower (second column) 
+\item{\code{beta}}{Posterior median (first column), lower (second column)
 and upper (third column) limits of regression coefficients \eqn{\beta}}
-\item{\code{sigma2}}{Posterior median (first column), lower (second column) 
+\item{\code{sigma2}}{Posterior median (first column), lower (second column)
 and upper (third column) limits of residual variance \eqn{\sigma^2}}
-\item{\code{epsilon}}{Posterior median (first column), lower (second column) 
-and upper (third column) limits of gene-specific residual over-dispersion 
+\item{\code{epsilon}}{Posterior median (first column), lower (second column)
+and upper (third column) limits of gene-specific residual over-dispersion
 parameter \eqn{\epsilon} }
 }}
 }}

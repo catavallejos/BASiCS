@@ -15,21 +15,21 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
-\item{VarThreshold}{Variance contribution threshold 
+\item{VarThreshold}{Variance contribution threshold
 (must be a positive value, between 0 and 1)}
 
-\item{ProbThreshold}{Optional parameter. Posterior probability threshold 
+\item{ProbThreshold}{Optional parameter. Posterior probability threshold
 (must be a positive value, between 0 and 1)}
 
-\item{EFDR}{Target for expected false discovery rate related 
+\item{EFDR}{Target for expected false discovery rate related
 to HVG/LVG detection (default = 0.10)}
 
-\item{OrderVariable}{Ordering variable for output. 
+\item{OrderVariable}{Ordering variable for output.
 Possible values: \code{'GeneIndex'}, \code{'Mu'},
  \code{'Delta'}, \code{'Sigma'} and \code{'Prob'}.}
 
-\item{Plot}{If \code{Plot = TRUE} error control and 
-expression versus HVG/LVG 
+\item{Plot}{If \code{Plot = TRUE} error control and
+expression versus HVG/LVG
 probability plots are generated}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
@@ -39,35 +39,35 @@ probability plots are generated}
 \describe{
 \item{\code{Table}}{Matrix whose columns contain}
    \describe{
-   \item{\code{GeneIndex}}{Vector of length \code{q.bio}. 
-        Gene index as in the order present in the analysed 
+   \item{\code{GeneIndex}}{Vector of length \code{q.bio}.
+        Gene index as in the order present in the analysed
         \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
-   \item{\code{GeneName}}{Vector of length \code{q.bio}. 
-               Gene name as in the order present in the analysed 
+   \item{\code{GeneName}}{Vector of length \code{q.bio}.
+               Gene name as in the order present in the analysed
          \code{\link[SingleCellExperiment]{SingleCellExperiment}}}
-   \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene, 
-         posterior median of gene-specific mean expression 
+   \item{\code{Mu}}{Vector of length \code{q.bio}. For each biological gene,
+         posterior median of gene-specific mean expression
          parameters \eqn{\mu_i}}
-   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological 
-         gene, posterior median of gene-specific biological 
+   \item{\code{Delta}}{Vector of length \code{q.bio}. For each biological
+         gene, posterior median of gene-specific biological
          over-dispersion parameter \eqn{\delta_i}}
-   \item{\code{Sigma}}{Vector of length \code{q.bio}. 
-         For each biological gene, proportion of the total variability 
+   \item{\code{Sigma}}{Vector of length \code{q.bio}.
+         For each biological gene, proportion of the total variability
          that is due to a biological heterogeneity component. }
-   \item{\code{Prob}}{Vector of length \code{q.bio}. 
-         For each biological gene, probability of being highly variable 
+   \item{\code{Prob}}{Vector of length \code{q.bio}.
+         For each biological gene, probability of being highly variable
          according to the given thresholds.}
-   \item{\code{HVG}}{Vector of length \code{q.bio}. 
-         For each biological gene, indicator of being detected as highly 
+   \item{\code{HVG}}{Vector of length \code{q.bio}.
+         For each biological gene, indicator of being detected as highly
          variable according to the given thresholds. }
    }
 \item{\code{ProbThreshold}}{Posterior probability threshold.}
 \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 }
-\code{BASiCS_DetectLVG} produces a similar output, 
-replacing the column \code{HVG} by 
-\code{LVG}, an indicator of a gene being detected as 
+\code{BASiCS_DetectLVG} produces a similar output,
+replacing the column \code{HVG} by
+\code{LVG}, an indicator of a gene being detected as
 lowly variable according to the given thresholds.
 }
 \description{

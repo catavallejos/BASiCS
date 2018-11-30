@@ -10,35 +10,35 @@ BASiCS_Filter(Counts, Tech = rep(FALSE, nrow(Counts)),
   MinAvCountsPerCellsWithExpression = 2)
 }
 \arguments{
-\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements 
+\item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements
 corresponds to the simulated expression counts.
-First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio} 
+First \code{q.bio} rows correspond to biological genes. Last \code{q-q.bio}
 rows correspond to technical spike-in genes.}
 
-\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE} 
+\item{Tech}{Logical vector of length \code{q}. If \code{Tech = FALSE}
 the gene is biological; otherwise the gene is spike-in.}
 
-\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate 
+\item{SpikeInput}{Vector of length \code{q-q.bio} whose elements indicate
 the simulated input concentrations for the spike-in genes.}
 
-\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch 
-information. Not required if a single batch is present on the data. 
+\item{BatchInfo}{Vector of length \code{n} whose elements indicate batch
+information. Not required if a single batch is present on the data.
 Default: \code{BatchInfo = NULL}.}
 
-\item{MinTotalCountsPerCell}{Minimum value of total expression counts 
-required per cell (biological and technical). 
+\item{MinTotalCountsPerCell}{Minimum value of total expression counts
+required per cell (biological and technical).
 Default: \code{MinTotalCountsPerCell = 2}.}
 
-\item{MinTotalCountsPerGene}{Minimum value of total expression counts 
-required per transcript (biological and technical). 
+\item{MinTotalCountsPerGene}{Minimum value of total expression counts
+required per transcript (biological and technical).
 Default: \code{MinTotalCountsPerGene = 2}.}
 
-\item{MinCellsWithExpression}{Minimum number of cells where expression 
-must be detected (positive count). Criteria applied to each transcript. 
+\item{MinCellsWithExpression}{Minimum number of cells where expression
+must be detected (positive count). Criteria applied to each transcript.
 Default: \code{MinCellsWithExpression = 2}.}
 
-\item{MinAvCountsPerCellsWithExpression}{Minimum average number of 
-counts per cells where expression is detected. Criteria applied to 
+\item{MinAvCountsPerCellsWithExpression}{Minimum average number of
+counts per cells where expression is detected. Criteria applied to
 each transcript. Default value: \code{MinAvCountsPerCellsWithExpression = 2}.}
 }
 \value{
@@ -53,9 +53,9 @@ A list of 2 elements
 }
 }
 \description{
-\code{BASiCS_Filter} indicates which transcripts and 
-cells pass a pre-defined inclusion criteria. The output of this 
-function can be combined with \code{newBASiCS_Data} to generate a 
+\code{BASiCS_Filter} indicates which transcripts and
+cells pass a pre-defined inclusion criteria. The output of this
+function can be combined with \code{newBASiCS_Data} to generate a
 the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
 For more systematic tools for quality control, please refer to the
 \code{scater} Bioconductor package.
@@ -68,13 +68,13 @@ rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))
 Tech <- c(rep(FALSE,40),rep(TRUE,10))
 set.seed(2)
 SpikeInput <- rgamma(10,1,1)
-SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10), 
+SpikeInfo <- data.frame('SpikeID' = paste0('Spike', 1:10),
                         'SpikeInput' = SpikeInput)
 
 Filter <- BASiCS_Filter(Counts, Tech, SpikeInput,
-                        MinTotalCountsPerCell = 2, 
+                        MinTotalCountsPerCell = 2,
                         MinTotalCountsPerGene = 2,
-                        MinCellsWithExpression = 2, 
+                        MinCellsWithExpression = 2,
                         MinAvCountsPerCellsWithExpression = 2)
 SpikeInfoFilter <- SpikeInfo[SpikeInfo$SpikeID \%in\% rownames(Filter$Counts),]
 FilterData <- newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
