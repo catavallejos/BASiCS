@@ -302,8 +302,8 @@ head(LVG$Table)
 ```{r quick-start-HVGdetectionPlot, fig.width=8, fig.height=8}
 SummarySC <- Summary(ChainSC)
 plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
-with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
-with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
+with(HVG$Table[HVG$Table$HVG,], points(Mu, Delta))
+with(LVG$Table[LVG$Table$LVG,], points(Mu, Delta))
 ```
 
 --->
@@ -375,7 +375,7 @@ used (`Regression = TRUE` as a function parameter in `BASiCS_MCMC`),
 
 # Alternative implementation modes
 
-Beyond its original implementation, BASiCS has been extended to adress 
+Beyond its original implementation, BASiCS has been extended to address 
 experimental designs in which spike-in molecules are not available as well as 
 to address the confounding that is typically observed between mean and 
 over-dispersion for scRNA-seq datasets [@eling2018correcting]. Alternative 
