@@ -16,7 +16,7 @@
 
 \item{Cells}{A vector of characters indicating what cells will be extrated.}
 
-\item{Iterations}{Numeric vector of positive integers indicating which MCMC 
+\item{Iterations}{Numeric vector of positive integers indicating which MCMC
 iterations will be extracted. The maximum value in \code{Iterations} must be
 less or equal than the total number of iterations contained in the original
 \code{\linkS4class{BASiCS_Chain}} object.}
