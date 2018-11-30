@@ -13,13 +13,13 @@ BASiCS_DenoisedCounts(Data, Chain)
 }
 \value{
 A matrix of denoised expression counts. In line with global scaling
-normalisation strategies, these are defined as \eqn{X_{ij}/(\phi_j \nu_j)} 
+normalisation strategies, these are defined as \eqn{X_{ij}/(\phi_j \nu_j)}
 for biological genes and \eqn{X_{ij}/(\nu_j)} for spike-in genes. For this
 calculation \eqn{\phi_j} \eqn{\nu_j} are estimated by their corresponding
 posterior medians. If spike-ins are not used, \eqn{\phi_j} is set equal to 1.
 }
 \description{
-Calculates denoised expression counts by removing 
+Calculates denoised expression counts by removing
 cell-specific technical variation. The latter includes global-scaling
 normalisation and therefore no further normalisation is required.
 }
@@ -33,7 +33,7 @@ Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
 ## and should not be used in regular use.
 ## For more useful parameters,
 ## see the vignette (\\code{browseVignettes("BASiCS")})
-Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500,
                      Regression = FALSE, PrintProgress = FALSE)
 
 DC <- BASiCS_DenoisedCounts(Data, Chain)

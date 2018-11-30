@@ -17,8 +17,8 @@
 An object of class \code{\linkS4class{BASiCS_Summary}}.
 }
 \description{
-For each of the BASiCS parameters (see Vallejos et al 2015), 
-\code{Summary} returns the corresponding postior medians and limits of 
+For each of the BASiCS parameters (see Vallejos et al 2015),
+\code{Summary} returns the corresponding postior medians and limits of
 the high posterior density interval (probabilty equal to \code{prob})
 }
 \examples{
