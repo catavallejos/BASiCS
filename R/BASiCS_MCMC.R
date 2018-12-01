@@ -292,10 +292,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   }
 
   # Parameters associated to the presence of batches
-  if (nBatch > 1) {
-    BatchDesign <- model.matrix(~as.factor(colData(Data)$BatchInfo) - 1)
-    BatchInfo <- as.numeric(colData(Data)$BatchInfo)
-  } else {
+  if(nBatch > 1) {
+    BatchDesign <- model.matrix(~as.factor(colData(Data)$BatchInfo) - 1)  
+    BatchInfo <- as.numeric(as.factor(colData(Data)$BatchInfo))
+  } 
+  else { 
     # If there are no batches or the user asked to ignore them
     BatchDesign <- matrix(1, nrow = n, ncol = 1)
     BatchInfo <- rep(1, times = n)
