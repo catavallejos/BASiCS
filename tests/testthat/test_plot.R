@@ -17,7 +17,7 @@ test_that("plot of BASiCS_Summary works without spikes", {
     WithSpikes = FALSE)
 
   capture.output(
-    Chain <- BASiCS_MCMC(
+    Chain <- run_BASiCS_MCMC(
       Data = Data,
       N = 100,
       Thin = 10,
@@ -36,7 +36,7 @@ test_that("plot of BASiCS_Summary works without spikes", {
 test_that("plot works for BASiCS_Chain (non-regression, spikes)", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_BASiCS_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -58,7 +58,7 @@ test_that("plot works for BASiCS_Chain (regression, no spikes)", {
 
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_BASiCS_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -81,7 +81,7 @@ test_that("plot works for BASiCS_Chain (regression, no spikes)", {
 test_that("plot works for BASiCS_Summary with all valid combinations", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_BASiCS_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -107,7 +107,7 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
 test_that("BASiCS_showFit works", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_BASiCS_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,

@@ -281,4 +281,6 @@ arma::mat deltaUpdateRegNoSpikes(
     double const& sigma2,
     arma::vec const& beta);
   
+int getSeed();
+
 #endif
