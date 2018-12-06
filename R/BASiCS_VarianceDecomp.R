@@ -13,8 +13,9 @@
 #' Default: \code{OrderVariable = "BioVarGlobal"}.
 #' @param Plot If \code{TRUE}, a barplot of the variance decomposition
 #' (global and by batches, if any) is generated. Default: \code{Plot = TRUE}.
-#' @param main,ylab,col,legend,args.legend,names.arg Passed to
+#' @param main,ylab,beside,col,legend,args.legend,names.arg Passed to
 #'  \code{\link[graphics]{barplot}}
+#'  
 #'
 #' @return A \code{\link[base]{data.frame}} whose first 4 columns correspond to
 #' \describe{
@@ -61,8 +62,7 @@ BASiCS_VarianceDecomp <- function(Chain,
                                   args.legend = list(x = "bottomright", bg = "white"),
                                   names.arg = if (nBatch > 1) {
                                       c("Overall", paste("Batch ", seq_len(nBatch)))
-                                    } else "Overall",
-                                  ...)
+                                    } else "Overall") # ...
 {
   if (!(OrderVariable %in% c("GeneName", "BioVarGlobal",
                              "TechVarGlobal", "ShotNoise"))) {
