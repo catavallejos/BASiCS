@@ -10,7 +10,7 @@ BASiCS_VarianceDecomp(Chain, OrderVariable = "BioVarGlobal",
   "mistyrose", "lightcyan"), legend = c("Biological", "Technical",
   "Shot noise"), args.legend = list(x = "bottomright", bg = "white"),
   names.arg = if (nBatch > 1) {     c("Overall", paste("Batch ",
-  seq_len(nBatch))) } else "Overall", ...)
+  seq_len(nBatch))) } else "Overall")
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
@@ -23,7 +23,7 @@ Default: \code{OrderVariable = "BioVarGlobal"}.}
 \item{Plot}{If \code{TRUE}, a barplot of the variance decomposition
 (global and by batches, if any) is generated. Default: \code{Plot = TRUE}.}
 
-\item{main, ylab, col, legend, args.legend, names.arg}{Passed to
+\item{main, ylab, beside, col, legend, args.legend, names.arg}{Passed to
 \code{\link[graphics]{barplot}}}
 }
 \value{
