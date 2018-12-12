@@ -20,7 +20,7 @@ arma::mat Hidden_muUpdate(
 {
 
   /* PROPOSAL STEP */
-  mu1 = exp( arma::randn(q0) % sqrt(prop_var) + log(mu0) );
+  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
 
   /* ACCEPT/REJECT STEP
@@ -29,12 +29,13 @@ arma::mat Hidden_muUpdate(
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
   // prior ratio
-  log_aux -= ((0.5/s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) / exponent;
+  log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) / exponent;
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
-      log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *
-        log( ( phinu(j)*mu1(i) + invdelta(i) ) /
-        ( phinu(j)*mu0(i) + invdelta(i) ));
+      log_aux(i) -= (Counts(i,j) + invdelta(i)) *
+        log(
+          (phinu(j) * mu1(i) + invdelta(i)) /
+          (phinu(j) * mu0(i) + invdelta(i)));
     }
   }
 
@@ -46,7 +47,9 @@ arma::mat Hidden_muUpdate(
   */
   ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
   for (int i = 0; i < q0; i++) {
-    if(ind(i) == 0) mu1(i) = mu0(i);
+    if(ind(i) == 0) {
+      mu1(i) = mu0(i);
+    }
   }
 
   /* OUTPUT */
@@ -86,17 +89,22 @@ arma::mat deltaUpdate(
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
-      log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
-      log_aux(i) -= std::lgamma(Counts(i,j) + (1/delta0(i)));
-      log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
-      log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
+      log_aux(i) += std::lgamma(Counts(i,j) + (1 / delta1(i)));
+      log_aux(i) -= std::lgamma(Counts(i,j) + (1 / delta0(i)));
+      log_aux(i) -= (Counts(i, j) + (1 / delta1(i))) *
+        log(phinu(j) * mu(i) + (1 / delta1(i)));
+      log_aux(i) += (Counts(i, j) + (1 / delta0(i))) *
+        log(phinu(j) * mu(i) + (1 / delta0(i)));
     }
   }
   // Component related to the prior
   if (prior_delta == 1) {
-    log_aux += ((log(delta1)-log(delta0))*a_delta - b_delta * (delta1 - delta0)) / exponent;
+    log_aux += ((log(delta1) - log(delta0)) *
+      a_delta - b_delta *
+      (delta1 - delta0)) / exponent;
   } else {
-    log_aux -= ((0.5/s2delta) * (pow(log(delta1),2) - pow(log(delta0),2))) / exponent;
+    log_aux -= ((0.5 / s2delta) *
+      (pow(log(delta1), 2) - pow(log(delta0), 2))) / exponent;
   }
 
   /* CREATING OUTPUT VARIABLE & DEBUG
@@ -107,7 +115,9 @@ arma::mat deltaUpdate(
   */
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
   for (int i = 0; i < q0; i++) {
-    if (ind(i) == 0) delta1(i) = delta0(i);
+    if (ind(i) == 0) {
+      delta1(i) = delta0(i);
+    }
   }
 
   // OUTPUT

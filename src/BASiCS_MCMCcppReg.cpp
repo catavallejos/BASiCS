@@ -286,7 +286,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         betaAux,
                         X,
                         sigma2Aux,
-                        variance);
+                        variance,
+                        geneExponent);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -321,7 +322,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                               lambdaAux,
                               X,
                               sigma2Aux,
-                              betaAux);
+                              betaAux,
+                              geneExponent);
 
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
@@ -387,7 +389,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
 
     // UPDATE OF EPSILON
     // Direct calculation conditional on regression related parameters
-    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
+    epsilonAux = log(deltaAux.col(0)) - X * betaAux;
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {

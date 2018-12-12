@@ -161,7 +161,8 @@ arma::mat muUpdateReg(
     arma::vec const& beta,
     arma::mat const& X,
     double const& sigma2,
-    double variance);
+    double variance,
+    double exponent);
 
 arma::mat deltaUpdateReg(
     arma::vec const& delta0, 
@@ -177,7 +178,8 @@ arma::mat deltaUpdateReg(
     arma::vec const& lambda,
     arma::mat const& X,
     double const& sigma2,
-    arma::vec const& beta);
+    arma::vec const& beta,
+    double exponent);
 
 arma::vec betaUpdateReg(double const& sigma2,
                         arma::mat const& VAux,
