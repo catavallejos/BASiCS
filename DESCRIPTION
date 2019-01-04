@@ -1,7 +1,7 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.4.0
+Version: 1.4.1
 Date: : 2018-10-21
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
@@ -61,7 +61,7 @@ Suggests:
     rmarkdown
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
-biocViews: Normalization, Sequencing, RNASeq, Software, 
+biocViews: ImmunoOncology, Normalization, Sequencing, RNASeq, Software, 
         GeneExpression, Transcriptomics, SingleCell, 
         DifferentialExpression, Bayesian, CellBiology
 SystemRequirements: C++11
