@@ -223,13 +223,21 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
                           double const& sigma2,
                           double const& eta,
                           int const& q0,
-                          arma::vec lambda1)
+                          arma::vec lambda1,
+                          double exponent)
 {
+  double a;
+  arma::vec b;
+  if (exponent == 1) {
+    a = ((eta / 2) - 1) / exponent + 1.5;
+    b = 0.5 * ((eta / exponent) + (pow(log(delta) - X * beta, 2) / sigma2) );
+  } else {
+    a = (eta + 1) / 2;
+    b = 0.5 * (eta + (pow(log(delta) - X * beta, 2) / sigma2) );
+  }
   std::default_random_engine generator;
 
   // Parameter calculations
-  double a = (eta + 1) / 2;
-  arma::vec b = 0.5 * (eta + (pow(log(delta) - X * beta, 2) / sigma2) );
   for(int i = 0; i < q0; i++) {
     std::gamma_distribution<double> gamma(a, 1.0 / b(i));
     lambda1(i) = gamma(generator);

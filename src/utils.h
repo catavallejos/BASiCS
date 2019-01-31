@@ -201,7 +201,8 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
                           double const& sigma2, 
                           double const& eta, 
                           int const& q0,
-                          arma::vec lambda1);
+                          arma::vec lambda1,
+                          double exponent);
 
 /* Declarations for functions used by the MCMC sampler for the non-spikes case
  * Stored in: utils_MCMCcppNoSpikes.cpp

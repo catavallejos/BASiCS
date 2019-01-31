@@ -346,10 +346,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     }
 
     // UPDATES OF REGRESSION RELATED PARAMETERS
-    V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
+    V1 = inv_V0 / geneExponent + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
     if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
-      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + InvVm0;
+      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + InvVm0 / geneExponent;
       mAux = VAux * mAux;
 
       // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
@@ -371,7 +371,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 sigma2Aux,
                                 eta0,
                                 q0,
-                                y_q0);
+                                y_q0,
+                                geneExponent);
     // UPDATE OF EPSILON
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X * betaAux;
