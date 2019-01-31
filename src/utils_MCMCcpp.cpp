@@ -29,7 +29,7 @@ arma::mat Hidden_muUpdate(
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
   // prior ratio
-  log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) / exponent;
+  log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) * exponent;
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
       log_aux(i) -= (Counts(i,j) + invdelta(i)) *
@@ -101,10 +101,10 @@ arma::mat deltaUpdate(
   if (prior_delta == 1) {
     log_aux += ((log(delta1) - log(delta0)) *
       a_delta - b_delta *
-      (delta1 - delta0)) / exponent;
+      (delta1 - delta0)) * exponent;
   } else {
     log_aux -= ((0.5 / s2delta) *
-      (pow(log(delta1), 2) - pow(log(delta0), 2))) / exponent;
+      (pow(log(delta1), 2) - pow(log(delta0), 2))) * exponent;
   }
 
   /* CREATING OUTPUT VARIABLE & DEBUG
@@ -153,7 +153,7 @@ Rcpp::List phiUpdate(
      all(prop_var * phi0 < 2.5327372760800758e+305) &
      all(phi1 > 0) & all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
-    double log_aux = sum((sum_bygene_bio + aphi / exponent) % (log(phi1) - log(phi0)));
+    double log_aux = sum((sum_bygene_bio + aphi * exponent) % (log(phi1) - log(phi0)));
 
     // Loop to replace matrix operations, through genes and cells
     // There is an extra factor in the prior n^(-n); it cancels out in the ratio
@@ -219,8 +219,8 @@ arma::vec sUpdateBatch(
   if (exponent == 1) {
     lambda = as - 1 / thetaBatch;
   } else {
-    lambda = ((as - 1) / exponent) - (1 / thetaBatch) + 1;
-    psi /= exponent;
+    lambda = ((as - 1) * exponent) - (1 / thetaBatch) + 1;
+    psi *= exponent;
   }
 
   // GIG draws
@@ -293,7 +293,7 @@ arma::mat nuUpdateBatch(
     }
   }
 
-  log_aux += (log(nu1) - log(nu0)) % ((sum_bygene_all + 1 / thetaBatch) / exponent);
+  log_aux += (log(nu1) - log(nu0)) % ((sum_bygene_all + 1 / thetaBatch) * exponent);
   log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1/(thetaBatch % s * exponent)));
 
   /* CREATING OUTPUT VARIABLE & DEBUG
@@ -349,7 +349,7 @@ arma::mat thetaUpdateBatch(
     log_aux *= a_theta;
     log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta) % exp(-y + logtheta) - 1);
   } else {
-    log_aux *= a_theta - 1 / exponent;
+    log_aux *= a_theta - 1 * exponent;
     log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta));
   }
   // Gamma component
@@ -357,7 +357,7 @@ arma::mat thetaUpdateBatch(
   // nu / s component
   log_aux += ((exp(-y + logtheta) - 1) / theta0) % sum(BatchDesignAux, 0).t();
   // exponential component
-  log_aux -= (b_theta / exponent) * theta0 % (exp(y - logtheta) - 1);
+  log_aux -= (b_theta * exponent) * theta0 % (exp(y - logtheta) - 1);
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
   ind %= 0.0001 < exp(y);

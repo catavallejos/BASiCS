@@ -62,7 +62,7 @@ arma::mat muUpdateReg(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
-  log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) / exponent;
+  log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) * exponent;
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
       log_aux(i) -= (Counts(i, j) + 1 / delta(i)) *
@@ -80,7 +80,7 @@ arma::mat muUpdateReg(
   log_aux -= lambda %
     (pow(log(delta) - X_mu1 * beta, 2) -
       pow(log(delta) - X * beta, 2)) /
-    (2 * sigma2 * exponent);
+    (2 * sigma2) * exponent;
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
@@ -164,7 +164,7 @@ arma::mat deltaUpdateReg(
   //  log_aux -= lambda % (pow(log(delta1) - X * beta, 2) -
   //    pow(log(delta0) - X * beta, 2)) / (2 * sigma2);
   log_aux -= lambda % (pow(log(delta1), 2) - pow(log(delta0), 2) -
-    2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2 * exponent);
+    2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2) * exponent;
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
@@ -229,8 +229,8 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
   double a;
   arma::vec b;
   if (exponent == 1) {
-    a = ((eta / 2) - 1) / exponent + 1.5;
-    b = 0.5 * ((eta / exponent) + (pow(log(delta) - X * beta, 2) / sigma2) );
+    a = ((eta / 2) - 1) * exponent + 1.5;
+    b = 0.5 * ((eta * exponent) + (pow(log(delta) - X * beta, 2) / sigma2) );
   } else {
     a = (eta + 1) / 2;
     b = 0.5 * (eta + (pow(log(delta) - X * beta, 2) / sigma2) );
