@@ -56,19 +56,25 @@ BASiCS_Sim <- function(Mu, Mu_spikes, Delta, Phi, S, Theta)
   q.bio <- length(Delta)
     
   # Arguments checking
-  if (!(is.vector(Mu) & is.numeric(Mu) & all(Mu > 0))) 
+  if (!(is.vector(Mu) & is.numeric(Mu) & all(Mu > 0))) {
     stop("Invalid argument value for 'Mu'.")
-  if (!(is.vector(Mu_spikes) & is.numeric(Mu_spikes) & all(Mu_spikes > 0))) 
+  }
+  if (!(is.vector(Mu_spikes) & is.numeric(Mu_spikes) & all(Mu_spikes > 0))) {
     stop("Invalid argument value for 'Mu_spikes'.")
-  if (!(is.vector(Delta) & is.numeric(Delta) & all(Delta >= 0))) 
+  }
+  if (!(is.vector(Delta) & is.numeric(Delta) & all(Delta >= 0))) {
     stop("Invalid argument value for 'Delta'.")
+  }
   if (!(is.vector(Phi) & is.numeric(Phi) & all(Phi > 0) & 
-        isTRUE(all.equal(sum(Phi), n, tolerance = 0.01)))) 
+        isTRUE(all.equal(sum(Phi), n, tolerance = 0.01)))) {
     stop("Invalid argument value for 'Phi'.")
-  if (!(is.vector(S) & is.numeric(S) & all(S > 0) & length(S) == n)) 
+  }
+  if (!(is.vector(S) & is.numeric(S) & all(S > 0) & length(S) == n)) {
     stop("Invalid argument value for 'S'.")
-  if (!(is.numeric(Theta) & length(Theta) == 1 & Theta >= 0)) 
+  }
+  if (!(is.numeric(Theta) & length(Theta) == 1 & Theta >= 0)) {
     stop("Invalid argument value for 'Theta'.")
+  }
     
   if (!all(c(n, q, q.bio, q - q.bio) > 0)) 
     stop("Arguments' dimensions are not compatible")

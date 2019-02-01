@@ -46,7 +46,7 @@ arma::mat muUpdateRegNoSpikes(
   // but the reference one (no need to be sequential)
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
   for (int i = 0; i < q0; i++) {
-    if(i != RefGene) {
+    if (i != RefGene) {
       for (int j = 0; j < n; j++) {
         log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *
           log(

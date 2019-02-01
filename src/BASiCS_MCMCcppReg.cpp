@@ -330,6 +330,15 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       deltaAccept += deltaAux.col(1);
     }
 
+    // theta and regression parameters are global; thus, they require scaling
+    // for both cases
+    double exponent;
+    if (geneExponent != 1) {
+      exponent = geneExponent;
+    } else if (cellExponent != 1) {
+      exponent = cellExponent;
+    }
+
     // UPDATE OF NU:
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
@@ -349,7 +358,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           y_n,
                           u_n,
                           ind_n,
-                          cellExponent);
+                          exponent);
 
     PnuAux += nuAux.col(1);
     if(i>=Burn) {
@@ -357,21 +366,22 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     }
 
     // UPDATES OF REGRESSION RELATED PARAMETERS
-    V1 = (inv_V0 * geneExponent) + X.t() * diagmat(lambdaAux) * X;
+    V1 = (inv_V0 * exponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
     if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
-      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * geneExponent);
+      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * exponent);
       mAux = VAux * mAux;
 
       // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
       betaAux = betaUpdateReg(sigma2Aux,
                               VAux,
                               mAux);
+
       sigma2Aux = sigma2UpdateReg(deltaAux.col(0),
                                   betaAux,
                                   lambdaAux,
                                   V1,
-                                  mInvVm0 * geneExponent,
+                                  mInvVm0 * exponent,
                                   mAux,
                                   sigma2_a0,
                                   sigma2_b0,
@@ -386,7 +396,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                 eta0,
                                 q0,
                                 y_q0,
-                                geneExponent);
+                                cellExponent);
 
     // UPDATE OF EPSILON
     // Direct calculation conditional on regression related parameters
