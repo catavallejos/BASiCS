@@ -24,7 +24,7 @@
 #' For more details see argument `type` in 
 #' `help(ke, package = "SingleCellExperiment")`. Default value: 
 #' \code{SpikeType = "ERCC"}. 
-#'
+#' @param Verbose Verbosity flag. Set FALSE to prevent printing of messages.
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
 #' @examples
@@ -69,7 +69,8 @@
 #' @export
 newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)), 
                            SpikeInfo = NULL, BatchInfo = NULL, 
-                           SpikeType = "ERCC") 
+                           SpikeType = "ERCC",
+                           Verbose = TRUE) 
 {
   # Validity checks for SpikeInfo
   if(!is.null(SpikeInfo)){
@@ -99,7 +100,9 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   else 
   { 
     SpikeInput <- 1; Tech <- rep(FALSE, nrow(Counts)) 
-    message("The data does not contain spike-in genes")
+    if (Verbose) {
+      message("The data does not contain spike-in genes")
+    }
     WithSpikes <- FALSE
   }
     
@@ -121,16 +124,18 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     S4Vectors::DataFrame("BatchInfo" = BatchInfo)
   colnames(Data) <- colnames(Counts)
   rownames(Data) <- rownames(Counts)
-    
-  message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 
-            "    - You must remove poor quality cells before hand \n", 
-            "    - We recommend to pre-filter lowly expressed transcripts. \n", 
-            "      Inclusion criteria may vary for each data. \n",
-            "      For example, remove transcripts: \n", 
-            "          - with low total counts across of all of the cells \n", 
-            "          - that are only expressed in a few cells \n", 
-            "            (genes expressed in only 1 cell are not accepted) \n", 
-            "\n BASiCS_Filter can be used for this purpose. \n")
+  
+  if (Verbose) {
+    message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n", 
+              "    - You must remove poor quality cells before hand \n", 
+              "    - We recommend to pre-filter lowly expressed transcripts. \n", 
+              "      Inclusion criteria may vary for each data. \n",
+              "      For example, remove transcripts: \n", 
+              "          - with low total counts across of all of the cells \n", 
+              "          - that are only expressed in a few cells \n", 
+              "            (genes expressed in only 1 cell are not accepted) \n", 
+              "\n BASiCS_Filter can be used for this purpose. \n")
+  }
   
   return(Data)
 }

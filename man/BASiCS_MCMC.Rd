@@ -4,112 +4,115 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE,
+  NGenePartition = 1, NCellPartition = 1, Verbose = TRUE, ...)
 }
 \arguments{
-\item{Data}{A \code{\linkS4class{SingleCellExperiment}} object. 
-If \code{WithSpikes = TRUE}, this MUST be formatted to include 
+\item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
+If \code{WithSpikes = TRUE}, this MUST be formatted to include
 the spike-ins information (see vignette).}
 
-\item{N}{Total number of iterations for the MCMC sampler. 
+\item{N}{Total number of iterations for the MCMC sampler.
 Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
 
 \item{Thin}{Thining period for the MCMC sampler. Use \code{Thin>=2}.}
 
-\item{Burn}{Burn-in period for the MCMC sampler. Use \code{Burn>=1}, 
+\item{Burn}{Burn-in period for the MCMC sampler. Use \code{Burn>=1},
 \code{Burn<N}, \code{Burn} being a multiple of \code{Thin}.}
 
-\item{Regression}{If \code{Regression = TRUE}, BASiCS exploits a joint prior 
+\item{Regression}{If \code{Regression = TRUE}, BASiCS exploits a joint prior
 formulation for mean and over-dispersion parameters to estimate a measure of
 residual over-dispersion is not confounded by mean expression. Recommended
 setting is \code{Regression = TRUE}.}
 
 \item{WithSpikes}{If \code{WithSpikes = TRUE}, BASiCS will use reads from
 added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE},
-BASiCS depends on replicated experiments (batches) to estimate 
-technical variability. In this case, please supply the BatchInfo vector 
+BASiCS depends on replicated experiments (batches) to estimate
+technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
+
+\item{Verbose}{Verbosity flag. Set FALSE to prevent printing of messages.}
 
 \item{...}{Optional parameters.
 \describe{
-\item{\code{PriorDelta}}{Specifies the prior used for \code{delta}. 
-Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and 
-'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}. 
-Default value: \code{PriorDelta = 'log-normal'}. 
-\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter 
-values required for the adopted prior (see Vallejos et al, 2015, 2016). 
+\item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.
+Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and
+'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}.
+Default value: \code{PriorDelta = 'log-normal'}.
+\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter
+values required for the adopted prior (see Vallejos et al, 2015, 2016).
 All elements must be positive real numbers.
 \describe{
-  \item{\code{s2.mu}}{Scale hyper-parameter for the 
-        log-Normal(\code{0},\code{s2.mu}) prior that is shared by all 
+  \item{\code{s2.mu}}{Scale hyper-parameter for the
+        log-Normal(\code{0},\code{s2.mu}) prior that is shared by all
         gene-specific expression rate parameters \eqn{\mu_i}.
         Default: \code{s2.mu = 0.5}.}
-  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`. 
-        Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta}) 
-        prior that is shared by all gene-specific over-dispersion parameters 
+  \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`.
+        Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta})
+        prior that is shared by all gene-specific over-dispersion parameters
         \eqn{\delta_i}. Default: \code{s2.delta = 0.5}. }
-  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`. 
-        Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) 
-        prior that is shared by all gene-specific biological over-dispersion 
+  \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`.
+        Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
+        prior that is shared by all gene-specific biological over-dispersion
         parameters \eqn{\delta_i}. Default: \code{a.delta = 1}.}
-  \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`. 
-        Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta}) 
-        prior that is shared by all gene-specific biological over-dispersion 
+  \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`.
+        Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
+        prior that is shared by all gene-specific biological over-dispersion
         hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.}
-  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all 
-        (scaled by \code{n}) cell-specific mRNA content normalising 
-        constants \eqn{\phi_j / n}. 
+  \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all
+        (scaled by \code{n}) cell-specific mRNA content normalising
+        constants \eqn{\phi_j / n}.
         Default: \code{p.phi} \code{= rep(1, n)}.}
-  \item{\code{a.s}}{Shape hyper-parameter for the 
-        Gamma(\code{a.s},\code{b.s}) prior that is shared by all 
+  \item{\code{a.s}}{Shape hyper-parameter for the
+        Gamma(\code{a.s},\code{b.s}) prior that is shared by all
         cell-specific capture efficiency normalising constants \eqn{s_j}.
         Default: \code{a.s = 1}.}
   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},
-        \code{b.s}) prior that is shared by all cell-specific capture 
-        efficiency normalising constants \eqn{s_j}. 
+        \code{b.s}) prior that is shared by all cell-specific capture
+        efficiency normalising constants \eqn{s_j}.
         Default: \code{b.s = 1}.}
-  \item{\code{a.theta}}{Shape hyper-parameter for the 
-        Gamma(\code{a.theta},\code{b.theta}) prior for technical noise 
+  \item{\code{a.theta}}{Shape hyper-parameter for the
+        Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
         parameter \eqn{\theta}. Default: \code{a.theta = 1}.}
-  \item{\code{b.theta}}{Rate hyper-parameter for the 
-        Gamma(\code{a.theta},\code{b.theta}) prior for technical noise 
+  \item{\code{b.theta}}{Rate hyper-parameter for the
+        Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
         parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
- \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta} 
-      specifies the degress of freedom for the residual term. 
+ \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
+      specifies the degress of freedom for the residual term.
       Default: \code{eta = 5}.}.
 
 }}
-\item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies 
-      the number of regression Gaussian Radial Basis Functions (GRBF) used 
-      within the correlated prior adopted for gene-specific over-dispersion 
+\item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies
+      the number of regression Gaussian Radial Basis Functions (GRBF) used
+      within the correlated prior adopted for gene-specific over-dispersion
       and mean expression paramters. Default: \code{k = 12}. }
-\item{\code{Var}}{Only used when \code{Regression = TRUE}. \code{Var} 
+\item{\code{Var}}{Only used when \code{Regression = TRUE}. \code{Var}
       specifies the GRBF scaling parameter. Default: \code{Var = 1.2}. }
-\item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings 
-      updates. It must be a positive number between 0 and 1. Default 
+\item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings
+      updates. It must be a positive number between 0 and 1. Default
       (and recommended): \code{AR = 0.44}}.
-\item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer 
+\item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer
       adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
-\item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated 
-      \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName} 
-      argument used to index the file name). 
+\item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated
+      \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName}
+      argument used to index the file name).
       Default: \code{StoreChains = FALSE}.}
-\item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of 
-      adaptive proposal variances (in log-scale) for all parameters is 
-      stored as a list in a `.Rds` file (\code{RunName} argument used to 
+\item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of
+      adaptive proposal variances (in log-scale) for all parameters is
+      stored as a list in a `.Rds` file (\code{RunName} argument used to
       index file name). Default: \code{StoreAdapt = FALSE}.}
-\item{\code{StoreDir}}{Directory where output files are stored. 
-      Only required if \code{StoreChains = TRUE} and/or 
+\item{\code{StoreDir}}{Directory where output files are stored.
+      Only required if \code{StoreChains = TRUE} and/or
       \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
-\item{\code{RunName}}{String used to index `.Rds` files storing chains 
+\item{\code{RunName}}{String used to index `.Rds` files storing chains
       and/or adaptive proposal variances.}
-\item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based 
+\item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based
       progress report is suppressed.}
-\item{\code{Start}}{Starting values for the MCMC sampler. We do not advise 
-      to use this argument. Default options have been tuned to facilitate 
-      convergence. If changed, it must be a list containing the following 
-      elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0}, 
-      \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, 
+\item{\code{Start}}{Starting values for the MCMC sampler. We do not advise
+      to use this argument. Default options have been tuned to facilitate
+      convergence. If changed, it must be a list containing the following
+      elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0},
+      \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0},
       \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
 }}
 }
@@ -117,21 +120,21 @@ All elements must be positive real numbers.
 An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 }
 \description{
-MCMC sampler to perform Bayesian inference for single-cell 
+MCMC sampler to perform Bayesian inference for single-cell
 mRNA sequencing datasets using the model described in Vallejos et al (2015).
 }
 \examples{
 
 # Built-in simulated dataset
 Data <- makeExampleBASiCS_Data()
-# To analyse real data, please refer to the instructions in: 
+# To analyse real data, please refer to the instructions in:
 # https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
 
 # Only a short run of the MCMC algorithm for illustration purposes
 # Longer runs migth be required to reach convergence
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = FALSE,
                      PrintProgress = FALSE, WithSpikes = TRUE)
-                     
+
 # To run the regression version of BASiCS, use:
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
                      PrintProgress = FALSE, WithSpikes = TRUE)
@@ -141,12 +144,12 @@ Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
 Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
                      PrintProgress = FALSE, WithSpikes = FALSE)
-                     
-# For illustration purposes we load a built-in 'BASiCS_Chain' object 
+
+# For illustration purposes we load a built-in 'BASiCS_Chain' object
 # (obtained using the 'BASiCS_MCMC' function)
 data(ChainSC)
 
-# `displayChainBASiCS` can be used to extract information from this output. 
+# `displayChainBASiCS` can be used to extract information from this output.
 # For example:
 head(displayChainBASiCS(ChainSC, Param = 'mu'))
 
@@ -158,11 +161,11 @@ plot(ChainSC, Param = 'theta', Batch = 1)
 # Calculating posterior medians and 95\% HPD intervals
 ChainSummary <- Summary(ChainSC)
 
-# `displaySummaryBASiCS` can be used to extract information from this output 
+# `displaySummaryBASiCS` can be used to extract information from this output
 # For example:
 head(displaySummaryBASiCS(ChainSummary, Param = 'mu'))
 
-# Graphical display of posterior medians and 95\% HPD intervals 
+# Graphical display of posterior medians and 95\% HPD intervals
 # For example:
 plot(ChainSummary, Param = 'mu', main = 'All genes')
 plot(ChainSummary, Param = 'mu', Genes = 1:10, main = 'First 10 genes')
@@ -170,25 +173,25 @@ plot(ChainSummary, Param = 'phi', main = 'All cells')
 plot(ChainSummary, Param = 'phi', Cells = 1:5, main = 'First 5 cells')
 plot(ChainSummary, Param = 'theta')
 
-# To constrast posterior medians of cell-specific parameters 
+# To constrast posterior medians of cell-specific parameters
 # For example:
 par(mfrow = c(1,2))
 plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = FALSE)
 # Recommended for large numbers of cells
-plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = TRUE) 
+plot(ChainSummary, Param = 'phi', Param2 = 's', SmoothPlot = TRUE)
 
 # To constrast posterior medians of gene-specific parameters
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', 
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x',
      SmoothPlot = FALSE)
 # Recommended
-plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', 
-     SmoothPlot = TRUE) 
+plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x',
+     SmoothPlot = TRUE)
 
 # Highly and lowly variable genes detection (within a single group of cells)
-DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60, 
+DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60,
                               EFDR = 0.10, Plot = TRUE)
-DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40, 
+DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40,
                               EFDR = 0.10, Plot = TRUE)
 
 plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
@@ -198,13 +201,13 @@ with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
        pch = 16, col = 'blue', cex = 1))
 
 # If variance thresholds are not fixed
-BASiCS_VarThresholdSearchHVG(ChainSC, 
-                             VarThresholdsGrid = seq(0.55,0.65,by=0.01), 
+BASiCS_VarThresholdSearchHVG(ChainSC,
+                             VarThresholdsGrid = seq(0.55,0.65,by=0.01),
                              EFDR = 0.10)
-BASiCS_VarThresholdSearchLVG(ChainSC, 
-                             VarThresholdsGrid = seq(0.35,0.45,by=0.01), 
+BASiCS_VarThresholdSearchLVG(ChainSC,
+                             VarThresholdsGrid = seq(0.35,0.45,by=0.01),
                              EFDR = 0.10)
-                             
+
 # To obtain denoised rates / counts, see:
 help(BASiCS_DenoisedRates)
 help(BASiCS_DenoisedCounts)
@@ -215,7 +218,7 @@ help(BASiCS_TestDE)
 
 }
 \references{
-Vallejos, Marioni and Richardson (2015). PLoS Computational Biology. 
+Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 
 Vallejos, Richardson and Marioni (2016). Genome Biology.
 

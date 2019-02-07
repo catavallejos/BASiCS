@@ -20,6 +20,7 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param Verbose Verbosity flag. Set FALSE to prevent printing of messages.
 #' @param ... Optional parameters.
 #' \describe{
 #' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.
@@ -216,6 +217,7 @@ BASiCS_MCMC <- function(Data,
                         WithSpikes = TRUE,
                         NGenePartition = 1,
                         NCellPartition = 1,
+                        Verbose = TRUE,
                         ...)
 {
   # Checks to ensure input arguments are valid
@@ -332,7 +334,9 @@ BASiCS_MCMC <- function(Data,
 
     # If regression case is chosen
     if(Regression == TRUE) {
-      message("Running with spikes BASiCS sampler (regression case) ... \n")
+      if (Verbose) {
+        message("Running with spikes BASiCS sampler (regression case) ... \n")
+      }
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(
                 N,
                 Thin,
@@ -384,7 +388,9 @@ BASiCS_MCMC <- function(Data,
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {
-      message("Running with spikes BASiCS sampler (no regression) ... \n")
+      if (Verbose) {
+        message("Running with spikes BASiCS sampler (no regression) ... \n")
+      }
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(
                 N = N,
                 Thin = Thin,
@@ -434,7 +440,9 @@ BASiCS_MCMC <- function(Data,
 #            "-------------------------------------------------------------\n")
 
     if(Regression == TRUE) {
-      message("Running no spikes BASiCS sampler (regression case) ... \n")
+      if (Verbose) {
+        message("Running no spikes BASiCS sampler (regression case) ... \n")
+      }
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(
                 N,
                 Thin,
@@ -486,7 +494,9 @@ BASiCS_MCMC <- function(Data,
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {
-      message("Running no spikes BASiCS sampler (no regression) ... \n")
+      if (Verbose) {
+        message("Running no spikes BASiCS sampler (no regression) ... \n")
+      }
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
                 N,
                 Thin,
@@ -543,17 +553,18 @@ BASiCS_MCMC <- function(Data,
   colnames(Chain$nu) <- CellLabels
   colnames(Chain$theta) <- paste0("Batch", unique(BatchInfo))
 
-  message("-------------------------------------------------------------\n",
-          "MCMC running time \n",
-          "-------------------------------------------------------------\n",
-          "user: ", round(Time['user.self'], 3), "\n",
-          "system: ", round(Time['sys.self'], 3), "\n",
-          "elapsed: ", round(Time['elapsed'], 3), "\n")
+  if (Verbose) {
+    message("-------------------------------------------------------------\n",
+            "MCMC running time \n",
+            "-------------------------------------------------------------\n",
+            "user: ", round(Time['user.self'], 3), "\n",
+            "system: ", round(Time['sys.self'], 3), "\n",
+            "elapsed: ", round(Time['elapsed'], 3), "\n")
 
-  message("-------------------------------------------------------------\n",
-          "Output \n",
-          "-------------------------------------------------------------\n")
-
+    message("-------------------------------------------------------------\n",
+            "Output \n",
+            "-------------------------------------------------------------\n")
+  }
   # Convert output into a `BASiCS_Chain` object
   ChainClass <- newBASiCS_Chain(parameters = Chain)
 
@@ -570,10 +581,12 @@ BASiCS_MCMC <- function(Data,
                                      StoreDir, RunName)
   }
   else {
-    message("-------------------------------------------------------------\n",
-            "BASiCS version ", packageVersion("BASiCS"), " : \n",
-            "vertical integration (spikes case) \n",
-            "-------------------------------------------------------------\n")
+    if (Verbose) {
+      message("-------------------------------------------------------------\n",
+              "BASiCS version ", packageVersion("BASiCS"), " : \n",
+              "vertical integration (spikes case) \n",
+              "-------------------------------------------------------------\n")
+    }
   }
 
   # Return `BASiCS_MCMC` object
