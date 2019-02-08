@@ -41,6 +41,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio, 
                                                             positive = TRUE))
   }
+
   
   if (WithSpikes == TRUE) 
   {
@@ -102,20 +103,26 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
     
     # Output list
-    out <- list(mu0 = mu0, delta0 = delta0, 
-                phi0 = phi0, s0 = s0, 
-                nu0 = nu0, theta0 = theta0, 
-                ls.mu0 = ls.mu0, ls.delta0 = ls.delta0, 
-                ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
+    out <- list(mu0 = mu0, 
+                delta0 = delta0, 
+                phi0 = phi0, 
+                s0 = s0, 
+                nu0 = nu0, 
+                theta0 = theta0, 
+                ls.mu0 = ls.mu0, 
+                ls.delta0 = ls.delta0, 
+                ls.phi0 = ls.phi0, 
+                ls.nu0 = ls.nu0, 
+                ls.theta0 = ls.theta0)
     
     # Starting values for regression-related parameters
+
     if(!is.null(PriorParam$eta)) {
       out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V) 
       out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
-      out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2, 
-                        rate = PriorParam$eta/2)
+      out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta / 2, 
+                        rate = PriorParam$eta / 2)
     }
 
     return(out)
 }
-

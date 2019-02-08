@@ -1,7 +1,6 @@
 HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn, 
                                         n, Regression, WithSpikes)
 {
-
   if (!("PriorDelta" %in% names(Args)) & Regression == FALSE) {
     message("-------------------------------------------------------------\n", 
             "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
@@ -17,6 +16,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn,
     k <- NULL; variance <- NULL; eta <- NULL
   }
   
+
   # Whether a sthocastic reference is used (no spikes case only)
   if(WithSpikes == FALSE)
   {
@@ -75,7 +75,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Args, Data, Burn,
   # Starting values for MCMC
   if ("Start" %in% names(Args)) { Start <- Args$Start } 
   else { Start <- HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes) }
-  
+
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) 
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   if (!(StopAdapt > 0)) 

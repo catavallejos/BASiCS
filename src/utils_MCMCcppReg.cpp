@@ -52,11 +52,9 @@ arma::mat muUpdateReg(
     double variance,
     double exponent)
 {
-
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
-
   /* ACCEPT/REJECT STEP
   * Note: there is a -1 factor coming from the log-normal prior.
   * However, it cancels out as using log-normal proposals.
@@ -71,17 +69,15 @@ arma::mat muUpdateReg(
           (phinu(j) * mu0(i) + 1 / delta(i)));
     }
   }
-
   // This is new due to regression prior on delta
   arma::mat X_mu1 = designMatrix(k, mu1, variance);
 
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check
-  log_aux -= lambda %
+  log_aux -= exponent * lambda %
     (pow(log(delta) - X_mu1 * beta, 2) -
       pow(log(delta) - X * beta, 2)) /
-    (2 * sigma2) * exponent;
-
+    (2 * sigma2);
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-3
@@ -94,7 +90,6 @@ arma::mat muUpdateReg(
       mu1(i) = mu0(i);
     }
   }
-
   /* OUTPUT */
   return join_rows(mu1, ind);
 }
@@ -163,8 +158,8 @@ arma::mat deltaUpdateReg(
   // The next operations are equivalent; second one a is simplified version
   //  log_aux -= lambda % (pow(log(delta1) - X * beta, 2) -
   //    pow(log(delta0) - X * beta, 2)) / (2 * sigma2);
-  log_aux -= lambda % (pow(log(delta1), 2) - pow(log(delta0), 2) -
-    2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2) * exponent;
+  log_aux -= exponent * lambda % (pow(log(delta1), 2) - pow(log(delta0), 2) -
+    2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:

@@ -215,7 +215,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
 
   // START OF MCMC LOOP
   for (int i=0; i<N; i++) {
-
     Rcpp::checkUserInterrupt();
 
     if (i == Burn) EndBurn();
@@ -237,11 +236,19 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                            n,
                            y_n,
                            cellExponent);
-
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]);
     if (i >= Burn) {
       phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    }
+
+    // theta and regression parameters are global; thus, they require scaling
+    // for both cases
+    double exponent;
+    if (geneExponent != 1) {
+      exponent = geneExponent;
+    } else if (cellExponent != 1) {
+      exponent = cellExponent;
     }
 
     // UPDATE OF THETA:
@@ -257,8 +264,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                 btheta,
                                 n,
                                 nBatch,
-                                cellExponent);
-
+                                exponent);
     PthetaAux += thetaAux.col(1);
     if (i >= Burn) {
       thetaAccept += thetaAux.col(1);
@@ -288,7 +294,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         sigma2Aux,
                         variance,
                         geneExponent);
-
     PmuAux += muAux.col(1);
     if (i >= Burn) {
       muAccept += muAux.col(1);
@@ -304,7 +309,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         n,
                         y_n,
                         cellExponent);
-
     // UPDATE OF DELTA:
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
@@ -324,19 +328,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                               sigma2Aux,
                               betaAux,
                               geneExponent);
-
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
       deltaAccept += deltaAux.col(1);
-    }
-
-    // theta and regression parameters are global; thus, they require scaling
-    // for both cases
-    double exponent;
-    if (geneExponent != 1) {
-      exponent = geneExponent;
-    } else if (cellExponent != 1) {
-      exponent = cellExponent;
     }
 
     // UPDATE OF NU:
@@ -358,7 +352,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           y_n,
                           u_n,
                           ind_n,
-                          exponent);
+                          cellExponent);
 
     PnuAux += nuAux.col(1);
     if(i>=Burn) {
@@ -376,7 +370,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       betaAux = betaUpdateReg(sigma2Aux,
                               VAux,
                               mAux);
-
       sigma2Aux = sigma2UpdateReg(deltaAux.col(0),
                                   betaAux,
                                   lambdaAux,
@@ -386,7 +379,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                   sigma2_a0,
                                   sigma2_b0,
                                   q0);
-
     }
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
     lambdaAux = lambdaUpdateReg(deltaAux.col(0),
@@ -397,7 +389,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                 q0,
                                 y_q0,
                                 cellExponent);
-
     // UPDATE OF EPSILON
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X * betaAux;

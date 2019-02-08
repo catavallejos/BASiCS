@@ -242,7 +242,6 @@ BASiCS_MCMC <- function(Data,
   } else {
     nBatch <- 1
   }
-
   sum.bycell.all <- matrixStats::rowSums2(counts(Data))
   sum.bygene.all <- matrixStats::colSums2(counts(Data))
 
@@ -258,6 +257,7 @@ BASiCS_MCMC <- function(Data,
                                          n,
                                          Regression,
                                          WithSpikes = WithSpikes)
+
   AR <- ArgsDef$AR
   StopAdapt <- ArgsDef$StopAdapt
   StoreChains <- ArgsDef$StoreChains
@@ -329,6 +329,8 @@ BASiCS_MCMC <- function(Data,
     Index <- seq_len(q.bio) - 1
   }
 
+  geneExponent <- 1 / NCellPartition
+  cellExponent <- 1 / NGenePartition
   # If spikes are available
   if (WithSpikes == TRUE) {
 
@@ -338,47 +340,50 @@ BASiCS_MCMC <- function(Data,
         message("Running with spikes BASiCS sampler (regression case) ... \n")
       }
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(
-                N,
-                Thin,
-                Burn,
-                as.matrix(counts(Data))[!spikes,],
-                BatchDesign,
-                SpikeInput,
-                mu0,
-                delta0,
-                phi0,
-                s0,
-                nu0,
-                rep(theta0, nBatch),
-                PriorParam$s2.mu,
-                PriorParam$p.phi,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.phi0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
-                sum.bycell.all,
-                sum.bycell.bio,
-                sum.bygene.all,
-                sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress),
-                k,
-                PriorParam$m,
-                PriorParam$V,
-                PriorParam$a.sigma2,
-                PriorParam$b.sigma2,
-                beta0,
-                sigma20,
-                PriorParam$eta,
-                lambda0,
-                variance))
+                N = N,
+                Thin = Thin,
+                Burn = Burn,
+                Counts = as.matrix(counts(Data))[!spikes,],
+                BatchDesign = BatchDesign,
+                muSpikes = SpikeInput,
+                mu0 = mu0,
+                delta0 = delta0,
+                phi0 = phi0,
+                s0 = s0,
+                nu0 = nu0,
+                theta0 = rep(theta0, nBatch),
+                s2mu = PriorParam$s2.mu,
+                aphi = PriorParam$p.phi,
+                as = PriorParam$a.s,
+                bs = PriorParam$b.s,
+                atheta = PriorParam$a.theta,
+                btheta = PriorParam$b.theta,
+                ar = AR,
+                LSmu0 = ls.mu0,
+                LSdelta0 = ls.delta0,
+                LSphi0 = ls.phi0,
+                LSnu0 = ls.nu0,
+                LStheta0 = rep(ls.theta0, nBatch),
+                sumByCellAll = sum.bycell.all,
+                sumByCellBio = sum.bycell.bio,
+                sumByGeneBio = sum.bygene.all,
+                sumByGeneAll = sum.bygene.bio,
+                StoreAdapt = as.numeric(StoreAdapt),
+                EndAdapt = StopAdapt,
+                PrintProgress = as.numeric(PrintProgress),
+                k = k,
+                m0 = PriorParam$m,
+                V0 = PriorParam$V,
+                sigma2_a0 = PriorParam$a.sigma2,
+                sigma2_b0 = PriorParam$b.sigma2,
+                beta0 = beta0,
+                sigma20 = sigma20,
+                eta0 = PriorParam$eta,
+                lambda0 = lambda0,
+                variance = variance,
+                geneExponent = geneExponent,
+                cellExponent = cellExponent
+      ))
 
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
@@ -427,8 +432,8 @@ BASiCS_MCMC <- function(Data,
                 StoreAdapt = as.numeric(StoreAdapt),
                 EndAdapt = StopAdapt,
                 PrintProgress = as.numeric(PrintProgress),
-                geneExponent = NCellPartition,
-                cellExponent = NGenePartition
+                geneExponent = geneExponent,
+                cellExponent = cellExponent
       ))
     }
   }
