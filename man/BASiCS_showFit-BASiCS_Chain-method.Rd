@@ -9,7 +9,8 @@
 \usage{
 \S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu)",
   ylab = "log(delta)", pch = 16, smooth = TRUE, variance = 1.2,
-  ...)
+  colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
+  colourGenesSel = "dark red", ...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
@@ -18,12 +19,28 @@
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 
-\item{pch}{As in \code{\link[graphics]{par}}.}
+\item{pch}{As in \code{\link[graphics]{par}}. Default value \code{pch = 16}.}
 
 \item{smooth}{Logical to indicate wether the smoothScatter function is used
-to plot the scatter plot.}
+to plot the scatter plot. Default value \code{smooth = TRUE}.}
 
-\item{variance}{Variance used to build GRBFs for regression}
+\item{variance}{Variance used to build GRBFs for regression. Default value
+\code{variance = 1.2}}
+
+\item{colour}{colour used to denote genes within the scatterplot. Only used 
+when \code{smooth = TRUE}. Default value 
+\code{colour = "dark blue"}.}
+
+\item{markExcludedGenes}{Whether or not lowly expressed genes that were
+excluded from the regression fit are included in the scatterplot.
+Default value \code{markExcludedGenes = TRUE}.}
+
+\item{GenesSel}{Vector of gene names to be highlighted in the scatterplot.
+Only used when \code{smooth = TRUE}. Default value \code{GenesSel = NULL}.}
+
+\item{colourGenesSel}{colour used to denote the genes listed in 
+\code{GenesSel} within the scatterplot. Default value 
+\code{colourGenesSel = "dark red"}.}
 
 \item{...}{Additional parameters for plotting.}
 }
