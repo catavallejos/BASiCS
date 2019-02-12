@@ -437,10 +437,22 @@ setMethod("displayChainBASiCS",
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param xlab As in \code{\link[graphics]{par}}.
 #' @param ylab As in \code{\link[graphics]{par}}.
-#' @param pch As in \code{\link[graphics]{par}}.
+#' @param pch As in \code{\link[graphics]{par}}. Default value \code{pch = 16}.
 #' @param smooth Logical to indicate wether the smoothScatter function is used
-#' to plot the scatter plot.
-#' @param variance Variance used to build GRBFs for regression
+#' to plot the scatter plot. Default value \code{smooth = TRUE}. 
+#' @param variance Variance used to build GRBFs for regression. Default value
+#' \code{variance = 1.2} 
+#' @param colour colour used to denote genes within the scatterplot. Only used 
+#' when \code{smooth = TRUE}. Default value 
+#' \code{colour = "dark blue"}. 
+#' @param markExcludedGenes Whether or not lowly expressed genes that were
+#' excluded from the regression fit are included in the scatterplot.
+#' Default value \code{markExcludedGenes = TRUE}.
+#' @param GenesSel Vector of gene names to be highlighted in the scatterplot.
+#' Only used when \code{smooth = TRUE}. Default value \code{GenesSel = NULL}.
+#' @param colourGenesSel colour used to denote the genes listed in 
+#' \code{GenesSel} within the scatterplot. Default value 
+#' \code{colourGenesSel = "dark red"}.
 #' @param ... Additional parameters for plotting.
 #'
 #' @examples
@@ -464,6 +476,10 @@ setMethod("BASiCS_showFit",
                                 pch = 16,
                                 smooth = TRUE,
                                 variance = 1.2,
+                                colour = "dark blue",
+                                markExcludedGenes = TRUE,
+                                GenesSel = NULL,
+                                colourGenesSel = "dark red",
                                 ...){
 
             if (!("beta" %in% names(object@parameters))) {
@@ -489,11 +505,12 @@ setMethod("BASiCS_showFit",
 
             # Calculate yhat = X*beta
             yhat <- apply(object@parameters$beta, 1, function(n) B%*%n)
-            yhat.HPD <- HPDinterval(mcmc(t(yhat)), 0.95)
+            yhat.HPD <- coda::HPDinterval(coda::mcmc(t(yhat)), 0.95)
 
             df <- data.frame(mu = log(colMedians(object@parameters$mu)),
                              delta = log(colMedians(object@parameters$delta)),
                              included = !is.na(object@parameters$epsilon[1,]))
+            rownames(df) <- colnames(object@parameters$mu)
 
             df2 <- data.frame(mu2 = grid.mu,
                               yhat = rowMedians(yhat),
@@ -502,21 +519,14 @@ setMethod("BASiCS_showFit",
             plot.out <- ggplot(df[df$included,],
                                aes_string(x = "mu", y = "delta")) +
               xlab(xlab) + ylab(ylab) +
-              theme_minimal(base_size = 15) +
-              geom_line(data = df2,
-                        inherit.aes = FALSE,
-                        mapping = aes_string(x = "mu2", y = "yhat"),
-                        colour = "dark red") +
-              geom_ribbon(data = df2,
-                          inherit.aes = FALSE,
-                          mapping = aes_string(x = "mu2",
-                                               ymin = "yhat.lower",
-                                               ymax = "yhat.upper"),
-                          alpha = 0.5) +
+              theme_minimal(base_size = 15)
+            if(markExcludedGenes == TRUE) {
+              plot.out <- plot.out + 
               geom_point(data = df[!df$included, ],
                          shape = pch,
                          colour = "purple",
                          alpha = 0.3)
+            }
 
             if (smooth) {
               plot.out <- plot.out +
@@ -529,8 +539,30 @@ setMethod("BASiCS_showFit",
             else {
               plot.out <- plot.out +
                 geom_point(shape = pch,
-                           colour = "dark blue")
+                           colour = colour)
             }
+            if(!is.null(GenesSel)) {
+              if(sum(GenesSel %in% rownames(df)) != length(GenesSel)) {
+                stop("Some elements of `GenesSel` are not found in the data.")
+              }
+              plot.out <- plot.out +
+                geom_point(data = df[rownames(df) %in% GenesSel,],
+                           shape = pch,
+                           colour = colourGenesSel)
+            }
+            
+            plot.out <- plot.out + 
+              geom_line(data = df2,
+                        inherit.aes = FALSE,
+                        mapping = aes_string(x = "mu2", y = "yhat"),
+                        colour = "dark red") +
+              geom_ribbon(data = df2,
+                          inherit.aes = FALSE,
+                          mapping = aes_string(x = "mu2",
+                                               ymin = "yhat.lower",
+                                               ymax = "yhat.upper"),
+                          alpha = 0.5)
+              
             return(plot.out)
           })
 

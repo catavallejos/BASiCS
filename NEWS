@@ -1043,3 +1043,11 @@ version 1.5.2: (2018-12-01)
 version 1.5.3: (2018-12-06)
 - Removes `...` argument from `BASiCS_VarianceDecomp`
 - Adds missing argument (`beside`) to documentation of `BASiCS_VarianceDecomp`
+
+version 1.5.4: (2019-02-12)
+- Replaces `HPDinterval` by `coda::HPDinterval` in `BASiCS_showFit` method
+- Same as above when calling `mcmc`
+- Changes `BASiCS_showFit` such that fit line is on top of the dots
+- Additional optional arguments (`markExcludedGenes`, `colour`, `GenesSel` and
+`colourGenesSel`) added to `BASiCS_showFit` for more flexibility 
+
