@@ -294,7 +294,7 @@ arma::mat nuUpdateBatch(
   }
 
   log_aux += (log(nu1) - log(nu0)) % ((sum_bygene_all + 1 / thetaBatch) * exponent);
-  log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1/(thetaBatch % s * exponent)));
+  log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1 / (thetaBatch % s * exponent)));
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
