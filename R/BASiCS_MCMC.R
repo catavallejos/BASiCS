@@ -371,8 +371,7 @@ BASiCS_MCMC <- function(Data,
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
-    }
-    else {
+    } else {
       if (Verbose) {
         message("Running with spikes BASiCS sampler (no regression) ... \n")
       }
@@ -415,8 +414,8 @@ BASiCS_MCMC <- function(Data,
                 geneExponent = geneExponent,
                 cellExponent = cellExponent
       ))
-  }
-  else {
+    }
+  } else {
 #    # If spikes are not available
 #    message("-------------------------------------------------------------\n",
 #            "IMPORTANT: this code is under development. DO NOT USE \n",
@@ -479,7 +478,9 @@ BASiCS_MCMC <- function(Data,
                 ConstrainGene,
                 NotConstrainGene,
                 ConstrainType,
-                as.numeric(StochasticRef)))
+                as.numeric(StochasticRef)),
+                geneExponent = geneExponent,
+                cellExponent = cellExponent)
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
@@ -526,7 +527,9 @@ BASiCS_MCMC <- function(Data,
                 ConstrainGene,
                 NotConstrainGene,
                 ConstrainType,
-                as.numeric(StochasticRef)))
+                as.numeric(StochasticRef)),
+                geneExponent = geneExponent,
+                cellExponent = cellExponent)
     }
   }
   # Format column names of MCMC chains

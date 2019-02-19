@@ -98,7 +98,7 @@ double zeroin_gig(double ax,double bx,
   if( fabs(prev_step) >= tol_act	/* If prev_step was large enough*/
   && fabs(fa) > fabs(fb) )	/* and was in true direction,	*/
   {					/* Interpolatiom may be tried	*/
-  //register 
+  //register
   double t1,cb,t2;
     cb = c-b;
     if( a==c )			/* If we have only two distinct	*/
@@ -157,11 +157,8 @@ NumericVector Rgig(const int n,
   /* special case which is basically a gamma distribution */
   if ((chi < ZTOL) & (lambda > 0.0)) {
     int i;
-    std::default_random_engine generator;
-    std::gamma_distribution<double> gamma(lambda, 2.0 / psi);
     for (i = 0; i<n; i++) {
-      // samps(i) = R::rgamma(lambda, 2.0 / psi);
-      samps(i) = gamma(generator);
+      samps(i) = R::rgamma(lambda, 2.0 / psi);
     }
     return samps;
   }
@@ -169,11 +166,8 @@ NumericVector Rgig(const int n,
   /* special cases which is basically an inverse gamma distribution */
   if ((psi < ZTOL) & (lambda < 0.0)) {
     int i;
-    std::default_random_engine generator;
-    std::gamma_distribution<double> gamma(0.0 - lambda, 2.0 / chi);
     for (i = 0; i < n; i++) {
-      // samps(i) = 1.0 / R::rgamma(0.0 - lambda, 2.0 / chi);
-      samps(i) = 1.0 / gamma(generator);
+      samps(i) = 1.0 / R::rgamma(0.0 - lambda, 2.0 / chi);
     }
     return samps;
   }
@@ -245,20 +239,13 @@ double RgigDouble(const double lambda, const double chi, const double psi)
   double samps;
   /* special case which is basically a gamma distribution */
   if ((chi < ZTOL) & (lambda > 0.0)) {
-    std::default_random_engine generator;
-    std::gamma_distribution<double> gamma(lambda, 2.0 / psi);
-
-    // samps = R::rgamma(lambda, 2.0/psi);
-    samps = gamma(generator);
+    samps = R::rgamma(lambda, 2.0/psi);
     return samps;
   }
 
   /* special cases which is basically an inverse gamma distribution */
   if ((psi < ZTOL) & (lambda < 0.0)) {
-    std::default_random_engine generator;
-    std::gamma_distribution<double> gamma(0.0 - lambda, 2.0 / chi);
-    samps = 1.0 / gamma(generator);
-    // samps = 1.0 / R::rgamma(0.0-lambda, 2.0/chi);
+    samps = 1.0 / R::rgamma(0.0-lambda, 2.0/chi);
     return samps;
   }
 
@@ -452,10 +439,7 @@ arma::vec Hidden_rDirichlet(
   for(i=0; i<alpha.size(); i++) {
     // shape = alpha(i) ; scale = 1
     // See https://en.wikipedia.org/wiki/Dirichlet_distribution#Random_number_generation
-    std::default_random_engine generator;
-    std::gamma_distribution<double> gamma(alpha(i), 1);
-    aux(i) = gamma(generator);
-    // aux(i) = R::rgamma(alpha(i), 1);
+    aux(i) = R::rgamma(alpha(i),1);
   }
   return aux / sum(aux);
 }

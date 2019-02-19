@@ -1,4 +1,5 @@
 #include "utils.h"
+
 /* Metropolis-Hastings updates of mu
 * Updates are implemented simulateaneously for all biological genes
 */
@@ -14,11 +15,14 @@ arma::mat Hidden_muUpdate(
     int const& n,
     arma::vec & mu1,
     arma::vec & u,
-    arma::vec & ind)
+    arma::vec & ind,
+    double exponent = 1)
 {
+
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
+
   /* ACCEPT/REJECT STEP
   * Note: there is a -1 factor coming from the log-normal prior.
   * However, it cancels out as using log-normal proposals.
@@ -27,12 +31,13 @@ arma::mat Hidden_muUpdate(
   log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) * exponent;
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
-      log_aux(i) -= (Counts(i,j) + invdelta(i)) *
+      log_aux(i) -= (Counts(i, j) + invdelta(i)) *
         log(
           (phinu(j) * mu1(i) + invdelta(i)) /
           (phinu(j) * mu0(i) + invdelta(i)));
     }
   }
+
   /* CREATING OUTPUT & DEBUG
   * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-3
@@ -41,13 +46,15 @@ arma::mat Hidden_muUpdate(
   */
   ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
   for (int i = 0; i < q0; i++) {
-    if(ind(i) == 0) {
+    if (ind(i) == 0) {
       mu1(i) = mu0(i);
     }
   }
+
   /* OUTPUT */
   return join_rows(mu1, ind);
 }
+
 /* Metropolis-Hastings updates of delta
 * Updates are implemented simulateaneously for all biological genes.
 */
@@ -65,7 +72,8 @@ arma::mat deltaUpdate(
     int const& n,
     arma::vec & delta1,
     arma::vec & u,
-    arma::vec & ind)
+    arma::vec & ind,
+    double exponent)
 {
   /* PROPOSAL STEP */
   delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
@@ -78,8 +86,8 @@ arma::mat deltaUpdate(
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
-      log_aux(i) += std::lgamma(Counts(i,j) + (1 / delta1(i)));
-      log_aux(i) -= std::lgamma(Counts(i,j) + (1 / delta0(i)));
+      log_aux(i) += std::lgamma(Counts(i, j) + (1 / delta1(i)));
+      log_aux(i) -= std::lgamma(Counts(i, j) + (1 / delta0(i)));
       log_aux(i) -= (Counts(i, j) + (1 / delta1(i))) *
         log(phinu(j) * mu(i) + (1 / delta1(i)));
       log_aux(i) += (Counts(i, j) + (1 / delta0(i))) *
@@ -126,7 +134,8 @@ Rcpp::List phiUpdate(
     arma::vec const& sum_bygene_bio,
     int const& q0,
     int const& n,
-    arma::vec & phi1)
+    arma::vec & phi1,
+    double exponent)
 {
   int ind;
 
@@ -146,7 +155,7 @@ Rcpp::List phiUpdate(
     // There is an extra factor n^(-(sum(aphi) - 1));it cancels out in the ratio
     for (int j = 0; j < n; j++) {
       for (int i = 0; i < q0; i++) {
-        log_aux -= (Counts(i,j) + invdelta(i)) *
+        log_aux -= (Counts(i, j) + invdelta(i)) *
           log(
             (phi1(j) * nu(j) * mu(i) + invdelta(i)) /
             (phi0(j) * nu(j) * mu(i) + invdelta(i)));
@@ -195,7 +204,8 @@ arma::vec sUpdateBatch(
     double const& bs,
     arma::mat const& BatchDesign,
     int const& n,
-    arma::vec & s1)
+    arma::vec & s1,
+    double exponent)
 {
 
   // Calculating parameters to the passed as input to the Rgig function (common for all cells)
@@ -258,7 +268,8 @@ arma::mat nuUpdateBatch(
     int const& n,
     arma::vec & nu1,
     arma::vec & u,
-    arma::vec & ind)
+    arma::vec & ind,
+    double exponent)
 {
   using arma::span;
 
@@ -271,7 +282,7 @@ arma::mat nuUpdateBatch(
 
   for (int j = 0; j < n; j++) {
     for (int i = 0; i < q0; i++) {
-      log_aux(j) -= (Counts(i,j) + invdelta(i)) *
+      log_aux(j) -= (Counts(i, j) + invdelta(i)) *
         log((phi(j)*nu1(j)*mu(i) + invdelta(i)) /
             (phi(j)*nu0(j)*mu(i) + invdelta(i)));
     }
@@ -300,24 +311,28 @@ arma::mat nuUpdateBatch(
 */
 arma::mat thetaUpdateBatch(
     arma::vec const& theta0, /* Current value of $\theta$ */
-arma::vec const& prop_var, /* Current value of the proposal variances for $\theta$ */
-arma::mat const& BatchDesign,
-arma::vec const& BatchSizes,
-arma::vec const& s, /* Current value of $s=(s_1,...,s_n)$' */
-arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-double const& a_theta, /* Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
-double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
-int const& n,
-int const& nBatch)
+    arma::vec const& prop_var, /* Current value of the proposal variances for $\theta$ */
+    arma::mat const& BatchDesign,
+    arma::vec const& BatchSizes,
+    arma::vec const& s, /* Current value of $s=(s_1, ..., s_n)$' */
+    arma::vec const& nu, /* Current value of $\nu=(\nu_1, ..., \nu_n)'$ */
+    double const& a_theta, /* Shape hyper-parameter of the Gamma($a_{\theta}$, $b_{\theta}$) prior assigned to $\theta$ */
+    double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$, $b_{\theta}$) prior assigned to $\theta$ */
+    int const& n,
+    int const& nBatch,
+    double exponent)
 {
   using arma::span;
+
   // CREATING VARIABLES WHERE TO STORE DRAWS
   arma::vec logtheta = log(theta0);
+
   // PROPOSAL STEP
   arma::vec y = arma::randn(nBatch) % sqrt(prop_var) + logtheta;
   arma::vec u = arma::randu(nBatch);
   arma::mat BatchDesignAux = BatchDesign.cols(0, nBatch - 1);
   BatchDesignAux.each_col() %= log(nu / s) - (nu / s);
+
   // ACCEPT/REJECT STEP
   // Theta ^ (a - n/theta - 1)
   arma::vec log_aux = (y - logtheta);
@@ -328,6 +343,7 @@ int const& nBatch)
     log_aux *= a_theta - 1 * exponent;
     log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta));
   }
+
   // Gamma component
   log_aux -= BatchSizes % (lgamma_cpp(exp(-y)) - lgamma_cpp(1 / theta0));
   // nu / s component

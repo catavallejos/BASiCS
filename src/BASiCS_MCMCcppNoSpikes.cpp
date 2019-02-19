@@ -307,9 +307,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     }
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt) {
+    if (i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50) {
+      if (Ibatch == 50) {
         PmuAux = PmuAux/(50-RefFreq);
         PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) + PmuAux.elem(find(Index_arma != RefGene))*0.1;
@@ -338,7 +338,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       nu.row(ind) = nuAux.col(0).t();
       theta.row(ind) = thetaAux.col(0).t();
 
-      if(StoreAdapt == 1) {
+      if (StoreAdapt == 1) {
         LSmu.row(ind) = LSmuAux.t();
         LSdelta.row(ind) = LSdeltaAux.t();
         LSnu.row(ind) = LSnuAux.t();

@@ -344,7 +344,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       nu.col(ind) = nuAux.col(0);
       theta.col(ind) = thetaAux.col(0);
 
-      if(StoreAdapt == 1) {
+      if (StoreAdapt == 1) {
         LSmu.col(ind) = LSmuAux;
         LSdelta.col(ind) = LSdeltaAux;
         LSphi(ind) = LSphiAux;
@@ -386,7 +386,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
 
-  if(StoreAdapt == 1) {
+  if (StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
     return(Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),

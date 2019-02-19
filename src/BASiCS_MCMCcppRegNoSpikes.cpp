@@ -258,7 +258,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // If using stochastic reference, randomly select 1 ref gene
-    if(StochasticRef == 1) {
+    if (StochasticRef == 1) {
       RefAux = as_scalar(
         arma::randi(1, arma::distr_param(0, RefGenes_arma.size() - 1))
       );
@@ -420,7 +420,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       sigma(ind) = sigma2Aux;
       epsilon.col(ind) = epsilonAux;
 
-      if(StoreAdapt == 1) {
+      if (StoreAdapt == 1) {
         LSmu.col(ind) = LSmuAux;
         LSdelta.col(ind) = LSdeltaAux;
         LSnu.col(ind) = LSnuAux;

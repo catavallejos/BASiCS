@@ -21,9 +21,9 @@ arma::mat designMatrix(
   // Possibly create this matrix outside
   arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
-  for(int i = 0; i < k - 2; i++) {
+  for (int i = 0; i < k - 2; i++) {
     X.col(i + 2) = exp(-0.5 * pow(x - myu(i), 2) / pow(h, 2));
-    //X.col(i+1) = pow(x,i+1);
+    //X.col(i+1) = pow(x, i+1);
   }
   return X;
 }
@@ -202,12 +202,9 @@ double sigma2UpdateReg(arma::vec const& delta,
   b += 0.5 * Rcpp::as<double>(wrap(beta.t() * V1 * beta - 2 * beta.t() * V1 * m));
   b += 0.5 * sum(lambda % pow(log(delta), 2));
 
-  std::default_random_engine generator;
-  std::gamma_distribution<double> gamma(a, 1.0 / b);
   // CV: 'if' condition removed as always truth
-  // if((a > 0) & (b > 0))
-  double sigma2 = pow(gamma(generator), -1);
-  // double sigma2 = pow(R::rgamma(a, 1.0 / b), -1);
+  // if ((a > 0) & (b > 0))
+  double sigma2 = pow(R::rgamma(a, 1.0 / b), -1);
 
   return sigma2;
 }
@@ -230,13 +227,10 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
     a = (eta + 1) / 2;
     b = 0.5 * (eta + (pow(log(delta) - X * beta, 2) / sigma2) );
   }
-  std::default_random_engine generator;
 
   // Parameter calculations
-  for(int i = 0; i < q0; i++) {
-    std::gamma_distribution<double> gamma(a, 1.0 / b(i));
-    lambda1(i) = gamma(generator);
-    // lambda1(i) = R::rgamma(a, 1.0 / b(i));
+  for (int i = 0; i < q0; i++) {
+    lambda1(i) = R::rgamma(a, 1.0 / b(i));
   }
   return lambda1;
 }

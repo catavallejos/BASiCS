@@ -18,11 +18,11 @@ test_that("Estimates match the given seed (no-spikes)",
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
   # Running the sampler on Data and sce object
   set.seed(14)
-  Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+  Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                        Regression = FALSE,
                        PrintProgress = FALSE, WithSpikes = FALSE)
   set.seed(14)
-  ChainSCE <- BASiCS_MCMC(sce, N = 1000, Thin = 10, Burn = 500, 
+  ChainSCE <- run_MCMC(sce, N = 1000, Thin = 10, Burn = 500, 
                        Regression = FALSE,
                        PrintProgress = FALSE, WithSpikes = FALSE)
   # Calculating a posterior summary
@@ -105,7 +105,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (no spikes)",
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
   # Running the sampler
   set.seed(14)
-  Chain <- BASiCS_MCMC(Data, N = 50, Thin = 10, Burn = 10,
+  Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,
                        Regression = FALSE, StoreAdapt=TRUE,
                        PrintProgress = FALSE, WithSpikes = FALSE)
   expect_s4_class(Chain, "BASiCS_Chain")

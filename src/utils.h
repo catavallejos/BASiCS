@@ -57,7 +57,8 @@ arma::mat Hidden_muUpdate(
     int const& n,
     arma::vec & mu1,
     arma::vec & u, 
-    arma::vec & ind);
+    arma::vec & ind,
+    double exponent);
 
 arma::mat deltaUpdate(
     arma::vec const& delta0, 
@@ -73,7 +74,8 @@ arma::mat deltaUpdate(
     int const& n,
     arma::vec & delta1,
     arma::vec & u, 
-    arma::vec & ind);
+    arma::vec & ind,
+    double exponent);
 
 Rcpp::List phiUpdate(
     arma::vec const& phi0, 
@@ -86,7 +88,8 @@ Rcpp::List phiUpdate(
     arma::vec const& sum_bygene_bio, 
     int const& q0,
     int const& n,
-    arma::vec & phi1);
+    arma::vec & phi1,
+    double exponent);
 
 arma::vec sUpdateBatch(
     arma::vec const& s0, 
@@ -96,7 +99,8 @@ arma::vec sUpdateBatch(
     double const& bs, 
     arma::mat const& BatchDesign,
     int const& n,
-    arma::vec & s1);
+    arma::vec & s1,
+    double exponent);
 
 arma::mat nuUpdateBatch(
     arma::vec const& nu0, 
@@ -114,7 +118,8 @@ arma::mat nuUpdateBatch(
     int const& n,
     arma::vec & nu1,
     arma::vec & u,
-    arma::vec & ind);
+    arma::vec & ind,
+    double exponent);
 
 arma::mat thetaUpdateBatch(
     arma::vec const& theta0, 
@@ -126,7 +131,8 @@ arma::mat thetaUpdateBatch(
     double const& a_theta, 
     double const& b_theta, 
     int const& n,
-    int const& nBatch);
+    int const& nBatch,
+    double exponent);
   
   /* Declarations for functions used by the MCMC sampler for the regression case
    * Stored in: utils_MCMCcppReg.cpp

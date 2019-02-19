@@ -128,7 +128,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat LStheta;
 
   // LOG-PROPOSAL VARIANCES
-  if(StoreAdapt == 1) {
+  if (StoreAdapt == 1) {
     LSmu = zeros(q0, Naux);
     LSdelta = zeros(q0, Naux);
     LSphi = ones(Naux);
@@ -355,7 +355,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           cellExponent);
 
     PnuAux += nuAux.col(1);
-    if(i>=Burn) {
+    if (i >= Burn) {
       nuAccept += nuAux.col(1);
     }
 
@@ -394,9 +394,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     epsilonAux = log(deltaAux.col(0)) - X * betaAux;
 
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
-    if(i < EndAdapt) {
+    if (i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
-      if(Ibatch==50) {
+      if (Ibatch == 50) {
         PmuAux = PmuAux/50;
         PmuAux = -1 + 2 * arma::conv_to<arma::mat>::from(PmuAux>ar);
         LSmuAux = LSmuAux + PmuAux * 0.1;

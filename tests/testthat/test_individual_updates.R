@@ -10,7 +10,7 @@ test_that("Dirichlet sampler", {
   x0 <- rgamma(length(phi0), shape = phi0, scale = 1)
   x0 <- x0 / sum(x0)
   
-  expect_that(all.equal(x, x0), is_true())
+  expect_equal(x, x0)
 })
 
 test_that("Spikes + no regression", {
@@ -34,7 +34,8 @@ test_that("Spikes + no regression", {
                                   phinu = Start$phi0 * Start$nu0,
                                   sum_bycell_bio = rowSums(CountsBio),
                                   s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
-                                  mu1 =  mu1, u = uGene, ind = indGene)
+                                  mu1 =  mu1, u = uGene, ind = indGene,
+                                  exponent = 1)
   
   mu1 <- c(11.12,  10.38,  5.44,  8.78, 22.06)
   mu1Obs <- round(Aux[1:5,1],2) 
