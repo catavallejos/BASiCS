@@ -1,70 +1,70 @@
 # Used in BASiCS_MCMC
-HiddenBASiCS_MCMC_Start <- function(Data, 
+HiddenBASiCS_MCMC_Start <- function(Data,
                                     PriorParam,
-                                    WithSpikes, 
-                                    ...) 
+                                    WithSpikes,
+                                    ls.mu0 = -4,
+                                    ls.delta0 = -2,
+                                    ls.phi0 = 11,
+                                    ls.nu0 = -10,
+                                    ls.theta0 = -4)
 {
-  if (!is(Data, "SingleCellExperiment")) 
+  if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.")
-  
+  }
+
   # Number of cells
   n <- dim(counts(Data))[2]
-  
+
   Spikes <- SingleCellExperiment::isSpike(Data)
-  
+
   # Number of instrinsic genes
-  if(!is.null(Spikes)){
+  if (!is.null(Spikes)) {
     q <- length(Spikes)
     q.bio <- sum(!Spikes)
-    
+
     # Separating spike-ins from the rest of genes
-    CountsBio <- as.matrix(counts(Data)[!Spikes, , drop = FALSE]) 
+    CountsBio <- as.matrix(counts(Data)[!Spikes, , drop = FALSE])
     CountsTech <- as.matrix(counts(Data)[Spikes, , drop = FALSE])
   }
-  else{
+  else {
     q.bio <- q <- nrow(Data)
-    
     CountsBio <- as.matrix(counts(Data))
   }
 
-  
+
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
   # Fix for cases in which 'scran' normalisation has invalid output
-  if( (min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0) )
-  {
+  if ((min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0)) {
     message("-------------------------------------------------------------\n",
             "There was an issue when applying `scran` normalization  \n",
             "`positive = TRUE` has been added to `computeSumFactors` call \n",
             "Please consider a more stringent quality control criteria. \n",
             "-------------------------------------------------------------\n")
-    suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio, 
+    suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio,
                                                             positive = TRUE))
   }
 
-  
-  if (WithSpikes == TRUE) 
-  {
+  if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
-    s0 <- matrixStats::colSums2(CountsTech) / 
+    s0 <- matrixStats::colSums2(CountsTech) /
       sum(metadata(Data)$SpikeInput)
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)
-    
-    # Initialize mu using average 'normalised counts' across cells 
+
+    # Initialize mu using average 'normalised counts' across cells
     # and true input values for spike-in genes
     nCountsBio <- t( t(CountsBio) / (phi0 * s0) )
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
-    mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)  
-  } 
-  else 
-  {
+    mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
+  }
+  else {
     s0 <- size_scran
     nu0 <- s0
     phi0 <- NULL
-    
+
     # Initialize mu using average 'normalised counts' across cells
     nCountsBio <- t( t(CountsBio) / s0 )
     meansBio <- rowMeans(nCountsBio)
@@ -72,36 +72,28 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
     mu0 <- meansBio
   }
-  
-    # Starting value for delta 
-    # Defined by the CV for high- and mid-expressed genes 
+
+    # Starting value for delta
+    # Defined by the CV for high- and mid-expressed genes
     # This is motivated by equation (2) in Vallejos et al (2016)
     varsBio <- matrixStats::rowVars(nCountsBio)
-    cv2Bio <- varsBio/(meansBio)^2
+    cv2Bio <- varsBio / (meansBio)^2
     delta0 <- rgamma(q.bio, 1, 1) + 1
     Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
     delta0[Aux] <- cv2Bio[Aux]
     # 1e-3 added to be coherent with tolerance used within MCMC sampler
     delta0 <- delta0 + 0.001
-    
+
     # Random stating value for theta (within typically observed range)
     theta0 <- runif(1, min = 0.2, max = 1)
-    
-    # If given, load default values for adaptive proposal variances
-    args <- list(...)
-    ls.mu0 <- ifelse("ls.mu0" %in% names(args), args$ls.mu0, -4)
-    ls.delta0 <- ifelse("ls.delta0" %in% names(args), args$ls.delta0, -2)
-    ls.phi0 <- ifelse("ls.phi0" %in% names(args), args$ls.phi0, 11)
-    ls.nu0 <- ifelse("ls.nu0" %in% names(args), args$ls.nu0, -10)
-    ls.theta0 <- ifelse("ls.theta0" %in% names(args), args$ls.theta0, -4)
-    
-    # Starting values for the proposal variances 
+
+    # Starting values for the proposal variances
     ls.mu0 <- rep(ls.mu0, q.bio)
     ls.delta0 <- rep(ls.delta0, q.bio)
-    ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11) 
+    ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
-    
+
     # Output list
     out <- list(mu0 = mu0, 
                 delta0 = delta0, 

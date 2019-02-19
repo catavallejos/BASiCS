@@ -7,9 +7,10 @@
 \alias{BASiCS_showFit,BASiCS_Chain-method}
 \title{Plotting the trend after Bayesian regression}
 \usage{
-\S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu[i])",
-  ylab = "log(delta[i])", pch = 16, col = "blue", bty = "n",
-  smooth = TRUE, variance = 1.2, ...)
+\S4method{BASiCS_showFit}{BASiCS_Chain}(object, xlab = "log(mu)",
+  ylab = "log(delta)", pch = 16, smooth = TRUE, variance = 1.2,
+  colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
+  colourGenesSel = "dark red", ...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
@@ -18,16 +19,28 @@
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
 
-\item{pch}{As in \code{\link[graphics]{par}}.}
+\item{pch}{As in \code{\link[graphics]{par}}. Default value \code{pch = 16}.}
 
-\item{col}{As in \code{\link[graphics]{par}}.}
+\item{smooth}{Logical to indicate wether the smoothScatter function is used
+to plot the scatter plot. Default value \code{smooth = TRUE}.}
 
-\item{bty}{As in \code{\link[graphics]{par}}.}
+\item{variance}{Variance used to build GRBFs for regression. Default value
+\code{variance = 1.2}}
 
-\item{smooth}{Logical to indicate wether the smoothScatter function is used 
-to plot the scatter plot.}
+\item{colour}{colour used to denote genes within the scatterplot. Only used 
+when \code{smooth = TRUE}. Default value 
+\code{colour = "dark blue"}.}
 
-\item{variance}{Variance used to build GRBFs for regression}
+\item{markExcludedGenes}{Whether or not lowly expressed genes that were
+excluded from the regression fit are included in the scatterplot.
+Default value \code{markExcludedGenes = TRUE}.}
+
+\item{GenesSel}{Vector of gene names to be highlighted in the scatterplot.
+Only used when \code{smooth = TRUE}. Default value \code{GenesSel = NULL}.}
+
+\item{colourGenesSel}{colour used to denote the genes listed in 
+\code{GenesSel} within the scatterplot. Default value 
+\code{colourGenesSel = "dark red"}.}
 
 \item{...}{Additional parameters for plotting.}
 }
@@ -35,7 +48,7 @@ to plot the scatter plot.}
 A plot object
 }
 \description{
-Plotting the trend after Bayesian regression using a 
+Plotting the trend after Bayesian regression using a
 \code{\linkS4class{BASiCS_Chain}} object
 }
 \examples{
@@ -44,7 +57,7 @@ BASiCS_showFit(ChainRNAReg)
 
 }
 \references{
-Eling et al (2018). Cell Systems 
+Eling et al (2018). Cell Systems
 https://doi.org/10.1016/j.cels.2018.06.011
 }
 \author{

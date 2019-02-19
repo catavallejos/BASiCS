@@ -195,9 +195,9 @@ DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40,
                               EFDR = 0.10, Plot = TRUE)
 
 plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
-with(DetectHVG$Table, points(Mu[HVG == TRUE], Delta[HVG == TRUE],
+with(DetectHVG$Table, points(Mu[HVG], Delta[HVG],
        pch = 16, col = 'red', cex = 1))
-with(DetectLVG$Table, points(Mu[LVG == TRUE], Delta[LVG == TRUE],
+with(DetectLVG$Table, points(Mu[LVG], Delta[LVG],
        pch = 16, col = 'blue', cex = 1))
 
 # If variance thresholds are not fixed

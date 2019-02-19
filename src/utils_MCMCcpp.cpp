@@ -1,5 +1,4 @@
 #include "utils.h"
-
 /* Metropolis-Hastings updates of mu
 * Updates are implemented simulateaneously for all biological genes
 */
@@ -15,20 +14,16 @@ arma::mat Hidden_muUpdate(
     int const& n,
     arma::vec & mu1,
     arma::vec & u,
-    arma::vec & ind,
-    double exponent)
+    arma::vec & ind)
 {
-
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
-
   /* ACCEPT/REJECT STEP
   * Note: there is a -1 factor coming from the log-normal prior.
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
-  // prior ratio
   log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) * exponent;
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
@@ -38,7 +33,6 @@ arma::mat Hidden_muUpdate(
           (phinu(j) * mu0(i) + invdelta(i)));
     }
   }
-
   /* CREATING OUTPUT & DEBUG
   * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-3
@@ -51,11 +45,9 @@ arma::mat Hidden_muUpdate(
       mu1(i) = mu0(i);
     }
   }
-
   /* OUTPUT */
   return join_rows(mu1, ind);
 }
-
 /* Metropolis-Hastings updates of delta
 * Updates are implemented simulateaneously for all biological genes.
 */
@@ -73,14 +65,11 @@ arma::mat deltaUpdate(
     int const& n,
     arma::vec & delta1,
     arma::vec & u,
-    arma::vec & ind,
-    double exponent)
+    arma::vec & ind)
 {
-
   /* PROPOSAL STEP */
   delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
   u = arma::randu(q0);
-
   /* ACCEPT/REJECT STEP
   * Note: there is a -1 factor coming from the log-normal prior.
   * However, it cancels out as using log-normal proposals.
@@ -106,7 +95,6 @@ arma::mat deltaUpdate(
     log_aux -= ((0.5 / s2delta) *
       (pow(log(delta1), 2) - pow(log(delta0), 2))) * exponent;
   }
-
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-3
@@ -119,7 +107,6 @@ arma::mat deltaUpdate(
       delta1(i) = delta0(i);
     }
   }
-
   // OUTPUT
   return join_rows(delta1, ind);
 }
@@ -139,8 +126,7 @@ Rcpp::List phiUpdate(
     arma::vec const& sum_bygene_bio,
     int const& q0,
     int const& n,
-    arma::vec & phi1,
-    double exponent)
+    arma::vec & phi1)
 {
   int ind;
 
@@ -150,8 +136,8 @@ Rcpp::List phiUpdate(
 
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)
   if (all(prop_var * phi1 < 2.5327372760800758e+305) &
-     all(prop_var * phi0 < 2.5327372760800758e+305) &
-     all(phi1 > 0) & all(phi0 > 0)) {
+      all(prop_var * phi0 < 2.5327372760800758e+305) &
+      all(phi1 > 0) & all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
     double log_aux = sum((sum_bygene_bio + aphi * exponent) % (log(phi1) - log(phi0)));
 
@@ -173,7 +159,7 @@ Rcpp::List phiUpdate(
     // gamma(sum(prop_var * phi0)) / gamma(sum(prop_var * phi1));
     // it cancels out as sum(prop_var*y) = sum(prop_var*phi0)
     log_aux += prop_var * sum(phi1 % log(phi0) - phi0 % log(phi1));
-    log_aux -= sum(lgamma_cpp_vec(prop_var*phi1) - lgamma_cpp_vec(prop_var*phi0));
+    log_aux -= sum(lgamma_cpp_vec(prop_var * phi1) - lgamma_cpp_vec(prop_var * phi0));
 
     if (!R_IsNA(log_aux)) {
       if (log(u) < log_aux) {
@@ -209,8 +195,7 @@ arma::vec sUpdateBatch(
     double const& bs,
     arma::mat const& BatchDesign,
     int const& n,
-    arma::vec & s1,
-    double exponent)
+    arma::vec & s1)
 {
 
   // Calculating parameters to the passed as input to the Rgig function (common for all cells)
@@ -273,8 +258,7 @@ arma::mat nuUpdateBatch(
     int const& n,
     arma::vec & nu1,
     arma::vec & u,
-    arma::vec & ind,
-    double exponent)
+    arma::vec & ind)
 {
   using arma::span;
 
@@ -297,7 +281,6 @@ arma::mat nuUpdateBatch(
   log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1 / (thetaBatch % s * exponent)));
 
   /* CREATING OUTPUT VARIABLE & DEBUG
-  * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-5
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
@@ -317,31 +300,24 @@ arma::mat nuUpdateBatch(
 */
 arma::mat thetaUpdateBatch(
     arma::vec const& theta0, /* Current value of $\theta$ */
-    arma::vec const& prop_var, /* Current value of the proposal variances for $\theta$ */
-    arma::mat const& BatchDesign,
-    arma::vec const& BatchSizes,
-    arma::vec const& s, /* Current value of $s=(s_1,...,s_n)$' */
-    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-    double const& a_theta, /* Shape hyper-parameter of the Gamma($a_{\theta}$,
-      $b_{\theta}$) prior assigned to $\theta$ */
-    double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$,
-      $b_{\theta}$) prior assigned to $\theta$ */
-    int const& n,
-    int const& nBatch,
-    double exponent)
+arma::vec const& prop_var, /* Current value of the proposal variances for $\theta$ */
+arma::mat const& BatchDesign,
+arma::vec const& BatchSizes,
+arma::vec const& s, /* Current value of $s=(s_1,...,s_n)$' */
+arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
+double const& a_theta, /* Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+int const& n,
+int const& nBatch)
 {
   using arma::span;
-
   // CREATING VARIABLES WHERE TO STORE DRAWS
   arma::vec logtheta = log(theta0);
-
   // PROPOSAL STEP
   arma::vec y = arma::randn(nBatch) % sqrt(prop_var) + logtheta;
   arma::vec u = arma::randu(nBatch);
-
   arma::mat BatchDesignAux = BatchDesign.cols(0, nBatch - 1);
   BatchDesignAux.each_col() %= log(nu / s) - (nu / s);
-
   // ACCEPT/REJECT STEP
   // Theta ^ (a - n/theta - 1)
   arma::vec log_aux = (y - logtheta);
@@ -361,10 +337,8 @@ arma::mat thetaUpdateBatch(
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
   ind %= 0.0001 < exp(y);
-
   // CREATING OUTPUT VARIABLE
   arma::vec theta = ind % exp(y) + (1 - ind) % theta0;
-
   // OUTPUT
   return join_rows(theta, arma::conv_to<arma::mat>::from(ind));
 }

@@ -15,21 +15,21 @@
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
-\item{Param}{Name of the slot to be used for the plot. 
-Possible values: \code{'mu'}, \code{'delta'}, 
-\code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'}, 
+\item{Param}{Name of the slot to be used for the plot.
+Possible values: \code{'mu'}, \code{'delta'},
+\code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'},
 \code{'beta'}, \code{'sigma2'} and \code{'epsilon'}.}
 
-\item{Gene}{Specifies which gene is requested. 
+\item{Gene}{Specifies which gene is requested.
 Required only if \code{Param = 'mu'} or \code{'delta'}}
 
-\item{Cell}{Specifies which cell is requested. 
+\item{Cell}{Specifies which cell is requested.
 Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
 
-\item{Batch}{Specifies which batch is requested. 
+\item{Batch}{Specifies which batch is requested.
 Required only if \code{Param = 'theta'}}
 
-\item{RegressionTerm}{Specifies which regression coefficient is requested. 
+\item{RegressionTerm}{Specifies which regression coefficient is requested.
 Required only if \code{Param = 'beta'}}
 
 \item{ylab}{As in \code{\link[graphics]{par}}.}
