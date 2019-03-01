@@ -198,7 +198,6 @@ double sigma2UpdateReg(arma::vec const& delta,
   // CV: 'if' condition removed as always truth
   // if((a > 0) & (b > 0))
   // double sigma2 = pow(R::rgamma(a, 1.0/b),-1);
-  std::default_random_engine generator(getSeed());
   std::gamma_distribution<double> gamma(a, 1.0 / b);
   double sigma2 = pow(gamma(generator), -1);
 
@@ -216,7 +215,6 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
   // Parameter calculations
   double a = (eta + 1) / 2;
   arma::vec b = 0.5 * ( eta + ( pow(log(delta) - X*beta,2) / sigma2) );
-  std::default_random_engine generator(getSeed());
   for(int i = 0; i < q0; i++) {
     std::gamma_distribution<double> gamma(a, 1.0 / b(i));
     double sigma2 = gamma(generator);

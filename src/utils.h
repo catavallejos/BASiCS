@@ -280,7 +280,9 @@ arma::mat deltaUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     arma::vec const& beta);
-  
+
+std::default_random_engine initGenerator();
 int getSeed();
+extern std::default_random_engine generator;
 
 #endif

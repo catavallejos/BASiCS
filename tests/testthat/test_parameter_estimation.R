@@ -80,3 +80,54 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes)",
                        Start = Start, PriorParam = PriorParam)
   expect_s4_class(Chain, "BASiCS_Chain")
 })
+
+
+
+test_that("gamma is reproducible when seed is set", {
+  library("Rcpp")
+  cpp <- '
+    #include <random>
+    #include <Rcpp.h>
+    using namespace Rcpp;
+
+    std::default_random_engine generator;
+
+    // [[Rcpp::export]]
+    int getSeed() {
+      Environment globalEnv = Environment::global_env();
+      NumericVector seed = globalEnv[".Random.seed"];
+      return (mean(seed));
+    }
+
+    // [[Rcpp::export]]
+    void initGenerator() {
+      std::default_random_engine gen (getSeed());
+      generator = gen;
+    }
+
+    // [[Rcpp::export]]
+    NumericVector callRGamma(int n, double shape, double scale) {
+      NumericVector out = NumericVector(n);
+      std::gamma_distribution<double> gamma(shape, scale);
+      for (int i = 0; i < n; i++) {
+        out[i] = gamma(generator);
+      }
+      return(out);
+    }
+  '
+
+  sourceCpp(code = cpp)
+
+  initGenerator()
+
+  x1 <- callRGamma(1000, 1, 2)
+  x2 <- callRGamma(1000, 1, 2)
+  expect_false(isTRUE(all.equal(x1, x2)))
+  set.seed(42)
+  initGenerator()
+  g1 <- callRGamma(1000, 1, 2)
+  set.seed(42)
+  initGenerator()
+  g2 <- callRGamma(1000, 1, 2)
+  expect_equal(g1, g2)
+})
