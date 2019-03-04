@@ -2,7 +2,7 @@ context("Individual MCMC updates (cpp code)\n")
 
 test_that("Dirichlet sampler", {
   # Generating arbitrary hyper-param
-  phi0 <- 1:10; phi0 <- phi0/sum(phi0)
+  phi0 <- 1:10; phi0 <- phi0 / sum(phi0)
   set.seed(2018)
   x <- as.vector(BASiCS:::Hidden_rDirichlet(phi0))
   
@@ -10,7 +10,7 @@ test_that("Dirichlet sampler", {
   x0 <- rgamma(length(phi0), shape = phi0, scale = 1)
   x0 <- x0 / sum(x0)
   
-  expect_that(all.equal(x, x0), is_true())
+  expect_equal(x, x0)
 })
 
 test_that("Spikes + no regression", {
@@ -38,9 +38,9 @@ test_that("Spikes + no regression", {
   
   mu1 <- c(11.12,  10.38,  5.44,  8.78, 22.06)
   mu1Obs <- round(Aux[1:5,1],2) 
-  expect_that(all.equal(mu1, mu1Obs), is_true())
+  expect_equal(mu1, mu1Obs)
 
   ind <- c(1, 0, 1, 1, 1)
   indObs <- Aux[1:5,2]
-  expect_that(all.equal(ind, indObs), is_true())  
+  expect_equal(ind, indObs)
 })

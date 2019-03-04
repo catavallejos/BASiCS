@@ -39,51 +39,51 @@ test_that("Estimates match the given seed (no-spikes+regression)",
                   "beta", "sigma2", "epsilon", "RefFreq")
   ParamNames1 <- c("mu", "delta", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon")
-  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true())
-  expect_that(all.equal(names(PostSummary@parameters), ParamNames1), is_true())
+  expect_equal(names(Chain@parameters), ParamNames)
+  expect_equal(names(PostSummary@parameters), ParamNames1)
 
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(12.309, 10.771,  6.854, 10.717, 30.529)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   MuObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                 "mu")[1:5,1],3))
-  expect_that(all.equal(MuObs, Mu), is_true())
-  expect_that(all.equal(MuObsSCE, Mu), is_true())
+  expect_equal(MuObs, Mu)
+  expect_equal(MuObsSCE, Mu)
 
   Delta <- c(1.112, 1.196, 1.640, 1.246, 0.496)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary,
                                                    "delta")[1:5,1],3))
   DeltaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                    "delta")[1:5,1],3))
-  expect_that(all.equal(DeltaObs, Delta), is_true())
-  expect_that(all.equal(DeltaObsSCE, Delta), is_true())
+  expect_equal(DeltaObs, Delta)
+  expect_equal(DeltaObsSCE, Delta)
 
   S <- c(0.806, 1.567, 0.233, 0.548, 1.357)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   SObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                   "s")[1:5,1],3))
-  expect_that(all.equal(SObs, S), is_true())
-  expect_that(all.equal(SObsSCE, S), is_true())
+  expect_equal(SObs, S)
+  expect_equal(SObsSCE, S)
 
   Theta <- c(0.197, 0.283)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   ThetaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                    "theta")[,1],3))
-  expect_that(all.equal(ThetaObs, Theta), is_true())
-  expect_that(all.equal(ThetaObsSCE, Theta), is_true())
+  expect_equal(ThetaObs, Theta)
+  expect_equal(ThetaObsSCE, Theta)
 
   Beta <- c(0.289, -0.365,  0.413,  0.161,  0.277)
   BetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "beta")[1:5,1],3))
   BetaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                   "beta")[1:5,1],3))
-  expect_that(all.equal(BetaObs, Beta), is_true())
-  expect_that(all.equal(BetaObsSCE, Beta), is_true())
+  expect_equal(BetaObs, Beta)
+  expect_equal(BetaObsSCE, Beta)
 
   Sigma2 <- 0.321
   Sigma2Obs <- round(displaySummaryBASiCS(PostSummary, "sigma2")[1],3)
   Sigma2ObsSCE <- round(displaySummaryBASiCS(PostSummarySCE, "sigma2")[1],3)
-  expect_that(all.equal(Sigma2Obs, Sigma2), is_true())
-  expect_that(all.equal(Sigma2ObsSCE, Sigma2), is_true())
+  expect_equal(Sigma2Obs, Sigma2)
+  expect_equal(Sigma2ObsSCE, Sigma2)
 
   # Obtaining denoised counts
   DC <- BASiCS_DenoisedCounts(Data, Chain)
@@ -92,8 +92,8 @@ test_that("Estimates match the given seed (no-spikes+regression)",
   DCcheck0 <- c(4.164,  1.388,  0.000,  8.328, 9.716)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   DCSCEcheck <- as.vector(round(DCSCE[1:5,1], 3))
-  expect_that(all.equal(DCcheck, DCcheck0), is_true())
-  expect_that(all.equal(DCSCEcheck, DCcheck0), is_true())
+  expect_equal(DCcheck, DCcheck0)
+  expect_equal(DCSCEcheck, DCcheck0)
 
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
@@ -102,8 +102,8 @@ test_that("Estimates match the given seed (no-spikes+regression)",
   DRcheck0 <- c(5.019,  3.062, 10.691,  1.584,  4.785)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   DRSCEcheck <- as.vector(round(DRSCE[10,1:5], 3))
-  expect_that(all.equal(DRcheck, DRcheck0), is_true())
-  expect_that(all.equal(DRSCEcheck, DRcheck0), is_true())
+  expect_equal(DRcheck, DRcheck0)
+  expect_equal(DRSCEcheck, DRcheck0)
 })
 
 test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE", {
