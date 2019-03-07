@@ -44,6 +44,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio,
                                                             positive = TRUE))
   }
+  size_scran[size_scran <= 0] <- .Machine[["double.xmin"]]
 
   if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
@@ -66,7 +67,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     phi0 <- NULL
 
     # Initialize mu using average 'normalised counts' across cells
-    nCountsBio <- t( t(CountsBio) / s0 )
+    nCountsBio <- t(t(CountsBio) / s0)
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
     meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
@@ -77,7 +78,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     # Defined by the CV for high- and mid-expressed genes
     # This is motivated by equation (2) in Vallejos et al (2016)
     varsBio <- matrixStats::rowVars(nCountsBio)
-    cv2Bio <- varsBio / (meansBio)^2
+    cv2Bio <- varsBio / meansBio ^ 2
     delta0 <- rgamma(q.bio, 1, 1) + 1
     Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
     delta0[Aux] <- cv2Bio[Aux]
@@ -108,7 +109,6 @@ HiddenBASiCS_MCMC_Start <- function(Data,
                 ls.theta0 = ls.theta0)
     
     # Starting values for regression-related parameters
-
     if(!is.null(PriorParam$eta)) {
       out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V) 
       out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)

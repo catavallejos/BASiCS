@@ -148,7 +148,7 @@ Rcpp::List phiUpdate(
       all(prop_var * phi0 < 2.5327372760800758e+305) &
       all(phi1 > 0) & all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
-    double log_aux = sum((sum_bygene_bio + aphi * exponent) % (log(phi1) - log(phi0)));
+    double log_aux = sum((sum_bygene_bio + (aphi * exponent)) % (log(phi1) - log(phi0)));
 
     // Loop to replace matrix operations, through genes and cells
     // There is an extra factor in the prior n^(-n); it cancels out in the ratio
@@ -161,6 +161,7 @@ Rcpp::List phiUpdate(
             (phi0(j) * nu(j) * mu(i) + invdelta(i)));
       }
     }
+
     // There is an extra factor
     // n^(-(sum(prop_var * phi1))) / n^(-(sum(prop_var * phi0)));
     // it cancels out as sum(prop_var*y) = sum(prop_var*phi0)
@@ -169,7 +170,6 @@ Rcpp::List phiUpdate(
     // it cancels out as sum(prop_var*y) = sum(prop_var*phi0)
     log_aux += prop_var * sum(phi1 % log(phi0) - phi0 % log(phi1));
     log_aux -= sum(lgamma_cpp_vec(prop_var * phi1) - lgamma_cpp_vec(prop_var * phi0));
-
     if (!R_IsNA(log_aux)) {
       if (log(u) < log_aux) {
         ind = 1;
@@ -182,7 +182,6 @@ Rcpp::List phiUpdate(
       // DEBUG: Print warning message
       Rcpp::Rcout << "Error when updating phi" << std::endl;
       Rcpp::stop("Please consider additional filter of the input dataset.");
-      ind = 0; phi1 = phi0;
     }
   } else {
     ind = 0; phi1 = phi0;
@@ -340,7 +339,7 @@ arma::mat thetaUpdateBatch(
     log_aux *= a_theta;
     log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta) % exp(-y + logtheta) - 1);
   } else {
-    log_aux *= a_theta - 1 * exponent;
+    log_aux *= (a_theta - 1) * exponent;
     log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta));
   }
 
@@ -350,6 +349,8 @@ arma::mat thetaUpdateBatch(
   log_aux += ((exp(-y + logtheta) - 1) / theta0) % sum(BatchDesignAux, 0).t();
   // exponential component
   log_aux -= (b_theta * exponent) * theta0 % (exp(y - logtheta) - 1);
+  // log_aux -= (b_theta) * theta0 % (exp(y - logtheta) - 1);
+
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
   ind %= 0.0001 < exp(y);

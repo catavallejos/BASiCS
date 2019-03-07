@@ -212,7 +212,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat X = designMatrix(k, means, variance);
 
   StartSampler(N);
-
   // START OF MCMC LOOP
   for (int i=0; i<N; i++) {
     Rcpp::checkUserInterrupt();
@@ -236,6 +235,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                            n,
                            y_n,
                            cellExponent);
+
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]);
     if (i >= Burn) {
@@ -244,7 +244,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
 
     // theta and regression parameters are global; thus, they require scaling
     // for both cases
-    double exponent;
+    double exponent = 1;
     if (geneExponent != 1) {
       exponent = geneExponent;
     } else if (cellExponent != 1) {
@@ -294,6 +294,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         sigma2Aux,
                         variance,
                         geneExponent);
+
     PmuAux += muAux.col(1);
     if (i >= Burn) {
       muAccept += muAux.col(1);
@@ -370,6 +371,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       betaAux = betaUpdateReg(sigma2Aux,
                               VAux,
                               mAux);
+
       sigma2Aux = sigma2UpdateReg(deltaAux.col(0),
                                   betaAux,
                                   lambdaAux,
@@ -380,6 +382,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                   sigma2_b0,
                                   q0);
     }
+
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
     lambdaAux = lambdaUpdateReg(deltaAux.col(0),
                                 X,
@@ -495,11 +498,11 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t(),
-        Rcpp::Named("designMatrix")=X,
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("designMatrix") = X,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.phi") = LSphi,
@@ -515,10 +518,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t()));
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t()));
 
   }
 }

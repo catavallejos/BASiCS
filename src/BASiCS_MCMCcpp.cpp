@@ -207,6 +207,15 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
     }
 
+    // theta and regression parameters are global; thus, they require scaling
+    // for both cases
+    double exponent = 1;
+    if (geneExponent != 1) {
+      exponent = geneExponent;
+    } else if (cellExponent != 1) {
+      exponent = cellExponent;
+    }
+
     // UPDATE OF THETA:
     // 1st ELEMENT IS THE UPDATE,
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -220,7 +229,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                                 btheta,
                                 n,
                                 nBatch,
-                                cellExponent);
+                                exponent);
     PthetaAux += thetaAux.col(1);
     if (i >= Burn) {
       thetaAccept += thetaAux.col(1);

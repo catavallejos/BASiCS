@@ -82,6 +82,7 @@ HiddenChecksBASiCS_Data <- function(Counts,
   }
 
   if (sum(matrixStats::rowSums2(Counts) == 0) > 0) {
+    # browser()
     warning("Some genes have zero counts across all cells. \n",
             "If comparing 2 groups, use `PriorDelta = 'log-normal' in BASiCS_MCMC.\n",
             "If not, please remove those genes.")
