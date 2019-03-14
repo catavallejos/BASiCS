@@ -1051,3 +1051,5 @@ version 1.5.4: (2019-02-12)
 - Additional optional arguments (`markExcludedGenes`, `colour`, `GenesSel` and
 `colourGenesSel`) added to `BASiCS_showFit` for more flexibility 
 
+version 1.5.5: (2019-03-14)
+- Updated vignette to include recommended settings earlier. 
