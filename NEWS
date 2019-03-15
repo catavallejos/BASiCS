@@ -1032,3 +1032,6 @@ version 1.3.23: (2018-10-18)
 
 version 1.3.24: (2018-10-21)
 - Version bump to trigger new build
+
+version 1.4.2: (2019-03-15)
+- Bug fix when not providing BatchInfo as factor
