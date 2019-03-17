@@ -21,12 +21,6 @@ HiddenChecksBASiCS_Data <- function(Counts,
         sum(!is.finite(SpikeInput)) == 0)) 
     errors <- c(errors, "Invalid value for 'SpikeInput'.\n")
   
-  # Checks on nameing of batches and cells
-  if (!is.null(BatchInfo) & sum(grepl("[[:space:]]", BatchInfo)) != 0){
-    errors <- c(errors, "The BatchInfo vector contains names with spaces.
-                Please remove any spaces from batch names.\n")
-  }
-  
   q <- nrow(Counts)
   if(WithSpikes){
     q.bio <- q - length(SpikeInput)
