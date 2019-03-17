@@ -1036,6 +1036,9 @@ version 1.3.24: (2018-10-21)
 version 1.4.2: (2019-03-15)
 - Bug fix when not providing BatchInfo as factor
 
-version 1.4.3. (2019-03-15)
+version 1.4.3: (2019-03-15)
 - Extra check if batch names contain spaces
 - Added line breaks after individual error messages 
+
+version 1.4.4: (2019-03-17)
+- Bug fix that corrects for the number of factors in BatchInfo vector
