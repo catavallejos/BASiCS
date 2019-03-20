@@ -1045,3 +1045,6 @@ version 1.4.4: (2019-03-17)
 
 version 1.4.5: (2019-03-20)
 - Small bug fix in 'test_mcmc_arguments.R'
+
+version 1.4.6: (2019-03-20)
+- Same as 1.4.5 but with minor additional fix.
