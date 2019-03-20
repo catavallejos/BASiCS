@@ -1053,3 +1053,10 @@ version 1.5.4: (2019-02-12)
 
 version 1.5.5: (2019-03-14)
 - Updated vignette to include recommended settings earlier. 
+
+version 1.5.6: (2019-03-20) - merge from RELEASE_3_8 branch
+- Bug fix when not providing BatchInfo as factor
+- Extra check if batch names contain spaces
+- Added line breaks after individual error messages 
+- Bug fix that corrects for the number of factors in BatchInfo vector
+- Small bug fix in 'test_mcmc_arguments.R'

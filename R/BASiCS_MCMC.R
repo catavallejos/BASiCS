@@ -231,10 +231,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   n <- dim(counts(Data))[2]
 
   # If Data contains batches
-  if (!is.null(colData(Data)$BatchInfo)){
-    nBatch <- length(unique(colData(Data)$BatchInfo))
+  if(!is.null(colData(Data)$BatchInfo)){
+    # Store the correct number of levels in batch vector
+    BatchInfo <- as.factor(colData(Data)$BatchInfo)
+    BatchInfo <- factor(BatchInfo, levels = unique(BatchInfo))
+    nBatch <- length(unique(BatchInfo))
   }
-  else {
+  else{
     nBatch <- 1
   }
 
@@ -293,13 +296,10 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
 
   # Parameters associated to the presence of batches
   if(nBatch > 1) {
-    BatchDesign <- model.matrix(~as.factor(colData(Data)$BatchInfo) - 1)  
-    BatchInfo <- as.numeric(as.factor(colData(Data)$BatchInfo))
-  } 
-  else { 
+    BatchDesign <- model.matrix(~BatchInfo - 1)  
+  } else { 
     # If there are no batches or the user asked to ignore them
-    BatchDesign <- matrix(1, nrow = n, ncol = 1)
-    BatchInfo <- rep(1, times = n)
+    BatchDesign <- matrix(1, nrow = n, ncol = 1) 
     nBatch <- 1
   }
 
