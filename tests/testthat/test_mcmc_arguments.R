@@ -150,12 +150,12 @@ test_that("MCMC fails for one or multiple arguments", {
   ### Without spikes
   
   # Test if it contains a 'counts' slot
-  sce <- SingleCellExperiment(assays = list(test = counts(DataSpikes)),
-                               colData = colData(DataSpikes))
-  expect_error(BASiCS_MCMC(Data = sce, N = 50, 
-                           Thin = 5, Burn = 25, Regression = FALSE, 
-                           WithSpikes = FALSE),
-               regexp = ".*does not contain a \'counts\' slot*")
+#  sce <- SingleCellExperiment(assays = list(test = counts(DataSpikes)),
+#                               colData = colData(DataSpikes))
+#  expect_error(BASiCS_MCMC(Data = sce, N = 50, 
+#                           Thin = 5, Burn = 25, Regression = FALSE, 
+#                           WithSpikes = FALSE),
+#               regexp = ".*does not contain a \'counts\' slot*")
   
   # Test if it is a SingleCellExperimentObject
   sce <- SummarizedExperiment(assays = list(counts = counts(DataSpikes)),
@@ -217,7 +217,15 @@ test_that("MCMC fails for one or multiple arguments", {
   metadata(sce)$SpikeInput <- metadata(DataSpikes)$SpikeInput
   expect_error(BASiCS_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
+                           WithSpikes = TRUE),
+               regexp = ".*object 'BatchInfo' not found.*")
+  
+  # Right SpikeInfo assignment + right BatchInfo
+  colData(sce) <- colData(DataSpikes)
+  expect_error(BASiCS_MCMC(Data = sce, N = 50, 
+                           Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE), NA)
+  
 })
 
 
