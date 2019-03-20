@@ -1042,3 +1042,6 @@ version 1.4.3: (2019-03-15)
 
 version 1.4.4: (2019-03-17)
 - Bug fix that corrects for the number of factors in BatchInfo vector
+
+version 1.4.5: (2019-03-20)
+- Small bug fix in 'test_mcmc_arguments.R'
