@@ -1,86 +1,73 @@
-HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold, 
-                                        GenesSelect, EFDR, Task) 
+HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
+                                        GenesSelect, EFDR, Task)
 {
   # Calculating posterior probabilities
-  if (Epsilon > 0) 
-  { 
-    Prob <- matrixStats::colMeans2(ifelse(abs(ChainLFC) > Epsilon, 1, 0)) 
-  } 
-  else 
-  {
+  if (Epsilon > 0) {
+    Prob <- matrixStats::colMeans2(ifelse(abs(ChainLFC) > Epsilon, 1, 0))
+  }
+  else {
     Prob_aux <- matrixStats::colMeans2(ifelse(ChainLFC > 0, 1, 0))
     Prob <- 2 * pmax(Prob_aux, 1 - Prob_aux) - 1
   }
-  
+
   # Posterior probability threshold search
-  if (is.null(ProbThreshold)) 
-  {
+  if (is.null(ProbThreshold)) {
     # When a posterior probability threshold has not been set a priori
     ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
-    
-    if (is.null(GenesSelect)) 
-    {
+
+    if (is.null(GenesSelect)) {
       EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob)
       EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob)
-    } 
-    else 
-    {
+    }
+    else {
       EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob[GenesSelect])
       EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob[GenesSelect])
     }
-    
+
     above <- abs(EFDRgrid - EFDR)
-    
-    if(sum(!is.na(above)) > 0)
-    {
+
+    if (sum(!is.na(above)) > 0) {
       # Search EFDR closest to the desired value
-      EFDRopt <- EFDRgrid[above == min(above, na.rm = TRUE) & !is.na(above)] 
+      EFDRopt <- EFDRgrid[above == min(above, na.rm = TRUE) & !is.na(above)]
       # If multiple threholds lead to same EFDR, choose the one with lowest EFNR
       EFNRopt <- EFNRgrid[EFDRgrid == mean(EFDRopt) & !is.na(EFDRgrid)]
-      if(sum(!is.na(EFNRopt)) > 0)
-      {
+      if (sum(!is.na(EFNRopt)) > 0) {
         optimal <- which(EFDRgrid == mean(EFDRopt) & EFNRgrid == mean(EFNRopt))
-      } 
-      else
-      {
+      }
+      else {
         optimal <- which(EFDRgrid == mean(EFDRopt))
       }
       # Quick fix for EFDR/EFNR ties; possibly not an issue in real datasets
       optimal <- median(round(median(optimal)))
-      OptThreshold <- c(ProbThresholds[optimal], 
+      OptThreshold <- c(ProbThresholds[optimal],
                         EFDRgrid[optimal], EFNRgrid[optimal])
-      
-      if( abs(OptThreshold[2] - EFDR) > 0.025 )
-      {
+
+      if (abs(OptThreshold[2] - EFDR) > 0.025) {
         message("For ", Task, " task:\n",
                 "It is not possible to find a probability threshold (>0.5) \n",
                 "that achieves the desired EFDR level (+-0.025). \n",
-                "The output below reflects the closest possible value. \n")         
-      }  
+                "The output below reflects the closest possible value. \n")
+      }
     }
-    else
-    {
+    else {
       message("EFDR calibration failed for ", Task, " task. \n",
               "Probability threshold automatically set equal to 0.90 \n")
-      OptThreshold <- c(0.9, NA, NA)  
+      OptThreshold <- c(0.9, NA, NA)
     }
-  } 
-  else 
-  {
+  }
+  else {
     # When a posterior probability threshold has been set a priori
-    if (is.null(GenesSelect)) 
-    {
+    if (is.null(GenesSelect)) {
       EFDRgrid <- HiddenEFDR(ProbThreshold, Prob)
       EFNRgrid <- HiddenEFNR(ProbThreshold, Prob)
-    } 
-    else 
-    {
+    }
+    else {
       EFDRgrid <- HiddenEFDR(ProbThreshold, Prob[GenesSelect])
       EFNRgrid <- HiddenEFNR(ProbThreshold, Prob[GenesSelect])
     }
     OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid)
   }
-  
-  list(Prob = Prob, OptThreshold = OptThreshold, 
+
+  list(Prob = Prob, OptThreshold = OptThreshold,
        EFDRgrid = EFDRgrid, EFNRgrid = EFNRgrid)
 }

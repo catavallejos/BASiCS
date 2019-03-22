@@ -19,6 +19,14 @@ test_that("MCMC fails for one or multiple arguments", {
                            Thin = 5, Burn = 25),
                regexp = "argument \"Regression\" is missing, with no default")
   
+  
+  DataSpikesBatchNotFactor <- DataSpikes
+  colData(DataSpikesBatchNotFactor)$BatchInfo <- paste("Batch",
+    colData(DataSpikesBatchNotFactor)$BatchInfo
+  )
+  expect_error(BASiCS_MCMC(Data = DataSpikesBatchNotFactor, N = 20, Thin = 2,
+                           Burn = 4, Regression = TRUE),
+               NA)
   # Check standard MCMC setting - additional parameters
   expect_error(BASiCS_MCMC(Data = DataSpikes, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE), NA)
@@ -218,6 +226,8 @@ test_that("MCMC fails for one or multiple arguments", {
   expect_error(BASiCS_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE), NA)
+
+  
 })
 
 

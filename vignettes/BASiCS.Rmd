@@ -117,6 +117,11 @@ For other optional parameters refer to `help(BASiCS_MCMC)`.
 Here, we illustrate the usage of `BASiCS_MCMC` using a built-in 
 synthetic dataset.
 
+**NOTE: WE USE A SMALL NUMBER OF ITERATIONS FOR ILLUSTRATION PURPOSES ONLY.
+LARGER NUMBER OF ITERATIONS ARE USUALLY REQUIRED TO ACHIEVE CONVERGENCE. OUR
+RECOMMENDED SETTING IS `N=20000`, `Thin=20` and `Burn=10000`.**
+
+
 ```{r quick-start-MCMC}
 Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
@@ -302,8 +307,8 @@ head(LVG$Table)
 ```{r quick-start-HVGdetectionPlot, fig.width=8, fig.height=8}
 SummarySC <- Summary(ChainSC)
 plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
-with(HVG$Table[HVG$Table$HVG == TRUE,], points(Mu, Delta))
-with(LVG$Table[LVG$Table$LVG == TRUE,], points(Mu, Delta))
+with(HVG$Table[HVG$Table$HVG,], points(Mu, Delta))
+with(LVG$Table[LVG$Table$LVG,], points(Mu, Delta))
 ```
 
 --->
@@ -375,7 +380,7 @@ used (`Regression = TRUE` as a function parameter in `BASiCS_MCMC`),
 
 # Alternative implementation modes
 
-Beyond its original implementation, BASiCS has been extended to adress 
+Beyond its original implementation, BASiCS has been extended to address 
 experimental designs in which spike-in molecules are not available as well as 
 to address the confounding that is typically observed between mean and 
 over-dispersion for scRNA-seq datasets [@eling2018correcting]. Alternative 
