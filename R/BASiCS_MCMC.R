@@ -238,6 +238,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     nBatch <- length(unique(BatchInfo))
   }
   else{
+    BatchInfo <- rep(1, times = n)
     nBatch <- 1
   }
 
