@@ -1,3 +1,5 @@
+Meta
+doc
 .Rproj.user
 .Rhistory
 .RData
@@ -8,4 +10,4 @@ inst/doc
 ..Rcheck
 */.DS_Store
 tests/testthat/*.Rds
-
+vignettes/.build.timestamp
