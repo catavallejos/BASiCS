@@ -18,11 +18,10 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}.}
 
-\item{Measure}{The diagnostic measure to be plotted in the histogram.
-Possible values: \code{"effectiveSize"}, \code{"geweke.diag"}.}
-
-\item{x, y}{MCMC parameter values to be plotted on the x or y axis, 
-respectively.}
+\item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
+respectively. If neither is supplied, Param will be plotted on the x axis
+and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
+a density plot.}
 
 \item{LogX, LogY}{A boolean value indicating whether to use a log10
 transformation for the x or y axis, respectively.}
@@ -31,9 +30,9 @@ transformation for the x or y axis, respectively.}
 A ggplot object.
 }
 \description{
-Plot parameter values and effective sample size or 
-Geweke's diagnostic z-statistic. See \link[coda]{effectiveSize} and 
-\link[coda]{geweke.diag} for more details on these diagnostic measures.
+Plot parameter values and effective sample size.
+See \link[coda]{effectiveSize}
+for more details on this diagnostic measure.
 }
 \examples{
 

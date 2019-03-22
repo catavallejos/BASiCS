@@ -873,9 +873,9 @@ setMethod("displaySummaryBASiCS",
 #'
 #' @title Create diagnostic plots of MCMC parameters
 #'
-#' @description Plot parameter values and effective sample size or 
-#' Geweke's diagnostic z-statistic. See \link[coda]{effectiveSize} and 
-#' \link[coda]{geweke.diag} for more details on these diagnostic measures.
+#' @description Plot parameter values and effective sample size.
+#' See \link[coda]{effectiveSize}
+#' for more details on this diagnostic measure.
 #'
 #' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
 #' @param Param Optional name of a chain parameter to restrict the histogram;
@@ -883,10 +883,10 @@ setMethod("displaySummaryBASiCS",
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
-#' @param Measure The diagnostic measure to be plotted in the histogram.
-#' Possible values: \code{"effectiveSize"}, \code{"geweke.diag"}.
-#' @param x,y MCMC parameter values to be plotted on the x or y axis, 
-#' respectively.
+#' @param x,y Optional MCMC parameter values to be plotted on the x or y axis, 
+#' respectively. If neither is supplied, Param will be plotted on the x axis
+#' and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
+#' a density plot.
 #' @param LogX,LogY A boolean value indicating whether to use a log10
 #' transformation for the x or y axis, respectively.
 #' 
@@ -910,30 +910,51 @@ setMethod("diagPlot",
           signature = "BASiCS_Chain",
           definition = function(object, 
                                 Param = "mu", 
-                                x = "mu", 
-                                y = "delta",
-                                Measure = c("effectiveSize",
-                                            "geweke.diag"),
-                                LogX = x %in% c("mu", "delta"),
-                                LogY = y %in% c("mu", "delta")) {
+                                x = NULL, 
+                                y = NULL,
+                                LogX = isTRUE(x %in% c("mu", "delta")),
+                                LogY = isTRUE(y %in% c("mu", "delta"))) {
 
+            if (!is.null(x) || !is.null(y)) {
+              if (!is.null(x) && is.null(y)) {
+                stop("Must specify both x and y or neither!")
+              }
+            } else {
+              LogX <- Param %in% c("mu", "delta")
+            }
+            Measure <- "effectiveSize"
             checkValidCombination(x, y, Param)
             metric <- getMeasure(object, Param, Measure)
-            xMat <- getParam(object, x)
-            yMat <- getParam(object, y)
-            df <- data.frame(
-              x = colMedians(xMat),
-              y = colMedians(yMat),
-              metric = metric
-            )
             sX <- if (LogX) scale_x_log10() else scale_x_continuous()
             sY <- if (LogY) scale_y_log10() else scale_y_continuous()
-            ggplot(df, aes(x = x, y = y, color = metric)) + 
-              geom_point() +
-              viridis::scale_color_viridis(name = scaleName(Measure, Param)) +
-              sX + sY +
-              labs(x = x,
-                   y = y)
+
+            if (!is.null(x)) {
+              xMat <- getParam(object, x)
+              yMat <- getParam(object, y)
+              df <- data.frame(
+                x = colMedians(xMat),
+                y = colMedians(yMat),
+                metric = metric
+              )
+              ggplot(df, aes(x = x, y = y, color = metric)) + 
+                geom_point(alpha = 0.5, shape = 16) +
+                viridis::scale_color_viridis(name = scaleName(Measure, Param)) +
+                sX + sY +
+                labs(x = x,
+                     y = y)              
+            } else {
+              xMat <- getParam(object, Param)
+              df <- data.frame(
+                x = colMedians(xMat),
+                y = metric
+              )
+              ggplot(df, aes(x = x, y = metric)) + 
+                geom_hex(aes(fill = ..density..)) +
+                viridis::scale_fill_viridis(name = "Density") +
+                sX + sY +
+                labs(x = Param,
+                     y = scaleName(Measure))
+            }
           }
 )
 
@@ -993,12 +1014,9 @@ setGeneric("diagHist", function(object, ...) {
 setMethod("diagHist",
           signature = signature("BASiCS_Chain"),
           definition = function(object, 
-                                Param = NULL, 
-                                Measure = c("effectiveSize",
-                                            "geweke.diag")) {
+                                Param = NULL) {
 
-            Measure <- match.arg(Measure)
-            MeasureFun <- match.fun(Measure)
+            Measure <- "effectiveSize"
 
             if (is.null(Param)) {
               metric <- lapply(names(object@parameters), function(param) {
@@ -1021,8 +1039,8 @@ setMethod("diagHist",
 
 checkValidCombination <- function(...) {
   Params <- list(...)
-  if (!(all(sapply(Params, function(x) x %in% geneParams())) || 
-        all(sapply(Params, function(x) x  %in% cellParams())))) {
+  if (!(all(sapply(Params, function(x) is.null(x) || x %in% geneParams())) || 
+        all(sapply(Params, function(x) is.null(x) || x  %in% cellParams())))) {
     stop(paste("Invalid combination of parameters:",
                paste(list(...), collapse = ", "), " \n"))
   } 

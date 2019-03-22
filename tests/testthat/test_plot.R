@@ -172,6 +172,6 @@ test_that("Diagnostic hist work", {
   expect_is(g, "ggplot")
   g <- diagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
-  g <- diagHist(Chain, Param = "nu", Measure = "geweke.diag")
+  g <- diagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
 })
