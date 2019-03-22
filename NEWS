@@ -1063,3 +1063,7 @@ version 1.5.6: (2019-03-20) - merge from RELEASE_3_8 branch
 
 version 1.5.7: (2019-03-22)
 - Added default value for 'BatchInfo' within 'BASiCS_MCMC'
+
+version 1.5.8: (2019-03-22)
+- Changes DESCRIPTION to have a single maintainer
+- Density plot added to plot Method for BASiCS_Chain objects
