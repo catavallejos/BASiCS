@@ -1,6 +1,7 @@
 #' @importFrom stats acf
 #' @importFrom Rcpp evalCpp
-#' @importFrom coda HPDinterval mcmc
+#' @importFrom coda HPDinterval mcmc gelman.diag effectiveSize geweke.diag
+#'                              heidel.diag raftery.diag
 #' @importFrom methods Summary is new show slotNames .hasSlot
 #' @importFrom testthat context test_check
 #' @importFrom graphics abline barplot legend lines par points segments smoothScatter plot
