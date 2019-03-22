@@ -336,9 +336,6 @@ setMethod("plot",
                                 RegressionTerm = NULL,
                                 ylab = "", xlab = "", ...)
           {
-            if (!(Param %in% names(x@parameters))) {
-              stop("'Param' argument is invalid")
-            }
             if (Param %in% c("mu", "delta", "epsilon") & is.null(Gene)) {
               stop("'Gene' value is required")
             }
@@ -352,18 +349,13 @@ setMethod("plot",
               stop("'RegressionTerm' value is required")
             }
 
-            geneParams <- c("mu", "delta", "epsilon")
-            cellParams <- c("s", "phi", "nu")
-            batchParams <- "theta"
-            regressionParams <- "beta"
-
-            if (Param %in% geneParams) {
+            if (Param %in% geneParams()) {
               Column <- Gene
-            } else if (Param %in% cellParams) {
+            } else if (Param %in% cellParams()) {
               Column <- Cell
-            } else if (Param %in% batchParams) {
+            } else if (Param == "theta") {
               Column <- Batch
-            } else if (Param %in% regressionParams) {
+            } else if (Param == "beta") {
               Column <- RegressionTerm
             }
             if (xlab == "") {
@@ -374,14 +366,25 @@ setMethod("plot",
             }
 
             par(mfrow = c(1, 2))
-            plot(x@parameters[[Param]][, Column],
+            plot(displayChainBASiCS(x, Param)[, Column],
                  type = "l",
                  xlab = xlab,
                  ylab = ylab,
-                 main = colnames(x@parameters)[Column],
+                 main = colnames(displayChainBASiCS(x, Param))[[Column]],
                  ...)
-            stats::acf(x@parameters[[Param]][, Column], main = "Autocorrelation")
+            stats::acf(displayChainBASiCS(x, Param)[, Column], main = "Autocorrelation")
           })
+
+
+getParam <- function(object, Param = "mu") {
+  if (is.null(Param) || 
+      is.na(Param) || 
+      length(Param) > 1 ||
+      !(Param %in% names(object@parameters))) {
+    stop("'Param' argument is invalid")
+  }
+  object@parameters[[Param]]
+}
 
 
 #' @name displayChainBASiCS-BASiCS_Chain-method
@@ -415,13 +418,7 @@ setMethod("plot",
 #' @export
 setMethod("displayChainBASiCS",
           signature = "BASiCS_Chain",
-          definition = function(object, Param = "mu")
-          {
-            if (!(Param %in% names(object@parameters))) {
-              stop("'Param' argument is invalid")
-            }
-            object@parameters[[Param]]
-          })
+          definition = getParam)
 
 #' @name BASiCS_showFit-BASiCS_Chain-method
 #' @aliases BASiCS_showFit BASiCS_showFit,BASiCS_Chain-method
@@ -712,26 +709,22 @@ setMethod("plot",
               }
             }
 
-            batchParams <- c("theta")
-            geneParams <- c("mu", "delta", "epsilon")
-            cellParams <- c("phi", "s", "nu")
-
             if (is.null(Param2)) {
               object <- x@parameters[[Param]]
 
-              if (Param %in% geneParams) {
+              if (Param %in% geneParams()) {
                 Columns <- Genes
                 ylabInd <- "i"
                 if (xlab == "") {
                   xlab <- "Gene"
                 }
-              } else if (Param %in% cellParams) {
+              } else if (Param %in% cellParams()) {
                 Columns <- Cells
                 ylabInd <- "j"
                 if (xlab == "") {
                   xlab <- "Cell"
                 }
-              } else if (Param %in% batchParams) {
+              } else if (Param == "theta") {
                 Columns <- Batches
                 ylabInd <- "b"
                 if (xlab == "") {
@@ -795,8 +788,7 @@ setMethod("plot",
             if (!Param2 %in% names(x@parameters)) {
               stop("'Param2' is not a parameter in this BASiCS_Summary object")
             }
-
-            ValidCombination <- FALSE
+            checkValidCombination(Param, Param2)
             if (SmoothPlot) {
               col <- grDevices::rgb(grDevices::col2rgb(col)[1],
                                     grDevices::col2rgb(col)[2],
@@ -804,38 +796,32 @@ setMethod("plot",
                                     50,
                                     maxColorValue = 255)
             }
-            if (Param %in% geneParams) {
+            if (Param %in% geneParams()) {
               Columns <- Genes
-              ValidCombination <- Param2 %in% geneParams
               ylabInd <- "i"
             }
-            if (Param %in% cellParams) {
+            if (Param %in% cellParams()) {
               Columns <- Cells
-              ValidCombination <- Param2 %in% cellParams
               ylabInd <- "j"
             }
-            if (!ValidCombination) {
-              stop("Invalid combination for Param and Param2. \n")
-            } else {
-              plot(
-                x@parameters[[Param]][Columns, 1],
-                x@parameters[[Param2]][Columns, 1],
-                xlab = bquote(.(Param)[.(ylabInd)]),
-                ylab = bquote(.(Param2)[.(ylabInd)]),
-                xlim = c(
-                  min(x@parameters[[Param]][Columns, 1]),
-                  max(x@parameters[[Param]][Columns, 1])
-                ),
-                ylim = c(
-                  min(x@parameters[[Param2]][Columns, 1]),
-                  max(x@parameters[[Param2]][Columns, 1])
-                ),
-                pch = pch,
-                col = col,
-                bty = bty,
-                ...
-              )
-            }
+            plot(
+              x@parameters[[Param]][Columns, 1],
+              x@parameters[[Param2]][Columns, 1],
+              xlab = bquote(.(Param)[.(ylabInd)]),
+              ylab = bquote(.(Param2)[.(ylabInd)]),
+              xlim = c(
+                min(x@parameters[[Param]][Columns, 1]),
+                max(x@parameters[[Param]][Columns, 1])
+              ),
+              ylim = c(
+                min(x@parameters[[Param2]][Columns, 1]),
+                max(x@parameters[[Param2]][Columns, 1])
+              ),
+              pch = pch,
+              col = col,
+              bty = bty,
+              ...
+            )
           }
         })
 
@@ -872,10 +858,188 @@ setMethod("plot",
 #' @export
 setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
-          definition = function(object, Param = "mu")
-          {
-            if (!(Param %in% names(object@parameters))) {
-              stop("'Param' argument is invalid")
+          definition = getParam)
+
+
+
+
+
+
+
+#' @name Plots of diagnostic measure for MCMC parameters
+#' @aliases diagPlot diagPlot-method
+#'
+#' @docType methods
+#'
+#' @title Create diagnostic plots of MCMC parameters
+#'
+#' @description Plot parameter values and effective sample size or 
+#' Geweke's diagnostic z-statistic. See \link[coda]{effectiveSize} and 
+#' \link[coda]{geweke.diag} for more details on these diagnostic measures.
+#'
+#' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
+#' @param Param Optional name of a chain parameter to restrict the histogram;
+#' if not supplied, all parameters will be assessed.
+#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
+#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
+#' \code{'sigma2'} and \code{'epsilon'}.
+#' @param Measure The diagnostic measure to be plotted in the histogram.
+#' Possible values: \code{"effectiveSize"}, \code{"geweke.diag"}.
+#' @param x,y MCMC parameter values to be plotted on the x or y axis, 
+#' respectively.
+#' @param LogX,LogY A boolean value indicating whether to use a log10
+#' transformation for the x or y axis, respectively.
+#' 
+#' @return A ggplot object.
+#'
+#' @examples
+#'
+#' # See
+#' help(BASiCS_MCMC)
+#'
+#' @seealso \code{\linkS4class{BASiCS_Chain}}
+#'
+#' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+#'
+#' @export
+setGeneric("diagPlot", function(object, ...) {
+  standardGeneric("diagPlot")
+})
+#' @export
+setMethod("diagPlot",
+          signature = "BASiCS_Chain",
+          definition = function(object, 
+                                Param = "mu", 
+                                x = "mu", 
+                                y = "delta",
+                                Measure = c("effectiveSize",
+                                            "geweke.diag"),
+                                LogX = x %in% c("mu", "delta"),
+                                LogY = y %in% c("mu", "delta")) {
+
+            checkValidCombination(x, y, Param)
+            metric <- getMeasure(object, Param, Measure)
+            xMat <- getParam(object, x)
+            yMat <- getParam(object, y)
+            df <- data.frame(
+              x = colMedians(xMat),
+              y = colMedians(yMat),
+              metric = metric
+            )
+            sX <- if (LogX) scale_x_log10() else scale_x_continuous()
+            sY <- if (LogY) scale_y_log10() else scale_y_continuous()
+            ggplot(df, aes(x = x, y = y, color = metric)) + 
+              geom_point() +
+              viridis::scale_color_viridis(name = scaleName(Measure, Param)) +
+              sX + sY +
+              labs(x = x,
+                   y = y)
+          }
+)
+
+
+
+scaleName <- function(Measure = c("effectiveSize",
+                                  "geweke.diag"),
+                      Param = NULL) {
+  Measure <- match.arg(Measure)
+  measure_name <- switch(Measure, 
+    effectiveSize = "Effective sample size",
+    geweke.diag = "Geweke diagnostic"
+  )
+  if (!is.null(Param)) {
+    measure_name <- paste0(measure_name, ": ", Param)
+  }
+  measure_name
+}
+
+#' @name Histograms of diagnostic measure for MCMC parameters
+#' @aliases diagHist diagHist-method
+#'
+#' @docType methods
+#'
+#' @title Create diagnostic plots of MCMC parameters
+#'
+#' @description Plot a histogram of effective sample size or Geweke's diagnostic
+#' z-statistic. See \link[coda]{effectiveSize} and \link[coda]{geweke.diag} for
+#' more details.
+#'
+#' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
+#' @param Param Optional name of a chain parameter to restrict the histogram;
+#' if not supplied, all parameters will be assessed.
+#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
+#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
+#' \code{'sigma2'} and \code{'epsilon'}.
+#' @param Measure The diagnostic measure to be plotted in the histogram.
+#' Possible values: \code{"effectiveSize"}, \code{"geweke.diag"}.
+#'
+#' @return A ggplot object.
+#'
+#' @examples
+#'
+#' # See
+#' help(BASiCS_MCMC)
+#'
+#' @seealso \code{\linkS4class{BASiCS_Chain}}
+#'
+#' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+#'
+#' @export
+setGeneric("diagHist", function(object, ...) {
+  standardGeneric("diagHist")
+})
+
+#' @export
+setMethod("diagHist",
+          signature = signature("BASiCS_Chain"),
+          definition = function(object, 
+                                Param = NULL, 
+                                Measure = c("effectiveSize",
+                                            "geweke.diag")) {
+
+            Measure <- match.arg(Measure)
+            MeasureFun <- match.fun(Measure)
+
+            if (is.null(Param)) {
+              metric <- lapply(names(object@parameters), function(param) {
+                getMeasure(object, param, Measure)
+              })
+              metric <- Reduce(c, metric)              
+            } else {
+              metric <- getMeasure(object, Param, Measure)
             }
-            object@parameters[[Param]]
-          })
+            if (length(metric) == 1) {
+              stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
+            }
+            ggplot(mapping = aes(x = metric)) + 
+              geom_histogram(bins = nclass.FD(metric)) +
+              labs(x = scaleName(Measure, Param),
+                   y = "Count")
+            }
+)
+
+
+checkValidCombination <- function(...) {
+  Params <- list(...)
+  if (!(all(sapply(Params, function(x) x %in% geneParams())) || 
+        all(sapply(Params, function(x) x  %in% cellParams())))) {
+    stop(paste("Invalid combination of parameters:",
+               paste(list(...), collapse = ", "), " \n"))
+  } 
+}
+
+getMeasure <- function(object, 
+                       Param,
+                       Measure = c("effectiveSize",
+                                   "geweke.diag")) {
+  Measure <- match.arg(Measure)
+  MeasureFun <- match.fun(Measure)
+  metric <- MeasureFun(coda::mcmc(getParam(object, Param)))
+  if (Measure == "geweke.diag") {
+    metric <- metric$z
+  }
+  metric
+}
+
+geneParams <- function() c("mu", "delta", "epsilon")
+cellParams <- function() c("s", "phi", "nu")
