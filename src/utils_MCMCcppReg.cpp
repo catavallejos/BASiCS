@@ -6,30 +6,29 @@
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec const& mu,
-    double const& variance)
-{
+    double const& variance) {
   arma::vec x = log(mu);
   double ran = x.max() - x.min();
-  arma::vec myu = arma::zeros(k-2);
+  arma::vec myu = arma::zeros(k - 2);
   myu(0) = x.min();
 
-  for(int i=1; i < myu.size(); i++) {
-    myu(i) = myu(i-1) + ran/(k-3);
+  for(int i = 1; i < myu.size(); i++) {
+    myu(i) = myu(i - 1) + ran / (k - 3);
   }
-  double h = (myu(1)-myu(0)) * variance;
+  double h = (myu(1) - myu(0)) * variance;
 
   // Possibly create this matrix outside
   arma::mat X = arma::ones(x.size(),k);
   X.col(1) = x;
-  for(int i=0; i < k-2; i++) {
-    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
-    //X.col(i+1) = pow(x,i+1);
+  for(int i = 0; i < k - 2; i++) {
+    X.col(i + 2) = exp(-0.5 * pow(x - myu(i), 2) / pow(h, 2));
+    // X.col(i + 1) = pow(x, i + 1);
   }
   return X;
 }
 
 /* Metropolis-Hastings updates of mu
-* Updates are implemented simulateaneously for all biological genes
+*  Updates are implemented simulateaneously for all biological genes
 */
 arma::mat muUpdateReg(
     arma::vec const& mu0,
@@ -49,11 +48,10 @@ arma::mat muUpdateReg(
     arma::vec const& beta,
     arma::mat const& X,
     double const& sigma2,
-    double variance)
-{
+    double variance) {
 
   /* PROPOSAL STEP */
-  mu1 = exp( arma::randn(q0) % sqrt(prop_var) + log(mu0) );
+  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
 
   /* ACCEPT/REJECT STEP
@@ -61,12 +59,13 @@ arma::mat muUpdateReg(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1),2) - pow(log(mu0),2));
-  for (int i=0; i < q0; i++) {
-    for (int j=0; j < n; j++) {
-      log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *
-        log( ( phinu(j)*mu1(i) + 1/delta(i) ) /
-        ( phinu(j)*mu0(i) + 1/delta(i) ));
+  log_aux -= (0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2));
+  for (int i = 0; i < q0; i++) {
+    for (int j = 0; j < n; j++) {
+      log_aux(i) -= (Counts(i,j) + 1 / delta(i)) *
+        log(
+          (phinu(j) * mu1(i) + 1 / delta(i)) /
+          (phinu(j) * mu0(i) + 1 / delta(i)));
     }
   }
 
@@ -75,7 +74,8 @@ arma::mat muUpdateReg(
 
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check
-  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
+  log_aux -= lambda % (pow(log(delta) - X_mu1 * beta, 2) -
+    pow(log(delta) - X * beta, 2)) / (2 * sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
@@ -84,8 +84,10 @@ arma::mat muUpdateReg(
   * - When the acceptance rate cannot be numerally computed
   */
   ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
-  for (int i=0; i < q0; i++) {
-    if(ind(i) == 0) mu1(i) = mu0(i);
+  for (int i = 0; i < q0; i++) {
+    if (ind(i) == 0) {
+      mu1(i) = mu0(i);
+    }
   }
 
   /* OUTPUT */
@@ -142,18 +144,20 @@ arma::mat deltaUpdateReg(
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
-      log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
-      log_aux(i) -= std::lgamma(Counts(i,j) + (1/delta0(i)));
-      log_aux(i) -= ( Counts(i,j)+(1/delta1(i)) ) * log( phinu(j)*mu(i)+(1/delta1(i)) );
-      log_aux(i) += ( Counts(i,j)+(1/delta0(i)) ) * log( phinu(j)*mu(i)+(1/delta0(i)) );
+      log_aux(i) += std::lgamma(Counts(i, j) + (1 / delta1(i)));
+      log_aux(i) -= std::lgamma(Counts(i, j) + (1 / delta0(i)));
+      log_aux(i) -= (Counts(i, j) + (1 / delta1(i))) *
+        log(phinu(j) * mu(i) + (1 / delta1(i)));
+      log_aux(i) += (Counts(i, j) + (1 / delta0(i)) ) *
+        log(phinu(j) * mu(i) + (1 / delta0(i)) );
     }
   }
 
   // REGRESSION RELATED FACTOR
   // The next lines are equivalent; second one a is simplified version
   //  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
-  log_aux -= lambda%(pow(log(delta1),2)-pow(log(delta0),2) -
-    2*(log(delta1)-log(delta0))%(X*beta))/(2*sigma2);
+  log_aux -= lambda % (pow(log(delta1), 2) - pow(log(delta0),2) -
+    2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
@@ -162,8 +166,10 @@ arma::mat deltaUpdateReg(
   * - When the acceptance rate cannot be numerally computed
   */
   ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i=0; i < q0; i++) {
-    if(ind(i) == 0) delta1(i) = delta0(i);
+  for (int i = 0; i < q0; i++) {
+    if (ind(i) == 0) {
+      delta1(i) = delta0(i);
+    }
   }
 
   // OUTPUT
@@ -191,8 +197,9 @@ double sigma2UpdateReg(arma::vec const& delta,
 {
   double a = sigma2_a0 + (q0 + beta.n_elem) / 2;
   double b = sigma2_b0 + 0.5 * mInvVm0;
-  b += 0.5 * Rcpp::as<double>(wrap(beta.t()*V1*beta - 2*beta.t()*V1*m));
-  b += 0.5 * sum( lambda % pow(log(delta), 2) );
+  b += 0.5 * Rcpp::as<double>(wrap(beta.t() * V1 * beta -
+    2 * beta.t() * V1 * m));
+  b += 0.5 * sum(lambda % pow(log(delta), 2));
 
 
   // CV: 'if' condition removed as always truth
@@ -214,7 +221,7 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
 {
   // Parameter calculations
   double a = (eta + 1) / 2;
-  arma::vec b = 0.5 * ( eta + ( pow(log(delta) - X*beta,2) / sigma2) );
+  arma::vec b = 0.5 * (eta + (pow(log(delta) - X * beta, 2) / sigma2));
   for(int i = 0; i < q0; i++) {
     std::gamma_distribution<double> gamma(a, 1.0 / b(i));
     double sigma2 = gamma(generator);

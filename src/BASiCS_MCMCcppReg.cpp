@@ -138,11 +138,16 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   }
 
   // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
-  arma::vec muAccept = zeros(q0); arma::vec PmuAux = zeros(q0);
-  arma::vec deltaAccept = zeros(q0); arma::vec PdeltaAux = zeros(q0);
-  double phiAccept = 0; double PphiAux = 0;
-  arma::vec nuAccept = zeros(n); arma::vec PnuAux = zeros(n);
-  arma::vec thetaAccept = zeros(nBatch); arma::vec PthetaAux = zeros(nBatch);
+  arma::vec muAccept = zeros(q0);
+  arma::vec PmuAux = zeros(q0);
+  arma::vec deltaAccept = zeros(q0);
+  arma::vec PdeltaAux = zeros(q0);
+  double phiAccept = 0;
+  double PphiAux = 0;
+  arma::vec nuAccept = zeros(n);
+  arma::vec PnuAux = zeros(n);
+  arma::vec thetaAccept = zeros(nBatch);
+  arma::vec PthetaAux = zeros(nBatch);
 
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
   arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0);
