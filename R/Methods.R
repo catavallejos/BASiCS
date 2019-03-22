@@ -372,15 +372,26 @@ setMethod("plot",
             if (ylab == "") {
               ylab <- bquote(.(Param)[.(Column)])
             }
-
-            par(mfrow = c(1, 2))
-            plot(x@parameters[[Param]][, Column],
-                 type = "l",
-                 xlab = xlab,
-                 ylab = ylab,
-                 main = colnames(x@parameters)[Column],
-                 ...)
-            stats::acf(x@parameters[[Param]][, Column], main = "Autocorrelation")
+            
+            DF1 <- data.frame("Iteration" = seq_len(nrow(x@parameters[[Param]])),
+                              "Draws" = x@parameters[[Param]][, Column])
+            # Code inspired by https://stackoverflow.com/questions/17788859/acf-plot-with-ggplot2-setting-width-of-geom-bar
+            MyAcf <- acf(x@parameters[[Param]][,Column], plot = FALSE)
+            DF2 <- with(MyAcf, data.frame(lag, acf))
+            
+            # Traceplot
+            p1 <- ggplot(DF1) + geom_point(aes(Iteration, Draws), col = adjustcolor("white", alpha.f = 0) ) + geom_line(aes(Iteration, Draws)) + 
+              xlab("Iteration") + ylab("Parameter value") + theme_classic() + 
+              ggtitle(colnames(x@parameters[[Param]])[Column]) 
+            p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
+              
+            p2 <- ggplot(DF2, aes(x = lag, y = acf)) + theme_classic() + 
+              geom_hline(aes(yintercept = 0)) + 
+              geom_segment(mapping = aes(xend = lag, yend = 0)) +
+              ggtitle(colnames(x@parameters[[Param]])[Column])
+            
+            cowplot::plot_grid(p1, p2)
+            
           })
 
 
