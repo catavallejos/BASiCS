@@ -1067,3 +1067,4 @@ version 1.5.7: (2019-03-22)
 version 1.5.8: (2019-03-22)
 - Changes DESCRIPTION to have a single maintainer
 - Density plot added to plot Method for BASiCS_Chain objects
+- Output plots for plot Method for BASiCS_Chain objects
