@@ -217,13 +217,6 @@ test_that("MCMC fails for one or multiple arguments", {
   metadata(sce)$SpikeInput <- metadata(DataSpikes)$SpikeInput
   expect_error(BASiCS_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
-                           WithSpikes = TRUE),
-               regexp = ".*object 'BatchInfo' not found.*")
-  
-  # Right SpikeInfo assignment + right BatchInfo
-  colData(sce) <- colData(DataSpikes)
-  expect_error(BASiCS_MCMC(Data = sce, N = 50, 
-                           Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE), NA)
   
 })

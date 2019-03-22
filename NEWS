@@ -1048,3 +1048,6 @@ version 1.4.5: (2019-03-20)
 
 version 1.4.6: (2019-03-20)
 - Same as 1.4.5 but with minor additional fix.
+
+version 1.4.7: (2019-03-22)
+- Added default value for 'BatchInfo' within 'BASiCS_MCMC'
