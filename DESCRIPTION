@@ -54,7 +54,8 @@ Imports:
     S4Vectors, 
     scran, 
     stats,
-    SummarizedExperiment, 
+    SummarizedExperiment,
+    viridis,
     testthat, 
     utils
 Suggests:
