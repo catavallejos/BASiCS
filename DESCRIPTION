@@ -1,7 +1,7 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.5.7
+Version: 1.5.8
 Date: : 2019-03-22
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
@@ -9,7 +9,7 @@ Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         person("Alan", "O'Callaghan", role = c("ctb")),
         person("Sylvia", "Richardson", role = c("ctb")), 
         person("John", "Marioni", role=c("ctb"))) 
-Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>, Nils Eling <eling@ebi.ac.uk>
+Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  heterogeneity in gene expression levels in seemingly homogeneous populations 
  of cells. However, these experiments are prone to high levels of technical 
@@ -41,9 +41,11 @@ Depends:
     ggplot2
 Imports:
     BiocGenerics, 
+    cowplot,
     methods, 
     coda, 
     data.table,
+    ggExtra,
     graphics, 
     grDevices,
     MASS, 

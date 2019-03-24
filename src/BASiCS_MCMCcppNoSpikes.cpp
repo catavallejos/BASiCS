@@ -205,6 +205,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       RefGene = RefGenes(RefAux); 
       if(i >= Burn) RefFreq(RefGene) += 1;
     }
+//    Rcpp::Rcout << "Updating mu" << std::endl;
     muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts_arma, 
                              1/deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
                              s2mu, q0, n, y_q0, u_q0, ind_q0,
