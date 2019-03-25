@@ -12,3 +12,10 @@ setGeneric("BASiCS_diagHist", function(object, ...) {
 setGeneric("BASiCS_diagPlot", function(object, ...) {
   standardGeneric("BASiCS_diagPlot")
 })
+
+if (!isGeneric("plot")) {
+  # #' @export
+  setGeneric("plot")
+  # #' @export
+  setMethod("plot", signature = "ANY", graphics::plot)
+}
