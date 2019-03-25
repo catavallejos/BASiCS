@@ -1,6 +1,5 @@
 # Used in BASiCS_DetectHVG and BASiCS_DetectLVG
 HiddenThresholdSearchDetectHVG_LVG <- function(ProbThreshold,
-                                               VarThreshold,
                                                Prob,
                                                EFDR)
 {
