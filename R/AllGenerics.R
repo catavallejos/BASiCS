@@ -14,7 +14,6 @@ setGeneric("BASiCS_diagPlot", function(object, ...) {
 })
 
 if (!isGeneric("plot")) {
-#' @export
-setGeneric("plot")
-setMethod("plot", signature = "ANY", graphics::plot)
+  setGeneric("plot")
+  setMethod("plot", signature = "ANY", graphics::plot)
 }
