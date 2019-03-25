@@ -25,24 +25,27 @@ arma::mat muUpdateNoSpikes(
   using arma::span;
   
   // PROPOSAL STEP    
-  mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
+  arma::vec y = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
+  mu1 = mu0 + 1 - 1;
   
   // INITIALIZE MU
   double aux; double iAux;
-  double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
+  double sumAux = sum(log(mu1.elem(ConstrainGene))) - log(mu1(RefGene));
+  
+//  Rcpp::Rcout << "sum(log(mu0(Constrain))) " << sum(log(mu0.elem(ConstrainGene))) << std::endl;
   
   // ACCEPT/REJECT STEP
   
   // Step 1: Computing the likelihood contribution of the acceptance rate 
   // Calculated in the same way for all genes, 
   // but the reference one (no need to be sequential)
-  arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+  arma::vec log_aux = (log(y) - log(mu0)) % sum_bycell_all;
   for (int i=0; i < q0; i++) {
     if(i != RefGene) {
       for (int j=0; j < n; j++) {
         log_aux(i) -= ( Counts(i,j) + invdelta(i) ) * 
-          log( ( nu(j)*mu1(i) + invdelta(i) ) / 
+          log( ( nu(j)*y(i) + invdelta(i) ) / 
           ( nu(j)*mu0(i) + invdelta(i) ));
       }
     }
@@ -54,29 +57,35 @@ arma::mat muUpdateNoSpikes(
   for (int i=0; i < ConstrainGene.size(); i++) {
     iAux = ConstrainGene(i);
     if(iAux != RefGene) {
-      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2)); 
-      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
+      aux = 0.5 * (ConstrainGene.size() * Constrain - sumAux - log(mu1(iAux)));
+      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(y(iAux)) - aux,2)); 
+      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
-        ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) {
+        ind(iAux) = 1; 
+        sumAux += log(y(iAux)) - log(mu1(iAux)); 
+        mu1(iAux) = y(iAux); 
+        mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
       }
-      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); }      
+      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); } 
+//      Rcpp::Rcout << "sum(log(mu1(Constrain))) " << sum(log(mu1.elem(ConstrainGene))) << std::endl;
     }
   }
   
   // Step 2.2: For the reference gene 
-  ind(RefGene) = 1;
-  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+//  ind(RefGene) = 1;
+//  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
   if(ConstrainType == 2) {
     for (int i=0; i < NotConstrainGene.size(); i++) {
       iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(mu1(iAux)),2) - pow(log(mu0(iAux)),2));
+      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(y(iAux)),2) - pow(log(mu0(iAux)),2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) { ind(iAux) = 1; }
+      if((log(u(iAux)) < log_aux(iAux)) & (y(iAux) > 1e-3)) { 
+        ind(iAux) = 1; mu1(iAux) = y(iAux);
+        }
       else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
     }
   }
