@@ -3,11 +3,13 @@
 \docType{methods}
 \name{Plots of diagnostic measure for MCMC parameters}
 \alias{Plots of diagnostic measure for MCMC parameters}
-\alias{diagPlot}
-\alias{diagPlot-method}
+\alias{BASiCS_diagPlot}
+\alias{BASiCS_diagPlot-method}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
-diagPlot(object, ...)
+\S4method{BASiCS_diagPlot}{BASiCS_Chain}(object, Param = "mu",
+  x = NULL, y = NULL, LogX = isTRUE(x \%in\% c("mu", "delta")),
+  LogY = isTRUE(y \%in\% c("mu", "delta")))
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
