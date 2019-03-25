@@ -627,12 +627,7 @@ setMethod("show",
                 " Parameters: ", names(object@parameters), "\n")
           })
 
-# if (!isGeneric("plot")) {
-# #' @export
-# setGeneric("plot")  
-# #' @export
-# setMethod("plot", signature = "ANY", graphics::plot)
-# }
+
 
 
 #' @name plot-BASiCS_Summary-method
