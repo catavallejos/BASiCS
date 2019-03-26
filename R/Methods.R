@@ -291,6 +291,8 @@ setMethod("rownames",
           signature = "BASiCS_Chain",
           definition = function(x) return(colnames(x@parameters$mu)))
 
+# @importFrom ggExtra ggMarginal 
+# @importFrom cowplot plot_grid
 #' @name plot-BASiCS_Chain-method
 #' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
 #'
@@ -327,9 +329,7 @@ setMethod("rownames",
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#'
-#' @importFrom ggExtra ggMarginal 
-#' @importFrom cowplot plot_grid
+#' 
 setMethod("plot",
           signature = "BASiCS_Chain",
           definition = function(x,
@@ -877,10 +877,8 @@ setMethod("displaySummaryBASiCS",
           definition = getParam)
 
 
-
-
-
-
+# @importFrom viridis scale_color_viridis
+# @importFrom viridis scale_fill_viridis
 
 #' @name Plots of diagnostic measure for MCMC parameters
 #' @aliases BASiCS_diagPlot BASiCS_diagPlot-method
@@ -917,9 +915,6 @@ setMethod("displaySummaryBASiCS",
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #' 
-#' @importFrom viridis scale_color_viridis
-#' @importFrom viridis scale_fill_viridis
-#'
 #' @export
 setMethod("BASiCS_diagPlot",
           signature = "BASiCS_Chain",
