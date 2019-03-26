@@ -3,11 +3,11 @@
 \docType{methods}
 \name{Histograms of diagnostic measure for MCMC parameters}
 \alias{Histograms of diagnostic measure for MCMC parameters}
-\alias{diagHist}
-\alias{diagHist-method}
+\alias{BASiCS_diagHist}
+\alias{BASiCS_diagHist-method}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
-diagHist(object, ...)
+\S4method{BASiCS_diagHist}{BASiCS_Chain}(object, Param = NULL)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}

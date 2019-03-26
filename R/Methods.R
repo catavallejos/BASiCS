@@ -351,9 +351,9 @@ setMethod("plot",
               stop("'RegressionTerm' value is required")
             }
 
-            if (Param %in% geneParams()) {
+            if (Param %in% HiddenGeneParams()) {
               Column <- Gene
-            } else if (Param %in% cellParams()) {
+            } else if (Param %in% HiddenCellParams()) {
               Column <- Cell
             } else if (Param == "theta") {
               Column <- Batch
@@ -635,10 +635,7 @@ setMethod("show",
                 " Parameters: ", names(object@parameters), "\n")
           })
 
-#' @export
-setGeneric("plot")
-#' @export
-setMethod("plot", signature = "ANY", graphics::plot)
+
 
 
 #' @name plot-BASiCS_Summary-method
@@ -731,13 +728,13 @@ setMethod("plot",
             if (is.null(Param2)) {
               object <- x@parameters[[Param]]
 
-              if (Param %in% geneParams()) {
+              if (Param %in% HiddenGeneParams()) {
                 Columns <- Genes
                 ylabInd <- "i"
                 if (xlab == "") {
                   xlab <- "Gene"
                 }
-              } else if (Param %in% cellParams()) {
+              } else if (Param %in% HiddenCellParams()) {
                 Columns <- Cells
                 ylabInd <- "j"
                 if (xlab == "") {
@@ -807,7 +804,7 @@ setMethod("plot",
             if (!Param2 %in% names(x@parameters)) {
               stop("'Param2' is not a parameter in this BASiCS_Summary object")
             }
-            checkValidCombination(Param, Param2)
+            HiddenCheckValidCombination(Param, Param2)
             if (SmoothPlot) {
               col <- grDevices::rgb(grDevices::col2rgb(col)[1],
                                     grDevices::col2rgb(col)[2],
@@ -815,11 +812,11 @@ setMethod("plot",
                                     50,
                                     maxColorValue = 255)
             }
-            if (Param %in% geneParams()) {
+            if (Param %in% HiddenGeneParams()) {
               Columns <- Genes
               ylabInd <- "i"
             }
-            if (Param %in% cellParams()) {
+            if (Param %in% HiddenCellParams()) {
               Columns <- Cells
               ylabInd <- "j"
             }
@@ -886,7 +883,7 @@ setMethod("displaySummaryBASiCS",
 
 
 #' @name Plots of diagnostic measure for MCMC parameters
-#' @aliases diagPlot diagPlot-method
+#' @aliases BASiCS_diagPlot BASiCS_diagPlot-method
 #'
 #' @docType methods
 #'
@@ -924,11 +921,7 @@ setMethod("displaySummaryBASiCS",
 #' @importFrom viridis scale_fill_viridis
 #'
 #' @export
-setGeneric("diagPlot", function(object, ...) {
-  standardGeneric("diagPlot")
-})
-#' @export
-setMethod("diagPlot",
+setMethod("BASiCS_diagPlot",
           signature = "BASiCS_Chain",
           definition = function(object, 
                                 Param = "mu", 
@@ -945,8 +938,8 @@ setMethod("diagPlot",
               LogX <- Param %in% c("mu", "delta")
             }
             Measure <- "effectiveSize"
-            checkValidCombination(x, y, Param)
-            metric <- getMeasure(object, Param, Measure)
+            HiddenCheckValidCombination(x, y, Param)
+            metric <- HiddenGetMeasure(object, Param, Measure)
             sX <- if (LogX) scale_x_log10() else scale_x_continuous()
             sY <- if (LogY) scale_y_log10() else scale_y_continuous()
 
@@ -960,7 +953,7 @@ setMethod("diagPlot",
               )
               ggplot(df, aes(x = x, y = y, color = metric)) + 
                 geom_point(alpha = 0.5, shape = 16) +
-                viridis::scale_color_viridis(name = scaleName(Measure, Param)) +
+                viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)) +
                 sX + sY +
                 labs(x = x,
                      y = y)              
@@ -975,14 +968,14 @@ setMethod("diagPlot",
                 viridis::scale_fill_viridis(name = "Density") +
                 sX + sY +
                 labs(x = Param,
-                     y = scaleName(Measure))
+                     y = HiddenScaleName(Measure))
             }
           }
 )
 
 
 
-scaleName <- function(Measure = c("effectiveSize",
+HiddenScaleName <- function(Measure = c("effectiveSize",
                                   "geweke.diag"),
                       Param = NULL) {
   Measure <- match.arg(Measure)
@@ -997,7 +990,7 @@ scaleName <- function(Measure = c("effectiveSize",
 }
 
 #' @name Histograms of diagnostic measure for MCMC parameters
-#' @aliases diagHist diagHist-method
+#' @aliases BASiCS_diagHist BASiCS_diagHist-method
 #'
 #' @docType methods
 #'
@@ -1028,12 +1021,7 @@ scaleName <- function(Measure = c("effectiveSize",
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #'
 #' @export
-setGeneric("diagHist", function(object, ...) {
-  standardGeneric("diagHist")
-})
-
-#' @export
-setMethod("diagHist",
+setMethod("BASiCS_diagHist",
           signature = signature("BASiCS_Chain"),
           definition = function(object, 
                                 Param = NULL) {
@@ -1042,33 +1030,33 @@ setMethod("diagHist",
 
             if (is.null(Param)) {
               metric <- lapply(names(object@parameters), function(param) {
-                getMeasure(object, param, Measure)
+                HiddenGetMeasure(object, param, Measure)
               })
               metric <- Reduce(c, metric)              
             } else {
-              metric <- getMeasure(object, Param, Measure)
+              metric <- HiddenGetMeasure(object, Param, Measure)
             }
             if (length(metric) == 1) {
               stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
             }
             ggplot(mapping = aes(x = metric)) + 
               geom_histogram(bins = grDevices::nclass.FD(metric)) +
-              labs(x = scaleName(Measure, Param),
+              labs(x = HiddenScaleName(Measure, Param),
                    y = "Count")
             }
 )
 
 
-checkValidCombination <- function(...) {
+HiddenCheckValidCombination <- function(...) {
   Params <- list(...)
-  if (!(all(sapply(Params, function(x) is.null(x) || x %in% geneParams())) || 
-        all(sapply(Params, function(x) is.null(x) || x  %in% cellParams())))) {
+  if (!(all(sapply(Params, function(x) is.null(x) || x %in% HiddenGeneParams())) || 
+        all(sapply(Params, function(x) is.null(x) || x  %in% HiddenCellParams())))) {
     stop(paste("Invalid combination of parameters:",
                paste(list(...), collapse = ", "), " \n"))
   } 
 }
 
-getMeasure <- function(object, 
+HiddenGetMeasure <- function(object, 
                        Param,
                        Measure = c("effectiveSize",
                                    "geweke.diag")) {
@@ -1081,5 +1069,5 @@ getMeasure <- function(object,
   metric
 }
 
-geneParams <- function() c("mu", "delta", "epsilon")
-cellParams <- function() c("s", "phi", "nu")
+HiddenGeneParams <- function() c("mu", "delta", "epsilon")
+HiddenCellParams <- function() c("s", "phi", "nu")
