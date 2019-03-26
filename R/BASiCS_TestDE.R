@@ -27,7 +27,8 @@
 #' changes in residual over-dispersion
 #' (must be a positive value, between 0 and 1)
 #' @param OrderVariable Ordering variable for output.
-#' Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
+#' Possible values: \code{'GeneIndex'} (default), \code{'GeneName'} and 
+#' \code{'Mu'} (mean expression).
 #' @param GroupLabel1 Label assigned to reference group.
 #' Default: \code{GroupLabel1 = 'Group1'}
 #' @param GroupLabel2 Label assigned to reference group.
@@ -496,8 +497,8 @@ BASiCS_TestDE <- function(Chain1,
     if (OrderVariable == "GeneName") {
       orderVar <- order(GeneName, decreasing = TRUE)
     }
-    if (OrderVariable == "Prob") {
-      orderVar <- order(ProbE, decreasing = TRUE)
+    if (OrderVariable == "Mu") {
+      orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
     }
     TableResDisp <- TableResDisp[orderVar, ]
   }
@@ -508,8 +509,8 @@ BASiCS_TestDE <- function(Chain1,
   if (OrderVariable == "GeneName") {
     orderVar <- order(GeneName, decreasing = TRUE)
   }
-  if (OrderVariable == "Prob") {
-    orderVar <- order(ProbM, decreasing = TRUE)
+  if (OrderVariable == "Mu") {
+    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
   }
   TableMean <- TableMean[orderVar, ]
 
@@ -519,8 +520,8 @@ BASiCS_TestDE <- function(Chain1,
   if (OrderVariable == "GeneName") {
     orderVar <- order(GeneName, decreasing = TRUE)
   }
-  if (OrderVariable == "Prob") {
-    orderVar <- order(ProbD, decreasing = TRUE)
+  if (OrderVariable == "Mu") {
+    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
   }
   TableDisp <- TableDisp[orderVar, ]
 
