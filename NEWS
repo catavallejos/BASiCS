@@ -1085,3 +1085,7 @@ version 1.5.10 (2019-03-26)
 - Small fixes for R CMD check
 - Ordering in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can only be done on
 GeneNames, GeneIndex and Prob
+
+version 1.5.11 (2019-03-26)
+- Edits in BASiCS_Package.R so that `roxygen2` creates `NAMESPACE`
+- `testthat` moved from Imports to Suggests
