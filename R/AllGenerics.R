@@ -13,7 +13,7 @@ setGeneric("BASiCS_diagPlot", function(object, ...) {
   standardGeneric("BASiCS_diagPlot")
 })
 
-if (!isGeneric("plot")) {
-  setGeneric("plot")
-  setMethod("plot", signature = "ANY", graphics::plot)
-}
+#if (!isGeneric("plot")) {
+#  setGeneric("plot")
+#  setMethod("plot", signature = "ANY", graphics::plot)
+#}
