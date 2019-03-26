@@ -1079,3 +1079,9 @@ approach (i.e. using epsilon to detect HVGs/LVGs).
 - In `BASiCS_DetectHVG` and `BASiCS_DetectLVG`, options for `OrderVariable` 
 were simplified (only original order and based on probability)
 - Temporary changes in no-spikes version have been restored
+
+version 1.5.10 (2019-03-26)
+- Corrected ordering in TestDE outpout so that genenames always match
+- Small fixes for R CMD check
+- Ordering in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can only be done on
+GeneNames, GeneIndex and Prob
