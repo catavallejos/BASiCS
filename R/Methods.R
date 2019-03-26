@@ -328,6 +328,8 @@ setMethod("rownames",
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
+#' @importFrom ggExtra ggMarginal 
+#' @importFrom cowplot plot_grid
 setMethod("plot",
           signature = "BASiCS_Chain",
           definition = function(x,
@@ -373,18 +375,19 @@ setMethod("plot",
             
             # Traceplot
             p1 <- ggplot2::ggplot(DF1) + 
-              ggplot2::geom_point(aes(Iteration, Draws),
-                                  col = adjustcolor("white", alpha.f = 0) ) + 
-              ggplot2::geom_line(aes(Iteration, Draws)) + 
+              ggplot2::geom_point(aes_string(x = "Iteration", y = "Draws"),
+                                  col = grDevices::adjustcolor("white", 
+                                                               alpha.f = 0) ) + 
+              ggplot2::geom_line(aes_string(x= "Iteration", y = "Draws")) + 
               ggplot2::xlab("Iteration") + ggplot2::ylab("Parameter value") + 
               ggplot2::theme_classic() + 
               ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column]) 
             p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
               
-            p2 <- ggplot2::ggplot(DF2, aes(x = lag, y = acf)) + 
+            p2 <- ggplot2::ggplot(DF2, aes_string(x = "lag", y = "acf")) + 
               ggplot2::theme_classic() + 
               ggplot2::geom_hline(aes(yintercept = 0)) + 
-              ggplot2::geom_segment(mapping = aes(xend = lag, yend = 0)) +
+              ggplot2::geom_segment(mapping = aes_string(xend = "lag", yend = 0)) +
               ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column])
             
             cowplot::plot_grid(p1, p2)
@@ -913,6 +916,9 @@ setMethod("displaySummaryBASiCS",
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+#' 
+#' @importFrom viridis scale_color_viridis
+#' @importFrom viridis scale_fill_viridis
 #'
 #' @export
 setMethod("BASiCS_diagPlot",
@@ -958,7 +964,7 @@ setMethod("BASiCS_diagPlot",
                 y = metric
               )
               ggplot(df, aes(x = x, y = metric)) + 
-                geom_hex(aes(fill = ..density..)) +
+                geom_hex(aes_string(fill = "..density..")) +
                 viridis::scale_fill_viridis(name = "Density") +
                 sX + sY +
                 labs(x = Param,
@@ -1034,7 +1040,7 @@ setMethod("BASiCS_diagHist",
               stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
             }
             ggplot(mapping = aes(x = metric)) + 
-              geom_histogram(bins = nclass.FD(metric)) +
+              geom_histogram(bins = grDevices::nclass.FD(metric)) +
               labs(x = HiddenScaleName(Measure, Param),
                    y = "Count")
             }
