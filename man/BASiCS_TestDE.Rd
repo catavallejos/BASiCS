@@ -43,7 +43,8 @@ changes in residual over-dispersion
 (must be a positive value, between 0 and 1)}
 
 \item{OrderVariable}{Ordering variable for output.
-Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.}
+Possible values: \code{'GeneIndex'} (default), \code{'GeneName'} and 
+\code{'Mu'} (mean expression).}
 
 \item{GroupLabel1}{Label assigned to reference group.
 Default: \code{GroupLabel1 = 'Group1'}}

@@ -74,7 +74,7 @@ HiddenHeaderTest_DE <- function(Chain1,
     }
   }
 
-  if (!(OrderVariable %in% c("GeneIndex", "GeneName", "Prob"))) {
+  if (!(OrderVariable %in% c("GeneIndex", "GeneName", "Mu"))) {
     stop("Invalid 'OrderVariable' value")
   }
   if (!is.character(GroupLabel1) | length(GroupLabel1) > 1) {

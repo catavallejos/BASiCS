@@ -103,7 +103,7 @@ BASiCS_DetectHVG <- function(Chain,
     nGenes <- ncol(Chain@parameters$epsilon)
     
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
-    EpsilonThreshold <- quantile(Epsilon, PercentileThreshold, na.rm = TRUE)
+    EpsilonThreshold <- stats::quantile(Epsilon, PercentileThreshold, na.rm = TRUE)
     
     # HVG probability for a given epsilon threshold
     Prob <- matrixStats::colMeans2(ifelse(Chain@parameters$epsilon >
@@ -197,10 +197,8 @@ BASiCS_DetectHVG <- function(Chain,
                               HVG = HVG, stringsAsFactors = FALSE)
 
     # Re-order the table of results
+    if (OrderVariable == "GeneIndex") { orderVar <- GeneIndex }
     if (OrderVariable == "GeneName") { orderVar <- GeneName }
-    if (OrderVariable == "Mu") { orderVar <- Mu }
-    if (OrderVariable == "Delta") { orderVar <- Delta }
-    if (OrderVariable == "Sigma") { orderVar <- Sigma }
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE), ]
 
@@ -255,7 +253,7 @@ BASiCS_DetectLVG <- function(Chain,
     nGenes <- ncol(Chain@parameters$epsilon)
     
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
-    EpsilonThreshold <- quantile(Epsilon, PercentileThreshold, na.rm = TRUE)
+    EpsilonThreshold <- stats::quantile(Epsilon, PercentileThreshold, na.rm = TRUE)
     
     # HVG probability for a given epsilon threshold
     Prob <- matrixStats::colMeans2(ifelse(Chain@parameters$epsilon <
@@ -349,10 +347,8 @@ BASiCS_DetectLVG <- function(Chain,
                               LVG = LVG, stringsAsFactors = FALSE)
 
     # Re-order the table of results
+    if (OrderVariable == "GeneIndex") { orderVar <- GeneIndex }
     if (OrderVariable == "GeneName") { orderVar <- GeneName }
-    if (OrderVariable == "Mu") { orderVar <- Mu }
-    if (OrderVariable == "Delta") { orderVar <- Delta }
-    if (OrderVariable == "Sigma") { orderVar <- Sigma }
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE), ]
 

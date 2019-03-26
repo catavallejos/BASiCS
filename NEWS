@@ -1068,3 +1068,20 @@ version 1.5.8: (2019-03-22)
 - Changes DESCRIPTION to have a single maintainer
 - Density plot added to plot Method for BASiCS_Chain objects
 - Output plots for plot Method for BASiCS_Chain objects
+
+version 1.5.9: (2019-03-24)
+- Alan O'Callaghan is now author
+- `diagPlot` and `diagHist` methods added to facilitate diagnosis of convergence 
+and mixing for MCMC chains
+- Added explicit calls to `ggplot2` in plot methods. 
+- `BASiCS_DetectHVG` and `BASiCS_DetectLVG` edited based on the "regression"
+approach (i.e. using epsilon to detect HVGs/LVGs). 
+- In `BASiCS_DetectHVG` and `BASiCS_DetectLVG`, options for `OrderVariable` 
+were simplified (only original order and based on probability)
+- Temporary changes in no-spikes version have been restored
+
+version 1.5.10 (2019-03-26)
+- Corrected ordering in TestDE outpout so that genenames always match
+- Small fixes for R CMD check
+- Ordering in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can only be done on
+GeneNames, GeneIndex and Prob
