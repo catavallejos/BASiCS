@@ -339,8 +339,8 @@ arma::mat thetaUpdateBatch(
     log_aux *= a_theta;
     log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta) % exp(-y + logtheta) - 1);
   } else {
-    log_aux *= (a_theta - 1) * exponent;
-    log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta));
+    log_aux *= ((a_theta - 1) * exponent);
+    log_aux -= BatchSizes % (logtheta / theta0) % ((y / logtheta) % exp(-y + logtheta) - 1);
   }
 
   // Gamma component
