@@ -1,7 +1,7 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.5.11
+Version: 1.5.12
 Date: : 2019-03-26
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
@@ -35,7 +35,7 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  mean/over-dispersion trend. 
 License: GPL (>= 2)
 Depends:
-    R (>= 3.5),
+    R (>= 3.6),
     SingleCellExperiment,
     KernSmooth,
     ggplot2

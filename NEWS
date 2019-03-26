@@ -1089,3 +1089,7 @@ GeneNames, GeneIndex and Prob
 version 1.5.11 (2019-03-26)
 - Edits in BASiCS_Package.R so that `roxygen2` creates `NAMESPACE`
 - `testthat` moved from Imports to Suggests
+
+version 1.5.12 (2019-03-26)
+- R (>= 3.6) is now a requirement 
+
