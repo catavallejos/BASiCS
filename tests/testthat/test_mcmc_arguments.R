@@ -168,14 +168,14 @@ test_that("MCMC fails for one or multiple arguments", {
                regexp = ".*does not contain a \'counts\' slot*")
   
   # Test if it is a SingleCellExperimentObject
-  sce <- SingleCellExperiment::SingleCellExperiment(
+  sce <- SummarizedExperiment::SummarizedExperiment(
     assays = list(counts = counts(DataSpikes)),
     colData = SummarizedExperiment::colData(DataSpikes)
   )
   expect_error(run_MCMC(Data = sce, N = 50, 
-                           Thin = 5, Burn = 25, Regression = FALSE, 
-                           WithSpikes = FALSE),
-               regexp = ".*is not a SummarizedExperiment::lass object.*")
+                        Thin = 5, Burn = 25, Regression = FALSE, 
+                        WithSpikes = FALSE),
+               regexp = ".*is not a SingleCellExperiment class object.*")
   
   # Test if it contains a batch vector
   sce <- SingleCellExperiment::SingleCellExperiment(
