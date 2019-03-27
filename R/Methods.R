@@ -395,7 +395,7 @@ setMethod("plot",
             
           })
 
-getParam <- function(object, Param = "mu") {
+HiddenGetParam <- function(object, Param = "mu") {
   if (is.null(Param) || 
       is.na(Param) || 
       length(Param) > 1 ||
@@ -437,7 +437,7 @@ getParam <- function(object, Param = "mu") {
 #' @export
 setMethod("displayChainBASiCS",
           signature = "BASiCS_Chain",
-          definition = getParam)
+          definition = HiddenGetParam)
 
 #' @name BASiCS_showFit-BASiCS_Chain-method
 #' @aliases BASiCS_showFit BASiCS_showFit,BASiCS_Chain-method
@@ -875,169 +875,8 @@ setMethod("plot",
 #' @export
 setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
-          definition = getParam)
+          definition = HiddenGetParam)
 
-
-# @importFrom viridis scale_color_viridis
-# @importFrom viridis scale_fill_viridis
-
-#' @name Plots of diagnostic measure for MCMC parameters
-#' @aliases BASiCS_diagPlot BASiCS_diagPlot-method
-#'
-#' @docType methods
-#'
-#' @title Create diagnostic plots of MCMC parameters
-#'
-#' @description Plot parameter values and effective sample size.
-#' See \link[coda]{effectiveSize}
-#' for more details on this diagnostic measure.
-#'
-#' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
-#' @param Param Optional name of a chain parameter to restrict the histogram;
-#' if not supplied, all parameters will be assessed.
-#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
-#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-#' \code{'sigma2'} and \code{'epsilon'}.
-#' @param x,y Optional MCMC parameter values to be plotted on the x or y axis, 
-#' respectively. If neither is supplied, Param will be plotted on the x axis
-#' and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
-#' a density plot.
-#' @param LogX,LogY A boolean value indicating whether to use a log10
-#' transformation for the x or y axis, respectively.
-#' 
-#' @return A ggplot object.
-#'
-#' @examples
-#'
-#' # See
-#' help(BASiCS_MCMC)
-#'
-#' @seealso \code{\linkS4class{BASiCS_Chain}}
-#'
-#' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
-#' 
-#' @export
-setMethod("BASiCS_diagPlot",
-          signature = "BASiCS_Chain",
-          definition = function(object, 
-                                Param = "mu", 
-                                x = NULL, 
-                                y = NULL,
-                                LogX = isTRUE(x %in% c("mu", "delta")),
-                                LogY = isTRUE(y %in% c("mu", "delta"))) {
-
-            if (!is.null(x) || !is.null(y)) {
-              if (!is.null(x) && is.null(y)) {
-                stop("Must specify both x and y or neither!")
-              }
-            } else {
-              LogX <- Param %in% c("mu", "delta")
-            }
-            Measure <- "effectiveSize"
-            HiddenCheckValidCombination(x, y, Param)
-            metric <- HiddenGetMeasure(object, Param, Measure)
-            sX <- if (LogX) scale_x_log10() else scale_x_continuous()
-            sY <- if (LogY) scale_y_log10() else scale_y_continuous()
-
-            if (!is.null(x)) {
-              xMat <- getParam(object, x)
-              yMat <- getParam(object, y)
-              df <- data.frame(
-                x = colMedians(xMat),
-                y = colMedians(yMat),
-                metric = metric
-              )
-
-              ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
-                ggplot2::geom_point(alpha = 0.5, shape = 16) +
-                viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)) +
-                sX + sY +
-                ggplot2::labs(x = x, y = y)              
-            } else {
-              xMat <- getParam(object, Param)
-              df <- data.frame(
-                x = matrixStats::colMedians(xMat),
-                y = metric
-              )
-              ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
-                ggplot2::geom_hex(ggplot2::aes_string(fill = "..density..")) +
-                viridis::scale_fill_viridis(name = "Density") +
-                sX + sY +
-                ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
-            }
-          }
-)
-
-
-
-HiddenScaleName <- function(Measure = c("effectiveSize",
-                                  "geweke.diag"),
-                      Param = NULL) {
-  Measure <- match.arg(Measure)
-  measure_name <- switch(Measure, 
-    effectiveSize = "Effective sample size",
-    geweke.diag = "Geweke diagnostic"
-  )
-  if (!is.null(Param)) {
-    measure_name <- paste0(measure_name, ": ", Param)
-  }
-  measure_name
-}
-
-#' @name Histograms of diagnostic measure for MCMC parameters
-#' @aliases BASiCS_diagHist BASiCS_diagHist-method
-#'
-#' @docType methods
-#'
-#' @title Create diagnostic plots of MCMC parameters
-#'
-#' @description Plot a histogram of effective sample size or Geweke's diagnostic
-#' z-statistic. See \link[coda]{effectiveSize} and \link[coda]{geweke.diag} for
-#' more details.
-#'
-#' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
-#' @param Param Optional name of a chain parameter to restrict the histogram;
-#' if not supplied, all parameters will be assessed.
-#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
-#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-#' \code{'sigma2'} and \code{'epsilon'}.
-#'
-#' @return A ggplot object.
-#'
-#' @examples
-#'
-#' # See
-#' help(BASiCS_MCMC)
-#'
-#' @seealso \code{\linkS4class{BASiCS_Chain}}
-#'
-#' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
-#'
-#' @export
-setMethod("BASiCS_diagHist",
-          signature = signature("BASiCS_Chain"),
-          definition = function(object, 
-                                Param = NULL) {
-
-            Measure <- "effectiveSize"
-
-            if (is.null(Param)) {
-              metric <- lapply(names(object@parameters), function(param) {
-                HiddenGetMeasure(object, param, Measure)
-              })
-              metric <- Reduce(c, metric)              
-            } else {
-              metric <- HiddenGetMeasure(object, Param, Measure)
-            }
-            if (length(metric) == 1) {
-              stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
-            }
-            ggplot2::ggplot(mapping = ggplot2::aes(x = metric)) + 
-              ggplot2::geom_histogram(bins = grDevices::nclass.FD(metric)) +
-              ggplot2::labs(x = HiddenScaleName(Measure, Param),
-                            y = "Count")
-            }
-)
 
 
 HiddenCheckValidCombination <- function(...) {
@@ -1047,19 +886,6 @@ HiddenCheckValidCombination <- function(...) {
     stop(paste("Invalid combination of parameters:",
                paste(list(...), collapse = ", "), " \n"))
   } 
-}
-
-HiddenGetMeasure <- function(object, 
-                       Param,
-                       Measure = c("effectiveSize",
-                                   "geweke.diag")) {
-  Measure <- match.arg(Measure)
-  MeasureFun <- match.fun(Measure)
-  metric <- MeasureFun(coda::mcmc(getParam(object, Param)))
-  if (Measure == "geweke.diag") {
-    metric <- metric$z
-  }
-  metric
 }
 
 HiddenGeneParams <- function() c("mu", "delta", "epsilon")
