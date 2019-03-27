@@ -5,6 +5,7 @@
 #' 
 #' @description These functions are defunct and no longer available. 
 #' 
+#' @param ... Unused.
 #' @details These functions are defunct and no longer available. 
 #' 
 #'   \itemize{
@@ -15,7 +16,5 @@
 #' 
 #' @rdname BASiCS-defunct
 BASiCS_D_TestDE <- function(...) {
-  
   .Defunct("BASiCS_TestDE")
-
 }

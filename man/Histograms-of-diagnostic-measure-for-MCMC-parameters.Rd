@@ -17,9 +17,6 @@ if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}.}
-
-\item{Measure}{The diagnostic measure to be plotted in the histogram.
-Possible values: \code{"effectiveSize"}, \code{"geweke.diag"}.}
 }
 \value{
 A ggplot object.
