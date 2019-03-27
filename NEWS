@@ -1091,5 +1091,8 @@ version 1.5.11 (2019-03-26)
 - `testthat` moved from Imports to Suggests
 
 version 1.5.12 (2019-03-26)
-- R (>= 3.6) is now a requirement 
+- R (>= 3.6) is now a requirement
+
+version 1.5.13 (2019-03-27)
+- `BASiCS_D_TestDE` from deprecated to defunct (follows BioC guidelines)
 
