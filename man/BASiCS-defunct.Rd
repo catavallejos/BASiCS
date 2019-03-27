@@ -7,6 +7,9 @@
 \usage{
 BASiCS_D_TestDE(...)
 }
+\arguments{
+\item{...}{Unused.}
+}
 \description{
 These functions are defunct and no longer available.
 }

@@ -13,7 +13,7 @@ test_that("Estimates match the given seed (spikes)",
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
   # Running the samples
   set.seed(18)
-  Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+  Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                        Regression = FALSE, PrintProgress = FALSE, 
                        Start = Start, PriorParam = PriorParam)
   # Calculating a posterior summary
@@ -74,7 +74,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes)",
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
   # Running the samples
   set.seed(18)
-  Chain <- BASiCS_MCMC(Data, N = 50, Thin = 10, Burn = 10,
+  Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,
                        Regression = FALSE, PrintProgress = FALSE, 
                        StoreAdapt = TRUE,
                        Start = Start, PriorParam = PriorParam)
