@@ -375,19 +375,23 @@ setMethod("plot",
             
             # Traceplot
             p1 <- ggplot2::ggplot(DF1) + 
-              ggplot2::geom_point(aes_string(x = "Iteration", y = "Draws"),
+              ggplot2::geom_point(ggplot2::aes_string(x = "Iteration", 
+                                                      y = "Draws"),
                                   col = grDevices::adjustcolor("white", 
                                                                alpha.f = 0) ) + 
-              ggplot2::geom_line(aes_string(x= "Iteration", y = "Draws")) + 
+              ggplot2::geom_line(ggplot2::aes_string(x= "Iteration", 
+                                                     y = "Draws")) + 
               ggplot2::xlab("Iteration") + ggplot2::ylab("Parameter value") + 
               ggplot2::theme_classic() + 
               ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column]) 
             p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
               
-            p2 <- ggplot2::ggplot(DF2, aes_string(x = "lag", y = "acf")) + 
+            p2 <- ggplot2::ggplot(DF2, ggplot2::aes_string(x = "lag", 
+                                                           y = "acf")) + 
               ggplot2::theme_classic() + 
-              ggplot2::geom_hline(aes(yintercept = 0)) + 
-              ggplot2::geom_segment(mapping = aes_string(xend = "lag", yend = 0)) +
+              ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) + 
+              ggplot2::geom_segment(mapping = ggplot2::aes_string(xend = "lag", 
+                                                                  yend = 0)) +
               ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column])
             
             cowplot::plot_grid(p1, p2)
