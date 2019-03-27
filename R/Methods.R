@@ -375,25 +375,25 @@ setMethod("plot",
             
             # Traceplot
             p1 <- ggplot2::ggplot(DF1) + 
-              ggplot2::geom_point(aes_string(x = "Iteration", y = "Draws"),
+              ggplot2::geom_point(ggplot2::aes_string(x = "Iteration", y = "Draws"),
                                   col = grDevices::adjustcolor("white", 
                                                                alpha.f = 0) ) + 
-              ggplot2::geom_line(aes_string(x= "Iteration", y = "Draws")) + 
-              ggplot2::xlab("Iteration") + ggplot2::ylab("Parameter value") + 
-              ggplot2::theme_classic() + 
-              ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column]) 
+              ggplot2::geom_line(ggplot2::aes_string(x= "Iteration", y = "Draws")) + 
+              ggplot2::labs(title = colnames(x@parameters[[Param]])[Column],
+                            x = "Iteration", 
+                            y = "Parameter value") + 
+              ggplot2::theme_classic()
             p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
               
-            p2 <- ggplot2::ggplot(DF2, aes_string(x = "lag", y = "acf")) + 
+            p2 <- ggplot2::ggplot(DF2, ggplot2::aes_string(x = "lag", y = "acf")) + 
               ggplot2::theme_classic() + 
-              ggplot2::geom_hline(aes(yintercept = 0)) + 
-              ggplot2::geom_segment(mapping = aes_string(xend = "lag", yend = 0)) +
+              ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) + 
+              ggplot2::geom_segment(mapping = ggplot2::aes_string(xend = "lag", yend = 0)) +
               ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column])
             
             cowplot::plot_grid(p1, p2)
             
           })
-
 
 getParam <- function(object, Param = "mu") {
   if (is.null(Param) || 
@@ -532,52 +532,53 @@ setMethod("BASiCS_showFit",
                               yhat = rowMedians(yhat),
                               yhat.upper = yhat.HPD[,2],
                               yhat.lower = yhat.HPD[,1])
+
             plot.out <- ggplot(df[df$included,],
-                               aes_string(x = "mu", y = "delta")) +
+                               ggplot2::aes_string(x = "mu", y = "delta")) +
               xlab(xlab) + ylab(ylab) +
               theme_minimal(base_size = 15)
             if(markExcludedGenes == TRUE) {
               plot.out <- plot.out + 
-              geom_point(data = df[!df$included, ],
-                         shape = pch,
-                         colour = "purple",
-                         alpha = 0.3)
+              ggplot2::geom_point(data = df[!df$included, ],
+                                  shape = pch,
+                                  colour = "purple",
+                                  alpha = 0.3)
             }
 
             if (smooth) {
+              cols <- c("dark blue", "yellow", "dark red")
               plot.out <- plot.out +
-                geom_hex(bins = 100) +
-                scale_fill_gradientn(name = "",
-                                     colours = colorRampPalette(
-                                      c("dark blue", "yellow", "dark red"))(100),
-                                     guide = FALSE)
+                ggplot2::geom_hex(bins = 100) +
+                ggplot2::scale_fill_gradientn(name = "",
+                                              colours = grDevices::colorRampPalette(cols)(100),
+                                              guide = FALSE)
             }
             else {
               plot.out <- plot.out +
-                geom_point(shape = pch,
-                           colour = colour)
+                ggplot2::geom_point(shape = pch,
+                                    colour = colour)
             }
             if(!is.null(GenesSel)) {
               if(sum(GenesSel %in% rownames(df)) != length(GenesSel)) {
                 stop("Some elements of `GenesSel` are not found in the data.")
               }
               plot.out <- plot.out +
-                geom_point(data = df[rownames(df) %in% GenesSel,],
-                           shape = pch,
-                           colour = colourGenesSel)
+                ggplot2::geom_point(data = df[rownames(df) %in% GenesSel,],
+                                    shape = pch,
+                                    colour = colourGenesSel)
             }
             
             plot.out <- plot.out + 
-              geom_line(data = df2,
-                        inherit.aes = FALSE,
-                        mapping = aes_string(x = "mu2", y = "yhat"),
-                        colour = "dark red") +
-              geom_ribbon(data = df2,
-                          inherit.aes = FALSE,
-                          mapping = aes_string(x = "mu2",
-                                               ymin = "yhat.lower",
-                                               ymax = "yhat.upper"),
-                          alpha = 0.5)
+              ggplot2::geom_line(data = df2,
+                                 inherit.aes = FALSE,
+                                 mapping = ggplot2::aes_string(x = "mu2", y = "yhat"),
+                                 colour = "dark red") +
+              ggplot2::geom_ribbon(data = df2,
+                                   inherit.aes = FALSE,
+                                   mapping = ggplot2::aes_string(x = "mu2",
+                                                       ymin = "yhat.lower",
+                                                       ymax = "yhat.upper"),
+                                   alpha = 0.5)
               
             return(plot.out)
           })
@@ -820,7 +821,7 @@ setMethod("plot",
               Columns <- Cells
               ylabInd <- "j"
             }
-            plot(
+            graphics::plot(
               x@parameters[[Param]][Columns, 1],
               x@parameters[[Param2]][Columns, 1],
               xlab = bquote(.(Param)[.(ylabInd)]),
@@ -946,24 +947,23 @@ setMethod("BASiCS_diagPlot",
                 y = colMedians(yMat),
                 metric = metric
               )
-              ggplot(df, aes(x = x, y = y, color = metric)) + 
-                geom_point(alpha = 0.5, shape = 16) +
+
+              ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
+                ggplot2::geom_point(alpha = 0.5, shape = 16) +
                 viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)) +
                 sX + sY +
-                labs(x = x,
-                     y = y)              
+                ggplot2::labs(x = x, y = y)              
             } else {
               xMat <- getParam(object, Param)
               df <- data.frame(
-                x = colMedians(xMat),
+                x = matrixStats::colMedians(xMat),
                 y = metric
               )
-              ggplot(df, aes(x = x, y = metric)) + 
-                geom_hex(aes_string(fill = "..density..")) +
+              ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
+                ggplot2::geom_hex(ggplot2::aes_string(fill = "..density..")) +
                 viridis::scale_fill_viridis(name = "Density") +
                 sX + sY +
-                labs(x = Param,
-                     y = HiddenScaleName(Measure))
+                ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
             }
           }
 )
@@ -1001,8 +1001,6 @@ HiddenScaleName <- function(Measure = c("effectiveSize",
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
-#' @param Measure The diagnostic measure to be plotted in the histogram.
-#' Possible values: \code{"effectiveSize"}, \code{"geweke.diag"}.
 #'
 #' @return A ggplot object.
 #'
@@ -1034,10 +1032,10 @@ setMethod("BASiCS_diagHist",
             if (length(metric) == 1) {
               stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
             }
-            ggplot(mapping = aes(x = metric)) + 
-              geom_histogram(bins = grDevices::nclass.FD(metric)) +
-              labs(x = HiddenScaleName(Measure, Param),
-                   y = "Count")
+            ggplot2::ggplot(mapping = ggplot2::aes(x = metric)) + 
+              ggplot2::geom_histogram(bins = grDevices::nclass.FD(metric)) +
+              ggplot2::labs(x = HiddenScaleName(Measure, Param),
+                            y = "Count")
             }
 )
 
