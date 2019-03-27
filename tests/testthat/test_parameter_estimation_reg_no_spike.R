@@ -4,8 +4,8 @@ test_that("Estimates match the given seed (no-spikes+regression)",
 {
   # Data example
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-  sce <- SingleCellExperiment(assays = list(counts = counts(Data)),
-                      colData = data.frame(BatchInfo = colData(Data)$BatchInfo))
+  sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts(Data)),
+                      colData = data.frame(BatchInfo = SingleCellExperiment::colData(Data)$BatchInfo))
   
   # Fixing starting values
   n <- ncol(Data)
@@ -22,11 +22,11 @@ test_that("Estimates match the given seed (no-spikes+regression)",
 
   # Running the sampler
   set.seed(14)
-  Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500,
+  Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500,
                        PrintProgress = FALSE, WithSpikes = FALSE,
                        Regression = TRUE)
   set.seed(14)
-  ChainSCE <- BASiCS_MCMC(sce, N = 1000, Thin = 10, Burn = 500,
+  ChainSCE <- run_MCMC(sce, N = 1000, Thin = 10, Burn = 500,
                        PrintProgress = FALSE, WithSpikes = FALSE,
                        Regression = TRUE)
 
@@ -123,7 +123,7 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
                                             WithSpikes = FALSE)
   # Running the sampler
   set.seed(42)
-  Chain <- BASiCS_MCMC(Data, N = 50, Thin = 10, Burn = 10,
+  Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,
                      PrintProgress = FALSE, WithSpikes = FALSE,
                      Regression = TRUE, StoreAdapt = TRUE,
                      Start = Start, PriorParam = PriorParam)
