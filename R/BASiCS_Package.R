@@ -3,23 +3,27 @@
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
 #' @importFrom data.table fread
-#' @importFrom ggplot2 aes_string scale_fill_gradientn geom_point theme_minimal geom_line geom_ribbon aes aes_string geom_hex geom_line geom_point geom_ribbon ggplot
-#' @importFrom graphics abline barplot legend lines par points segments smoothScatter plot
-#' @importFrom grDevices colorRampPalette
+#' @importFrom ggplot2 aes aes_string geom_hline geom_line geom_point 
+#' @importFrom ggplot2 geom_ribbon geom_segment ggplot ggtitle 
+#' @importFrom ggplot2 scale_fill_gradientn theme_minimal theme_classic 
+#' @importFrom ggplot2 xlab ylab 
+#' @importFrom graphics abline barplot legend lines par plot points segments 
+#' @importFrom graphics smoothScatter 
+#' @importFrom grDevices adjustcolor colorRampPalette
 #' @importFrom ggExtra ggMarginal
 #' @importFrom MASS mvrnorm
-#' @importFrom matrixStats rowMeans2 colMeans2 rowVars colVars colMedians rowMedians
-#' @importFrom methods Summary is new show slotNames .hasSlot
+#' @importFrom matrixStats colMeans2 colMedians colVars
+#' @importFrom matrixStats rowMeans2 rowMedians rowVars   
+#' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
-#' @importFrom S4Vectors metadata DataFrame
-#' @importFrom stats median model.matrix rgamma rpois runif acf
+#' @importFrom S4Vectors DataFrame metadata 
+#' @importFrom stats acf median model.matrix rgamma rpois runif 
 #' @importFrom SingleCellExperiment isSpike
-#' @importFrom SummarizedExperiment assay colData assayNames 
-#' @importFrom viridis scale_fill_viridis scale_color_viridis
+#' @importFrom SummarizedExperiment assay assayNames  colData 
+#' @importFrom viridis scale_color_viridis scale_fill_viridis 
 #' @importFrom utils packageVersion write.table
-#' @importMethodsFrom BiocGenerics counts updateObject subset colnames rownames
+#' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importMethodsFrom scran computeSumFactors
-#' @import ggplot2
 #' @import SingleCellExperiment
 #' @import KernSmooth
 NULL
