@@ -133,23 +133,23 @@ test_that("Diagnostic plot works", {
     PrintProgress = FALSE,
     Regression = TRUE,
     WithSpikes = TRUE)
-  g <- diagPlot(Chain)
+  g <- BASiCS_diagPlot(Chain)
   expect_is(g, "ggplot")
-  g <- diagPlot(Chain, Param = "delta")
+  g <- BASiCS_diagPlot(Chain, Param = "delta")
   expect_is(g, "ggplot")
-  g <- diagPlot(Chain, Param = "epsilon")
+  g <- BASiCS_diagPlot(Chain, Param = "epsilon")
   expect_is(g, "ggplot")
-  g <- diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
   expect_error(
-    diagPlot(Chain, Param = "nu", x = "mu", y = "epsilon"),
+    BASiCS_diagPlot(Chain, Param = "nu", x = "mu", y = "epsilon"),
     "Invalid combination of parameters"
   )
   expect_error(
-    diagPlot(Chain, Param = "delta", x = "delta", y = "nu"),
+    BASiCS_diagPlot(Chain, Param = "delta", x = "delta", y = "nu"),
     "Invalid combination of parameters:"
   )
-  g <- diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
 
 })
@@ -166,12 +166,12 @@ test_that("Diagnostic hist work", {
     PrintProgress = FALSE,
     Regression = TRUE,
     WithSpikes = TRUE)
-  g <- diagHist(Chain)
+  g <- BASiCS_diagHist(Chain)
   expect_is(g, "ggplot")
-  g <- diagHist(Chain, Param = "delta")
+  g <- BASiCS_diagHist(Chain, Param = "delta")
   expect_is(g, "ggplot")
-  g <- diagHist(Chain, Param = "nu")
+  g <- BASiCS_diagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
-  g <- diagHist(Chain, Param = "nu")
+  g <- BASiCS_diagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
 })

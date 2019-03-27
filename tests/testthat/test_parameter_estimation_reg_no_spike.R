@@ -4,8 +4,8 @@ test_that("Estimates match the given seed (no-spikes+regression)",
 {
   # Data example
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-  sce <- SingleCellExperiment(assays = list(counts = counts(Data)),
-                      colData = data.frame(BatchInfo = colData(Data)$BatchInfo))
+  sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts(Data)),
+                      colData = data.frame(BatchInfo = SingleCellExperiment::colData(Data)$BatchInfo))
   
   # Fixing starting values
   n <- ncol(Data)

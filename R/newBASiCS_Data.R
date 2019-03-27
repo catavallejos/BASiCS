@@ -120,12 +120,10 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   }
 
   # Create a SingleCellExperiment data object
-  Data <- SingleCellExperiment::SingleCellExperiment(
-                assays = list(counts = as.matrix(Counts)),
-                metadata = list(SpikeInput = SpikeInput))
+  Data <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = as.matrix(Counts)),
+                                                     metadata = list(SpikeInput = SpikeInput))
   SingleCellExperiment::isSpike(Data, SpikeType) <- Tech
-  SummarizedExperiment::colData(Data) <-
-    S4Vectors::DataFrame("BatchInfo" = BatchInfo)
+  SummarizedExperiment::colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
   colnames(Data) <- colnames(Counts)
   rownames(Data) <- rownames(Counts)
 
