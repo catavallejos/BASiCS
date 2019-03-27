@@ -1101,4 +1101,6 @@ version 1.5.14 (2019-03-27)
 - Removes full import of `ggplot2` in `BASiCS_Package.R`
 - `BASiCS_Package.R` is now in alphabetical order
 
+version 1.5.15 (2019-03-27)
+- Extended message to suggest additional QC when MCMC sampler fails
 
