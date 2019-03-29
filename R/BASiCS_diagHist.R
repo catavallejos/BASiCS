@@ -10,7 +10,9 @@
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
-#'
+#' @param na.rm Logical value indicating whether NA values should be removed
+#' before calculating effective sample size.
+#' 
 #' @return A ggplot object.
 #'
 #' @examples
@@ -23,7 +25,7 @@
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #'
 #' @export
-BASiCS_diagHist <- function(object, Param = NULL) {
+BASiCS_diagHist <- function(object, Param = NULL, na.rm = FALSE) {
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
@@ -31,7 +33,7 @@ BASiCS_diagHist <- function(object, Param = NULL) {
 
   if (is.null(Param)) {
     metric <- lapply(names(object@parameters), function(param) {
-      try(HiddenGetMeasure(object, param, Measure), silent = TRUE)
+      try(HiddenGetMeasure(object, param, Measure, na.rm), silent = TRUE)
     })
     ind_error <- vapply(metric, function(x) inherits(x, "try-error"), logical(1))
     metric <- metric[!ind_error]
@@ -46,7 +48,7 @@ BASiCS_diagHist <- function(object, Param = NULL) {
     }
     metric <- Reduce(c, metric)              
   } else {
-    metric <- HiddenGetMeasure(object, Param, Measure)
+    metric <- HiddenGetMeasure(object, Param, Measure, na.rm)
   }
   if (length(metric) == 1) {
     stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
