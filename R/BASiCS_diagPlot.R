@@ -53,8 +53,8 @@ BASiCS_diagPlot <- function(object,
   Measure <- "effectiveSize"
   HiddenCheckValidCombination(x, y, Param)
   metric <- HiddenGetMeasure(object, Param, Measure, na.rm)
-  sX <- if (LogX) scale_x_log10() else scale_x_continuous()
-  sY <- if (LogY) scale_y_log10() else scale_y_continuous()
+  sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()
+  sY <- if (LogY) ggplot2::scale_y_log10() else ggplot2::scale_y_continuous()
 
   if (!is.null(x)) {
     xMat <- HiddenGetParam(object, x)

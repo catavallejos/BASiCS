@@ -39,7 +39,7 @@ BASiCS_diagHist <- function(object, Param = NULL, na.rm = FALSE) {
     metric <- metric[!ind_error]
     if (all(ind_error)) {
       stop("coda::effectiveSize failed for all parameters.")
-    } else {
+    } else if (any(ind_error)) {
       warning(
         paste("coda::effectiveSize failed for some parameters:",
           paste(names(object@parameters)[ind_error], collapse = ", ")

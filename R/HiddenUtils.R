@@ -23,6 +23,9 @@ HiddenGetMeasure <- function(object,
   mat <- HiddenGetParam(object, Param)
   if (na.rm) {
     mat <- mat[, !apply(mat, 2, function(col) any(is.na(col)))]
+    if (!ncol(mat)) {
+      stop(paste("No non-NA samples for", Param))
+    }
   }
   metric <- MeasureFun(coda::mcmc(mat))
   if (Measure == "geweke.diag") {
