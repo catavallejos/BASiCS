@@ -55,8 +55,8 @@ BASiCS_diagPlot <- function(object,
     xMat <- HiddenGetParam(object, x)
     yMat <- HiddenGetParam(object, y)
     df <- data.frame(
-      x = colMedians(xMat),
-      y = colMedians(yMat),
+      x = matrixStats::colMedians(xMat),
+      y = matrixStats::colMedians(yMat),
       metric = metric
     )
 
