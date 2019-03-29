@@ -16,6 +16,8 @@
 #' a density plot.
 #' @param LogX,LogY A boolean value indicating whether to use a log10
 #' transformation for the x or y axis, respectively.
+#' @param na.rm Logical value indicating whether NA values should be removed
+#' before calculating effective sample size.
 #' 
 #' @return A ggplot object.
 #'
@@ -34,7 +36,10 @@ BASiCS_diagPlot <- function(object,
                             x = NULL, 
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
-                            LogY = isTRUE(y %in% c("mu", "delta"))) {
+                            LogY = isTRUE(y %in% c("mu", "delta")),
+                            na.rm = FALSE) {
+
+
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
@@ -47,9 +52,9 @@ BASiCS_diagPlot <- function(object,
   }
   Measure <- "effectiveSize"
   HiddenCheckValidCombination(x, y, Param)
-  metric <- HiddenGetMeasure(object, Param, Measure)
-  sX <- if (LogX) scale_x_log10() else scale_x_continuous()
-  sY <- if (LogY) scale_y_log10() else scale_y_continuous()
+  metric <- HiddenGetMeasure(object, Param, Measure, na.rm)
+  sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()
+  sY <- if (LogY) ggplot2::scale_y_log10() else ggplot2::scale_y_continuous()
 
   if (!is.null(x)) {
     xMat <- HiddenGetParam(object, x)

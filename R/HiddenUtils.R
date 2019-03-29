@@ -1,6 +1,6 @@
 HiddenScaleName <- function(Measure = c("effectiveSize",
-                                  "geweke.diag"),
-                      Param = NULL) {
+                                        "geweke.diag"),
+                            Param = NULL) {
   Measure <- match.arg(Measure)
   measure_name <- switch(Measure, 
     effectiveSize = "Effective sample size",
@@ -13,12 +13,21 @@ HiddenScaleName <- function(Measure = c("effectiveSize",
 }
 
 HiddenGetMeasure <- function(object, 
-                       Param,
-                       Measure = c("effectiveSize",
-                                   "geweke.diag")) {
+                             Param,
+                             Measure = c("effectiveSize",
+                                         "geweke.diag"), 
+                             na.rm = FALSE) {
+
   Measure <- match.arg(Measure)
   MeasureFun <- match.fun(Measure)
-  metric <- MeasureFun(coda::mcmc(HiddenGetParam(object, Param)))
+  mat <- HiddenGetParam(object, Param)
+  if (na.rm) {
+    mat <- mat[, !apply(mat, 2, function(col) any(is.na(col)))]
+    if (!ncol(mat)) {
+      stop(paste("No non-NA samples for", Param))
+    }
+  }
+  metric <- MeasureFun(coda::mcmc(mat))
   if (Measure == "geweke.diag") {
     metric <- metric$z
   }
