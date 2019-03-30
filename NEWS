@@ -1104,3 +1104,7 @@ version 1.5.14 (2019-03-27)
 version 1.5.15 (2019-03-27)
 - Extended message to suggest additional QC when MCMC sampler fails
 
+version 1.5.16 (2019-03-30)
+- `SingleCellExperiment` moved to depends (DESCRIPTION)
+
+
