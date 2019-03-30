@@ -28,6 +28,4 @@
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importMethodsFrom scran computeSumFactors
 #' @importClassesFrom Biobase Versioned
-#  @import SingleCellExperiment
-# @import KernSmooth
 NULL
