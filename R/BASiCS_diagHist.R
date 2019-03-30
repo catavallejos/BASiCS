@@ -17,8 +17,7 @@
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # See help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'

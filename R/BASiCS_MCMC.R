@@ -191,11 +191,12 @@
 #'                              EFDR = 0.10)
 #'
 #' # To obtain denoised rates / counts, see:
-#' help(BASiCS_DenoisedRates)
-#' help(BASiCS_DenoisedCounts)
+#' # help(BASiCS_DenoisedRates)
+#' # and
+#' # help(BASiCS_DenoisedCounts)
 #'
 #' # For examples of differential analyses between 2 populations of cells see:
-#' help(BASiCS_TestDE)
+#' # help(BASiCS_TestDE)
 #'
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}

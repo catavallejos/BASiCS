@@ -30,7 +30,7 @@ The subset can contain specific genes, cells or MCMC iterations
 }
 \examples{
 
-help(BASiCS_MCMC)
+# see help(BASiCS_MCMC)
 
 }
 \author{
