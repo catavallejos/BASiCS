@@ -1106,5 +1106,10 @@ version 1.5.15 (2019-03-27)
 
 version 1.5.16 (2019-03-30)
 - `SingleCellExperiment` moved to depends (DESCRIPTION)
-
+- Explicit calls to external packages (e.g. `SingleCellExperiment::`)
+- Unit tests for `BASiCS_diagHist` and `BASiCS_diagPlot`
+- `BASiCS_diagHist`, `BASiCS_diagPlot` and `BASiCS_showFit` moved from
+methods to functions
+- Internal functions marked as 'Hidden'
+- `BASiCS_diagHist`, etc moved into separate .R
 
