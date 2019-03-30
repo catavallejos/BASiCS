@@ -1111,5 +1111,5 @@ version 1.5.16 (2019-03-30)
 - `BASiCS_diagHist`, `BASiCS_diagPlot` and `BASiCS_showFit` moved from
 methods to functions
 - Internal functions marked as 'Hidden'
-- `BASiCS_diagHist`, etc moved into separate .R
+- `BASiCS_diagHist`, etc moved into separate .R files
 
