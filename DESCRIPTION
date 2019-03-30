@@ -36,9 +36,10 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
 License: GPL (>= 2)
 Depends:
     R (>= 3.6),
+    KernSmooth,
     SingleCellExperiment
 Imports:
-    KernSmooth,
+    Biobase,
     ggplot2,
     BiocGenerics, 
     cowplot,

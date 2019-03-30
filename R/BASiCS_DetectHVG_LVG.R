@@ -60,8 +60,7 @@
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # See help(BASiCS_MCMC)
 #'
 #' @details See vignette
 #'

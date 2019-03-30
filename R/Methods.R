@@ -125,7 +125,7 @@ setMethod("updateObject",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' # see help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -174,7 +174,7 @@ setMethod("Summary",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' # see help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
@@ -259,7 +259,7 @@ setMethod("subset",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' # see help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
@@ -283,7 +283,7 @@ setMethod("colnames",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' # see help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
@@ -324,8 +324,7 @@ setMethod("rownames",
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # see help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -426,8 +425,7 @@ HiddenGetParam <- function(object, Param = "mu") {
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # See help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
@@ -455,8 +453,7 @@ setMethod("displayChainBASiCS",
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # See help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -539,8 +536,7 @@ setMethod("show",
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # See help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -720,8 +716,7 @@ setMethod("plot",
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' # See help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Summary}}
 #'

@@ -43,14 +43,14 @@ test_that("plot works for BASiCS_Chain (non-regression, spikes)", {
     PrintProgress = FALSE,
     Regression = FALSE,
     WithSpikes = TRUE)
-
+  pdf(NULL)
   plot(Chain, Param = "mu", Gene = 1)
   plot(Chain, Param = "delta", Gene = 1)
   plot(Chain, Param = "phi", Cell = 1)
   plot(Chain, Param = "s", Cell = 1)
   plot(Chain, Param = "nu", Cell = 1)
   plot(Chain, Param = "theta")
-
+  dev.off()
 })
 
 test_that("plot works for BASiCS_Chain (regression, no spikes)", {
@@ -66,6 +66,7 @@ test_that("plot works for BASiCS_Chain (regression, no spikes)", {
     Regression = TRUE,
     WithSpikes = FALSE)
 
+  pdf(NULL)
   expect_error({
     plot(Chain, Param = "mu", Gene = 1)
     plot(Chain, Param = "delta", Gene = 1)
@@ -75,6 +76,7 @@ test_that("plot works for BASiCS_Chain (regression, no spikes)", {
     plot(Chain, Param = "theta")
     plot(Chain, Param = "beta", RegressionTerm = 1)
   }, NA)
+  dev.off()
 })
 
 test_that("plot works for BASiCS_Summary with all valid combinations", {
@@ -90,6 +92,7 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
     WithSpikes = TRUE)
 
   SChain <- Summary(Chain)
+  pdf(NULL)
   expect_error({
     plot(SChain, Param = "mu", Param2 = "delta")
     plot(SChain, Param = "mu", Param2 = "epsilon")
@@ -100,6 +103,7 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
     plot(SChain, Param = "sigma2")
     plot(SChain, Param = "beta")
   }, NA)
+  dev.off()
 })
 
 
@@ -115,10 +119,13 @@ test_that("BASiCS_showFit works", {
     Regression = TRUE,
     WithSpikes = TRUE)
 
+  pdf(NULL)
   expect_error({
     BASiCS_showFit(Chain, smooth = TRUE)
     BASiCS_showFit(Chain, smooth = FALSE)
   }, NA)
+  dev.off()
+
 })
 
 
