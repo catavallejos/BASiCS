@@ -38,8 +38,7 @@ for more details on this diagnostic measure.
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+# See help(BASiCS_MCMC)
 
 }
 \seealso{

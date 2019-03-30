@@ -34,9 +34,9 @@
 #' Theta <- 0.39
 #'
 #' Data <- BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
-#' head(counts(Data))
-#' dim(counts(Data))
-#' metadata(Data)$SpikeInput
+#' head(SingleCellExperiment::counts(Data))
+#' dim(SingleCellExperiment::counts(Data))
+#' S4Vectors::metadata(Data)$SpikeInput
 #' SingleCellExperiment::isSpike(Data)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}, Nils Eling

@@ -19,7 +19,7 @@ Returns the labels of gene-specific BASiCS parameters
 }
 \examples{
 
-help(BASiCS_MCMC)
+# see help(BASiCS_MCMC)
 
 }
 \author{
