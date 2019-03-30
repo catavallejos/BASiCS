@@ -23,7 +23,7 @@ the high posterior density interval (probabilty equal to \code{prob})
 }
 \examples{
 
-help(BASiCS_MCMC)
+# see help(BASiCS_MCMC)
 
 }
 \author{

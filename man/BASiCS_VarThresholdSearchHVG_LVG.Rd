@@ -44,8 +44,7 @@ See vignette
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+# See help(BASiCS_MCMC)
 
 }
 \references{

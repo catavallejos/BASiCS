@@ -19,8 +19,7 @@ Prints a summary of the properties of \code{object}.
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+# See help(BASiCS_MCMC)
 
 }
 \author{
