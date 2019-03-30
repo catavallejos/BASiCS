@@ -22,6 +22,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname BASiCS_Chain-methods
+#' @export
 setMethod("show",
           signature = "BASiCS_Chain",
           definition = function(object)
@@ -87,6 +88,7 @@ setMethod("show",
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_Chain-methods
+#' @export
 setMethod("updateObject",
           signature = "BASiCS_Chain",
           definition = function(object, ..., verbose = FALSE)
@@ -178,6 +180,7 @@ setMethod("Summary",
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
+#' @export
 setMethod("subset",
           signature = "BASiCS_Chain",
           definition = function(x, Genes = NULL,
@@ -262,7 +265,8 @@ setMethod("subset",
 #' # see help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#'
+#' 
+#' @export
 setMethod("colnames",
           signature = "BASiCS_Chain",
           definition = function(x) colnames(x@parameters$s))
@@ -287,6 +291,7 @@ setMethod("colnames",
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
+#' @export
 setMethod("rownames",
           signature = "BASiCS_Chain",
           definition = function(x) return(colnames(x@parameters$mu)))
@@ -329,6 +334,7 @@ setMethod("rownames",
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' 
+#' @export
 setMethod("plot",
           signature = "BASiCS_Chain",
           definition = function(x,
@@ -459,6 +465,8 @@ setMethod("displayChainBASiCS",
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_Summary-methods
+#' 
+#' @export
 setMethod("show",
           signature = "BASiCS_Summary",
           definition = function(object)

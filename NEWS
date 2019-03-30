@@ -1113,3 +1113,9 @@ methods to functions
 - Internal functions marked as 'Hidden'
 - `BASiCS_diagHist`, etc moved into separate .R files
 
+version 1.5.17 (2019-03-30)
+- Minor changes in dependencies to pass R CMD check
+- Minor typo fix in documentation of `newBASiCS_Data`
+- `@export` call added to all methods
+
+
