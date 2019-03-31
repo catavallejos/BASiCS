@@ -14,6 +14,7 @@
 #' @importFrom graphics smoothScatter 
 #' @importFrom grDevices adjustcolor colorRampPalette
 #' @importFrom ggExtra ggMarginal
+#' @importFrom KernSmooth bkde2D
 #' @importFrom MASS mvrnorm
 #' @importFrom matrixStats colMeans2 colMedians colVars
 #' @importFrom matrixStats rowMeans2 rowMedians rowVars   
