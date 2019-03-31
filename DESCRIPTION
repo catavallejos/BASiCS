@@ -55,9 +55,10 @@ Imports:
     S4Vectors, 
     scran, 
     stats,
+    stats4,
     SummarizedExperiment,
-    utils,
-    viridis
+    viridis,
+    utils    
 Suggests:
     BiocStyle,
     knitr,
