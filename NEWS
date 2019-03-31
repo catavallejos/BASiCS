@@ -1118,4 +1118,9 @@ version 1.5.17 (2019-03-30)
 - Minor typo fix in documentation of `newBASiCS_Data`
 - `@export` call added to all methods
 
+version 1.5.19 (2019-03-31)
+- `stats4` added to imports in order to import `plot` S4 generic.
+- `KernSmooth` removed from DESCRIPTION.
+- Maintainer field removed from DESCRIPTION (use Author@R only)
+- Updates to travis integration to include BiocCheck
 
