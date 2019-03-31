@@ -10,7 +10,7 @@
 #'                     scale_x_continuous scale_y_continuous
 #' @importFrom ggplot2 theme_minimal theme_classic 
 #' @importFrom ggplot2 xlab ylab labs
-#' @importFrom graphics abline barplot legend lines par plot points segments 
+#' @importFrom graphics abline barplot legend lines par points segments 
 #' @importFrom graphics smoothScatter 
 #' @importFrom grDevices adjustcolor colorRampPalette
 #' @importFrom ggExtra ggMarginal
@@ -28,4 +28,6 @@
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importMethodsFrom scran computeSumFactors
 #' @importClassesFrom Biobase Versioned
+#' @importFrom stats4 plot
 NULL
+
