@@ -33,3 +33,15 @@ HiddenGetMeasure <- function(object,
   }
   metric
 }
+
+
+HiddenGetParam <- function(object, Param = "mu") {
+  if (is.null(Param) || 
+      is.na(Param) || 
+      length(Param) > 1 ||
+      !(Param %in% names(object@parameters))) {
+    stop("'Param' argument is invalid")
+  }
+  object@parameters[[Param]]
+}
+
