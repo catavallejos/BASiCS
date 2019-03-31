@@ -394,15 +394,8 @@ setMethod("plot",
             
           })
 
-HiddenGetParam <- function(object, Param = "mu") {
-  if (is.null(Param) || 
-      is.na(Param) || 
-      length(Param) > 1 ||
-      !(Param %in% names(object@parameters))) {
-    stop("'Param' argument is invalid")
-  }
-  object@parameters[[Param]]
-}
+#' @export
+setMethod("plot", signature = "ANY", graphics::plot)
 
 
 #' @name displayChainBASiCS-BASiCS_Chain-method
