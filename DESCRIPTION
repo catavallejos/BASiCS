@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.5.17
-Date: : 2019-03-30
+Version: 1.5.18
+Date: : 2019-03-31
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="cnvallej@uc.cl"), person("Nils", "Eling", 
         role=c("aut"), email="eling@ebi.ac.uk"), 
@@ -36,28 +36,28 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
 License: GPL (>= 2)
 Depends:
     R (>= 3.6),
-    KernSmooth,
     SingleCellExperiment
 Imports:
     Biobase,
-    ggplot2,
     BiocGenerics, 
-    cowplot,
-    methods, 
     coda, 
+    cowplot,
     data.table,
     ggExtra,
+    ggplot2,
     graphics, 
     grDevices,
+    KernSmooth,
     MASS, 
     matrixStats, 
+    methods, 
     Rcpp (>= 0.11.3), 
     S4Vectors, 
     scran, 
     stats,
     SummarizedExperiment,
-    viridis,
-    utils
+    utils,
+    viridis
 Suggests:
     BiocStyle,
     knitr,
