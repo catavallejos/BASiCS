@@ -22,7 +22,7 @@
 #' Default value: \code{BatchInfo = NULL}.
 #' @param SpikeType Character to indicate what type of spike-ins are in use.
 #' For more details see argument `type` in
-#' see `help(ke, package = "SingleCellExperiment")`. Default value:
+#' see `help(isSpike, package = "SingleCellExperiment")`. Default value:
 #' \code{SpikeType = "ERCC"}.
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
