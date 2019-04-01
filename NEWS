@@ -1124,3 +1124,6 @@ version 1.5.19 (2019-03-31)
 - Maintainer field removed from DESCRIPTION (use Author@R only)
 - Updates to travis integration to include BiocCheck
 
+version 1.5.20 (2019-04-01)
+- Updated documentation for `BASiCS_MCMC`, `BASiCS_DetectHVG`, 
+`BASiCS_DetectLVG` and `BASiCS_VarThresholdSearchHVG_LVG`
