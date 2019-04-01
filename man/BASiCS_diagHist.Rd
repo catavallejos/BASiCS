@@ -30,6 +30,16 @@ more details.
 
 # See help(BASiCS_MCMC)
 
+# Built-in simulated dataset
+Data <- makeExampleBASiCS_Data()
+# To analyse real data, please refer to the instructions in:
+# https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
+
+# Only a short run of the MCMC algorithm for illustration purposes
+# Longer runs migth be required to reach convergence
+Chain <- BASiCS_MCMC(Data, N = 10, Thin = 2, Burn = 4, Regression = FALSE,
+                     PrintProgress = FALSE, WithSpikes = TRUE)
+
 }
 \seealso{
 \code{\linkS4class{BASiCS_Chain}}
