@@ -8,7 +8,6 @@ warnings_are_errors: false
 
 branches:
   only:
-    - master
     - Devel
 
 r_github_packages:
