@@ -32,7 +32,9 @@
 #' # Longer runs migth be required to reach convergence
 #' Chain <- BASiCS_MCMC(Data, N = 10, Thin = 2, Burn = 4, Regression = FALSE,
 #'                      PrintProgress = FALSE, WithSpikes = TRUE)
+#' # Plot effective sample size for mu (y) against mu, coloured by density
 #' BASiCS_diagPlot(Chain)
+#' # Effective sample size as colour, mu as x, delta as y.
 #' BASiCS_diagPlot(Chain, x = "mu", y = "delta")
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
