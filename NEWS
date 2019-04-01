@@ -1063,3 +1063,79 @@ version 1.5.6: (2019-03-20) - merge from RELEASE_3_8 branch
 
 version 1.5.7: (2019-03-22)
 - Added default value for 'BatchInfo' within 'BASiCS_MCMC'
+
+version 1.5.8: (2019-03-22)
+- Changes DESCRIPTION to have a single maintainer
+- Density plot added to plot Method for BASiCS_Chain objects
+- Output plots for plot Method for BASiCS_Chain objects
+
+version 1.5.9: (2019-03-24)
+- Alan O'Callaghan is now author
+- `diagPlot` and `diagHist` methods added to facilitate diagnosis of convergence 
+and mixing for MCMC chains
+- Added explicit calls to `ggplot2` in plot methods. 
+- `BASiCS_DetectHVG` and `BASiCS_DetectLVG` edited based on the "regression"
+approach (i.e. using epsilon to detect HVGs/LVGs). 
+- In `BASiCS_DetectHVG` and `BASiCS_DetectLVG`, options for `OrderVariable` 
+were simplified (only original order and based on probability)
+- Temporary changes in no-spikes version have been restored
+
+version 1.5.10 (2019-03-26)
+- Corrected ordering in TestDE outpout so that genenames always match
+- Small fixes for R CMD check
+- Ordering in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can only be done on
+GeneNames, GeneIndex and Prob
+
+version 1.5.11 (2019-03-26)
+- Edits in BASiCS_Package.R so that `roxygen2` creates `NAMESPACE`
+- `testthat` moved from Imports to Suggests
+
+version 1.5.12 (2019-03-26)
+- R (>= 3.6) is now a requirement
+
+version 1.5.13 (2019-03-27)
+- `BASiCS_D_TestDE` from deprecated to defunct (follows BioC guidelines)
+
+version 1.5.14 (2019-03-27)
+- Brackets removed from `setGeneric` call (as per Hadley Wickham recommendation)
+- Removes full import of `ggplot2` in `BASiCS_Package.R`
+- `BASiCS_Package.R` is now in alphabetical order
+
+version 1.5.15 (2019-03-27)
+- Extended message to suggest additional QC when MCMC sampler fails
+
+version 1.5.16 (2019-03-30)
+- `SingleCellExperiment` moved to depends (DESCRIPTION)
+- Explicit calls to external packages (e.g. `SingleCellExperiment::`)
+- Unit tests for `BASiCS_diagHist` and `BASiCS_diagPlot`
+- `BASiCS_diagHist`, `BASiCS_diagPlot` and `BASiCS_showFit` moved from
+methods to functions
+- Internal functions marked as 'Hidden'
+- `BASiCS_diagHist`, etc moved into separate .R files
+
+version 1.5.17 (2019-03-30)
+- Minor changes in dependencies to pass R CMD check
+- Minor typo fix in documentation of `newBASiCS_Data`
+- `@export` call added to all methods
+
+version 1.5.19 (2019-03-31)
+- `stats4` added to imports in order to import `plot` S4 generic.
+- `KernSmooth` removed from DESCRIPTION.
+- Maintainer field removed from DESCRIPTION (use Author@R only)
+- Updates to travis integration to include BiocCheck
+
+version 1.5.20 (2019-04-01)
+- Updated documentation for `BASiCS_MCMC`, `BASiCS_DetectHVG`, 
+`BASiCS_DetectLVG` and `BASiCS_VarThresholdSearchHVG_LVG`
+
+version 1.5.21 (2019-04-01)
+- Uses built-in chain in examples for `BASiCS_diagHist` and `BASiCS_diagPlot`
+
+version 1.5.22 (2019-04-02)
+- `HiddenCheckValidCombination`, `HiddenGeneParams` and `HiddenGeneParams`
+moved from `Methods.R` to `HiddenUtils.R`
+- `sapply` replaced by `vapply` in `HiddenCheckValidCombination`,  
+`HiddenThresholdSearchDetectHVL_LVG.R` and `HiddenThresholdSearchTestDE.R`
+- Use of `set.seed` removed from `makeExampleBASiCS_Data` 
+- Unit tests updated accordingly
+- Adds missing running examples to Rds in order to pass R CMD BioCheck

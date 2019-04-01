@@ -22,6 +22,7 @@
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname BASiCS_Chain-methods
+#' @export
 setMethod("show",
           signature = "BASiCS_Chain",
           definition = function(object)
@@ -87,6 +88,7 @@ setMethod("show",
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_Chain-methods
+#' @export
 setMethod("updateObject",
           signature = "BASiCS_Chain",
           definition = function(object, ..., verbose = FALSE)
@@ -125,7 +127,8 @@ setMethod("updateObject",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' data(ChainSC)
+#' SummarySC <- Summary(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -174,10 +177,18 @@ setMethod("Summary",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' data(ChainSC)
+#' 
+#' # Extracts 3 first genes
+#' ChainSC1 <- subset(ChainSC, Genes = rownames(ChainSC)[1:3])
+#' # Extracts 3 first cells
+#' ChainSC2 <- subset(ChainSC, Cells = colnames(ChainSC)[1:3])
+#' # Extracts 10 first iterations
+#' ChainSC3 <- subset(ChainSC, Iterations = 1:10)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
+#' @export
 setMethod("subset",
           signature = "BASiCS_Chain",
           definition = function(x, Genes = NULL,
@@ -259,10 +270,12 @@ setMethod("subset",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' data(ChainSC)
+#' colnames(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
-#'
+#' 
+#' @export
 setMethod("colnames",
           signature = "BASiCS_Chain",
           definition = function(x) colnames(x@parameters$s))
@@ -283,14 +296,18 @@ setMethod("colnames",
 #'
 #' @examples
 #'
-#' help(BASiCS_MCMC)
+#' data(ChainSC)
+#' rownames(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
+#' @export
 setMethod("rownames",
           signature = "BASiCS_Chain",
           definition = function(x) return(colnames(x@parameters$mu)))
 
+# @importFrom ggExtra ggMarginal 
+# @importFrom cowplot plot_grid
 #' @name plot-BASiCS_Chain-method
 #' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
 #'
@@ -322,12 +339,12 @@ setMethod("rownames",
 #'
 #' @examples
 #'
-#' # See
 #' help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#'
+#' 
+#' @export
 setMethod("plot",
           signature = "BASiCS_Chain",
           definition = function(x,
@@ -336,9 +353,6 @@ setMethod("plot",
                                 RegressionTerm = NULL,
                                 ylab = "", xlab = "", ...)
           {
-            if (!(Param %in% names(x@parameters))) {
-              stop("'Param' argument is invalid")
-            }
             if (Param %in% c("mu", "delta", "epsilon") & is.null(Gene)) {
               stop("'Gene' value is required")
             }
@@ -352,18 +366,13 @@ setMethod("plot",
               stop("'RegressionTerm' value is required")
             }
 
-            geneParams <- c("mu", "delta", "epsilon")
-            cellParams <- c("s", "phi", "nu")
-            batchParams <- "theta"
-            regressionParams <- "beta"
-
-            if (Param %in% geneParams) {
+            if (Param %in% HiddenGeneParams()) {
               Column <- Gene
-            } else if (Param %in% cellParams) {
+            } else if (Param %in% HiddenCellParams()) {
               Column <- Cell
-            } else if (Param %in% batchParams) {
+            } else if (Param == "theta") {
               Column <- Batch
-            } else if (Param %in% regressionParams) {
+            } else if (Param == "beta") {
               Column <- RegressionTerm
             }
             if (xlab == "") {
@@ -372,17 +381,37 @@ setMethod("plot",
             if (ylab == "") {
               ylab <- bquote(.(Param)[.(Column)])
             }
-
-            par(mfrow = c(1, 2))
-            plot(x@parameters[[Param]][, Column],
-                 type = "l",
-                 xlab = xlab,
-                 ylab = ylab,
-                 main = colnames(x@parameters)[Column],
-                 ...)
-            stats::acf(x@parameters[[Param]][, Column], main = "Autocorrelation")
+            
+            DF1 <- data.frame("Iteration" = seq_len(nrow(x@parameters[[Param]])),
+                              "Draws" = x@parameters[[Param]][, Column])
+            # Code inspired by https://stackoverflow.com/questions/17788859/acf-plot-with-ggplot2-setting-width-of-geom-bar
+            MyAcf <- acf(x@parameters[[Param]][,Column], plot = FALSE)
+            DF2 <- with(MyAcf, data.frame(lag, acf))
+            
+            # Traceplot
+            p1 <- ggplot2::ggplot(DF1) + 
+              ggplot2::geom_point(ggplot2::aes_string(x = "Iteration", y = "Draws"),
+                                  col = grDevices::adjustcolor("white", 
+                                                               alpha.f = 0) ) + 
+              ggplot2::geom_line(ggplot2::aes_string(x= "Iteration", y = "Draws")) + 
+              ggplot2::labs(title = colnames(x@parameters[[Param]])[Column],
+                            x = "Iteration", 
+                            y = "Parameter value") + 
+              ggplot2::theme_classic()
+            p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
+              
+            p2 <- ggplot2::ggplot(DF2, ggplot2::aes_string(x = "lag", y = "acf")) + 
+              ggplot2::theme_classic() + 
+              ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) + 
+              ggplot2::geom_segment(mapping = ggplot2::aes_string(xend = "lag", yend = 0)) +
+              ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column])
+            
+            cowplot::plot_grid(p1, p2)
+            
           })
 
+# #' @export
+#setMethod("plot", signature = "ANY", graphics::plot)
 
 #' @name displayChainBASiCS-BASiCS_Chain-method
 #' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_Chain-method
@@ -404,7 +433,6 @@ setMethod("plot",
 #'
 #' @examples
 #'
-#' # See
 #' help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
@@ -415,156 +443,7 @@ setMethod("plot",
 #' @export
 setMethod("displayChainBASiCS",
           signature = "BASiCS_Chain",
-          definition = function(object, Param = "mu")
-          {
-            if (!(Param %in% names(object@parameters))) {
-              stop("'Param' argument is invalid")
-            }
-            object@parameters[[Param]]
-          })
-
-#' @name BASiCS_showFit-BASiCS_Chain-method
-#' @aliases BASiCS_showFit BASiCS_showFit,BASiCS_Chain-method
-#'
-#' @docType methods
-#' @rdname BASiCS_showFit-BASiCS_Chain-method
-#'
-#' @title Plotting the trend after Bayesian regression
-#'
-#' @description Plotting the trend after Bayesian regression using a
-#' \code{\linkS4class{BASiCS_Chain}} object
-#'
-#' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param xlab As in \code{\link[graphics]{par}}.
-#' @param ylab As in \code{\link[graphics]{par}}.
-#' @param pch As in \code{\link[graphics]{par}}. Default value \code{pch = 16}.
-#' @param smooth Logical to indicate wether the smoothScatter function is used
-#' to plot the scatter plot. Default value \code{smooth = TRUE}. 
-#' @param variance Variance used to build GRBFs for regression. Default value
-#' \code{variance = 1.2} 
-#' @param colour colour used to denote genes within the scatterplot. Only used 
-#' when \code{smooth = TRUE}. Default value 
-#' \code{colour = "dark blue"}. 
-#' @param markExcludedGenes Whether or not lowly expressed genes that were
-#' excluded from the regression fit are included in the scatterplot.
-#' Default value \code{markExcludedGenes = TRUE}.
-#' @param GenesSel Vector of gene names to be highlighted in the scatterplot.
-#' Only used when \code{smooth = TRUE}. Default value \code{GenesSel = NULL}.
-#' @param colourGenesSel colour used to denote the genes listed in 
-#' \code{GenesSel} within the scatterplot. Default value 
-#' \code{colourGenesSel = "dark red"}.
-#' @param ... Additional parameters for plotting.
-#'
-#' @examples
-#' data(ChainRNAReg)
-#' BASiCS_showFit(ChainRNAReg)
-#'
-#' @return A plot object
-#'
-#' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' @author Catalina Vallejos \email{cnvallej@@uc.cl}
-#'
-#' @references
-#' Eling et al (2018). Cell Systems
-#' https://doi.org/10.1016/j.cels.2018.06.011
-#' @export
-setMethod("BASiCS_showFit",
-          signature = "BASiCS_Chain",
-          definition = function(object,
-                                xlab = "log(mu)",
-                                ylab = "log(delta)",
-                                pch = 16,
-                                smooth = TRUE,
-                                variance = 1.2,
-                                colour = "dark blue",
-                                markExcludedGenes = TRUE,
-                                GenesSel = NULL,
-                                colourGenesSel = "dark red",
-                                ...){
-
-            if (!("beta" %in% names(object@parameters))) {
-              stop("'beta' is missing. Regression was not performed.")
-            }
-
-
-            m <- log(object@parameters$mu[1,])
-            grid.mu <- seq(round(min(m), digits = 2),
-                           round(max(m), digits = 2), length.out = 1000)
-
-            # Create design matrix across the grid
-            n <- ncol(object@parameters$beta)
-            range <- diff(range(grid.mu))
-            myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
-            h <- diff(myu)*variance
-
-            B <- matrix(1,length(grid.mu),n)
-            B[,2] <- grid.mu
-            for (j in seq_len(n-2)) {
-              B[,j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
-            }
-
-            # Calculate yhat = X*beta
-            yhat <- apply(object@parameters$beta, 1, function(n) B%*%n)
-            yhat.HPD <- coda::HPDinterval(coda::mcmc(t(yhat)), 0.95)
-
-            df <- data.frame(mu = log(colMedians(object@parameters$mu)),
-                             delta = log(colMedians(object@parameters$delta)),
-                             included = !is.na(object@parameters$epsilon[1,]))
-            rownames(df) <- colnames(object@parameters$mu)
-
-            df2 <- data.frame(mu2 = grid.mu,
-                              yhat = rowMedians(yhat),
-                              yhat.upper = yhat.HPD[,2],
-                              yhat.lower = yhat.HPD[,1])
-            plot.out <- ggplot(df[df$included,],
-                               aes_string(x = "mu", y = "delta")) +
-              xlab(xlab) + ylab(ylab) +
-              theme_minimal(base_size = 15)
-            if(markExcludedGenes == TRUE) {
-              plot.out <- plot.out + 
-              geom_point(data = df[!df$included, ],
-                         shape = pch,
-                         colour = "purple",
-                         alpha = 0.3)
-            }
-
-            if (smooth) {
-              plot.out <- plot.out +
-                geom_hex(bins = 100) +
-                scale_fill_gradientn(name = "",
-                                     colours = colorRampPalette(
-                                      c("dark blue", "yellow", "dark red"))(100),
-                                     guide = FALSE)
-            }
-            else {
-              plot.out <- plot.out +
-                geom_point(shape = pch,
-                           colour = colour)
-            }
-            if(!is.null(GenesSel)) {
-              if(sum(GenesSel %in% rownames(df)) != length(GenesSel)) {
-                stop("Some elements of `GenesSel` are not found in the data.")
-              }
-              plot.out <- plot.out +
-                geom_point(data = df[rownames(df) %in% GenesSel,],
-                           shape = pch,
-                           colour = colourGenesSel)
-            }
-            
-            plot.out <- plot.out + 
-              geom_line(data = df2,
-                        inherit.aes = FALSE,
-                        mapping = aes_string(x = "mu2", y = "yhat"),
-                        colour = "dark red") +
-              geom_ribbon(data = df2,
-                          inherit.aes = FALSE,
-                          mapping = aes_string(x = "mu2",
-                                               ymin = "yhat.lower",
-                                               ymax = "yhat.upper"),
-                          alpha = 0.5)
-              
-            return(plot.out)
-          })
+          definition = HiddenGetParam)
 
 #########################################################################
 # Methods for BASiCS_Summary objects
@@ -582,13 +461,15 @@ setMethod("BASiCS_showFit",
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' data(ChainSC)
+#' show(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @rdname BASiCS_Summary-methods
+#' 
+#' @export
 setMethod("show",
           signature = "BASiCS_Summary",
           definition = function(object)
@@ -619,10 +500,7 @@ setMethod("show",
                 " Parameters: ", names(object@parameters), "\n")
           })
 
-#' @export
-setGeneric("plot")
-#' @export
-setMethod("plot", signature = "ANY", graphics::plot)
+
 
 
 #' @name plot-BASiCS_Summary-method
@@ -669,7 +547,6 @@ setMethod("plot", signature = "ANY", graphics::plot)
 #'
 #' @examples
 #'
-#' # See
 #' help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
@@ -712,26 +589,22 @@ setMethod("plot",
               }
             }
 
-            batchParams <- c("theta")
-            geneParams <- c("mu", "delta", "epsilon")
-            cellParams <- c("phi", "s", "nu")
-
             if (is.null(Param2)) {
               object <- x@parameters[[Param]]
 
-              if (Param %in% geneParams) {
+              if (Param %in% HiddenGeneParams()) {
                 Columns <- Genes
                 ylabInd <- "i"
                 if (xlab == "") {
                   xlab <- "Gene"
                 }
-              } else if (Param %in% cellParams) {
+              } else if (Param %in% HiddenCellParams()) {
                 Columns <- Cells
                 ylabInd <- "j"
                 if (xlab == "") {
                   xlab <- "Cell"
                 }
-              } else if (Param %in% batchParams) {
+              } else if (Param == "theta") {
                 Columns <- Batches
                 ylabInd <- "b"
                 if (xlab == "") {
@@ -795,8 +668,7 @@ setMethod("plot",
             if (!Param2 %in% names(x@parameters)) {
               stop("'Param2' is not a parameter in this BASiCS_Summary object")
             }
-
-            ValidCombination <- FALSE
+            HiddenCheckValidCombination(Param, Param2)
             if (SmoothPlot) {
               col <- grDevices::rgb(grDevices::col2rgb(col)[1],
                                     grDevices::col2rgb(col)[2],
@@ -804,38 +676,32 @@ setMethod("plot",
                                     50,
                                     maxColorValue = 255)
             }
-            if (Param %in% geneParams) {
+            if (Param %in% HiddenGeneParams()) {
               Columns <- Genes
-              ValidCombination <- Param2 %in% geneParams
               ylabInd <- "i"
             }
-            if (Param %in% cellParams) {
+            if (Param %in% HiddenCellParams()) {
               Columns <- Cells
-              ValidCombination <- Param2 %in% cellParams
               ylabInd <- "j"
             }
-            if (!ValidCombination) {
-              stop("Invalid combination for Param and Param2. \n")
-            } else {
-              plot(
-                x@parameters[[Param]][Columns, 1],
-                x@parameters[[Param2]][Columns, 1],
-                xlab = bquote(.(Param)[.(ylabInd)]),
-                ylab = bquote(.(Param2)[.(ylabInd)]),
-                xlim = c(
-                  min(x@parameters[[Param]][Columns, 1]),
-                  max(x@parameters[[Param]][Columns, 1])
-                ),
-                ylim = c(
-                  min(x@parameters[[Param2]][Columns, 1]),
-                  max(x@parameters[[Param2]][Columns, 1])
-                ),
-                pch = pch,
-                col = col,
-                bty = bty,
-                ...
-              )
-            }
+            graphics::plot(
+              x@parameters[[Param]][Columns, 1],
+              x@parameters[[Param2]][Columns, 1],
+              xlab = bquote(.(Param)[.(ylabInd)]),
+              ylab = bquote(.(Param2)[.(ylabInd)]),
+              xlim = c(
+                min(x@parameters[[Param]][Columns, 1]),
+                max(x@parameters[[Param]][Columns, 1])
+              ),
+              ylim = c(
+                min(x@parameters[[Param2]][Columns, 1]),
+                max(x@parameters[[Param2]][Columns, 1])
+              ),
+              pch = pch,
+              col = col,
+              bty = bty,
+              ...
+            )
           }
         })
 
@@ -861,7 +727,6 @@ setMethod("plot",
 #'
 #' @examples
 #'
-#' # See
 #' help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Summary}}
@@ -872,10 +737,4 @@ setMethod("plot",
 #' @export
 setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
-          definition = function(object, Param = "mu")
-          {
-            if (!(Param %in% names(object@parameters))) {
-              stop("'Param' argument is invalid")
-            }
-            object@parameters[[Param]]
-          })
+          definition = HiddenGetParam)

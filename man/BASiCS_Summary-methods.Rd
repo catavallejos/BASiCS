@@ -19,8 +19,8 @@ Prints a summary of the properties of \code{object}.
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+data(ChainSC)
+show(ChainSC)
 
 }
 \author{

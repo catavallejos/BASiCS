@@ -1,52 +1,52 @@
 #include "utils.h"
 
 /* MCMC sampler for the non-spike case
- * N: Total number of MCMC draws 
- * Thin: Thinning period for MCMC chain 
- * Burn: Burning period for MCMC chain 
- * Counts: $q \times n$ matrix of expression counts
- * BatchDesign: Design matrix representing batch information 
- * (number of columns must be equal to number of batches)
- * mu0: Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ 
- * delta0: Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$
- * phi0: Starting value of $\phi=(\phi_1,...,\phi_n)$'
- * nu0: Starting value of $\nu=(\nu_1,...,\nu_n)$'
- * theta0: Starting value of $\theta$ 
- * s2mu: Prior variance for log-Normal(0, $s^2_{\mu}$) assigned to the 
- * unconstrained mean expression parameters
- * adelta: Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
- * prior assigned to each $\delta_i$ 
- * bdelta: Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
- * prior assigned to each $\delta_i$ 
- * s2delta: Prior variance for log-Normal(0, $s^2_{\delta}$) assigned to each
- * $\delta_i$
- * prior_delta: (as in HiddenBASiCS_MCMCcpp)
- * atheta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
- * prior assigned to $\theta$
- * btheta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
- * prior assigned to $\theta$
- * ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
- * LSmu0: Starting value of adaptive proposal variance of 
- * $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
- * LSdelta0: Starting value of adaptive proposal variance of 
- * $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
- * LSnu0: Starting value of adaptive proposal variance of 
- * $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
- * LStheta0: Starting value of adaptive proposal variance of $\theta$ (log-scale) 
- * sumByCellAll: Sum of expression counts by cell (all genes)
- * sumByGeneAll: Sum of expression counts by gene (all genes) 
- * StoreAdapt: (as in HiddenBASiCS_MCMCcpp)
- * EndAdapt: (as in HiddenBASiCS_MCMCcpp)
- * PrintProgress: (as in HiddenBASiCS_MCMCcpp)
- * Constrain:
- * Index:
- * RefGene:
- * RefGenes:
- * ConstrainGene:
- * NotConstrainGene:
- * ConstrainType: 
- * StochasticRef: 
- */
+* N: Total number of MCMC draws 
+* Thin: Thinning period for MCMC chain 
+* Burn: Burning period for MCMC chain 
+* Counts: $q \times n$ matrix of expression counts
+* BatchDesign: Design matrix representing batch information 
+* (number of columns must be equal to number of batches)
+* mu0: Starting value of $\mu=(\mu_1,...,\mu_q_0)'$ 
+* delta0: Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$
+* phi0: Starting value of $\phi=(\phi_1,...,\phi_n)$'
+* nu0: Starting value of $\nu=(\nu_1,...,\nu_n)$'
+* theta0: Starting value of $\theta$ 
+* s2mu: Prior variance for log-Normal(0, $s^2_{\mu}$) assigned to the 
+* unconstrained mean expression parameters
+* adelta: Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
+* prior assigned to each $\delta_i$ 
+* bdelta: Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$) 
+* prior assigned to each $\delta_i$ 
+* s2delta: Prior variance for log-Normal(0, $s^2_{\delta}$) assigned to each
+* $\delta_i$
+* prior_delta: (as in HiddenBASiCS_MCMCcpp)
+* atheta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
+* prior assigned to $\theta$
+* btheta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) 
+* prior assigned to $\theta$
+* ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
+* LSmu0: Starting value of adaptive proposal variance of 
+* $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
+* LSdelta0: Starting value of adaptive proposal variance of 
+* $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
+* LSnu0: Starting value of adaptive proposal variance of 
+* $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
+* LStheta0: Starting value of adaptive proposal variance of $\theta$ (log-scale) 
+* sumByCellAll: Sum of expression counts by cell (all genes)
+* sumByGeneAll: Sum of expression counts by gene (all genes) 
+* StoreAdapt: (as in HiddenBASiCS_MCMCcpp)
+* EndAdapt: (as in HiddenBASiCS_MCMCcpp)
+* PrintProgress: (as in HiddenBASiCS_MCMCcpp)
+* Constrain:
+* Index:
+* RefGene:
+* RefGenes:
+* ConstrainGene:
+* NotConstrainGene:
+* ConstrainType: 
+* StochasticRef: 
+*/
 // [[Rcpp::export]]
 Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     int N, 

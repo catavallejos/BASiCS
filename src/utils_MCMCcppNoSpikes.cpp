@@ -1,8 +1,8 @@
 #include "utils.h"
 
 /* Metropolis-Hastings updates of mu 
- * Updates are implemented simulateaneously for all biological genes
- */
+* Updates are implemented simulateaneously for all biological genes
+*/
 arma::mat muUpdateNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -135,6 +135,3 @@ arma::mat nuUpdateBatchNoSpikes(
   // OUTPUT
   return join_rows(nu1, ind);
 }
-
-
-

@@ -30,7 +30,14 @@ The subset can contain specific genes, cells or MCMC iterations
 }
 \examples{
 
-help(BASiCS_MCMC)
+data(ChainSC)
+
+# Extracts 3 first genes
+ChainSC1 <- subset(ChainSC, Genes = rownames(ChainSC)[1:3])
+# Extracts 3 first cells
+ChainSC2 <- subset(ChainSC, Cells = colnames(ChainSC)[1:3])
+# Extracts 10 first iterations
+ChainSC3 <- subset(ChainSC, Iterations = 1:10)
 
 }
 \author{

@@ -37,15 +37,22 @@ printed in the console. Default: \code{Progress = TRUE}.}
 }
 \description{
 Detection method for highly and lowly variable genes
-using a grid of variance contribution thresholds
+using a grid of variance contribution thresholds. Only used when 
+HVG/LVG are found based on the variance decomposition.
 }
 \details{
 See vignette
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+data(ChainSC)
+
+BASiCS_VarThresholdSearchHVG(ChainSC,
+                             VarThresholdsGrid = seq(0.55,0.65,by=0.01),
+                             EFDR = 0.10)
+BASiCS_VarThresholdSearchLVG(ChainSC,
+                             VarThresholdsGrid = seq(0.35,0.45,by=0.01),
+                             EFDR = 0.10)
 
 }
 \references{
