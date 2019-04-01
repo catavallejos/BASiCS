@@ -15,6 +15,7 @@ test_that("Dirichlet sampler", {
 
 test_that("Spikes + no regression", {
   
+  set.seed(3)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   CountsBio <- assay(Data)[!isSpike(Data),]
   q0 <- nrow(CountsBio); n <- ncol(CountsBio)
@@ -36,7 +37,7 @@ test_that("Spikes + no regression", {
                                   s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
                                   mu1 =  mu1, u = uGene, ind = indGene)
   
-  mu1 <- c(11.12,  10.38,  5.44,  8.78, 22.06)
+  mu1 <- c(6.78, 15.67,  5.43, 13.05, 24.20)
   mu1Obs <- round(Aux[1:5,1],2) 
   expect_that(all.equal(mu1, mu1Obs), is_true())
 

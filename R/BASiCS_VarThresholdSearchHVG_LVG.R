@@ -5,7 +5,8 @@
 #' a grid of variance contribution thresholds
 #'
 #' @description Detection method for highly and lowly variable genes
-#' using a grid of variance contribution thresholds
+#' using a grid of variance contribution thresholds. Only used when 
+#' HVG/LVG are found based on the variance decomposition. 
 #'
 #' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param VarThresholdsGrid Grid of values for the variance contribution
@@ -17,8 +18,14 @@
 #'
 #' @examples
 #'
-#' # See
-#' help(BASiCS_MCMC)
+#' data(ChainSC)
+#' 
+#' BASiCS_VarThresholdSearchHVG(ChainSC,
+#'                              VarThresholdsGrid = seq(0.55,0.65,by=0.01),
+#'                              EFDR = 0.10)
+#' BASiCS_VarThresholdSearchLVG(ChainSC,
+#'                              VarThresholdsGrid = seq(0.35,0.45,by=0.01),
+#'                              EFDR = 0.10)
 #'
 #' @details See vignette
 #'

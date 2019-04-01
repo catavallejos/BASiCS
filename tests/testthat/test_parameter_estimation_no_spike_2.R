@@ -3,20 +3,21 @@ context("Parameter estimation (no-spikes),
 
 test_that("Estimates match (no-spikes)", 
 {
+  set.seed(12)
   Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                   WithBatch = TRUE)
   Data2 <- newBASiCS_Data(Counts = assay(Data1)[!isSpike(Data1),],
                           Tech = isSpike(Data1)[!isSpike(Data1)],
-                          BatchInfo = colData(Data1)$BatchInfo)
+                          BatchInfo = SingleCellExperiment::colData(Data1)$BatchInfo)
   expect_that(all.equal(assay(Data1)[!isSpike(Data1),], assay(Data2)), is_true())
 
   set.seed(16)
-  Chain1 <- BASiCS_MCMC(Data1, N = 1000, Thin = 10, Burn = 500, 
+  Chain1 <- run_MCMC(Data1, N = 1000, Thin = 10, Burn = 500, 
                         Regression = FALSE, 
                         PrintProgress = FALSE, WithSpikes = FALSE)
   PostSummary1 <- Summary(Chain1)
   set.seed(16)
-  Chain2 <- BASiCS_MCMC(Data2, N = 1000, Thin = 10, Burn = 500,
+  Chain2 <- run_MCMC(Data2, N = 1000, Thin = 10, Burn = 500,
                         Regression = FALSE, WithSpikes = FALSE, 
                         PrintProgress = FALSE)
   PostSummary2 <- Summary(Chain2)

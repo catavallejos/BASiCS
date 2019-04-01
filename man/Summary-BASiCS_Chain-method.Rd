@@ -23,7 +23,8 @@ the high posterior density interval (probabilty equal to \code{prob})
 }
 \examples{
 
-help(BASiCS_MCMC)
+data(ChainSC)
+SummarySC <- Summary(ChainSC)
 
 }
 \author{

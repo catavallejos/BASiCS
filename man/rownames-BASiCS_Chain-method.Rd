@@ -19,7 +19,8 @@ Returns the labels of gene-specific BASiCS parameters
 }
 \examples{
 
-help(BASiCS_MCMC)
+data(ChainSC)
+rownames(ChainSC)
 
 }
 \author{

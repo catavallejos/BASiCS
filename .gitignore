@@ -11,3 +11,4 @@ inst/doc
 */.DS_Store
 tests/testthat/*.Rds
 vignettes/.build.timestamp
+BASiCS.Rproj

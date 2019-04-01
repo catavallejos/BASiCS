@@ -2,6 +2,7 @@ context("plots")
 
 test_that("plot of BASiCS_Summary works without spikes", {
   # Data example
+  set.seed(19)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
   set.seed(42)
   n <- ncol(Data)
@@ -17,7 +18,7 @@ test_that("plot of BASiCS_Summary works without spikes", {
     WithSpikes = FALSE)
 
   capture.output(
-    Chain <- BASiCS_MCMC(
+    Chain <- run_MCMC(
       Data = Data,
       N = 100,
       Thin = 10,
@@ -26,7 +27,6 @@ test_that("plot of BASiCS_Summary works without spikes", {
       Regression = FALSE,
       WithSpikes = FALSE)
   )
-  print(plot)
   S <- Summary(Chain)
   pdf(NULL)
   expect_error(plot(S), NA)
@@ -36,7 +36,7 @@ test_that("plot of BASiCS_Summary works without spikes", {
 test_that("plot works for BASiCS_Chain (non-regression, spikes)", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -44,21 +44,21 @@ test_that("plot works for BASiCS_Chain (non-regression, spikes)", {
     PrintProgress = FALSE,
     Regression = FALSE,
     WithSpikes = TRUE)
-
+  pdf(NULL)
   plot(Chain, Param = "mu", Gene = 1)
   plot(Chain, Param = "delta", Gene = 1)
   plot(Chain, Param = "phi", Cell = 1)
   plot(Chain, Param = "s", Cell = 1)
   plot(Chain, Param = "nu", Cell = 1)
   plot(Chain, Param = "theta")
-
+  dev.off()
 })
 
 test_that("plot works for BASiCS_Chain (regression, no spikes)", {
 
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -67,6 +67,7 @@ test_that("plot works for BASiCS_Chain (regression, no spikes)", {
     Regression = TRUE,
     WithSpikes = FALSE)
 
+  pdf(NULL)
   expect_error({
     plot(Chain, Param = "mu", Gene = 1)
     plot(Chain, Param = "delta", Gene = 1)
@@ -76,12 +77,13 @@ test_that("plot works for BASiCS_Chain (regression, no spikes)", {
     plot(Chain, Param = "theta")
     plot(Chain, Param = "beta", RegressionTerm = 1)
   }, NA)
+  dev.off()
 })
 
 test_that("plot works for BASiCS_Summary with all valid combinations", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -91,6 +93,7 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
     WithSpikes = TRUE)
 
   SChain <- Summary(Chain)
+  pdf(NULL)
   expect_error({
     plot(SChain, Param = "mu", Param2 = "delta")
     plot(SChain, Param = "mu", Param2 = "epsilon")
@@ -101,13 +104,14 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
     plot(SChain, Param = "sigma2")
     plot(SChain, Param = "beta")
   }, NA)
+  dev.off()
 })
 
 
 test_that("BASiCS_showFit works", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
-  Chain <- BASiCS_MCMC(
+  Chain <- run_MCMC(
     Data = Data,
     N = 100,
     Thin = 10,
@@ -116,8 +120,66 @@ test_that("BASiCS_showFit works", {
     Regression = TRUE,
     WithSpikes = TRUE)
 
+  pdf(NULL)
   expect_error({
     BASiCS_showFit(Chain, smooth = TRUE)
     BASiCS_showFit(Chain, smooth = FALSE)
   }, NA)
+  dev.off()
+
+})
+
+
+test_that("Diagnostic plot works", {
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+  set.seed(42)
+  Chain <- run_MCMC(
+    Data = Data,
+    N = 100,
+    Thin = 10,
+    Burn = 10,
+    PrintProgress = FALSE,
+    Regression = TRUE,
+    WithSpikes = TRUE)
+  g <- BASiCS_diagPlot(Chain)
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagPlot(Chain, Param = "delta")
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagPlot(Chain, Param = "epsilon")
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  expect_is(g, "ggplot")
+  expect_error(
+    BASiCS_diagPlot(Chain, Param = "nu", x = "mu", y = "epsilon"),
+    "Invalid combination of parameters"
+  )
+  expect_error(
+    BASiCS_diagPlot(Chain, Param = "delta", x = "delta", y = "nu"),
+    "Invalid combination of parameters:"
+  )
+  g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  expect_is(g, "ggplot")
+
+})
+
+
+test_that("Diagnostic hist work", {
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
+  set.seed(42)
+  Chain <- run_MCMC(
+    Data,
+    N = 100,
+    Thin = 10,
+    Burn = 10,
+    PrintProgress = FALSE,
+    Regression = TRUE,
+    WithSpikes = TRUE)
+  g <- BASiCS_diagHist(Chain)
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagHist(Chain, Param = "delta")
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagHist(Chain, Param = "nu")
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagHist(Chain, Param = "nu")
+  expect_is(g, "ggplot")
 })
