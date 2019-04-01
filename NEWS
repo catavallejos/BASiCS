@@ -1127,3 +1127,6 @@ version 1.5.19 (2019-03-31)
 version 1.5.20 (2019-04-01)
 - Updated documentation for `BASiCS_MCMC`, `BASiCS_DetectHVG`, 
 `BASiCS_DetectLVG` and `BASiCS_VarThresholdSearchHVG_LVG`
+
+version 1.5.21 (2019-04-01)
+- Uses buil-in chain in examples of `BASiCS_diagHist` and `BASiCS_diagPlot`
