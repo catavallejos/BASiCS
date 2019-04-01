@@ -45,3 +45,20 @@ HiddenGetParam <- function(object, Param = "mu") {
   object@parameters[[Param]]
 }
 
+HiddenCheckValidCombination <- function(...) {
+  Params <- list(...)
+  Check1 <- vapply(Params, 
+                   FUN = function(x) is.null(x) || x %in% HiddenGeneParams(),
+                   FUN.VALUE = TRUE)
+  Check2 <- vapply(Params, 
+                   FUN = function(x) is.null(x) || x  %in% HiddenCellParams(),
+                   FUN.VALUE = TRUE)
+  
+  if (!(all(Check1) || all(Check2))) {
+    stop(paste("Invalid combination of parameters:",
+               paste(list(...), collapse = ", "), " \n"))
+  } 
+}
+
+HiddenGeneParams <- function() c("mu", "delta", "epsilon")
+HiddenCellParams <- function() c("s", "phi", "nu")

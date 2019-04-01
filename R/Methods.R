@@ -127,7 +127,8 @@ setMethod("updateObject",
 #'
 #' @examples
 #'
-#' # see help(BASiCS_MCMC)
+#' data(ChainSC)
+#' SummarySC <- Summary(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -176,7 +177,14 @@ setMethod("Summary",
 #'
 #' @examples
 #'
-#' # see help(BASiCS_MCMC)
+#' data(ChainSC)
+#' 
+#' # Extracts 3 first genes
+#' ChainSC1 <- subset(ChainSC, Genes = rownames(ChainSC)[1:3])
+#' # Extracts 3 first cells
+#' ChainSC2 <- subset(ChainSC, Cells = colnames(ChainSC)[1:3])
+#' # Extracts 10 first iterations
+#' ChainSC3 <- subset(ChainSC, Iterations = 1:10)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
@@ -262,7 +270,8 @@ setMethod("subset",
 #'
 #' @examples
 #'
-#' # see help(BASiCS_MCMC)
+#' data(ChainSC)
+#' colnames(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' 
@@ -287,7 +296,8 @@ setMethod("colnames",
 #'
 #' @examples
 #'
-#' # see help(BASiCS_MCMC)
+#' data(ChainSC)
+#' rownames(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
@@ -329,7 +339,7 @@ setMethod("rownames",
 #'
 #' @examples
 #'
-#' # see help(BASiCS_MCMC)
+#' help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -400,9 +410,8 @@ setMethod("plot",
             
           })
 
-#' @export
-setMethod("plot", signature = "ANY", graphics::plot)
-
+# #' @export
+#setMethod("plot", signature = "ANY", graphics::plot)
 
 #' @name displayChainBASiCS-BASiCS_Chain-method
 #' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_Chain-method
@@ -424,7 +433,7 @@ setMethod("plot", signature = "ANY", graphics::plot)
 #'
 #' @examples
 #'
-#' # See help(BASiCS_MCMC)
+#' help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
@@ -452,7 +461,8 @@ setMethod("displayChainBASiCS",
 #'
 #' @examples
 #'
-#' # See help(BASiCS_MCMC)
+#' data(ChainSC)
+#' show(ChainSC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -537,7 +547,7 @@ setMethod("show",
 #'
 #' @examples
 #'
-#' # See help(BASiCS_MCMC)
+#' help(BASiCS_MCMC)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -717,7 +727,7 @@ setMethod("plot",
 #'
 #' @examples
 #'
-#' # See help(BASiCS_MCMC)
+#' help(BASiCS_MCMC)
 #'
 #' @seealso \code{\linkS4class{BASiCS_Summary}}
 #'
@@ -728,17 +738,3 @@ setMethod("plot",
 setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
           definition = HiddenGetParam)
-
-
-
-HiddenCheckValidCombination <- function(...) {
-  Params <- list(...)
-  if (!(all(sapply(Params, function(x) is.null(x) || x %in% HiddenGeneParams())) || 
-        all(sapply(Params, function(x) is.null(x) || x  %in% HiddenCellParams())))) {
-    stop(paste("Invalid combination of parameters:",
-               paste(list(...), collapse = ", "), " \n"))
-  } 
-}
-
-HiddenGeneParams <- function() c("mu", "delta", "epsilon")
-HiddenCellParams <- function() c("s", "phi", "nu")

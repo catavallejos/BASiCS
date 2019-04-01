@@ -83,7 +83,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     Rho <- matrix(1, ncol = n, nrow = q.bio)
     # Simulated cell-specific random effects
     if (all(Theta > 0)) {
-      set.seed(1000)
+#      set.seed(1000)
       Nu <- rgamma(n, shape = 1/Theta, rate = 1/(S * Theta))
     }
     else {
@@ -95,15 +95,15 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
       # Biological genes
       if (i <= q.bio) {
         if (Delta[i] > 0) {
-          set.seed(i)
+#          set.seed(i)
           Rho[i, ] <- rgamma(n, shape = 1/Delta[i], rate = 1/Delta[i])
         }
-        set.seed(i + 10000)
+#        set.seed(i + 10000)
         Counts.sim[i, ] <- rpois(n, lambda = Phi * Nu * Rho[i, ] * Mu[i])
       }
       else {
         # Technical genes
-        set.seed(i + 20000)
+#        set.seed(i + 20000)
         Counts.sim[i, ] <- rpois(n, lambda = Nu * Mu[i])
       }
     }
@@ -136,7 +136,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     # Simulated cell-specific random effects
     Phi[seq_len(15)] <- 2 * Phi[seq_len(15)]
     if (all(Theta > 0)) {
-      set.seed(1000)
+ #     set.seed(1000)
       Nu <- rgamma(n, shape = 1 / Theta, rate = 1 / (Phi * Theta))
     }
     else {
@@ -146,10 +146,10 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     # Simulated counts data
     for (i in seq_len(q.bio)) {
       if (Delta[i] > 0) {
-        set.seed(i)
+ #       set.seed(i)
         Rho[i, ] <- rgamma(n, shape = 1 / Delta[i], rate = 1 / Delta[i])
       }
-      set.seed(i + 10000)
+ #     set.seed(i + 10000)
       Counts.sim[i, ] <- rpois(n, lambda = Nu * Rho[i, ] * Mu[i])
     }
     rownames(Counts.sim) <- paste0("Gene", seq_len(q.bio))

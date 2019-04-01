@@ -1129,4 +1129,13 @@ version 1.5.20 (2019-04-01)
 `BASiCS_DetectLVG` and `BASiCS_VarThresholdSearchHVG_LVG`
 
 version 1.5.21 (2019-04-01)
-- Uses buil-in chain in examples of `BASiCS_diagHist` and `BASiCS_diagPlot`
+- Uses built-in chain in examples for `BASiCS_diagHist` and `BASiCS_diagPlot`
+
+version 1.5.22 (2019-04-02)
+- `HiddenCheckValidCombination`, `HiddenGeneParams` and `HiddenGeneParams`
+moved from `Methods.R` to `HiddenUtils.R`
+- `sapply` replaced by `vapply` in `HiddenCheckValidCombination`,  
+`HiddenThresholdSearchDetectHVL_LVG.R` and `HiddenThresholdSearchTestDE.R`
+- Use of `set.seed` removed from `makeExampleBASiCS_Data` 
+- Unit tests updated accordingly
+- Adds missing running examples to Rds in order to pass R CMD BioCheck

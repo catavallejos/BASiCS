@@ -15,7 +15,7 @@ BASiCS_diagPlot(object, Param = "mu", x = NULL, y = NULL,
 if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-\code{'sigma2'} and \code{'epsilon'}.}
+\code{'sigma2'} and \code{'epsilon'}. Default \code{Param = 'mu'}}
 
 \item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
 respectively. If neither is supplied, Param will be plotted on the x axis
@@ -38,19 +38,13 @@ for more details on this diagnostic measure.
 }
 \examples{
 
-# Built-in simulated dataset
-Data <- makeExampleBASiCS_Data()
-# To analyse real data, please refer to the instructions in:
-# https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
+# Built-in example chain
+data(ChainSC)
 
-# Only a short run of the MCMC algorithm for illustration purposes
-# Longer runs migth be required to reach convergence
-Chain <- BASiCS_MCMC(Data, N = 10, Thin = 2, Burn = 4, Regression = FALSE,
-                     PrintProgress = FALSE, WithSpikes = TRUE)
-# Plot effective sample size for mu (y) against mu, coloured by density
-BASiCS_diagPlot(Chain)
+# Point estimates versus effective sample size
+BASiCS_diagPlot(ChainSC, Param = "mu")
 # Effective sample size as colour, mu as x, delta as y.
-BASiCS_diagPlot(Chain, x = "mu", y = "delta")
+BASiCS_diagPlot(ChainSC, x = "mu", y = "delta")
 
 }
 \seealso{

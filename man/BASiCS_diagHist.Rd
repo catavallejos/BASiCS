@@ -13,7 +13,7 @@ BASiCS_diagHist(object, Param = NULL, na.rm = FALSE)
 if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-\code{'sigma2'} and \code{'epsilon'}.}
+\code{'sigma2'} and \code{'epsilon'}. Default \code{Param = NULL}.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
@@ -28,21 +28,14 @@ more details.
 }
 \examples{
 
-# See help(BASiCS_MCMC)
+# Built-in example chain
+data(ChainSC)
 
-# Built-in simulated dataset
-Data <- makeExampleBASiCS_Data()
-# To analyse real data, please refer to the instructions in:
-# https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
-
-# Only a short run of the MCMC algorithm for illustration purposes
-# Longer runs migth be required to reach convergence
-Chain <- BASiCS_MCMC(Data, N = 10, Thin = 2, Burn = 4, Regression = FALSE,
-                     PrintProgress = FALSE, WithSpikes = TRUE)
 # See effective sample size distribution across all parameters
-BASiCS_diagHist(Chain)
+BASiCS_diagHist(ChainSC)
 # For mu only
-BASiCS_diagHist(Chain, Param = "mu")
+BASiCS_diagHist(ChainSC, Param = "mu")
+
 }
 \seealso{
 \code{\linkS4class{BASiCS_Chain}}

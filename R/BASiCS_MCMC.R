@@ -108,6 +108,7 @@
 #' @examples
 #'
 #' # Built-in simulated dataset
+#' set.seed(1) 
 #' Data <- makeExampleBASiCS_Data()
 #' # To analyse real data, please refer to the instructions in:
 #' # https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
@@ -123,6 +124,7 @@
 #'
 #' # To run the non-spike version BASiCS requires the data to contain at least
 #' # 2 batches:
+#' set.seed(2)
 #' Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
 #'                      PrintProgress = FALSE, WithSpikes = FALSE)
