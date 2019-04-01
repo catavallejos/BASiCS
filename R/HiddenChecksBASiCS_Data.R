@@ -40,12 +40,12 @@ HiddenChecksBASiCS_Data <- function(Counts,
       errors <- c(errors, "Spike-in assignment is not compatible with data.")
     }
 
-    if (sum(matrixStats::colSums2(Counts[Tech, ]) == 0) > 0) {
+    if (sum(matrixStats::colSums2(Counts[Tech, , drop = FALSE]) == 0) > 0) {
       errors <- c(errors, "Some cells have zero reads mapping back to the
                   spike-in genes. Please remove these before running the MCMC.")
     }
 
-    if (sum(matrixStats::colSums2(Counts[!Tech, ]) == 0) > 0) {
+    if (sum(matrixStats::colSums2(Counts[!Tech, , drop = FALSE]) == 0) > 0) {
       errors <- c(errors, "Some cells have zero reads mapping back to the
                   intrinsic genes. Please remove them before running the MCMC.")
     }
