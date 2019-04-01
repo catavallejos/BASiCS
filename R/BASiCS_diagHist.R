@@ -28,7 +28,10 @@
 #' # Longer runs migth be required to reach convergence
 #' Chain <- BASiCS_MCMC(Data, N = 10, Thin = 2, Burn = 4, Regression = FALSE,
 #'                      PrintProgress = FALSE, WithSpikes = TRUE)
-#' 
+#' # See effective sample size distribution across all parameters
+#' BASiCS_diagHist(Chain)
+#' # For mu only
+#' BASiCS_diagHist(Chain, Param = "mu")
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
