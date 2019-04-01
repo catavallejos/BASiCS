@@ -16,12 +16,16 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
     ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
 
     if (is.null(GenesSelect)) {
-      EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob)
-      EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob)
+      EFDRgrid <- vapply(ProbThresholds, FUN = HiddenEFDR, 
+                         FUN.VALUE = 1, Prob = Prob)
+      EFNRgrid <- vapply(ProbThresholds, FUN = HiddenEFNR, 
+                         FUN.VALUE = 1, Prob = Prob)
     }
     else {
-      EFDRgrid <- sapply(ProbThresholds, HiddenEFDR, Prob = Prob[GenesSelect])
-      EFNRgrid <- sapply(ProbThresholds, HiddenEFNR, Prob = Prob[GenesSelect])
+      EFDRgrid <- vapply(ProbThresholds, FUN = HiddenEFDR, 
+                         FUN.VALUE = 1, Prob = Prob[GenesSelect])
+      EFNRgrid <- vapply(ProbThresholds, FUN = HiddenEFNR, 
+                         FUN.VALUE = 1, Prob = Prob[GenesSelect])
     }
 
     above <- abs(EFDRgrid - EFDR)

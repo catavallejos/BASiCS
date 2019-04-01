@@ -3,6 +3,7 @@ context("Parameter estimation (no-spikes),
 
 test_that("Estimates match (no-spikes)", 
 {
+  set.seed(12)
   Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                   WithBatch = TRUE)
   Data2 <- newBASiCS_Data(Counts = assay(Data1)[!isSpike(Data1),],

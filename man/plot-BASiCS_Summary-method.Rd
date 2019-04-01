@@ -66,7 +66,7 @@ A plot object
 }
 \examples{
 
-# See help(BASiCS_MCMC)
+help(BASiCS_MCMC)
 
 }
 \author{

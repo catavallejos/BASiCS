@@ -2,6 +2,7 @@ context("plots")
 
 test_that("plot of BASiCS_Summary works without spikes", {
   # Data example
+  set.seed(19)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
   set.seed(42)
   n <- ncol(Data)

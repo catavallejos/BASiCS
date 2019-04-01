@@ -25,7 +25,7 @@ Accessors for the slots of a \code{\linkS4class{BASiCS_Chain}}
 }
 \examples{
 
-# See help(BASiCS_MCMC)
+help(BASiCS_MCMC)
 
 }
 \seealso{

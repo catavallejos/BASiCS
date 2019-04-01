@@ -1,14 +1,13 @@
 language: r
 
 r: bioc-devel
-bioc_check: true  
 
 # Strict checks in place
 warnings_are_errors: false
 
 branches:
   only:
-    - Devel
+    - master
 
 r_github_packages:
   - jimhester/covr
