@@ -3,11 +3,16 @@
 #'
 #' @title Detection method for highly (HVG) and lowly (LVG) variable genes
 #'
-#' @description Functions to detect highly and lowly variable genes
+#' @description Functions to detect highly and lowly variable genes. If the 
+#' `BASiCS_Chain`` object was generated using the regression approach,
+#' `BASiCS`` finds the top highly variable genes based on the posteriors of the 
+#' epsilon parameters. Otherwise, the old approach is used, which initially 
+#' performs a variance decomposition.
 #'
 #' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param PercentileThreshold Threshold to detect a percentile of variable genes
-#' (must be a positive value, between 0 and 1). Defaults: 0.9 for HVG, 0.1 for LVG
+#' (must be a positive value, between 0 and 1). Defaults: 0.9 for HVG (top 10%), 
+#' 0.1 for LVG (bottom 10%)
 #' @param VarThreshold Variance contribution threshold
 #' (must be a positive value, between 0 and 1). This is only used when the 
 #' BASiCS non-regression model was used to generate the Chain object.
@@ -59,8 +64,24 @@
 #' }
 #'
 #' @examples
+#' 
+#' # Loads short example chain (non-regression implementation)
+#' data(ChainSC)
 #'
-#' # See help(BASiCS_MCMC)
+#' #' # Highly and lowly variable genes detection (within a single group of cells)
+#' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60,
+#'                               EFDR = 0.10, Plot = TRUE)
+#' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40,
+#'                               EFDR = 0.10, Plot = TRUE)
+#'                               
+#' # Loads short example chain (regression implementation)
+#' data(ChainSCReg)
+#'
+#' #' # Highly and lowly variable genes detection (within a single group of cells)
+#' DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.90,
+#'                               EFDR = 0.10, Plot = TRUE)
+#' DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.10,
+#'                               EFDR = 0.10, Plot = TRUE)
 #'
 #' @details See vignette
 #'

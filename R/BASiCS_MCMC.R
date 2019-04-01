@@ -170,26 +170,6 @@
 #' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x',
 #'      SmoothPlot = TRUE)
 #'
-#' # Highly and lowly variable genes detection (within a single group of cells)
-#' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60,
-#'                               EFDR = 0.10, Plot = TRUE)
-#' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40,
-#'                               EFDR = 0.10, Plot = TRUE)
-#'
-#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
-#' with(DetectHVG$Table, points(Mu[HVG], Delta[HVG],
-#'        pch = 16, col = 'red', cex = 1))
-#' with(DetectLVG$Table, points(Mu[LVG], Delta[LVG],
-#'        pch = 16, col = 'blue', cex = 1))
-#'
-#' # If variance thresholds are not fixed
-#' BASiCS_VarThresholdSearchHVG(ChainSC,
-#'                              VarThresholdsGrid = seq(0.55,0.65,by=0.01),
-#'                              EFDR = 0.10)
-#' BASiCS_VarThresholdSearchLVG(ChainSC,
-#'                              VarThresholdsGrid = seq(0.35,0.45,by=0.01),
-#'                              EFDR = 0.10)
-#'
 #' # To obtain denoised rates / counts, see:
 #' # help(BASiCS_DenoisedRates)
 #' # and
@@ -197,7 +177,6 @@
 #'
 #' # For examples of differential analyses between 2 populations of cells see:
 #' # help(BASiCS_TestDE)
-#'
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
