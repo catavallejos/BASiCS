@@ -132,6 +132,7 @@ arma::mat deltaUpdateReg(
     arma::vec const& beta,
     double exponent)
 {
+  using arma::span;
 
   /* PROPOSAL STEP */
   delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
@@ -141,8 +142,8 @@ arma::mat deltaUpdateReg(
   * Note: there is a -1 factor coming from the log-normal prior.
   * However, it cancels out as using log-normal proposals.
   */
-  arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
-  log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  arma::vec log_aux = - n * (lgamma_cpp(1 / delta1) - lgamma_cpp(1 / delta0));
+  log_aux -= n * ((log(delta1) / delta1) - (log(delta0) / delta0));
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
       log_aux(i) += std::lgamma(Counts(i, j) + (1 / delta1(i)));
@@ -158,7 +159,8 @@ arma::mat deltaUpdateReg(
   // The next operations are equivalent; second one a is simplified version
   //  log_aux -= lambda % (pow(log(delta1) - X * beta, 2) -
   //    pow(log(delta0) - X * beta, 2)) / (2 * sigma2);
-  log_aux -= exponent * lambda % (pow(log(delta1), 2) - pow(log(delta0), 2) -
+  log_aux -= exponent * lambda %
+    (pow(log(delta1), 2) - pow(log(delta0), 2) -
     2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG

@@ -225,7 +225,8 @@ arma::mat muUpdateNoSpikes(
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
-    int const& ConstrainType);
+    int const& ConstrainType,
+    double exponent);
 
 arma::mat nuUpdateBatchNoSpikes(
     arma::vec const& nu0, 
@@ -241,7 +242,8 @@ arma::mat nuUpdateBatchNoSpikes(
     int const& n,
     arma::vec & nu1,
     arma::vec & u,
-    arma::vec & ind);
+    arma::vec & ind,
+    double exponent);
 
 /* Declarations for functions used by the MCMC sampler for the regression and 
  * non-spikes case
@@ -272,7 +274,8 @@ arma::mat muUpdateRegNoSpikes(
     arma::vec const& beta,
     arma::mat const& X,
     double const& sigma2,
-    double variance);
+    double variance,
+    double exponent);
 
 arma::mat deltaUpdateRegNoSpikes(
     arma::vec const& delta0,
@@ -288,6 +291,7 @@ arma::mat deltaUpdateRegNoSpikes(
     arma::vec const& lambda,
     arma::mat const& X,
     double const& sigma2,
-    arma::vec const& beta);
+    arma::vec const& beta,
+    double exponent);
   
 #endif

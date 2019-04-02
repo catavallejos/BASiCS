@@ -1,52 +1,52 @@
 #include "utils.h"
 
 /* MCMC sampler for the non-spike case
- * N: Total number of MCMC draws
- * Thin: Thinning period for MCMC chain
- * Burn: Burning period for MCMC chain
- * Counts: $q \times n$ matrix of expression counts
- * BatchDesign: Design matrix representing batch information
- * (number of columns must be equal to number of batches)
- * mu0: Starting value of $\mu=(\mu_1,...,\mu_q_0)'$
- * delta0: Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$
- * phi0: Starting value of $\phi=(\phi_1,...,\phi_n)$'
- * nu0: Starting value of $\nu=(\nu_1,...,\nu_n)$'
- * theta0: Starting value of $\theta$
- * s2mu: Prior variance for log-Normal(0, $s^2_{\mu}$) assigned to the
- * unconstrained mean expression parameters
- * adelta: Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$)
- * prior assigned to each $\delta_i$
- * bdelta: Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$)
- * prior assigned to each $\delta_i$
- * s2delta: Prior variance for log-Normal(0, $s^2_{\delta}$) assigned to each
- * $\delta_i$
- * prior_delta: (as in HiddenBASiCS_MCMCcpp)
- * atheta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$)
- * prior assigned to $\theta$
- * btheta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$)
- * prior assigned to $\theta$
- * ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
- * LSmu0: Starting value of adaptive proposal variance of
- * $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
- * LSdelta0: Starting value of adaptive proposal variance of
- * $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
- * LSnu0: Starting value of adaptive proposal variance of
- * $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
- * LStheta0: Starting value of adaptive proposal variance of $\theta$ (log-scale)
- * sumByCellAll: Sum of expression counts by cell (all genes)
- * sumByGeneAll: Sum of expression counts by gene (all genes)
- * StoreAdapt: (as in HiddenBASiCS_MCMCcpp)
- * EndAdapt: (as in HiddenBASiCS_MCMCcpp)
- * PrintProgress: (as in HiddenBASiCS_MCMCcpp)
- * Constrain:
- * Index:
- * RefGene:
- * RefGenes:
- * ConstrainGene:
- * NotConstrainGene:
- * ConstrainType:
- * StochasticRef:
- */
+* N: Total number of MCMC draws
+* Thin: Thinning period for MCMC chain
+* Burn: Burning period for MCMC chain
+* Counts: $q \times n$ matrix of expression counts
+* BatchDesign: Design matrix representing batch information
+* (number of columns must be equal to number of batches)
+* mu0: Starting value of $\mu=(\mu_1,...,\mu_q_0)'$
+* delta0: Starting value of $\delta=(\delta_1,...,\delta_{q_0})'$
+* phi0: Starting value of $\phi=(\phi_1,...,\phi_n)$'
+* nu0: Starting value of $\nu=(\nu_1,...,\nu_n)$'
+* theta0: Starting value of $\theta$
+* s2mu: Prior variance for log-Normal(0, $s^2_{\mu}$) assigned to the
+* unconstrained mean expression parameters
+* adelta: Shape hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$)
+* prior assigned to each $\delta_i$
+* bdelta: Rate hyper-parameter of the Gamma($a_{\delta}$,$b_{\delta}$)
+* prior assigned to each $\delta_i$
+* s2delta: Prior variance for log-Normal(0, $s^2_{\delta}$) assigned to each
+* $\delta_i$
+* prior_delta: (as in HiddenBASiCS_MCMCcpp)
+* atheta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$)
+* prior assigned to $\theta$
+* btheta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$)
+* prior assigned to $\theta$
+* ar: Optimal acceptance rate for adaptive Metropolis-Hastings updates
+* LSmu0: Starting value of adaptive proposal variance of
+* $\mu=(\mu_1,...,\mu_q_0)'$ (log-scale)
+* LSdelta0: Starting value of adaptive proposal variance of
+* $\delta=(\delta_1,...,\delta_{q_0})'$ (log-scale)
+* LSnu0: Starting value of adaptive proposal variance of
+* $\nu=(\nu_1,...,\nu_n)'$ (log-scale)
+* LStheta0: Starting value of adaptive proposal variance of $\theta$ (log-scale)
+* sumByCellAll: Sum of expression counts by cell (all genes)
+* sumByGeneAll: Sum of expression counts by gene (all genes)
+* StoreAdapt: (as in HiddenBASiCS_MCMCcpp)
+* EndAdapt: (as in HiddenBASiCS_MCMCcpp)
+* PrintProgress: (as in HiddenBASiCS_MCMCcpp)
+* Constrain:
+* Index:
+* RefGene:
+* RefGenes:
+* ConstrainGene:
+* NotConstrainGene:
+* ConstrainType:
+* StochasticRef:
+*/
 // [[Rcpp::export]]
 Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     int N,
@@ -96,7 +96,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   // NUMBER OF CELLS, GENES AND STORED DRAWS
   int n = Counts.ncol();
   int q0 = Counts.nrow();
-  int Naux = N/Thin - Burn/Thin;
+  int Naux = N / Thin - Burn / Thin;
   int nBatch = BatchDesign.ncol();
 
   // TRANSFORMATION TO ARMA ELEMENTS
@@ -110,7 +110,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec RefGenes_arma = as_arma(RefGenes);
 
   // OTHER GLOBAL QUANTITIES
-  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  arma::vec BatchSizes = sum(BatchDesign_arma, 0).t();
 
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(Naux, q0);
@@ -253,7 +253,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                              RefGene,
                              ConstrainGene_arma,
                              NotConstrainGene_arma,
-                             ConstrainType);
+                             ConstrainType,
+                             geneExponent);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -278,8 +279,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                            u_q0,
                            ind_q0,
                            geneExponent);
+
     PdeltaAux += deltaAux.col(1);
-    if (i>=Burn) {
+    if (i >= Burn) {
       deltaAccept += deltaAux.col(1);
     }
 
@@ -299,7 +301,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                   n,
                                   y_n,
                                   u_n,
-                                  ind_n);
+                                  ind_n,
+                                  cellExponent);
 
     PnuAux += nuAux.col(1);
     if (i >= Burn) {
@@ -310,22 +313,25 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     if (i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
       if (Ibatch == 50) {
-        PmuAux = PmuAux/(50-RefFreq);
-        PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
-        LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) + PmuAux.elem(find(Index_arma != RefGene))*0.1;
-        PdeltaAux = PdeltaAux/50;
-        PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
-        LSdeltaAux = LSdeltaAux+PdeltaAux*0.1;
-        PnuAux = PnuAux/50;
-        PnuAux = -1+2*arma::conv_to<arma::mat>::from(PnuAux>ar);
-        LSnuAux = LSnuAux+PnuAux*0.1;
-        PthetaAux = PthetaAux/50;
-        PthetaAux = -1+2*arma::conv_to<arma::mat>::from(PthetaAux>ar);
-        LSthetaAux = LSthetaAux + PthetaAux*0.1;
+        PmuAux = PmuAux / (50 - RefFreq);
+        PmuAux = -1 + 2 * arma::conv_to<arma::mat>::from(PmuAux>ar);
+        LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) +
+          PmuAux.elem(find(Index_arma != RefGene)) * 0.1;
+        PdeltaAux = PdeltaAux / 50;
+        PdeltaAux = -1 + 2 * arma::conv_to<arma::mat>::from(PdeltaAux>ar);
+        LSdeltaAux = LSdeltaAux+PdeltaAux * 0.1;
+        PnuAux = PnuAux / 50;
+        PnuAux = -1 + 2 * arma::conv_to<arma::mat>::from(PnuAux>ar);
+        LSnuAux = LSnuAux+PnuAux * 0.1;
+        PthetaAux = PthetaAux / 50;
+        PthetaAux = -1 + 2 * arma::conv_to<arma::mat>::from(PthetaAux>ar);
+        LSthetaAux = LSthetaAux + PthetaAux * 0.1;
 
         Ibatch = 0;
-        PmuAux = PmuAux0; PdeltaAux = PdeltaAux0;
-        PnuAux = PnuAux0; PthetaAux = PthetaAux0;
+        PmuAux = PmuAux0;
+        PdeltaAux = PdeltaAux0;
+        PnuAux = PnuAux0;
+        PthetaAux = PthetaAux0;
       }
     }
 

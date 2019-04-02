@@ -290,7 +290,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 betaAux,
                                 X,
                                 sigma2Aux,
-                                variance);
+                                variance,
+                                geneExponent);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -315,7 +316,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                       lambdaAux,
                                       X,
                                       sigma2Aux,
-                                      betaAux);
+                                      betaAux,
+                                      geneExponent);
 
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
@@ -338,7 +340,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   n,
                                   y_n,
                                   u_n,
-                                  ind_n);
+                                  ind_n,
+                                  cellExponent);
 
     PnuAux += nuAux.col(1);
     if (i >= Burn) {

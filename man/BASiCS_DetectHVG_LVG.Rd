@@ -4,19 +4,26 @@
 \alias{BASiCS_DetectHVG}
 \alias{BASiCS_DetectHVG_LVG}
 \alias{BASiCS_DetectLVG}
-\title{Detection method for highly and lowly variable genes}
+\title{Detection method for highly (HVG) and lowly (LVG) variable genes}
 \usage{
-BASiCS_DetectHVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
-  OrderVariable = "Prob", Plot = FALSE, ...)
+BASiCS_DetectHVG(Chain, PercentileThreshold = 0.9, VarThreshold = NULL,
+  ProbThreshold = NULL, EFDR = 0.1, OrderVariable = "Prob",
+  Plot = FALSE, ...)
 
-BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
-  OrderVariable = "Prob", Plot = FALSE, ...)
+BASiCS_DetectLVG(Chain, PercentileThreshold = 0.1, VarThreshold = NULL,
+  ProbThreshold = NULL, EFDR = 0.1, OrderVariable = "Prob",
+  Plot = FALSE, ...)
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
+\item{PercentileThreshold}{Threshold to detect a percentile of variable genes
+(must be a positive value, between 0 and 1). Defaults: 0.9 for HVG (top 10 
+percent), 0.1 for LVG (bottom 10 percent)}
+
 \item{VarThreshold}{Variance contribution threshold
-(must be a positive value, between 0 and 1)}
+(must be a positive value, between 0 and 1). This is only used when the 
+BASiCS non-regression model was used to generate the Chain object.}
 
 \item{ProbThreshold}{Optional parameter. Posterior probability threshold
 (must be a positive value, between 0 and 1)}
@@ -25,19 +32,17 @@ BASiCS_DetectLVG(Chain, VarThreshold, ProbThreshold = NULL, EFDR = 0.1,
 to HVG/LVG detection (default = 0.10)}
 
 \item{OrderVariable}{Ordering variable for output.
-Possible values: \code{'GeneIndex'}, \code{'Mu'},
- \code{'Delta'}, \code{'Sigma'} and \code{'Prob'}.}
+Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.}
 
 \item{Plot}{If \code{Plot = TRUE} error control and
-expression versus HVG/LVG
-probability plots are generated}
+expression versus HVG/LVG probability plots are generated}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
 }
 \value{
 \code{BASiCS_DetectHVG} returns a list of 4 elements:
 \describe{
-\item{\code{Table}}{Matrix whose columns contain}
+\item{\code{Table}}{Matrix whose columns can contain}
    \describe{
    \item{\code{GeneIndex}}{Vector of length \code{q.bio}.
         Gene index as in the order present in the analysed
@@ -54,32 +59,53 @@ probability plots are generated}
    \item{\code{Sigma}}{Vector of length \code{q.bio}.
          For each biological gene, proportion of the total variability
          that is due to a biological heterogeneity component. }
+   \item{\code{Epsilon}}{Vector of length \code{q.bio}.
+         For each biological gene, posterior median of gene-specific residual
+         over-dispersion parameter \eqn{\epsilon_i}. }
    \item{\code{Prob}}{Vector of length \code{q.bio}.
          For each biological gene, probability of being highly variable
          according to the given thresholds.}
    \item{\code{HVG}}{Vector of length \code{q.bio}.
          For each biological gene, indicator of being detected as highly
          variable according to the given thresholds. }
+   \item{\code{LVG}}{Vector of length \code{q.bio}.
+         For each biological gene, indicator of being detected as lowly
+         variable according to the given thresholds. }
    }
 \item{\code{ProbThreshold}}{Posterior probability threshold.}
 \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
 \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
 }
-\code{BASiCS_DetectLVG} produces a similar output,
-replacing the column \code{HVG} by
-\code{LVG}, an indicator of a gene being detected as
-lowly variable according to the given thresholds.
 }
 \description{
-Functions to detect highly and lowly variable genes
+Functions to detect highly and lowly variable genes. If the 
+BASiCS_Chain object was generated using the regression approach,
+BASiCS finds the top highly variable genes based on the posteriors of the 
+epsilon parameters. Otherwise, the old approach is used, which initially 
+performs a variance decomposition.
 }
 \details{
 See vignette
 }
 \examples{
 
-# See
-help(BASiCS_MCMC)
+# Loads short example chain (non-regression implementation)
+data(ChainSC)
+
+# Highly and lowly variable genes detection (within a single group of cells)
+DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60,
+                              EFDR = 0.10, Plot = TRUE)
+DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40,
+                              EFDR = 0.10, Plot = TRUE)
+                              
+# Loads short example chain (regression implementation)
+data(ChainSCReg)
+
+# Highly and lowly variable genes detection (within a single group of cells)
+DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.90,
+                              EFDR = 0.10, Plot = TRUE)
+DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.10,
+                              EFDR = 0.10, Plot = TRUE)
 
 }
 \references{
@@ -90,4 +116,6 @@ Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
 }

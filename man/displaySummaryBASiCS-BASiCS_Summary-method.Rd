@@ -26,7 +26,6 @@ object
 }
 \examples{
 
-# See
 help(BASiCS_MCMC)
 
 }

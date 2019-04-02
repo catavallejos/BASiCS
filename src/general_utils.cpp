@@ -423,8 +423,9 @@ arma::vec DegubInd(arma::vec ind,
     }
     else {
       ind(i) = 0;
-      Rcpp::Rcout << "Error when updating " << param << i+1 << std::endl;
-      Rcpp::warning("Consider additional data filter if error is frequent.");
+      Rcpp::Rcout << "Error when updating " << param << " " << i+1 << std::endl;
+      Rcpp::Rcout << "Consider applying additional quality control" << std::endl;
+      Rcpp::Rcout << "to remove genes/cells when low total counts." << std::endl;
     }
   }
   return ind;

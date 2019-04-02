@@ -21,8 +21,8 @@ test_that("MCMC fails for one or multiple arguments", {
   
   
   DataSpikesBatchNotFactor <- DataSpikes
-  colData(DataSpikesBatchNotFactor)$BatchInfo <- paste("Batch",
-    colData(DataSpikesBatchNotFactor)$BatchInfo
+  SummarizedExperiment::colData(DataSpikesBatchNotFactor)$BatchInfo <- paste("Batch",
+    SummarizedExperiment::colData(DataSpikesBatchNotFactor)$BatchInfo
   )
   expect_error(run_MCMC(Data = DataSpikesBatchNotFactor, N = 20, Thin = 2,
                            Burn = 4, Regression = TRUE),
@@ -39,7 +39,7 @@ test_that("MCMC fails for one or multiple arguments", {
                regexp = ".*does not contain TRUE values.*")
   
   Data2 <- DataSpikes
-  metadata(Data2)$SpikeInput <- NULL 
+  S4Vectors::metadata(Data2)$SpikeInput <- NULL
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE),
@@ -62,7 +62,7 @@ test_that("MCMC fails for one or multiple arguments", {
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
-  metadata(Data2)$SpikeInput <- NULL 
+  S4Vectors::metadata(Data2)$SpikeInput <- NULL
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE), NA)
@@ -74,14 +74,17 @@ test_that("MCMC fails for one or multiple arguments", {
                            WithSpikes = FALSE), NA)
   
   Data2 <- DataNoSpikes
-  colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
+  SummarizedExperiment::colData(Data2)$BatchInfo <- rep(
+    1, 
+    length(SummarizedExperiment::colData(Data2)$BatchInfo)
+  ) 
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE),
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
-  colData(Data2)$BatchInfo <- NULL
+  SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE),
@@ -105,7 +108,7 @@ test_that("MCMC fails for one or multiple arguments", {
                regexp = ".*does not contain TRUE values.*")
   
   Data2 <- DataSpikes
-  metadata(Data2)$SpikeInput <- NULL 
+  S4Vectors::metadata(Data2)$SpikeInput <- NULL
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = TRUE, 
                            WithSpikes = TRUE),
@@ -128,7 +131,7 @@ test_that("MCMC fails for one or multiple arguments", {
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
-  metadata(Data2)$SpikeInput <- NULL 
+  S4Vectors::metadata(Data2)$SpikeInput <- NULL
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = TRUE, 
                            WithSpikes = FALSE), NA)
@@ -140,14 +143,17 @@ test_that("MCMC fails for one or multiple arguments", {
                            WithSpikes = FALSE), NA)
   
   Data2 <- DataNoSpikes
-  colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
+  SummarizedExperiment::colData(Data2)$BatchInfo <- rep(
+    1, 
+    length(SummarizedExperiment::colData(Data2)$BatchInfo)
+  )  
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = TRUE, 
                            WithSpikes = FALSE),
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
-  colData(Data2)$BatchInfo <- NULL
+  SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = TRUE, 
                            WithSpikes = FALSE),
@@ -158,45 +164,57 @@ test_that("MCMC fails for one or multiple arguments", {
   ### Without spikes
   
   # Test if it contains a 'counts' slot
-  sce <- SingleCellExperiment(assays = list(test = counts(DataSpikes)),
-                               colData = colData(DataSpikes))
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(test = counts(DataSpikes)),
+    colData = SummarizedExperiment::colData(DataSpikes)
+  )
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE),
                regexp = ".*does not contain a \'counts\' slot*")
   
   # Test if it is a SingleCellExperimentObject
-  sce <- SummarizedExperiment(assays = list(counts = counts(DataSpikes)),
-                               colData = colData(DataSpikes))
+  sce <- SummarizedExperiment::SummarizedExperiment(
+    assays = list(counts = counts(DataSpikes)),
+    colData = SummarizedExperiment::colData(DataSpikes)
+  )
   expect_error(run_MCMC(Data = sce, N = 50, 
-                           Thin = 5, Burn = 25, Regression = FALSE, 
-                           WithSpikes = FALSE),
+                        Thin = 5, Burn = 25, Regression = FALSE, 
+                        WithSpikes = FALSE),
                regexp = ".*is not a SingleCellExperiment class object.*")
   
   # Test if it contains a batch vector
-  sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)))
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(counts = counts(DataSpikes))
+  )
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE),
                regexp = ".*does not contain a BatchInfo vector.*")
 
   # incorrect batch vector
-  sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)),
-              colData = data.frame(BatchInfo = colData(DataSpikesNoBatch)$BatchInfo))
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(counts = counts(DataSpikes)),
+    colData = data.frame(BatchInfo = SummarizedExperiment::colData(DataSpikesNoBatch)$BatchInfo)
+  )
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE), 
                regexp = ".*requires the data to contain at least 2 batches.*")
     
   # Incorporate a batch vector
-  sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)),
-              colData = data.frame(BatchInfo = colData(DataSpikes)$BatchInfo))
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(counts = counts(DataSpikes)),
+    colData = data.frame(BatchInfo = SummarizedExperiment::colData(DataSpikes)$BatchInfo)
+  )
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE), NA)
   
   ### With spikes
-  sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)))
+  sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(counts = counts(DataSpikes))
+  )
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE),
@@ -209,24 +227,22 @@ test_that("MCMC fails for one or multiple arguments", {
                regexp = ".*does not contain the \'SpikeInput\' slot.*")
   
   # Wrong SpikeInput
-  metadata(sce)$SpikeInput <- 1
+  S4Vectors::metadata(sce)$SpikeInput <- 1
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE),
                regexp = ".*Spike-in assignment is not compatible with data.*")
   
-  metadata(sce)$SpikeInput <- c(1,2,3)
+  S4Vectors::metadata(sce)$SpikeInput <- c(1, 2, 3)
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE),
                regexp = ".*Spike-in assignment is not compatible with data.*")
   
   # Right SpikeInfo assignment  
-  metadata(sce)$SpikeInput <- metadata(DataSpikes)$SpikeInput
+  S4Vectors::metadata(sce)$SpikeInput <- S4Vectors::metadata(DataSpikes)$SpikeInput
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE), NA)
+
 })
-
-
-

@@ -22,7 +22,7 @@
 #' Default value: \code{BatchInfo = NULL}.
 #' @param SpikeType Character to indicate what type of spike-ins are in use.
 #' For more details see argument `type` in 
-#' `help(ke, package = "SingleCellExperiment")`. Default value: 
+#' `help(isSpike, package = "SingleCellExperiment")`. Default value: 
 #' \code{SpikeType = "ERCC"}. 
 #' @param Verbose Verbosity flag. Set FALSE to prevent printing of messages.
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
@@ -126,12 +126,10 @@ newBASiCS_Data <- function(Counts,
   }
 
   # Create a SingleCellExperiment data object
-  Data <- SingleCellExperiment::SingleCellExperiment(
-                assays = list(counts = as.matrix(Counts)),
-                metadata = list(SpikeInput = SpikeInput))
+  Data <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = as.matrix(Counts)),
+                                                     metadata = list(SpikeInput = SpikeInput))
   SingleCellExperiment::isSpike(Data, SpikeType) <- Tech
-  SummarizedExperiment::colData(Data) <-
-    S4Vectors::DataFrame("BatchInfo" = BatchInfo)
+  SummarizedExperiment::colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
   colnames(Data) <- colnames(Counts)
   rownames(Data) <- rownames(Counts)
   

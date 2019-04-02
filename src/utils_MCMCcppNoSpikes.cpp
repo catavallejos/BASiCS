@@ -1,8 +1,8 @@
 #include "utils.h"
 
 /* Metropolis-Hastings updates of mu
- * Updates are implemented simulateaneously for all biological genes
- */
+* Updates are implemented simulateaneously for all biological genes
+*/
 arma::mat muUpdateNoSpikes(
     arma::vec const& mu0,
     arma::vec const& prop_var,
@@ -20,7 +20,8 @@ arma::mat muUpdateNoSpikes(
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
-    int const& ConstrainType)
+    int const& ConstrainType,
+    double exponent)
 {
   using arma::span;
 
@@ -39,11 +40,12 @@ arma::mat muUpdateNoSpikes(
   // but the reference one (no need to be sequential)
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
   for (int i = 0; i < q0; i++) {
-    if(i != RefGene) {
+    if (i != RefGene) {
       for (int j = 0; j < n; j++) {
-        log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *
-          log( ( nu(j)*mu1(i) + invdelta(i) ) /
-          ( nu(j)*mu0(i) + invdelta(i) ));
+        log_aux(i) -= (Counts(i, j) + invdelta(i)) *
+          log(
+            (nu(j) * mu1(i) + invdelta(i)) /
+            (nu(j) * mu0(i) + invdelta(i)));
       }
     }
   }
@@ -53,15 +55,17 @@ arma::mat muUpdateNoSpikes(
   // Step 2.1: For genes that are under the constrain (excluding the reference one)
   for (unsigned int i = 0; i < ConstrainGene.size(); i++) {
     iAux = ConstrainGene(i);
-    if(iAux != RefGene) {
+    if (iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux,2));
-      log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux,2));
+      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - aux, 2)) * exponent;
+      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - aux, 2)) * exponent;
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
         ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux));
+      } else {
+        ind(iAux) = 0;
+        mu1(iAux) = mu0(iAux);
       }
-      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux); }
     }
   }
 
@@ -71,13 +75,17 @@ arma::mat muUpdateNoSpikes(
 
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
-  if(ConstrainType == 2) {
+  if (ConstrainType == 2) {
     for (unsigned int i = 0; i < NotConstrainGene.size(); i++) {
       iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5/s2_mu) * (pow(log(mu1(iAux)),2) - pow(log(mu0(iAux)),2));
+      log_aux(iAux) -= (0.5 / s2_mu) *
+        (pow(log(mu1(iAux)), 2) - pow(log(mu0(iAux)), 2)) * exponent;
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) { ind(iAux) = 1; }
-      else{ind(iAux) = 0; mu1(iAux) = mu0(iAux);}
+      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+        ind(iAux) = 1;
+      } else {
+        ind(iAux) = 0; mu1(iAux) = mu0(iAux);
+      }
     }
   }
   // OUTPUT
@@ -101,7 +109,8 @@ arma::mat nuUpdateBatchNoSpikes(
     int const& n,
     arma::vec & nu1,
     arma::vec & u,
-    arma::vec & ind)
+    arma::vec & ind,
+    double exponent)
 {
   using arma::span;
 
@@ -110,14 +119,15 @@ arma::mat nuUpdateBatchNoSpikes(
   u = arma::randu(n);
 
   // ACCEPT/REJECT STEP
-  arma::vec log_aux = (log(nu1) - log(nu0)) % (sum_bygene_all + 1 / thetaBatch);
-  log_aux -= (nu1 -nu0)  % (1 / (thetaBatch % s));
+  arma::vec log_aux = (log(nu1) - log(nu0)) % ((sum_bygene_all + 1 / thetaBatch)  * exponent);
+  log_aux -= (nu1 -nu0)  % (1 / (thetaBatch % s * exponent));
 
   for (int j = 0; j < n; j++) {
     for (int i = 0; i < q0; i++) {
-      log_aux(j) -= ( Counts(i, j) + invdelta(i) ) *
-        log( ( nu1(j)*mu(i) + invdelta(i) ) /
-        ( nu0(j)*mu(i) + invdelta(i) ));
+      log_aux(j) -= (Counts(i, j) + invdelta(i)) *
+        log(
+          (nu1(j) * mu(i) + invdelta(i)) /
+          (nu0(j) * mu(i) + invdelta(i)));
     }
   }
 
@@ -129,12 +139,11 @@ arma::mat nuUpdateBatchNoSpikes(
   */
   ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
   for (int j = 0; j < n; j++) {
-    if(ind(j) == 0) nu1(j) = nu0(j);
+    if (ind(j) == 0) {
+      nu1(j) = nu0(j);
+    }
   }
 
   // OUTPUT
   return join_rows(nu1, ind);
 }
-
-
-

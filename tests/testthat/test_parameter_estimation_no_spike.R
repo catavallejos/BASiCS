@@ -1,13 +1,13 @@
 context("Parameter estimation and denoised data (no-spikes), 
         original data doesn't have spikes\n")
 
-test_that("Estimates match the given seed (no-spikes)", 
-{
+test_that("Estimates match the given seed (no-spikes)", {
   # Data example
+  set.seed(10)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, 
                                  WithBatch = TRUE)
-  sce <- SingleCellExperiment(assays = list(counts = counts(Data)),
-                      colData = data.frame(BatchInfo = colData(Data)$BatchInfo))
+  sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts(Data)),
+                      colData = data.frame(BatchInfo = SummarizedExperiment::colData(Data)$BatchInfo))
   
   # Fixing starting values
   n <- ncol(Data)
@@ -36,14 +36,14 @@ test_that("Estimates match the given seed (no-spikes)",
   expect_that(all.equal(names(PostSummary@parameters), ParamNames1), is_true())
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(14.031, 11.601, 6.799, 10.882, 30.704)
+  Mu <- c(9.625, 14.665,  6.997,  8.724, 31.469)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   MuObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE, 
                                                    "mu")[1:5,1],3))
   expect_that(all.equal(MuObs, Mu), is_true())
   expect_that(all.equal(MuObsSCE, Mu), is_true())
             
-  Delta <- c(1.080, 1.125, 1.589, 1.272, 0.607)
+  Delta <- c(1.234, 0.949, 1.710, 1.414, 0.440)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
                                                    "delta")[1:5,1],3))
   DeltaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE, 
@@ -51,14 +51,14 @@ test_that("Estimates match the given seed (no-spikes)",
   expect_that(all.equal(DeltaObs, Delta), is_true())
   expect_that(all.equal(DeltaObsSCE, Delta), is_true())
   
-  S <- c(0.641, 1.277, 0.241, 0.631, 1.264)
+  S <- c(1.387, 1.552, 0.610, 2.184, 1.457)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   SObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE, 
                                                   "s")[1:5,1],3))
   expect_that(all.equal(SObs, S), is_true())
   expect_that(all.equal(SObsSCE, S), is_true())
   
-  Theta <- c(0.187, 0.313)
+  Theta <- c(0.120, 0.109)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   ThetaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE, 
                                                       "theta")[,1],3))
@@ -71,7 +71,7 @@ test_that("Estimates match the given seed (no-spikes)",
   set.seed(2018)
   DCSCE <- BASiCS_DenoisedCounts(sce, ChainSCE)
   # Checks for an arbitrary set of genes / cells
-  DCcheck0 <- c(5.017, 1.672, 0.000, 10.033, 11.706)
+  DCcheck0 <- c(31.007, 21.633,  7.211,  3.605, 63.456)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   DCSCEcheck <- as.vector(round(DCSCE[1:5,1], 3))
   expect_that(all.equal(DCcheck, DCcheck0), is_true())
@@ -83,7 +83,7 @@ test_that("Estimates match the given seed (no-spikes)",
   set.seed(2018)
   DRSCE <- BASiCS_DenoisedRates(sce, ChainSCE)
   # Checks for an arbitrary set of genes / cells
-  DRcheck0 <- c(5.786,  3.272, 10.572,  1.535,  4.880)
+  DRcheck0 <- c(2.193,  2.981, 19.924, 15.005,  5.930)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   DRSCEcheck <- as.vector(round(DRSCE[10,1:5], 3))
   expect_that(all.equal(DRcheck, DRcheck0), is_true())
@@ -94,6 +94,7 @@ test_that("Estimates match the given seed (no-spikes)",
 test_that("Chain creation works when StoreAdapt=TRUE (no spikes)", 
 {
   # Data example
+  set.seed(11)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, 
                                  WithBatch = TRUE)
   # Fixing starting values
