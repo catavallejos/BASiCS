@@ -1139,3 +1139,7 @@ moved from `Methods.R` to `HiddenUtils.R`
 - Use of `set.seed` removed from `makeExampleBASiCS_Data` 
 - Unit tests updated accordingly
 - Adds missing running examples to Rds in order to pass R CMD BioCheck
+
+version 1.5.23 (2019-04-02)
+- Minor edit to the documentation of `makeExampleBASiCS_Data` (explain why
+a fixed seed is no longer used)
