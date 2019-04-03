@@ -160,6 +160,11 @@ test_that("Diagnostic plot works", {
   g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
 
+  Chain@parameters[["epsilon"]][, 1] <- NA
+  g <- BASiCS_diagPlot(Chain, Param = "epsilon", x = "mu", y = "epsilon")
+  expect_is(g, "ggplot")
+  g <- BASiCS_diagPlot(Chain, Param = "epsilon")
+  expect_is(g, "ggplot")
 })
 
 
@@ -174,7 +179,9 @@ test_that("Diagnostic hist work", {
     PrintProgress = FALSE,
     Regression = TRUE,
     WithSpikes = TRUE)
-  g <- BASiCS_diagHist(Chain)
+  expect_warning(g <- BASiCS_diagHist(Chain),
+    "coda::effectiveSize failed for some parameters: theta, sigma2"
+  )
   expect_is(g, "ggplot")
   g <- BASiCS_diagHist(Chain, Param = "delta")
   expect_is(g, "ggplot")

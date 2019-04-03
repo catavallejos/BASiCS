@@ -4,7 +4,7 @@
 \alias{BASiCS_diagHist}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
-BASiCS_diagHist(object, Param = NULL, na.rm = FALSE)
+BASiCS_diagHist(object, Param = NULL, na.rm = TRUE)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
