@@ -30,7 +30,8 @@ arma::mat muUpdateNoSpikes(
   u = arma::randu(q0);
 
   // INITIALIZE MU
-  double aux; double iAux;
+  double aux;
+  int iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
 
   // ACCEPT/REJECT STEP
@@ -59,9 +60,11 @@ arma::mat muUpdateNoSpikes(
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
       log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - aux, 2)) * exponent;
       log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - aux, 2)) * exponent;
+
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
-        ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux));
+        ind(iAux) = 1;
+        sumAux += log(mu1(iAux)) - log(mu0(iAux));
       } else {
         ind(iAux) = 0;
         mu1(iAux) = mu0(iAux);

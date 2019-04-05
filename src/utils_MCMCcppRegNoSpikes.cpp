@@ -37,7 +37,8 @@ arma::mat muUpdateRegNoSpikes(
   u = arma::randu(q0);
 
   // INITIALIZE MU
-  double aux; double iAux;
+  double aux;
+  int iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
 
   // ACCEPT/REJECT STEP
