@@ -1143,3 +1143,7 @@ moved from `Methods.R` to `HiddenUtils.R`
 version 1.5.23 (2019-04-02)
 - Minor edit to the documentation of `makeExampleBASiCS_Data` (explain why
 a fixed seed is no longer used)
+
+version 1.5.24 (2019-04-05)
+- Minor edit to the documentation of `makeExampleBASiCS_Data` (fixed link to 
+`set.seed` documentation as it led to WARNINGS in Bioc-devel)
