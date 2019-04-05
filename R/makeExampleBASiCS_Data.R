@@ -26,7 +26,7 @@
 #' @details Note: In BASiCS versions < 1.5.22, \code{makeExampleBASiCS_Data} 
 #' used a fixed seed within the function. This has been removed to comply with 
 #' Bioconductor policies. If a reproducible example is required, please use 
-#' \link[base]{set.seed} prior to calling \code{makeExampleBASiCS_Data} .
+#' \code{set.seed} prior to calling \code{makeExampleBASiCS_Data} .
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
