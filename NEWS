@@ -1147,3 +1147,10 @@ a fixed seed is no longer used)
 version 1.5.24 (2019-04-05)
 - Minor edit to the documentation of `makeExampleBASiCS_Data` (fixed link to 
 `set.seed` documentation as it led to WARNINGS in Bioc-devel)
+
+version 1.5.25 (2019-04-05)
+- Edits `BASiCS_TestDE` to avoid low posterior probability thresholds derived 
+from the EFDR calibration. This alters some of the related 'Hidden' functions. 
+- In `BASiCS_TestDE`, default values for `EFDR_M`, `EFDR_D` and `EFDR_R` 
+were changed to 0.05. 
+- Unit tests updated accordingly

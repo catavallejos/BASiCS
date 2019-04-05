@@ -13,15 +13,15 @@ test_that("Differential test is correct (regression case)",
             
   # Classification frequency
             
-  FreqMean0 <- c(324,  18,   8)
+  FreqMean0 <- c(335,   9,   6)
   FreqMean <- as.vector(table(Test$TableMean$ResultDiffMean))
   expect_that(all.equal(FreqMean, FreqMean0), is_true())
             
-  FreqDisp0 <- c(26, 158, 166)
+  FreqDisp0 <- c(15, 236,  99)
   FreqDisp <- as.vector(table(Test$TableDisp$ResultDiffDisp))
   expect_that(all.equal(FreqDisp, FreqDisp0), is_true())
   
-  FreqRes0 <- c(328,   7,  15)
+  FreqRes0 <- c(338,   4,   8)
   FreqRes <- as.vector(table(Test$TableResDisp$ResultDiffResDisp))
   expect_that(all.equal(FreqRes, FreqRes0), is_true())
             
