@@ -1147,3 +1147,7 @@ a fixed seed is no longer used)
 version 1.5.24 (2019-04-05)
 - Minor edit to the documentation of `makeExampleBASiCS_Data` (fixed link to 
 `set.seed` documentation as it led to WARNINGS in Bioc-devel)
+
+version 1.5.25 (2019-04-07)
+- Minor change in `muUpdateNoSpikes` (C++ function in `utils_MCMCNoSpikes.cpp`)
+to avoid WARNINGS in bioc-devel related to integers vs unsigned integers

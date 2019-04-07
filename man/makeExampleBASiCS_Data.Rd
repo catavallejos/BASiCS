@@ -31,7 +31,7 @@ used to illustrate BASiCS in some of the package and vignette examples.
 Note: In BASiCS versions < 1.5.22, \code{makeExampleBASiCS_Data} 
 used a fixed seed within the function. This has been removed to comply with 
 Bioconductor policies. If a reproducible example is required, please use 
-\link[base]{set.seed} prior to calling \code{makeExampleBASiCS_Data} .
+\code{set.seed} prior to calling \code{makeExampleBASiCS_Data} .
 }
 \examples{
 Data <- makeExampleBASiCS_Data()
