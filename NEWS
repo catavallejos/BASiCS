@@ -1151,3 +1151,7 @@ version 1.5.24 (2019-04-05)
 version 1.5.25 (2019-04-07)
 - Minor change in `muUpdateNoSpikes` (C++ function in `utils_MCMCNoSpikes.cpp`)
 to avoid WARNINGS in bioc-devel related to integers vs unsigned integers
+
+version 1.5.26 (2019-04-08)
+- Similar changes applied to `utils_MCMCcppReg.cpp` and
+`utils_MCMCcppRegNoSpikes.cpp`.
