@@ -13,7 +13,7 @@ arma::mat designMatrix(
   arma::vec myu = arma::zeros(k-2);
   myu(0) = x.min();
   
-  for(int i=1; i < myu.size(); i++) {
+  for(int i=1; i < (k-2); i++) {
     myu(i) = myu(i-1) + ran/(k-3);
   }
   double h = (myu(1)-myu(0)) * variance;
