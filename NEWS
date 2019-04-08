@@ -1155,3 +1155,10 @@ to avoid WARNINGS in bioc-devel related to integers vs unsigned integers
 version 1.5.26 (2019-04-08)
 - Similar changes applied to `utils_MCMCcppReg.cpp` and
 `utils_MCMCcppRegNoSpikes.cpp`.
+
+version 1.5.27 (2019-04-08)
+- Edits `BASiCS_TestDE` to avoid low posterior probability thresholds derived 
+from the EFDR calibration. This alters some of the related 'Hidden' functions. 
+- In `BASiCS_TestDE`, default values for `EFDR_M`, `EFDR_D` and `EFDR_R` 
+were changed to 0.05. 
+- Unit tests updated accordingly
