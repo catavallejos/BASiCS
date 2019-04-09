@@ -4,7 +4,8 @@
 \alias{BASiCS_Sim}
 \title{Generates synthetic data according to the model implemented in BASiCS}
 \usage{
-BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
+BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta,
+  BatchInfo = NULL)
 }
 \arguments{
 \item{Mu}{Gene-specific mean expression parameters \eqn{\mu_i} for all
@@ -13,7 +14,9 @@ all elements must be positive numbers)}
 
 \item{Mu_spikes}{\eqn{\mu_i} for all technical genes defined as true
 input molecules (vector of length \code{q-q.bio},
-all elements must be positive numbers)}
+all elements must be positive numbers). If \code{Mu_spikes = NULL}, the
+generated data will not contain spike-ins. If \code{Phi = NULL}, 
+\code{Mu_spikes} will be ignored. Default: \code{Mu_spikes = NULL}.}
 
 \item{Delta}{Gene-specific biological over-dispersion parameters
 \eqn{\delta_i}, biological genes only
@@ -21,12 +24,15 @@ all elements must be positive numbers)}
 
 \item{Phi}{Cell-specific mRNA content normalising parameters \eqn{\phi_j}
 (vector of length \code{n}, all elements must be positive numbers and
-the sum of its elements must be equal to \code{n})}
+the sum of its elements must be equal to \code{n}). \code{Phi} must be set
+equal to \code{NULL} when generating data without spike-ins. If 
+\code{Mu_spikes = NULL}, \code{Phi} will be ignored. 
+Default: \code{Phi = NULL}}
 
 \item{S}{Cell-specific technical normalising parameters \eqn{s_j}
 (vector of length \code{n}, all elements must be positive numbers)}
 
-\item{Theta}{Technical variability parameter \eqn{\theta} (must be positive)}
+\item{BatchInfo}{same as in \code{\link[BASiCS]{newBASiCS_Data}}}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}},
@@ -41,17 +47,21 @@ implemented in BASiCS.
 # Simulated parameter values for 10 genes
 # (7 biogical and 3 spike-in) measured in 5 cells
 Mu <- c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19)
-Mu_spike <-  c(1010.72, 7.90, 31.59)
+Mu_spikes <-  c(1010.72, 7.90, 31.59)
 Delta <- c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)
 Phi <- c(1.00, 1.06, 1.09, 1.05, 0.80)
 S <- c(0.38, 0.40, 0.38, 0.39, 0.34)
 Theta <- 0.39
 
-Data <- BASiCS_Sim(Mu, Mu_spike, Delta, Phi, S, Theta)
+# Data with spike-ins, single batch
+Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
 head(SingleCellExperiment::counts(Data))
 dim(SingleCellExperiment::counts(Data))
 S4Vectors::metadata(Data)$SpikeInput
 SingleCellExperiment::isSpike(Data)
+
+# Data without spike-ins, single batch
+Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta)
 
 }
 \references{
