@@ -32,7 +32,14 @@ Default: \code{Phi = NULL}}
 \item{S}{Cell-specific technical normalising parameters \eqn{s_j}
 (vector of length \code{n}, all elements must be positive numbers)}
 
-\item{BatchInfo}{same as in \code{\link[BASiCS]{newBASiCS_Data}}}
+\item{Theta}{Technical variability parameter \eqn{\theta} (must be positive).
+\code{Theta} can be a scalar (single batch of samples), or a vector (multiple
+batches of samples). If a value for \code{BatchInfo} is provided, the length
+of \code{Theta} must match the number of unique values in \code{BatchInfo}.}
+
+\item{BatchInfo}{same as in \code{\link[BASiCS]{newBASiCS_Data}}. If 
+spike-ins, are not in use, the number of unique values contained in 
+\code{BatchInfo} must be larger than 1 (i.e. multiple batches are present).}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}},
@@ -60,8 +67,14 @@ dim(SingleCellExperiment::counts(Data))
 S4Vectors::metadata(Data)$SpikeInput
 SingleCellExperiment::isSpike(Data)
 
-# Data without spike-ins, single batch
-Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta)
+# Data with spike-ins, multiple batches
+BatchInfo <- c(1,1,1,2,2)
+Theta2 <- rep(Theta, times = 2)
+Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta2, BatchInfo)
+
+# Data without spike-ins, multiple batches
+Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, 
+                   Phi = NULL, S, Theta2, BatchInfo)
 
 }
 \references{

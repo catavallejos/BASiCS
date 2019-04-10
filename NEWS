@@ -1164,5 +1164,5 @@ were changed to 0.05.
 - Unit tests updated accordingly
 
 version 1.5.28 (2019-04-09)
-- Edited version of `BASiCS_Sim` to allow no spikes - WIP 
-- TO-DO: fix issue when no spikes + no batch
+- Edited version of `BASiCS_Sim` to allow no spikes and multiple batches
+- Documentation updated accordingly
