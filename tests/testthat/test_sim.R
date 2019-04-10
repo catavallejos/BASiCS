@@ -1,0 +1,33 @@
+context("simulated data")
+
+test_that("BASiCS_Sim works", {
+  # Simulated parameter values for 10 genes
+  # (7 biogical and 3 spike-in) measured in 5 cells
+  Mu <- c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19)
+  Mu_spikes <-  c(1010.72, 7.90, 31.59)
+  Delta <- c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)
+  Phi <- c(1.00, 1.06, 1.09, 1.05, 0.80)
+  S <- c(0.38, 0.40, 0.38, 0.39, 0.34)
+  Theta <- 0.39
+
+  # Data with spike-ins, single batch
+  Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
+  head(SingleCellExperiment::counts(Data))
+  dim(SingleCellExperiment::counts(Data))
+  S4Vectors::metadata(Data)$SpikeInput
+  SingleCellExperiment::isSpike(Data)
+
+  # Data with spike-ins, multiple batches
+  BatchInfo <- c(rep(1, 3), rep(2, 2))
+  Theta2 <- rep(Theta, times = 2)
+  Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta2, BatchInfo)
+  expect_is(Data, "SingleCellExperiment")
+
+  # Data without spike-ins, multiple batches
+  Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta2, BatchInfo)
+  expect_is(Data, "SingleCellExperiment")
+  expect_error(
+    BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta),
+    "When spike-ins are not included, 'BatchInfo' is required."
+  )
+})
