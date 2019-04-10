@@ -1,19 +1,20 @@
 HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL, 
-                             Delta, Phi = NULL, S, Theta){
+                             Delta, Phi = NULL, S, Theta) {
   
   # Number of cells
   n <- length(S)
   # Total number of genes, including biological and technical ones
-  if(!is.null(Mu_spikes)) {
+  if (!is.null(Mu_spikes)) {
     q <- length(Mu) + length(Mu_spikes) 
     q.bio <- length(Mu)
     # Merge biological and technical genes
     Mu <- c(Mu, Mu_spikes)
-  }
-  else {
+  } else {
     q <- length(Mu); q.bio <- length(Mu)
   }
-  if(is.null(Phi)) Phi <- rep(1, times = n)
+  if (is.null(Phi)) {
+    Phi <- rep(1, times = n)
+  }
   
   
   # Matrix where simulated counts will be stored
@@ -23,8 +24,7 @@ HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL,
   # Simulated cell-specific random effects
   if (all(Theta > 0)) {
     Nu <- rgamma(n, shape = 1 / Theta, rate = 1 / (S * Theta))
-  }
-  else {
+  } else {
     Nu <- S
   }
   # Simulated counts data - biological genes
@@ -35,20 +35,19 @@ HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL,
     }
   }
   # Simulated counts data - spike-in genes
-  if(!is.null(Mu_spikes)) {
-    for(i in (seq_len(q - q.bio) + q.bio) ) {
+  if (!is.null(Mu_spikes)) {
+    for (i in (seq_len(q - q.bio) + q.bio)) {
       Counts.sim[i, ] <- rpois(n, lambda = Nu * Mu[i])  
     }
   }
   
   rownames(Counts.sim) <- paste0("Gene", seq_len(q))
   
-  if(!is.null(Mu_spikes)) {
+  if (!is.null(Mu_spikes)) {
     SpikeInfo <- data.frame(paste0("Gene", seq(q.bio + 1, q)), 
                             Mu[seq(q.bio + 1, q)])  
     Tech <- ifelse(seq_len(q) > q.bio, TRUE, FALSE)
-  }
-  else {
+  } else {
     SpikeInfo <- NULL
     Tech <- rep(FALSE, q)
   }
