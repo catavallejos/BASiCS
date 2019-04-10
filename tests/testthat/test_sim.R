@@ -11,21 +11,47 @@ test_that("BASiCS_Sim works", {
   Theta <- 0.39
 
   # Data with spike-ins, single batch
+  set.seed(1)
   Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
   head(SingleCellExperiment::counts(Data))
   dim(SingleCellExperiment::counts(Data))
   S4Vectors::metadata(Data)$SpikeInput
   SingleCellExperiment::isSpike(Data)
+  # Check if values are reproducible given fixed seed
+  Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
+  Aux0 <- c(6, 0, 0, 1, 11)
+  expect_that(all.equal(Aux, Aux0), is_true())
+  Aux <- sum(SingleCellExperiment::counts(Data))
+  Aux0 <- 3044
+  expect_that(all.equal(Aux, Aux0), is_true())
 
   # Data with spike-ins, multiple batches
   BatchInfo <- c(rep(1, 3), rep(2, 2))
   Theta2 <- rep(Theta, times = 2)
+  set.seed(2)
   Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta2, BatchInfo)
   expect_is(Data, "SingleCellExperiment")
+  # Check if values are reproducible given fixed seed
+  Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
+  Aux0 <- c(0, 2, 2, 0, 0)
+  expect_that(all.equal(Aux, Aux0), is_true())
+  Aux <- sum(SingleCellExperiment::counts(Data))
+  Aux0 <- 1050
+  expect_that(all.equal(Aux, Aux0), is_true())
 
   # Data without spike-ins, multiple batches
+  set.seed(3)
   Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta2, BatchInfo)
   expect_is(Data, "SingleCellExperiment")
+  # Check if values are reproducible given fixed seed
+  Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
+  Aux0 <- c(0, 1, 0, 0, 4)
+  expect_that(all.equal(Aux, Aux0), is_true())
+  Aux <- sum(SingleCellExperiment::counts(Data))
+  Aux0 <- 80
+  expect_that(all.equal(Aux, Aux0), is_true())
+  
+  # When the parameter input is not right
   expect_error(
     BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta),
     "When spike-ins are not included, 'BatchInfo' is required."

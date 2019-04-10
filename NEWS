@@ -1166,3 +1166,7 @@ were changed to 0.05.
 version 1.5.28 (2019-04-09)
 - Edited version of `BASiCS_Sim` to allow no spikes and multiple batches
 - Documentation updated accordingly
+
+version 1.5.29 (2019-04-10)
+- Unit test associated to `BASiCS_Sim` updated to use a fixed seed and to
+check exact values being reproducible
