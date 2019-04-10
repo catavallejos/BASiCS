@@ -65,4 +65,18 @@ HiddenHeaderBASiCS_Sim <- function(Mu, Mu_spikes, Delta, Phi,
     }
   }
   
+  # Check that batches are present if spike-ins not included
+  # Potentially remove this in next releases
+  if(is.null(Mu_spikes)) {
+    if(is.null(BatchInfo)) {
+      stop("When spike-ins are not included, 'BatchInfo' is required.")
+    }
+    else {
+      if(length(unique(BatchInfo)) <= 1) {
+        stop("When spike-ins are not included, 'BatchInfo' must contain",
+             " multiple batches (i.e. length(unique(BatchInfo)) > 1).")  
+      }  
+    }
+  }
+  
 }
