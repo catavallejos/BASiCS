@@ -1170,3 +1170,8 @@ version 1.5.28 (2019-04-09)
 version 1.5.29 (2019-04-10)
 - Unit test associated to `BASiCS_Sim` updated to use a fixed seed and to
 check exact values being reproducible
+
+version 1.5.30 (2019-04-11)
+- `BASiCS_effectiveSize` has been created as a wrapper of `coda::effectiveSize`.
+This is to resolve issues when `Param = 'epsilon'` as it contains `NA` for very
+lowly expressed genes that are excluded from the mean/over-dispersion trend.
