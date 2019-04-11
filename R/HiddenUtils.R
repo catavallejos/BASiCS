@@ -34,7 +34,6 @@ HiddenGetMeasure <- function(object,
   metric
 }
 
-
 HiddenGetParam <- function(object, Param = "mu") {
   if (is.null(Param) || 
       is.na(Param) || 
