@@ -7,21 +7,25 @@
 BASiCS_effectiveSize(object, Param, na.rm = TRUE)
 }
 \arguments{
-\item{object}{A BASiCS_Chain object.}
+\item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}.}
 
-\item{Param}{The parameter to use to calculate effectiveSize.}
+\item{Param}{The parameter to use to calculate effectiveSize. Possible
+values: \code{'mu'}, \code{'delta'}, \code{'phi'}, \code{'s'}, 
+\code{'nu'}, \code{'theta'}, \code{'beta'}, \code{'sigma2'} and 
+\code{'epsilon'}.}
 
-\item{na.rm}{Remove NA values before calculating effectiveSize. Default is TRUE.}
+\item{na.rm}{Remove \code{NA} values before calculating effectiveSize. 
+Only relevant when \code{Param = "epsilon"} (genes with very low 
+expression are excluding when infering the mean/over-dispersion trend. 
+Default: \code{na.rm = TRUE}.}
 }
 \description{
-Calculate effective sample size for BASiCS_Chain parameters
+A wrapper of \code{coda::effectiveSize} to be used with 
+\code{\linkS4class{BASiCS_Chain}} objects.
 }
 \examples{
-data(ChainSCReg)
-# Will often fail for real chains, when epsilon is NA
-effectiveSize(ChainSCReg@parameters[["epsilon"]])
-# This has an na.rm argument which removes these NA values before
-# calculating effectiveSize
+
+data(ChainSC)
 BASiCS_effectiveSize(ChainSC, Param = "mu")
 
 }

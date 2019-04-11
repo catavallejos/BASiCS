@@ -1,5 +1,8 @@
 #' Calculate effective sample size for BASiCS_Chain parameters
 #' 
+#' @description A wrapper of \code{coda::effectiveSize} to be used with 
+#' \code{\linkS4class{BASiCS_Chain}} objects.
+#' 
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}.
 #' @param Param The parameter to use to calculate effectiveSize. Possible
 #' values: \code{'mu'}, \code{'delta'}, \code{'phi'}, \code{'s'}, 
@@ -11,14 +14,8 @@
 #' Default: \code{na.rm = TRUE}.
 #' 
 #' @examples
-#' data(ChainSCReg)
-#' # Will often fail for real chains, when epsilon is NA
-#' # Only relevant when \code{Param = "epsilon"} (genes with very low 
-#' # expression are excluding when infering the mean/over-dispersion trend.
-#' effectiveSize(ChainSCReg@parameters[["epsilon"]])
-#'
-#' # This has an na.rm argument which removes these NA values before
-#' # calculating effectiveSize
+#' 
+#' data(ChainSC)
 #' BASiCS_effectiveSize(ChainSC, Param = "mu")
 #' 
 #' @export
