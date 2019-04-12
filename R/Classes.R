@@ -59,7 +59,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @export
-setClass("BASiCS_Chain",
+7setClass("BASiCS_Chain",
          representation = representation(
            parameters = "list"),
          contains = "Versioned",
@@ -252,4 +252,32 @@ setClass("BASiCS_Summary",
       prototype = prototype(new("Versioned",
                                 versions = c("BASiCS_Summary" =
                                                utils::packageVersion("BASiCS"))))
+)
+
+
+
+#' @export
+setClass("BASiCS_DEResults",
+  representation = representation(
+    Results = "list",
+    Chain1_offset = "BASiCS_Chain",
+    Chain2_offset = "BASiCS_Chain",
+    OffsetChain = "numeric",
+    Offset = "numeric",
+    Extras = "list",
+    ## gene annotations!
+    RowData = "data.frame"
+  ),
+  contains = "Versioned"
+)
+#' @export
+setClass("BASiCS_DEResult",
+  representation = representation(
+    Table = "data.frame",
+    ProbThreshold = "numeric",
+    EFDR = "numeric",
+    EFNR = "numeric",
+    Epsilon = "numeric",
+    Extras = "list"
+  )
 )
