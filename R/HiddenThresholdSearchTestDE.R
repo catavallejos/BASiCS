@@ -1,5 +1,5 @@
 HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
-                                        GenesSelect, EFDR, Task, suffix)
+                                        GenesSelect, EFDR, Task, Suffix)
 {
   # Calculating posterior probabilities
   Prob <- HiddenTailProbTestDE(ChainLFC, Epsilon)
@@ -64,7 +64,7 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
         OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])  
         message("For ", Task, " task:\n",
                 "the posterior probability threshold chosen via EFDR calibration is too low.",
-                "Probability threshold automatically set equal to 'ProbThreshold", suffix, "'.")
+                "Probability threshold automatically set equal to 'ProbThreshold", Suffix, "'.")
       }
     }
     else {
