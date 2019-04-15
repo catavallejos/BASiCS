@@ -1175,3 +1175,6 @@ version 1.5.30 (2019-04-11)
 - `BASiCS_effectiveSize` has been created as a wrapper of `coda::effectiveSize`.
 This is to resolve issues when `Param = 'epsilon'` as it contains `NA` for very
 lowly expressed genes that are excluded from the mean/over-dispersion trend.
+
+version 1.5.31 (2019-04-15)
+- Updated vignette to include ERCC calculation
