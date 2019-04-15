@@ -59,7 +59,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @export
-7setClass("BASiCS_Chain",
+setClass("BASiCS_Chain",
          representation = representation(
            parameters = "list"),
          contains = "Versioned",
@@ -257,27 +257,53 @@ setClass("BASiCS_Summary",
 
 
 #' @export
-setClass("BASiCS_DEResults",
+setClass("BASiCS_ResultsDE",
   representation = representation(
     Results = "list",
     Chain1_offset = "BASiCS_Chain",
     Chain2_offset = "BASiCS_Chain",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
     OffsetChain = "numeric",
     Offset = "numeric",
-    Extras = "list",
+    RowData = "data.frame",
     ## gene annotations!
-    RowData = "data.frame"
+    Extras = "list"
   ),
   contains = "Versioned"
 )
-#' @export
-setClass("BASiCS_DEResult",
+
+setClass("BASiCS_ResultDE",
   representation = representation(
     Table = "data.frame",
+    Name = "character",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
     ProbThreshold = "numeric",
     EFDR = "numeric",
     EFNR = "numeric",
     Epsilon = "numeric",
     Extras = "list"
+  )
+)
+
+setClass("BASiCS_OffsetCorrected", 
+  representation = representation(
+    GroupLabel1 = "character", 
+    GroupLabel2 = "character",
+    OffsetChain = "numeric",
+    OffsetEst = "numeric",
+    Chain1_offset = "BASiCS_Chain",
+    Chain2_offset = "BASiCS_Chain",
+    ChainTau = "matrix",
+    Mu1 = "numeric", 
+    Mu1_old = "numeric", 
+    Mu2 = "numeric",
+    MuBase = "numeric", 
+    MuBase_old = "numeric", 
+    MedianTau = "numeric",
+    MedianTau_old = "numeric",
+    Delta1 = "numeric",
+    Delta2 = "numeric"
   )
 )
