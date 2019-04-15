@@ -46,7 +46,8 @@
 #' Default: \code{GroupLabel2 = 'Group2'}
 #' @param Plot If \code{Plot = TRUE}, MA and volcano plots are generated.
 #' @param PlotOffset If \code{Plot = TRUE}, the offset effect is visualised.
-#' @param PlotOffsetType
+#' @param PlotOffsetType See argument \code{Type} in 
+#' \code{\link{BASiCS_PlotOffset}} for more information.
 #' @param Offset Optional argument to remove a fix offset effect (if not
 #' previously removed from the MCMC chains). Default: \code{Offset = TRUE}.
 #' @param EFDR_M Target for expected false discovery rate related to
@@ -69,6 +70,9 @@
 #' order as how genes are displayed in the table of counts.
 #' This argument is necessary in order to have a meaningful EFDR calibration
 #' when the user decides to exclude some genes from the comparison.
+#' @param IncludeEpsilon Flag indicating where to include epsilon in the 
+#' figures and analysis. Default is \code{TRUE} if epsilon is present in
+#' the chains.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #'
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
@@ -316,48 +320,89 @@ BASiCS_TestDE <- function(Chain1,
     Chain2_offset <- NULL
   }
 
-  Search <- is.null(ProbThresholdM)
 
-  # Changes in mean expression
+
+  TestDifferential <- function(Chain, 
+                               Epsilon,
+                               Base,
+                               Param1,
+                               Param2,
+                               ProbThreshold, 
+                               GenesSelect, 
+                               EFDR,
+                               GroupLabel1,
+                               GroupLabel2, 
+                               Aux,
+                               Measure
+                               ) {
+
+    Median <- matrixStats::colMedians(Chain)
+    Base <- (Param1 * n1 + Param2 * n2) / n
+
+    Prob <- Aux$Prob
+    OptThreshold <- Aux$OptThreshold
+
+    # Test results
+    Plus1 <- which(Prob > OptThreshold[[1]] & Median > 0)
+    Plus2 <- which(Prob > OptThreshold[[1]] & Median < 0)
+    ResultDiff <- rep("NoDiff", length(Median))
+    ResultDiff[Plus1] <- paste0(GroupLabel1, "+")
+    ResultDiff[Plus2] <- paste0(GroupLabel2, "+")
+    if (!is.null(GenesSelect)) {
+        ResultDiff[!GenesSelect] <- "ExcludedByUser"
+    }
+    # Output table
+    Table <- cbind.data.frame(
+      GeneName = GeneName,
+      MEASUREOverall = as.numeric(Base),
+      MEASURE1 = Param1,
+      MEASURE2 = Param2,
+      MEASUREFC = as.numeric(2 ^ Median),
+      MEASUREDISTANCE = as.numeric(Median),
+      ProbDiffMEASURE = as.numeric(Prob),
+      ResultDiffMEASURE = ResultDiff,
+      stringsAsFactors = FALSE)
+
+    if (Measure == "epsilon") {
+      Table$MeasureFC <- NULL
+    }
+    colnames(Table) <- gsub("MEASURE", Measure, colnames(Table))
+    colnames(Table) <- gsub("DISTANCE", DistanceVar(Measure), colnames(Table))
+
+    # Rounding to 3 decimal points
+    IndNumeric <- vapply(Table, is.numeric, logical(1))
+    Table[, IndNumeric] <- round(Table[, IndNumeric], 3)
+    
+    # PlotSearch(Measure, Aux, EFDR)
+
+    Table
+  }
+
+
   AuxMean <- HiddenThresholdSearchTestDE(ChainTau,
                                          EpsilonM,
                                          ProbThresholdM,
                                          GenesSelect,
                                          EFDR_M,
-                                         Task = "Differential mean", 
-                                         suffix = "M")
-  ProbM <- AuxMean$Prob
-  OptThresholdM <- AuxMean$OptThreshold
+                                         Task = Task, 
+                                         Suffix = Suffix)
 
-  # Test results
-  MeanPlus1 <- which(ProbM > OptThresholdM[1] & MedianTau > 0)
-  MeanPlus2 <- which(ProbM > OptThresholdM[1] & MedianTau < 0)
-  ResultDiffMean <- rep("NoDiff", length(MedianTau))
-  ResultDiffMean[MeanPlus1] <- paste0(GroupLabel1, "+")
-  ResultDiffMean[MeanPlus2] <- paste0(GroupLabel2, "+")
-  if (!is.null(GenesSelect)) {
-      ResultDiffMean[!GenesSelect] <- "ExcludedByUser"
-  }
-  # Output table
-  TableMean <- cbind.data.frame(GeneName = GeneName,
-                                MeanOverall = as.numeric(MuBase),
-                                Mean1 = Mu1,
-                                Mean2 = Mu2,
-                                MeanFC = as.numeric(2 ^ MedianTau),
-                                MeanLog2FC = as.numeric(MedianTau),
-                                ProbDiffMean = as.numeric(ProbM),
-                                ResultDiffMean = ResultDiffMean,
-                                stringsAsFactors = FALSE)
-  # Rounding to 3 decimal points
-  TableMean[, 2:7] <- round(TableMean[, 2:7], 3)
+  TableMean <- TestDifferential(
+    Chain = ChainTau, 
+    Epsilon = EpsilonM, 
+    Param1 = Mu1,
+    Param2 = Mu2,
+    ProbThreshold = ProbThresholdM, 
+    GenesSelect = GenesSelect, 
+    EFDR = EFDR_M, 
+    GroupLabel1 = GroupLabel1,
+    GroupLabel2 = GroupLabel2,
+    Aux = AuxMean,
+    Measure = "Mean"
+  )
 
   # Genes with no change in mean expression
-  NotDE <- ResultDiffMean == "NoDiff"
-
-  # Changes in over dispersion
-  ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
-  MedianOmega <- matrixStats::colMedians(ChainOmega)
-  DeltaBase <- (Delta1 * n1 + Delta2 * n2) / n
+  NotDE <- TableMean$ResultDiffMean == "NoDiff"
 
   # Genes to calibrate EFDR
   if (!is.null(GenesSelect)) {
@@ -366,58 +411,51 @@ BASiCS_TestDE <- function(Chain1,
     select <- NotDE
   }
 
-  AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega,
-                                         EpsilonD,
-                                         ProbThresholdD,
-                                         select,
-                                         EFDR_D,
-                                         Task = "Differential dispersion",
-                                         suffix = "D")
-  ProbD <- AuxDisp$Prob
-  OptThresholdD <- AuxDisp$OptThreshold
+  ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
 
-  # Test results
-  DispPlus1 <- which(ProbD > OptThresholdD[1] & MedianOmega > 0)
-  DispPlus2 <- which(ProbD > OptThresholdD[1] & MedianOmega < 0)
-  ResultDiffDisp <- rep("NoDiff", length(MedianOmega))
-  ResultDiffDisp[DispPlus1] <- paste0(GroupLabel1, "+")
-  ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
 
-  ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
+  AuxDisp <- HiddenThresholdSearchTestDE(
+    ChainOmega,
+    EpsilonD,
+    ProbThresholdD,
+    select,
+    EFDR_D,
+    Task = "Differential dispersion", 
+    Suffix = "D")
+
+
+  TableDisp <- TestDifferential(
+    Chain = ChainOmega, 
+    Epsilon = EpsilonD, 
+    Param1 = Delta1,
+    Param2 = Delta2,
+    ProbThreshold = ProbThresholdD, 
+    GenesSelect = select, 
+    EFDR = EFDR_D, 
+    GroupLabel1 = GroupLabel1,
+    GroupLabel2 = GroupLabel2,
+    Aux = AuxDisp,
+    Measure = "Disp"
+  )
+
+  TableDisp$MeanOverall <- TableMean$MeanOverall
+  TableDisp$ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
   if (!is.null(GenesSelect)) {
-    ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
+    TableDisp$ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
   }
 
-  # Output table
-  TableDisp <- cbind.data.frame(GeneName = GeneName,
-                                MeanOverall = as.numeric(MuBase),
-                                DispOverall = as.numeric(DeltaBase),
-                                Disp1 = Delta1,
-                                Disp2 = Delta2,
-                                DispFC = as.numeric(2^(MedianOmega)),
-                                DispLog2FC = as.numeric(MedianOmega),
-                                ProbDiffDisp = as.numeric(ProbD),
-                                ResultDiffDisp = ResultDiffDisp,
-                                stringsAsFactors = FALSE)
-  # Rounding to 3 decimal points
-  TableDisp[, 2:8] <- round(TableDisp[, 2:8], 3)
-
+  # Changes in over dispersion
   orderVar <- switch(OrderVariable,
     "GeneIndex" = order(GeneIndex, decreasing = FALSE),
     "GeneName" = order(GeneName, decreasing = TRUE),
     "Mu" = order(as.numeric(MuBase), decreasing = TRUE)
   )
+
   # Changes in residual over-dispersion - if regression approach was used
   if (IncludeEpsilon) {
+
     NotExcluded <- !(is.na(Chain1@parameters$epsilon[1, ]) |
                      is.na(Chain2@parameters$epsilon[1, ]))
-
-    ChainPsi <- Chain1@parameters$epsilon - Chain2@parameters$epsilon
-    MedianPsi <- matrixStats::colMedians(ChainPsi)
-    Epsilon1 <- matrixStats::colMedians(Chain1@parameters$epsilon)
-    Epsilon2 <- matrixStats::colMedians(Chain2@parameters$epsilon)
-    EpsilonBase <- (Epsilon1 * n1 + Epsilon2 * n2) / n
-
     # Genes to calibrate EFDR
     if (!is.null(GenesSelect)) {
       select <- NotExcluded & GenesSelect
@@ -425,43 +463,38 @@ BASiCS_TestDE <- function(Chain1,
       select <- NotExcluded
     }
 
-    AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi,
-                                              EpsilonR,
-                                              ProbThresholdR,
-                                              select,
-                                              EFDR_R,
-                                              Task = "Differential residual dispersion",
-                                              suffix = "R")
-    ProbE <- AuxResDisp$Prob
-    OptThresholdE <- AuxResDisp$OptThreshold
+    ChainPsi <- Chain1@parameters$epsilon - Chain2@parameters$epsilon
+    Epsilon1 <- matrixStats::colMedians(Chain1@parameters$epsilon)
+    Epsilon2 <- matrixStats::colMedians(Chain2@parameters$epsilon)
 
-    # Test results
-    ResDispPlus1 <- which(ProbE > OptThresholdE[1] & MedianPsi > 0)
-    ResDispPlus2 <- which(ProbE > OptThresholdE[1] & MedianPsi < 0)
-    ResultDiffResDisp <- rep("NoDiff", length(MedianPsi))
-    ResultDiffResDisp[ResDispPlus1] <- paste0(GroupLabel1, "+")
-    ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
+    AuxResDisp <- HiddenThresholdSearchTestDE(
+      ChainPsi,
+      EpsilonR,
+      ProbThresholdR,
+      select,
+      EFDR_R,
+      Task = "residual differential dispersion", 
+      Suffix = "R")
 
-    ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"
+
+    TableResDisp <- TestDifferential(
+      Chain = ChainPsi, 
+      Epsilon = EpsilonR, 
+      Param1 = Epsilon1,
+      Param2 = Epsilon2,
+      ProbThreshold = ProbThresholdR, 
+      GenesSelect = select,
+      EFDR = EFDR_R, 
+      GroupLabel1 = GroupLabel1,
+      GroupLabel2 = GroupLabel2,
+      Aux = AuxResDisp,
+      Measure = "ResDisp")
+
+    TableResDisp$MeanOverall <- TableMean$MeanOverall
+    TableResDisp$ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"
     if (!is.null(GenesSelect)) {
-      ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
+      TableResDisp$ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
     }
-
-    # Output table
-    TableResDisp <- cbind.data.frame(
-      GeneName = GeneName,
-      MeanOverall = as.numeric(MuBase),
-      ResDispOverall = as.numeric(EpsilonBase),
-      ResDisp1 = Epsilon1,
-      ResDisp2 = Epsilon2,
-      ResDispDistance = as.numeric(MedianPsi),
-      ProbDiffResDisp = as.numeric(ProbE),
-      ResultDiffResDisp = ResultDiffResDisp,
-      stringsAsFactors = FALSE)
-
-    # Rounding to 3 decimal points
-    TableResDisp[, 2:7] <- round(TableResDisp[, 2:7], 3)
-
 
     TableResDisp <- TableResDisp[orderVar, ]
   }
@@ -476,17 +509,13 @@ BASiCS_TestDE <- function(Chain1,
             "and excluded from EFDR calibration. \n",
             "-------------------------------------------------------------\n")
   }
-
   if (Plot) {
-    BASiCS_plotDE(
+    BASiCS_PlotDE(
       GroupLabel1 = GroupLabel1,
       GroupLabel2 = GroupLabel2,
       AuxMean = AuxMean, 
       AuxDisp = AuxDisp, 
       AuxResDisp = AuxResDisp,
-      OptThresholdM = OptThresholdM,
-      OptThresholdD = OptThresholdD,
-      OptThresholdE = OptThresholdE,
       EFDR_M = EFDR_M,
       EFDR_D = EFDR_D,
       EFDR_R = EFDR_R,
@@ -505,9 +534,9 @@ BASiCS_TestDE <- function(Chain1,
       Name = "Mean",
       GroupLabel1 = GroupLabel1,
       GroupLabel2 = GroupLabel2,
-      ProbThreshold = OptThresholdM[[1]],
-      EFDR = OptThresholdM[[2]],
-      EFNR = OptThresholdM[[3]],
+      ProbThreshold = AuxMean$OptThreshold[[1]],
+      EFDR = AuxMean$OptThreshold[[2]],
+      EFNR = AuxMean$OptThreshold[[3]],
       Epsilon = EpsilonM
     ),
     Disp = new("BASiCS_ResultDE", 
@@ -515,9 +544,9 @@ BASiCS_TestDE <- function(Chain1,
       Name = "Disp",
       GroupLabel1 = GroupLabel1,
       GroupLabel2 = GroupLabel2,
-      ProbThreshold = OptThresholdD[[1]],
-      EFDR = OptThresholdD[[2]],
-      EFNR = OptThresholdD[[3]],
+      ProbThreshold = AuxDisp$OptThreshold[[1]],
+      EFDR = AuxDisp$OptThreshold[[2]],
+      EFNR = AuxDisp$OptThreshold[[3]],
       Epsilon = EpsilonD
     )
   )
@@ -530,9 +559,9 @@ BASiCS_TestDE <- function(Chain1,
         Name = "ResDisp",
         GroupLabel1 = GroupLabel1,
         GroupLabel2 = GroupLabel2,
-        ProbThreshold = OptThresholdE[[1]],
-        EFDR = OptThresholdE[[2]],
-        EFNR = OptThresholdE[[3]],
+        ProbThreshold = AuxResDisp$OptThreshold[[1]],
+        EFDR = AuxResDisp$OptThreshold[[2]],
+        EFNR = AuxResDisp$OptThreshold[[3]],
         Epsilon = EpsilonR
       )
     )
