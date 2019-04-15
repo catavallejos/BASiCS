@@ -34,7 +34,7 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  mean/over-dispersion trend. 
 License: GPL (>= 2)
 Depends:
-    R (>= 3.6),
+    R (>= 3.5),
     SingleCellExperiment
 Imports:
     Biobase,
@@ -57,6 +57,7 @@ Imports:
     stats4,
     SummarizedExperiment,
     viridis,
+    reshape2,
     utils    
 Suggests:
     BiocStyle,
