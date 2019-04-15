@@ -7,10 +7,12 @@
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
   EpsilonD = log2(1.5), EpsilonR = log2(1.5)/log2(exp(1)),
   ProbThresholdM = 2/3, ProbThresholdD = 2/3, ProbThresholdR = 2/3,
-  OrderVariable = "GeneIndex", GroupLabel1 = "Group1",
-  GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE,
-  Offset = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, EFDR_R = 0.05,
-  GenesSelect = NULL, ...)
+  OrderVariable = c("GeneIndex", "GeneName", "Mu"),
+  GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
+  PlotOffset = TRUE, PlotOffsetType = c("offset estimate",
+  "before-after", "MA plot"), Offset = TRUE, EFDR_M = 0.05,
+  EFDR_D = 0.05, EFDR_R = 0.05, GenesSelect = NULL,
+  IncludeEpsilon = !is.null(Chain1@parameters[["epsilon"]]), ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}}

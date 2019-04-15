@@ -61,3 +61,30 @@ HiddenCheckValidCombination <- function(...) {
 
 HiddenGeneParams <- function() c("mu", "delta", "epsilon")
 HiddenCellParams <- function() c("s", "phi", "nu")
+
+
+
+
+MeasureName <- function(measure) {
+  switch(measure, 
+    "Mean" = "mean expression", 
+    "Disp" = "over dispersion",
+    "ResDisp" = "residual over dispersion")
+}
+
+DistanceName <- function(measure) {
+  switch(measure, 
+    "ResDisp" = "distance",
+    "fold change")
+}
+
+DistanceVar <- function(measure) {
+  switch(measure, 
+    "ResDisp" = "Distance",
+    "Log2FC")
+}
+
+
+cap <- function(s) {
+  sub("([[:alpha:]])([[:alpha:]]+)", "\\U\\1\\L\\2", s, perl = TRUE)
+}

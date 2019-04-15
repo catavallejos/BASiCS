@@ -46,6 +46,7 @@
 #' Default: \code{GroupLabel2 = 'Group2'}
 #' @param Plot If \code{Plot = TRUE}, MA and volcano plots are generated.
 #' @param PlotOffset If \code{Plot = TRUE}, the offset effect is visualised.
+#' @param PlotOffsetType
 #' @param Offset Optional argument to remove a fix offset effect (if not
 #' previously removed from the MCMC chains). Default: \code{Offset = TRUE}.
 #' @param EFDR_M Target for expected false discovery rate related to
@@ -214,11 +215,11 @@ BASiCS_TestDE <- function(Chain1,
                           Chain2,
                           EpsilonM = log2(1.5),
                           EpsilonD = log2(1.5),
-                          EpsilonR = log2(1.5)/log2(exp(1)),
-                          ProbThresholdM = 2/3,
-                          ProbThresholdD = 2/3,
-                          ProbThresholdR = 2/3,
-                          OrderVariable = "GeneIndex",
+                          EpsilonR = log2(1.5) / log2(exp(1)),
+                          ProbThresholdM = 2 / 3,
+                          ProbThresholdD = 2 / 3,
+                          ProbThresholdR = 2 / 3,
+                          OrderVariable = c("GeneIndex", "GeneName", "Mu"),
                           GroupLabel1 = "Group1",
                           GroupLabel2 = "Group2",
                           Plot = TRUE,
@@ -233,8 +234,10 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_D = 0.05,
                           EFDR_R = 0.05,
                           GenesSelect = NULL, 
-                          Print = TRUE, ...)
+                          IncludeEpsilon = !is.null(Chain1@parameters[["epsilon"]]),
+                          ...)
 {
+  OrderVariable <- match.arg(OrderVariable)
 
   HiddenHeaderTest_DE(Chain1,
                       Chain2,
@@ -265,98 +268,39 @@ BASiCS_TestDE <- function(Chain1,
   n1 <- ncol(Chain1@parameters$nu)
   n2 <- ncol(Chain2@parameters$nu)
   n <- n1 + n2
+
   # With offset correction
   if (Offset) {
-    # Calculating iteration-specific offset
+
+    OffsetCorrected <- BASiCS_CorrectOffset(Chain1 = Chain1, 
+                                            Chain2 = Chain2, 
+                                            GroupLabel1 = GroupLabel1, 
+                                            GroupLabel2 = GroupLabel2, 
+                                            Plot = PlotOffset)
+    Mu1 <- OffsetCorrected@Mu1
+    Mu2 <- OffsetCorrected@Mu2
+    Delta1 <- OffsetCorrected@Delta1
+    Delta2 <- OffsetCorrected@Delta2
+    MuBase <- OffsetCorrected@MuBase
+    ChainTau <- OffsetCorrected@ChainTau
+    MedianTau <- OffsetCorrected@MedianTau
+
+    # Default values when no offset correction is applied
+    OffsetEst <- OffsetCorrected@OffsetEst
+    OffsetChain <- OffsetCorrected@OffsetChain
+    Chain1_offset <- OffsetCorrected@Chain1_offset
+    Chain2_offset <- OffsetCorrected@Chain2_offset
+
+  } else {
     OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
-                    matrixStats::rowSums2(Chain2@parameters$mu)
+                   matrixStats::rowSums2(Chain2@parameters$mu)
     # Offset point estimate
     OffsetEst <- median(OffsetChain)
-
-    # Offset correction
-    Chain1_offset <- Chain1
-    Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
-    #Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
-    Chain2_offset <- Chain2  # Chain2 requires no change
-    Mu1 <- matrixStats::colMedians(Chain1_offset@parameters$mu)
-    Mu2 <- matrixStats::colMedians(Chain2_offset@parameters$mu)
-    Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
-    Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
-#    Summary1 <- Summary(Chain1_offset)
-#    Summary2 <- Summary(Chain2_offset)
-
-    # Pre-offset correction LFC estimates
-#    Summary1_old <- Summary(Chain1)
-#    Summary2_old <- Summary(Chain2)
-    Mu1_old <- matrixStats::colMedians(Chain1@parameters$mu)
-    MuBase_old <- (Mu1_old * n1 + Mu2 * n2) / n
-    ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
-    MedianTau_old <- matrixStats::colMedians(ChainTau_old)
-
-    # Offset corrected LFC estimates
-    MuBase <- (Mu1 * n1 + Mu2 * n2)/n
-    ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
-    MedianTau <- matrixStats::colMedians(ChainTau)
-
-    if (PlotOffset) {
-      message("-------------------------------------------------------------\n",
-              "Offset estimate: ", round(OffsetEst, 4), "\n",
-              "(ratio ", GroupLabel1, " vs ", GroupLabel2, ").\n",
-              "-------------------------------------------------------------\n",
-              "Plots to follow: \n",
-              "1. Posterior uncertainty for offset estimate \n",
-              "2. Mean expression estimates before/after offset correction \n",
-              "3. MA plot before/after offset correction \n")
-
-      par(ask = TRUE)
-      # Offset uncertainty
-      graphics::boxplot(OffsetChain, frame = FALSE,
-                        main = "Offset MCMC chain", ylab = "Offset estimate")
-      # Mean expression parameters before/after offset correction
-      par(mfrow = c(1, 2))
-      graphics::boxplot(cbind(Mu1_old, Mu2),
-                        frame = FALSE, main = "Before correction",
-                        names = c(GroupLabel1, GroupLabel2),
-                        ylab = "Mean expression", log = "y")
-      graphics::boxplot(cbind(Mu1, Mu2),
-                        frame = FALSE, main = "After correction",
-                        names = c(GroupLabel1, GroupLabel2),
-                        ylab = "Mean expression", log = "y")
-      # MA plot pre/after offset
-      par(mfrow = c(1, 2))
-      graphics::smoothScatter(log2(MuBase_old), MedianTau_old, bty = "n",
-                              xlab = "Mean expresssion (log2)",
-                              ylab = paste("Log2 fold change", GroupLabel1,
-                                            "vs", GroupLabel2),
-                              main = "Before correction")
-      abline(h = 0, lty = 2)
-      abline(h = log2(OffsetEst), lty = 1, col = "red")
-      legend('topright', "log2offset", lty = 1, col = "red")
-      graphics::smoothScatter(log2(MuBase), MedianTau, bty = "n",
-                              xlab = "Mean expresssion (log2)",
-                              ylab = paste("Log2 fold change", GroupLabel1,
-                                            "vs", GroupLabel2),
-                              main = "After correction")
-      abline(h = 0, lty = 2)
-      par(ask = FALSE)
-    } else {
-      message("-------------------------------------------------------------\n",
-              "Offset estimate: ", round(OffsetEst, 4), "\n",
-              "(ratio ", GroupLabel1, " vs ", GroupLabel2, ").\n",
-              "To visualise its effect, please use 'PlotOffset = TRUE'.\n",
-              "-------------------------------------------------------------\n")
+    if (!isTRUE(all.equal(OffsetEst, 0))) {
+      stop(paste("Global offset detected between Chain1 and Chain2!\n ",
+                 "Please remove with BASiCS_correctOffset or set Offset=TRUE."))
     }
-  }
-  else {
-    message("-------------------------------------------------------------\n",
-            "It is recomended to perform a global offset correction \n",
-            "to remove global changes between the two groups of cells \n",
-            "Default offset value set equal to 1.\n",
-            "To perform offset correction, please set 'Offset = TRUE'. \n",
-            "-------------------------------------------------------------\n")
 
-    # Summary1 <- Summary(Chain1)
-    # Summary2 <- Summary(Chain2)
     Mu1 <- matrixStats::colMedians(Chain1@parameters$mu)
     Mu2 <- matrixStats::colMedians(Chain2@parameters$mu)
     Delta1 <- matrixStats::colMedians(Chain1@parameters$delta)
@@ -370,7 +314,6 @@ BASiCS_TestDE <- function(Chain1,
     OffsetChain <- NULL
     Chain1_offset <- NULL
     Chain2_offset <- NULL
-
   }
 
   Search <- is.null(ProbThresholdM)
@@ -400,7 +343,7 @@ BASiCS_TestDE <- function(Chain1,
                                 MeanOverall = as.numeric(MuBase),
                                 Mean1 = Mu1,
                                 Mean2 = Mu2,
-                                MeanFC = as.numeric(2^(MedianTau)),
+                                MeanFC = as.numeric(2 ^ MedianTau),
                                 MeanLog2FC = as.numeric(MedianTau),
                                 ProbDiffMean = as.numeric(ProbM),
                                 ResultDiffMean = ResultDiffMean,
@@ -419,8 +362,7 @@ BASiCS_TestDE <- function(Chain1,
   # Genes to calibrate EFDR
   if (!is.null(GenesSelect)) {
     select <- NotDE & GenesSelect
-  }
-  else {
+  } else {
     select <- NotDE
   }
 
@@ -460,8 +402,13 @@ BASiCS_TestDE <- function(Chain1,
   # Rounding to 3 decimal points
   TableDisp[, 2:8] <- round(TableDisp[, 2:8], 3)
 
+  orderVar <- switch(OrderVariable,
+    "GeneIndex" = order(GeneIndex, decreasing = FALSE),
+    "GeneName" = order(GeneName, decreasing = TRUE),
+    "Mu" = order(as.numeric(MuBase), decreasing = TRUE)
+  )
   # Changes in residual over-dispersion - if regression approach was used
-  if (!is.null(Chain1@parameters$epsilon)){
+  if (IncludeEpsilon) {
     NotExcluded <- !(is.na(Chain1@parameters$epsilon[1, ]) |
                      is.na(Chain2@parameters$epsilon[1, ]))
 
@@ -474,8 +421,7 @@ BASiCS_TestDE <- function(Chain1,
     # Genes to calibrate EFDR
     if (!is.null(GenesSelect)) {
       select <- NotExcluded & GenesSelect
-    }
-    else {
+    } else {
       select <- NotExcluded
     }
 
@@ -516,38 +462,11 @@ BASiCS_TestDE <- function(Chain1,
     # Rounding to 3 decimal points
     TableResDisp[, 2:7] <- round(TableResDisp[, 2:7], 3)
 
-    if (OrderVariable == "GeneIndex") {
-      orderVar <- order(GeneIndex, decreasing = FALSE)
-    }
-    if (OrderVariable == "GeneName") {
-      orderVar <- order(GeneName, decreasing = TRUE)
-    }
-    if (OrderVariable == "Mu") {
-      orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
-    }
+
     TableResDisp <- TableResDisp[orderVar, ]
   }
 
-  if (OrderVariable == "GeneIndex") {
-    orderVar <- order(GeneIndex, decreasing = FALSE)
-  }
-  if (OrderVariable == "GeneName") {
-    orderVar <- order(GeneName, decreasing = TRUE)
-  }
-  if (OrderVariable == "Mu") {
-    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
-  }
   TableMean <- TableMean[orderVar, ]
-
-  if (OrderVariable == "GeneIndex") {
-    orderVar <- order(GeneIndex, decreasing = FALSE)
-  }
-  if (OrderVariable == "GeneName") {
-    orderVar <- order(GeneName, decreasing = TRUE)
-  }
-  if (OrderVariable == "Mu") {
-    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
-  }
   TableDisp <- TableDisp[orderVar, ]
 
   if (!is.null(GenesSelect)) {
@@ -559,276 +478,75 @@ BASiCS_TestDE <- function(Chain1,
   }
 
   if (Plot) {
-    if (Search) {
-      message("Plots to follow: \n",
-              "1. EFDR/EFNR control plots \n",
-              "2. MA plots \n",
-              "3. Volcano plots \n")
-    }
-    else {
-      message("Plots to follow: \n",
-              "1. MA plots \n",
-              "2. Volcano plots \n")
-    }
-
-    par(ask = TRUE)
-
-    if (Search) {
-      if (!is.null(Chain1@parameters$epsilon)) {
-        par(mfrow = c(1, 3))
-      }
-      else {
-        par(mfrow = c(1, 2))
-      }
-      ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
-      plot(ProbThresholds, AuxMean$EFDRgrid,
-           type = "l", lty = 1, bty = "n",
-           ylab = "Error rate", xlab = "Probability threshold",
-           ylim = c(0, 1), main = "Differential mean")
-      lines(ProbThresholds, AuxMean$EFNRgrid, lty = 2)
-      abline(h = EFDR_M, col = "blue", lwd = 2, lty = 1)
-      abline(v = OptThresholdM[1], col = "red", lwd = 2, lty = 1)
-      legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1, 2, 1),
-             col = c("black", "black", "blue"), bty = "n")
-      plot(ProbThresholds, AuxDisp$EFDRgrid,
-           type = "l", lty = 1, bty = "n",
-           ylab = "Error rate", xlab = "Probability threshold",
-           ylim = c(0, 1), main = "Differential dispersion")
-      lines(ProbThresholds, AuxDisp$EFNRgrid, lty = 2)
-      abline(h = EFDR_D, col = "blue", lwd = 2, lty = 1)
-      abline(v = OptThresholdD[1], col = "red", lwd = 2, lty = 1)
-      legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1, 2, 1),
-             col = c("black", "black", "blue"), bty = "n")
-      if(!is.null(Chain1@parameters$epsilon)){
-        plot(ProbThresholds, AuxResDisp$EFDRgrid, type = "l", lty = 1, bty = "n",
-             ylab = "Error rate", xlab = "Probability threshold",
-             ylim = c(0, 1), main = "Differential residual dispersion")
-        lines(ProbThresholds, AuxResDisp$EFNRgrid, lty = 2)
-        abline(h = EFDR_R, col = "blue", lwd = 2, lty = 1)
-        abline(v = OptThresholdE[1], col = "red", lwd = 2, lty = 1)
-        legend("top", c("EFDR", "EFNR", "Target EFDR"), lty = c(1, 2, 1),
-               col = c("black", "black", "blue"), bty = "n")
-      }
-    }
-
-    # MA plots
-    if(!is.null(Chain1@parameters$epsilon)){
-      par(mfrow = c(1, 3))
-    }
-    else {
-      par(mfrow = c(1, 2))
-    }
-    with(TableMean,
-         graphics::smoothScatter(log2(MeanOverall), MeanLog2FC,
-                                 bty = "n",
-                                 xlab = "Mean expresssion (log2)",
-                                 ylab = paste("Log2 fold change",
-                                              GroupLabel1, "vs",
-                                              GroupLabel2),
-                                 main = "Differential mean"))
-    with(TableMean[!(TableMean$ResultDiffMean %in%
-                     c("ExcludedByUser", "NoDiff")), ],
-        points(log2(MeanOverall), MeanLog2FC, pch = 16, col = "red"))
-    abline(h = c(-EpsilonM, EpsilonM), lty = 2)
-    with(TableDisp,
-         graphics::smoothScatter(log2(MeanOverall), DispLog2FC,
-                                 bty = "n",
-                                 xlab = "Mean expresssion (log2)",
-                                 ylab = paste("Log2 fold change",
-                                              GroupLabel1, "vs",
-                                              GroupLabel2),
-                                 main = "Differential dispersion"))
-    with(TableDisp[!(TableDisp$ResultDiffDisp %in%
-                       c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
-        points(log2(MeanOverall), DispLog2FC, pch = 16, col = "red"))
-    abline(h = c(-EpsilonD, EpsilonD), lty = 2)
-
-    if (!is.null(Chain1@parameters$epsilon)) {
-
-      with(TableResDisp[TableResDisp$ResultDiffResDisp != "ExcludedFromTesting", ],
-           graphics::smoothScatter(log2(MeanOverall), ResDispDistance,
-                                   bty = "n",
-                                   xlab = "Mean expresssion (log2)",
-                                   ylab = paste("Difference",
-                                                GroupLabel1, "vs",
-                                                GroupLabel2),
-                                   main = "Differential residual dispersion"))
-      with(TableResDisp[!(TableResDisp$ResultDiffResDisp %in%
-                         c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
-           points(log2(MeanOverall), ResDispDistance, pch = 16, col = "red"))
-      abline(h = c(-EpsilonR, EpsilonR), lty = 2)
-    }
-
-    # Volcano plots
-    if (!is.null(Chain1@parameters$epsilon)) {
-      par(mfrow = c(1, 3))
-    }
-    else {
-      par(mfrow = c(1, 2))
-    }
-    with(TableMean,
-         graphics::smoothScatter(MeanLog2FC, ProbDiffMean,
-                                 bty = "n", ylim = c(0, 1),
-                                 ylab = "Posterior probability",
-                                 xlab = paste("Log2 fold change",
-                                              GroupLabel1, "vs",
-                                              GroupLabel2),
-                                 main = "Differential mean test"))
-    with(TableMean[!(TableMean$ResultDiffMean %in%
-                     c("ExcludedByUser", "NoDiff")), ],
-         points(MeanLog2FC, ProbDiffMean, pch = 16, col = "red"))
-    abline(v = c(-EpsilonM, EpsilonM), lty = 2)
-    with(TableDisp,
-         graphics::smoothScatter(DispLog2FC, ProbDiffDisp,
-                                 bty = "n", ylim = c(0, 1),
-                                 ylab = "Posterior probability",
-                                 xlab = paste("Log2 fold change",
-                                              GroupLabel1, "vs",
-                                              GroupLabel2),
-                                 main = "Differential dispersion test"))
-    with(TableDisp[!(TableDisp$ResultDiffDisp %in%
-                       c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
-         points(DispLog2FC, ProbDiffDisp, pch = 16, col = "red"))
-    abline(v = c(-EpsilonD, EpsilonD), lty = 2)
-
-    if (!is.null(Chain1@parameters$epsilon)) {
-
-      with(TableResDisp[TableResDisp$ResultDiffResDisp != "ExcludedFromTesting", ],
-           graphics::smoothScatter(ResDispDistance, ProbDiffResDisp,
-                                   bty = "n", ylim = c(0, 1),
-                                   ylab = "Posterior probability",
-                                   xlab = paste("Difference",
-                                                GroupLabel1, "vs",
-                                                GroupLabel2),
-                                   main = "Differential residual dispersion test"))
-      with(TableResDisp[!(TableResDisp$ResultDiffResDisp %in%
-                         c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
-           points(ResDispDistance, ProbDiffResDisp, pch = 16, col = "red"))
-      abline(v = c(-EpsilonR, EpsilonR), lty = 2)
-    }
-
-    par(ask = FALSE)
+    BASiCS_plotDE(
+      GroupLabel1 = GroupLabel1,
+      GroupLabel2 = GroupLabel2,
+      AuxMean = AuxMean, 
+      AuxDisp = AuxDisp, 
+      AuxResDisp = AuxResDisp,
+      OptThresholdM = OptThresholdM,
+      OptThresholdD = OptThresholdD,
+      OptThresholdE = OptThresholdE,
+      EFDR_M = EFDR_M,
+      EFDR_D = EFDR_D,
+      EFDR_R = EFDR_R,
+      EpsilonM = EpsilonM,
+      EpsilonD = EpsilonD,
+      EpsilonR = EpsilonR,
+      TableMean = TableMean,
+      TableDisp = TableDisp,
+      TableResDisp = TableResDisp,
+      IncludeEpsilon = IncludeEpsilon)
   }
 
+  Results <- list(
+    Mean = new("BASiCS_ResultDE", 
+      Table = TableMean,
+      Name = "Mean",
+      GroupLabel1 = GroupLabel1,
+      GroupLabel2 = GroupLabel2,
+      ProbThreshold = OptThresholdM[[1]],
+      EFDR = OptThresholdM[[2]],
+      EFNR = OptThresholdM[[3]],
+      Epsilon = EpsilonM
+    ),
+    Disp = new("BASiCS_ResultDE", 
+      Table = TableDisp,
+      Name = "Disp",
+      GroupLabel1 = GroupLabel1,
+      GroupLabel2 = GroupLabel2,
+      ProbThreshold = OptThresholdD[[1]],
+      EFDR = OptThresholdD[[2]],
+      EFNR = OptThresholdD[[3]],
+      Epsilon = EpsilonD
+    )
+  )
 
-  out <- new("BASiCS_TestDE",
+  if (IncludeEpsilon) {
+    Results <- c(
+      Results, 
+      ResDisp = new("BASiCS_ResultDE", 
+        Table = TableResDisp,
+        Name = "ResDisp",
+        GroupLabel1 = GroupLabel1,
+        GroupLabel2 = GroupLabel2,
+        ProbThreshold = OptThresholdE[[1]],
+        EFDR = OptThresholdE[[2]],
+        EFNR = OptThresholdE[[3]],
+        Epsilon = EpsilonR
+      )
+    )
+  }
+
+  new("BASiCS_ResultsDE",
     Results = Results,
     Chain1_offset = Chain1_offset,
     Chain2_offset = Chain2_offset,
+    GroupLabel1 = GroupLabel1,
+    GroupLabel2 = GroupLabel2,
     OffsetChain = OffsetChain,
     Offset = OffsetEst,
     Extras = list()
   )
-
-
-  if (!is.null(Chain1@parameters$epsilon)) {
-    out <- structure(
-      list(TableMean = TableMean,
-           TableDisp = TableDisp,
-           TableResDisp = TableResDisp,
-           DiffMeanSummary = list(ProbThreshold = OptThresholdM[1],
-                                  EFDR = OptThresholdM[2],
-                                  EFNR = OptThresholdM[3],
-                                  Epsilon = EpsilonM),
-           DiffDispSummary = list(ProbThreshold = OptThresholdD[1],
-                                  EFDR = OptThresholdD[2],
-                                  EFNR = OptThresholdD[3],
-                                  Epsilon = EpsilonD),
-           DiffResDispSummary = list(ProbThreshold = OptThresholdE[1],
-                                     EFDR = OptThresholdE[2],
-                                     EFNR = OptThresholdE[3],
-                                     Epsilon = EpsilonR),
-           Chain1_offset = Chain1_offset,
-           Chain2_offset = Chain2_offset,
-           GroupLabel1 = GroupLabel1,
-           GroupLabel2 = GroupLabel2,
-           OffsetChain = OffsetChain,
-           Offset = OffsetEst),
-      class = "BASiCS_TestDE"
-    )  
-  }
-  else {
-
-    out <- structure(
-      list(TableMean = TableMean,
-           TableDisp = TableDisp,
-           DiffMeanSummary = list(ProbThreshold = OptThresholdM[1],
-                                  EFDR = OptThresholdM[2],
-                                  EFNR = OptThresholdM[3],
-                                  Epsilon = EpsilonM),
-           DiffDispSummary = list(ProbThreshold = OptThresholdD[1],
-                                  EFDR = OptThresholdD[2],
-                                  EFNR = OptThresholdD[3],
-                                  Epsilon = EpsilonD),
-           Chain1_offset = Chain1_offset,
-           Chain2_offset = Chain2_offset,
-           OffsetChain = OffsetChain,
-           Offset = OffsetEst),
-      class = "BASiCS_TestDE"
-    )
-  }
-  if (Print) {
-    print(out)
-  }
-  out
 }
 
-
-
-print.BASiCS_TestDE <- function(x) {
-  measures <- c("Mean", "Disp", "ResDisp")
-  measures <- measures[sapply(measures, function(m) paste0("Table", m) %in% names(x))]
-
-  for (measure in measures) {
-
-    tableName <- paste0("Table", measure)
-    diffName <- paste0("ResultDiff", measure)
-    diffSummaryName <- paste0("Diff", measure, "Summary")
-    table <- x[[tableName]]
-    nPlus1 <- sum(table[[diffName]] == paste0(x$GroupLabel1, "+"))
-    nPlus2 <- sum(table[[diffName]] == paste0(x$GroupLabel2, "+"))
-    message(
-      "-------------------------------------------------------------\n",
-      nPlus1 + nPlus2," genes with a change in ", measureName(measure), ":\n",
-      "- Higher ", measureName(measure), " in ", x$GroupLabel1, " samples: ", nPlus1, "\n",
-      "- Higher ", measureName(measure), " in ", x$GroupLabel2, " samples: ", nPlus2, "\n",
-      "- ", cap(distanceName(measure)), " tolerance = ", round(2^(x[[diffSummaryName]]$Epsilon)*100, 2), "% \n",
-      "- Probability threshold = ", x[[diffSummaryName]]$ProbThreshold, "\n",
-      "- EFDR = ", round(100 * x[[diffSummaryName]]$EFDR, 2), "% \n",
-      "- EFNR = ", round(100 * x[[diffSummaryName]]$EFNR, 2), "% \n"
-    )
-    if (measure == "delta") {
-      NotDE <- sum(table[[diffName]]  == "ExcludedFromTesting")
-      message(
-        "NOTE: differential dispersion assessment only applied to the \n",
-        sum(NotDE), " genes for which the mean did not change. \n",
-        "and that were included for testing. \n"
-      )
-    } else if (measure == "epsilon") {
-      NotExcluded <- sum(table[[diffName]] != "ExcludedFromTesting")
-      message(
-        "NOTE: differential residual dispersion assessment applied to \n",
-        sum(NotExcluded), " genes expressed in at least 2 cells per condition \n",
-        "and that were included for testing. \n"
-      )
-    }
-    message("-------------------------------------------------------------\n\n")
-  }
-}
-
-measureName <- function(measure) {
-  switch(measure, 
-    "Mean" = "mean expression", 
-    "Disp" = "over dispersion",
-    "ResDisp" = "residual over dispersion")
-}
-
-distanceName <- function(measure) {
-  switch(measure, 
-    "ResDisp" = "distance",
-    "fold change")
-}
-
-cap <- function(s) {
-  sub("([[:alpha:]])([[:alpha:]]+)", "\\U\\1\\L\\2", s, perl = TRUE)
-}
