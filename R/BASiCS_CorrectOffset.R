@@ -1,3 +1,23 @@
+#' @name BASiCS_TestDE
+#'
+#' @title Remove global mean expression offset
+#'
+#' @description Remove global offset in mean expression between two 
+#' \code{BASiCS_Chain} objects.
+#'
+#' @examples
+#'
+#' # Loading two 'BASiCS_Chain' objects (obtained using 'BASiCS_MCMC')
+#' data(ChainSC)
+#' data(ChainRNA)
+#' 
+#' BASiCS_CorrectOffset(ChainSC, ChainRNA, "a", "b", Plot = FALSE)
+#'
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
+#' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
+#' 
+#' @export
 BASiCS_CorrectOffset <- function(Chain1, 
                                  Chain2, 
                                  GroupLabel1, 

@@ -1,3 +1,35 @@
+#' @name BASiCS_PlotOffset
+#'
+#' @title Visualise global offset in mean expression between two chains.
+#'
+#' @description Visualise global offset in mean expression between two 
+#' \code{BASiCS_Chain} objects.
+#' 
+#' @param OffsetCorrected Object of class BASiCS_OffsetCorrected
+#' @param Type The type of plot generated.
+#'    \code{"offset estimate"} produces a boxplot of the offset alongside
+#'    an estimate of the global offset.
+#'    \code{"before-after"} produces MA plots of Mean expression against
+#'    log2(fold-change) before and after offset correction.
+#'    \code{"MA plot"} produces an MA plot of Mean expression against 
+#'    log2(fold-change).
+#' @param Print Print the plots (TRUE), or simply return them as a list (FALSE)?
+#' Default is \code{FALSE}.
+#'
+#' @examples
+#'
+#' # Loading two 'BASiCS_Chain' objects (obtained using 'BASiCS_MCMC')
+#' data(ChainSC)
+#' data(ChainRNA)
+#' 
+#' Corrected <- BASiCS_CorrectOffset(ChainSC, ChainRNA, "a", "b", Plot = FALSE)
+#' BASiCS_PlotOffset(Corrected)
+#'
+#'
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
+#' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
+#' 
 #' @export
 BASiCS_PlotOffset <- function(OffsetCorrected,
                               Type = c(
@@ -92,8 +124,7 @@ DEPlots <- function(
     GroupLabel2,
     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
     Aux,
-    OptThreshold,
-    epsilon,
+    Epsilon,
     EFDR,
     Table,
     Measure,
@@ -107,7 +138,7 @@ DEPlots <- function(
 
   if (Search) {
     plots <- c(
-      list(PlotSearch(Measure, ProbThresholds, Aux, OptThreshold[[1]], EFDR)),
+      list(PlotSearch(Measure, Aux, EFDR, ProbThresholds)),
       plots
     )
   }
@@ -117,11 +148,16 @@ DEPlots <- function(
 
 
 
-PlotSearch <- function(Measure, ProbThresholds, Aux, ProbThreshold, EFDR) {
+PlotSearch <- function(Measure, 
+                       Aux, 
+                       EFDR,
+                       ProbThresholds = seq(0.5, 0.9995, by = 0.00025)
+                       ) {
   df <- data.frame(
     ProbThresholds, 
     EFDR = Aux$EFDRgrid, 
     EFNR = Aux$EFNRgrid)
+
   mdf <- reshape2::melt(df,measure.vars = c("EFDR", "EFNR"))
   ggplot2::ggplot(mdf, aes(x = ProbThresholds, y = value, color = variable)) +
     ggplot2::geom_line() +
@@ -135,7 +171,7 @@ PlotSearch <- function(Measure, ProbThresholds, Aux, ProbThreshold, EFDR) {
       # , palette = "Dark2"
       ) +
     ggplot2::geom_hline(yintercept = EFDR, col = "steelblue", lty = 2) +
-    ggplot2::geom_vline(xintercept = ProbThreshold, col = "indianred", lty = 1)
+    ggplot2::geom_vline(xintercept = Aux$OptThreshold[[1]], col = "indianred", lty = 1)
 }
 
 
@@ -147,9 +183,6 @@ PlotGrids <- function(
     AuxMean, 
     AuxDisp, 
     AuxResDisp = NULL,
-    OptThresholdM,
-    OptThresholdD,
-    OptThresholdE = NULL,
     EpsilonM,
     EpsilonD,
     EpsilonR,
@@ -163,14 +196,14 @@ PlotGrids <- function(
     ) {
 
   plots <- list(
-    PlotSearch("Mean", ProbThresholds, AuxMean, OptThresholdM[[1]], EFDR_M),
-    PlotSearch("Disp", ProbThresholds, AuxDisp, OptThresholdD[[1]], EFDR_D)
+    PlotSearch("Mean", AuxMean, EFDR_M, ProbThresholds),
+    PlotSearch("Disp", AuxDisp, EFDR_D, ProbThresholds)
   )
 
   if (IncludeEpsilon) {
     plots <- c(
       plots, 
-      list(PlotSearch("ResDisp", ProbThresholds, AuxResDisp, OptThresholdE[[1]], EFDR_R))
+      list(PlotSearch("ResDisp", AuxResDisp, EFDR_R, ProbThresholds))
     )
   }
   cowplot::plot_grid(plotlist = plots, nrow = 1)
@@ -185,9 +218,6 @@ PlotMAs <- function(
     AuxMean, 
     AuxDisp, 
     AuxResDisp = NULL,
-    OptThresholdM,
-    OptThresholdD,
-    OptThresholdE = NULL,
     EpsilonM,
     EpsilonD,
     EpsilonR,
@@ -224,9 +254,6 @@ PlotVolcanos <- function(
     AuxMean, 
     AuxDisp, 
     AuxResDisp = NULL,
-    OptThresholdM,
-    OptThresholdD,
-    OptThresholdE = NULL,
     EpsilonM,
     EpsilonD,
     EpsilonR,
@@ -300,16 +327,14 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     ggplot2::geom_hline(yintercept = Epsilon, lty = "dashed", color = "grey40")
 }
 
-BASiCS_plotDE <- function(
+
+BASiCS_PlotDE <- function(
     GroupLabel1,
     GroupLabel2,
     ProbThresholds = seq(0.5, 0.9995, by = 0.00025), 
     AuxMean, 
     AuxDisp, 
     AuxResDisp = NULL,
-    OptThresholdM,
-    OptThresholdD,
-    OptThresholdE = NULL,
     EpsilonM,
     EpsilonD,
     EpsilonR,
@@ -327,17 +352,19 @@ BASiCS_plotDE <- function(
     ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
 
     plots <- list(
-      PlotSearch("Mean", ProbThresholds, AuxMean, OptThresholdM[[1]], EFDR_M),
-      PlotSearch("Disp", ProbThresholds, AuxDisp, OptThresholdD[[1]], EFDR_D)
+      PlotSearch("Mean", AuxMean, EFDR_M, ProbThresholds),
+      PlotSearch("Disp", AuxDisp, EFDR_D, ProbThresholds)
     )
 
     if (IncludeEpsilon) {
-      plots <- c(plots, list(PlotSearch("ResDisp", ProbThresholds, AuxResDisp, OptThresholdE[[1]], EFDR_R)))
+      plots <- c(
+        plots, 
+        list(PlotSearch("ResDisp", AuxResDisp, EFDR_R, ProbThresholds))
+      )
     }
-    cowplot::plot_grid(plotlist = plots, nrow = 1)
+    c <- cowplot::plot_grid(plotlist = plots, nrow = 1)
+    print(c)
   }
-
-
 
   # MA plots
   plots <- list(
@@ -348,11 +375,8 @@ BASiCS_plotDE <- function(
   if (IncludeEpsilon) {
     plots <- c(plots, list(MAPlot("ResDisp", TableResDisp, GroupLabel1, GroupLabel2, EpsilonR)))
   }
-  cowplot::plot_grid(plotlist = plots, nrow = 1)
-
-
-
-
+  c <- cowplot::plot_grid(plotlist = plots, nrow = 1)
+  print(c)
 
   plots <- list(
     VolcanoPlot("Mean", TableMean, GroupLabel1, GroupLabel2, EpsilonM),
@@ -365,5 +389,6 @@ BASiCS_plotDE <- function(
       list(VolcanoPlot("ResDisp", TableResDisp, GroupLabel1, GroupLabel2, EpsilonR))
     )
   }
-  cowplot::plot_grid(plotlist = plots, nrow = 1)
+  c <- cowplot::plot_grid(plotlist = plots, nrow = 1)
+  print(c)
 }
