@@ -21,16 +21,16 @@
 #' data(ChainSC)
 #' 
 #' # See effective sample size distribution across all parameters
-#' BASiCS_diagHist(ChainSC)
+#' BASiCS_DiagHist(ChainSC)
 #' # For mu only
-#' BASiCS_diagHist(ChainSC, Param = "mu")
+#' BASiCS_DiagHist(ChainSC, Param = "mu")
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #'
 #' @export
-BASiCS_diagHist <- function(object, Param = NULL, na.rm = TRUE) {
+BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }

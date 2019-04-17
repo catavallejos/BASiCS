@@ -35,13 +35,13 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
                               Type = c(
                                 "offset estimate", 
                                 "before-after",
-                                "MA plot"
+                                "MAPlot"
                               ),
                               Print = FALSE
                               ) {
   Type <- match.arg(Type)
 
-  plots <- list()
+  Plots <- list()
   if ("offset estimate" %in% Type) {
     # Offset uncertainty
     g <- ggplot2::ggplot(mapping = ggplot2::aes(y = OffsetCorrected@OffsetChain)) +
@@ -50,7 +50,7 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     if (Print) {
       print(g)
     }
-    plots[[Type]] <- g
+    Plots[[Type]] <- g
   }
 
   # Mean expression parameters before/after offset correction
@@ -74,16 +74,16 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     if (Print) {
       print(g)
     }
-    plots[[Type]] <- g
+    Plots[[Type]] <- g
   }
 
-  if ("MA plot" %in% Type) {
+  if ("MAPlot" %in% Type) {
     # MA plot pre/after offset
 
     g1 <- ggplot2::ggplot(mapping = ggplot2::aes(x = log2(OffsetCorrected@MuBase_old), 
                                                  y = OffsetCorrected@MedianTau_old)) +
-      # geom_hex() + 
-      ggplot2::geom_point() +
+      ggplot2::geom_hex() + 
+      # ggplot2::geom_point() +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
         y = paste(
@@ -96,8 +96,8 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
 
     g2 <- ggplot2::ggplot(mapping = ggplot2::aes(x = log2(OffsetCorrected@MuBase), 
                                                  y = OffsetCorrected@MedianTau)) +
-      # ggplot2::geom_hex() + 
-      ggplot2::geom_point() +
+      ggplot2::geom_hex() + 
+      # ggplot2::geom_point() +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
         y = paste(
@@ -111,52 +111,99 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     if (Print) {
       print(g)
     }
-    plots[[Type]] <- g
+    Plots[[Type]] <- g
   }
-  plots
+  if (length(Plots) == 1) {
+    Plots <- Plots[[1]]
+  }
+  Plots
 }
 
 
+DEPlots_ResultDE <- function(
+    ResultDE,
+    GroupLabel1 = ResultDE@GroupLabel1,
+    GroupLabel2 = ResultDE@GroupLabel2,
+    ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
+    Epsilon = ResultDE@Epsilon,
+    EFDR = ResultDE@EFDR,
+    Table = ResultDE@Table,
+    Measure = ResultDE@Name,
+    EFDRgrid = ResultDE@EFDRgrid,
+    EFNRgrid = ResultDE@EFNRgrid,
+    ProbThreshold = ResultDE@ProbThreshold,
+    Which = c("MAPlot", "VolcanoPlot", "GridPlot")){
 
+  DEPlots(
+    GroupLabel1 = GroupLabel1,
+    GroupLabel2 = GroupLabel2,
+    ProbThresholds = ProbThresholds,
+    Epsilon = Epsilon,
+    EFDR = EFDR,
+    Table = Table,
+    Measure = Measure,
+    EFDRgrid = EFDRgrid,
+    EFNRgrid = EFNRgrid,
+    ProbThreshold = ProbThreshold,
+    Which = Which
+  )
+}
 
 DEPlots <- function(
     GroupLabel1,
     GroupLabel2,
     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
-    Aux,
     Epsilon,
     EFDR,
     Table,
     Measure,
-    Search = TRUE
+    EFDRgrid,
+    EFNRgrid,
+    ProbThreshold,
+    Which = c("MAPlot", "VolcanoPlot", "GridPlot")
     ) {
 
-  plots <- list(
-    MAPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon),
-    VolcanoPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon)
-  )
+  Which <- match.arg(Which, several.ok = TRUE)
 
-  if (Search) {
-    plots <- c(
-      list(PlotSearch(Measure, Aux, EFDR, ProbThresholds)),
-      plots
+  Plots <- list()
+
+  if ("MAPlot" %in% Which) {
+    Plots <- c(Plots, 
+      list(MAPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon))
     )
   }
-
-  cowplot::plot_grid(plotlist = plots, nrow = 1)
+  if ("VolcanoPlot" %in% Which) {
+    Plots <- c(Plots, 
+      list(VolcanoPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon))
+    )
+  }
+  if ("GridPlot" %in% Which) {
+    Plots <- c(
+      list(GridPlot(Measure, EFDR, ProbThresholds, EFDRgrid, EFNRgrid, ProbThreshold)),
+      Plots
+    )
+  }
+  if (length(Plots) == 1) {
+    Plots <- Plots[[1]]
+  } else {
+    Plots <- cowplot::plot_grid(plotlist = Plots, nrow = 1)
+  }
+  Plots
 }
 
 
 
-PlotSearch <- function(Measure, 
-                       Aux, 
+GridPlot <- function(Measure, 
                        EFDR,
-                       ProbThresholds = seq(0.5, 0.9995, by = 0.00025)
+                       ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
+                       EFDRgrid,
+                       EFNRgrid,
+                       ProbThreshold
                        ) {
   df <- data.frame(
     ProbThresholds, 
-    EFDR = Aux$EFDRgrid, 
-    EFNR = Aux$EFNRgrid)
+    EFDR = EFDRgrid, 
+    EFNR = EFNRgrid)
 
   mdf <- reshape2::melt(df,measure.vars = c("EFDR", "EFNR"))
   ggplot2::ggplot(mdf, aes(x = ProbThresholds, y = value, color = variable)) +
@@ -171,116 +218,10 @@ PlotSearch <- function(Measure,
       # , palette = "Dark2"
       ) +
     ggplot2::geom_hline(yintercept = EFDR, col = "steelblue", lty = 2) +
-    ggplot2::geom_vline(xintercept = Aux$OptThreshold[[1]], col = "indianred", lty = 1)
+    ggplot2::geom_vline(xintercept = ProbThreshold, col = "indianred", lty = 1)
 }
 
 
-
-PlotGrids <- function(
-    GroupLabel1,
-    GroupLabel2,
-    ProbThresholds = seq(0.5, 0.9995, by = 0.00025), 
-    AuxMean, 
-    AuxDisp, 
-    AuxResDisp = NULL,
-    EpsilonM,
-    EpsilonD,
-    EpsilonR,
-    EFDR_M,
-    EFDR_D,
-    EFDR_R = NULL,
-    TableMean,
-    TableDisp,
-    TableResDisp = NULL,
-    IncludeEpsilon = !is.null(AuxResDisp)
-    ) {
-
-  plots <- list(
-    PlotSearch("Mean", AuxMean, EFDR_M, ProbThresholds),
-    PlotSearch("Disp", AuxDisp, EFDR_D, ProbThresholds)
-  )
-
-  if (IncludeEpsilon) {
-    plots <- c(
-      plots, 
-      list(PlotSearch("ResDisp", AuxResDisp, EFDR_R, ProbThresholds))
-    )
-  }
-  cowplot::plot_grid(plotlist = plots, nrow = 1)
-}
-
-
-
-PlotMAs <- function(
-    GroupLabel1,
-    GroupLabel2,
-    ProbThresholds = seq(0.5, 0.9995, by = 0.00025), 
-    AuxMean, 
-    AuxDisp, 
-    AuxResDisp = NULL,
-    EpsilonM,
-    EpsilonD,
-    EpsilonR,
-    EFDR_M,
-    EFDR_D,
-    EFDR_R = NULL,
-    TableMean,
-    TableDisp,
-    TableResDisp = NULL,
-    IncludeEpsilon = !is.null(AuxResDisp)
-    ) {
-
-  # MA plots
-  plots <- list(
-    MAPlot("Mean", TableMean, GroupLabel1, GroupLabel2, EpsilonM),
-    MAPlot("Disp", TableDisp, GroupLabel1, GroupLabel2, EpsilonD)
-  )
-
-  if (IncludeEpsilon) {
-    plots <- c(
-      plots, 
-      list(MAPlot("ResDisp", TableResDisp, GroupLabel1, GroupLabel2, EpsilonR))
-    )
-  }
-  cowplot::plot_grid(plotlist = plots, nrow = 1)
-}
-
-
-
-PlotVolcanos <- function(
-    GroupLabel1,
-    GroupLabel2,
-    ProbThresholds = seq(0.5, 0.9995, by = 0.00025), 
-    AuxMean, 
-    AuxDisp, 
-    AuxResDisp = NULL,
-    EpsilonM,
-    EpsilonD,
-    EpsilonR,
-    EFDR_M,
-    EFDR_D,
-    EFDR_R = NULL,
-    TableMean,
-    TableDisp,
-    TableResDisp = NULL,
-    IncludeEpsilon = !is.null(AuxResDisp)
-    ) {
-
-  # MA plots
-  plots <- list(
-    VolcanoPlot("Mean", TableMean, GroupLabel1, GroupLabel2, EpsilonM),
-    VolcanoPlot("Disp", TableDisp, GroupLabel1, GroupLabel2, EpsilonD)
-  )
-
-  if (IncludeEpsilon) {
-    plots <- c(
-      plots, 
-      list(VolcanoPlot("ResDisp", TableResDisp, GroupLabel1, GroupLabel2, EpsilonR))
-    )
-  }
-  cowplot::plot_grid(plotlist = plots, nrow = 1)
-
-}
 
 MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   IndDiff <- !Table[[paste0("ResultDiff", Measure)]] %in% c("ExcludedByUser", "NoDiff")
@@ -291,7 +232,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         y = paste0(Measure, DistanceVar(Measure)))
     ) + 
     ggplot2::geom_hex(bins = 75, aes(fill = ..density..)) +
-    ggplot2::geom_point() +
+    # ggplot2::geom_point() +
     ggplot2::scale_x_continuous(trans = "log2") +
     viridis::scale_fill_viridis(name = "Density") +
     ggplot2::labs(
@@ -328,67 +269,8 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
 }
 
 
-BASiCS_PlotDE <- function(
-    GroupLabel1,
-    GroupLabel2,
-    ProbThresholds = seq(0.5, 0.9995, by = 0.00025), 
-    AuxMean, 
-    AuxDisp, 
-    AuxResDisp = NULL,
-    EpsilonM,
-    EpsilonD,
-    EpsilonR,
-    EFDR_M,
-    EFDR_D,
-    EFDR_R = NULL,
-    TableMean,
-    TableDisp,
-    TableResDisp = NULL,
-    IncludeEpsilon = !is.null(AuxResDisp),
-    Search = TRUE) {
-
-  if (Search) {
-
-    ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
-
-    plots <- list(
-      PlotSearch("Mean", AuxMean, EFDR_M, ProbThresholds),
-      PlotSearch("Disp", AuxDisp, EFDR_D, ProbThresholds)
-    )
-
-    if (IncludeEpsilon) {
-      plots <- c(
-        plots, 
-        list(PlotSearch("ResDisp", AuxResDisp, EFDR_R, ProbThresholds))
-      )
-    }
-    c <- cowplot::plot_grid(plotlist = plots, nrow = 1)
-    print(c)
-  }
-
-  # MA plots
-  plots <- list(
-    MAPlot("Mean", TableMean, GroupLabel1, GroupLabel2, EpsilonM),
-    MAPlot("Disp", TableDisp, GroupLabel1, GroupLabel2, EpsilonD)
-  )
-
-  if (IncludeEpsilon) {
-    plots <- c(plots, list(MAPlot("ResDisp", TableResDisp, GroupLabel1, GroupLabel2, EpsilonR)))
-  }
-  c <- cowplot::plot_grid(plotlist = plots, nrow = 1)
-  print(c)
-
-  plots <- list(
-    VolcanoPlot("Mean", TableMean, GroupLabel1, GroupLabel2, EpsilonM),
-    VolcanoPlot("Disp", TableDisp, GroupLabel1, GroupLabel2, EpsilonD)
-  )
-
-  if (IncludeEpsilon) {
-    plots <- c(
-      plots, 
-      list(VolcanoPlot("ResDisp", TableResDisp, GroupLabel1, GroupLabel2, EpsilonR))
-    )
-  }
-  c <- cowplot::plot_grid(plotlist = plots, nrow = 1)
-  print(c)
+BASiCS_PlotDE <- function(ResultsDE, Which = c("MAPlot", "VolcanoPlot", "GridPlot"), ...) {
+  l <- lapply(ResultsDE@Results, DEPlots_ResultDE, Which = Which, ...)
+  nrow <- if (length(Which) > 1) length(ResultsDE@Results) else length(Which)
+  cowplot::plot_grid(plotlist = l, nrow = nrow)
 }
