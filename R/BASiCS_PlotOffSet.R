@@ -236,13 +236,17 @@ GridPlot <- function(Measure,
 
 MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   IndDiff <- !Table[[paste0("ResultDiff", Measure)]] %in% c("ExcludedByUser", "NoDiff")
+  bins <- NClassFD2D(
+    Table[[paste0(Measure, "Overall")]],
+    Table[[paste0(Measure, DistanceVar(Measure))]]
+  )
   ggplot2::ggplot(
       Table, 
       ggplot2::aes_string(
         x = paste0(Measure, "Overall"), 
         y = paste0(Measure, DistanceVar(Measure)))
     ) + 
-    ggplot2::geom_hex(bins = 75, aes(fill = ..density..)) +
+    ggplot2::geom_hex(bins = bins, aes(fill = ..density..)) +
     # ggplot2::geom_point() +
     ggplot2::scale_x_continuous(trans = "log2") +
     viridis::scale_fill_viridis(name = "Density") +
@@ -260,6 +264,10 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
 
 VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   IndDiff <- !Table[[paste0("ResultDiff", Measure)]] %in% c("ExcludedByUser", "NoDiff")
+  bins <- NClassFD2D(
+    Table[[paste0(Measure, DistanceVar(Measure))]],
+    Table[[paste0("ProbDiff", Measure)]]
+  )
   ggplot2::ggplot(
       Table, 
       ggplot2::aes_string(
@@ -267,7 +275,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         y = paste0("ProbDiff", Measure))
     ) +
     # ggplot2::geom_point() +
-    ggplot2::geom_hex(bins = 75, aes(fill = ..density..)) +
+    ggplot2::geom_hex(bins = bins, aes(fill = ..density..)) +
     viridis::scale_fill_viridis(name = "Density") +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::labs(y = "Posterior probability",
