@@ -3,7 +3,7 @@ title: "DE plot demo"
 date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('BASiCS')`"
 output: 
-  html_document:
+  md_document:
     fig_width: 15
     fig_height: 12
 ---
