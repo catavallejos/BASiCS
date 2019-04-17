@@ -4,8 +4,8 @@ date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('BASiCS')`"
 output: 
   md_document:
-    fig_width: 15
-    fig_height: 12
+    fig_width: 12
+    fig_height: 9
 ---
 
 ```{r objs}
@@ -18,9 +18,9 @@ data(ChainSCReg)
 data(ChainRNAReg)
 
 t <- theme_bw()
-t$text <- element_text(size = 15)
+t$text$size <- 15
 t$plot.title <- element_text(hjust = 0.5)
-theme_set(theme_bw())
+theme_set(t)
 
 os <- BASiCS_CorrectOffset(ChainSCReg, ChainRNAReg, Plot = FALSE)
 de <- BASiCS_TestDE(ChainSCReg, ChainRNAReg, PlotOffset=FALSE, Plot=FALSE)

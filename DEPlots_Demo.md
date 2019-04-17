@@ -9,9 +9,9 @@
     data(ChainRNAReg)
 
     t <- theme_bw()
-    t$text <- element_text(size = 15)
+    t$text$size <- 15
     t$plot.title <- element_text(hjust = 0.5)
-    theme_set(theme_bw())
+    theme_set(t)
 
     os <- BASiCS_CorrectOffset(ChainSCReg, ChainRNAReg, Plot = FALSE)
 
@@ -43,21 +43,11 @@
 
     BASiCS_PlotOffset(os, Type = "MAPlot")
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
 <img src="DEPlots_Demo_files/figure-markdown_strict/offsets-3.png" width="1200px" height="500px" />
 
     DEPlots_ResultDE(de@Results[[1]])
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
+    ## Warning: Removed 16 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -65,15 +55,11 @@
 
     DEPlots_ResultDE(de@Results[[1]], Which = "MAPlot")
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: separately-2.png" width="1200px" height="500px" />
 
     DEPlots_ResultDE(de@Results[[1]], Which = "VolcanoPlot")
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
+    ## Warning: Removed 16 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -85,19 +71,11 @@
 
     BASiCS_PlotDE(de)
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
+    ## Warning: Removed 16 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
+    ## Warning: Removed 13 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -111,13 +89,7 @@
 
     ## Warning: Removed 186 rows containing non-finite values (stat_binhex).
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
     ## Warning: Removed 4 rows containing missing values (geom_point).
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -125,12 +97,6 @@
 
     BASiCS_PlotDE(de, Which = "MAPlot")
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
     ## Warning in self$trans$transform(x): NaNs produced
 
     ## Warning: Transformation introduced infinite values in continuous x-axis
@@ -141,27 +107,19 @@
 
     ## Warning: Removed 186 rows containing non-finite values (stat_binhex).
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
-
     ## Warning: Removed 4 rows containing missing values (geom_point).
 
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: together-2.png" width="1200px" height="500px" />
 
     BASiCS_PlotDE(de, Which = "VolcanoPlot")
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
+    ## Warning: Removed 16 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
+    ## Warning: Removed 13 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
-
-    ## Warning: Computation failed in `stat_binhex()`:
-    ## "hbin" not resolved from current namespace (hexbin)
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
