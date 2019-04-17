@@ -47,7 +47,7 @@
 
     DEPlots_ResultDE(de@Results[[1]])
 
-    ## Warning: Removed 16 rows containing missing values (geom_hex).
+    ## Warning: Removed 6 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -59,7 +59,7 @@
 
     DEPlots_ResultDE(de@Results[[1]], Which = "VolcanoPlot")
 
-    ## Warning: Removed 16 rows containing missing values (geom_hex).
+    ## Warning: Removed 6 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -71,11 +71,11 @@
 
     BASiCS_PlotDE(de)
 
-    ## Warning: Removed 16 rows containing missing values (geom_hex).
+    ## Warning: Removed 6 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
-    ## Warning: Removed 13 rows containing missing values (geom_hex).
+    ## Warning: Removed 8 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -90,6 +90,8 @@
     ## Warning: Removed 186 rows containing non-finite values (stat_binhex).
 
     ## Warning: Removed 4 rows containing missing values (geom_point).
+
+    ## Warning: Removed 1 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
@@ -113,13 +115,15 @@
 
     BASiCS_PlotDE(de, Which = "VolcanoPlot")
 
-    ## Warning: Removed 16 rows containing missing values (geom_hex).
+    ## Warning: Removed 6 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
-    ## Warning: Removed 13 rows containing missing values (geom_hex).
+    ## Warning: Removed 8 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
+
+    ## Warning: Removed 1 rows containing missing values (geom_hex).
 
     ## Warning: Removed 1 rows containing missing values (geom_hline).
 
