@@ -1,0 +1,48 @@
+---
+title: "DE plot demo"
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('BASiCS')`"
+output: 
+  html_document:
+    fig_width: 15
+    fig_height: 12
+---
+
+```{r objs}
+
+suppressPackageStartupMessages({
+    load_all()
+    library("ggplot2")
+})
+data(ChainSCReg)
+data(ChainRNAReg)
+
+t <- theme_bw()
+t$text <- element_text(size = 15)
+t$plot.title <- element_text(hjust = 0.5)
+theme_set(theme_bw())
+
+os <- BASiCS_CorrectOffset(ChainSCReg, ChainRNAReg, Plot = FALSE)
+de <- BASiCS_TestDE(ChainSCReg, ChainRNAReg, PlotOffset=FALSE, Plot=FALSE)
+```
+
+```{r offsets, out.width="1200px", out.height="500px"}
+BASiCS_PlotOffset(os, Type = "offset estimate")
+BASiCS_PlotOffset(os, Type = "before-after")
+BASiCS_PlotOffset(os, Type = "MAPlot")
+```
+
+```{r DE: separately, out.width="1200px", out.height="500px"}
+DEPlots_ResultDE(de@Results[[1]])
+DEPlots_ResultDE(de@Results[[1]], Which = "MAPlot")
+DEPlots_ResultDE(de@Results[[1]], Which = "VolcanoPlot")
+DEPlots_ResultDE(de@Results[[1]], Which = "GridPlot")
+```
+
+
+```{r DE: together, out.width="1200px", out.height="500px"}
+BASiCS_PlotDE(de)
+BASiCS_PlotDE(de, Which = "MAPlot")
+BASiCS_PlotDE(de, Which = "VolcanoPlot")
+BASiCS_PlotDE(de, Which = "GridPlot")
+```

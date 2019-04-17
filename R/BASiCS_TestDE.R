@@ -509,24 +509,6 @@ BASiCS_TestDE <- function(Chain1,
             "and excluded from EFDR calibration. \n",
             "-------------------------------------------------------------\n")
   }
-  if (Plot) {
-    BASiCS_PlotDE(
-      GroupLabel1 = GroupLabel1,
-      GroupLabel2 = GroupLabel2,
-      AuxMean = AuxMean, 
-      AuxDisp = AuxDisp, 
-      AuxResDisp = AuxResDisp,
-      EFDR_M = EFDR_M,
-      EFDR_D = EFDR_D,
-      EFDR_R = EFDR_R,
-      EpsilonM = EpsilonM,
-      EpsilonD = EpsilonD,
-      EpsilonR = EpsilonR,
-      TableMean = TableMean,
-      TableDisp = TableDisp,
-      TableResDisp = TableResDisp,
-      IncludeEpsilon = IncludeEpsilon)
-  }
 
   Results <- list(
     Mean = new("BASiCS_ResultDE", 
@@ -537,6 +519,8 @@ BASiCS_TestDE <- function(Chain1,
       ProbThreshold = AuxMean$OptThreshold[[1]],
       EFDR = AuxMean$OptThreshold[[2]],
       EFNR = AuxMean$OptThreshold[[3]],
+      EFDRgrid = AuxMean$EFDRgrid,
+      EFNRgrid = AuxMean$EFNRgrid,
       Epsilon = EpsilonM
     ),
     Disp = new("BASiCS_ResultDE", 
@@ -547,6 +531,8 @@ BASiCS_TestDE <- function(Chain1,
       ProbThreshold = AuxDisp$OptThreshold[[1]],
       EFDR = AuxDisp$OptThreshold[[2]],
       EFNR = AuxDisp$OptThreshold[[3]],
+      EFDRgrid = AuxDisp$EFDRgrid,
+      EFNRgrid = AuxDisp$EFNRgrid,
       Epsilon = EpsilonD
     )
   )
@@ -562,12 +548,16 @@ BASiCS_TestDE <- function(Chain1,
         ProbThreshold = AuxResDisp$OptThreshold[[1]],
         EFDR = AuxResDisp$OptThreshold[[2]],
         EFNR = AuxResDisp$OptThreshold[[3]],
+        EFDRgrid = AuxResDisp$EFDRgrid,
+        EFNRgrid = AuxResDisp$EFNRgrid,
         Epsilon = EpsilonR
       )
     )
   }
 
-  new("BASiCS_ResultsDE",
+
+
+  Out <- new("BASiCS_ResultsDE",
     Results = Results,
     Chain1_offset = Chain1_offset,
     Chain2_offset = Chain2_offset,
@@ -577,5 +567,9 @@ BASiCS_TestDE <- function(Chain1,
     Offset = OffsetEst,
     Extras = list()
   )
+  if (Plot) {
+    BASiCS_PlotDE(Out)
+  }
+  Out
 }
 

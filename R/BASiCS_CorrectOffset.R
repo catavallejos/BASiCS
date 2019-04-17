@@ -20,8 +20,8 @@
 #' @export
 BASiCS_CorrectOffset <- function(Chain1, 
                                  Chain2, 
-                                 GroupLabel1, 
-                                 GroupLabel2, 
+                                 GroupLabel1 = "Group1", 
+                                 GroupLabel2 = "Group2", 
                                  Plot = TRUE,
                                  ...) {
   
