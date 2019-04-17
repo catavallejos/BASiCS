@@ -117,23 +117,31 @@ BASiCS_DetectHVG <- function(Chain,
   # performs the variance decomposition.
   
   if(!is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)){
-    # Find the epsilon threshold that correspond to the top 'PercentileThreshold'
-    # genes
+    # Find the epsilon threshold that correspond to the top 
+    # 'PercentileThreshold' genes
     
     nGenes <- ncol(Chain@parameters$epsilon)
     
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
-    EpsilonThreshold <- stats::quantile(Epsilon, PercentileThreshold, na.rm = TRUE)
+    EpsilonThreshold <- stats::quantile(
+      Epsilon, 
+      PercentileThreshold, 
+      na.rm = TRUE
+    )
     
     # HVG probability for a given epsilon threshold
-    Prob <- matrixStats::colMeans2(ifelse(Chain@parameters$epsilon >
-                                     EpsilonThreshold, 1, 0))
+    Prob <- matrixStats::colMeans2(
+      ifelse(Chain@parameters$epsilon > EpsilonThreshold, 1, 0)
+    )
     
     # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, Prob[!is.na(Prob)], EFDR)
+    Aux <- HiddenThresholdSearchDetectHVG_LVG(
+      ProbThreshold, 
+      Prob[!is.na(Prob)], 
+      EFDR
+    )
     
-    if(Search)
-    {
+    if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
       ProbThresholds <- Aux$ProbThresholds
@@ -174,9 +182,10 @@ BASiCS_DetectHVG <- function(Chain,
       par(ask = FALSE)
     }
     
-    message(sum(HVG, na.rm = TRUE), " genes classified as highly variable using: \n",
-            "- The ",
-            round(100 * PercentileThreshold, 2), "percentile of variable genes \n",
+    message(sum(HVG, na.rm = TRUE), 
+            " genes classified as highly variable using: \n",
+            "- The ", round(100 * PercentileThreshold, 2), 
+            "percentile of variable genes \n",
             "- Evidence threshold = ", OptThreshold[1], "\n",
             "- EFDR = ", round(100 * OptThreshold[2], 2), "% \n",
             "- EFNR = ", round(100 * OptThreshold[3], 2), "% \n")
@@ -273,17 +282,25 @@ BASiCS_DetectLVG <- function(Chain,
     nGenes <- ncol(Chain@parameters$epsilon)
     
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
-    EpsilonThreshold <- stats::quantile(Epsilon, PercentileThreshold, na.rm = TRUE)
+    EpsilonThreshold <- stats::quantile(
+      Epsilon, 
+      PercentileThreshold, 
+      na.rm = TRUE
+    )
     
     # HVG probability for a given epsilon threshold
-    Prob <- matrixStats::colMeans2(ifelse(Chain@parameters$epsilon <
-                                            EpsilonThreshold, 1, 0))
+    Prob <- matrixStats::colMeans2(
+      ifelse(Chain@parameters$epsilon < EpsilonThreshold, 1, 0)
+    )
     
     # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, Prob[!is.na(Prob)], EFDR)
+    Aux <- HiddenThresholdSearchDetectHVG_LVG(
+      ProbThreshold, 
+      Prob[!is.na(Prob)], 
+      EFDR
+    )
     
-    if(Search)
-    {
+    if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
       ProbThresholds <- Aux$ProbThresholds
@@ -324,9 +341,10 @@ BASiCS_DetectLVG <- function(Chain,
       par(ask = FALSE)
     }
     
-    message(sum(LVG, na.rm = TRUE), " genes classified as lowly variable using: \n",
-            "- The ",
-            round(100 * PercentileThreshold, 2), "percentile of variable genes \n",
+    message(sum(LVG, na.rm = TRUE), 
+            " genes classified as lowly variable using: \n",
+            "- The ", round(100 * PercentileThreshold, 2), 
+            "percentile of variable genes \n",
             "- Evidence threshold = ", OptThreshold[1], "\n",
             "- EFDR = ", round(100 * OptThreshold[2], 2), "% \n",
             "- EFNR = ", round(100 * OptThreshold[3], 2), "% \n")
@@ -339,13 +357,13 @@ BASiCS_DetectLVG <- function(Chain,
     VarDecomp <- HiddenVarDecomp(Chain)
 
     # LVG probability for a given variance threshold
-    Prob <- matrixStats::colMeans2(ifelse(VarDecomp$BioVarGlobal <
-                                            VarThreshold, 1, 0))
+    Prob <- matrixStats::colMeans2(
+      ifelse(VarDecomp$BioVarGlobal < VarThreshold, 1, 0)
+    )
 
     # Threshold search
     Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, Prob, EFDR)
-    if(Search)
-    {
+    if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
       ProbThresholds <- Aux$ProbThresholds
