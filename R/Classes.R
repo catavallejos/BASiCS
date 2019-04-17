@@ -282,6 +282,8 @@ setClass("BASiCS_ResultDE",
     ProbThreshold = "numeric",
     EFDR = "numeric",
     EFNR = "numeric",
+    EFDRgrid = "numeric",
+    EFNRgrid = "numeric",
     Epsilon = "numeric",
     Extras = "list"
   )
