@@ -46,7 +46,9 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     # Offset uncertainty
     g <- ggplot2::ggplot(mapping = ggplot2::aes(y = OffsetCorrected@OffsetChain)) +
       ggplot2::geom_boxplot() +
-      ggplot2::labs(title = "Offset MCMC chain", y = "Offset estimate", x = NULL)
+      ggplot2::labs(
+        # title = "Offset MCMC chain", 
+        y = "Offset estimate", x = NULL)
     if (Print) {
       print(g)
     }
@@ -85,25 +87,31 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     x <- log2(OffsetCorrected@MuBase_old)
     y <- OffsetCorrected@MedianTau_old
     g1 <- ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
-      ggplot2::geom_hex(bins = NClassFD2D(x, y), 
-        aes(fill = ..density..)
-      ) + 
+      ggplot2::geom_hex(
+        bins = NClassFD2D(x, y), 
+        aes(fill = ..density..), 
+        na.rm = TRUE) + 
       # ggplot2::geom_point() +
+      ggplot2::geom_hline(yintercept = 0, lty = 2) +
+      ggplot2::geom_hline(
+        yintercept = log2(OffsetCorrected@OffsetEst), 
+        lty = 1, 
+        col = "red", 
+        na.rm = TRUE) +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
         y = paste(
           "Log2 fold change", OffsetCorrected@GroupLabel1,
           "vs", OffsetCorrected@GroupLabel2),
         title = "Before correction") +
-      viridis::scale_fill_viridis(name = "Density") +
-      ggplot2::geom_hline(yintercept = 0, lty = 2) +
-      ggplot2::geom_hline(yintercept = log2(OffsetCorrected@OffsetEst), lty = 1, col = "red")
+      viridis::scale_fill_viridis(name = "Density")
 
 
     x <- log2(OffsetCorrected@MuBase)
     y <- OffsetCorrected@MedianTau
     g2 <- ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
-      ggplot2::geom_hex(bins = NClassFD2D(x, y), aes(fill = ..density..)) + 
+      ggplot2::geom_hex(bins = NClassFD2D(x, y), aes(fill = ..density..), na.rm = TRUE) + 
+      ggplot2::geom_hline(yintercept = 0, lty = 2) +
       # ggplot2::geom_point() +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
@@ -111,7 +119,6 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
           "Log2 fold change", OffsetCorrected@GroupLabel1,
           "vs", OffsetCorrected@GroupLabel2),
         title = "After correction") +
-      ggplot2::geom_hline(yintercept = 0, lty = 2) +
       viridis::scale_fill_viridis(name = "Density")
 
     g <- cowplot::plot_grid(g1, g2)
@@ -221,8 +228,8 @@ GridPlot <- function(Measure,
     ggplot2::geom_line() +
     ggplot2::labs(
       y = "Error rate", 
-      x = "Probability threshold",
-      title = paste("Differential", MeasureName(Measure))
+      x = "Probability threshold"
+      # ,title = paste("Differential", MeasureName(Measure))
     ) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::scale_color_discrete(name = ""
@@ -235,6 +242,7 @@ GridPlot <- function(Measure,
 
 
 MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
+
   IndDiff <- !Table[[paste0("ResultDiff", Measure)]] %in% c("ExcludedByUser", "NoDiff")
   bins <- NClassFD2D(
     Table[[paste0(Measure, "Overall")]],
@@ -246,20 +254,28 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         x = paste0(Measure, "Overall"), 
         y = paste0(Measure, DistanceVar(Measure)))
     ) + 
-    ggplot2::geom_hex(bins = bins, aes(fill = ..density..)) +
+    ggplot2::geom_hex(bins = bins, aes(fill = ..density..), na.rm = TRUE) +
     # ggplot2::geom_point() +
+    ggplot2::geom_point(
+      data = Table[IndDiff, ], 
+      shape = 16, 
+      colour = "violetred", 
+      na.rm = TRUE) +
+    ggplot2::geom_hline(
+      yintercept = c(-Epsilon, Epsilon), 
+      lty = "dashed", 
+      color = "grey40", 
+      na.rm = TRUE) +
     ggplot2::scale_x_continuous(trans = "log2") +
     viridis::scale_fill_viridis(name = "Density") +
     ggplot2::labs(
-      x = paste(cap(MeasureName(Measure)), " (log2)"),
-      ylab = paste("Log2 fold change",
+      x = paste(cap(MeasureName(Measure))),
+      y = paste(cap(LogDistanceName(Measure)),
         GroupLabel1, "vs",
-        GroupLabel2),
-      title = paste("Differential", MeasureName(Measure))
-    ) +
-    ggplot2::geom_point(data = Table[IndDiff, ], shape = 16, colour = "violetred") +
-    ggplot2::geom_hline(yintercept = -Epsilon, lty = "dashed", color = "grey40") +
-    ggplot2::geom_hline(yintercept = Epsilon, lty = "dashed", color = "grey40")
+        GroupLabel2)
+      # ,
+      # title = paste("Differential", MeasureName(Measure))
+    )
 }
 
 VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
@@ -275,16 +291,24 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         y = paste0("ProbDiff", Measure))
     ) +
     # ggplot2::geom_point() +
-    ggplot2::geom_hex(bins = bins, aes(fill = ..density..)) +
-    viridis::scale_fill_viridis(name = "Density") +
+    ggplot2::geom_hex(bins = bins, aes(fill = ..density..), na.rm = TRUE) +
+    ggplot2::geom_point(
+      data = Table[IndDiff, ], 
+      shape = 16, 
+      col = "violetred", 
+      na.rm = TRUE) +
+    ggplot2::geom_hline(
+      yintercept = c(-Epsilon, Epsilon), 
+      lty = "dashed", 
+      color = "grey40", 
+      na.rm = TRUE) +
     ggplot2::ylim(c(0, 1)) +
-    ggplot2::labs(y = "Posterior probability",
-         x = paste("Log2 fold change", GroupLabel1, "vs", GroupLabel2),
-         title = paste("Differential", MeasureName(Measure), "test")
-    ) +
-    ggplot2::geom_point(data = Table[IndDiff, ], shape = 16, col = "violetred") +
-    ggplot2::geom_hline(yintercept = -Epsilon, lty = "dashed", color = "grey40") +
-    ggplot2::geom_hline(yintercept = Epsilon, lty = "dashed", color = "grey40")
+    viridis::scale_fill_viridis(name = "Density") +
+    ggplot2::labs(
+      x = paste(cap(LogDistanceName(Measure)), GroupLabel1, "vs", GroupLabel2),
+      y = "Posterior probability"
+      # ,title = paste("Differential", MeasureName(Measure), "test")
+    )
 }
 
 

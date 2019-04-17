@@ -47,10 +47,6 @@
 
     DEPlots_ResultDE(de@Results[[1]])
 
-    ## Warning: Removed 6 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
-
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: separately-1.png" width="1200px" height="500px" />
 
     DEPlots_ResultDE(de@Results[[1]], Which = "MAPlot")
@@ -58,10 +54,6 @@
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: separately-2.png" width="1200px" height="500px" />
 
     DEPlots_ResultDE(de@Results[[1]], Which = "VolcanoPlot")
-
-    ## Warning: Removed 6 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
 
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: separately-3.png" width="1200px" height="500px" />
 
@@ -71,14 +63,6 @@
 
     BASiCS_PlotDE(de)
 
-    ## Warning: Removed 6 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
-
-    ## Warning: Removed 8 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
-
     ## Warning in self$trans$transform(x): NaNs produced
 
     ## Warning: Transformation introduced infinite values in continuous x-axis
@@ -86,14 +70,6 @@
     ## Warning in self$trans$transform(x): NaNs produced
 
     ## Warning: Transformation introduced infinite values in continuous x-axis
-
-    ## Warning: Removed 186 rows containing non-finite values (stat_binhex).
-
-    ## Warning: Removed 4 rows containing missing values (geom_point).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
 
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: together-1.png" width="1200px" height="500px" />
 
@@ -101,31 +77,16 @@
 
     ## Warning in self$trans$transform(x): NaNs produced
 
-    ## Warning: Transformation introduced infinite values in continuous x-axis
+    ## Warning in self$trans$transform(x): Transformation introduced infinite
+    ## values in continuous x-axis
 
     ## Warning in self$trans$transform(x): NaNs produced
 
     ## Warning: Transformation introduced infinite values in continuous x-axis
 
-    ## Warning: Removed 186 rows containing non-finite values (stat_binhex).
-
-    ## Warning: Removed 4 rows containing missing values (geom_point).
-
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: together-2.png" width="1200px" height="500px" />
 
     BASiCS_PlotDE(de, Which = "VolcanoPlot")
-
-    ## Warning: Removed 6 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
-
-    ## Warning: Removed 8 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hex).
-
-    ## Warning: Removed 1 rows containing missing values (geom_hline).
 
 <img src="DEPlots_Demo_files/figure-markdown_strict/DE: together-3.png" width="1200px" height="500px" />
 
