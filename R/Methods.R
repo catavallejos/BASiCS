@@ -137,7 +137,7 @@ setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95) {
 
-  out <- lapply(x@parameters,
+  out <- lapply(x@parameters[names(x@parameters) != "designMatrix"],
     function(n) {
       HPD <- matrix(data = NA, ncol = 3, nrow = ncol(n),
                     dimnames = list(colnames(n), c("median", "lower", "upper")))
