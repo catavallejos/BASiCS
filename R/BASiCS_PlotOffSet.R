@@ -77,12 +77,17 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     Plots[[Type]] <- g
   }
 
-  if ("MAPlot" %in% Type) {
-    # MA plot pre/after offset
 
-    g1 <- ggplot2::ggplot(mapping = ggplot2::aes(x = log2(OffsetCorrected@MuBase_old), 
-                                                 y = OffsetCorrected@MedianTau_old)) +
-      ggplot2::geom_hex() + 
+
+  if ("MAPlot" %in% Type) {
+
+    # MA plot pre/after offset
+    x <- log2(OffsetCorrected@MuBase_old)
+    y <- OffsetCorrected@MedianTau_old
+    g1 <- ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_hex(bins = NClassFD2D(x, y), 
+        aes(fill = ..density..)
+      ) + 
       # ggplot2::geom_point() +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
@@ -90,13 +95,15 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
           "Log2 fold change", OffsetCorrected@GroupLabel1,
           "vs", OffsetCorrected@GroupLabel2),
         title = "Before correction") +
-      viridis::scale_fill_viridis() +
+      viridis::scale_fill_viridis(name = "Density") +
       ggplot2::geom_hline(yintercept = 0, lty = 2) +
       ggplot2::geom_hline(yintercept = log2(OffsetCorrected@OffsetEst), lty = 1, col = "red")
 
-    g2 <- ggplot2::ggplot(mapping = ggplot2::aes(x = log2(OffsetCorrected@MuBase), 
-                                                 y = OffsetCorrected@MedianTau)) +
-      ggplot2::geom_hex() + 
+
+    x <- log2(OffsetCorrected@MuBase)
+    y <- OffsetCorrected@MedianTau
+    g2 <- ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_hex(bins = NClassFD2D(x, y), aes(fill = ..density..)) + 
       # ggplot2::geom_point() +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
@@ -105,7 +112,7 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
           "vs", OffsetCorrected@GroupLabel2),
         title = "After correction") +
       ggplot2::geom_hline(yintercept = 0, lty = 2) +
-      viridis::scale_fill_viridis()
+      viridis::scale_fill_viridis(name = "Density")
 
     g <- cowplot::plot_grid(g1, g2)
     if (Print) {
@@ -117,6 +124,10 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     Plots <- Plots[[1]]
   }
   Plots
+}
+
+NClassFD2D <- function(x, y) {
+  max(nclass.FD(x), nclass.FD(y))
 }
 
 
