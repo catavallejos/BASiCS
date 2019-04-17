@@ -78,6 +78,12 @@ DistanceName <- function(measure) {
     "fold change")
 }
 
+LogDistanceName <- function(measure) {
+  switch(measure, 
+    "ResDisp" = "distance",
+    "log2(fold change)")
+}
+
 DistanceVar <- function(measure) {
   switch(measure, 
     "ResDisp" = "Distance",
