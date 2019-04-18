@@ -71,10 +71,10 @@ BASiCS_ShowFit <- function(object,
   myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
   h <- diff(myu)*variance
 
-  B <- matrix(1,length(grid.mu),n)
-  B[,2] <- grid.mu
-  for (j in seq_len(n-2)) {
-    B[,j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
+  B <- matrix(1, length(grid.mu), n)
+  B[, 2] <- grid.mu
+  for (j in seq_len(n - 2)) {
+    B[, j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
   }
 
   # Calculate yhat = X*beta
@@ -83,7 +83,7 @@ BASiCS_ShowFit <- function(object,
 
   df <- data.frame(mu = log(colMedians(object@parameters$mu)),
                    delta = log(colMedians(object@parameters$delta)),
-                   included = !is.na(object@parameters$epsilon[1,]))
+                   included = !is.na(object@parameters$epsilon[1, ]))
   rownames(df) <- colnames(object@parameters$mu)
 
   df2 <- data.frame(mu2 = grid.mu,

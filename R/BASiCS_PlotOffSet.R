@@ -314,6 +314,16 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
 
 BASiCS_PlotDE <- function(ResultsDE, Which = c("MAPlot", "VolcanoPlot", "GridPlot"), ...) {
   l <- lapply(ResultsDE@Results, DEPlots_ResultDE, Which = Which, ...)
-  nrow <- if (length(Which) > 1) length(ResultsDE@Results) else length(Which)
-  cowplot::plot_grid(plotlist = l, nrow = nrow)
+  if (length(Which) > 1) {
+    nrow <- length(ResultsDE@Results)
+    labels <- lapply(ResultsDE@Results, function(x) {
+      cap(MeasureName(x@Name))
+    })
+    labels <- Reduce(c, labels)
+    labels <- c(labels, rep("", length(ResultsDE@Results) * length(Which)))
+  } else {
+    nrow <- length(Which)
+    labels <- sapply(ResultsDE@Results, function(x) cap(MeasureName(x@Name)))
+  }
+  cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels)
 }
