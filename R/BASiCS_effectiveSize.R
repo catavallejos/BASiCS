@@ -13,6 +13,9 @@
 #' expression are excluding when infering the mean/over-dispersion trend. 
 #' Default: \code{na.rm = TRUE}.
 #' 
+#' @return A vector with effective sample sizes for all the elements 
+#' of \code{Param}
+#' 
 #' @examples
 #' 
 #' data(ChainSC)
