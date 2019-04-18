@@ -30,7 +30,7 @@
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #'
 #' @export
-BASiCS_diagHist <- function(object, Param = NULL, na.rm = FALSE) {
+BASiCS_diagHist <- function(object, Param = NULL, na.rm = TRUE) {
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }

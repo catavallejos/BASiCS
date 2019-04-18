@@ -559,7 +559,8 @@ BASiCS_MCMC <- function(Data,
             "-------------------------------------------------------------\n")
   }
   # Convert output into a `BASiCS_Chain` object
-  ChainClass <- newBASiCS_Chain(parameters = Chain)
+  ChainClass <- newBASiCS_Chain(parameters = Chain[!grepl("ls.", names(Chain))])
+
   # Store chain and/or adaptive variances
   HiddenBASiCS_MCMC_OutputStore(ChainClass,
                                 Chain,

@@ -32,6 +32,9 @@ arma::mat muUpdateRegNoSpikes(
 {
   using arma::span;
 
+  int nConstrainGene = ConstrainGene.size();
+  int nNotConstrainGene = NotConstrainGene.size();
+
   // PROPOSAL STEP
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
@@ -70,7 +73,7 @@ arma::mat muUpdateRegNoSpikes(
   // Step 2: Computing prior component of the acceptance rate
 
   // Step 2.1: For genes that are under the constrain (excluding the reference one)
-  for (unsigned int i = 0; i < ConstrainGene.size(); i++) {
+  for (int i = 0; i < nConstrainGene; i++) {
     iAux = ConstrainGene(i);
     if (iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
@@ -94,7 +97,7 @@ arma::mat muUpdateRegNoSpikes(
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
   if (ConstrainType == 2) {
-    for (unsigned int i = 0; i < NotConstrainGene.size(); i++) {
+    for (int i=0; i < nNotConstrainGene; i++) {
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) * (pow(log(mu1(iAux)), 2) - pow(log(mu0(iAux)), 2));
       // ACCEPT REJECT

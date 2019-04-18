@@ -1139,3 +1139,50 @@ moved from `Methods.R` to `HiddenUtils.R`
 - Use of `set.seed` removed from `makeExampleBASiCS_Data` 
 - Unit tests updated accordingly
 - Adds missing running examples to Rds in order to pass R CMD BioCheck
+
+version 1.5.23 (2019-04-02)
+- Minor edit to the documentation of `makeExampleBASiCS_Data` (explain why
+a fixed seed is no longer used)
+
+version 1.5.24 (2019-04-05)
+- Minor edit to the documentation of `makeExampleBASiCS_Data` (fixed link to 
+`set.seed` documentation as it led to WARNINGS in Bioc-devel)
+
+version 1.5.25 (2019-04-07)
+- Minor change in `muUpdateNoSpikes` (C++ function in `utils_MCMCNoSpikes.cpp`)
+to avoid WARNINGS in bioc-devel related to integers vs unsigned integers
+
+version 1.5.26 (2019-04-08)
+- Similar changes applied to `utils_MCMCcppReg.cpp` and
+`utils_MCMCcppRegNoSpikes.cpp`.
+
+version 1.5.27 (2019-04-08)
+- Edits `BASiCS_TestDE` to avoid low posterior probability thresholds derived 
+from the EFDR calibration. This alters some of the related 'Hidden' functions. 
+- In `BASiCS_TestDE`, default values for `EFDR_M`, `EFDR_D` and `EFDR_R` 
+were changed to 0.05. 
+- Unit tests updated accordingly
+
+version 1.5.28 (2019-04-09)
+- Edited version of `BASiCS_Sim` to allow no spikes and multiple batches
+- Documentation updated accordingly
+
+version 1.5.29 (2019-04-10)
+- Unit test associated to `BASiCS_Sim` updated to use a fixed seed and to
+check exact values being reproducible
+
+version 1.5.30 (2019-04-11)
+- `BASiCS_effectiveSize` has been created as a wrapper of `coda::effectiveSize`.
+This is to resolve issues when `Param = 'epsilon'` as it contains `NA` for very
+lowly expressed genes that are excluded from the mean/over-dispersion trend.
+
+version 1.5.31 (2019-04-15)
+- Updated vignette to include ERCC calculation
+
+version 1.5.32 (2019-04-17)
+- Minor change in `BASiCS_MCMC` to avoid storing adaptive variances in the
+`BASiCS_Chain` object when `StoreAdapt = TRUE`. 
+- New unit test to ensure the correct output in `BASiCS_Chain@parameters`
+- Minor change in `Summary` method for `BASiCS_Chain` class to avoid calculating 
+posterior summaries when `designMatrix` is part of the `parameters` slot
+- Added `return` to the docummentation of `BASiCS_effectiveSize`. 

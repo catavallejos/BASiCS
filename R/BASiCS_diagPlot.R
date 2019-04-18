@@ -42,7 +42,7 @@ BASiCS_diagPlot <- function(object,
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
                             LogY = isTRUE(y %in% c("mu", "delta")),
-                            na.rm = FALSE) {
+                            na.rm = TRUE) {
 
 
   if (!inherits(object, "BASiCS_Chain")) {
@@ -64,19 +64,25 @@ BASiCS_diagPlot <- function(object,
   if (!is.null(x)) {
     xMat <- HiddenGetParam(object, x)
     yMat <- HiddenGetParam(object, y)
+    xMat <- xMat[, names(metric), drop = FALSE]
+    yMat <- yMat[, names(metric), drop = FALSE]
+
     df <- data.frame(
       x = matrixStats::colMedians(xMat),
       y = matrixStats::colMedians(yMat),
       metric = metric
     )
-
+    df <- df[order(df$metric), ]
     ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
       ggplot2::geom_point(alpha = 0.5, shape = 16) +
-      viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)) +
+      viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)
+        #, trans="log10"
+        ) +
       sX + sY +
       ggplot2::labs(x = x, y = y)              
   } else {
     xMat <- HiddenGetParam(object, Param)
+    xMat <- xMat[, names(metric), drop = FALSE]
     df <- data.frame(
       x = matrixStats::colMedians(xMat),
       y = metric
@@ -84,7 +90,7 @@ BASiCS_diagPlot <- function(object,
     ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
       ggplot2::geom_hex( #ggplot2::aes_string(fill = "..density..")
         ) +
-      viridis::scale_fill_viridis(name = "Density", trans = "log10") +
+      viridis::scale_fill_viridis(name = "Count", trans = "log10") +
       sX + sY +
       ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
   }
