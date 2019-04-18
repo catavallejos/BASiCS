@@ -19,6 +19,10 @@ Only relevant when \code{Param = "epsilon"} (genes with very low
 expression are excluding when infering the mean/over-dispersion trend. 
 Default: \code{na.rm = TRUE}.}
 }
+\value{
+A vector with effective sample sizes for all the elements 
+of \code{Param}
+}
 \description{
 A wrapper of \code{coda::effectiveSize} to be used with 
 \code{\linkS4class{BASiCS_Chain}} objects.
