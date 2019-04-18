@@ -70,7 +70,8 @@
 #' order as how genes are displayed in the table of counts.
 #' This argument is necessary in order to have a meaningful EFDR calibration
 #' when the user decides to exclude some genes from the comparison.
-#' @param IncludeEpsilon Flag indicating where to include epsilon in the 
+#' @param IncludeEpsilon Flag indicating where to include the residual 
+#' overdispersion parameter, epsilon, in the 
 #' figures and analysis. Default is \code{TRUE} if epsilon is present in
 #' the chains.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
