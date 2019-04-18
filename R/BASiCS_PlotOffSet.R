@@ -48,7 +48,11 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
       ggplot2::geom_boxplot() +
       ggplot2::labs(
         # title = "Offset MCMC chain", 
-        y = "Offset estimate", x = NULL)
+        y = "Offset estimate", x = NULL) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()
+      )
     if (Print) {
       print(g)
     }
@@ -57,22 +61,26 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
 
   # Mean expression parameters before/after offset correction
   if ("before-after" %in% Type) {
+    ylim <- range(
+      c(OffsetCorrected@Mu1_old, OffsetCorrected@Mu1, OffsetCorrected@Mu2)
+    )
     df <- cbind(OffsetCorrected@Mu1_old, OffsetCorrected@Mu2)
     colnames(df) <- c(OffsetCorrected@GroupLabel1, OffsetCorrected@GroupLabel2)
     mdf <- reshape2::melt(df)
-    ggplot2::ggplot(mdf, ggplot2::aes(x = Var2, y = value)) +
+    g1 <- ggplot2::ggplot(mdf, ggplot2::aes(x = Var2, y = value)) +
       ggplot2::labs(title = "Before correction", y = "Mean expression", x = NULL) +
-      ggplot2::geom_boxplot() +
-      ggplot2::scale_y_log10()
+      ggplot2::geom_violin() +
+      ggplot2::scale_y_log10(limits = ylim)
 
     df <- cbind(OffsetCorrected@Mu1, OffsetCorrected@Mu2)
     colnames(df) <- c(OffsetCorrected@GroupLabel1, OffsetCorrected@GroupLabel2)
     mdf <- reshape2::melt(df)
-    g <- ggplot2::ggplot(mdf, ggplot2::aes(x = Var2, y = value)) +
+    g2 <- ggplot2::ggplot(mdf, ggplot2::aes(x = Var2, y = value)) +
       ggplot2::labs(title = "After correction", y = "Mean expression", x = NULL) +
-      ggplot2::geom_boxplot() +
-      ggplot2::scale_y_log10()
+      ggplot2::geom_violin() +
+      ggplot2::scale_y_log10(limits = ylim)
 
+    g <- cowplot::plot_grid(g1, g2)
     if (Print) {
       print(g)
     }
@@ -84,11 +92,13 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
   if ("MAPlot" %in% Type) {
 
     # MA plot pre/after offset
-    x <- log2(OffsetCorrected@MuBase_old)
-    y <- OffsetCorrected@MedianTau_old
-    g1 <- ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
+    df <- data.frame(
+      x = log2(OffsetCorrected@MuBase_old),
+      y = OffsetCorrected@MedianTau_old
+    )
+    g1 <- ggplot2::ggplot(df, mapping = ggplot2::aes(x = x, y = y)) +
       ggplot2::geom_hex(
-        bins = NClassFD2D(x, y), 
+        bins = NClassFD2D(df$x, df$y), 
         aes(fill = ..density..), 
         na.rm = TRUE) + 
       # ggplot2::geom_point() +
@@ -106,13 +116,17 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
         title = "Before correction") +
       viridis::scale_fill_viridis(name = "Density")
 
-
-    x <- log2(OffsetCorrected@MuBase)
-    y <- OffsetCorrected@MedianTau
-    g2 <- ggplot2::ggplot(mapping = ggplot2::aes(x = x, y = y)) +
-      ggplot2::geom_hex(bins = NClassFD2D(x, y), aes(fill = ..density..), na.rm = TRUE) + 
-      ggplot2::geom_hline(yintercept = 0, lty = 2) +
+    df <- data.frame(
+      x = log2(OffsetCorrected@MuBase),
+      y = OffsetCorrected@MedianTau
+    )
+    g2 <- ggplot2::ggplot(df, mapping = ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_hex(
+        mapping = aes(fill = ..density..), 
+        bins = NClassFD2D(df$x, df$y), 
+        na.rm = TRUE) + 
       # ggplot2::geom_point() +
+      ggplot2::geom_hline(yintercept = 0, lty = 2) +
       ggplot2::labs(
         x = "Mean expresssion (log2)",
         y = paste(
