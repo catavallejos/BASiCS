@@ -1186,3 +1186,6 @@ version 1.5.32 (2019-04-17)
 - Minor change in `Summary` method for `BASiCS_Chain` class to avoid calculating 
 posterior summaries when `designMatrix` is part of the `parameters` slot
 - Added `return` to the docummentation of `BASiCS_effectiveSize`. 
+
+version 1.5.33 (2019-04-19)
+- Updated ERCC formula in the vignette.
