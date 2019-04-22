@@ -34,9 +34,14 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                         Start = HiddenBASiCS_MCMC_Start(
                                           Data,
                                           PriorParam,
-                                          WithSpikes)
+                                          WithSpikes),
+                                        ml = HiddenFindRBFLocations(
+                                          Data = Data, 
+                                          k = k
+                                        )
                                         )
 {
+
   PriorDelta <- match.arg(PriorDelta)
 
   if (missing(PriorDelta) & !Regression) {
@@ -96,6 +101,15 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
     stop("Invalid PriorDelta value.")
   }
 
+  # arma::vec ml = arma::zeros(k - 2);
+  # ml(0) = x.min();
+
+  # for(int i=1; i < (k-2); i++) {
+  #   ml(i) = ml(i-1) + ran / (k - 3);
+  # }
+  # double h = (ml(1) - ml(0)) * variance;
+
+
  list(AR = AR, 
       StopAdapt = StopAdapt, 
       StoreChains = StoreChains,
@@ -111,6 +125,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
       ConstrainType = ConstrainType, 
       ConstrainProp = ConstrainProp,
       k = k, 
+      ml = ml,
       variance = variance,
       Start = Start)
 }

@@ -86,6 +86,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double eta0,
     NumericVector lambda0,
     double const& variance,
+    NumericVector ml,
     double geneExponent,
     double cellExponent)
 {
@@ -209,7 +210,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat V1 = arma::zeros(k, k);
   // Model matrix initialization
   arma::vec means = muAux(arma::span(0, q0 - 1), 0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::mat X = designMatrix(k, means, ml, variance);
 
   StartSampler(N);
   // START OF MCMC LOOP
@@ -293,6 +294,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         X,
                         sigma2Aux,
                         variance,
+                        ml,
                         geneExponent);
 
     PmuAux += muAux.col(1);
@@ -423,7 +425,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux(arma::span(0, q0 - 1), 0);
-        X = designMatrix(k, means, variance);
+        X = designMatrix(k, means, ml, variance);
       }
     }
 

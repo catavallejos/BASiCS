@@ -19,9 +19,9 @@
 #' @examples
 #' 
 #' data(ChainSC)
-#' BASiCS_effectiveSize(ChainSC, Param = "mu")
+#' BASiCS_EffectiveSize(ChainSC, Param = "mu")
 #' 
 #' @export
-BASiCS_effectiveSize <- function(object, Param, na.rm = TRUE) {
+BASiCS_EffectiveSize <- function(object, Param, na.rm = TRUE) {
   HiddenGetMeasure(object, Param, Measure = "effectiveSize", na.rm)
 }

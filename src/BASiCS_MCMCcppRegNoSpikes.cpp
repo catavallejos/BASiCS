@@ -88,6 +88,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     IntegerVector NotConstrainGene,
     int ConstrainType,
     int StochasticRef,
+    NumericVector ml,
     double geneExponent,
     double cellExponent)
 {
@@ -208,7 +209,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux.col(0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::mat X = designMatrix(k, means, ml, variance);
 
   StartSampler(N);
 
@@ -291,6 +292,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 X,
                                 sigma2Aux,
                                 variance,
+                                ml,
                                 geneExponent);
 
     PmuAux += muAux.col(1);
@@ -404,7 +406,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
-        X = designMatrix(k, means, variance);
+        X = designMatrix(k, means, ml, variance);
       }
     }
 

@@ -256,6 +256,8 @@ BASiCS_MCMC <- function(Data,
   StochasticRef <- ArgsDef$StochasticRef
   ConstrainType <- ArgsDef$ConstrainType
   ConstrainProp <- ArgsDef$ConstrainProp
+  ml <- ArgsDef$ml
+  print(ml)
   # Starting values for MCMC chains
   mu0 <- as.vector(Start$mu0)[!spikes]
   delta0 <- as.vector(Start$delta0)
@@ -350,6 +352,7 @@ BASiCS_MCMC <- function(Data,
           eta0 = PriorParam$eta,
           lambda0 = lambda0,
           variance = variance,
+          ml = ml,
           geneExponent = geneExponent,
           cellExponent = cellExponent
         )

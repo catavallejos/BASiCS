@@ -141,6 +141,7 @@ arma::mat thetaUpdateBatch(
 arma::mat designMatrix(
     int const& k, 
     arma::vec const& mu, 
+    Rcpp::NumericVector const& ml,
     double const& variance);
 
 arma::mat muUpdateReg(
@@ -162,6 +163,7 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    NumericVector ml,
     double exponent);
 
 arma::mat deltaUpdateReg(
@@ -275,6 +277,7 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    NumericVector ml,
     double exponent);
 
 arma::mat deltaUpdateRegNoSpikes(
