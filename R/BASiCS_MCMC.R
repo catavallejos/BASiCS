@@ -257,7 +257,7 @@ BASiCS_MCMC <- function(Data,
   ConstrainType <- ArgsDef$ConstrainType
   ConstrainProp <- ArgsDef$ConstrainProp
   ml <- ArgsDef$ml
-  print(ml)
+
   # Starting values for MCMC chains
   mu0 <- as.vector(Start$mu0)[!spikes]
   delta0 <- as.vector(Start$delta0)
