@@ -15,38 +15,38 @@ test_that("Differential test is correct (regression case)",
             
   FreqMean0 <- c(335,   9,   6)
   FreqMean <- as.vector(table(Test$TableMean$ResultDiffMean))
-  expect_that(all.equal(FreqMean, FreqMean0), is_true())
+  expect_equal(FreqMean, FreqMean0)
             
   FreqDisp0 <- c(15, 236,  99)
   FreqDisp <- as.vector(table(Test$TableDisp$ResultDiffDisp))
-  expect_that(all.equal(FreqDisp, FreqDisp0), is_true())
+  expect_equal(FreqDisp, FreqDisp0)
   
   FreqRes0 <- c(338,   4,   8)
   FreqRes <- as.vector(table(Test$TableResDisp$ResultDiffResDisp))
-  expect_that(all.equal(FreqRes, FreqRes0), is_true())
+  expect_equal(FreqRes, FreqRes0)
             
   # Posterior probabilities
             
   ProbMean0 <- c(0.01, 0.01, 0.79, 0.41, 0.35)
   ProbMean <- round(Test$TableMean$ProbDiffMean[1:5], 2)
-  expect_that(all.equal(ProbMean, ProbMean0), is_true())
+  expect_equal(ProbMean, ProbMean0)
             
   ProbDisp0 <- c(0.72, 0.72, 0.72, 1.00, 0.59)
   ProbDisp <- round(tail(Test$TableDisp$ProbDiffDisp, 5), 2)
-  expect_that(all.equal(ProbDisp, ProbDisp0), is_true())
+  expect_equal(ProbDisp, ProbDisp0)
   
   ProbRes0 <- c(0.60, 0.56, 0.63, 1.00, 0.52)
   ProbRes <- round(tail(Test$TableRes$ProbDiffRes, 5), 2)
-  expect_that(all.equal(ProbRes, ProbRes0), is_true())
+  expect_equal(ProbRes, ProbRes0)
             
   # Log2 fold changes
   Lfc2Mean0 <- c(-0.22, -0.08, -0.92, -0.54, -0.46)
   Lfc2Mean <- round(Test$TableMean$MeanLog2FC[1:5], 2)
-  expect_that(all.equal(Lfc2Mean, Lfc2Mean0), is_true())
+  expect_equal(Lfc2Mean, Lfc2Mean0)
             
   Lfc2Disp0 <- c(0.92, 1.02, 0.86, 6.23, 0.26)
   Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5),2)
-  expect_that(all.equal(Lfc2Disp, Lfc2Disp0), is_true())
+  expect_equal(Lfc2Disp, Lfc2Disp0)
             
 })
 
