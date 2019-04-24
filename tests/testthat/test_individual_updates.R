@@ -10,7 +10,7 @@ test_that("Dirichlet sampler", {
   x0 <- rgamma(length(phi0), shape = phi0, scale = 1)
   x0 <- x0 / sum(x0)
   
-  expect_that(all.equal(x, x0), is_true())
+  expect_equal(x, x0)
 })
 
 test_that("Spikes + no regression", {
@@ -39,9 +39,9 @@ test_that("Spikes + no regression", {
   
   mu1 <- c(6.78, 15.67,  5.43, 13.05, 24.20)
   mu1Obs <- round(Aux[1:5,1],2) 
-  expect_that(all.equal(mu1, mu1Obs), is_true())
+  expect_equal(mu1, mu1Obs)
 
   ind <- c(1, 0, 1, 1, 1)
   indObs <- Aux[1:5,2]
-  expect_that(all.equal(ind, indObs), is_true())  
+  expect_equal(ind, indObs)
 })
