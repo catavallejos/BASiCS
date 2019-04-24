@@ -20,19 +20,20 @@ test_that("BASiCS_Filter",
                           MinTotalCountsPerGene = 2,
                           MinCellsWithExpression = 2, 
                           MinAvCountsPerCellsWithExpression = 2)
-  expect_true(all.equal(names(Filter), 
-                        c("Counts", "Tech", "SpikeInput", "BatchInfo", 
-                          "IncludeGenes", "IncludeCells")))
+  expect_equal(
+    names(Filter), 
+    c("Counts", "Tech", "SpikeInput", "BatchInfo", "IncludeGenes", "IncludeCells")
+  )
   
   IncludeCells <- rep(TRUE, times = 10); IncludeCells[7] <- FALSE
-  expect_true(all.equal(Filter$IncludeCells, IncludeCells))
+  expect_equal(Filter$IncludeCells, IncludeCells)
   
   IncludeGenes <- rep(TRUE, times = 50); 
   IncludeGenes[c(3, 12, 24, 25, 32, 36, 41, 42, 45, 47)] <- FALSE
-  expect_true(all.equal(Filter$IncludeGenes, IncludeGenes))
+  expect_equal(Filter$IncludeGenes, IncludeGenes)
   
-  expect_true(all.equal(rownames(Filter$Counts)[Filter$Tech],
-                        c("Spike3", "Spike4", "Spike6", 
-                          "Spike8", "Spike9", "Spike10")))
+  expect_equal(
+    rownames(Filter$Counts)[Filter$Tech],
+    c("Spike3", "Spike4", "Spike6", "Spike8", "Spike9", "Spike10")
+  )
 })
-

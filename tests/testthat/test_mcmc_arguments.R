@@ -239,9 +239,4 @@ test_that("MCMC fails for one or multiple arguments", {
   expect_error(run_MCMC(Data = sce, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = TRUE), NA)
-
-  
 })
-
-
-
