@@ -100,6 +100,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     NumericVector lambda0, 
     double const& variance,
     NumericVector ml,
+    bool FixML,
     double geneExponent,
     double cellExponent);
 
@@ -191,6 +192,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int ConstrainType,
     int StochasticRef,
     NumericVector ml,
+    bool FixML,
     double geneExponent,
     double cellExponent);
 

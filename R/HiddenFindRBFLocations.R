@@ -1,5 +1,6 @@
 HiddenFindRBFLocations <- function(Data, k = 12) {
-  x <- log(rowMeans(SingleCellExperiment::counts(Data)))
+  # x <- log(rowMeans(SingleCellExperiment::counts(Data)))
+  x <- log(Data)
   ml <- numeric(k - 2)
   range <- max(x) - min(x)
   ml[[1]] <- min(x)

@@ -6,20 +6,11 @@
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec const& mu,
-    Rcpp::NumericVector const& ml, // locations (fixed a priori)
-    double const& variance)
-{
+    arma::vec const& ml, // locations (fixed a priori)
+    double const& variance) {
 
   arma::vec x = log(mu);
 
-  double ran = x.max() - x.min();
-  arma::vec m = arma::zeros(k - 2);
-  m(0) = x.min();
-
-  for(int i=1; i < (k-2); i++) {
-    m(i) = m(i-1) + ran / (k - 3);
-  }
-  // Rcpp::Rcout << "M VECTOR: " << m << std::endl;
   double h = (ml(1) - ml(0)) * variance;
 
   // Possibly create this matrix outside
@@ -29,6 +20,17 @@ arma::mat designMatrix(
     X.col(i + 2) = exp(-0.5 * pow(x - ml(i), 2) / pow(h, 2));
   }
   return X;
+}
+
+
+arma::vec estimateRBFLocations(int const& k, arma::vec const& x) {
+  arma::vec m = arma::zeros(k - 2);
+  m(0) = x.min();
+  double range = x.max() - x.min();
+  for(int i = 1; i < (k - 2); i++) {
+    m(i) = m(i - 1) + range / (k - 3);
+  }
+  return(m);
 }
 
 /* Metropolis-Hastings updates of mu
@@ -53,9 +55,9 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    NumericVector ml,
-    double exponent)
-{
+    arma::vec ml,
+    double exponent) {
+
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);

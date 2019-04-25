@@ -395,32 +395,22 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
 
+  Rcpp::List output = Rcpp::List::create(
+    Rcpp::Named("mu") = mu.t(),
+    Rcpp::Named("delta") = delta.t(),
+    Rcpp::Named("phi") = phi.t(),
+    Rcpp::Named("s") = s.t(),
+    Rcpp::Named("nu") = nu.t(),
+    Rcpp::Named("theta") = theta.t()
+  );
   if (StoreAdapt == 1) {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu.t(),
-        Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("phi") = phi.t(),
-        Rcpp::Named("s") = s.t(),
-        Rcpp::Named("nu") = nu.t(),
-        Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("ls.mu") = LSmu.t(),
-        Rcpp::Named("ls.delta") = LSdelta.t(),
-        Rcpp::Named("ls.phi") = LSphi,
-        Rcpp::Named("ls.nu") = LSnu.t(),
-        Rcpp::Named("ls.theta") = LStheta.t()));
+    output["ls.mu"] = LSmu.t();
+    output["ls.delta"] = LSdelta.t();
+    output["ls.phi"] = LSphi;
+    output["ls.nu"] = LSnu.t();
+    output["ls.theta"] = LStheta.t();
   }
-
-  else {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu.t(),
-        Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("phi") = phi.t(),
-        Rcpp::Named("s") = s.t(),
-        Rcpp::Named("nu") = nu.t(),
-        Rcpp::Named("theta") = theta.t()));
-  }
+  return(output);
 }
 
 

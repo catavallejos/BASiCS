@@ -379,28 +379,20 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcpp::Rcout << " " << std::endl;
 
+  Rcpp::List output = Rcpp::List::create(
+    Rcpp::Named("mu") = mu,
+    Rcpp::Named("delta") = delta,
+    Rcpp::Named("s") = s,
+    Rcpp::Named("nu") = nu,
+    Rcpp::Named("theta") = theta,
+    Rcpp::Named("RefFreq") = RefFreq / (N - Burn)
+  );
+
   if (StoreAdapt == 1) {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu,
-        Rcpp::Named("delta") = delta,
-        Rcpp::Named("s") = s,
-        Rcpp::Named("nu") = nu,
-        Rcpp::Named("theta") = theta,
-        Rcpp::Named("ls.mu") = LSmu,
-        Rcpp::Named("ls.delta") = LSdelta,
-        Rcpp::Named("ls.nu") = LSnu,
-        Rcpp::Named("ls.theta") = LStheta,
-        Rcpp::Named("RefFreq") = RefFreq / (N - Burn)));
+    output["ls.mu"] = LSmu;
+    output["ls.delta"] = LSdelta;
+    output["ls.nu"] = LSnu;
+    output["ls.theta"] = LStheta;
   }
-  else {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu,
-        Rcpp::Named("delta") = delta,
-        Rcpp::Named("s") = s,
-        Rcpp::Named("nu") = nu,
-        Rcpp::Named("theta") = theta,
-        Rcpp::Named("RefFreq") = RefFreq / (N - Burn)));
-  }
+  return(output);
 }

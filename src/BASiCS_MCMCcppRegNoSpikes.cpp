@@ -89,6 +89,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int ConstrainType,
     int StochasticRef,
     NumericVector ml,
+    bool FixML,
     double geneExponent,
     double cellExponent)
 {
@@ -204,12 +205,19 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec lambdaAux = as_arma(lambda0);
   double sigma2Aux = sigma20;
   arma::vec epsilonAux = arma::zeros(q0);
+  arma::vec ml_arma;
 
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux.col(0);
-  arma::mat X = designMatrix(k, means, ml, variance);
+
+  if (FixML) {
+    ml_arma = as_arma(ml);
+  } else {
+    ml_arma = estimateRBFLocations(k, means);
+  }
+  arma::mat X = designMatrix(k, means, ml_arma, variance);
 
   StartSampler(N);
 
@@ -292,7 +300,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 X,
                                 sigma2Aux,
                                 variance,
-                                ml,
+                                ml_arma,
                                 geneExponent);
 
     PmuAux += muAux.col(1);
@@ -406,7 +414,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
-        X = designMatrix(k, means, ml, variance);
+        if (!FixML) {
+          ml_arma = estimateRBFLocations(k, means);
+        }
+        X = designMatrix(k, means, ml_arma, variance);
       }
     }
 
@@ -465,37 +476,26 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << " " << std::endl;
 
+  Rcpp::List output = Rcpp::List::create(
+    Rcpp::Named("mu") = mu.t(),
+    Rcpp::Named("delta") = delta.t(),
+    Rcpp::Named("s") = s.t(),
+    Rcpp::Named("nu") = nu.t(),
+    Rcpp::Named("theta") = theta.t(),
+    Rcpp::Named("beta") = beta.t(),
+    Rcpp::Named("sigma2") = sigma,
+    Rcpp::Named("lambda") = lambda.t(),
+    Rcpp::Named("epsilon") = epsilon.t(),
+    Rcpp::Named("RefFreq") = RefFreq / (N - Burn),
+    Rcpp::Named("ml") = ml_arma.t()
+  );
+
   if (StoreAdapt == 1) {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu.t(),
-        Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("s") = s.t(),
-        Rcpp::Named("nu") = nu.t(),
-        Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta") = beta.t(),
-        Rcpp::Named("sigma2") = sigma,
-        Rcpp::Named("lambda") = lambda.t(),
-        Rcpp::Named("epsilon") = epsilon.t(),
-        Rcpp::Named("designMatrix") = X,
-        Rcpp::Named("ls.mu") = LSmu.t(),
-        Rcpp::Named("ls.delta") = LSdelta.t(),
-        Rcpp::Named("ls.nu") = LSnu.t(),
-        Rcpp::Named("ls.theta") = LStheta.t(),
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn)));
+    output["designMatrix"] = X;
+    output["ls.mu"] = LSmu.t();
+    output["ls.delta"] = LSdelta.t();
+    output["ls.nu"] = LSnu.t();
+    output["ls.theta"] = LStheta.t();
   }
-  else {
-    // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
-        Rcpp::Named("mu") = mu.t(),
-        Rcpp::Named("delta") = delta.t(),
-        Rcpp::Named("s") = s.t(),
-        Rcpp::Named("nu") = nu.t(),
-        Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta") = beta.t(),
-        Rcpp::Named("sigma2") = sigma,
-        Rcpp::Named("lambda") = lambda.t(),
-        Rcpp::Named("epsilon") = epsilon.t(),
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn)));
-  }
+  return(output);
 }

@@ -29,26 +29,36 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                           a.s = 1,
                                           b.s = 1,
                                           a.theta = 1,
-                                          b.theta = 1),
-                                        eta = 5,
-                                        Start = HiddenBASiCS_MCMC_Start(
-                                          Data,
-                                          PriorParam,
-                                          WithSpikes),
+                                          b.theta = 1,
+                                          m = rep(0, k),
+                                          V = diag(k),
+                                          a.sigma2 = 2,
+                                          b.sigma2 = 2,
+                                          eta = 5
+                                        ),
+                                        Start = BASiCS_MCMC_Start(
+                                          Data = Data,
+                                          eta = PriorParam$eta,
+                                          m = PriorParam$m,
+                                          V = PriorParam$V,
+                                          a.sigma2 = PriorParam$a.sigma2,
+                                          b.sigma2 = PriorParam$b.sigma2,
+                                          WithSpikes = WithSpikes),
                                         ml = HiddenFindRBFLocations(
-                                          Data = Data, 
+                                          Data = Start$mu0, 
                                           k = k
-                                        )
-                                        )
-{
+                                        ),
+                                        FixML = FALSE) {
 
   PriorDelta <- match.arg(PriorDelta)
 
   if (missing(PriorDelta) & !Regression) {
-    message("-------------------------------------------------------------\n",
-            "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
-            "Vallejos et al (2015) used a 'gamma' prior instead.\n",
-            "-------------------------------------------------------------\n")
+    message(
+      "-------------------------------------------------------------\n",
+      "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
+      "Vallejos et al (2015) used a 'gamma' prior instead.\n",
+      "-------------------------------------------------------------\n"
+    )
   }
   if (Regression) {
     if (k <= 3) {
@@ -56,11 +66,6 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
     }
   }
 
-  if (Regression) {
-    PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)
-    PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2
-    PriorParam$eta <- eta
-  }
 
   # Validity checks
   if (!(PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
@@ -71,8 +76,9 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
         PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
         PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
         PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 ))
+        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 )) {
     stop("Invalid prior hyper-parameter values.")
+  }
   if (Regression) {
     if (!(length(PriorParam$m) == k &
          ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &
@@ -101,31 +107,25 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
     stop("Invalid PriorDelta value.")
   }
 
-  # arma::vec ml = arma::zeros(k - 2);
-  # ml(0) = x.min();
-
-  # for(int i=1; i < (k-2); i++) {
-  #   ml(i) = ml(i-1) + ran / (k - 3);
-  # }
-  # double h = (ml(1) - ml(0)) * variance;
-
-
- list(AR = AR, 
-      StopAdapt = StopAdapt, 
-      StoreChains = StoreChains,
-      StoreAdapt = StoreAdapt, 
-      StoreDir = StoreDir,
-      RunName = RunName, 
-      PrintProgress = PrintProgress,
-      PriorParam = PriorParam, 
-      PriorDeltaNum = PriorDeltaNum,
-      PriorDelta = PriorDelta,
-      WithSpikes = WithSpikes, 
-      StochasticRef = StochasticRef,
-      ConstrainType = ConstrainType, 
-      ConstrainProp = ConstrainProp,
-      k = k, 
-      ml = ml,
-      variance = variance,
-      Start = Start)
+  list(
+    AR = AR, 
+    StopAdapt = StopAdapt, 
+    StoreChains = StoreChains,
+    StoreAdapt = StoreAdapt, 
+    StoreDir = StoreDir,
+    RunName = RunName, 
+    PrintProgress = PrintProgress,
+    PriorParam = PriorParam, 
+    PriorDeltaNum = PriorDeltaNum,
+    PriorDelta = PriorDelta,
+    WithSpikes = WithSpikes, 
+    StochasticRef = StochasticRef,
+    ConstrainType = ConstrainType, 
+    ConstrainProp = ConstrainProp,
+    k = k, 
+    ml = ml,
+    FixML = FixML,
+    variance = variance,
+    Start = Start
+  )
 }

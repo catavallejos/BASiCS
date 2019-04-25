@@ -23,85 +23,190 @@
 #' @param Verbose Verbosity flag. Set FALSE to prevent printing of messages.
 #' @param ... Optional parameters.
 #' \describe{
-#' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.
-#' Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and
-#' 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}.
-#' Default value: \code{PriorDelta = 'log-normal'}.
-#' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter
-#' values required for the adopted prior (see Vallejos et al, 2015, 2016).
-#' All elements must be positive real numbers.
-#' \describe{
-#'   \item{\code{s2.mu}}{Scale hyper-parameter for the
+#'   \item{
+#'     \code{PriorDelta}
+#'   }{
+#'     Specifies the prior used for \code{delta}.
+#'     Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and
+#'     'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
+#'     Default value: \code{PriorDelta = 'log-normal'}.
+#'   }
+#'   \item{
+#'     \code{PriorParam}
+#'   }{
+#'     List of 7 elements, containing the hyper-parameter
+#'     values required for the adopted prior (see Vallejos et al, 2015, 2016).
+#'     All elements must be positive real numbers.
+#'     \describe{
+#'       \item{
+#'         \code{s2.mu}
+#'       }{
+#'         Scale hyper-parameter for the
 #'         log-Normal(\code{0},\code{s2.mu}) prior that is shared by all
 #'         gene-specific expression rate parameters \eqn{\mu_i}.
-#'         Default: \code{s2.mu = 0.5}.}
-#'   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`.
+#'         Default: \code{s2.mu = 0.5}.
+#'       }
+#'       \item{
+#'         \code{s2.delta}
+#'       }{
+#'         Only used when `PriorDelta == 'log-normal'`.
 #'         Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta})
 #'         prior that is shared by all gene-specific over-dispersion parameters
-#'         \eqn{\delta_i}. Default: \code{s2.delta = 0.5}. }
-#'   \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`.
+#'         \eqn{\delta_i}. Default: \code{s2.delta = 0.5}. 
+#'       }
+#'       \item{
+#'         \code{a.delta}
+#'       }{
+#'         Only used when `PriorDelta == 'gamma'`.
 #'         Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
 #'         prior that is shared by all gene-specific biological over-dispersion
-#'         parameters \eqn{\delta_i}. Default: \code{a.delta = 1}.}
-#'   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`.
+#'         parameters \eqn{\delta_i}. Default: \code{a.delta = 1}.
+#'       }
+#'       \item{
+#'         \code{b.delta}
+#'       }{
+#'         Only used when `PriorDelta == 'gamma'`.
 #'         Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
 #'         prior that is shared by all gene-specific biological over-dispersion
-#'         hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.}
-#'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all
+#'         hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.
+#'       }
+#'       \item{
+#'         \code{p.phi}
+#'       }{
+#'         Dirichlet hyper-parameter for the joint of all
 #'         (scaled by \code{n}) cell-specific mRNA content normalising
 #'         constants \eqn{\phi_j / n}.
-#'         Default: \code{p.phi} \code{= rep(1, n)}.}
-#'   \item{\code{a.s}}{Shape hyper-parameter for the
+#'         Default: \code{p.phi} \code{= rep(1, n)}.
+#'       }
+#'       \item{
+#'         \code{a.s}
+#'       }{
+#'         Shape hyper-parameter for the
 #'         Gamma(\code{a.s},\code{b.s}) prior that is shared by all
 #'         cell-specific capture efficiency normalising constants \eqn{s_j}.
-#'         Default: \code{a.s = 1}.}
-#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},
+#'         Default: \code{a.s = 1}.
+#'       }
+#'       \item{
+#'         \code{b.s}
+#'       }{
+#'         Rate hyper-parameter for the Gamma(\code{a.s},
 #'         \code{b.s}) prior that is shared by all cell-specific capture
 #'         efficiency normalising constants \eqn{s_j}.
-#'         Default: \code{b.s = 1}.}
-#'   \item{\code{a.theta}}{Shape hyper-parameter for the
+#'         Default: \code{b.s = 1}.
+#'       }
+#'       \item{
+#'         \code{a.theta}
+#'       }{
+#'         Shape hyper-parameter for the
 #'         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
-#'         parameter \eqn{\theta}. Default: \code{a.theta = 1}.}
-#'   \item{\code{b.theta}}{Rate hyper-parameter for the
+#'         parameter \eqn{\theta}. Default: \code{a.theta = 1}.
+#'       }
+#'       \item{
+#'         \code{b.theta}
+#'       }{
+#'         Rate hyper-parameter for the
 #'         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
-#'         parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
-#'  \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
-#'       specifies the degress of freedom for the residual term.
-#'       Default: \code{eta = 5}.}.
-#'
-#' }}
-#' \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies
-#'       the number of regression Gaussian Radial Basis Functions (GRBF) used
-#'       within the correlated prior adopted for gene-specific over-dispersion
-#'       and mean expression paramters. Default: \code{k = 12}. }
-#' \item{\code{Var}}{Only used when \code{Regression = TRUE}. \code{Var}
-#'       specifies the GRBF scaling parameter. Default: \code{Var = 1.2}. }
-#' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings
-#'       updates. It must be a positive number between 0 and 1. Default
-#'       (and recommended): \code{AR = 0.44}}.
-#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer
-#'       adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
-#' \item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated
-#'       \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName}
-#'       argument used to index the file name).
-#'       Default: \code{StoreChains = FALSE}.}
-#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of
-#'       adaptive proposal variances (in log-scale) for all parameters is
-#'       stored as a list in a `.Rds` file (\code{RunName} argument used to
-#'       index file name). Default: \code{StoreAdapt = FALSE}.}
-#' \item{\code{StoreDir}}{Directory where output files are stored.
-#'       Only required if \code{StoreChains = TRUE} and/or
-#'       \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
-#' \item{\code{RunName}}{String used to index `.Rds` files storing chains
-#'       and/or adaptive proposal variances.}
-#' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based
-#'       progress report is suppressed.}
-#' \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise
-#'       to use this argument. Default options have been tuned to facilitate
-#'       convergence. If changed, it must be a list containing the following
-#'       elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0},
-#'       \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0},
-#'       \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
+#'         parameter \eqn{\theta}. Default: \code{b.theta = 1}.
+#'       }
+#'       \item{
+#'         \code{eta}
+#'       }{
+#'         Only used when \code{Regression = TRUE}. \code{eta}
+#'         specifies the degress of freedom for the residual term.
+#'         Default: \code{eta = 5}.
+#'       }
+#'     }
+#'   }
+#'   \item{
+#'     \code{k}
+#'   }{
+#'     Only used when \code{Regression = TRUE}. \code{k} specifies
+#'     the number of regression Gaussian Radial Basis Functions (GRBF) used
+#'     within the correlated prior adopted for gene-specific over-dispersion
+#'     and mean expression paramters. Default: \code{k = 12}. 
+#'   }
+#'   \item{
+#'     \code{FixML}
+#'   }{
+#'     Only used when \code{Regression = TRUE}. \code{FixML} specifies
+#'     whether the locations of the \code{k - 2} Gaussian Radial Basis Functions 
+#'     (GRBF) used within the correlated prior for gene-specific mean and
+#'     over-dispersion are fixed a priori.
+#'   }
+#'   \item{
+#'     \code{ml}
+#'   }{
+#'     Only used when \code{Regression = TRUE} and \code{FixML = TRUE}. 
+#'     \code{ml} specifies
+#'     the location of the \code{k - 2} Gaussian Radial Basis Functions (GRBF) 
+#'     used within the correlated prior adopted for gene-specific 
+#'     over-dispersion and mean expression parameters. If not supplied, 
+#'     it is estimated from the starting mu values, \code{mu0}.
+#'   }
+#'   \item{
+#'     \code{Var}
+#'   }{
+#'     Only used when \code{Regression = TRUE}. \code{Var}
+#'     specifies the GRBF scaling parameter. Default: \code{Var = 1.2}.
+#'   }
+#'   \item{
+#'     \code{AR}
+#'   }{
+#'     Optimal acceptance rate for adaptive Metropolis Hastings
+#'     updates. It must be a positive number between 0 and 1. Default
+#'     (and recommended): \code{AR = 0.44}.
+#'   }
+#'   \item{
+#'     \code{StopAdapt}
+#'   }{
+#'     Iteration at which adaptive proposals are not longer
+#'     adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.
+#'   }
+#'   \item{
+#'     \code{StoreChains}
+#'   }{
+#'     If \code{StoreChains = TRUE}, the generated
+#'     \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName}
+#'     argument used to index the file name).
+#'     Default: \code{StoreChains = FALSE}.
+#'   }
+#'   \item{
+#'     \code{StoreAdapt}
+#'   }{
+#'     If \code{StoreAdapt = TRUE}, trajectory of
+#'     adaptive proposal variances (in log-scale) for all parameters is
+#'     stored as a list in a `.Rds` file (\code{RunName} argument used to
+#'     index file name). Default: \code{StoreAdapt = FALSE}.
+#'   }
+#'   \item{
+#'     \code{StoreDir}
+#'   }{
+#'     Directory where output files are stored.
+#'     Only required if \code{StoreChains = TRUE} and/or
+#'     \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.
+#'   }
+#'   \item{
+#'     \code{RunName}
+#'   }{
+#'     String used to index `.Rds` files storing chains
+#'     and/or adaptive proposal variances.
+#'   }
+#'   \item{
+#'     \code{PrintProgress}
+#'   }{
+#'     If \code{PrintProgress = FALSE}, console-based
+#'     progress report is suppressed.
+#'   }
+#'   \item{
+#'     \code{Start}
+#'   }{
+#'     Starting values for the MCMC sampler. We do not advise
+#'     to use this argument. Default options have been tuned to facilitate
+#'     convergence. If changed, it must be a list containing the following
+#'     elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0},
+#'     \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0},
+#'     \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}
+#'   }
 #' }
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
@@ -256,6 +361,7 @@ BASiCS_MCMC <- function(Data,
   StochasticRef <- ArgsDef$StochasticRef
   ConstrainType <- ArgsDef$ConstrainType
   ConstrainProp <- ArgsDef$ConstrainProp
+  FixML <- ArgsDef$FixML
   ml <- ArgsDef$ml
 
   # Starting values for MCMC chains
@@ -353,6 +459,7 @@ BASiCS_MCMC <- function(Data,
           lambda0 = lambda0,
           variance = variance,
           ml = ml,
+          FixML = FixML,
           geneExponent = geneExponent,
           cellExponent = cellExponent
         )
@@ -478,6 +585,8 @@ BASiCS_MCMC <- function(Data,
           NotConstrainGene = NotConstrainGene,
           ConstrainType = ConstrainType,
           StochasticRef = as.numeric(StochasticRef),
+          ml = ml,
+          FixML = FixML,
           geneExponent = geneExponent,
           cellExponent = cellExponent
         )
@@ -562,7 +671,9 @@ BASiCS_MCMC <- function(Data,
             "-------------------------------------------------------------\n")
   }
   # Convert output into a `BASiCS_Chain` object
-  ChainClass <- newBASiCS_Chain(parameters = Chain[!grepl("ls.", names(Chain))])
+  indParam <- !(grepl("ls.", names(Chain)) | names(Chain) == "ml")
+
+  ChainClass <- newBASiCS_Chain(parameters = Chain[indParam])
 
   # Store chain and/or adaptive variances
   HiddenBASiCS_MCMC_OutputStore(ChainClass,
@@ -581,8 +692,7 @@ BASiCS_MCMC <- function(Data,
                                      ConstrainType,
                                      StoreDir,
                                      RunName)
-  }
-  else {
+  } else {
     if (Verbose) {
       message("-------------------------------------------------------------\n",
               "BASiCS version ", packageVersion("BASiCS"), " : \n",

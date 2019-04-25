@@ -52,7 +52,7 @@ test_that("Valid BASiCS_MCMC output object",
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix", "RefFreq")
+                  "beta", "sigma2", "epsilon", "RefFreq", "designMatrix")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)

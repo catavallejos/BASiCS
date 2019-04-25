@@ -28,9 +28,8 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    NumericVector ml,
-    double exponent)
-{
+    arma::vec ml,
+    double exponent) {
   using arma::span;
 
   int nConstrainGene = ConstrainGene.size();
