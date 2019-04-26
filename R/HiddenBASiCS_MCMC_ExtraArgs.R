@@ -48,7 +48,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                           Data = Start$mu0, 
                                           k = k
                                         ),
-                                        FixML = FALSE) {
+                                        FixML = !missing(ml)) {
 
   PriorDelta <- match.arg(PriorDelta)
 
@@ -106,7 +106,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
   if (!(PriorDelta %in% c("gamma", "log-normal"))) {
     stop("Invalid PriorDelta value.")
   }
-
+  
   list(
     AR = AR, 
     StopAdapt = StopAdapt, 
