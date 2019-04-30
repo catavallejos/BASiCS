@@ -27,16 +27,16 @@
 #' data(ChainSC)
 #' 
 #' # Point estimates versus effective sample size
-#' BASiCS_diagPlot(ChainSC, Param = "mu")
+#' BASiCS_DiagPlot(ChainSC, Param = "mu")
 #' # Effective sample size as colour, mu as x, delta as y.
-#' BASiCS_diagPlot(ChainSC, x = "mu", y = "delta")
+#' BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #' 
 #' @export
-BASiCS_diagPlot <- function(object, 
+BASiCS_DiagPlot <- function(object, 
                             Param = "mu", 
                             x = NULL, 
                             y = NULL,
@@ -95,3 +95,6 @@ BASiCS_diagPlot <- function(object,
       ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
   }
 }
+#' @rdname BASiCS_DiagPlot
+#' @export
+BASiCS_diagPlot <- BASiCS_DiagPlot

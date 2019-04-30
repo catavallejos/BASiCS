@@ -1,5 +1,4 @@
-
-#' @rdname BASiCS_showFit
+#' @rdname BASiCS_ShowFit
 #'
 #' @title Plotting the trend after Bayesian regression
 #'
@@ -29,7 +28,7 @@
 #'
 #' @examples
 #' data(ChainRNAReg)
-#' BASiCS_showFit(ChainRNAReg)
+#' BASiCS_ShowFit(ChainRNAReg)
 #'
 #' @return A ggplot2 object
 #'
@@ -40,7 +39,7 @@
 #' Eling et al (2018). Cell Systems
 #' https://doi.org/10.1016/j.cels.2018.06.011
 #' @export
-BASiCS_showFit <- function(object,
+BASiCS_ShowFit <- function(object,
                            xlab = "log(mu)",
                            ylab = "log(delta)",
                            pch = 16,
@@ -140,3 +139,6 @@ BASiCS_showFit <- function(object,
     
   return(plot.out)
 }
+#' @rdname BASiCS_ShowFit
+#' @export
+BASiCS_showFit <- BASiCS_ShowFit

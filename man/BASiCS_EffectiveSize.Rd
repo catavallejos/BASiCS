@@ -2,9 +2,12 @@
 % Please edit documentation in R/BASiCS_EffectiveSize.R
 \name{BASiCS_EffectiveSize}
 \alias{BASiCS_EffectiveSize}
+\alias{BASiCS_effectiveSize}
 \title{Calculate effective sample size for BASiCS_Chain parameters}
 \usage{
 BASiCS_EffectiveSize(object, Param, na.rm = TRUE)
+
+BASiCS_effectiveSize(object, Param, na.rm = TRUE)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}.}
