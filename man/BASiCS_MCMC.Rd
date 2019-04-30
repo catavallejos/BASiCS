@@ -138,6 +138,24 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
     and mean expression paramters. Default: \code{k = 12}. 
   }
   \item{
+    \code{FixML}
+  }{
+    Only used when \code{Regression = TRUE}. \code{FixML} specifies
+    whether the locations of the \code{k - 2} Gaussian Radial Basis Functions 
+    (GRBF) used within the correlated prior for gene-specific mean and
+    over-dispersion are fixed a priori.
+  }
+  \item{
+    \code{ml}
+  }{
+    Only used when \code{Regression = TRUE} and \code{FixML = TRUE}. 
+    \code{ml} specifies
+    the location of the \code{k - 2} Gaussian Radial Basis Functions (GRBF) 
+    used within the correlated prior adopted for gene-specific 
+    over-dispersion and mean expression parameters. If not supplied, 
+    it is estimated from the starting mu values, \code{mu0}.
+  }
+  \item{
     \code{Var}
   }{
     Only used when \code{Regression = TRUE}. \code{Var}

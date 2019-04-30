@@ -36,7 +36,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                           b.sigma2 = 2,
                                           eta = 5
                                         ),
-                                        Start = BASiCS_MCMC_Start(
+                                        Start = HiddenBASiCS_MCMC_Start(
                                           Data = Data,
                                           eta = PriorParam$eta,
                                           m = PriorParam$m,

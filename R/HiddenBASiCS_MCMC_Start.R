@@ -1,6 +1,6 @@
 # Used in BASiCS_MCMC
 #' @export
-BASiCS_MCMC_Start <- function(Data,
+HiddenBASiCS_MCMC_Start <- function(Data,
                               Regression = !is.null(eta),
                               eta = NULL,
                               m,
