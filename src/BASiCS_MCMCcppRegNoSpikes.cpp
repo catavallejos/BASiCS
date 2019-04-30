@@ -150,12 +150,12 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec PthetaAux = zeros(nBatch);
 
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
-  arma::mat muAux = zeros(q0,2);
+  arma::mat muAux = zeros(q0, 2);
   muAux.col(0) = as_arma(mu0);
-  arma::mat deltaAux = zeros(q0,2);
+  arma::mat deltaAux = zeros(q0, 2);
   deltaAux.col(0) = as_arma(delta0);
   arma::vec sAux = as_arma(s0);
-  arma::mat nuAux = zeros(n,2);
+  arma::mat nuAux = zeros(n, 2);
   nuAux.col(0) = as_arma(nu0);
   arma::mat thetaAux = zeros(nBatch, 2);
   thetaAux.col(0) = as_arma(theta0);
@@ -215,7 +215,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   if (FixML) {
     ml_arma = as_arma(ml);
   } else {
-    ml_arma = estimateRBFLocations(k, means);
+    ml_arma = estimateRBFLocations(k, log(means));
   }
   arma::mat X = designMatrix(k, means, ml_arma, variance);
 
@@ -415,7 +415,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
         if (!FixML) {
-          ml_arma = estimateRBFLocations(k, means);
+          ml_arma = estimateRBFLocations(k, log(means));
         }
         X = designMatrix(k, means, ml_arma, variance);
       }

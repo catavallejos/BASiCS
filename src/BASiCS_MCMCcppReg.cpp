@@ -216,7 +216,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   if (FixML) {
     ml_arma = as_arma(ml);
   } else {
-    ml_arma = estimateRBFLocations(k, means);
+    ml_arma = estimateRBFLocations(k, log(means));
   }
 
   arma::mat X = designMatrix(k, means, ml_arma, variance);
@@ -435,7 +435,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux(arma::span(0, q0 - 1), 0);
         if (!FixML) {
-          ml_arma = estimateRBFLocations(k, means);
+          ml_arma = estimateRBFLocations(k, log(means));
         }
         X = designMatrix(k, means, ml_arma, variance);
       }
