@@ -22,7 +22,7 @@ arma::mat designMatrix(
   return X;
 }
 
-
+// [[Rcpp::export]]
 arma::vec estimateRBFLocations(int const& k, arma::vec const& x) {
   arma::vec m = arma::zeros(k - 2);
   m(0) = x.min();
