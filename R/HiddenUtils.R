@@ -95,3 +95,7 @@ DistanceVar <- function(measure) {
 cap <- function(s) {
   sub("([[:alpha:]])([[:alpha:]]+)", "\\U\\1\\L\\2", s, perl = TRUE)
 }
+
+NSamples <- function(Chain) {
+  nrow(Chain@parameters[[1]])
+}
