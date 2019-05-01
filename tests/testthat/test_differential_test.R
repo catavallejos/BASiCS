@@ -1,9 +1,9 @@
 context("Differential test\n")
 
-test_that("Differential test is correct", 
-{
-  data(ChainSC)
-  data(ChainRNA)
+data(ChainSC)
+data(ChainRNA)
+
+test_that("Differential test is correct", {
             
   Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                         GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
@@ -42,6 +42,13 @@ test_that("Differential test is correct",
             
 })
 
-
+test_that("Differential test fails when different number of samples", {
+  Chain2 <- ChainSC
+  Chain2@parameters <- lapply(Chain2@parameters, function(x) x[1:10, ])
+  expect_error(
+    BASiCS_TestDE(ChainSC, Chain2),
+    "Chains must have an equal number of samples to run BASiCS_TestDE."
+  )
+})
 
 

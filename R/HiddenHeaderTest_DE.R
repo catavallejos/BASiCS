@@ -46,6 +46,9 @@ HiddenHeaderTest_DE <- function(Chain1,
   if (!is(Chain2, "BASiCS_Chain")) {
     stop("'Chain2' is not a 'BASiCS_Chain' class object.")
   }
+  if (!NSamples(Chain1) == NSamples(Chain2)) {
+    stop("Chains must have an equal number of samples to run BASiCS_TestDE.")
+  }
 
   # Test compatibility of both BASiCS_Chain objects
   if (ncol(Chain1@parameters$mu) != ncol(Chain2@parameters$mu)) {
