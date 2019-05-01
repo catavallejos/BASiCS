@@ -61,3 +61,7 @@ HiddenCheckValidCombination <- function(...) {
 
 HiddenGeneParams <- function() c("mu", "delta", "epsilon")
 HiddenCellParams <- function() c("s", "phi", "nu")
+
+NSamples <- function(Chain) {
+  nrow(Chain@parameters[[1]])
+}
