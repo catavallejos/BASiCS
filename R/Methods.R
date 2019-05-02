@@ -41,8 +41,6 @@ setMethod("show",
               q.bio <- ncol(object@parameters$delta)
               n <- ncol(object@parameters$phi)
               nBatch <- ncol(object@parameters$theta)
-              cat("An object of class ", class(object), "\n",
-                  " ", N, " MCMC samples.\n", sep = "")
               if (nBatch > 1) {
                 cat(" Dataset contains ", q.bio, " biological genes and ",
                     n, " cells (", nBatch, " batches). \n", sep = "")
