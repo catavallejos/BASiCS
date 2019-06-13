@@ -2,9 +2,14 @@
 % Please edit documentation in R/BASiCS_DiagPlot.R
 \name{BASiCS_DiagPlot}
 \alias{BASiCS_DiagPlot}
+\alias{BASiCS_diagPlot}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
 BASiCS_DiagPlot(object, Param = "mu", x = NULL, y = NULL,
+  LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
+  c("mu", "delta")), na.rm = TRUE)
+
+BASiCS_diagPlot(object, Param = "mu", x = NULL, y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
   c("mu", "delta")), na.rm = TRUE)
 }

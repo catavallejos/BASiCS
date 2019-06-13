@@ -95,3 +95,6 @@ BASiCS_DiagPlot <- function(object,
       ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
   }
 }
+#' @export
+#' @rdname BASiCS_DiagPlot
+BASiCS_diagPlot <- BASiCS_DiagPlot

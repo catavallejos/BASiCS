@@ -1,43 +1,55 @@
 #' Produce plots assessing differential expression results
 #' 
-#' @param ResultsDE A BASiCS_ResultsDE object
-#' @param Which 
+#' @param object A BASiCS_ResultsDE or BASiCS_ResultDE object.
+#' @param Which Which plot to produce? Options: "MAPlot", "VolcanoPlot", 
+#'  "GridPlot"
 #' @param ... Passed to methods
-setMethod("BASiCS_DEPlots", signature(object = "BASiCS_ResultsDE"),
+#' @examples
+#' data(ChainSC)
+#' data(ChainRNA)
+#'
+#' Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
+#'                       GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
+#'                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+#'                       OffSet = TRUE)
+#' BASiCS_PlotDE(Test)
+#' BASiCS_PlotDE(Test@Results[[1]])
+#' @export
+setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
   function(object, Which = c("MAPlot", "VolcanoPlot", "GridPlot"), ...) {
-    l <- lapply(ResultsDE@Results, BASiCS_DEPlots, Which = Which, ...)
+    l <- lapply(object@Results, BASiCS_PlotDE, Which = Which, ...)
     if (length(Which) > 1) {
-      nrow <- length(ResultsDE@Results)
-      labels <- lapply(ResultsDE@Results, function(x) {
+      nrow <- length(object@Results)
+      labels <- lapply(object@Results, function(x) {
         cap(MeasureName(x@Name))
       })
       labels <- Reduce(c, labels)
-      labels <- c(labels, rep("", length(ResultsDE@Results) * length(Which)))
+      labels <- c(labels, rep("", length(object@Results) * length(Which)))
     } else {
       nrow <- length(Which)
-      labels <- sapply(ResultsDE@Results, function(x) cap(MeasureName(x@Name)))
+      labels <- sapply(object@Results, function(x) cap(MeasureName(x@Name)))
     }
     cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels)
   }
 )
-
-setMethod("BASiCS_DEPlots", signature(object = "BASiCS_ResultDE"),
+#' @export
+setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
   function(
     object,
-    GroupLabel1 = ResultDE@GroupLabel1,
-    GroupLabel2 = ResultDE@GroupLabel2,
+    GroupLabel1 = object@GroupLabel1,
+    GroupLabel2 = object@GroupLabel2,
     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
-    Epsilon = ResultDE@Epsilon,
-    EFDR = ResultDE@EFDR,
-    Table = ResultDE@Table,
-    Measure = ResultDE@Name,
-    EFDRgrid = ResultDE@EFDRgrid,
-    EFNRgrid = ResultDE@EFNRgrid,
-    ProbThreshold = ResultDE@ProbThreshold,
+    Epsilon = object@Epsilon,
+    EFDR = object@EFDR,
+    Table = object@Table,
+    Measure = object@Name,
+    EFDRgrid = object@EFDRgrid,
+    EFNRgrid = object@EFNRgrid,
+    ProbThreshold = object@ProbThreshold,
     Which = c("MAPlot", "VolcanoPlot", "GridPlot")
   ){
 
-    BASiCS_DEPlots(
+    BASiCS_PlotDE(
       GroupLabel1 = GroupLabel1,
       GroupLabel2 = GroupLabel2,
       ProbThresholds = ProbThresholds,
@@ -52,7 +64,7 @@ setMethod("BASiCS_DEPlots", signature(object = "BASiCS_ResultDE"),
     )
   }
 )
-setMethod("BASiCS_DEPlots", signature(object = "missing"),
+setMethod("BASiCS_PlotDE", signature(object = "missing"),
   function(
     GroupLabel1,
     GroupLabel2,
@@ -99,12 +111,12 @@ setMethod("BASiCS_DEPlots", signature(object = "missing"),
 
 
 GridPlot <- function(Measure, 
-                       EFDR,
-                       ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
-                       EFDRgrid,
-                       EFNRgrid,
-                       ProbThreshold
-                       ) {
+                     EFDR,
+                     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
+                     EFDRgrid,
+                     EFNRgrid,
+                     ProbThreshold
+                     ) {
   df <- data.frame(
     ProbThresholds, 
     EFDR = EFDRgrid, 

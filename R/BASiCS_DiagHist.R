@@ -64,3 +64,6 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
                   y = "Count")
 }
 
+#' @export
+#' @rdname BASiCS_DiagHist
+BASiCS_diagHist <- BASiCS_DiagHist

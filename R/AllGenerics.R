@@ -1,8 +1,11 @@
 #########################################################################
 # New generic functions
+#' @export
 setGeneric("displayChainBASiCS", 
            function(object, ...) standardGeneric("displayChainBASiCS"))
+#' @export
 setGeneric("displaySummaryBASiCS", 
            function(object, ...) standardGeneric("displaySummaryBASiCS"))
-setGeneric("BASiCS_DEPlots", 
-           function(object, ...) standardGeneric("BASiCS_DEPlots"))
+#' @export
+setGeneric("BASiCS_PlotDE", 
+           function(object, ...) standardGeneric("BASiCS_PlotDE"))
