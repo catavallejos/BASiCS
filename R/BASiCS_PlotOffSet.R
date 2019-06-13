@@ -49,9 +49,9 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
       ggplot2::labs(
         # title = "Offset MCMC chain", 
         y = "Offset estimate", x = NULL) +
-      theme(
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_blank(),
+        axis.ticks.x = ggplot2::element_blank()
       )
     if (Print) {
       print(g)
