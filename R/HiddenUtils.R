@@ -62,8 +62,9 @@ HiddenCheckValidCombination <- function(...) {
 HiddenGeneParams <- function() c("mu", "delta", "epsilon")
 HiddenCellParams <- function() c("s", "phi", "nu")
 
-
-
+NClassFD2D <- function(x, y) {
+  max(nclass.FD(x), nclass.FD(y))
+}
 
 MeasureName <- function(measure) {
   switch(measure, 
