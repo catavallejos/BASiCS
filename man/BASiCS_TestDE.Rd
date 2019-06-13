@@ -260,6 +260,8 @@ Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       EpsilonR = log2(1.5)/log2(exp(1)),
                       OffSet = TRUE)
 
+## Plotting the results of these tests
+BASiCS_PlotDE(Test)
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
