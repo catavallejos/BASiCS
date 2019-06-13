@@ -20,10 +20,10 @@ test_that("BASiCS_Sim works", {
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(6, 0, 0, 1, 11)
-  expect_that(all.equal(Aux, Aux0), is_true())
+  expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 3044
-  expect_that(all.equal(Aux, Aux0), is_true())
+  expect_equal(Aux, Aux0)
 
   # Data with spike-ins, multiple batches
   BatchInfo <- c(rep(1, 3), rep(2, 2))
@@ -34,10 +34,10 @@ test_that("BASiCS_Sim works", {
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(0, 2, 2, 0, 0)
-  expect_that(all.equal(Aux, Aux0), is_true())
+  expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 1050
-  expect_that(all.equal(Aux, Aux0), is_true())
+  expect_equal(Aux, Aux0)
 
   # Data without spike-ins, multiple batches
   set.seed(3)
@@ -46,10 +46,10 @@ test_that("BASiCS_Sim works", {
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(0, 1, 0, 0, 4)
-  expect_that(all.equal(Aux, Aux0), is_true())
+  expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 80
-  expect_that(all.equal(Aux, Aux0), is_true())
+  expect_equal(Aux, Aux0)
   
   # When the parameter input is not right
   expect_error(
