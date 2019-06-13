@@ -1,5 +1,4 @@
 #' @useDynLib BASiCS
-#' @exportPattern "^[^\\Hidden]"
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
 #' @importFrom data.table fread

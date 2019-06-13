@@ -2,9 +2,12 @@
 % Please edit documentation in R/BASiCS_DiagHist.R
 \name{BASiCS_DiagHist}
 \alias{BASiCS_DiagHist}
+\alias{BASiCS_diagHist}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
 BASiCS_DiagHist(object, Param = NULL, na.rm = TRUE)
+
+BASiCS_diagHist(object, Param = NULL, na.rm = TRUE)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
