@@ -5,7 +5,7 @@
 \title{Visualise global offset in mean expression between two chains.}
 \usage{
 BASiCS_PlotOffset(OffsetCorrected, Type = c("offset estimate",
-  "before-after", "MA plot"), Print = FALSE)
+  "before-after", "MAPlot"), Print = FALSE)
 }
 \arguments{
 \item{OffsetCorrected}{Object of class BASiCS_OffsetCorrected}

@@ -272,7 +272,7 @@ setClass("BASiCS_ResultsDE",
   ),
   contains = "Versioned"
 )
-
+#' @export
 setClass("BASiCS_ResultDE",
   representation = representation(
     Table = "data.frame",
@@ -288,7 +288,7 @@ setClass("BASiCS_ResultDE",
     Extras = "list"
   )
 )
-
+#' @export
 setClass("BASiCS_OffsetCorrected", 
   representation = representation(
     GroupLabel1 = "character", 
