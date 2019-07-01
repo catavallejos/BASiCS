@@ -45,6 +45,7 @@ BASiCS_ShowFit <- function(object,
                            pch = 16,
                            smooth = TRUE,
                            variance = 1.2,
+                           ml = NULL,
                            colour = "dark blue",
                            markExcludedGenes = TRUE,
                            GenesSel = NULL,
@@ -64,31 +65,36 @@ BASiCS_ShowFit <- function(object,
   grid.mu <- seq(round(min(m), digits = 2),
                  round(max(m), digits = 2), length.out = 1000)
 
-  # Create design matrix across the grid
+  
   n <- ncol(object@parameters$beta)
-  range <- diff(range(grid.mu))
-  myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
-  h <- diff(myu)*variance
+  if (is.null(ml)) {
+    # Create design matrix across the grid
+    range <- diff(range(grid.mu))
+    myu <- seq(min(grid.mu), by = range / (n - 3), length.out = n - 2)
+  } else {
+    myu <- ml
+  }
+  h <- diff(myu) * variance
 
-  B <- matrix(1,length(grid.mu),n)
-  B[,2] <- grid.mu
-  for (j in seq_len(n-2)) {
-    B[,j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
+  B <- matrix(1,length(grid.mu), n)
+  B[, 2] <- grid.mu
+  for (j in seq_len(n - 2)) {
+    B[, j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
   }
 
-  # Calculate yhat = X*beta
-  yhat <- apply(object@parameters$beta, 1, function(n) B%*%n)
+  # Calculate yhat = X * beta
+  yhat <- apply(object@parameters$beta, 1, function(n) B %*% n)
   yhat.HPD <- coda::HPDinterval(coda::mcmc(t(yhat)), 0.95)
 
   df <- data.frame(mu = log(colMedians(object@parameters$mu)),
                    delta = log(colMedians(object@parameters$delta)),
-                   included = !is.na(object@parameters$epsilon[1,]))
+                   included = !is.na(object@parameters$epsilon[1, ]))
   rownames(df) <- colnames(object@parameters$mu)
 
   df2 <- data.frame(mu2 = grid.mu,
                     yhat = rowMedians(yhat),
-                    yhat.upper = yhat.HPD[,2],
-                    yhat.lower = yhat.HPD[,1])
+                    yhat.upper = yhat.HPD[, 2],
+                    yhat.lower = yhat.HPD[, 1])
 
   plot.out <- ggplot(df[df$included,],
                      ggplot2::aes_string(x = "mu", y = "delta")) +
@@ -137,7 +143,7 @@ BASiCS_ShowFit <- function(object,
                                              ymax = "yhat.upper"),
                          alpha = 0.5)
     
-  return(plot.out)
+  plot.out
 }
 #' @rdname BASiCS_ShowFit
 #' @export
