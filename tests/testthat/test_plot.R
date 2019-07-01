@@ -190,3 +190,33 @@ test_that("Diagnostic hist work", {
   g <- BASiCS_diagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
 })
+
+
+test_that("DE plots work (non-regression)", {
+  data(ChainSC)
+  data(ChainRNA)
+  Test <- BASiCS_TestDE(ChainSC, ChainRNA, Plot = FALSE, PlotOffset = FALSE)
+  BASiCS_PlotDE(Test)
+  BASiCS_PlotDE(Test@Results[[1]])
+  BASiCS_PlotDE(Test@Results[[2]])
+
+  for (type in c("MAPlot", "GridPlot", "VolcanoPlot")) {
+    BASiCS_PlotDE(Test@Results[[1]], Which = type)
+    BASiCS_PlotDE(Test@Results[[2]], Which = type)
+  }
+})
+
+test_that("DE plots work (regression)", {
+  data(ChainSCReg)
+  data(ChainRNAReg)
+  Test <- BASiCS_TestDE(ChainSCReg, ChainRNAReg, Plot = FALSE, PlotOffset = FALSE)
+  BASiCS_PlotDE(Test)
+  BASiCS_PlotDE(Test@Results[[1]])
+  BASiCS_PlotDE(Test@Results[[2]])
+  BASiCS_PlotDE(Test@Results[[3]])
+  for (type in c("MAPlot", "GridPlot", "VolcanoPlot")) {
+    BASiCS_PlotDE(Test@Results[[1]], Which = type)
+    BASiCS_PlotDE(Test@Results[[2]], Which = type)
+    BASiCS_PlotDE(Test@Results[[3]], Which = type)
+  }
+})
