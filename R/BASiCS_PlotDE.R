@@ -13,7 +13,11 @@
 #'                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
 #'                       OffSet = TRUE)
 #' BASiCS_PlotDE(Test)
-#' BASiCS_PlotDE(Test@Results[[1]])
+#' @return 
+#'  Plot objects.
+#' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
+#' @author Nils Eling \email{eling@@ebi.ac.uk}
+#' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
 #' @export
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
   function(object, Which = c("MAPlot", "VolcanoPlot", "GridPlot"), ...) {
@@ -27,7 +31,11 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
       labels <- c(labels, rep("", length(object@Results) * length(Which)))
     } else {
       nrow <- length(Which)
-      labels <- sapply(object@Results, function(x) cap(MeasureName(x@Name)))
+      labels <- vapply(
+        object@Results, 
+        function(x) cap(MeasureName(x@Name)), 
+        character(1)
+      )
     }
     cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels)
   }
@@ -123,7 +131,9 @@ GridPlot <- function(Measure,
     EFNR = EFNRgrid)
 
   mdf <- reshape2::melt(df,measure.vars = c("EFDR", "EFNR"))
-  ggplot2::ggplot(mdf, aes(x = ProbThresholds, y = value, color = variable)) +
+  ggplot2::ggplot(mdf, 
+      aes_string(x = "ProbThresholds", y = "value", color = "variable")
+    ) +
     ggplot2::geom_line() +
     ggplot2::labs(
       y = "Error rate", 
@@ -154,7 +164,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         y = paste0("ProbDiff", Measure))
     ) +
     # ggplot2::geom_point() +
-    ggplot2::geom_hex(bins = bins, aes(fill = ..density..), na.rm = TRUE) +
+    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
     ggplot2::geom_point(
       data = Table[IndDiff, ], 
       shape = 16, 
@@ -182,26 +192,28 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   #   Table[[paste0(Measure, DistanceVar(Measure))]]
   # )
   bins <- 100
+  xscale <- ggplot2::scale_x_continuous(
+    trans = if (Measure == "ResDisp") "identity" else "log2"
+  )
   ggplot2::ggplot(
       Table, 
       ggplot2::aes_string(
         x = paste0(Measure, "Overall"), 
         y = paste0(Measure, DistanceVar(Measure)))
     ) + 
-    ggplot2::geom_hex(bins = bins, aes(fill = ..density..), na.rm = TRUE) +
+    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
     # ggplot2::geom_point() +
     ggplot2::geom_point(
       data = Table[IndDiff, ], 
       shape = 16, 
-      colour = "#e41a1c", 
+      colour = "violetred", 
       na.rm = TRUE) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
       lty = "dashed", 
-      color = "grey40", 
-      na.rm = TRUE) +
-    ggplot2::scale_x_continuous(trans = "log2") +
-    viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
+      color = "grey40") +
+    xscale +
+    viridis::scale_fill_viridis(name = "Density") +
     ggplot2::labs(
       x = paste(cap(MeasureName(Measure))),
       y = paste(cap(LogDistanceName(Measure)),

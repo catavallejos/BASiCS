@@ -16,6 +16,9 @@
 
 \item{...}{Passed to methods}
 }
+\value{
+Plot objects.
+}
 \description{
 Produce plots assessing differential expression results
 }
@@ -28,5 +31,11 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       OffSet = TRUE)
 BASiCS_PlotDE(Test)
-BASiCS_PlotDE(Test@Results[[1]])
+}
+\author{
+Catalina A. Vallejos \email{cnvallej@uc.cl}
+
+Nils Eling \email{eling@ebi.ac.uk}
+
+Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
 }
