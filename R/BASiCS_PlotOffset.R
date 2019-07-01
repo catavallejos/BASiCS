@@ -25,6 +25,7 @@
 #' Corrected <- BASiCS_CorrectOffset(ChainSC, ChainRNA, "a", "b", Plot = FALSE)
 #' BASiCS_PlotOffset(Corrected)
 #'
+#' @return Plot objects.
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -45,7 +46,7 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
   if ("offset estimate" %in% Type) {
     # Offset uncertainty
     g <- ggplot2::ggplot(mapping = ggplot2::aes(y = OffsetCorrected@OffsetChain)) +
-      ggplot2::geom_boxplot() +
+      ggplot2::geom_boxplot(na.rm = TRUE) +
       ggplot2::labs(
         # title = "Offset MCMC chain", 
         y = "Offset estimate", x = NULL) +
@@ -67,15 +68,15 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     df <- cbind(OffsetCorrected@Mu1_old, OffsetCorrected@Mu2)
     colnames(df) <- c(OffsetCorrected@GroupLabel1, OffsetCorrected@GroupLabel2)
     mdf <- reshape2::melt(df)
-    g1 <- ggplot2::ggplot(mdf, ggplot2::aes(x = Var2, y = value)) +
+    g1 <- ggplot2::ggplot(mdf, ggplot2::aes_string(x = "Var2", y = "value")) +
       ggplot2::labs(title = "Before correction", y = "Mean expression", x = NULL) +
-      ggplot2::geom_violin() +
+      ggplot2::geom_violin(na.rm = TRUE) +
       ggplot2::scale_y_log10(limits = ylim)
 
     df <- cbind(OffsetCorrected@Mu1, OffsetCorrected@Mu2)
     colnames(df) <- c(OffsetCorrected@GroupLabel1, OffsetCorrected@GroupLabel2)
     mdf <- reshape2::melt(df)
-    g2 <- ggplot2::ggplot(mdf, ggplot2::aes(x = Var2, y = value)) +
+    g2 <- ggplot2::ggplot(mdf, ggplot2::aes_string(x = "Var2", y = "value")) +
       ggplot2::labs(title = "After correction", y = "Mean expression", x = NULL) +
       ggplot2::geom_violin() +
       ggplot2::scale_y_log10(limits = ylim)
@@ -96,11 +97,11 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
       x = log2(OffsetCorrected@MuBase_old),
       y = OffsetCorrected@MedianTau_old
     )
-    g1 <- ggplot2::ggplot(df, mapping = ggplot2::aes(x = x, y = y)) +
+    g1 <- ggplot2::ggplot(df, mapping = ggplot2::aes_string(x = "x", y = "y")) +
       ggplot2::geom_hex(
         # bins = NClassFD2D(df$x, df$y), 
         bins = 100,
-        aes(fill = ..density..), 
+        aes_string(fill = "..density.."), 
         na.rm = TRUE) + 
       # ggplot2::geom_point() +
       ggplot2::geom_hline(yintercept = 0, lty = 2) +
@@ -121,9 +122,10 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
       x = log2(OffsetCorrected@MuBase),
       y = OffsetCorrected@MedianTau
     )
-    g2 <- ggplot2::ggplot(df, mapping = ggplot2::aes(x = x, y = y)) +
+    g2 <- ggplot2::ggplot(df, mapping = ggplot2::aes_string(x = "x", y = "y")) +
       ggplot2::geom_hex(
-        mapping = aes(fill = ..density..), 
+        mapping = aes_string(fill = "..density.."), 
+        bins = 100,
         # bins = NClassFD2D(df$x, df$y), 
         bins = 100,
         na.rm = TRUE) + 
@@ -148,4 +150,3 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
   }
   Plots
 }
-
