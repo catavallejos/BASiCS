@@ -40,7 +40,11 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
     metric <- lapply(names(object@parameters), function(param) {
       try(HiddenGetMeasure(object, param, Measure, na.rm), silent = TRUE)
     })
-    ind_error <- vapply(metric, function(x) inherits(x, "try-error"), logical(1))
+    ind_error <- vapply(
+      metric,
+      function(x) inherits(x, "try-error"),
+      logical(1)
+    )
     metric <- metric[!ind_error]
     if (all(ind_error)) {
       stop("coda::effectiveSize failed for all parameters.")
