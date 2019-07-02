@@ -49,9 +49,9 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
       ggplot2::labs(
         # title = "Offset MCMC chain", 
         y = "Offset estimate", x = NULL) +
-      theme(
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_blank(),
+        axis.ticks.x = ggplot2::element_blank()
       )
     if (Print) {
       print(g)
@@ -98,7 +98,8 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     )
     g1 <- ggplot2::ggplot(df, mapping = ggplot2::aes(x = x, y = y)) +
       ggplot2::geom_hex(
-        bins = NClassFD2D(df$x, df$y), 
+        # bins = NClassFD2D(df$x, df$y), 
+        bins = 100,
         aes(fill = ..density..), 
         na.rm = TRUE) + 
       # ggplot2::geom_point() +
@@ -114,7 +115,7 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
           "Log2 fold change", OffsetCorrected@GroupLabel1,
           "vs", OffsetCorrected@GroupLabel2),
         title = "Before correction") +
-      viridis::scale_fill_viridis(name = "Density")
+      viridis::scale_fill_viridis(name = "Density", guide = FALSE)
 
     df <- data.frame(
       x = log2(OffsetCorrected@MuBase),
@@ -123,7 +124,8 @@ BASiCS_PlotOffset <- function(OffsetCorrected,
     g2 <- ggplot2::ggplot(df, mapping = ggplot2::aes(x = x, y = y)) +
       ggplot2::geom_hex(
         mapping = aes(fill = ..density..), 
-        bins = NClassFD2D(df$x, df$y), 
+        # bins = NClassFD2D(df$x, df$y), 
+        bins = 100,
         na.rm = TRUE) + 
       # ggplot2::geom_point() +
       ggplot2::geom_hline(yintercept = 0, lty = 2) +
@@ -262,6 +264,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     Table[[paste0(Measure, "Overall")]],
     Table[[paste0(Measure, DistanceVar(Measure))]]
   )
+  bins <- 100
   ggplot2::ggplot(
       Table, 
       ggplot2::aes_string(
@@ -273,7 +276,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     ggplot2::geom_point(
       data = Table[IndDiff, ], 
       shape = 16, 
-      colour = "violetred", 
+      colour = "#e41a1c", 
       na.rm = TRUE) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
@@ -281,7 +284,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       color = "grey40", 
       na.rm = TRUE) +
     ggplot2::scale_x_continuous(trans = "log2") +
-    viridis::scale_fill_viridis(name = "Density") +
+    viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
     ggplot2::labs(
       x = paste(cap(MeasureName(Measure))),
       y = paste(cap(LogDistanceName(Measure)),
@@ -298,6 +301,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     Table[[paste0(Measure, DistanceVar(Measure))]],
     Table[[paste0("ProbDiff", Measure)]]
   )
+  bins <- 100
   ggplot2::ggplot(
       Table, 
       ggplot2::aes_string(
@@ -309,7 +313,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     ggplot2::geom_point(
       data = Table[IndDiff, ], 
       shape = 16, 
-      col = "violetred", 
+      col = "#e41a1c", 
       na.rm = TRUE) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
@@ -317,7 +321,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       color = "grey40", 
       na.rm = TRUE) +
     ggplot2::ylim(c(0, 1)) +
-    viridis::scale_fill_viridis(name = "Density") +
+    viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
     ggplot2::labs(
       x = paste(cap(LogDistanceName(Measure)), GroupLabel1, "vs", GroupLabel2),
       y = "Posterior probability"
