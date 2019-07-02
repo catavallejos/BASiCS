@@ -385,8 +385,8 @@ BASiCS_TestDE <- function(Chain1,
                                          ProbThresholdM,
                                          GenesSelect,
                                          EFDR_M,
-                                         Task = Task, 
-                                         Suffix = Suffix)
+                                         Task = "Differential expression", 
+                                         Suffix = "M")
 
   TableMean <- TestDifferential(
     Chain = ChainTau, 
