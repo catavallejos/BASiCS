@@ -250,11 +250,9 @@ $$ \mu_{i} = C_i \times 10^{-18} \times (6.022 \times 10^{23})
 [here](https://assets.thermofisher.com/TFS-Assets/LSG/manuals/cms_095046.txt))
 - $10^{-18}$ is to convert att to mol
 - $6.022 \times 10^{23}$ is the Avogadro number (mol $\rightarrow$ molecule)
-- $V$ is the volume added into each chamber (in nL)
+- $V$ is the volume added into each chamber (**in microlitres**)
 - $D$ is a dilution factor
 
-For example, for the 96-well plate in the Fluidigm C1 system, 
-$V = 6.7 \times 10^{-3}$ (see [here](https://www.fluidigm.com/faq/ifc-9)). 
 
 ### Without spike-in genes
 
