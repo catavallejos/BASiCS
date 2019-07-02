@@ -5,8 +5,8 @@
 \alias{BASiCS_CorrectOffset}
 \title{Remove global mean expression offset}
 \usage{
-BASiCS_CorrectOffset(Chain1, Chain2, GroupLabel1, GroupLabel2,
-  Plot = TRUE, ...)
+BASiCS_CorrectOffset(Chain1, Chain2, GroupLabel1 = "Group1",
+  GroupLabel2 = "Group2", Plot = TRUE, ...)
 
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
   EpsilonD = log2(1.5), EpsilonR = log2(1.5)/log2(exp(1)),
@@ -105,7 +105,8 @@ order as how genes are displayed in the table of counts.
 This argument is necessary in order to have a meaningful EFDR calibration
 when the user decides to exclude some genes from the comparison.}
 
-\item{IncludeEpsilon}{Flag indicating where to include epsilon in the 
+\item{IncludeEpsilon}{Flag indicating where to include the residual 
+overdispersion parameter, epsilon, in the 
 figures and analysis. Default is \code{TRUE} if epsilon is present in
 the chains.}
 }
@@ -259,6 +260,8 @@ Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
                       EpsilonR = log2(1.5)/log2(exp(1)),
                       OffSet = TRUE)
 
+## Plotting the results of these tests
+BASiCS_PlotDE(Test)
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

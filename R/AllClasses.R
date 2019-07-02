@@ -98,7 +98,10 @@ setClass("BASiCS_Chain",
               if (sum(!(names(object@parameters) %in% ValidNames) > 0) > 0) {
                 errors <- c(errors,
                   paste("Invalid elements",
-                    paste(setdiff(names(object@parameters), ValidNames), collapse = ", "),
+                    paste(
+                      setdiff(names(object@parameters), ValidNames), 
+                      collapse = ", "
+                    ),
                     "in `parameters` slot"))
               }
 
@@ -119,18 +122,32 @@ setClass("BASiCS_Chain",
               n <- ncol(object@parameters$s)
 
               # Check number of iterations per element of `parameters`
-              if (sum(lapply(
-                  object@parameters[setdiff(names(object@parameters), c("RefFreq", "designMatrix"))],
-                  nrow) != N) > 0) {
+              nrows <- vapply(
+                object@parameters[
+                  setdiff(names(object@parameters), c("RefFreq", "designMatrix"))
+                ],
+                nrow
+              )
+              if (sum(nrows != N) > 0) {
                 errors <- c(errors, "Different numbers of iterations")
               }
               # Check dimensions for basic gene-specific parameters
-              if (sum(lapply(object@parameters[c("mu", "delta")], ncol) != q) > 0) {
+              ncols <- vapply(
+                object@parameters[c("mu", "delta")], 
+                ncol, 
+                numeric(1)
+              )
+              if (sum(ncols != q) > 0) {
                 errors <- c(errors,
-                            "Parameters' dimensions are not compatible (genes)")
+                  "Parameters' dimensions are not compatible (genes)")
               }
               # Check dimensions for basic cell-specific parameters
-              if (sum(lapply(object@parameters[c("s", "nu")], ncol) != n) > 0) {
+              ncols <- vapply(
+                object@parameters[c("s", "nu")], 
+                ncol, 
+                numeric(1)
+              )
+              if (sum(ncols!= n) > 0) {
                 errors <- c(errors,
                             "Parameters' dimensions are not compatible (cells)")
               }
@@ -272,7 +289,7 @@ setClass("BASiCS_ResultsDE",
   ),
   contains = "Versioned"
 )
-
+#' @export
 setClass("BASiCS_ResultDE",
   representation = representation(
     Table = "data.frame",
@@ -288,7 +305,7 @@ setClass("BASiCS_ResultDE",
     Extras = "list"
   )
 )
-
+#' @export
 setClass("BASiCS_OffsetCorrected", 
   representation = representation(
     GroupLabel1 = "character", 

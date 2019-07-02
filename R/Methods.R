@@ -41,8 +41,6 @@ setMethod("show",
               q.bio <- ncol(object@parameters$delta)
               n <- ncol(object@parameters$phi)
               nBatch <- ncol(object@parameters$theta)
-              cat("An object of class ", class(object), "\n",
-                  " ", N, " MCMC samples.\n", sep = "")
               if (nBatch > 1) {
                 cat(" Dataset contains ", q.bio, " biological genes and ",
                     n, " cells (", nBatch, " batches). \n", sep = "")
@@ -736,9 +734,6 @@ setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
           definition = HiddenGetParam)
 
-
-
-
 #' @export
 setMethod("show", signature = "BASiCS_OffsetCorrected", 
   function(object) {
@@ -747,7 +742,6 @@ setMethod("show", signature = "BASiCS_OffsetCorrected",
       "`BASiCS_TestDE(OffsetCorrected = OffsetCorrected)`", sep = "")
   }
 )
-
 
 #' @export
 setMethod("show", signature = "BASiCS_ResultsDE", 
@@ -761,7 +755,6 @@ setMethod("show", signature = "BASiCS_ResultsDE",
 #' @export
 setMethod("show", signature = "BASiCS_ResultDE", 
   function(object) {
-    # measures <- c("Mean", "Disp", "ResDisp")
     diffName <- paste0("ResultDiff", object@Name)
     
     nPlus1 <- sum(object@Table[[diffName]] == paste0(object@GroupLabel1, "+"))
