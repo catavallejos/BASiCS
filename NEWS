@@ -1192,3 +1192,6 @@ version 1.5.33 (2019-04-19)
 
 version 1.5.34 (2019-04-20)
 - Fixes typo in vignette
+
+version 1.7.1 (2019-07-27)
+- `is_true` deprecated in `testthat`. Unit tests updated to use `expect_true`
