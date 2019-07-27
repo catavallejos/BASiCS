@@ -12,10 +12,10 @@ test_that("Valid BASiCS_MCMC output object",
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta")
-  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true())
+  expect_true(all.equal(names(Chain@parameters), ParamNames))
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)  
-  expect_that(all.equal(names(PostSummary@parameters), ParamNames), is_true())
+  expect_true(all.equal(names(PostSummary@parameters), ParamNames))
   
   # Running the samples: spikes + regression
   set.seed(18)
@@ -25,11 +25,11 @@ test_that("Valid BASiCS_MCMC output object",
   # Checking parameter names
   ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon", "designMatrix")
-  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true()) 
+  expect_true(all.equal(names(Chain@parameters), ParamNames)) 
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)  
-  expect_that(all.equal(names(PostSummary@parameters), 
-                        ParamNames[-length(ParamNames)]), is_true())
+  expect_true(all.equal(names(PostSummary@parameters), 
+                        ParamNames[-length(ParamNames)]))
 
   # Data example: no-spikes
   set.seed(7)
@@ -41,11 +41,11 @@ test_that("Valid BASiCS_MCMC output object",
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta", "RefFreq")
-  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true())
+  expect_true(all.equal(names(Chain@parameters), ParamNames))
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)  
-  expect_that(all.equal(names(PostSummary@parameters), 
-                        ParamNames[-length(ParamNames)]), is_true())
+  expect_true(all.equal(names(PostSummary@parameters), 
+                        ParamNames[-length(ParamNames)]))
   
   # Running the samples: no-spikes + regression
   set.seed(18)
@@ -55,12 +55,12 @@ test_that("Valid BASiCS_MCMC output object",
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon", "designMatrix", "RefFreq")
-  expect_that(all.equal(names(Chain@parameters), ParamNames), is_true()) 
+  expect_true(all.equal(names(Chain@parameters), ParamNames)) 
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)  
-  expect_that(all.equal(names(PostSummary@parameters), 
+  expect_true(all.equal(names(PostSummary@parameters), 
                         ParamNames[-c(length(ParamNames)-1,
-                                      length(ParamNames))]), is_true())
+                                      length(ParamNames))]))
  
 })
 
