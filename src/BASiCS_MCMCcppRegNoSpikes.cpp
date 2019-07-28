@@ -87,7 +87,11 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     NumericVector ConstrainGene,
     NumericVector NotConstrainGene,
     int ConstrainType,
-    int StochasticRef) 
+    int StochasticRef,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta) 
 {
   using arma::ones;
   using arma::zeros;
@@ -220,7 +224,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
                                 BatchDesign_arma, BatchSizes,
-                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+                                sAux, nuAux.col(0), atheta, btheta, n, 
+                                nBatch, mintol_theta);
     PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
     thetaBatch = BatchDesign_arma * thetaAux.col(0); 
     
@@ -242,7 +247,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 Constrain, RefGene, ConstrainGene_arma, 
                                 NotConstrainGene_arma, ConstrainType, 
                                 k, lambdaAux, betaAux, X, 
-                                sigma2Aux, variance);     
+                                sigma2Aux, variance, mintol_mu);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
@@ -253,7 +258,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     deltaAux = deltaUpdateRegNoSpikes(deltaAux.col(0), exp(LSdeltaAux), 
                                       Counts_arma, muAux.col(0), 
                                       nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
-                                      lambdaAux, X, sigma2Aux, betaAux);  
+                                      lambdaAux, X, sigma2Aux, 
+                                      betaAux, mintol_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
     
     // UPDATE OF NU: 
@@ -263,7 +269,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   BatchDesign_arma,
                                   muAux.col(0), 1/deltaAux.col(0),
                                   sAux, thetaBatch, sumByGeneAll_arma, q0, n,
-                                  y_n, u_n, ind_n); 
+                                  y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
     // UPDATES OF REGRESSION RELATED PARAMETERS

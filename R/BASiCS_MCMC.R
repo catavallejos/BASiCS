@@ -190,8 +190,7 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
-                        WithSpikes = TRUE, ...)
+BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
 {
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
@@ -224,9 +223,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     nBatch <- 1
   }
 
+  # Total counts per cell and/or gene
   sum.bycell.all <- matrixStats::rowSums2(counts(Data))
   sum.bygene.all <- matrixStats::colSums2(counts(Data))
-
   sum.bycell.bio <- matrixStats::rowSums2(BioCounts)
   sum.bygene.bio <- matrixStats::colSums2(BioCounts)
 
@@ -235,24 +234,11 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                                          Burn,
                                          n,
                                          Regression,
-                                         WithSpikes = WithSpikes,
+                                         WithSpikes,
                                          ...)
-  AR <- ArgsDef$AR
-  StopAdapt <- ArgsDef$StopAdapt
-  StoreChains <- ArgsDef$StoreChains
-  StoreAdapt <- ArgsDef$StoreAdapt
-  StoreDir <- ArgsDef$StoreDir
-  RunName <- ArgsDef$RunName
-  PrintProgress <- ArgsDef$PrintProgress
-  PriorParam <- ArgsDef$PriorParam
-  PriorDeltaNum <- ArgsDef$PriorDeltaNum
-  PriorDelta <- ArgsDef$PriorDelta
-  k <- ArgsDef$k
-  variance <- ArgsDef$variance
+  # Starting values for the MCMC (parameters and adaptive variances)
+  # Loaded separately to simplify calling to the elements of its list
   Start <- ArgsDef$Start
-  StochasticRef <- ArgsDef$StochasticRef
-  ConstrainType <- ArgsDef$ConstrainType
-  ConstrainProp <- ArgsDef$ConstrainProp
 
   # Starting values for MCMC chains
   mu0 <- as.vector(Start$mu0)[!spikes]
@@ -263,12 +249,12 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   theta0 <- as.numeric(Start$theta0)
 
 
-  # Starting values for adaptive proposal variances
-  ls.mu0 <- as.vector(Start$ls.mu0)
-  ls.delta0 <- as.vector(Start$ls.delta0)
-  ls.phi0 <- as.numeric(Start$ls.phi0)
-  ls.nu0 <- as.vector(Start$ls.nu0)
-  ls.theta0 <- as.numeric(Start$ls.theta0)
+  # Starting values 
+  Start$ls.mu0 <- as.vector(Start$ls.mu0)
+  Start$ls.delta0 <- as.vector(Start$ls.delta0)
+  Start$ls.phi0 <- as.numeric(Start$ls.phi0)
+  Start$ls.nu0 <- as.vector(Start$ls.nu0)
+  Start$ls.theta0 <- as.numeric(Start$ls.theta0)
 
   # Starting values for Regression
   if (Regression) {
@@ -306,35 +292,39 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 s0,
                 nu0,
                 rep(theta0, nBatch),
-                PriorParam$s2.mu,
-                PriorParam$p.phi,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.phi0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
+                ArgsDef$PriorParam$s2.mu,
+                ArgsDef$PriorParam$p.phi,
+                ArgsDef$PriorParam$a.s,
+                ArgsDef$PriorParam$b.s,
+                ArgsDef$PriorParam$a.theta,
+                ArgsDef$PriorParam$b.theta,
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.phi0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, nBatch),
                 sum.bycell.all,
                 sum.bycell.bio,
                 sum.bygene.all,
                 sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress),
-                k,
-                PriorParam$m,
-                PriorParam$V,
-                PriorParam$a.sigma2,
-                PriorParam$b.sigma2,
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
+                ArgsDef$k,
+                ArgsDef$PriorParam$m,
+                ArgsDef$PriorParam$V,
+                ArgsDef$PriorParam$a.sigma2,
+                ArgsDef$PriorParam$b.sigma2,
                 beta0,
                 sigma20,
-                PriorParam$eta,
+                ArgsDef$PriorParam$eta,
                 lambda0,
-                variance))
+                ArgsDef$variance,
+                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_delta,
+                ArgsDef$mintol_nu,
+                ArgsDef$mintol_theta))
 
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
@@ -356,29 +346,33 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 s0,
                 nu0,
                 rep(theta0, nBatch),
-                PriorParam$s2.mu,
-                PriorParam$a.delta,
-                PriorParam$b.delta,
-                PriorParam$s2.delta,
-                PriorDeltaNum,
-                PriorParam$p.phi,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.phi0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
+                ArgsDef$PriorParam$s2.mu,
+                ArgsDef$PriorParam$a.delta,
+                ArgsDef$PriorParam$b.delta,
+                ArgsDef$PriorParam$s2.delta,
+                ArgsDef$PriorDeltaNum,
+                ArgsDef$PriorParam$p.phi,
+                ArgsDef$PriorParam$a.s,
+                ArgsDef$PriorParam$b.s,
+                ArgsDef$PriorParam$a.theta,
+                ArgsDef$PriorParam$b.theta,
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.phi0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, nBatch),
                 sum.bycell.all,
                 sum.bycell.bio,
                 sum.bygene.all,
                 sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress)))
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
+                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_delta,
+                ArgsDef$mintol_nu,
+                ArgsDef$mintol_theta))
     }
   }
   else {
@@ -390,8 +384,9 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
     # Definition of parameters that are specific to the no-spikes case
     NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
       as.matrix(BioCounts),
-      ConstrainType,
-      StochasticRef, q.bio, mu0, PriorDelta, ConstrainProp)
+      ArgsDef$ConstrainType,
+      ArgsDef$StochasticRef, 
+      q.bio, mu0, ArgsDef$PriorDelta, ArgsDef$ConstrainProp)
     ConstrainGene <- NoSpikesParam$ConstrainGene
     NotConstrainGene <- NoSpikesParam$NotConstrainGene
     Constrain <- NoSpikesParam$Constrain
@@ -411,39 +406,43 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 s0,
                 nu0,
                 rep(theta0, nBatch),
-                PriorParam$s2.mu,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
+                ArgsDef$PriorParam$s2.mu,
+                ArgsDef$PriorParam$a.s,
+                ArgsDef$PriorParam$b.s,
+                ArgsDef$PriorParam$a.theta,
+                ArgsDef$PriorParam$b.theta,
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, nBatch),
                 sum.bycell.bio,
                 sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress),
-                k,
-                PriorParam$m,
-                PriorParam$V,
-                PriorParam$a.sigma2,
-                PriorParam$b.sigma2,
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
+                ArgsDef$k,
+                ArgsDef$PriorParam$m,
+                ArgsDef$PriorParam$V,
+                ArgsDef$PriorParam$a.sigma2,
+                ArgsDef$PriorParam$b.sigma2,
                 beta0,
                 sigma20,
-                PriorParam$eta,
+                ArgsDef$PriorParam$eta,
                 lambda0,
-                variance,
+                ArgsDef$variance,
                 Constrain,
                 Index,
                 RefGene,
                 RefGenes,
                 ConstrainGene,
                 NotConstrainGene,
-                ConstrainType,
-                as.numeric(StochasticRef)))
+                ArgsDef$ConstrainType,
+                as.numeric(ArgsDef$StochasticRef), 
+                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_delta,
+                ArgsDef$mintol_nu,
+                ArgsDef$mintol_theta))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
@@ -462,33 +461,37 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
         s0,
         nu0,
         rep(theta0, nBatch),
-        PriorParam$s2.mu,
-        PriorParam$a.delta,
-        PriorParam$b.delta,
-        PriorParam$s2.delta,
-        PriorDeltaNum,
-        PriorParam$a.s,
-        PriorParam$b.s,
-        PriorParam$a.theta,
-        PriorParam$b.theta,
-        AR,
-        ls.mu0,
-        ls.delta0,
-        ls.nu0,
-        rep(ls.theta0, nBatch),
+        ArgsDef$PriorParam$s2.mu,
+        ArgsDef$PriorParam$a.delta,
+        ArgsDef$PriorParam$b.delta,
+        ArgsDef$PriorParam$s2.delta,
+        ArgsDef$PriorDeltaNum,
+        ArgsDef$PriorParam$a.s,
+        ArgsDef$PriorParam$b.s,
+        ArgsDef$PriorParam$a.theta,
+        ArgsDef$PriorParam$b.theta,
+        ArgsDef$AR,
+        Start$ls.mu0,
+        Start$ls.delta0,
+        Start$ls.nu0,
+        rep(Start$ls.theta0, nBatch),
         sum.bycell.bio,
         sum.bygene.bio,
-        as.numeric(StoreAdapt),
-        StopAdapt,
-        as.numeric(PrintProgress),
+        as.numeric(ArgsDef$StoreAdapt),
+        ArgsDef$StopAdapt,
+        as.numeric(ArgsDef$PrintProgress),
         Constrain,
         Index,
         RefGene,
         RefGenes,
         ConstrainGene,
         NotConstrainGene,
-        ConstrainType,
-        as.numeric(StochasticRef)))
+        ArgsDef$ConstrainType,
+        as.numeric(ArgsDef$StochasticRef),
+        ArgsDef$mintol_mu, 
+        ArgsDef$mintol_delta,
+        ArgsDef$mintol_nu,
+        ArgsDef$mintol_theta))
     }
   }
 
@@ -523,21 +526,21 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
   # Store chain and/or adaptive variances
   HiddenBASiCS_MCMC_OutputStore(ChainClass,
                                 Chain,
-                                StoreChains,
-                                StoreAdapt,
-                                StoreDir,
-                                RunName)
+                                ArgsDef$StoreChains,
+                                ArgsDef$StoreAdapt,
+                                ArgsDef$StoreDir,
+                                ArgsDef$RunName)
 
   # Store reference gene information (no spikes case only)
   if (!WithSpikes) {
-    if (StoreChains)
+    if (ArgsDef$StoreChains)
       HiddenBASiCS_MCMC_RefFreqStore(Data,
                                      Chain,
                                      RefGene,
                                      RefGenes,
-                                     ConstrainType,
-                                     StoreDir,
-                                     RunName)
+                                     ArgsDef$ConstrainType,
+                                     ArgsDef$StoreDir,
+                                     ArgsDef$RunName)
   }
   else {
     message("-------------------------------------------------------------\n",

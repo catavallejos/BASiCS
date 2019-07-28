@@ -35,7 +35,8 @@ test_that("Spikes + no regression", {
                                   phinu = Start$phi0 * Start$nu0,
                                   sum_bycell_bio = rowSums(CountsBio),
                                   s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
-                                  mu1 =  mu1, u = uGene, ind = indGene)
+                                  mu1 =  mu1, u = uGene, ind = indGene,
+                                  mintol = 1e-3)
   
   mu1 <- c(6.78, 15.67,  5.43, 13.05, 24.20)
   mu1Obs <- round(Aux[1:5,1],2) 

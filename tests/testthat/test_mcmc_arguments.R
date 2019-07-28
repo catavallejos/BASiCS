@@ -74,7 +74,8 @@ test_that("MCMC fails for one or multiple arguments", {
                            WithSpikes = FALSE), NA)
   
   Data2 <- DataNoSpikes
-  SummarizedExperiment::colData(Data2)$BatchInfo <- rep(1, length(SummarizedExperiment::colData(Data2)$BatchInfo))  
+  SummarizedExperiment::colData(Data2)$BatchInfo <- rep(1, 
+                                                        length(SummarizedExperiment::colData(Data2)$BatchInfo))  
   expect_error(run_MCMC(Data = Data2, N = 50, 
                            Thin = 5, Burn = 25, Regression = FALSE, 
                            WithSpikes = FALSE),
