@@ -73,7 +73,11 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     NumericVector sumByGeneBio,
     int StoreAdapt, 
     int EndAdapt,
-    int PrintProgress) 
+    int PrintProgress,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta) 
 {
   using arma::ones;
   using arma::zeros;
@@ -184,7 +188,8 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
                                 BatchDesign_arma, BatchSizes,
-                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+                                sAux, nuAux.col(0), atheta, btheta, n, 
+                                nBatch, mintol_theta);
     PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
     thetaBatch = BatchDesign_arma * thetaAux.col(0); 
     
@@ -194,7 +199,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     muAux = Hidden_muUpdate(muAux.col(0), exp(LSmuAux), Counts_arma, 
                      1/deltaAux.col(0), phiAux % nuAux.col(0), 
                      sumByCellBio_arma, s2mu, q0, n,
-                     y_q0, u_q0, ind_q0);     
+                     y_q0, u_q0, ind_q0, mintol_mu);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
@@ -207,7 +212,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
                            muAux.col(0), phiAux % nuAux.col(0), 
                            adelta, bdelta, s2delta, prior_delta, 
-                           q0, n, y_q0, u_q0, ind_q0);  
+                           q0, n, y_q0, u_q0, ind_q0, mintol_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
     
     // UPDATE OF NU: 
@@ -217,7 +222,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                           BatchDesign_arma,
                           muAux.col(0), 1/deltaAux.col(0),
                           phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
-                          y_n, u_n, ind_n); 
+                          y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS

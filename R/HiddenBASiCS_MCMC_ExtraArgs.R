@@ -34,8 +34,14 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                         Start = HiddenBASiCS_MCMC_Start(
                                           Data,
                                           PriorParam,
-                                          WithSpikes)
-                                        )
+                                          WithSpikes,
+                                          ),
+                                        mintol_mu = 1e-3,
+                                        mintol_delta = 1e-3,
+                                        mintol_nu = 1e-5,
+                                        mintol_theta = 1e-4
+)
+                                        
 {
 
   PriorDelta <- match.arg(PriorDelta)
@@ -96,14 +102,20 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
   if (!(PriorDelta %in% c("gamma", "log-normal"))) {
     stop("Invalid PriorDelta value.")
   }
+  
+  if(!(mintol_mu > 0) | !(mintol_delta > 0) | 
+     !(mintol_nu > 0) | !(mintol_theta > 0)) {
+    stop("Invalid value for mintol parameters (mu, delta, nu or theta)")
+  }
 
  list(AR = AR, StopAdapt = StopAdapt, StoreChains = StoreChains,
       StoreAdapt = StoreAdapt, StoreDir = StoreDir,
       RunName = RunName, PrintProgress = PrintProgress,
       PriorParam = PriorParam, PriorDeltaNum = PriorDeltaNum,
       PriorDelta = PriorDelta,
-      WithSpikes = WithSpikes, StochasticRef = StochasticRef,
+      StochasticRef = StochasticRef,
       ConstrainType = ConstrainType, ConstrainProp = ConstrainProp,
-      k = k, variance = variance,
-      Start = Start)
+      k = k, variance = variance, Start = Start,
+      mintol_mu = mintol_mu, mintol_delta = mintol_delta,
+      mintol_nu = mintol_nu, mintol_theta = mintol_theta)
 }

@@ -93,6 +93,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
+    # Convert vectors to numeric values
+    ls.phi0 <- as.numeric(ls.phi0)
+    ls.theta0 <- as.numeric(ls.theta0)
 
     # Output list
     out <- list(mu0 = mu0, delta0 = delta0,
@@ -106,7 +109,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
       out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V)
       out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
       out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2,
-                        rate = PriorParam$eta/2)
+                            rate = PriorParam$eta/2)
     }
 
     return(out)
