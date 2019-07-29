@@ -35,11 +35,11 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
          "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   
-  # If BatchInfo slot is missing and WithSpikes == FALSE
-  if(!WithSpikes & is.null(colData(Data)$BatchInfo))
-    stop("'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 
-         "Please assign the batch information to: 'colData(Data)$BatchInfo = BatchInfo'. \n",
-         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
+  # # If BatchInfo slot is missing and WithSpikes == FALSE
+  # if(!WithSpikes & is.null(colData(Data)$BatchInfo))
+  #   stop("'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 
+  #        "Please assign the batch information to: 'colData(Data)$BatchInfo = BatchInfo'. \n",
+  #        "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
 
   # Checking how counts are stored
   if(!("counts" %in% assayNames(Data)))
