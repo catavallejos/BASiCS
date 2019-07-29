@@ -1,7 +1,6 @@
 context("Differential test\n")
 
-test_that("Differential test is correct", 
-{
+test_that("Differential test is correct", {
   data(ChainSC)
   data(ChainRNA)
             
@@ -38,8 +37,7 @@ test_that("Differential test is correct",
             
   Lfc2Disp0 <- c(0.62,  0.67,  0.54, 4.39, -0.12)
   Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5),2)
-  expect_equal(Lfc2Disp, Lfc2Disp0)
-            
+  expect_equal(Lfc2Disp, Lfc2Disp0)            
 })
 
 

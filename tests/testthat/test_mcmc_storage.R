@@ -44,7 +44,7 @@ test_that("Valid BASiCS_MCMC output object",
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)  
   expect_equal(names(PostSummary@parameters), ParamNames[-length(ParamNames)])
-  
+ 
   # Running the samples: no-spikes + regression
   set.seed(18)
   Chain <- run_MCMC(Data, N = 200, Thin = 2, Burn = 100, 

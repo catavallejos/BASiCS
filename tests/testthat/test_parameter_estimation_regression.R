@@ -14,7 +14,7 @@ test_that("Estimates match the given seed (spikes+regression)",
   PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
   PriorParam$eta <- 5
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = TRUE)
   # Running the sampler
   set.seed(12)
   Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
@@ -66,7 +66,7 @@ test_that("Estimates match the given seed (spikes+regression)",
   DCcheck0 <- c(0.000, 10.591,  0.000, 24.712,  3.530)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   expect_equal(DCcheck, DCcheck0, tolerance = 1, scale = 1)
-  
+
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
   
@@ -89,7 +89,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)",
   PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
   PriorParam$eta <- 5
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = TRUE)
   # Running the sampler
   set.seed(12)
   Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,

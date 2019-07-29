@@ -28,7 +28,7 @@ test_that("Generated data does not match given seed (no spikes case)", {
   DataCheck0 <- c(0,   5,   3,   6,  28,   4,   3, 170,   0,  10)
   DataCheck <- as.vector(assay(Data)[1:10,1])
   expect_equal(DataCheck0, DataCheck)
-  
+ 
   # Checks isSpike info
   TechCheck0 <- rep(FALSE, 50)
   TechCheck <- isSpike(Data)

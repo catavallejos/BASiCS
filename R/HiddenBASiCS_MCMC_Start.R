@@ -1,18 +1,17 @@
-# Used in BASiCS_MCMC
-#' @export
 HiddenBASiCS_MCMC_Start <- function(Data,
-                              Regression = !is.null(eta),
-                              eta = NULL,
-                              m,
-                              V,
-                              a.sigma2,
-                              b.sigma2,
-                              WithSpikes,
-                              ls.mu0 = -4,
-                              ls.delta0 = -2,
-                              ls.phi0 = 11,
-                              ls.nu0 = -10,
-                              ls.theta0 = -4) {
+                                    Regression = !is.null(eta),
+                                    WithSpikes,
+                                    eta = NULL,
+                                    m = rep(0, k),
+                                    V = diag(k),
+                                    k = 12,
+                                    a.sigma2 = 2,
+                                    b.sigma2 = 2,
+                                    ls.mu0 = -4,
+                                    ls.delta0 = -2,
+                                    ls.phi0 = 11,
+                                    ls.nu0 = -10,
+                                    ls.theta0 = -4) {
 
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.")
@@ -65,7 +64,8 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     nCountsBio <- t( t(CountsBio) / (phi0 * s0) )
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
-    mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
+    #mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
+    mu0 <- meansBio + 1
   }
   else {
     s0 <- size_scran
@@ -100,6 +100,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
+    # Convert to numeric values
+    ls.phi0 <- as.numeric(ls.phi0)
+    ls.theta0 <- as.numeric(ls.theta0)
 
     # Output list
     out <- list(mu0 = mu0, 

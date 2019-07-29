@@ -88,8 +88,12 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double const& variance,
     NumericVector ml,
     bool FixML,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta,
     double geneExponent,
-    double cellExponent)
+    double cellExponent) 
 {
   using arma::ones;
   using arma::zeros;
@@ -274,7 +278,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                 btheta,
                                 n,
                                 nBatch,
-                                exponent);
+                                exponent,
+                                mintol_theta);
     PthetaAux += thetaAux.col(1);
     if (i >= Burn) {
       thetaAccept += thetaAux.col(1);
@@ -304,7 +309,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         sigma2Aux,
                         variance,
                         ml_arma,
-                        geneExponent);
+                        geneExponent,
+                        mintol_mu);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -339,7 +345,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                               X,
                               sigma2Aux,
                               betaAux,
-                              geneExponent);
+                              geneExponent,
+                              mintol_delta);
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
       deltaAccept += deltaAux.col(1);
@@ -364,7 +371,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           y_n,
                           u_n,
                           ind_n,
-                          cellExponent);
+                          cellExponent, mintol_nu);
 
     PnuAux += nuAux.col(1);
     if (i >= Burn) {

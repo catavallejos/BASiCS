@@ -50,7 +50,7 @@ test_that("BASiCS_Sim works", {
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 80
   expect_equal(Aux, Aux0)
-  
+
   # When the parameter input is not right
   expect_error(
     BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta),

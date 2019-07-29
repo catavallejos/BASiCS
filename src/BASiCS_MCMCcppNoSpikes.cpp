@@ -87,7 +87,11 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     int ConstrainType,
     int StochasticRef,
     double geneExponent,
-    double cellExponent)
+    double cellExponent,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta)
 {
   using arma::ones;
   using arma::zeros;
@@ -219,7 +223,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                 btheta,
                                 n,
                                 nBatch,
-                                cellExponent);
+                                cellExponent,
+                                mintol_theta);
     PthetaAux += thetaAux.col(1);
     if (i >= Burn) {
       thetaAccept += thetaAux.col(1);
@@ -254,7 +259,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                              ConstrainGene_arma,
                              NotConstrainGene_arma,
                              ConstrainType,
-                             geneExponent);
+                             geneExponent,
+                             mintol_mu);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -278,7 +284,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                            y_q0,
                            u_q0,
                            ind_q0,
-                           geneExponent);
+                           geneExponent,
+                           mintol_delta);
 
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
@@ -302,7 +309,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                   y_n,
                                   u_n,
                                   ind_n,
-                                  cellExponent);
+                                  cellExponent,
+                                  mintol_nu);
 
     PnuAux += nuAux.col(1);
     if (i >= Burn) {

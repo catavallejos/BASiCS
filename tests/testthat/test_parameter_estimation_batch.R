@@ -11,7 +11,7 @@ test_that("Estimates match the given seed (spikes+batch)",
                      b.delta = 1, p.phi = rep(1, times = n), 
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = TRUE)
   # Running the samples
   set.seed(18)
   Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 

@@ -91,7 +91,11 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     NumericVector ml,
     bool FixML,
     double geneExponent,
-    double cellExponent)
+    double cellExponent,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta) 
 {
   using arma::ones;
   using arma::zeros;
@@ -253,7 +257,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 btheta,
                                 n,
                                 nBatch,
-                                cellExponent);
+                                cellExponent,
+                                mintol_theta);
 
     PthetaAux += thetaAux.col(1);
     if (i >= Burn) {
@@ -299,7 +304,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 sigma2Aux,
                                 variance,
                                 ml_arma,
-                                geneExponent);
+                                geneExponent, mintol_mu);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -324,7 +329,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                       X,
                                       sigma2Aux,
                                       betaAux,
-                                      geneExponent);
+                                      geneExponent,
+                                      mintol_delta);
 
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
@@ -347,7 +353,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   y_n,
                                   u_n,
                                   ind_n,
-                                  cellExponent);
+                                  cellExponent,
+                                  mintol_nu);
     PnuAux += nuAux.col(1);
     if (i >= Burn) {
       nuAccept += nuAux.col(1);

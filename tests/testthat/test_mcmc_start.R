@@ -8,7 +8,7 @@ test_that("Generated starting values do not match given seed (spikes case)", {
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = TRUE)
 
   Check0 <- c(7.361, 10.647,  6.742,  8.421, 21.284)
   Check <- as.vector(round(Start$mu0[1:5], 3))
@@ -64,7 +64,7 @@ test_that("Generated starting values do not match given seed (no spikes case)",
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = FALSE)
   
   Check0 <- c(9.019, 20.049,  7.819, 13.087, 35.027)
   Check <- as.vector(round(Start$mu0[1:5], 3))
@@ -115,16 +115,17 @@ test_that("Generated starting values do not match given seed (regression+spike)"
           {
   set.seed(6)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  n <- ncol(Data); k <- 12
-  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n),
-                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)
-  PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2
-  PriorParam$eta <- 5
-
+  n <- ncol(Data)
+  k <- 12
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    m = rep(0, k),
+    V = diag(k),
+    eta = 5,
+    Regression = TRUE,
+    WithSpikes = TRUE
+  )
   
   Check0 <- c(0.800,  1.939, -0.906,  0.554,  0.897)
   Check <- as.vector(round(Start$beta0[1:5], 3))

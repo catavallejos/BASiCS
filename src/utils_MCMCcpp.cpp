@@ -16,7 +16,8 @@ arma::mat Hidden_muUpdate(
     arma::vec & mu1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent = 1)
+    double exponent,
+    double const& mintol)
 {
 
   /* PROPOSAL STEP */
@@ -44,9 +45,9 @@ arma::mat Hidden_muUpdate(
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
   */
-  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
-  for (int i = 0; i < q0; i++) {
-    if (ind(i) == 0) {
+  ind = DegubInd(ind, q0, u, log_aux, mu1, mintol, "mu");
+  for (int i=0; i < q0; i++) {
+    if(ind(i) == 0) {
       mu1(i) = mu0(i);
     }
   }
@@ -73,7 +74,8 @@ arma::mat deltaUpdate(
     arma::vec & delta1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent)
+    double exponent,
+    double const& mintol)
 {
   /* PROPOSAL STEP */
   delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
@@ -108,8 +110,8 @@ arma::mat deltaUpdate(
   * - If smaller than 1e-3
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */
-  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
+  */ 
+  ind = DegubInd(ind, q0, u, log_aux, delta1, mintol, "delta");
   for (int i = 0; i < q0; i++) {
     if (ind(i) == 0) {
       delta1(i) = delta0(i);
@@ -268,7 +270,8 @@ arma::mat nuUpdateBatch(
     arma::vec & nu1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent)
+    double exponent,
+    double const& mintol)
 {
   using arma::span;
 
@@ -294,9 +297,9 @@ arma::mat nuUpdateBatch(
   * - If smaller than 1e-5
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */
-  ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
-  for (int j = 0; j < n; j++) {
+  */ 
+  ind = DegubInd(ind, n, u, log_aux, nu1, mintol, "nu");
+  for (int j=0; j < n; j++) {
     if (ind(j) == 0) {
       nu1(j) = nu0(j);
     }
@@ -319,7 +322,8 @@ arma::mat thetaUpdateBatch(
     double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$, $b_{\theta}$) prior assigned to $\theta$ */
     int const& n,
     int const& nBatch,
-    double exponent)
+    double exponent,
+    double const& mintol)
 {
   using arma::span;
 
@@ -353,7 +357,8 @@ arma::mat thetaUpdateBatch(
 
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
-  ind %= 0.0001 < exp(y);
+  ind %= mintol < exp(y);
+  
   // CREATING OUTPUT VARIABLE
   arma::vec theta = ind % exp(y) + (1 - ind) % theta0;
   // OUTPUT

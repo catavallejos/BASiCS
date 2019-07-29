@@ -1,7 +1,6 @@
 context("Differential test (regression case)\n")
 
-test_that("Differential test is correct (regression case)", 
-{
+test_that("Differential test is correct (regression case)", {
   data(ChainSCReg)
   data(ChainRNAReg)
             

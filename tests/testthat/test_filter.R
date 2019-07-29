@@ -1,8 +1,6 @@
 context("BASiCS_Filter\n")
 
-test_that("BASiCS_Filter", 
-{
-
+test_that("BASiCS_Filter", {
   set.seed(1)
   Counts <- matrix(rpois(50*10, 2), ncol = 10)
   rownames(Counts) <- c(paste0('Gene', 1:40), paste0('Spike', 1:10))

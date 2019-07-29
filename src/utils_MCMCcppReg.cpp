@@ -56,8 +56,9 @@ arma::mat muUpdateReg(
     double const& sigma2,
     double variance,
     arma::vec ml,
-    double exponent) {
-
+    double exponent,
+    double const& mintol) {
+  
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
@@ -90,8 +91,8 @@ arma::mat muUpdateReg(
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
   */
-  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
-  for (int i = 0; i < q0; i++) {
+  ind = DegubInd(ind, q0, u, log_aux, mu1, mintol, "mu");
+  for (int i=0; i < q0; i++) {
     if (ind(i) == 0) {
       mu1(i) = mu0(i);
     }
@@ -136,7 +137,8 @@ arma::mat deltaUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     arma::vec const& beta,
-    double exponent)
+    double exponent,
+    double const& mintol)
 {
   using arma::span;
 
@@ -174,9 +176,9 @@ arma::mat deltaUpdateReg(
   * - If smaller than 1e-3
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */
-  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i = 0; i < q0; i++) {
+  */    
+  ind = DegubInd(ind, q0, u, log_aux, delta1, mintol, "delta");
+  for (int i=0; i < q0; i++) {
     if (ind(i) == 0) {
       delta1(i) = delta0(i);
     }

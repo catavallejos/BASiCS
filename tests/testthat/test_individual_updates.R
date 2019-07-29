@@ -23,7 +23,8 @@ test_that("Spikes + no regression", {
                      b.delta = 1, p.phi = rep(1, times = n), 
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, 
+                                            WithSpikes = TRUE)
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   
@@ -36,7 +37,7 @@ test_that("Spikes + no regression", {
                                   sum_bycell_bio = rowSums(CountsBio),
                                   s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
                                   mu1 =  mu1, u = uGene, ind = indGene,
-                                  exponent = 1)
+                                  exponent = 1, mintol = 1e-3)
   
   mu1 <- c(6.78, 15.67,  5.43, 13.05, 24.20)
   mu1Obs <- round(Aux[1:5,1],2) 

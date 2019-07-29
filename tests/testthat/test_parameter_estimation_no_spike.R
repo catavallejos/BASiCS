@@ -15,7 +15,7 @@ test_that("Estimates match the given seed (no-spikes)", {
                      b.delta = 1, p.phi = rep(1, times = n), 
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = FALSE)
   # Running the sampler on Data and sce object
   set.seed(14)
   Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
@@ -103,7 +103,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (no spikes)",
                      b.delta = 1, p.phi = rep(1, times = n), 
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = FALSE)
   # Running the sampler
   set.seed(14)
   Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,

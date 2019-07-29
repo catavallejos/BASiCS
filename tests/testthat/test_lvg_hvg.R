@@ -50,6 +50,5 @@ test_that("HVG/LVG detection using epsilons is correct",
             
   ProbLVG0 <- c(1.00, 1.00, 1.00, 1.00, 0.97)
   ProbLVG <- round(DetectLVG$Table$Prob[1:5], 2)
-  expect_equal(ProbLVG, ProbLVG0)
-            
+  expect_equal(ProbLVG, ProbLVG0)            
 })

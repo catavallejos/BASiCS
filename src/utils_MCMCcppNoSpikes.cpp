@@ -21,7 +21,8 @@ arma::mat muUpdateNoSpikes(
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
     int const& ConstrainType,
-    double exponent)
+    double exponent,
+    double const& mintol)
 {
   using arma::span;
 
@@ -65,12 +66,9 @@ arma::mat muUpdateNoSpikes(
       log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - aux, 2)) * exponent;
 
       // ACCEPT REJECT
-      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
-        sumAux += log(mu1(iAux)) - log(mu0(iAux));
-      } else {
-        ind(iAux) = 0;
-        mu1(iAux) = mu0(iAux);
+        sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
       }
     }
   }
@@ -87,7 +85,7 @@ arma::mat muUpdateNoSpikes(
       log_aux(iAux) -= (0.5 / s2_mu) *
         (pow(log(mu1(iAux)), 2) - pow(log(mu0(iAux)), 2)) * exponent;
       // ACCEPT REJECT
-      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
       } else {
         ind(iAux) = 0; mu1(iAux) = mu0(iAux);
@@ -116,7 +114,8 @@ arma::mat nuUpdateBatchNoSpikes(
     arma::vec & nu1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent)
+    double exponent,
+    double const& mintol)
 {
   using arma::span;
 
@@ -142,10 +141,10 @@ arma::mat nuUpdateBatchNoSpikes(
   * - If smaller than 1e-5
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */
-  ind = DegubInd(ind, n, u, log_aux, nu1, 1e-5, "nu");
-  for (int j = 0; j < n; j++) {
-    if (ind(j) == 0) {
+  */  
+  ind = DegubInd(ind, n, u, log_aux, nu1, mintol, "nu");
+  for (int j=0; j < n; j++) {
+    if(ind(j) == 0) {
       nu1(j) = nu0(j);
     }
   }

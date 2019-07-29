@@ -29,7 +29,9 @@ arma::mat muUpdateRegNoSpikes(
     double const& sigma2,
     double variance,
     arma::vec ml,
-    double exponent) {
+    double exponent,
+    double const& mintol) {
+
   using arma::span;
 
   int nConstrainGene = ConstrainGene.size();
@@ -80,12 +82,9 @@ arma::mat muUpdateRegNoSpikes(
       log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux, 2));
       log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux, 2));
       // ACCEPT REJECT
-      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
-        sumAux += log(mu1(iAux)) - log(mu0(iAux));
-      } else{
-        ind(iAux) = 0;
-        mu1(iAux) = mu0(iAux);
+        sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
       }
     }
   }
@@ -101,11 +100,10 @@ arma::mat muUpdateRegNoSpikes(
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) * (pow(log(mu1(iAux)), 2) - pow(log(mu0(iAux)), 2));
       // ACCEPT REJECT
-      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > 1e-3)) {
+      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
       } else {
-        ind(iAux) = 0;
-        mu1(iAux) = mu0(iAux);
+        ind(iAux) = 0; mu1(iAux) = mu0(iAux);
       }
     }
   }
@@ -132,8 +130,8 @@ arma::mat deltaUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     arma::vec const& beta,
-    double exponent)
-{
+    double exponent,
+    double const& mintol) {
   using arma::span;
 
   // PROPOSAL STEP
@@ -168,7 +166,7 @@ arma::mat deltaUpdateRegNoSpikes(
     2 * (log(delta1) - log(delta0)) % (X * beta)) / (2 * sigma2);
 
   // CREATING OUTPUT VARIABLE & DEBUG
-  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
+  ind = DegubInd(ind, q0, u, log_aux, delta1, mintol, "delta");
   for (int i = 0; i < q0; i++) {
     if (ind(i) == 0) {
       delta1(i) = delta0(i);

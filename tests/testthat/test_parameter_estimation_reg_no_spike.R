@@ -18,8 +18,7 @@ test_that("Estimates match the given seed (no-spikes+regression)",
   PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
   PriorParam$eta <- 5
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam,
-                                            WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = FALSE)
 
   # Running the sampler
   set.seed(14)
@@ -121,8 +120,7 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
   PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2
   PriorParam$eta <- 5
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, 
-                                            WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = FALSE)
   # Running the sampler
   set.seed(42)
   Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,
