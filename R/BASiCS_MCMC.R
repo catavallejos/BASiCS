@@ -465,8 +465,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
     if (ArgsDef$StoreChains)
       HiddenBASiCS_MCMC_RefFreqStore(Data,
                                      Chain,
-                                     RefGene,
-                                     RefGenes,
+                                     ArgsDef$RefGene,
+                                     ArgsDef$RefGenes,
                                      ArgsDef$ConstrainType,
                                      ArgsDef$StoreDir,
                                      ArgsDef$RunName)
