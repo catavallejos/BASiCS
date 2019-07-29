@@ -1200,4 +1200,5 @@ version 1.7.2 (2019-07-28)
 - Specific minimum tolerance thresholds (e.g. 1e-3 for mu updates) replaced by
 global parameters (e.g. `mintol_mu`). Optional parameters; internal use only. 
 Incorporated within `HiddenBASiCS_MCMC_ExtraArgs`. 
-- General clean up to remove code redundancy in `BASiCS_MCMC` (WIP)
+- General clean up to remove code redundancy in `BASiCS_MCMC`
+- `HiddenBASiCS_MCMC_GlobalParams` created to facilitate clean-up above
