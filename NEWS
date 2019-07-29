@@ -1204,4 +1204,7 @@ Incorporated within `HiddenBASiCS_MCMC_ExtraArgs`.
 - `HiddenBASiCS_MCMC_GlobalParams` created to facilitate clean-up above
 
 version 1.7.3 (2019-07-29)
-- Minor typo fixed in `BASiCS_MCMC`. 
+- Minor typo fixed in `BASiCS_MCMC`.
+
+version 1.7.4 (x-y-z)
+- Show method for regression objects now correctly shows number of cells.
