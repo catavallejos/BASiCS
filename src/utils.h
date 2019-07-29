@@ -137,9 +137,13 @@ arma::mat thetaUpdateBatch(
    */
   
 arma::mat designMatrix(
-    int const& k, 
-    arma::vec const& mu, 
+    arma::vec const& mu,
+    arma::vec const& locations,
     double const& variance);
+
+arma::vec estimateRBFLocations(
+    arma::vec const& mu,
+    int const& k);
 
 arma::mat muUpdateReg(
     arma::vec const& mu0, 
@@ -160,6 +164,7 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    arma::vec locations,
     double const& mintol);
 
 arma::mat deltaUpdateReg(
@@ -272,6 +277,7 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    arma::vec locations,
     double const& mintol);
 
 arma::mat deltaUpdateRegNoSpikes(

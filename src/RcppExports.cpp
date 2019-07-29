@@ -269,6 +269,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// estimateRBFLocations
+arma::vec estimateRBFLocations(arma::vec const& mu, int const& k);
+RcppExport SEXP _BASiCS_estimateRBFLocations(SEXP muSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(estimateRBFLocations(mu, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_DenoisedRates", (DL_FUNC) &_BASiCS_HiddenBASiCS_DenoisedRates, 7},
@@ -278,6 +290,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes, 47},
     {"_BASiCS_Hidden_rDirichlet", (DL_FUNC) &_BASiCS_Hidden_rDirichlet, 1},
     {"_BASiCS_Hidden_muUpdate", (DL_FUNC) &_BASiCS_Hidden_muUpdate, 13},
+    {"_BASiCS_estimateRBFLocations", (DL_FUNC) &_BASiCS_estimateRBFLocations, 2},
     {NULL, NULL, 0}
 };
 
