@@ -1202,3 +1202,6 @@ global parameters (e.g. `mintol_mu`). Optional parameters; internal use only.
 Incorporated within `HiddenBASiCS_MCMC_ExtraArgs`. 
 - General clean up to remove code redundancy in `BASiCS_MCMC`
 - `HiddenBASiCS_MCMC_GlobalParams` created to facilitate clean-up above
+
+version 1.7.3 (2019-07-29)
+- Minor typo fixed in `BASiCS_MCMC`. 
