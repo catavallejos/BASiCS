@@ -29,7 +29,7 @@ setMethod("show",
           {
             N <- nrow(object@parameters$mu)
             q.bio <- ncol(object@parameters$delta)
-            n <- ncol(object@parameters$phi)
+            n <- ncol(object@parameters$nu)
             nBatch <- ncol(object@parameters$theta)
             cat("An object of class ", class(object), "\n",
                 " ", N, " MCMC samples.\n", sep = "")
@@ -39,7 +39,7 @@ setMethod("show",
             else {
               N <- nrow(object@parameters$mu)
               q.bio <- ncol(object@parameters$delta)
-              n <- ncol(object@parameters$phi)
+              n <- ncol(object@parameters$nu)
               nBatch <- ncol(object@parameters$theta)
               cat("An object of class ", class(object), "\n",
                   " ", N, " MCMC samples.\n", sep = "")

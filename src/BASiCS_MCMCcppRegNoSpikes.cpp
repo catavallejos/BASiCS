@@ -117,7 +117,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
   arma::mat inv_V0 = inv(as_arma(V0));
   double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t() * inv_V0 * as_arma(m0)));
-  arma::vec InvVm0 = inv_V0*as_arma(m0);
+  arma::vec InvVm0 = inv_V0 * as_arma(m0);
 
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux);
@@ -229,7 +229,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if (i == Burn) EndBurn();
 
     Ibatch++;
-
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     sAux = sUpdateBatch(sAux,
@@ -241,7 +240,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                         n,
                         y_n,
                         cellExponent);
-
     // UPDATE OF THETA:
     // 1st ELEMENT IS THE UPDATE,
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -307,7 +305,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if (i >= Burn) {
       muAccept += muAux.col(1);
     }
-
     // UPDATE OF DELTA:
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
@@ -333,7 +330,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if (i >= Burn) {
       deltaAccept += deltaAux.col(1);
     }
-
     // UPDATE OF NU:
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
@@ -352,7 +348,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   u_n,
                                   ind_n,
                                   cellExponent);
-
     PnuAux += nuAux.col(1);
     if (i >= Burn) {
       nuAccept += nuAux.col(1);
@@ -360,13 +355,16 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
 
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = (inv_V0 * geneExponent) + X.t() * diagmat(lambdaAux) * X;
+
     VAux = inv(V1);
     if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
-      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * geneExponent);
-      mAux = VAux * mAux;
 
+      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * geneExponent);
+
+      mAux = VAux * mAux;
       // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
       betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
+
       sigma2Aux = sigma2UpdateReg(deltaAux.col(0),
                                   betaAux,
                                   lambdaAux,
