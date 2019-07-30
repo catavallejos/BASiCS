@@ -1206,5 +1206,9 @@ Incorporated within `HiddenBASiCS_MCMC_ExtraArgs`.
 version 1.7.3 (2019-07-29)
 - Minor typo fixed in `BASiCS_MCMC`.
 
-version 1.7.4 (x-y-z)
+version 1.7.4 (2019-07-30)
 - Show method for regression objects now correctly shows number of cells.
+- `HiddenBASiCS_MCMCcppReg` and `HiddenBASiCS_MCMCcppRegNoSpikes` (C++ code)
+modified to update design matrix throughout MCMC (GRBF locations remain fixed
+after the burn-in period is over)
+- Unit tests updated accordingly. 

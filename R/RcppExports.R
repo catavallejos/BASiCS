@@ -29,3 +29,7 @@ Hidden_muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_b
     .Call('_BASiCS_Hidden_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, s2_mu, q0, n, mu1, u, ind, mintol)
 }
 
+estimateRBFLocations <- function(mu, k) {
+    .Call('_BASiCS_estimateRBFLocations', PACKAGE = 'BASiCS', mu, k)
+}
+
