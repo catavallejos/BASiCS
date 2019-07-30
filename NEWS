@@ -1212,3 +1212,6 @@ version 1.7.4 (2019-07-30)
 modified to update design matrix throughout MCMC (GRBF locations remain fixed
 after the burn-in period is over)
 - Unit tests updated accordingly. 
+
+version 1.7.5 (2019-07-30)
+- Returns to original updates for X (fixed after burn-in)
