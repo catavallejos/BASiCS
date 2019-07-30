@@ -200,8 +200,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
-  arma::vec means = muAux.col(0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::vec means = muAux(arma::span(0,q0-1),0);
+  arma::vec locations = estimateRBFLocations(means, k);
+  arma::mat X = designMatrix(means, locations, variance);
   
   StartSampler(N);
   
@@ -247,7 +248,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 Constrain, RefGene, ConstrainGene_arma, 
                                 NotConstrainGene_arma, ConstrainType, 
                                 k, lambdaAux, betaAux, X, 
-                                sigma2Aux, variance, mintol_mu);     
+                                sigma2Aux, variance, mintol_mu, locations);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
@@ -314,8 +315,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux.col(0);
-        X = designMatrix(k, means, variance);
+        means = muAux(arma::span(0,q0-1),0);
+        locations = estimateRBFLocations(means, k);
+        X = designMatrix(means, locations, variance);
       }
     }
     

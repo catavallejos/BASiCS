@@ -1215,3 +1215,10 @@ after the burn-in period is over)
 
 version 1.7.5 (2019-07-30)
 - Returns to original updates for X (fixed after burn-in)
+
+version 1.7.6 (2019-07-30)
+- `estimateRBFLocations` added to cpp code to separate the 
+estimation of locations and the design matrix update (unit test update is not required).
+
+version 1.7.7 (2019-07-30) - WIP
+- location params fixed a priori, but X updated always - WIP
