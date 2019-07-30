@@ -98,7 +98,10 @@ setClass("BASiCS_Chain",
               if (sum(!(names(object@parameters) %in% ValidNames) > 0) > 0) {
                 errors <- c(errors,
                   paste("Invalid elements",
-                    paste(setdiff(names(object@parameters), ValidNames), collapse = ", "),
+                    paste(
+                      setdiff(names(object@parameters), ValidNames), 
+                      collapse = ", "
+                    ),
                     "in `parameters` slot"))
               }
 
@@ -119,18 +122,32 @@ setClass("BASiCS_Chain",
               n <- ncol(object@parameters$s)
 
               # Check number of iterations per element of `parameters`
-              if (sum(lapply(
-                  object@parameters[setdiff(names(object@parameters), c("RefFreq", "designMatrix"))],
-                  nrow) != N) > 0) {
+              nrows <- vapply(
+                object@parameters[
+                  setdiff(names(object@parameters), c("RefFreq", "designMatrix"))
+                ],
+                nrow
+              )
+              if (sum(nrows != N) > 0) {
                 errors <- c(errors, "Different numbers of iterations")
               }
               # Check dimensions for basic gene-specific parameters
-              if (sum(lapply(object@parameters[c("mu", "delta")], ncol) != q) > 0) {
+              ncols <- vapply(
+                object@parameters[c("mu", "delta")], 
+                ncol, 
+                numeric(1)
+              )
+              if (sum(ncols != q) > 0) {
                 errors <- c(errors,
-                            "Parameters' dimensions are not compatible (genes)")
+                  "Parameters' dimensions are not compatible (genes)")
               }
               # Check dimensions for basic cell-specific parameters
-              if (sum(lapply(object@parameters[c("s", "nu")], ncol) != n) > 0) {
+              ncols <- vapply(
+                object@parameters[c("s", "nu")], 
+                ncol, 
+                numeric(1)
+              )
+              if (sum(ncols!= n) > 0) {
                 errors <- c(errors,
                             "Parameters' dimensions are not compatible (cells)")
               }
@@ -252,4 +269,60 @@ setClass("BASiCS_Summary",
       prototype = prototype(new("Versioned",
                                 versions = c("BASiCS_Summary" =
                                                utils::packageVersion("BASiCS"))))
+)
+
+
+
+#' @export
+setClass("BASiCS_ResultsDE",
+  representation = representation(
+    Results = "list",
+    Chain1_offset = "BASiCS_Chain",
+    Chain2_offset = "BASiCS_Chain",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
+    OffsetChain = "numeric",
+    Offset = "numeric",
+    RowData = "data.frame",
+    ## gene annotations!
+    Extras = "list"
+  ),
+  contains = "Versioned"
+)
+#' @export
+setClass("BASiCS_ResultDE",
+  representation = representation(
+    Table = "data.frame",
+    Name = "character",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
+    ProbThreshold = "numeric",
+    EFDR = "numeric",
+    EFNR = "numeric",
+    EFDRgrid = "numeric",
+    EFNRgrid = "numeric",
+    Epsilon = "numeric",
+    Extras = "list"
+  )
+)
+#' @export
+setClass("BASiCS_OffsetCorrected", 
+  representation = representation(
+    GroupLabel1 = "character", 
+    GroupLabel2 = "character",
+    OffsetChain = "numeric",
+    OffsetEst = "numeric",
+    Chain1_offset = "BASiCS_Chain",
+    Chain2_offset = "BASiCS_Chain",
+    ChainTau = "matrix",
+    Mu1 = "numeric", 
+    Mu1_old = "numeric", 
+    Mu2 = "numeric",
+    MuBase = "numeric", 
+    MuBase_old = "numeric", 
+    MedianTau = "numeric",
+    MedianTau_old = "numeric",
+    Delta1 = "numeric",
+    Delta2 = "numeric"
+  )
 )

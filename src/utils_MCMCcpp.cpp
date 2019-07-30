@@ -188,6 +188,7 @@ Rcpp::List phiUpdate(
   } else {
     ind = 0; phi1 = phi0;
   }
+
   return(Rcpp::List::create(Rcpp::Named("phi") = phi1,
                             Rcpp::Named("ind") = ind));
 }
@@ -333,6 +334,7 @@ arma::mat thetaUpdateBatch(
   // PROPOSAL STEP
   arma::vec y = arma::randn(nBatch) % sqrt(prop_var) + logtheta;
   arma::vec u = arma::randu(nBatch);
+
   arma::mat BatchDesignAux = BatchDesign.cols(0, nBatch - 1);
   BatchDesignAux.each_col() %= log(nu / s) - (nu / s);
 

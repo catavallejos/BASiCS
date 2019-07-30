@@ -6,13 +6,13 @@
 \title{Plotting the trend after Bayesian regression}
 \usage{
 BASiCS_ShowFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, colour = "dark blue",
-  markExcludedGenes = TRUE, GenesSel = NULL,
+  pch = 16, smooth = TRUE, variance = 1.2, ml = NULL,
+  colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
   colourGenesSel = "dark red", ...)
 
 BASiCS_showFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, colour = "dark blue",
-  markExcludedGenes = TRUE, GenesSel = NULL,
+  pch = 16, smooth = TRUE, variance = 1.2, ml = NULL,
+  colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
   colourGenesSel = "dark red", ...)
 }
 \arguments{

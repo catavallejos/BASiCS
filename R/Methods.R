@@ -41,8 +41,6 @@ setMethod("show",
               q.bio <- ncol(object@parameters$delta)
               n <- ncol(object@parameters$nu)
               nBatch <- ncol(object@parameters$theta)
-              cat("An object of class ", class(object), "\n",
-                  " ", N, " MCMC samples.\n", sep = "")
               if (nBatch > 1) {
                 cat(" Dataset contains ", q.bio, " biological genes and ",
                     n, " cells (", nBatch, " batches). \n", sep = "")
@@ -410,9 +408,6 @@ setMethod("plot",
             
           })
 
-# #' @export
-#setMethod("plot", signature = "ANY", graphics::plot)
-
 #' @name displayChainBASiCS-BASiCS_Chain-method
 #' @aliases displayChainBASiCS displayChainBASiCS,BASiCS_Chain-method
 #'
@@ -738,3 +733,60 @@ setMethod("plot",
 setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
           definition = HiddenGetParam)
+
+#' @export
+setMethod("show", signature = "BASiCS_OffsetCorrected", 
+  function(object) {
+    message("A BASiCS_OffsetCorrected object for ", object@GroupLabel1, " and ",
+      object@GroupLabel2, ". To test for differential expression run ", 
+      "`BASiCS_TestDE(OffsetCorrected = OffsetCorrected)`", sep = "")
+  }
+)
+
+#' @export
+setMethod("show", signature = "BASiCS_ResultsDE", 
+  function(object) {
+    for (x in object@Results) {
+      print(x)
+    }
+  }
+)
+
+#' @export
+setMethod("show", signature = "BASiCS_ResultDE", 
+  function(object) {
+    diffName <- paste0("ResultDiff", object@Name)
+    
+    nPlus1 <- sum(object@Table[[diffName]] == paste0(object@GroupLabel1, "+"))
+    nPlus2 <- sum(object@Table[[diffName]] == paste0(object@GroupLabel2, "+"))
+    message(
+      "-------------------------------------------------------------\n",
+      nPlus1 + nPlus2," genes with a change in ", MeasureName(object@Name), ":\n",
+      "- Higher ", MeasureName(object@Name), " in ", 
+      object@GroupLabel1, " samples: ", nPlus1, "\n",
+      "- Higher ", MeasureName(object@Name), " in ", 
+      object@GroupLabel2, " samples: ", nPlus2, "\n",
+      "- ", cap(DistanceName(object@Name)), 
+          " tolerance = ", round(2^(object@Epsilon) * 100, 2), "% \n",
+      "- Probability threshold = ", object@ProbThreshold, "\n",
+      "- EFDR = ", round(100 * object@EFDR, 2), "% \n",
+      "- EFNR = ", round(100 * object@EFNR, 2), "% \n"
+    )
+    if (object@Name == "delta") {
+      NotDE <- sum(object@Table[[diffName]]  == "ExcludedFromTesting")
+      message(
+        "NOTE: differential dispersion assessment only applied to the \n",
+        sum(NotDE), " genes for which the mean did not change. \n",
+        "and that were included for testing. \n"
+      )
+    } else if (object@Name == "epsilon") {
+      NotExcluded <- sum(object@Table[[diffName]] != "ExcludedFromTesting")
+      message(
+        "NOTE: differential residual dispersion assessment applied to \n",
+        sum(NotExcluded), " genes expressed in at least 2 cells per condition \n",
+        "and that were included for testing. \n"
+      )
+    }
+    message("-------------------------------------------------------------\n\n")
+  }
+)

@@ -57,6 +57,7 @@ Imports:
     stats4,
     SummarizedExperiment,
     viridis,
+    reshape2,
     utils    
 Suggests:
     BiocStyle,

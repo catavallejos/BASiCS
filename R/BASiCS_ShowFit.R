@@ -1,5 +1,6 @@
 #' @rdname BASiCS_ShowFit
 #'
+#' @aliases BASiCS_showFit
 #' @title Plotting the trend after Bayesian regression
 #'
 #' @description Plotting the trend after Bayesian regression using a
@@ -76,7 +77,7 @@ BASiCS_ShowFit <- function(object,
   }
   h <- diff(myu) * variance
 
-  B <- matrix(1,length(grid.mu), n)
+  B <- matrix(1, length(grid.mu), n)
   B[, 2] <- grid.mu
   for (j in seq_len(n - 2)) {
     B[, j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
@@ -145,6 +146,7 @@ BASiCS_ShowFit <- function(object,
     
   plot.out
 }
+
 #' @rdname BASiCS_ShowFit
 #' @export
 BASiCS_showFit <- BASiCS_ShowFit
