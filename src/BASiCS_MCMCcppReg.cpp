@@ -195,9 +195,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
-  arma::vec means = muAux(arma::span(0,q0-1),0);
-  arma::vec locations = estimateRBFLocations(means, k);
-  arma::mat X = designMatrix(means, locations, variance);
+  arma::vec locations = estimateRBFLocations(muAux.col(0), k);
+  arma::mat X = designMatrix(muAux.col(0), locations, variance);
 
   StartSampler(N);
 
@@ -260,6 +259,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
 
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
 
+    // Update design matrix every iteration based on new mu,
+    // but with fixed locations after adaptation
+    X = designMatrix(muAux.col(0), locations, variance);
+    
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
                         as, bs, BatchDesign_arma, n, y_n);
@@ -304,10 +307,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X*betaAux;
 
-    // Update design matrix every iteration based on new mu,
-    // but with fixed locations after adaptation
-    X = designMatrix(means, locations, variance);
-
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if (i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
@@ -333,9 +332,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         PnuAux = PnuAux0; PthetaAux = PthetaAux0;
 
         // REGRESSION
-        // Update of locations every 50 iterations during Burn in period
-        means = muAux(arma::span(0, q0 - 1), 0);
-        locations = estimateRBFLocations(means, k);
+        // Update of GRBF's locations every 50 iterations during Burn in period
+        locations = estimateRBFLocations(muAux.col(0), k);
       }
     }
 

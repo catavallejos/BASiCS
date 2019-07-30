@@ -200,9 +200,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
-  arma::vec means = muAux.col(0);
-  arma::vec locations = estimateRBFLocations(means, k);
-  arma::mat X = designMatrix(means, locations, variance);
+  arma::vec locations = estimateRBFLocations(muAux.col(0), k);
+  arma::mat X = designMatrix(muAux.col(0), locations, variance);
 
   StartSampler(N);
 
@@ -274,6 +273,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if (i >= Burn) {
       muAccept += muAux.col(1);
     }
+    // Update design matrix every iteration based on new mu,
+    // but with fixed locations after adaptation
+    X = designMatrix(muAux.col(0), locations, variance);
 
     // UPDATE OF DELTA:
     // 1st COLUMN IS THE UPDATE,
@@ -316,10 +318,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X*betaAux;
 
-    // Update design matrix every iteration based on new mu,
-    // but with fixed locations after adaptation
-    X = designMatrix(means, locations, variance);
-
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if (i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)
@@ -343,8 +341,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
 
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux.col(0);
-        locations = estimateRBFLocations(means, k);
+        locations = estimateRBFLocations(muAux.col(0), k);
       }
     }
 
