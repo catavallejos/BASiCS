@@ -317,7 +317,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-
+        locations = estimateRBFLocations(means, k);
       }
     }
     

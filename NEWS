@@ -1221,4 +1221,4 @@ version 1.7.6 (2019-07-30)
 estimation of locations and the design matrix update (unit test update is not required).
 
 version 1.7.7 (2019-07-30) - WIP
-- location params fixed a priori, but X updated always - WIP
+- added update of locations (up to burn-in), but X updated always  - WIP
