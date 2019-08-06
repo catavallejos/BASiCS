@@ -25,6 +25,7 @@
 #' @importFrom SummarizedExperiment assay assayNames  colData 
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
 #' @importFrom utils packageVersion write.table
+#' @importFrom hexbin hexbin
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importMethodsFrom scran computeSumFactors
 #' @importClassesFrom Biobase Versioned
