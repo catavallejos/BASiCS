@@ -126,7 +126,8 @@ setClass("BASiCS_Chain",
                 object@parameters[
                   setdiff(names(object@parameters), c("RefFreq", "designMatrix"))
                 ],
-                nrow
+                nrow,
+                numeric(1)
               )
               if (sum(nrows != N) > 0) {
                 errors <- c(errors, "Different numbers of iterations")
