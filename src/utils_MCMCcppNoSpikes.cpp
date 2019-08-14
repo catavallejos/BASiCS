@@ -69,6 +69,9 @@ arma::mat muUpdateNoSpikes(
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
         sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+      } else {
+        ind(iAux) = 0;
+        mu1(iAux) = mu0(iAux);
       }
     }
   }
@@ -88,7 +91,8 @@ arma::mat muUpdateNoSpikes(
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
       } else {
-        ind(iAux) = 0; mu1(iAux) = mu0(iAux);
+        ind(iAux) = 0;
+        mu1(iAux) = mu0(iAux);
       }
     }
   }

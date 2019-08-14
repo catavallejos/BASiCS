@@ -65,7 +65,7 @@ arma::mat muUpdateRegNoSpikes(
   // Revise this part
   // This is new due to regression prior on delta
   arma::mat X_mu1 = designMatrix(mu1, ml, variance);
-  
+
   // REGRESSION RELATED FACTOR
   log_aux -= exponent * lambda %
     (pow(log(delta) - X_mu1 * beta, 2) -
@@ -82,9 +82,12 @@ arma::mat muUpdateRegNoSpikes(
       log_aux(iAux) -= (0.5 * 2 /s2_mu) * (pow(log(mu1(iAux)) - aux, 2));
       log_aux(iAux) += (0.5 * 2 /s2_mu) * (pow(log(mu0(iAux)) - aux, 2));
       // ACCEPT REJECT
-      if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
+      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
         sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+      } else {
+        ind(iAux) = 0;
+        mu1(iAux) = mu0(iAux);
       }
     }
   }
@@ -103,7 +106,8 @@ arma::mat muUpdateRegNoSpikes(
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
       } else {
-        ind(iAux) = 0; mu1(iAux) = mu0(iAux);
+        ind(iAux) = 0;
+        mu1(iAux) = mu0(iAux);
       }
     }
   }

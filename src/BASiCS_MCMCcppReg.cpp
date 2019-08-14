@@ -311,7 +311,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         ml_arma,
                         geneExponent,
                         mintol_mu);
-    X = designMatrix(k, means, ml_arma, variance);
+    X = designMatrix(means, ml_arma, variance);
     
     PmuAux += muAux.col(1);
     if (i >= Burn) {
