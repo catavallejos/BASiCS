@@ -64,8 +64,8 @@ arma::mat muUpdateRegNoSpikes(
   }
   // Revise this part
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(k, mu1, ml, variance);
-
+  arma::mat X_mu1 = designMatrix(mu1, ml, variance);
+  
   // REGRESSION RELATED FACTOR
   log_aux -= exponent * lambda %
     (pow(log(delta) - X_mu1 * beta, 2) -

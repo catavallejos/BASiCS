@@ -2,8 +2,7 @@
 
 // Functions for regression case of BASiCS
 
-// Model matrix generation for regression
-arma::mat designMatrix(
+arma::mat designMatrixOriginal(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec const& mu,
     arma::vec const& ml, // locations (fixed a priori)
@@ -33,7 +32,26 @@ arma::vec estimateRBFLocations(int const& k, arma::vec const& x) {
   return(m);
 }
 
-/* Metropolis-Hastings updates of mu
+arma::mat designMatrix(
+    arma::vec const& mu, 
+    arma::vec const& locations, 
+    double const& variance) 
+{
+  arma::vec x = log(mu);
+  double h = (locations(1)-locations(0)) * variance;
+  int k = locations.size() + 2;
+  
+  // Possibly create this matrix outside
+  arma::mat X = arma::ones(x.size(), k);
+  X.col(1) = x;
+  for(int i = 0; i < k - 2; i++) {
+    X.col(i + 2) = exp(-0.5 * pow(x - locations(i), 2) / pow(h, 2));
+    //X.col(i+1) = pow(x,i+1);
+  }
+  return X;
+}
+
+/* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
 */
 arma::mat muUpdateReg(
@@ -77,7 +95,7 @@ arma::mat muUpdateReg(
     }
   }
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(k, mu1, ml, variance);
+  arma::mat X_mu1 = designMatrix(mu1, ml, variance);
 
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check

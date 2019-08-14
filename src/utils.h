@@ -143,10 +143,19 @@ arma::mat thetaUpdateBatch(
    * Stored in: utils_MCMCcppReg.cpp
    */
   
-arma::mat designMatrix(
+arma::mat designMatrixOriginal(
     int const& k, 
     arma::vec const& mu, 
     arma::vec const& ml,
+    double const& variance);
+  
+arma::vec estimateRBFLocations(
+    arma::vec const& mu,
+    int const& k);
+    
+arma::mat designMatrix(
+    arma::vec const& mu, 
+    arma::vec const& locations, 
     double const& variance);
 
 arma::vec estimateRBFLocations(int const& k, arma::vec const& x);

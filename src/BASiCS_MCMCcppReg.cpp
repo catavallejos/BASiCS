@@ -223,7 +223,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     ml_arma = estimateRBFLocations(k, log(means));
   }
 
-  arma::mat X = designMatrix(k, means, ml_arma, variance);
+  arma::mat X = designMatrix(means, ml_arma, variance);
 
   StartSampler(N);
   // START OF MCMC LOOP
@@ -311,7 +311,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         ml_arma,
                         geneExponent,
                         mintol_mu);
-
+    X = designMatrix(k, means, ml_arma, variance);
+    
     PmuAux += muAux.col(1);
     if (i >= Burn) {
       muAccept += muAux.col(1);
@@ -444,7 +445,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         if (!FixML) {
           ml_arma = estimateRBFLocations(k, log(means));
         }
-        X = designMatrix(k, means, ml_arma, variance);
       }
     }
 

@@ -17,7 +17,7 @@ test_that("Estimates match the given seed (spikes+regression)",
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = TRUE)
   # Running the sampler
   set.seed(12)
-  Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
+  Chain <- run_MCMC(Data, N = 20, Thin = 2, Burn = 4, 
                        PrintProgress = FALSE, Regression = TRUE,
                        Start = Start, PriorParam = PriorParam)
   # Calculating a posterior summary
