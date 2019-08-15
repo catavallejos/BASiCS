@@ -35,4 +35,3 @@ test_that("BASiCS_Filter", {
     c("Spike3", "Spike4", "Spike6", "Spike8", "Spike9", "Spike10")
   )
 })
-

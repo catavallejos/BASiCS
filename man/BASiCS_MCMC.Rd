@@ -5,7 +5,7 @@
 \title{BASiCS MCMC sampler}
 \usage{
 BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE,
-  geneExponent = 1, cellExponent = 1, Verbose = TRUE, ...)
+  GeneExponent = 1, CellExponent = 1, Verbose = TRUE, ...)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
@@ -30,6 +30,9 @@ added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE}
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
+
+\item{GeneExponent, CellExponent}{Exponents applied to the prior for MCMC 
+updates. Useful when performing divide & conquer MCMC strategies.}
 
 \item{Verbose}{Verbosity flag. Set FALSE to prevent printing of messages.}
 

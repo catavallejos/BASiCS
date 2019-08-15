@@ -10,8 +10,7 @@ test_that("Differential test is correct (regression case)", {
                         EpsilonR = log2(1.5)/log2(exp(1)),
                         OffSet = TRUE, Plot = FALSE, PlotOffset = FALSE)
             
-  # Classification frequency
-            
+  # Classification frequency       
   FreqMean0 <- c(335,   9,   6)
   FreqMean <- as.vector(table(Test@Results$Mean@Table$ResultDiffMean))
   expect_equal(FreqMean, FreqMean0)
@@ -24,8 +23,7 @@ test_that("Differential test is correct (regression case)", {
   FreqRes <- as.vector(table(Test@Results$ResDisp@Table$ResultDiffResDisp))
   expect_equal(FreqRes, FreqRes0)
             
-  # Posterior probabilities
-            
+  # Posterior probabilities    
   ProbMean0 <- c(0.01, 0.01, 0.79, 0.41, 0.35)
   ProbMean <- round(Test@Results$Mean@Table$ProbDiffMean[1:5], 2)
   expect_equal(ProbMean, ProbMean0)
@@ -46,9 +44,4 @@ test_that("Differential test is correct (regression case)", {
   Lfc2Disp0 <- c(0.92, 1.02, 0.86, 6.23, 0.26)
   Lfc2Disp <- round(tail(Test@Results$Disp@Table$DispLog2FC, 5),2)
   expect_equal(Lfc2Disp, Lfc2Disp0)
-            
 })
-
-
-
-

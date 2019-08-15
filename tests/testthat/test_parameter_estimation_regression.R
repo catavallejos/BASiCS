@@ -1,7 +1,6 @@
 context("Parameter estimation and denoised data (spikes+regression)\n")
 
-test_that("Estimates match the given seed (spikes+regression)", 
-{
+test_that("Estimates match the given seed (spikes+regression)", {
   # Data example
   set.seed(15)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
@@ -75,8 +74,8 @@ test_that("Estimates match the given seed (spikes+regression)",
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   expect_equal(DRcheck, DRcheck0, tolerance = 1, scale = 1)
 })
-test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", 
-{
+
+test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   # Data example
   set.seed(18)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)

@@ -133,7 +133,8 @@ GridPlot <- function(
     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
     EFDRgrid,
     EFNRgrid,
-    ProbThreshold) {
+    ProbThreshold
+    ) {
 
   df <- data.frame(
     ProbThresholds, 
@@ -159,14 +160,45 @@ GridPlot <- function(
     ggplot2::geom_vline(xintercept = ProbThreshold, col = "indianred", lty = 1)
 }
 
-DiffExp <- function(Table, Measure) {
-  DiffResult <- Table[[paste0("ResultDiff", Measure)]]
-  !DiffResult %in% c("ExcludedByUser", "ExcludedFromTesting", "NoDiff")
+
+
+VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
+  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
+  # bins <- NClassFD2D(
+  #   Table[[paste0(Measure, DistanceVar(Measure))]],
+  #   Table[[paste0("ProbDiff", Measure)]]
+  # )
+  bins <- 100
+  ggplot2::ggplot(
+      Table, 
+      ggplot2::aes_string(
+        x = paste0(Measure, DistanceVar(Measure)), 
+        y = paste0("ProbDiff", Measure))
+    ) +
+    # ggplot2::geom_point() +
+    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
+    ggplot2::geom_point(
+      data = Table[IndDiff, ], 
+      shape = 16, 
+      col = "violetred", 
+      na.rm = TRUE) +
+    ggplot2::geom_hline(
+      yintercept = c(-Epsilon, Epsilon), 
+      lty = "dashed", 
+      color = "grey40", 
+      na.rm = TRUE) +
+    ggplot2::ylim(c(0, 1)) +
+    viridis::scale_fill_viridis(name = "Density") +
+    ggplot2::labs(
+      x = paste(cap(LogDistanceName(Measure)), GroupLabel1, "vs", GroupLabel2),
+      y = "Posterior probability"
+      # ,title = paste("Differential", MeasureName(Measure), "test")
+    )
 }
 
 MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
 
-  IndDiff <- DiffExp(Table, Measure)
+  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, "Overall")]],
   #   Table[[paste0(Measure, DistanceVar(Measure))]]

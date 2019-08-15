@@ -110,7 +110,7 @@ arma::mat deltaUpdate(
   * - If smaller than 1e-3
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */ 
+  */
   ind = DegubInd(ind, q0, u, log_aux, delta1, mintol, "delta");
   for (int i = 0; i < q0; i++) {
     if (ind(i) == 0) {
@@ -298,7 +298,7 @@ arma::mat nuUpdateBatch(
   * - If smaller than 1e-5
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */ 
+  */
   ind = DegubInd(ind, n, u, log_aux, nu1, mintol, "nu");
   for (int j=0; j < n; j++) {
     if (ind(j) == 0) {
@@ -360,9 +360,10 @@ arma::mat thetaUpdateBatch(
   arma::umat ind = log(u) < log_aux;
   // DEBUG: Reject proposed values below 0.0001 (to avoid numerical innacuracies)
   ind %= mintol < exp(y);
-  
+
   // CREATING OUTPUT VARIABLE
   arma::vec theta = ind % exp(y) + (1 - ind) % theta0;
+
   // OUTPUT
   return join_rows(theta, arma::conv_to<arma::mat>::from(ind));
 }

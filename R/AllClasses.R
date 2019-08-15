@@ -273,13 +273,25 @@ setClass("BASiCS_Summary",
 )
 
 
-
+#' @name BASiCS_ResultsDE
+#' @aliases BASiCS_ResultsDE-class
+#'
+#' @title The BASiCS_ResultsDE class
+#'
+#' @description Results of BASiCS_TestDE
+#' @slot Results \code{\linkS4class{BASiCS_ResultDE}} objects
+#' @slot Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects. 
+#' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2
+#' @slot OffsetChain Fold change between each draw of mu
+#' @slot Offset Ratio between median of chains 
+#' @slot RowData Annotation for genes
+#' @slot Extras Slot for extra information to be added later
 #' @export
 setClass("BASiCS_ResultsDE",
   representation = representation(
     Results = "list",
-    Chain1_offset = "BASiCS_Chain",
-    Chain2_offset = "BASiCS_Chain",
+    Chain1 = "BASiCS_Chain",
+    Chain2 = "BASiCS_Chain",
     GroupLabel1 = "character",
     GroupLabel2 = "character",
     OffsetChain = "numeric",
@@ -290,6 +302,26 @@ setClass("BASiCS_ResultsDE",
   ),
   contains = "Versioned"
 )
+
+
+#' @name BASiCS_ResultDE
+#' @aliases BASiCS_ResultDE-class
+#'
+#' @title The BASiCS_ResultDE class
+#'
+#' @description Container of results for a single differential test.
+#' @slot Table Tabular results for each gene.
+#' @slot Name The name of the test performed (typically "Mean", "Disp" or 
+#'  "ResDisp")
+#' @slot GroupLabel1,GroupLabel2 Group labels.
+#' @slot ProbThreshold Posterior probability threshold used in differential 
+#' test.
+#' @slot EFDR,EFNR Expected false discovery and expected false negative rates
+#' for differential test.
+#' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values check before thresholds
+#' were fixed.
+#' @slot Epsilon Minimum fold change or difference threshold.
+#' @slot Extra objects for class flexibility.
 #' @export
 setClass("BASiCS_ResultDE",
   representation = representation(
@@ -306,15 +338,37 @@ setClass("BASiCS_ResultDE",
     Extras = "list"
   )
 )
+
+
+#' @name BASiCS_OffsetCorrected
+#' @aliases BASiCS_OffsetCorrected-class
+#'
+#' @title The BASiCS_OffsetCorrected class
+#'
+#' @description Container of two chains which have been offset to have matching
+#' mean mu values.
+#' @slot Chain1,Chain2 Objects of class \code{\linkS4class{BASiCS_Chain}}.
+#' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2, respectively.
+#' @slot OffsetChain Ratio between sum of mus
+#' @slot OffsetEst Median offset estimate
+#' @slot ChainTau log2 fold-change between MCMC draws for mu
+#' @slot Mu1 Median mu values for Chain1
+#' @slot Mu1_old Median mu values for Chain1 before scaling
+#' @slot Mu2 Median mu values for Chain2
+#' @slot MuBase (Mu1 * n1 + Mu2 * n2) / n
+#' @slot MuBaseOld (Mu1 * n1 + Mu2 * n2) / n before offset correction
+#' @slot MedianTau Median fold change
+#' @slot MedianTau_old Median fold change before offset correction
+#' @slot Delta1,Delta2 Median delta for chain 1 and chain 2
 #' @export
 setClass("BASiCS_OffsetCorrected", 
   representation = representation(
+    Chain1 = "BASiCS_Chain",
+    Chain2 = "BASiCS_Chain",
     GroupLabel1 = "character", 
     GroupLabel2 = "character",
     OffsetChain = "numeric",
     OffsetEst = "numeric",
-    Chain1_offset = "BASiCS_Chain",
-    Chain2_offset = "BASiCS_Chain",
     ChainTau = "matrix",
     Mu1 = "numeric", 
     Mu1_old = "numeric", 

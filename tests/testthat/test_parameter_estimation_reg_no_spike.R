@@ -1,7 +1,6 @@
 context("Parameter estimation and denoised data (no-spikes+regression)\n")
 
-test_that("Estimates match the given seed (no-spikes+regression)", 
-{
+test_that("Estimates match the given seed (no-spikes+regression)", {
   # Data example
   set.seed(13)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)

@@ -58,7 +58,8 @@ Imports:
     SummarizedExperiment,
     viridis,
     reshape2,
-    utils    
+    utils,
+    hexbin
 Suggests:
     BiocStyle,
     knitr,
@@ -74,3 +75,4 @@ NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
 RoxygenNote: 6.1.1
+Encoding: UTF-8

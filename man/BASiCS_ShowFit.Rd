@@ -6,12 +6,12 @@
 \title{Plotting the trend after Bayesian regression}
 \usage{
 BASiCS_ShowFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, ml = NULL,
+  pch = 16, smooth = TRUE, variance = 1.2, locations = NULL,
   colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
   colourGenesSel = "dark red", ...)
 
 BASiCS_showFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, ml = NULL,
+  pch = 16, smooth = TRUE, variance = 1.2, locations = NULL,
   colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
   colourGenesSel = "dark red", ...)
 }
@@ -29,6 +29,8 @@ to plot the scatter plot. Default value \code{smooth = TRUE}.}
 
 \item{variance}{Variance used to build GRBFs for regression. Default value
 \code{variance = 1.2}}
+
+\item{locations}{Locations (in terms of log(mu)) of GRBFs}
 
 \item{colour}{colour used to denote genes within the scatterplot. Only used 
 when \code{smooth = TRUE}. Default value 

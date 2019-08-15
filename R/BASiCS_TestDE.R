@@ -76,111 +76,8 @@
 #' the chains.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #'
-#' @return \code{BASiCS_TestDE} returns a list of 4 elements:
-#' \describe{
-#' \item{\code{TableMean}}{A \code{\link[base]{data.frame}} containing the
-#'       results of the differential mean test
-#'    \describe{
-#'    \item{\code{GeneName}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression
-#'          parameter \eqn{\mu_i} is averaged across both groups of cells
-#'          (weighted by sample size).}
-#'    \item{\code{Mean1}}{Estimated mean expression parameter \eqn{\mu_i} for
-#'          each biological gene in the first group of cells.}
-#'    \item{\code{Mean2}}{Estimated mean expression parameter \eqn{\mu_i} for
-#'          each biological gene in the second group of cells.}
-#'    \item{\code{MeanFC}}{Fold change in mean expression parameters between
-#'          the first and second groups of cells.}
-#'    \item{\code{MeanLog2FC}}{Log2-transformed fold change in mean expression
-#'          between the first and second groups of cells.}
-#'    \item{\code{ProbDiffMean}}{Posterior probability for mean expression
-#'          difference between the first and second groups of cells.}
-#'    \item{\code{ResultDiffExp}}{Indicator if a gene has a higher mean
-#'          expression in the first or second groups of cells.}
-#'    }}
-#' \item{\code{TableDisp}}{A \code{\link[base]{data.frame}} containing the
-#'       results of the differential dispersion test (excludes genes for which
-#'       the mean does not changes).
-#'    \describe{
-#'    \item{\code{GeneName}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression
-#'          parameter \eqn{\mu_i} is averaged across both groups of cells
-#'          (weighted by sample size).}
-#'    \item{\code{DispOverall}}{For each gene, the estimated over-dispersion
-#'          parameter \eqn{\delta_i} is averaged across both groups of cells
-#'          (weighted by sample size).}
-#'    \item{\code{Disp1}}{Estimated over-dispersion parameter \eqn{\delta_i}
-#'          for each biological gene in the first group of cells.}
-#'    \item{\code{Disp2}}{Estimated over-dispersion parameter \eqn{\delta_i}
-#'          for each biological gene in the second group of cells.}
-#'    \item{\code{DispFC}}{Fold change in over-dispersion parameters between
-#'          the between the first and second groups of cells.}
-#'    \item{\code{DispLog2FC}}{Log-transformed fold change in over-dispersion
-#'          between the first and second groups of cells.}
-#'    \item{\code{ProbDiffDisp}}{Posterior probability for over-dispersion
-#'          difference between the first and second groups of cells.}
-#'    \item{\code{ResultDiffDisp}}{Indicator if a gene has a higher
-#'          over-dispersion in the first or second groups of cells. Genes
-#'          labelled with "ExcludedFromTest" were detected as showing
-#'          differential mean expression.}
-#'    }}
-#' \item{\code{TableResDisp}}{A \code{\link[base]{data.frame}} containing the
-#'       results of the differential residual over-dispersion test.
-#'    \describe{
-#'    \item{\code{GeneName}}{Gene name}
-#'    \item{\code{MeanOverall}}{For each gene, the estimated mean expression
-#'          parameter \eqn{\mu_i} is averaged across both groups of cells
-#'          (weighted by sample size).}
-#'    \item{\code{ResDispOverall}}{For each gene, the estimated residual
-#'          over-dispersion parameter \eqn{\delta_i} is averaged across both
-#'          groups of cells (weighted by sample size).}
-#'    \item{\code{ResDisp1}}{Estimated residual over-dispersion parameter
-#'          \eqn{\epsilon_i} for each biological gene in the first group of
-#'          cells.}
-#'    \item{\code{ResDisp2}}{Estimated residual over-dispersion parameter
-#'          \eqn{\epsilon_i} for each biological gene in the second group of
-#'          cells.}
-#'    \item{\code{ResDispDistance}}{Difference in residual over-dispersion
-#'          between the first and second groups of cells.}
-#'    \item{\code{ProbDiffResDisp}}{Posterior probability for residual
-#'          over-dispersion difference between the first and second groups of
-#'          cells.}
-#'    \item{\code{ResultDiffResDisp}}{Indicator if a gene has a higher
-#'          residual over-dispersion in the first or second groups of cells.
-#'          Genes labelled with "ExcludedFromTest" were not expressed in
-#'          at least 2 cells per condition.}
-#'    }}
-#'  \item{\code{DiffMeanSummary}}{A list containing the following information
-#'        for the differential mean expression test:
-#'    \describe{
-#'   \item{\code{ProbThreshold}}{Posterior probability threshold.}
-#'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
-#'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
-#'   }}
-#'  \item{\code{DiffDispSummary}}{A list containing the following
-#'        information for the differential over-dispersion test:
-#'    \describe{
-#'   \item{\code{ProbThreshold}}{Posterior probability threshold.}
-#'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
-#'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
-#'   }}
-#'  \item{\code{DiffResDispSummary}}{A list containing the following
-#'        information for the differential residual over-dispersion test:
-#'    \describe{
-#'   \item{\code{ProbThreshold}}{Posterior probability threshold.}
-#'   \item{\code{EFDR}}{Expected false discovery rate for the given thresholds.}
-#'   \item{\code{EFNR}}{Expected false negative rate for the given thresholds.}
-#'   }}
-#'  \item{\code{Chain1_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object:
-#'        \code{Chain1} after offset removal.}
-#'  \item{\code{Chain2_offset}}{an \code{\link[BASiCS]{BASiCS_Chain}} object:
-#'        \code{Chain2} after offset removal (this is only provided for
-#'        completeness; \code{Chain2} is not affected by the offset).}
-#'  \item{\code{OffsetChain}}{MCMC chain calculated for the offset effect.}
-#'  \item{\code{Offset}}{Estimated offset (posterior median of
-#'        \code{OffsetChain}). Default value set equal to 1 when offset
-#'        correction is not performed.}
-#' }
+#' @return \code{BASiCS_TestDE} returns an object of class
+#' \code{\linkS4class{BASiCS_ResultsDE}}
 #'
 #' @examples
 #'
@@ -295,8 +192,8 @@ BASiCS_TestDE <- function(Chain1,
     # Default values when no offset correction is applied
     OffsetEst <- OffsetCorrected@OffsetEst
     OffsetChain <- OffsetCorrected@OffsetChain
-    Chain1_offset <- OffsetCorrected@Chain1_offset
-    Chain2_offset <- OffsetCorrected@Chain2_offset
+    Chain1_offset <- OffsetCorrected@Chain1
+    Chain2_offset <- OffsetCorrected@Chain2
 
   } else {
     OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
@@ -312,7 +209,7 @@ BASiCS_TestDE <- function(Chain1,
     Mu2 <- matrixStats::colMedians(Chain2@parameters$mu)
     Delta1 <- matrixStats::colMedians(Chain1@parameters$delta)
     Delta2 <- matrixStats::colMedians(Chain2@parameters$delta)
-    MuBase <- (Mu1 * n1 + Mu2 * n2)/n
+    MuBase <- (Mu1 * n1 + Mu2 * n2) / n
     ChainTau <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
     MedianTau <- matrixStats::colMedians(ChainTau)
 
@@ -562,8 +459,8 @@ BASiCS_TestDE <- function(Chain1,
 
   Out <- new("BASiCS_ResultsDE",
     Results = Results,
-    Chain1_offset = Chain1_offset,
-    Chain2_offset = Chain2_offset,
+    Chain1 = Chain1_offset,
+    Chain2 = Chain2_offset,
     GroupLabel1 = GroupLabel1,
     GroupLabel2 = GroupLabel2,
     OffsetChain = OffsetChain,

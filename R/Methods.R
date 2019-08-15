@@ -734,6 +734,19 @@ setMethod("displaySummaryBASiCS",
           signature = "BASiCS_Summary",
           definition = HiddenGetParam)
 
+
+#' @docType methods
+#' @rdname show-BASiCS_OffsetCorrected-method
+#'
+#' @title Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}} object
+#'
+#' @param object an object of class \code{\linkS4class{BASiCS_OffsetCorrected}}
+#'
+#' @examples
+#'
+#' help(BASiCS_MCMC)
+#'
+#' @seealso \code{\link[methods]{show}}
 #' @export
 setMethod("show", signature = "BASiCS_OffsetCorrected", 
   function(object) {
@@ -743,6 +756,18 @@ setMethod("show", signature = "BASiCS_OffsetCorrected",
   }
 )
 
+#' @docType methods
+#' @rdname show-BASiCS_ResultsDE-method
+#'
+#' @title Accessors for the slots of a \code{\linkS4class{BASiCS_ResultsDE}} object
+#'
+#' @param object an object of class \code{\linkS4class{BASiCS_ResultsDE}}
+#'
+#' @examples
+#'
+#' help(BASiCS_MCMC)
+#'
+#' @seealso \code{\link[methods]{show}}
 #' @export
 setMethod("show", signature = "BASiCS_ResultsDE", 
   function(object) {
@@ -752,9 +777,23 @@ setMethod("show", signature = "BASiCS_ResultsDE",
   }
 )
 
+
+#' @docType methods
+#' @rdname show-BASiCS_ResultDE-method
+#'
+#' @title Accessors for the slots of a \code{\linkS4class{BASiCS_ResultDE}} object
+#'
+#' @param object an object of class \code{\linkS4class{BASiCS_ResultDE}}
+#'
+#' @examples
+#'
+#' help(BASiCS_MCMC)
+#'
+#' @seealso \code{\link[methods]{show}}
 #' @export
 setMethod("show", signature = "BASiCS_ResultDE", 
   function(object) {
+    # measures <- c("Mean", "Disp", "ResDisp")
     diffName <- paste0("ResultDiff", object@Name)
     
     nPlus1 <- sum(object@Table[[diffName]] == paste0(object@GroupLabel1, "+"))

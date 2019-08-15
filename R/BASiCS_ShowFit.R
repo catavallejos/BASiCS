@@ -14,6 +14,7 @@
 #' to plot the scatter plot. Default value \code{smooth = TRUE}. 
 #' @param variance Variance used to build GRBFs for regression. Default value
 #' \code{variance = 1.2} 
+#' @param locations Locations (in terms of log(mu)) of GRBFs
 #' @param colour colour used to denote genes within the scatterplot. Only used 
 #' when \code{smooth = TRUE}. Default value 
 #' \code{colour = "dark blue"}. 
@@ -46,7 +47,7 @@ BASiCS_ShowFit <- function(object,
                            pch = 16,
                            smooth = TRUE,
                            variance = 1.2,
-                           ml = NULL,
+                           locations = NULL,
                            colour = "dark blue",
                            markExcludedGenes = TRUE,
                            GenesSel = NULL,
@@ -68,12 +69,12 @@ BASiCS_ShowFit <- function(object,
 
   
   n <- ncol(object@parameters$beta)
-  if (is.null(ml)) {
+  if (is.null(locations)) {
     # Create design matrix across the grid
     range <- diff(range(grid.mu))
     myu <- seq(min(grid.mu), by = range / (n - 3), length.out = n - 2)
   } else {
-    myu <- ml
+    myu <- locations
   }
   h <- diff(myu) * variance
 

@@ -1,7 +1,6 @@
 context("Basic example of HVG/LVG detection\n")
 
-test_that("HVG/LVG detection is correct", 
-{
+test_that("HVG/LVG detection is correct", {
   data(ChainSC)
 
   DetectHVG <- BASiCS_DetectHVG(ChainSC, PercentileThreshold = NULL,
@@ -25,12 +24,10 @@ test_that("HVG/LVG detection is correct",
   
   ProbLVG0 <- c(0.92, 0.92, 0.92, 0.91, 0.91)
   ProbLVG <- round(DetectLVG$Table$Prob[141:145], 2)
-  expect_equal(ProbLVG, ProbLVG0)
-  
+  expect_equal(ProbLVG, ProbLVG0)  
 })
 
-test_that("HVG/LVG detection using epsilons is correct", 
-{
+test_that("HVG/LVG detection using epsilons is correct", {
   data(ChainSCReg)
             
   DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
@@ -50,5 +47,5 @@ test_that("HVG/LVG detection using epsilons is correct",
             
   ProbLVG0 <- c(1.00, 1.00, 1.00, 1.00, 0.97)
   ProbLVG <- round(DetectLVG$Table$Prob[1:5], 2)
-  expect_equal(ProbLVG, ProbLVG0)            
+  expect_equal(ProbLVG, ProbLVG0)
 })

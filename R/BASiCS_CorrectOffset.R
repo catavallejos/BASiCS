@@ -50,7 +50,7 @@ BASiCS_CorrectOffset <- function(Chain1,
   MedianTau_old <- matrixStats::colMedians(ChainTau_old)
 
   # Offset corrected LFC estimates
-  MuBase <- (Mu1 * n1 + Mu2 * n2)/n
+  MuBase <- (Mu1 * n1 + Mu2 * n2) / n
   ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
   MedianTau <- matrixStats::colMedians(ChainTau)
 
@@ -59,8 +59,8 @@ BASiCS_CorrectOffset <- function(Chain1,
     GroupLabel2 = GroupLabel2,
     OffsetChain = OffsetChain,
     OffsetEst = OffsetEst,
-    Chain1_offset = Chain1_offset,
-    Chain2_offset = Chain2_offset,
+    Chain1 = Chain1_offset,
+    Chain2 = Chain2_offset,
     Mu1 = Mu1,
     Mu1_old = Mu1_old,
     Mu2 = Mu2,
