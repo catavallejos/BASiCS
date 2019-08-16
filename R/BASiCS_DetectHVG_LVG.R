@@ -166,20 +166,28 @@ BASiCS_DetectHVG <- function(Chain,
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE, na.last = TRUE), ]
     
-    if (Plot)
-    {
-      if (Search)
-      {
+    if (Plot) {
+      plots <- list()
+      if (Search) {
         # EFDR / EFNR plot
-        par(ask = TRUE)
-        HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
+        # par(ask = TRUE)
+        plots[[1]] <- HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
       }
       
       # Output plot : mean vs prob
-      HiddenPlot2DetectHVG_LVG(Task = "HVG", Mu, Prob,
-                               OptThreshold, Hits = HVG, ...)
-      
-      par(ask = FALSE)
+      plots <- c(plots, 
+        list(
+          HiddenPlot2DetectHVG_LVG(
+            Task = "HVG", 
+            Mu,
+            Prob,
+            OptThreshold, 
+            Hits = HVG,
+            ...
+          )
+        )
+      )
+            
     }
     
     message(sum(HVG, na.rm = TRUE), 

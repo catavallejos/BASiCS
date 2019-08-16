@@ -307,7 +307,7 @@ setMethod("rownames",
 # @importFrom ggExtra ggMarginal 
 # @importFrom cowplot plot_grid
 #' @name plot-BASiCS_Chain-method
-#' @aliases plot plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
+#' @aliases plot,BASiCS_Chain-method plot,BASiCS_Chain,ANY-method
 #'
 #' @docType methods
 #' @rdname plot-BASiCS_Chain-method

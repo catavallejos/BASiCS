@@ -16,6 +16,26 @@ mean mu values.
 
 \item{\code{GroupLabel1,GroupLabel2}}{Labels for Chain1 and Chain2, respectively.}
 
-\item{\code{OffsetChain}}{}
+\item{\code{OffsetChain}}{Fold change (ratio) between each MCMC draw}
+
+\item{\code{OffsetEst}}{Estimated ratio between median of chains}
+
+\item{\code{ChainTau}}{log2(fold-change) between each MCMC draw}
+
+\item{\code{Mu1}}{Median mu values for Chain1}
+
+\item{\code{Mu1_old}}{Median mu values for Chain1 before offset correction}
+
+\item{\code{Mu2}}{Median mu values for Chain2}
+
+\item{\code{MuBase}}{(Mu1 * n1 + Mu2 * n2) / n}
+
+\item{\code{MuBaseOld}}{(Mu1_old * n1 + Mu2 * n2) / n}
+
+\item{\code{MedianTau}}{Median log2(fold-change)}
+
+\item{\code{MedianTau_old}}{Median log2(fold-change) before offset correction}
+
+\item{\code{Delta1,Delta2}}{Median delta value for Chain1 and Chain2}
 }}
 

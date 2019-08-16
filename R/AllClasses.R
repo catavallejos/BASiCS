@@ -282,7 +282,7 @@ setClass("BASiCS_Summary",
 #' @slot Results \code{\linkS4class{BASiCS_ResultDE}} objects
 #' @slot Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects. 
 #' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2
-#' @slot OffsetChain
+#' @slot OffsetChain Fold change (ratio) between MCMC each draw
 #' @slot Offset Ratio between median of chains 
 #' @slot RowData Annotation for genes
 #' @slot Extras Slot for extra information to be added later
@@ -348,17 +348,17 @@ setClass("BASiCS_ResultDE",
 #' mean mu values.
 #' @slot Chain1,Chain2 Objects of class \code{\linkS4class{BASiCS_Chain}}.
 #' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2, respectively.
-#' @slot OffsetChain 
-#' @slot OffsetEst
-#' @slot ChainTau
-#' @slot Mu1
-#' @slot Mu1_old
-#' @slot Mu2
-#' @slot MuBase
-#' @slot MuBaseOld
-#' @slot MedianTau
-#' @slot MedianTau_old
-#' @slot Delta1,Delta2
+#' @slot OffsetChain Fold change (ratio) between each MCMC draw
+#' @slot OffsetEst Estimated ratio between median of chains 
+#' @slot ChainTau log2(fold-change) between each MCMC draw
+#' @slot Mu1 Median mu values for Chain1
+#' @slot Mu1_old Median mu values for Chain1 before offset correction
+#' @slot Mu2 Median mu values for Chain2
+#' @slot MuBase (Mu1 * n1 + Mu2 * n2) / n
+#' @slot MuBaseOld (Mu1_old * n1 + Mu2 * n2) / n
+#' @slot MedianTau Median log2(fold-change)
+#' @slot MedianTau_old Median log2(fold-change) before offset correction
+#' @slot Delta1,Delta2 Median delta value for Chain1 and Chain2
 #' @export
 setClass("BASiCS_OffsetCorrected", 
   representation = representation(

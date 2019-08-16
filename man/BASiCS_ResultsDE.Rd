@@ -17,6 +17,8 @@ Results of BASiCS_TestDE
 
 \item{\code{GroupLabel1,GroupLabel2}}{Labels for Chain1 and Chain2}
 
+\item{\code{OffsetChain}}{Fold change (ratio) between MCMC each draw}
+
 \item{\code{Offset}}{Ratio between median of chains}
 
 \item{\code{RowData}}{Annotation for genes}

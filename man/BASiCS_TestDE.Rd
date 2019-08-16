@@ -140,11 +140,11 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       OffSet = TRUE)
 
 # Results for the differential mean test
-head(Test$TableMean)
+head(Test@Results[["Mean"]]@Table)
 
 # Results for the differential over-dispersion test
 # This only includes genes marked as 'NoDiff' in Test$TableMean
-head(Test$TableDisp)
+head(Test@Results[["Disp"]]@Table)
 
 # For testing differences in residual over-dispersion, two chains obtained
 # via 'BASiCS_MCMC(Data, N, Thin, Burn, Regression=TRUE)' need to be provided
