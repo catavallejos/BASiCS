@@ -40,6 +40,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels)
   }
 )
+
 #' @export
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
   function(
@@ -176,7 +177,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       color = "grey40", 
       na.rm = TRUE) +
     ggplot2::ylim(c(0, 1)) +
-    viridis::scale_fill_viridis(name = "Density") +
+    viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
     ggplot2::labs(
       x = paste(cap(LogDistanceName(Measure)), GroupLabel1, "vs", GroupLabel2),
       y = "Posterior probability"
@@ -213,7 +214,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       lty = "dashed", 
       color = "grey40") +
     xscale +
-    viridis::scale_fill_viridis(name = "Density") +
+    viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
     ggplot2::labs(
       x = paste(cap(MeasureName(Measure))),
       y = paste(cap(LogDistanceName(Measure)),
