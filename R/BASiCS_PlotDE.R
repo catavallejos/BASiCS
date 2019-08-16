@@ -44,30 +44,20 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
   function(
     object,
-    GroupLabel1 = object@GroupLabel1,
-    GroupLabel2 = object@GroupLabel2,
-    ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
-    Epsilon = object@Epsilon,
-    EFDR = object@EFDR,
-    Table = object@Table,
-    Measure = object@Name,
-    EFDRgrid = object@EFDRgrid,
-    EFNRgrid = object@EFNRgrid,
-    ProbThreshold = object@ProbThreshold,
     Which = c("MAPlot", "VolcanoPlot", "GridPlot")
   ){
 
     BASiCS_PlotDE(
-      GroupLabel1 = GroupLabel1,
-      GroupLabel2 = GroupLabel2,
-      ProbThresholds = ProbThresholds,
-      Epsilon = Epsilon,
-      EFDR = EFDR,
-      Table = Table,
-      Measure = Measure,
-      EFDRgrid = EFDRgrid,
-      EFNRgrid = EFNRgrid,
-      ProbThreshold = ProbThreshold,
+      GroupLabel1 = object@GroupLabel1,
+      GroupLabel2 = object@GroupLabel2,
+      ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
+      Epsilon = object@Epsilon,
+      EFDR = object@EFDR,
+      Table = object@Table,
+      Measure = object@Name,
+      EFDRgrid = object@EFDRgrid,
+      EFNRgrid = object@EFNRgrid,
+      ProbThreshold = object@ProbThreshold,
       Which = Which
     )
   }
@@ -93,7 +83,15 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
 
     if ("MAPlot" %in% Which) {
       Plots <- c(Plots, 
-        list(MAPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon))
+        list(
+          MAPlot(
+            Measure,
+            Table,
+            GroupLabel1,
+            GroupLabel2,
+            Epsilon
+          )
+        )
       )
     }
     if ("VolcanoPlot" %in% Which) {
@@ -112,7 +110,16 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     }
     if ("GridPlot" %in% Which) {
       Plots <- c(
-        list(GridPlot(Measure, EFDR, ProbThresholds, EFDRgrid, EFNRgrid, ProbThreshold)),
+        list(
+          GridPlot(
+            Measure,
+            EFDR,
+            ProbThresholds,
+            EFDRgrid,
+            EFNRgrid,
+            ProbThreshold
+          )
+        ),
         Plots
       )
     }
@@ -176,17 +183,23 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         y = paste0("ProbDiff", Measure))
     ) +
     # ggplot2::geom_point() +
-    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
+    ggplot2::geom_hex(
+      bins = bins,
+      aes_string(fill = "..density.."),
+      na.rm = TRUE
+    ) +
     ggplot2::geom_point(
       data = Table[IndDiff, ], 
       shape = 16, 
       col = "violetred", 
-      na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
       lty = "dashed", 
       color = "grey40", 
-      na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     ggplot2::ylim(c(0, 1)) +
     viridis::scale_fill_viridis(name = "Density") +
     ggplot2::labs(
@@ -213,17 +226,24 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
         x = paste0(Measure, "Overall"), 
         y = paste0(Measure, DistanceVar(Measure)))
     ) + 
-    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
+    ggplot2::geom_hex(
+      bins = bins,
+      aes_string(fill = "..density.."),
+      na.rm = TRUE
+    ) +
     # ggplot2::geom_point() +
     ggplot2::geom_point(
       data = Table[IndDiff, ], 
       shape = 16, 
       colour = "violetred", 
-      na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
       lty = "dashed", 
-      color = "grey40") +
+      color = "grey40",
+      na.rm = TRUE
+    ) +
     xscale +
     viridis::scale_fill_viridis(name = "Density") +
     ggplot2::labs(
@@ -245,7 +265,7 @@ VolcanoPlot <- function(
     Epsilon,
     ProbThreshold) {
 
-  IndDiff <- DiffExp(Table, Measure)
+  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
 
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, DistanceVar(Measure))]],
@@ -264,17 +284,20 @@ VolcanoPlot <- function(
       data = Table[IndDiff, ],
       shape = 16,
       col = "violetred",
-      na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     ggplot2::geom_vline(
       xintercept = c(-Epsilon, Epsilon),
       lty = "dashed",
       color = "grey40",
-      na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     ggplot2::geom_hline(
       yintercept = c(ProbThreshold),
       lty = "dashed",
       color = "grey40",
-      na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     ggplot2::ylim(c(0, 1)) +
     viridis::scale_fill_viridis(name = "Density") +
     ggplot2::labs(
@@ -282,4 +305,8 @@ VolcanoPlot <- function(
       y = "Posterior probability"
       # ,title = paste("Differential", MeasureName(Measure), "test")
     )
+}
+
+DiffExp <- function(Results) {
+  !Results %in% c("ExcludedByUser", "ExcludedFromTesting", "NoDiff")
 }
