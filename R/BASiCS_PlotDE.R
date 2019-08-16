@@ -152,7 +152,7 @@ GridPlot <- function(Measure,
 
 
 VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
-  IndDiff <- !Table[[paste0("ResultDiff", Measure)]] %in% c("ExcludedByUser", "NoDiff")
+  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, DistanceVar(Measure))]],
   #   Table[[paste0("ProbDiff", Measure)]]
@@ -187,7 +187,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
 
 MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
 
-  IndDiff <- !Table[[paste0("ResultDiff", Measure)]] %in% c("ExcludedByUser", "NoDiff")
+  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, "Overall")]],
   #   Table[[paste0(Measure, DistanceVar(Measure))]]
@@ -223,4 +223,8 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       # ,
       # title = paste("Differential", MeasureName(Measure))
     )
+}
+
+DiffExp <- function(res) {
+  !res %in% c("ExcludedByUser", "ExcludedFromTesting", "NoDiff")
 }
