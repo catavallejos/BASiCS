@@ -142,4 +142,7 @@ BASiCS_ShowFit <- function(object,
 }
 
 #' @export
-BASiCS_showFit <- BASiCS_ShowFit
+BASiCS_showFit <- function(...) {
+  .Deprecated("BASiCS_ShowFit")
+  BASiCS_ShowFit(...)
+}

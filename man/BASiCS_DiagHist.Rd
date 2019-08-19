@@ -7,7 +7,7 @@
 \usage{
 BASiCS_DiagHist(object, Param = NULL, na.rm = TRUE)
 
-BASiCS_diagHist(object, Param = NULL, na.rm = TRUE)
+BASiCS_diagHist(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}

@@ -97,4 +97,7 @@ BASiCS_DiagPlot <- function(object,
 }
 #' @export
 #' @rdname BASiCS_DiagPlot
-BASiCS_diagPlot <- BASiCS_DiagPlot
+BASiCS_diagPlot <- function(...) {
+  .Deprecated("BASiCS_DiagPlot")
+  BASiCS_DiagPlot(...)
+}

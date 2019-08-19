@@ -9,9 +9,7 @@ BASiCS_DiagPlot(object, Param = "mu", x = NULL, y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
   c("mu", "delta")), na.rm = TRUE)
 
-BASiCS_diagPlot(object, Param = "mu", x = NULL, y = NULL,
-  LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
-  c("mu", "delta")), na.rm = TRUE)
+BASiCS_diagPlot(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}

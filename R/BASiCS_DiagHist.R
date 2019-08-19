@@ -70,4 +70,8 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
 
 #' @export
 #' @rdname BASiCS_DiagHist
-BASiCS_diagHist <- BASiCS_DiagHist
+BASiCS_diagHist <- function(...) {
+  .Deprecated("BASiCS_diagHist")
+  BASiCS_diagHist(...)
+}
+
