@@ -136,9 +136,18 @@ arma::mat thetaUpdateBatch(
    * Stored in: utils_MCMCcppReg.cpp
    */
   
-arma::mat designMatrix(
+arma::mat designMatrixOriginal(
     int const& k, 
     arma::vec const& mu, 
+    double const& variance);
+  
+arma::vec estimateRBFLocations(
+    arma::vec const& mu,
+    int const& k);
+    
+arma::mat designMatrix(
+    arma::vec const& mu, 
+    arma::vec const& locations, 
     double const& variance);
 
 arma::mat muUpdateReg(
@@ -160,7 +169,8 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    double const& mintol);
+    double const& mintol,
+    arma::vec const& locations);
 
 arma::mat deltaUpdateReg(
     arma::vec const& delta0, 
@@ -272,7 +282,8 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    double const& mintol);
+    double const& mintol,
+    arma::vec const& locations);
 
 arma::mat deltaUpdateRegNoSpikes(
     arma::vec const& delta0,

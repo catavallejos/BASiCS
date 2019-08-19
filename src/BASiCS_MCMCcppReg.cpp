@@ -196,7 +196,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux(arma::span(0,q0-1),0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::vec locations = estimateRBFLocations(means, k);
+  arma::mat X = designMatrix(means, locations, variance);
+//  arma::mat X = designMatrixOriginal(k, means, variance);
   
   StartSampler(N);
   
@@ -238,8 +240,12 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, 
                         y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, 
-                        variance, mintol_mu);     
+                        variance, mintol_mu, locations);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    
+    means = muAux(arma::span(0,q0-1),0);
+    //locations = estimateRBFLocations(means, k);
+    X = designMatrix(means, locations, variance);
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -311,8 +317,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux(arma::span(0,q0-1),0);
-        X = designMatrix(k, means, variance);
+        locations = estimateRBFLocations(means, k);
       }
     }
     
