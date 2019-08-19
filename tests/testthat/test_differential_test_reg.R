@@ -13,11 +13,11 @@ test_that("Differential test is correct (regression case)",
             
   # Classification frequency
             
-  FreqMean0 <- c(335,   9,   6)
+  FreqMean0 <- c(333,   8,   9)
   FreqMean <- as.vector(table(Test$TableMean$ResultDiffMean))
   expect_true(all.equal(FreqMean, FreqMean0))
             
-  FreqDisp0 <- c(15, 236,  99)
+  FreqDisp0 <- c(17, 233, 100)
   FreqDisp <- as.vector(table(Test$TableDisp$ResultDiffDisp))
   expect_true(all.equal(FreqDisp, FreqDisp0))
   
@@ -27,7 +27,7 @@ test_that("Differential test is correct (regression case)",
             
   # Posterior probabilities
             
-  ProbMean0 <- c(0.01, 0.01, 0.79, 0.41, 0.35)
+  ProbMean0 <- c(0.01, 0.01, 0.75, 0.32, 0.28)
   ProbMean <- round(Test$TableMean$ProbDiffMean[1:5], 2)
   expect_true(all.equal(ProbMean, ProbMean0))
             
@@ -40,7 +40,7 @@ test_that("Differential test is correct (regression case)",
   expect_true(all.equal(ProbRes, ProbRes0))
             
   # Log2 fold changes
-  Lfc2Mean0 <- c(-0.22, -0.08, -0.92, -0.54, -0.46)
+  Lfc2Mean0 <- c(-0.17, -0.02, -0.86, -0.48, -0.40)
   Lfc2Mean <- round(Test$TableMean$MeanLog2FC[1:5], 2)
   expect_true(all.equal(Lfc2Mean, Lfc2Mean0))
             

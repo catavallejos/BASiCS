@@ -262,8 +262,10 @@ BASiCS_TestDE <- function(Chain1,
   # With offset correction
   if (Offset) {
     # Calculating iteration-specific offset
-    OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
-                    matrixStats::rowSums2(Chain2@parameters$mu)
+    # OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
+    #                matrixStats::rowSums2(Chain2@parameters$mu)
+    OffsetChain <- matrixStats::rowMedians(Chain1@parameters$mu) /
+      matrixStats::rowMedians(Chain2@parameters$mu)
     # Offset point estimate
     OffsetEst <- median(OffsetChain)
 

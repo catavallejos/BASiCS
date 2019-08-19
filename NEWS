@@ -1215,3 +1215,8 @@ after the burn-in period is over)
 
 version 1.7.5 (2019-07-30)
 - Returns to original updates for X (fixed after burn-in)
+
+version 1.7.6 (2019-08-19)
+- Offset correction within `BASiCS_TestDE` modified to use `rowMedians` 
+instead of `rowSums2`. This makes it more robust to outlier genes. 
+- Unit tests updated accordingly.
