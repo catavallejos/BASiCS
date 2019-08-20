@@ -13,20 +13,19 @@ test_that("HVG/LVG detection is correct",
   
   FreqHVG0 <- c(347,   3)
   FreqHVG <- as.vector(table(DetectHVG$Table$HVG))  
-  expect_true(all.equal(FreqHVG, FreqHVG0))
+  expect_equal(FreqHVG, FreqHVG0)
   
   FreqLVG0 <- c( 119, 231)
   FreqLVG <- as.vector(table(DetectLVG$Table$LVG))  
-  expect_true(all.equal(FreqLVG, FreqLVG0))         
+  expect_equal(FreqLVG, FreqLVG0)
 
   ProbHVG0 <- c(0.97, 0.96, 0.69, 0.68, 0.65)
   ProbHVG <- round(DetectHVG$Table$Prob[1:5], 2)
-  expect_true(all.equal(ProbHVG, ProbHVG0))
+  expect_equal(ProbHVG, ProbHVG0)
   
   ProbLVG0 <- c(0.92, 0.92, 0.92, 0.91, 0.91)
   ProbLVG <- round(DetectLVG$Table$Prob[141:145], 2)
-  expect_true(all.equal(ProbLVG, ProbLVG0))
-  
+  expect_equal(ProbLVG, ProbLVG0)  
 })
 
 test_that("HVG/LVG detection using epsilons is correct", 

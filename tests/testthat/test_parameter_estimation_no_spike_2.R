@@ -8,8 +8,8 @@ test_that("Estimates match (no-spikes)",
                                   WithBatch = TRUE)
   Data2 <- newBASiCS_Data(Counts = assay(Data1)[!isSpike(Data1),],
                           Tech = isSpike(Data1)[!isSpike(Data1)],
-                          BatchInfo = SingleCellExperiment::colData(Data1)$BatchInfo)
-  expect_true(all.equal(assay(Data1)[!isSpike(Data1),], assay(Data2)))
+                          BatchInfo = colData(Data1)$BatchInfo)
+  expect_equal(assay(Data1)[!isSpike(Data1),], assay(Data2))
 
   set.seed(16)
   Chain1 <- run_MCMC(Data1, N = 1000, Thin = 10, Burn = 500, 
@@ -25,18 +25,18 @@ test_that("Estimates match (no-spikes)",
   # Check if parameter estimates match for the first 5 genes and cells
   Mu1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "mu")[,1],3))
   Mu2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "mu")[,1],3))
-  expect_true(all.equal(Mu1, Mu2))
-            
+  expect_equal(Mu1, Mu2)
+
   Delta1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "delta")[,1],3))
   Delta2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "delta")[,1],3))
-  expect_true(all.equal(Delta1, Delta2))
-            
+  expect_equal(Delta1, Delta2)
+
   S1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "s")[,1],3))
   S2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "s")[,1],3))
-  expect_true(all.equal(S1, S2))
-  
+  expect_equal(S1, S2)
+
   Theta1 <- as.vector(round(displaySummaryBASiCS(PostSummary1, "theta")[,1],3))
   Theta2 <- as.vector(round(displaySummaryBASiCS(PostSummary2, "theta")[,1],3))
-  expect_true(all.equal(Theta1, Theta2))
+  expect_equal(Theta1, Theta2)
 })
 

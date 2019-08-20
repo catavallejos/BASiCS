@@ -22,9 +22,9 @@ test_that("Estimates match the given seed (spikes)",
 
   # Checking parameter names
   ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta")
-  expect_true(all.equal(names(Chain@parameters), ParamNames))
-  expect_true(all.equal(names(PostSummary@parameters), ParamNames))
-            
+  expect_equal(names(Chain@parameters), ParamNames)
+  expect_equal(names(PostSummary@parameters), ParamNames)
+
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(9.983,  6.903,  3.242,  5.589, 23.492)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
@@ -81,4 +81,55 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes)",
                        StoreAdapt = TRUE,
                        Start = Start, PriorParam = PriorParam)
   expect_s4_class(Chain, "BASiCS_Chain")
+})
+
+
+
+test_that("gamma is reproducible when seed is set", {
+  library("Rcpp")
+  cpp <- '
+    #include <random>
+    #include <Rcpp.h>
+    using namespace Rcpp;
+
+    std::default_random_engine generator;
+
+    // [[Rcpp::export]]
+    int getSeed() {
+      Environment globalEnv = Environment::global_env();
+      NumericVector seed = globalEnv[".Random.seed"];
+      return (mean(seed));
+    }
+
+    // [[Rcpp::export]]
+    void initGenerator() {
+      std::default_random_engine gen (getSeed());
+      generator = gen;
+    }
+
+    // [[Rcpp::export]]
+    NumericVector callRGamma(int n, double shape, double scale) {
+      NumericVector out = NumericVector(n);
+      std::gamma_distribution<double> gamma(shape, scale);
+      for (int i = 0; i < n; i++) {
+        out[i] = gamma(generator);
+      }
+      return(out);
+    }
+  '
+
+  sourceCpp(code = cpp)
+
+  initGenerator()
+
+  x1 <- callRGamma(1000, 1, 2)
+  x2 <- callRGamma(1000, 1, 2)
+  expect_false(isTRUE(all.equal(x1, x2)))
+  set.seed(42)
+  initGenerator()
+  g1 <- callRGamma(1000, 1, 2)
+  set.seed(42)
+  initGenerator()
+  g2 <- callRGamma(1000, 1, 2)
+  expect_equal(g1, g2)
 })

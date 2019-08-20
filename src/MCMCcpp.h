@@ -194,4 +194,5 @@ arma::mat HiddenBASiCS_DenoisedRates(
     int q0,
     int n);
 
+
 #endif

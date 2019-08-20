@@ -52,7 +52,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)
-
+    
     # Initialize mu using average 'normalised counts' across cells
     # and true input values for spike-in genes
     nCountsBio <- t( t(CountsBio) / (phi0 * s0) )

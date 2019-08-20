@@ -33,40 +33,40 @@ test_that("Estimates match the given seed (no-spikes)",
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta", "RefFreq")
   ParamNames1 <- c("mu", "delta", "s", "nu", "theta")
-  expect_true(all.equal(names(Chain@parameters), ParamNames))
-  expect_true(all.equal(names(PostSummary@parameters), ParamNames1))
-            
+  expect_equal(names(Chain@parameters), ParamNames)
+  expect_equal(names(PostSummary@parameters), ParamNames1)
+
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(9.625, 14.665,  6.997,  8.724, 31.469)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   MuObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                    "mu")[1:5,1],3))
-  expect_true(all.equal(MuObs, Mu))
-  expect_true(all.equal(MuObsSCE, Mu))
-            
-  Delta <- c(1.234, 0.949, 1.710, 1.414, 0.440)
-  DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
+  expect_equal(MuObs, Mu)
+  expect_equal(MuObsSCE, Mu)
+
+  Delta <- c(1.080, 1.125, 1.589, 1.272, 0.607)
+  DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary,
                                                    "delta")[1:5,1],3))
   DeltaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                    "delta")[1:5,1],3))
-  expect_true(all.equal(DeltaObs, Delta))
-  expect_true(all.equal(DeltaObsSCE, Delta))
-  
-  S <- c(1.387, 1.552, 0.610, 2.184, 1.457)
+  expect_equal(DeltaObs, Delta)
+  expect_equal(DeltaObsSCE, Delta)
+
+  S <- c(0.641, 1.277, 0.241, 0.631, 1.264)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   SObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                   "s")[1:5,1],3))
-  expect_true(all.equal(SObs, S))
-  expect_true(all.equal(SObsSCE, S))
-  
-  Theta <- c(0.120, 0.109)
+  expect_equal(SObs, S)
+  expect_equal(SObsSCE, S)
+
+  Theta <- c(0.187, 0.313)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[,1],3))
   ThetaObsSCE <- as.vector(round(displaySummaryBASiCS(PostSummarySCE,
                                                       "theta")[,1],3))
-  expect_true(all.equal(ThetaObs, Theta))
-  expect_true(all.equal(ThetaObsSCE, Theta))
-  
-  # Obtaining denoised counts   
+  expect_equal(ThetaObs, Theta)
+  expect_equal(ThetaObsSCE, Theta)
+
+  # Obtaining denoised counts
   set.seed(2018)
   DC <- BASiCS_DenoisedCounts(Data, Chain)
   set.seed(2018)
@@ -75,9 +75,9 @@ test_that("Estimates match the given seed (no-spikes)",
   DCcheck0 <- c(31.007, 21.633,  7.211,  3.605, 63.456)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   DCSCEcheck <- as.vector(round(DCSCE[1:5,1], 3))
-  expect_true(all.equal(DCcheck, DCcheck0))
-  expect_true(all.equal(DCSCEcheck, DCcheck0))
-  
+  expect_equal(DCcheck, DCcheck0)
+  expect_equal(DCSCEcheck, DCcheck0)
+
   # Obtaining denoised rates
   set.seed(2018)
   DR <- BASiCS_DenoisedRates(Data, Chain)
@@ -87,8 +87,8 @@ test_that("Estimates match the given seed (no-spikes)",
   DRcheck0 <- c(2.193,  2.981, 19.924, 15.005,  5.930)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   DRSCEcheck <- as.vector(round(DRSCE[10,1:5], 3))
-  expect_true(all.equal(DRcheck, DRcheck0))
-  expect_true(all.equal(DRSCEcheck, DRcheck0))
+  expect_equal(DRcheck, DRcheck0)
+  expect_equal(DRSCEcheck, DRcheck0)
 })
 
 
