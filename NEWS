@@ -1220,3 +1220,8 @@ version 1.7.6 (2019-08-19)
 - Offset correction within `BASiCS_TestDE` modified to use `rowMedians` 
 instead of `rowSums2`. This makes it more robust to outlier genes. 
 - Unit tests updated accordingly.
+
+version 1.7.7 (2019-08-20)
+- Preliminary version of `BASiCS_CorrectOffset` has been added. This includes
+a trimmed option for the offset calculation that excludes lowly expressed genes.
+This is similar to what is implemented in `scran:::.rescale_clusters
