@@ -42,6 +42,7 @@ BASiCS_DiagPlot <- function(object,
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
                             LogY = isTRUE(y %in% c("mu", "delta")),
+                            Smooth = TRUE,
                             na.rm = TRUE) {
 
 
@@ -88,11 +89,17 @@ BASiCS_DiagPlot <- function(object,
       y = metric
     )
     ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
-      ggplot2::geom_hex( #ggplot2::aes_string(fill = "..density..")
-        ) +
-      viridis::scale_fill_viridis(name = "Count", trans = "log10") +
       sX + sY +
       ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
+    if (Smooth) {
+      g <- g +
+        ggplot2::geom_hex() +
+        viridis::scale_fill_viridis(name = "Count", trans = "log10")
+    } else {
+      g <- g +
+        ggplot2::geom_point()
+    }
+    g
   }
 }
 #' @export
