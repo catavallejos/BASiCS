@@ -2,8 +2,7 @@
 
 // Functions for regression case of BASiCS
 
-// Model matrix generation for regression
-arma::mat designMatrix(
+arma::mat designMatrixOriginal(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec const& mu,
     double const& variance)
@@ -13,22 +12,60 @@ arma::mat designMatrix(
   arma::vec myu = arma::zeros(k-2);
   myu(0) = x.min();
 
-  for(int i=1; i < myu.size(); i++) {
-    myu(i) = myu(i-1) + ran/(k-3);
+  
+  for(int i=1; i < (k - 2); i++) {
+    myu(i) = myu(i - 1) + ran / (k - 3);
   }
-  double h = (myu(1)-myu(0)) * variance;
+  double h = (myu(1) - myu(0)) * variance;
 
   // Possibly create this matrix outside
-  arma::mat X = arma::ones(x.size(),k);
+  arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
-  for(int i=0; i < k-2; i++) {
-    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
+  for(int i = 0; i < k - 2; i++) {
+    X.col(i + 2) = exp(-0.5 * pow(x - myu(i), 2) / pow(h, 2));
     //X.col(i+1) = pow(x,i+1);
   }
   return X;
 }
 
-/* Metropolis-Hastings updates of mu
+
+// estimate GRBF locations
+arma::vec estimateRBFLocations(
+    arma::vec const& mu,
+    int const& k)
+{
+  arma::vec x = log(mu);
+  double range = x.max() - x.min();
+  arma::vec locations = arma::zeros(k - 2);
+  locations(0) = x.min();
+  
+  for (int i = 1; i < (k - 2); i++) {
+    locations(i) = locations(i - 1) + range / (k - 3);
+  }
+  return(locations);
+}
+
+// Model matrix generation for regression
+arma::mat designMatrix(
+    arma::vec const& mu, 
+    arma::vec const& locations, 
+    double const& variance) 
+{
+  arma::vec x = log(mu);
+  double h = (locations(1)-locations(0)) * variance;
+  int k = locations.size() + 2;
+  
+  // Possibly create this matrix outside
+  arma::mat X = arma::ones(x.size(), k);
+  X.col(1) = x;
+  for(int i = 0; i < k - 2; i++) {
+    X.col(i + 2) = exp(-0.5 * pow(x - locations(i), 2) / pow(h, 2));
+    //X.col(i+1) = pow(x,i+1);
+  }
+  return X;
+}
+
+/* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
 */
 arma::mat muUpdateReg(
@@ -49,7 +86,9 @@ arma::mat muUpdateReg(
     arma::vec const& beta,
     arma::mat const& X,
     double const& sigma2,
-    double variance)
+    double variance,
+    double const& mintol,
+    arma::vec const& locations)
 {
 
   /* PROPOSAL STEP */
@@ -71,11 +110,13 @@ arma::mat muUpdateReg(
   }
 
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(k, mu1, variance);
-
+  arma::mat X_mu1 = designMatrix(mu1, locations, variance);
+  //arma::mat X_mu1 = designMatrixOriginal(k, mu1, variance);
+  
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check
-  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
+  log_aux -= lambda%(pow(log(delta) - X_mu1 * beta, 2) - 
+      pow(log(delta) - X * beta, 2)) / (2 * sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
@@ -83,9 +124,11 @@ arma::mat muUpdateReg(
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
   */
-  ind = DegubInd(ind, q0, u, log_aux, mu1, 1e-3, "mu");
+  ind = DegubInd(ind, q0, u, log_aux, mu1, mintol, "mu");
   for (int i=0; i < q0; i++) {
-    if(ind(i) == 0) mu1(i) = mu0(i);
+    if(ind(i) == 0) {
+      mu1(i) = mu0(i);
+    }
   }
 
   /* OUTPUT */
@@ -127,7 +170,8 @@ arma::mat deltaUpdateReg(
     arma::vec const& lambda,
     arma::mat const& X,
     double const& sigma2,
-    arma::vec const& beta)
+    arma::vec const& beta,
+    double const& mintol)
 {
 
   /* PROPOSAL STEP */
@@ -152,18 +196,25 @@ arma::mat deltaUpdateReg(
   // REGRESSION RELATED FACTOR
   // The next lines are equivalent; second one a is simplified version
   //  log_aux -= lambda%(pow(log(delta1)-X*beta,2) - pow(log(delta0)-X*beta,2))/(2*sigma2);
-  log_aux -= lambda%(pow(log(delta1),2)-pow(log(delta0),2) -
-    2*(log(delta1)-log(delta0))%(X*beta))/(2*sigma2);
+  log_aux -= lambda % 
+    (
+      pow(log(delta1), 2) - pow(log(delta0), 2) -
+      2 * (log(delta1) - log(delta0)) % 
+      (X * beta)
+    ) / 
+    (2 * sigma2);
 
   /* CREATING OUTPUT VARIABLE & DEBUG
   * Proposed values are automatically rejected in the following cases:
   * - If smaller than 1e-3
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */
-  ind = DegubInd(ind, q0, u, log_aux, delta1, 1e-3, "delta");
-  for (int i=0; i < q0; i++) {
-    if(ind(i) == 0) delta1(i) = delta0(i);
+  */    
+  ind = DegubInd(ind, q0, u, log_aux, delta1, mintol, "delta");
+  for (int i = 0; i < q0; i++) {
+    if (ind(i) == 0) {
+      delta1(i) = delta0(i);
+    }
   }
 
   // OUTPUT

@@ -1,11 +1,35 @@
+HiddenCheckThresholds <- function(Epsilon, ProbThreshold, EFDR, suffix) {
+  
+  if (Epsilon < 0 | !is.finite(Epsilon)) {
+    stop(paste0("'Epsilon", suffix, "' must be a positive real value"))
+  }
+  if (!is.null(ProbThreshold)) {
+    if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
+      stop(paste0("'ProbThreshold", suffix, "' must be contained in (0,1) \n"))
+    }
+  }
+  if (!is.null(EFDR)) {
+    if(EFDR < 0 | EFDR > 1 | !is.finite(EFDR)) {
+      stop(paste0("'EFDR_", suffix, "' must be contained in (0,1) \n"))
+    }
+  }
+  if(is.null(EFDR) & is.null(ProbThreshold)) {
+    stop(paste0("A value for 'EFDR_", suffix, "' or 'ProbThreshold", suffix, 
+                "' must be provided \n"))  
+  }
+}
+
 HiddenHeaderTest_DE <- function(Chain1,
                                 Chain2,
                                 EpsilonM,
                                 EpsilonD,
+                                EpsilonR,
                                 EFDR_M,
                                 EFDR_D,
+                                EFDR_R,
                                 ProbThresholdM,
                                 ProbThresholdD,
+                                ProbThresholdR,
                                 OrderVariable,
                                 GroupLabel1,
                                 GroupLabel2,
@@ -31,13 +55,6 @@ HiddenHeaderTest_DE <- function(Chain1,
     stop("The  'BASiCS_Chain' objects contain genes in different order.")
   }
 
-  if (EpsilonM < 0 | !is.finite(EpsilonM)) {
-    stop("'EpsilonM' must be a positive real value")
-  }
-  if (EpsilonD < 0 | !is.finite(EpsilonD)) {
-    stop("'EpsilonD' must be a positive real value")
-  }
-
   if (!is.logical(Plot) | length(Plot) != 1) {
     stop("Please insert TRUE or FALSE for 'Plot' parameter")
   }
@@ -52,29 +69,14 @@ HiddenHeaderTest_DE <- function(Chain1,
     stop("'OffSet' is no longer a valid argument. Use 'Offset' instead.\n")
   }
 
-  if (!is.null(ProbThresholdM)) {
-    if (ProbThresholdM < 0 | ProbThresholdM > 1 | !is.finite(ProbThresholdM)) {
-      stop("'ProbThresholdM' must be contained in (0,1) \n
-           For automatic threshold search use ProbThresholdM = NULL.")
-    }
+  # Checks valid threshold input values
+  HiddenCheckThresholds(EpsilonM, ProbThresholdM, EFDR_M, suffix = "M")
+  HiddenCheckThresholds(EpsilonD, ProbThresholdD, EFDR_D, suffix = "D")
+  if (!is.null(Chain1@parameters$epsilon)) {
+    HiddenCheckThresholds(EpsilonR, ProbThresholdR, EFDR_R, suffix = "R")  
   }
-  if (!is.null(ProbThresholdD)) {
-    if (ProbThresholdD < 0 | ProbThresholdD > 1 | !is.finite(ProbThresholdD)) {
-      stop("'ProbThresholdD' must be contained in (0,1) \n
-           For automatic threshold search use ProbThresholdD = NULL.")
-    }
-  }
-
-  if (!is.null(EFDR_M) | !is.null(EFDR_D)) {
-    if (EFDR_M < 0 | EFDR_M > 1 | !is.finite(EFDR_M)) {
-      stop("'EFDR_M' must be contained in (0,1). \n")
-    }
-    if (EFDR_D < 0 | EFDR_D > 1 | !is.finite(EFDR_D)) {
-      stop("'EFDR_D' must be contained in (0,1). \n")
-    }
-  }
-
-  if (!(OrderVariable %in% c("GeneIndex", "GeneName", "Prob"))) {
+  
+  if (!(OrderVariable %in% c("GeneIndex", "GeneName", "Mu"))) {
     stop("Invalid 'OrderVariable' value")
   }
   if (!is.character(GroupLabel1) | length(GroupLabel1) > 1) {
@@ -92,13 +94,13 @@ HiddenHeaderTest_DE <- function(Chain1,
     stop("Invalid value for 'GenesSelect'")
   }
 
-  if (!is.null(ProbThresholdM)) {
-    message("A value has been provided for `ProbThresholdM` \n",
-            "EFDR will not be calibrated in differential mean test. \n")
-  }
+#  if (!is.null(ProbThresholdM)) {
+#    message("A value has been provided for `ProbThresholdM` \n",
+#            "EFDR will not be calibrated in differential mean test. \n")
+#  }
 
-  if (!is.null(ProbThresholdD)) {
-    message("A value has been provided for `ProbThresholdD` \n",
-            "EFDR will not be calibrated in differential over-dispersion test. \n")
-  }
+#  if (!is.null(ProbThresholdD)) {
+#    message("A value has been provided for `ProbThresholdD` \n",
+#            "EFDR will not be calibrated in differential over-dispersion test. \n")
+#  }
 }

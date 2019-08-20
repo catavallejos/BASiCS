@@ -1,15 +1,14 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.5.2
-Date: : 2018-10-21
+Version: 1.7.7
+Date: : 2019-07-30
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
-        email="cnvallej@uc.cl"), person("Nils", "Eling", 
-        role=c("aut"), email="eling@ebi.ac.uk"), 
-        person("Alan", "O'Callaghan", role = c("ctb")),
+        email="cnvallej@uc.cl"), 
+        person("Nils", "Eling", role=c("aut")), 
+        person("Alan", "O'Callaghan", role = c("aut")),
         person("Sylvia", "Richardson", role = c("ctb")), 
         person("John", "Marioni", role=c("ctb"))) 
-Maintainer: Catalina A. Vallejos <cnvallej@uc.cl>, Nils Eling <eling@ebi.ac.uk>
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  heterogeneity in gene expression levels in seemingly homogeneous populations 
  of cells. However, these experiments are prone to high levels of technical 
@@ -35,33 +34,38 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  mean/over-dispersion trend. 
 License: GPL (>= 2)
 Depends:
-    R (>= 3.5),
-    SingleCellExperiment,
-    KernSmooth,
-    ggplot2
+    R (>= 3.6),
+    SingleCellExperiment
 Imports:
+    Biobase,
     BiocGenerics, 
-    methods, 
     coda, 
+    cowplot,
     data.table,
+    ggExtra,
+    ggplot2,
     graphics, 
     grDevices,
+    KernSmooth,
     MASS, 
     matrixStats, 
+    methods, 
     Rcpp (>= 0.11.3), 
     S4Vectors, 
     scran, 
     stats,
-    SummarizedExperiment, 
-    testthat, 
-    utils
+    stats4,
+    SummarizedExperiment,
+    viridis,
+    utils    
 Suggests:
     BiocStyle,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
-biocViews: Normalization, Sequencing, RNASeq, Software, 
+biocViews: ImmunoOncology, Normalization, Sequencing, RNASeq, Software, 
         GeneExpression, Transcriptomics, SingleCell, 
         DifferentialExpression, Bayesian, CellBiology, ImmunoOncology
 SystemRequirements: C++11

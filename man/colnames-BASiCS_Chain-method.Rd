@@ -19,7 +19,8 @@ Returns the labels of cell-specific BASiCS parameters
 }
 \examples{
 
-help(BASiCS_MCMC)
+data(ChainSC)
+colnames(ChainSC)
 
 }
 \author{

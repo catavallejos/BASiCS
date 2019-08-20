@@ -58,7 +58,8 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     nCountsBio <- t( t(CountsBio) / (phi0 * s0) )
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
-    mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
+    #mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
+    mu0 <- meansBio + 1
   }
   else {
     s0 <- size_scran
@@ -93,6 +94,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
     ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
     ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
+    # Convert to numeric values
+    ls.phi0 <- as.numeric(ls.phi0)
+    ls.theta0 <- as.numeric(ls.theta0)
 
     # Output list
     out <- list(mu0 = mu0, delta0 = delta0,

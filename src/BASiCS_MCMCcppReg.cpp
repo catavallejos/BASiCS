@@ -85,7 +85,11 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double sigma20, 
     double eta0, 
     NumericVector lambda0, 
-    double const& variance) 
+    double const& variance,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta) 
 {
   using arma::ones;
   using arma::zeros;
@@ -192,7 +196,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux(arma::span(0,q0-1),0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::vec locations = estimateRBFLocations(means, k);
+  arma::mat X = designMatrix(means, locations, variance);
+//  arma::mat X = designMatrixOriginal(k, means, variance);
   
   StartSampler(N);
   
@@ -221,7 +227,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
                                 BatchDesign_arma, BatchSizes,
-                                sAux, nuAux.col(0), atheta, btheta, n, nBatch);
+                                sAux, nuAux.col(0), atheta, btheta, n, 
+                                nBatch, mintol_theta);
     PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
     thetaBatch = BatchDesign_arma * thetaAux.col(0); 
     
@@ -232,8 +239,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
                         phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, 
                         y_q0, u_q0, ind_q0,
-                        k, lambdaAux, betaAux, X, sigma2Aux, variance);     
+                        k, lambdaAux, betaAux, X, sigma2Aux, 
+                        variance, mintol_mu, locations);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    
+    means = muAux(arma::span(0,q0-1),0);
+    //locations = estimateRBFLocations(means, k);
+    X = designMatrix(means, locations, variance);
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
@@ -246,7 +258,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
                               muAux.col(0), 
                               phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
-                              lambdaAux, X, sigma2Aux, betaAux);  
+                              lambdaAux, X, sigma2Aux, betaAux, mintol_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);  
     
     // UPDATE OF NU: 
@@ -256,7 +268,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           BatchDesign_arma,
                           muAux.col(0), 1/deltaAux.col(0),
                           phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
-                          y_n, u_n, ind_n); 
+                          y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
@@ -305,8 +317,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux(arma::span(0,q0-1),0);
-        X = designMatrix(k, means, variance);
+        locations = estimateRBFLocations(means, k);
       }
     }
     

@@ -6,11 +6,11 @@
 \usage{
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
   EpsilonD = log2(1.5), EpsilonR = log2(1.5)/log2(exp(1)),
-  ProbThresholdM = NULL, ProbThresholdD = NULL,
-  ProbThresholdR = NULL, OrderVariable = "GeneIndex",
-  GroupLabel1 = "Group1", GroupLabel2 = "Group2", Plot = TRUE,
-  PlotOffset = TRUE, Offset = TRUE, EFDR_M = 0.1, EFDR_D = 0.1,
-  EFDR_R = 0.1, GenesSelect = NULL, ...)
+  ProbThresholdM = 2/3, ProbThresholdD = 2/3, ProbThresholdR = 2/3,
+  OrderVariable = "GeneIndex", GroupLabel1 = "Group1",
+  GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE,
+  Offset = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, EFDR_R = 0.05,
+  GenesSelect = NULL, ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}}
@@ -32,18 +32,30 @@ changes in residual over-dispersion (must be a positive real number).
 Default value: \code{EpsilonR= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).}
 
 \item{ProbThresholdM}{Optional parameter. Probability threshold for detecting
-changes in overall expression (must be a positive value, between 0 and 1)}
+changes in overall expression (must be a positive value, between 0 and 1). 
+If \code{EFDR_M = NULL}, the posterior probability threshold for the 
+differential mean expression test will be set to \code{ProbThresholdM}. If
+a value for \code{EFDR_M} is provided, the posterior probability threshold
+is chosen to achieve an EFDR equal to \code{EFDR_M} and \code{ProbThresholdM} 
+defines a minimum probability threshold for this calibration (this avoids low 
+values of \code{ProbThresholdM} to be chosen by the EFDR calibration. 
+Default value \code{ProbThresholdM = 2/3}, i.e. the probability of observing 
+a log2-FC above \code{EpsilonM} must be at least twice the probality of 
+observing the complementary event (log2-FC below \code{EpsilonM}).}
 
 \item{ProbThresholdD}{Optional parameter. Probability threshold for detecting
-changes in cell-to-cell biological over-dispersion
-(must be a positive value, between 0 and 1)}
+changes in cell-to-cell biological over-dispersion (must be a positive value, 
+between 0 and 1). Same usage as \code{ProbThresholdM}, depending on the value
+provided for \code{EFDR_D}. Default value \code{ProbThresholdD = 2/3}.}
 
 \item{ProbThresholdR}{Optional parameter. Probability threshold for detecting
-changes in residual over-dispersion
-(must be a positive value, between 0 and 1)}
+changes in residual over-dispersion (must be a positive value, between 0 and 
+1). Same usage as \code{ProbThresholdM}, depending on the value provided for 
+\code{EFDR_R}. Default value \code{ProbThresholdR = 2/3}.}
 
 \item{OrderVariable}{Ordering variable for output.
-Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.}
+Possible values: \code{'GeneIndex'} (default), \code{'GeneName'} and 
+\code{'Mu'} (mean expression).}
 
 \item{GroupLabel1}{Label assigned to reference group.
 Default: \code{GroupLabel1 = 'Group1'}}
@@ -59,13 +71,19 @@ Default: \code{GroupLabel2 = 'Group2'}}
 previously removed from the MCMC chains). Default: \code{Offset = TRUE}.}
 
 \item{EFDR_M}{Target for expected false discovery rate related to
-the comparison of means. Default \code{EFDR_M = 0.10}.}
+the comparison of means. If \code{EFDR_M = NULL}, EFDR calibration is not
+performed and the posterior probability threshold is set equal to 
+\code{ProbThresholdM}. Default \code{EFDR_M = 0.05}.}
 
 \item{EFDR_D}{Target for expected false discovery rate related to
-the comparison of dispersions. Default \code{EFDR_D = 0.10}.}
+the comparison of dispersions. If \code{EFDR_D = NULL}, EFDR calibration is 
+not performed and the posterior probability threshold is set equal to 
+\code{ProbThresholdD}.Default \code{EFDR_D = 0.05}.}
 
 \item{EFDR_R}{Target for expected false discovery rate related to
-the comparison of residual over-dispersions. Default \code{EFDR_D = 0.10}.}
+the comparison of residual over-dispersions. If \code{EFDR_R = NULL}, EFDR 
+calibration is not performed and the posterior probability threshold is set 
+equal to \code{ProbThresholdR}.Default \code{EFDR_D = 0.05}.}
 
 \item{GenesSelect}{Optional argument to provide a user-defined list
 of genes to be considered for the comparison.

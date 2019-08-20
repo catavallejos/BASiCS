@@ -1,24 +1,34 @@
-#' @importFrom stats acf
-#' @importFrom Rcpp evalCpp
-#' @importFrom coda HPDinterval mcmc
-#' @importFrom methods Summary is new show slotNames .hasSlot
-#' @importFrom testthat context test_check
-#' @importFrom graphics abline barplot legend lines par points segments smoothScatter plot
-#' @importFrom data.table fread
-#' @importFrom S4Vectors metadata DataFrame
-#' @importFrom SummarizedExperiment assay colData assayNames 
-#' @importFrom SingleCellExperiment isSpike
-#' @importFrom stats median model.matrix rgamma rpois runif acf
-#' @importFrom utils packageVersion write.table
-#' @importFrom matrixStats rowMeans2 colMeans2 rowVars colVars colMedians rowMedians
-#' @importFrom grDevices colorRampPalette
-#' @importFrom MASS mvrnorm
-#' @importMethodsFrom BiocGenerics counts updateObject subset colnames rownames
-#' @importMethodsFrom scran computeSumFactors
 #' @useDynLib BASiCS
 #' @exportPattern "^[^\\Hidden]"
-#' @importFrom ggplot2 aes_string scale_fill_gradientn geom_point theme_minimal geom_line geom_ribbon aes aes_string geom_hex geom_line geom_point geom_ribbon ggplot
-#' @import ggplot2
-#' @import SingleCellExperiment
-#' @import KernSmooth
+#' @importFrom coda HPDinterval mcmc effectiveSize
+#' @importFrom cowplot plot_grid
+#' @importFrom data.table fread
+#' @importFrom ggplot2 aes aes_string 
+#' @importFrom ggplot2 geom_ribbon geom_segment ggplot ggtitle 
+#'                     geom_hline geom_line geom_point 
+#' @importFrom ggplot2 scale_fill_gradientn scale_x_log10 scale_y_log10 
+#'                     scale_x_continuous scale_y_continuous
+#' @importFrom ggplot2 theme_minimal theme_classic 
+#' @importFrom ggplot2 xlab ylab labs
+#' @importFrom graphics abline barplot legend lines par points segments 
+#' @importFrom graphics smoothScatter 
+#' @importFrom grDevices adjustcolor colorRampPalette
+#' @importFrom ggExtra ggMarginal
+#' @importFrom KernSmooth bkde2D
+#' @importFrom MASS mvrnorm
+#' @importFrom matrixStats colMeans2 colMedians colVars
+#' @importFrom matrixStats rowMeans2 rowMedians rowVars   
+#' @importFrom methods .hasSlot is new show slotNames Summary 
+#' @importFrom Rcpp evalCpp
+#' @importFrom S4Vectors DataFrame metadata 
+#' @importFrom stats acf median model.matrix rgamma rpois runif 
+#' @importFrom SingleCellExperiment isSpike isSpike<- counts clearSpikes
+#' @importFrom SummarizedExperiment assay assayNames  colData 
+#' @importFrom viridis scale_color_viridis scale_fill_viridis 
+#' @importFrom utils packageVersion write.table
+#' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
+#' @importMethodsFrom scran computeSumFactors
+#' @importClassesFrom Biobase Versioned
+#' @importFrom stats4 plot
 NULL
+

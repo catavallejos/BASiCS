@@ -26,8 +26,9 @@ knitr::opts_chunk$set(dev="png")
 ```
 
 ```{r library, echo=FALSE}
-library(BASiCS)
-library(BiocStyle)
+library("BASiCS")
+library("BiocStyle")
+library("SingleCellExperiment")
 ```
 
 # Introduction 
@@ -116,6 +117,11 @@ For other optional parameters refer to `help(BASiCS_MCMC)`.
 
 Here, we illustrate the usage of `BASiCS_MCMC` using a built-in 
 synthetic dataset.
+
+**NOTE: WE USE A SMALL NUMBER OF ITERATIONS FOR ILLUSTRATION PURPOSES ONLY.
+LARGER NUMBER OF ITERATIONS ARE USUALLY REQUIRED TO ACHIEVE CONVERGENCE. OUR
+RECOMMENDED SETTING IS `N=20000`, `Thin=20` and `Burn=10000`.**
+
 
 ```{r quick-start-MCMC}
 Data <- makeExampleBASiCS_Data()
@@ -233,6 +239,20 @@ slot via the `isSpike` function.
 
 Once the additional information is included, 
 the object can be used within BASiCS.
+
+NOTE: Input number of molecules for spike-in should be calculated using 
+experimental information. For each spike-in gene $i$, we use \vspace{-0.2cm} 
+
+$$ \mu_{i} = C_i \times 10^{-18} \times (6.022 \times 10^{23}) 
+\times V \times D \hspace{0.5cm} \mbox{where,} $$
+
+- $C_i$ is the concentration of the spike $i$ in the ERCC mix (see 
+[here](https://assets.thermofisher.com/TFS-Assets/LSG/manuals/cms_095046.txt))
+- $10^{-18}$ is to convert att to mol
+- $6.022 \times 10^{23}$ is the Avogadro number (mol $\rightarrow$ molecule)
+- $V$ is the volume added into each chamber (**in microlitres**)
+- $D$ is a dilution factor
+
 
 ### Without spike-in genes
 

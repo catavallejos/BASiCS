@@ -108,6 +108,7 @@
 #' @examples
 #'
 #' # Built-in simulated dataset
+#' set.seed(1) 
 #' Data <- makeExampleBASiCS_Data()
 #' # To analyse real data, please refer to the instructions in:
 #' # https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation
@@ -123,6 +124,7 @@
 #'
 #' # To run the non-spike version BASiCS requires the data to contain at least
 #' # 2 batches:
+#' set.seed(2)
 #' Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 10, Regression = TRUE,
 #'                      PrintProgress = FALSE, WithSpikes = FALSE)
@@ -170,33 +172,13 @@
 #' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x',
 #'      SmoothPlot = TRUE)
 #'
-#' # Highly and lowly variable genes detection (within a single group of cells)
-#' DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60,
-#'                               EFDR = 0.10, Plot = TRUE)
-#' DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40,
-#'                               EFDR = 0.10, Plot = TRUE)
-#'
-#' plot(ChainSummary, Param = 'mu', Param2 = 'delta', log = 'x', col = 8)
-#' with(DetectHVG$Table, points(Mu[HVG], Delta[HVG],
-#'        pch = 16, col = 'red', cex = 1))
-#' with(DetectLVG$Table, points(Mu[LVG], Delta[LVG],
-#'        pch = 16, col = 'blue', cex = 1))
-#'
-#' # If variance thresholds are not fixed
-#' BASiCS_VarThresholdSearchHVG(ChainSC,
-#'                              VarThresholdsGrid = seq(0.55,0.65,by=0.01),
-#'                              EFDR = 0.10)
-#' BASiCS_VarThresholdSearchLVG(ChainSC,
-#'                              VarThresholdsGrid = seq(0.35,0.45,by=0.01),
-#'                              EFDR = 0.10)
-#'
 #' # To obtain denoised rates / counts, see:
-#' help(BASiCS_DenoisedRates)
-#' help(BASiCS_DenoisedCounts)
+#' # help(BASiCS_DenoisedRates)
+#' # and
+#' # help(BASiCS_DenoisedCounts)
 #'
 #' # For examples of differential analyses between 2 populations of cells see:
-#' help(BASiCS_TestDE)
-#'
+#' # help(BASiCS_TestDE)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
@@ -208,104 +190,36 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
-                        WithSpikes = TRUE, ...)
+BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
 {
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
-  # If data contains spike-ins
-  if (!is.null(SingleCellExperiment::isSpike(Data))) {
-    q <- nrow(Data)
-    q.bio <- sum(!SingleCellExperiment::isSpike(Data))
-    spikes <- SingleCellExperiment::isSpike(Data)
-    BioCounts <- counts(Data)[!spikes, ]
-  }
-  else {
-    BioCounts <- counts(Data)
-    q.bio <- q <- nrow(Data)
-    spikes <- rep(FALSE, q)
-  }
+  # Numbers of cells/genes/batches + count table + design matrix for batch
+  GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
 
-  n <- dim(counts(Data))[2]
-
-  # If Data contains batches
-  if (!is.null(colData(Data)$BatchInfo)){
-    nBatch <- length(unique(colData(Data)$BatchInfo))
-  }
-  else {
-    nBatch <- 1
-  }
-
+  # Total counts per cell and/or gene
   sum.bycell.all <- matrixStats::rowSums2(counts(Data))
   sum.bygene.all <- matrixStats::colSums2(counts(Data))
+  sum.bycell.bio <- matrixStats::rowSums2(GPar$BioCounts)
+  sum.bygene.bio <- matrixStats::colSums2(GPar$BioCounts)
 
-  sum.bycell.bio <- matrixStats::rowSums2(BioCounts)
-  sum.bygene.bio <- matrixStats::colSums2(BioCounts)
-
-  # Assignment of default values
+  # Assignment of optional parameters (default values if input not provided)
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,
                                          Burn,
-                                         n,
+                                         GPar,
                                          Regression,
-                                         WithSpikes = WithSpikes,
+                                         WithSpikes,
                                          ...)
-  AR <- ArgsDef$AR
-  StopAdapt <- ArgsDef$StopAdapt
-  StoreChains <- ArgsDef$StoreChains
-  StoreAdapt <- ArgsDef$StoreAdapt
-  StoreDir <- ArgsDef$StoreDir
-  RunName <- ArgsDef$RunName
-  PrintProgress <- ArgsDef$PrintProgress
-  PriorParam <- ArgsDef$PriorParam
-  PriorDeltaNum <- ArgsDef$PriorDeltaNum
-  PriorDelta <- ArgsDef$PriorDelta
-  k <- ArgsDef$k
-  variance <- ArgsDef$variance
+  # Starting values for the MCMC (parameters and adaptive variances)
+  # Loaded separately to simplify calling to the elements of its list
+  # Same for prior parameters
   Start <- ArgsDef$Start
-  StochasticRef <- ArgsDef$StochasticRef
-  ConstrainType <- ArgsDef$ConstrainType
-  ConstrainProp <- ArgsDef$ConstrainProp
-
-  # Starting values for MCMC chains
-  mu0 <- as.vector(Start$mu0)[!spikes]
-  delta0 <- as.vector(Start$delta0)
-  phi0 <- as.vector(Start$phi0)
-  s0 <- as.vector(Start$s0)
-  nu0 <- as.vector(Start$nu0)
-  theta0 <- as.numeric(Start$theta0)
-
-
-  # Starting values for adaptive proposal variances
-  ls.mu0 <- as.vector(Start$ls.mu0)
-  ls.delta0 <- as.vector(Start$ls.delta0)
-  ls.phi0 <- as.numeric(Start$ls.phi0)
-  ls.nu0 <- as.vector(Start$ls.nu0)
-  ls.theta0 <- as.numeric(Start$ls.theta0)
-
-  # Starting values for Regression
-  if (Regression) {
-      beta0 <- Start$beta0
-      sigma20 <- Start$sigma20
-      lambda0 <- Start$lambda0
-  }
-
-  # Parameters associated to the presence of batches
-  if(nBatch > 1) {
-    BatchDesign <- model.matrix(~as.factor(colData(Data)$BatchInfo) - 1)  
-    BatchInfo <- as.numeric(as.factor(colData(Data)$BatchInfo))
-  } 
-  else { 
-    # If there are no batches or the user asked to ignore them
-    BatchDesign <- matrix(1, nrow = n, ncol = 1)
-    BatchInfo <- rep(1, times = n)
-    nBatch <- 1
-  }
+  PriorParam <- ArgsDef$PriorParam
 
   # If spikes are available
   if (WithSpikes) {
-    SpikeInput <- metadata(Data)$SpikeInput
 
     # If regression case is chosen
     if (Regression) {
@@ -314,48 +228,52 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 N,
                 Thin,
                 Burn,
-                as.matrix(BioCounts),
-                BatchDesign,
-                SpikeInput,
-                mu0,
-                delta0,
-                phi0,
-                s0,
-                nu0,
-                rep(theta0, nBatch),
+                GPar$BioCounts,
+                GPar$BatchDesign,
+                metadata(Data)$SpikeInput,
+                Start$mu0,
+                Start$delta0,
+                Start$phi0,
+                Start$s0,
+                Start$nu0,
+                rep(Start$theta0, GPar$nBatch),
                 PriorParam$s2.mu,
                 PriorParam$p.phi,
                 PriorParam$a.s,
                 PriorParam$b.s,
                 PriorParam$a.theta,
                 PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.phi0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.phi0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, GPar$nBatch),
                 sum.bycell.all,
                 sum.bycell.bio,
                 sum.bygene.all,
                 sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress),
-                k,
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
+                ArgsDef$k,
                 PriorParam$m,
                 PriorParam$V,
                 PriorParam$a.sigma2,
                 PriorParam$b.sigma2,
-                beta0,
-                sigma20,
+                Start$beta0,
+                Start$sigma20,
                 PriorParam$eta,
-                lambda0,
-                variance))
+                Start$lambda0,
+                ArgsDef$variance,
+                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_delta,
+                ArgsDef$mintol_nu,
+                ArgsDef$mintol_theta))
 
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {
@@ -364,106 +282,99 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
                 N,
                 Thin,
                 Burn,
-                as.matrix(BioCounts),
-                BatchDesign,
-                SpikeInput,
-                mu0,
-                delta0,
-                phi0,
-                s0,
-                nu0,
-                rep(theta0, nBatch),
+                GPar$BioCounts,
+                GPar$BatchDesign,
+                metadata(Data)$SpikeInput,
+                Start$mu0,
+                Start$delta0,
+                Start$phi0,
+                Start$s0,
+                Start$nu0,
+                rep(Start$theta0, GPar$nBatch),
                 PriorParam$s2.mu,
                 PriorParam$a.delta,
                 PriorParam$b.delta,
                 PriorParam$s2.delta,
-                PriorDeltaNum,
+                ArgsDef$PriorDeltaNum,
                 PriorParam$p.phi,
                 PriorParam$a.s,
                 PriorParam$b.s,
                 PriorParam$a.theta,
                 PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.phi0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.phi0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, GPar$nBatch),
                 sum.bycell.all,
                 sum.bycell.bio,
                 sum.bygene.all,
                 sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress)))
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
+                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_delta,
+                ArgsDef$mintol_nu,
+                ArgsDef$mintol_theta))
     }
   }
   else {
-#    # If spikes are not available
-#    message("-------------------------------------------------------------\n",
-#            "IMPORTANT: this code is under development. DO NOT USE \n",
-#            "This part of the code is just a place-holder \n",
-#            "-------------------------------------------------------------\n")
-    # Definition of parameters that are specific to the no-spikes case
-    NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
-      as.matrix(BioCounts),
-      ConstrainType,
-      StochasticRef, q.bio, mu0, PriorDelta, ConstrainProp)
-    ConstrainGene <- NoSpikesParam$ConstrainGene
-    NotConstrainGene <- NoSpikesParam$NotConstrainGene
-    Constrain <- NoSpikesParam$Constrain
-    RefGenes <- NoSpikesParam$RefGenes; RefGene <- NoSpikesParam$RefGene
-    Index <- seq_len(q.bio) - 1
-
+    # If spikes are not available
     if (Regression) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(
                 N,
                 Thin,
                 Burn,
-                as.matrix(BioCounts),
-                BatchDesign,
-                mu0,
-                delta0,
-                s0,
-                nu0,
-                rep(theta0, nBatch),
+                GPar$BioCounts,
+                GPar$BatchDesign,
+                Start$mu0,
+                Start$delta0,
+                Start$s0,
+                Start$nu0,
+                rep(Start$theta0, GPar$nBatch),
                 PriorParam$s2.mu,
                 PriorParam$a.s,
                 PriorParam$b.s,
                 PriorParam$a.theta,
                 PriorParam$b.theta,
-                AR,
-                ls.mu0,
-                ls.delta0,
-                ls.nu0,
-                rep(ls.theta0, nBatch),
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, GPar$nBatch),
                 sum.bycell.bio,
                 sum.bygene.bio,
-                as.numeric(StoreAdapt),
-                StopAdapt,
-                as.numeric(PrintProgress),
-                k,
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
+                ArgsDef$k,
                 PriorParam$m,
                 PriorParam$V,
                 PriorParam$a.sigma2,
                 PriorParam$b.sigma2,
-                beta0,
-                sigma20,
+                Start$beta0,
+                Start$sigma20,
                 PriorParam$eta,
-                lambda0,
-                variance,
-                Constrain,
-                Index,
-                RefGene,
-                RefGenes,
-                ConstrainGene,
-                NotConstrainGene,
-                ConstrainType,
-                as.numeric(StochasticRef)))
+                Start$lambda0,
+                ArgsDef$variance,
+                ArgsDef$Constrain,
+                ArgsDef$Index,
+                ArgsDef$RefGene,
+                ArgsDef$RefGenes,
+                ArgsDef$ConstrainGene,
+                ArgsDef$NotConstrainGene,
+                ArgsDef$ConstrainType,
+                as.numeric(ArgsDef$StochasticRef), 
+                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_delta,
+                ArgsDef$mintol_nu,
+                ArgsDef$mintol_theta))
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(BioCounts > 0, 1, 0)) > 1
+      AtLeast2Cells <- matrixStats::rowSums2(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {
@@ -472,56 +383,60 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
         N,
         Thin,
         Burn,
-        as.matrix(BioCounts),
-        BatchDesign,
-        mu0,
-        delta0,
-        s0,
-        nu0,
-        rep(theta0, nBatch),
+        GPar$BioCounts,
+        GPar$BatchDesign,
+        Start$mu0,
+        Start$delta0,
+        Start$s0,
+        Start$nu0,
+        rep(Start$theta0, GPar$nBatch),
         PriorParam$s2.mu,
         PriorParam$a.delta,
         PriorParam$b.delta,
         PriorParam$s2.delta,
-        PriorDeltaNum,
+        ArgsDef$PriorDeltaNum,
         PriorParam$a.s,
         PriorParam$b.s,
         PriorParam$a.theta,
         PriorParam$b.theta,
-        AR,
-        ls.mu0,
-        ls.delta0,
-        ls.nu0,
-        rep(ls.theta0, nBatch),
+        ArgsDef$AR,
+        Start$ls.mu0,
+        Start$ls.delta0,
+        Start$ls.nu0,
+        rep(Start$ls.theta0, GPar$nBatch),
         sum.bycell.bio,
         sum.bygene.bio,
-        as.numeric(StoreAdapt),
-        StopAdapt,
-        as.numeric(PrintProgress),
-        Constrain,
-        Index,
-        RefGene,
-        RefGenes,
-        ConstrainGene,
-        NotConstrainGene,
-        ConstrainType,
-        as.numeric(StochasticRef)))
+        as.numeric(ArgsDef$StoreAdapt),
+        ArgsDef$StopAdapt,
+        as.numeric(ArgsDef$PrintProgress),
+        ArgsDef$Constrain,
+        ArgsDef$Index,
+        ArgsDef$RefGene,
+        ArgsDef$RefGenes,
+        ArgsDef$ConstrainGene,
+        ArgsDef$NotConstrainGene,
+        ArgsDef$ConstrainType,
+        as.numeric(ArgsDef$StochasticRef),
+        ArgsDef$mintol_mu, 
+        ArgsDef$mintol_delta,
+        ArgsDef$mintol_nu,
+        ArgsDef$mintol_theta))
     }
   }
 
   # Format column names of MCMC chains
-  colnames(Chain$mu) <- colnames(Chain$delta) <- rownames(BioCounts)
+  colnames(Chain$mu) <- colnames(Chain$delta) <- rownames(GPar$BioCounts)
   if (Regression) {
     colnames(Chain$epsilon) <- colnames(Chain$mu)
     Chain$lambda <- NULL # Remove to reduce storage
   }
-  CellLabels <- paste0(colnames(counts(Data)), "_Batch", BatchInfo)
+  CellLabels <- paste0(colnames(counts(Data)), "_Batch", GPar$BatchInfo)
   colnames(Chain$s) <- CellLabels
   if (WithSpikes) {
     colnames(Chain$phi) <- CellLabels
   }
   colnames(Chain$nu) <- CellLabels
-  colnames(Chain$theta) <- paste0("Batch", unique(BatchInfo))
+  colnames(Chain$theta) <- paste0("Batch", unique(GPar$BatchInfo))
 
   message("-------------------------------------------------------------\n",
           "MCMC running time \n",
@@ -535,26 +450,26 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression,
           "-------------------------------------------------------------\n")
 
   # Convert output into a `BASiCS_Chain` object
-  ChainClass <- newBASiCS_Chain(parameters = Chain)
+  ChainClass <- newBASiCS_Chain(parameters = Chain[!grepl("ls.", names(Chain))])
 
   # Store chain and/or adaptive variances
   HiddenBASiCS_MCMC_OutputStore(ChainClass,
                                 Chain,
-                                StoreChains,
-                                StoreAdapt,
-                                StoreDir,
-                                RunName)
+                                ArgsDef$StoreChains,
+                                ArgsDef$StoreAdapt,
+                                ArgsDef$StoreDir,
+                                ArgsDef$RunName)
 
   # Store reference gene information (no spikes case only)
   if (!WithSpikes) {
-    if (StoreChains)
+    if (ArgsDef$StoreChains)
       HiddenBASiCS_MCMC_RefFreqStore(Data,
                                      Chain,
-                                     RefGene,
-                                     RefGenes,
-                                     ConstrainType,
-                                     StoreDir,
-                                     RunName)
+                                     ArgsDef$RefGene,
+                                     ArgsDef$RefGenes,
+                                     ArgsDef$ConstrainType,
+                                     ArgsDef$StoreDir,
+                                     ArgsDef$RunName)
   }
   else {
     message("-------------------------------------------------------------\n",

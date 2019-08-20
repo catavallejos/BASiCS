@@ -1039,3 +1039,186 @@ version 1.5.1: (2018-11-29)
 version 1.5.2: (2018-12-01)
 - Fixes use of `BatchInfo` when it cannot be parsed to numeric
 - Refactors the use of `...` argument (several functions)
+
+version 1.5.3: (2018-12-06)
+- Removes `...` argument from `BASiCS_VarianceDecomp`
+- Adds missing argument (`beside`) to documentation of `BASiCS_VarianceDecomp`
+
+version 1.5.4: (2019-02-12)
+- Replaces `HPDinterval` by `coda::HPDinterval` in `BASiCS_showFit` method
+- Same as above when calling `mcmc`
+- Changes `BASiCS_showFit` such that fit line is on top of the dots
+- Additional optional arguments (`markExcludedGenes`, `colour`, `GenesSel` and
+`colourGenesSel`) added to `BASiCS_showFit` for more flexibility 
+
+version 1.5.5: (2019-03-14)
+- Updated vignette to include recommended settings earlier. 
+
+version 1.5.6: (2019-03-20) - merge from RELEASE_3_8 branch
+- Bug fix when not providing BatchInfo as factor
+- Extra check if batch names contain spaces
+- Added line breaks after individual error messages 
+- Bug fix that corrects for the number of factors in BatchInfo vector
+- Small bug fix in 'test_mcmc_arguments.R'
+
+version 1.5.7: (2019-03-22)
+- Added default value for 'BatchInfo' within 'BASiCS_MCMC'
+
+version 1.5.8: (2019-03-22)
+- Changes DESCRIPTION to have a single maintainer
+- Density plot added to plot Method for BASiCS_Chain objects
+- Output plots for plot Method for BASiCS_Chain objects
+
+version 1.5.9: (2019-03-24)
+- Alan O'Callaghan is now author
+- `diagPlot` and `diagHist` methods added to facilitate diagnosis of convergence 
+and mixing for MCMC chains
+- Added explicit calls to `ggplot2` in plot methods. 
+- `BASiCS_DetectHVG` and `BASiCS_DetectLVG` edited based on the "regression"
+approach (i.e. using epsilon to detect HVGs/LVGs). 
+- In `BASiCS_DetectHVG` and `BASiCS_DetectLVG`, options for `OrderVariable` 
+were simplified (only original order and based on probability)
+- Temporary changes in no-spikes version have been restored
+
+version 1.5.10 (2019-03-26)
+- Corrected ordering in TestDE outpout so that genenames always match
+- Small fixes for R CMD check
+- Ordering in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` can only be done on
+GeneNames, GeneIndex and Prob
+
+version 1.5.11 (2019-03-26)
+- Edits in BASiCS_Package.R so that `roxygen2` creates `NAMESPACE`
+- `testthat` moved from Imports to Suggests
+
+version 1.5.12 (2019-03-26)
+- R (>= 3.6) is now a requirement
+
+version 1.5.13 (2019-03-27)
+- `BASiCS_D_TestDE` from deprecated to defunct (follows BioC guidelines)
+
+version 1.5.14 (2019-03-27)
+- Brackets removed from `setGeneric` call (as per Hadley Wickham recommendation)
+- Removes full import of `ggplot2` in `BASiCS_Package.R`
+- `BASiCS_Package.R` is now in alphabetical order
+
+version 1.5.15 (2019-03-27)
+- Extended message to suggest additional QC when MCMC sampler fails
+
+version 1.5.16 (2019-03-30)
+- `SingleCellExperiment` moved to depends (DESCRIPTION)
+- Explicit calls to external packages (e.g. `SingleCellExperiment::`)
+- Unit tests for `BASiCS_diagHist` and `BASiCS_diagPlot`
+- `BASiCS_diagHist`, `BASiCS_diagPlot` and `BASiCS_showFit` moved from
+methods to functions
+- Internal functions marked as 'Hidden'
+- `BASiCS_diagHist`, etc moved into separate .R files
+
+version 1.5.17 (2019-03-30)
+- Minor changes in dependencies to pass R CMD check
+- Minor typo fix in documentation of `newBASiCS_Data`
+- `@export` call added to all methods
+
+version 1.5.19 (2019-03-31)
+- `stats4` added to imports in order to import `plot` S4 generic.
+- `KernSmooth` removed from DESCRIPTION.
+- Maintainer field removed from DESCRIPTION (use Author@R only)
+- Updates to travis integration to include BiocCheck
+
+version 1.5.20 (2019-04-01)
+- Updated documentation for `BASiCS_MCMC`, `BASiCS_DetectHVG`, 
+`BASiCS_DetectLVG` and `BASiCS_VarThresholdSearchHVG_LVG`
+
+version 1.5.21 (2019-04-01)
+- Uses built-in chain in examples for `BASiCS_diagHist` and `BASiCS_diagPlot`
+
+version 1.5.22 (2019-04-02)
+- `HiddenCheckValidCombination`, `HiddenGeneParams` and `HiddenGeneParams`
+moved from `Methods.R` to `HiddenUtils.R`
+- `sapply` replaced by `vapply` in `HiddenCheckValidCombination`,  
+`HiddenThresholdSearchDetectHVL_LVG.R` and `HiddenThresholdSearchTestDE.R`
+- Use of `set.seed` removed from `makeExampleBASiCS_Data` 
+- Unit tests updated accordingly
+- Adds missing running examples to Rds in order to pass R CMD BioCheck
+
+version 1.5.23 (2019-04-02)
+- Minor edit to the documentation of `makeExampleBASiCS_Data` (explain why
+a fixed seed is no longer used)
+
+version 1.5.24 (2019-04-05)
+- Minor edit to the documentation of `makeExampleBASiCS_Data` (fixed link to 
+`set.seed` documentation as it led to WARNINGS in Bioc-devel)
+
+version 1.5.25 (2019-04-07)
+- Minor change in `muUpdateNoSpikes` (C++ function in `utils_MCMCNoSpikes.cpp`)
+to avoid WARNINGS in bioc-devel related to integers vs unsigned integers
+
+version 1.5.26 (2019-04-08)
+- Similar changes applied to `utils_MCMCcppReg.cpp` and
+`utils_MCMCcppRegNoSpikes.cpp`.
+
+version 1.5.27 (2019-04-08)
+- Edits `BASiCS_TestDE` to avoid low posterior probability thresholds derived 
+from the EFDR calibration. This alters some of the related 'Hidden' functions. 
+- In `BASiCS_TestDE`, default values for `EFDR_M`, `EFDR_D` and `EFDR_R` 
+were changed to 0.05. 
+- Unit tests updated accordingly
+
+version 1.5.28 (2019-04-09)
+- Edited version of `BASiCS_Sim` to allow no spikes and multiple batches
+- Documentation updated accordingly
+
+version 1.5.29 (2019-04-10)
+- Unit test associated to `BASiCS_Sim` updated to use a fixed seed and to
+check exact values being reproducible
+
+version 1.5.30 (2019-04-11)
+- `BASiCS_effectiveSize` has been created as a wrapper of `coda::effectiveSize`.
+This is to resolve issues when `Param = 'epsilon'` as it contains `NA` for very
+lowly expressed genes that are excluded from the mean/over-dispersion trend.
+
+version 1.5.31 (2019-04-15)
+- Updated vignette to include ERCC calculation
+
+version 1.5.32 (2019-04-17)
+- Minor change in `BASiCS_MCMC` to avoid storing adaptive variances in the
+`BASiCS_Chain` object when `StoreAdapt = TRUE`. 
+- New unit test to ensure the correct output in `BASiCS_Chain@parameters`
+- Minor change in `Summary` method for `BASiCS_Chain` class to avoid calculating 
+posterior summaries when `designMatrix` is part of the `parameters` slot
+- Added `return` to the docummentation of `BASiCS_effectiveSize`. 
+
+version 1.5.33 (2019-04-19)
+- Updated ERCC formula in the vignette.
+
+version 1.5.34 (2019-04-20)
+- Fixes typo in vignette
+
+version 1.7.1 (2019-07-27)
+- `is_true` deprecated in `testthat`. Unit tests updated to use `expect_true`
+
+version 1.7.2 (2019-07-28)
+- Specific minimum tolerance thresholds (e.g. 1e-3 for mu updates) replaced by
+global parameters (e.g. `mintol_mu`). Optional parameters; internal use only. 
+Incorporated within `HiddenBASiCS_MCMC_ExtraArgs`. 
+- General clean up to remove code redundancy in `BASiCS_MCMC`
+- `HiddenBASiCS_MCMC_GlobalParams` created to facilitate clean-up above
+
+version 1.7.3 (2019-07-29)
+- Minor typo fixed in `BASiCS_MCMC`.
+
+version 1.7.4 (2019-07-30)
+- Show method for regression objects now correctly shows number of cells.
+- `HiddenBASiCS_MCMCcppReg` and `HiddenBASiCS_MCMCcppRegNoSpikes` (C++ code)
+modified to update design matrix throughout MCMC (GRBF locations remain fixed
+after the burn-in period is over)
+- Unit tests updated accordingly. 
+
+version 1.7.5 (2019-07-30)
+- Returns to original updates for X (fixed after burn-in)
+
+version 1.7.6 (2019-07-30)
+- `estimateRBFLocations` added to cpp code to separate the 
+estimation of locations and the design matrix update (unit test update is not required).
+
+version 1.7.7 (2019-07-30) - WIP
+- added update of locations (up to burn-in), but X updated always  - WIP
