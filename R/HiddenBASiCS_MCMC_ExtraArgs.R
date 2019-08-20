@@ -43,7 +43,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                           V = PriorParam$V,
                                           a.sigma2 = PriorParam$a.sigma2,
                                           b.sigma2 = PriorParam$b.sigma2,
-                                          WithSpikes = WithSpikes),
+                                          WithSpikes = WithSpikes
+                                        ),
                                         ml = HiddenFindRBFLocations(
                                           Data = Start$mu0, 
                                           k = k

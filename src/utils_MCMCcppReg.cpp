@@ -4,22 +4,29 @@
 
 arma::mat designMatrixOriginal(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
-    arma::vec const& mu,
-    arma::vec const& ml, // locations (fixed a priori)
-    double const& variance) {
-
+    arma::vec const& mu, 
+    double const& variance) 
+{
   arma::vec x = log(mu);
-
-  double h = (ml(1) - ml(0)) * variance;
-
+  double ran = x.max() - x.min();
+  arma::vec myu = arma::zeros(k-2);
+  myu(0) = x.min();
+  
+  for(int i=1; i < (k-2); i++) {
+    myu(i) = myu(i-1) + ran/(k-3);
+  }
+  double h = (myu(1)-myu(0)) * variance;
+  
   // Possibly create this matrix outside
   arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
-  for (int i = 0; i < k - 2; i++) {
-    X.col(i + 2) = exp(-0.5 * pow(x - ml(i), 2) / pow(h, 2));
+  for(int i=0; i < k-2; i++) {
+    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
+    //X.col(i+1) = pow(x,i+1);
   }
   return X;
 }
+
 
 // [[Rcpp::export]]
 arma::vec estimateRBFLocations(int const& k, arma::vec const& x) {

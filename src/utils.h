@@ -146,7 +146,6 @@ arma::mat thetaUpdateBatch(
 arma::mat designMatrixOriginal(
     int const& k, 
     arma::vec const& mu, 
-    arma::vec const& ml,
     double const& variance);
   
 arma::vec estimateRBFLocations(
