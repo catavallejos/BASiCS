@@ -28,7 +28,7 @@
 #' @export
 BASiCS_CorrectOffset <- function(Chain, 
                                  ChainRef,
-                                 minexpr = 5) {
+                                 min.mean = 1) {
 
   # Extract MCMC chains for mean parameters
   mu1 <- Chain@parameters$mu
@@ -40,7 +40,7 @@ BASiCS_CorrectOffset <- function(Chain,
   # This is based on medians to be more robust (rowMeans2 used before)
   OffsetChain0 <- matrixStats::rowMedians(mu1) / matrixStats::rowMedians(mu2)
   OffsetEst0 <- median(OffsetChain0)
-  include <- which((colMedians(mu1) / OffsetEst0 + colMedians(mu2))/2 >= minexpr)
+  include <- which((colMedians(mu1) / OffsetEst0 + colMedians(mu2))/2 >= min.mean)
   
   # Calculating iteration-specific offset 
   OffsetChain <- matrixStats::rowMedians(mu1[,include]) / 

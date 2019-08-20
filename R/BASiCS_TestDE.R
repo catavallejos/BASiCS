@@ -68,7 +68,10 @@
 #' order as how genes are displayed in the table of counts.
 #' This argument is necessary in order to have a meaningful EFDR calibration
 #' when the user decides to exclude some genes from the comparison.
-#' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
+#' @param min.mean Minimum mean expression threshold required for inclusion in
+#' input calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
+#' parameter is only relevant with `Offset = TRUE`.
+#' @param ... Optional parameters.
 #'
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
 #' \describe{
@@ -227,7 +230,8 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_M = 0.05,
                           EFDR_D = 0.05,
                           EFDR_R = 0.05,
-                          GenesSelect = NULL, ...)
+                          GenesSelect = NULL, 
+                          min.mean = 1, ...)
 {
 
   HiddenHeaderTest_DE(Chain1,
@@ -274,7 +278,7 @@ BASiCS_TestDE <- function(Chain1,
     #Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
     #Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
     
-    A <- BASiCS_CorrectOffset(Chain1, Chain2)
+    A <- BASiCS_CorrectOffset(Chain1, Chain2, min.mean = min.mean)
     OffsetEst <- A$Offset
     OffsetChain <- A$OffsetChain
     Chain1_offset <- A$Chain

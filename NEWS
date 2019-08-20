@@ -1225,3 +1225,6 @@ version 1.7.7 (2019-08-20)
 - Preliminary version of `BASiCS_CorrectOffset` has been added. This includes
 a trimmed option for the offset calculation that excludes lowly expressed genes.
 This is similar to what is implemented in `scran:::.rescale_clusters
+
+version 1.7.8 (2019-08-20)
+- `min.mean` parameter exposed in `BASiCS_CorrectOffset` and `BASiCS_TestDE`

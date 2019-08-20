@@ -5,7 +5,7 @@
 \alias{BASiCS_CorrectOffset}
 \title{Remove global mean expression offset}
 \usage{
-BASiCS_CorrectOffset(Chain, ChainRef, minexpr = 5)
+BASiCS_CorrectOffset(Chain, ChainRef, min.mean = 1)
 
 BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
   EpsilonD = log2(1.5), EpsilonR = log2(1.5)/log2(exp(1)),
@@ -13,9 +13,13 @@ BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
   OrderVariable = "GeneIndex", GroupLabel1 = "Group1",
   GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE,
   Offset = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, EFDR_R = 0.05,
-  GenesSelect = NULL, ...)
+  GenesSelect = NULL, min.mean = 1, ...)
 }
 \arguments{
+\item{min.mean}{Minimum mean expression threshold required for inclusion in
+input calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
+parameter is only relevant with `Offset = TRUE`.}
+
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}}
 containing parameter estimates for the first group of cells}
 
@@ -97,7 +101,7 @@ order as how genes are displayed in the table of counts.
 This argument is necessary in order to have a meaningful EFDR calibration
 when the user decides to exclude some genes from the comparison.}
 
-\item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
+\item{...}{Optional parameters.}
 }
 \value{
 A list whose first element is an offset corrected version of `Chain1` 
