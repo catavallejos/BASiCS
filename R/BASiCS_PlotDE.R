@@ -197,7 +197,7 @@ VolcanoPlot <- function(
   #   Table[[paste0(Measure, DistanceVar(Measure))]],
   #   Table[[paste0("ProbDiff", Measure)]]
   # )
-  bins <- 100
+  bins <- 50
   ggplot2::ggplot(
       Table,
       ggplot2::aes_string(
@@ -210,7 +210,8 @@ VolcanoPlot <- function(
       data = Table[IndDiff, ],
       shape = 16,
       col = "violetred",
-      na.rm = TRUE
+      na.rm = TRUE,
+      alpha = 0.8
     ) +
     ggplot2::geom_vline(
       xintercept = c(-Epsilon, Epsilon),
@@ -240,7 +241,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   #   Table[[paste0(Measure, "Overall")]],
   #   Table[[paste0(Measure, DistanceVar(Measure))]]
   # )
-  bins <- 100
+  bins <- 50
   xscale <- ggplot2::scale_x_continuous(
     trans = if (Measure == "ResDisp") "identity" else "log2"
   )
@@ -260,7 +261,8 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       data = Table[IndDiff, ], 
       shape = 16, 
       colour = "violetred", 
-      na.rm = TRUE
+      na.rm = TRUE,
+      alpha = 0.8
     ) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
