@@ -107,7 +107,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     }
     if ("VolcanoPlot" %in% Which) {
       Plots <- c(Plots, 
-        list(VolcanoPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon))
+        list(VolcanoPlot(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, ProbThreshold))
       )
     }
     if ("GridPlot" %in% Which) {
@@ -165,13 +165,13 @@ GridPlot <- function(Measure,
 
 
 
-VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
+VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, ProbThreshold) {
   IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, DistanceVar(Measure))]],
   #   Table[[paste0("ProbDiff", Measure)]]
   # )
-  bins <- 100
+  bins <- 50
   ggplot2::ggplot(
       Table, 
       ggplot2::aes_string(
@@ -181,12 +181,20 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     # ggplot2::geom_point() +
     ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
     ggplot2::geom_point(
-      data = Table[IndDiff, ], 
-      shape = 16, 
-      col = "violetred", 
-      na.rm = TRUE) +
+      data = Table[IndDiff, ],
+      shape = 16,
+      col = "violetred",
+      na.rm = TRUE,
+      alpha = 0.8
+    ) +
+    ggplot2::geom_vline(
+      xintercept = c(-Epsilon, Epsilon),
+      lty = "dashed",
+      color = "grey40",
+      na.rm = TRUE
+    ) +
     ggplot2::geom_hline(
-      yintercept = c(-Epsilon, Epsilon), 
+      yintercept = ProbThreshold, 
       lty = "dashed", 
       color = "grey40", 
       na.rm = TRUE) +
@@ -206,7 +214,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   #   Table[[paste0(Measure, "Overall")]],
   #   Table[[paste0(Measure, DistanceVar(Measure))]]
   # )
-  bins <- 100
+  bins <- 50
   xscale <- ggplot2::scale_x_continuous(
     trans = if (Measure == "ResDisp") "identity" else "log2"
   )
@@ -222,7 +230,9 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
       data = Table[IndDiff, ], 
       shape = 16, 
       colour = "violetred", 
-      na.rm = TRUE) +
+      na.rm = TRUE,
+      alpha = 0.8
+    ) +
     ggplot2::geom_hline(
       yintercept = c(-Epsilon, Epsilon), 
       lty = "dashed", 
