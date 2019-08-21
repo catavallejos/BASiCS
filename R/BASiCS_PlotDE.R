@@ -24,11 +24,19 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     l <- lapply(object@Results, BASiCS_PlotDE, Which = Which, ...)
     if (length(Which) > 1) {
       nrow <- length(object@Results)
-      labels <- lapply(object@Results, function(x) {
+      labels <- sapply(object@Results, function(x) {
         cap(MeasureName(x@Name))
       })
-      labels <- Reduce(c, labels)
+      # labels <- Reduce(c, labels)
       labels <- c(labels, rep("", length(object@Results) * length(Which)))
+      l <- lapply(l, 
+        function(g) {
+          g +
+            ggplot2::theme(
+              plot.margin = unit(c(0.100, 0, 0.05, 0), units = "npc")
+            )
+        }
+      )
     } else {
       nrow <- length(Which)
       labels <- vapply(
@@ -37,7 +45,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         character(1)
       )
     }
-    cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels)
+    cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels, hjust = 0)
   }
 )
 
@@ -129,24 +137,30 @@ GridPlot <- function(Measure,
   df <- data.frame(
     ProbThresholds, 
     EFDR = EFDRgrid, 
-    EFNR = EFNRgrid)
-
+    EFNR = EFNRgrid
+  )
   mdf <- reshape2::melt(df,measure.vars = c("EFDR", "EFNR"))
   ggplot2::ggplot(mdf, 
       aes_string(x = "ProbThresholds", y = "value", color = "variable")
     ) +
-    ggplot2::geom_line() +
+    ggplot2::geom_line(na.rm = TRUE) +
     ggplot2::labs(
       y = "Error rate", 
       x = "Probability threshold"
       # ,title = paste("Differential", MeasureName(Measure))
     ) +
     ggplot2::ylim(c(0, 1)) +
-    ggplot2::scale_color_discrete(name = ""
-      # , palette = "Dark2"
-      ) +
-    ggplot2::geom_hline(yintercept = EFDR, col = "steelblue", lty = 2) +
-    ggplot2::geom_vline(xintercept = ProbThreshold, col = "indianred", lty = 1)
+    ggplot2::scale_color_brewer(name = "", palette = "Set2") +
+    ggplot2::geom_hline(
+      aes(yintercept = EFDR, colour = "Selected\nEFDR"),
+      lty = 2,
+      na.rm = TRUE
+    ) +
+    ggplot2::geom_vline(
+      aes(colour = "Probability\nthreshold", xintercept = ProbThreshold),
+      lty = 1,
+      na.rm = TRUE
+    )
 }
 
 
