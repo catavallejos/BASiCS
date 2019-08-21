@@ -21,9 +21,8 @@ arma::mat muUpdateNoSpikes(
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
     int const& ConstrainType,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
   using arma::span;
 
   int nConstrainGene = ConstrainGene.size();
@@ -68,7 +67,7 @@ arma::mat muUpdateNoSpikes(
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
-        sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
+        sumAux += log(mu1(iAux)) - log(mu0(iAux));
       } else {
         ind(iAux) = 0;
         mu1(iAux) = mu0(iAux);
@@ -118,9 +117,8 @@ arma::mat nuUpdateBatchNoSpikes(
     arma::vec & nu1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
   using arma::span;
 
   // PROPOSAL STEP
@@ -145,7 +143,7 @@ arma::mat nuUpdateBatchNoSpikes(
   * - If smaller than 1e-5
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */  
+  */
   ind = DegubInd(ind, n, u, log_aux, nu1, mintol, "nu");
   for (int j=0; j < n; j++) {
     if(ind(j) == 0) {

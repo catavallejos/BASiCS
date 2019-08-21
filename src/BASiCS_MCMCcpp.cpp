@@ -74,12 +74,12 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     int StoreAdapt,
     int EndAdapt,
     int PrintProgress,
-    double geneExponent,
-    double cellExponent,
+    double GeneExponent,
+    double CellExponent,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta) 
+    double const& mintol_theta)
 {
   using arma::ones;
   using arma::zeros;
@@ -203,7 +203,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                            q0,
                            n,
                            y_n,
-                           cellExponent);
+                           CellExponent);
 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]);
@@ -214,10 +214,10 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // theta and regression parameters are global; thus, they require scaling
     // for both cases
     double exponent = 1;
-    if (geneExponent != 1) {
-      exponent = geneExponent;
-    } else if (cellExponent != 1) {
-      exponent = cellExponent;
+    if (GeneExponent != 1) {
+      exponent = GeneExponent;
+    } else if (CellExponent != 1) {
+      exponent = CellExponent;
     }
 
     // UPDATE OF THETA:
@@ -256,7 +256,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                             y_q0,
                             u_q0,
                             ind_q0,
-                            geneExponent,
+                            GeneExponent,
                             mintol_mu);
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -272,7 +272,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                         BatchDesign_arma,
                         n,
                         y_n,
-                        cellExponent);
+                        CellExponent);
 
     // UPDATE OF DELTA:
     // 1st COLUMN IS THE UPDATE,
@@ -291,7 +291,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                            y_q0,
                            u_q0,
                            ind_q0,
-                           geneExponent,
+                           GeneExponent,
                            mintol_delta);
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
@@ -317,7 +317,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                           y_n,
                           u_n,
                           ind_n,
-                          cellExponent,
+                          CellExponent,
                           mintol_nu);
     PnuAux += nuAux.col(1);
     if (i >= Burn) {

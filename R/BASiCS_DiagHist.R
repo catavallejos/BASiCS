@@ -12,7 +12,7 @@
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Param = NULL}.
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
-#' 
+#' @param ... Unused
 #' @return A ggplot object.
 #'
 #' @examples
@@ -70,4 +70,8 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
 
 #' @export
 #' @rdname BASiCS_DiagHist
-BASiCS_diagHist <- BASiCS_DiagHist
+BASiCS_diagHist <- function(...) {
+  .Deprecated("BASiCS_DiagHist")
+  BASiCS_DiagHist(...)
+}
+

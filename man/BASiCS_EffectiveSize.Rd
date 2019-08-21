@@ -7,7 +7,7 @@
 \usage{
 BASiCS_EffectiveSize(object, Param, na.rm = TRUE)
 
-BASiCS_effectiveSize(object, Param, na.rm = TRUE)
+BASiCS_effectiveSize(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}.}
@@ -21,6 +21,8 @@ values: \code{'mu'}, \code{'delta'}, \code{'phi'}, \code{'s'},
 Only relevant when \code{Param = "epsilon"} (genes with very low 
 expression are excluding when infering the mean/over-dispersion trend. 
 Default: \code{na.rm = TRUE}.}
+
+\item{...}{Unused}
 }
 \value{
 A vector with effective sample sizes for all the elements 

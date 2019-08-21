@@ -117,14 +117,13 @@ BASiCS_ShowFit <- function(object,
       ggplot2::scale_fill_gradientn(name = "",
                                     colours = grDevices::colorRampPalette(cols)(100),
                                     guide = FALSE)
-  }
-  else {
+  } else {
     plot.out <- plot.out +
       ggplot2::geom_point(shape = pch,
                           colour = colour)
   }
-  if(!is.null(GenesSel)) {
-    if(sum(GenesSel %in% rownames(df)) != length(GenesSel)) {
+  if (!is.null(GenesSel)) {
+    if (sum(GenesSel %in% rownames(df)) != length(GenesSel)) {
       stop("Some elements of `GenesSel` are not found in the data.")
     }
     plot.out <- plot.out +
@@ -150,4 +149,7 @@ BASiCS_ShowFit <- function(object,
 
 #' @rdname BASiCS_ShowFit
 #' @export
-BASiCS_showFit <- BASiCS_ShowFit
+BASiCS_showFit <- function(...) {
+  .Deprecated("BASiCS_showFit")
+  BASiCS_ShowFit(...)
+}

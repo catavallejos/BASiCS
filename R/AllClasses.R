@@ -282,7 +282,7 @@ setClass("BASiCS_Summary",
 #' @slot Results \code{\linkS4class{BASiCS_ResultDE}} objects
 #' @slot Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects. 
 #' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2
-#' @slot OffsetChain Fold change between each draw of mu
+#' @slot OffsetChain Fold change (ratio) between MCMC each draw
 #' @slot Offset Ratio between median of chains 
 #' @slot RowData Annotation for genes
 #' @slot Extras Slot for extra information to be added later
@@ -338,7 +338,6 @@ setClass("BASiCS_ResultDE",
     Extras = "list"
   )
 )
-
 
 #' @name BASiCS_OffsetCorrected
 #' @aliases BASiCS_OffsetCorrected-class

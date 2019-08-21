@@ -1,3 +1,5 @@
+# TODO: there seems to be code duplications here
+
 #' @name BASiCS_DetectHVG
 #' @aliases BASiCS_DetectHVG BASiCS_DetectHVG_LVG
 #'
@@ -166,10 +168,8 @@ BASiCS_DetectHVG <- function(Chain,
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE, na.last = TRUE), ]
     
-    if (Plot)
-    {
-      if (Search)
-      {
+    if (Plot) {
+      if (Search) {
         # EFDR / EFNR plot
         par(ask = TRUE)
         HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
@@ -192,8 +192,7 @@ BASiCS_DetectHVG <- function(Chain,
     
     list(Table = Table, EviThreshold = OptThreshold[1],
          EFDR = OptThreshold[2], EFNR = OptThreshold[3])
-  }
-  else{
+  } else {
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
 
@@ -203,8 +202,7 @@ BASiCS_DetectHVG <- function(Chain,
 
     # Threshold search
     Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, Prob, EFDR)
-    if(Search)
-    {
+    if(Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
       ProbThresholds <- Aux$ProbThresholds
@@ -231,10 +229,8 @@ BASiCS_DetectHVG <- function(Chain,
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE), ]
 
-    if (Plot)
-    {
-      if (Search)
-      {
+    if (Plot) {
+      if (Search) {
         # EFDR / EFNR plot
         par(ask = TRUE)
         HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
@@ -325,10 +321,8 @@ BASiCS_DetectLVG <- function(Chain,
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE, na.last = TRUE), ]
     
-    if (Plot)
-    {
-      if (Search)
-      {
+    if (Plot) {
+      if (Search) {
         # EFDR / EFNR plot
         par(ask = TRUE)
         HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
@@ -351,8 +345,7 @@ BASiCS_DetectLVG <- function(Chain,
     
     list(Table = Table, EviThreshold = OptThreshold[1],
          EFDR = OptThreshold[2], EFNR = OptThreshold[3])
-  }
-  else{
+  } else {
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
 
@@ -390,10 +383,8 @@ BASiCS_DetectLVG <- function(Chain,
     if (OrderVariable == "Prob") { orderVar <- Prob }
     Table <- Table[order(orderVar, decreasing = TRUE), ]
 
-    if (Plot)
-    {
-      if (Search)
-      {
+    if (Plot) {
+      if (Search) {
         # EFDR / EFNR plot
         par(ask = TRUE)
         HiddenPlot1DetectHVG_LVG(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)

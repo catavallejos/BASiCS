@@ -43,16 +43,19 @@ double rinvgauss(const double mu, const double lambda)
   mu2 = mu * mu;
   l2 = 2.0*lambda;
   x1 = mu + mu2*y/l2 - (mu/l2)* sqrt(4.0*mu*lambda*y + mu2*y*y);
-
   u = unif_rand(); // ******
   if(u <= mu/(mu + x1)) return x1;
   else return mu2/x1;
 }
 
 /* Auxiliary function taken from rgig.c */
-double zeroin_gig(double ax,double bx,
+double zeroin_gig(double ax,
+                  double bx,
                   double f(double x, double m, double beta, double lambda),
-                  double tol,double m,double beta,double lambda)
+                  double tol,
+                  double m,
+                  double beta,
+                  double lambda)
   /* An estimate to the root  */
   //double ax;				/* Left border | of the range	*/
   //double bx;  				/* Right border| the root is seeked*/
@@ -63,7 +66,6 @@ double zeroin_gig(double ax,double bx,
   //double beta;                            /* specific to gig_y_gfn */
   //double lambda;                          /* specific to gig_y_gfn */
 {
-
   double a,b,c;				/* Abscissae, descr. see above	*/
   double fa;				/* f(a)				*/
   double fb;				/* f(b)				*/
@@ -306,30 +308,26 @@ double RgigDouble(const double lambda, const double chi, const double psi)
 
 /* END OF ADAPTED CODE*/
 
-void StartSampler(int const& N)
-{
+void StartSampler(int const& N) {
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << "MCMC sampler has been started: " << N << " iterations to go." << std::endl;
   Rcout << "-----------------------------------------------------" << std::endl;
 }
 
-void EndBurn()
-{
+void EndBurn() {
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << "End of Burn-in period."<< std::endl;
   Rcout << "-----------------------------------------------------" << std::endl;
 }
 
-void CurrentIter(int const& i, int const& N)
-{
+void CurrentIter(int const& i, int const& N) {
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << "Iteration " << i << " out of " << N << " has been completed." << std::endl;
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << "Current draws for selected parameters are displayed below." << std::endl;
 }
 
-void EndSampler(int const& N)
-{
+void EndSampler(int const& N) {
   Rcout << " " << std::endl;
   Rcout << "-----------------------------------------------------" << std::endl;
   Rcout << "-----------------------------------------------------" << std::endl;
@@ -343,8 +341,7 @@ void EndSampler(int const& N)
 }
 
 void ReportAR(arma::vec const& AR,
-              std::string const& Param)
-{
+              std::string const& Param) {
   Rcout << " " << std::endl;
   Rcout << "Minimum acceptance rate among " <<
     Param << ": " << min(AR) << std::endl;
@@ -358,24 +355,21 @@ void ReportAR(arma::vec const& AR,
 /* Auxiliary function that converts Rcpp::NumericVector
  * objects into arma::vec objects
  */
-arma::vec as_arma(NumericVector& x)
-{
+arma::vec as_arma(NumericVector& x) {
   return arma::vec(x.begin(), x.length(), false);
 }
 
 /* Auxiliary function that converts Rcpp::NumericMatrix
 * objects into arma::mac objects
 */
-arma::mat as_arma(NumericMatrix& x)
-{
+arma::mat as_arma(NumericMatrix& x) {
   return arma::mat(x.begin(), x.nrow(), x.ncol(), false);
 }
 
 /* Auxiliary function: logarithm of a Gamma function applied
 * element-wise to an arma::mat object
 */
-arma::mat lgamma_cpp(arma::mat const& x)
-{
+arma::mat lgamma_cpp(arma::mat const& x) {
   arma::mat output = x;
   for (unsigned int i=0; i<arma::size(x,0); i++) {
     for(unsigned int j=0; j<arma::size(x,1); j++) {
@@ -388,8 +382,7 @@ arma::mat lgamma_cpp(arma::mat const& x)
 /* Auxiliary function: logarithm of a Gamma function applied
 * element-wise to an arma::mat object
 */
-arma::vec lgamma_cpp_vec(arma::vec const& x)
-{
+arma::vec lgamma_cpp_vec(arma::vec const& x) {
   arma::vec output = x;
   for (unsigned int i=0; i < output.size(); i++) {
     output(i) = std::lgamma(x(i));
@@ -400,11 +393,13 @@ arma::vec lgamma_cpp_vec(arma::vec const& x)
 /* Auxiliary function: to avoid numerical overflows/underflows
 * when computing a sum of exponentiated values
 */
-double log_sum_exp_cpp(arma::vec const& x_arma)
-{
+double log_sum_exp_cpp(arma::vec const& x_arma) {
   double offset;
-  if ( max(abs(x_arma)) > max(x_arma) ) { offset = min(x_arma);}
-  else { offset = max(x_arma);}
+  if (max(abs(x_arma)) > max(x_arma) ){
+    offset = min(x_arma);
+  } else {
+    offset = max(x_arma);
+  }
   return log(sum(exp(x_arma - offset))) + offset;
 }
 
@@ -417,11 +412,13 @@ arma::vec DegubInd(arma::vec ind,
                    std::string const& param)
 {
   for (int i=0; i < q; i++) {
-    if( arma::is_finite(log_aux(i)) & arma::is_finite(y(i)) ) {
-      if((log(u(i)) < log_aux(i)) & (y(i) > threshold)) { ind(i) = 1; }
-      else{ind(i) = 0;}
-    }
-    else {
+    if (arma::is_finite(log_aux(i)) & arma::is_finite(y(i))) {
+      if ((log(u(i)) < log_aux(i)) & (y(i) > threshold)) {
+        ind(i) = 1;
+      } else{
+        ind(i) = 0;
+      }
+    } else {
       ind(i) = 0;
       Rcpp::Rcout << "Error when updating " << param << " " << i+1 << std::endl;
       Rcpp::Rcout << "Consider applying additional quality control" << std::endl;
@@ -432,9 +429,7 @@ arma::vec DegubInd(arma::vec ind,
 }
 
 /*Dirichlet sampler*/
-arma::vec Hidden_rDirichlet(
-    arma::vec alpha)
-{
+arma::vec Hidden_rDirichlet(arma::vec alpha) {
   arma::vec aux = arma::ones(alpha.size());
   unsigned int i;
   for(i=0; i<alpha.size(); i++) {

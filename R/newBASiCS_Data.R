@@ -72,8 +72,7 @@ newBASiCS_Data <- function(Counts,
                            SpikeInfo = NULL, 
                            BatchInfo = NULL, 
                            SpikeType = "ERCC",
-                           Verbose = TRUE) 
-{
+                           Verbose = TRUE) {
   # Validity checks for SpikeInfo
   if (!is.null(SpikeInfo)) {
     if (!is.data.frame(SpikeInfo)) {
@@ -104,10 +103,9 @@ newBASiCS_Data <- function(Counts,
     matching <- match(GeneName[Tech], SpikeInfo[, 1])
     SpikeInput <- SpikeInfo[matching, 2]
     WithSpikes <- TRUE
-  } 
-  else 
-  { 
-    SpikeInput <- 1; Tech <- rep(FALSE, nrow(Counts)) 
+  } else { 
+    SpikeInput <- 1
+    Tech <- rep(FALSE, nrow(Counts)) 
     if (Verbose) {
       message("The data does not contain spike-in genes")
     }

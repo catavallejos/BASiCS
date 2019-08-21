@@ -7,11 +7,9 @@
 \usage{
 BASiCS_DiagPlot(object, Param = "mu", x = NULL, y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
-  c("mu", "delta")), na.rm = TRUE)
+  c("mu", "delta")), Smooth = TRUE, na.rm = TRUE)
 
-BASiCS_diagPlot(object, Param = "mu", x = NULL, y = NULL,
-  LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
-  c("mu", "delta")), na.rm = TRUE)
+BASiCS_diagPlot(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
@@ -30,8 +28,13 @@ a density plot.}
 \item{LogX, LogY}{A boolean value indicating whether to use a log10
 transformation for the x or y axis, respectively.}
 
+\item{Smooth}{Boolean value indicating whether to use smoothing (hexagonal
+bins coloured based on density) in the plot.}
+
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
+
+\item{...}{Unused}
 }
 \value{
 A ggplot object.

@@ -90,12 +90,12 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int StochasticRef,
     NumericVector ml,
     bool FixML,
-    double geneExponent,
-    double cellExponent,
+    double GeneExponent,
+    double CellExponent,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta) 
+    double const& mintol_theta)
 {
   using arma::ones;
   using arma::zeros;
@@ -243,7 +243,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                         BatchDesign_arma,
                         n,
                         y_n,
-                        cellExponent);
+                        CellExponent);
     // UPDATE OF THETA:
     // 1st ELEMENT IS THE UPDATE,
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -257,7 +257,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 btheta,
                                 n,
                                 nBatch,
-                                cellExponent,
+                                CellExponent,
                                 mintol_theta);
 
     PthetaAux += thetaAux.col(1);
@@ -305,7 +305,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 sigma2Aux,
                                 variance,
                                 ml_arma,
-                                geneExponent, mintol_mu);
+                                GeneExponent, mintol_mu);
     X = designMatrix(means, ml_arma, variance);
 
     PmuAux += muAux.col(1);
@@ -331,7 +331,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                       X,
                                       sigma2Aux,
                                       betaAux,
-                                      geneExponent,
+                                      GeneExponent,
                                       mintol_delta);
 
     PdeltaAux += deltaAux.col(1);
@@ -355,7 +355,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   y_n,
                                   u_n,
                                   ind_n,
-                                  cellExponent,
+                                  CellExponent,
                                   mintol_nu);
     PnuAux += nuAux.col(1);
     if (i >= Burn) {
@@ -363,12 +363,12 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     }
 
     // UPDATES OF REGRESSION RELATED PARAMETERS
-    V1 = (inv_V0 * geneExponent) + X.t() * diagmat(lambdaAux) * X;
+    V1 = (inv_V0 * GeneExponent) + X.t() * diagmat(lambdaAux) * X;
 
     VAux = inv(V1);
     if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
 
-      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * geneExponent);
+      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * GeneExponent);
 
       mAux = VAux * mAux;
       // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
@@ -378,7 +378,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   betaAux,
                                   lambdaAux,
                                   V1,
-                                  mInvVm0 * geneExponent,
+                                  mInvVm0 * GeneExponent,
                                   mAux,
                                   sigma2_a0,
                                   sigma2_b0,
@@ -392,7 +392,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 eta0,
                                 q0,
                                 y_q0,
-                                geneExponent);
+                                GeneExponent);
     // UPDATE OF EPSILON
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X * betaAux;

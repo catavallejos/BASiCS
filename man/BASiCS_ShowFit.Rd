@@ -10,10 +10,7 @@ BASiCS_ShowFit(object, xlab = "log(mu)", ylab = "log(delta)",
   colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
   colourGenesSel = "dark red", ...)
 
-BASiCS_showFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, locations = NULL,
-  colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
-  colourGenesSel = "dark red", ...)
+BASiCS_showFit(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}

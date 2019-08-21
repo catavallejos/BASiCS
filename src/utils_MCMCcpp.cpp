@@ -16,9 +16,8 @@ arma::mat Hidden_muUpdate(
     arma::vec & mu1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
 
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
@@ -74,9 +73,9 @@ arma::mat deltaUpdate(
     arma::vec & delta1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
+
   /* PROPOSAL STEP */
   delta1 = exp(arma::randn(q0) % sqrt(prop_var) + log(delta0));
   u = arma::randu(q0);
@@ -137,8 +136,8 @@ Rcpp::List phiUpdate(
     int const& q0,
     int const& n,
     arma::vec & phi1,
-    double exponent)
-{
+    double const& exponent) {
+
   int ind;
 
   // PROPOSAL STEP
@@ -207,8 +206,7 @@ arma::vec sUpdateBatch(
     arma::mat const& BatchDesign,
     int const& n,
     arma::vec & s1,
-    double exponent)
-{
+    double const& exponent) {
 
   // Calculating parameters to the passed as input to the Rgig function (common for all cells)
   arma::vec lambda;
@@ -271,9 +269,8 @@ arma::mat nuUpdateBatch(
     arma::vec & nu1,
     arma::vec & u,
     arma::vec & ind,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
   using arma::span;
 
   // PROPOSAL STEP
@@ -323,9 +320,8 @@ arma::mat thetaUpdateBatch(
     double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$, $b_{\theta}$) prior assigned to $\theta$ */
     int const& n,
     int const& nBatch,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
   using arma::span;
 
   // CREATING VARIABLES WHERE TO STORE DRAWS

@@ -24,7 +24,8 @@ test_that("plot of BASiCS_Summary works without spikes", {
     Burn = 10,
     PrintProgress = FALSE,
     Regression = FALSE,
-    WithSpikes = FALSE)
+    WithSpikes = FALSE
+  )
   S <- Summary(Chain)
   pdf(NULL)
   expect_error(plot(S), NA)
@@ -89,7 +90,7 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
     PrintProgress = FALSE,
     Regression = TRUE,
     WithSpikes = TRUE)
-  
+
   SChain <- Summary(Chain)
   pdf(NULL)
   expect_error({

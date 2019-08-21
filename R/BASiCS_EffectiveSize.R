@@ -12,6 +12,7 @@
 #' Only relevant when \code{Param = "epsilon"} (genes with very low 
 #' expression are excluding when infering the mean/over-dispersion trend. 
 #' Default: \code{na.rm = TRUE}.
+#' @param ... Unused
 #' 
 #' @return A vector with effective sample sizes for all the elements 
 #' of \code{Param}
@@ -27,4 +28,7 @@ BASiCS_EffectiveSize <- function(object, Param, na.rm = TRUE) {
 }
 #' @rdname BASiCS_EffectiveSize
 #' @export
-BASiCS_effectiveSize <- BASiCS_EffectiveSize
+BASiCS_effectiveSize <- function(...) {
+  .Deprecated("BASiCS_EffectiveSize")
+  BASiCS_EffectiveSize(...)
+}

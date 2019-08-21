@@ -86,8 +86,8 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     IntegerVector NotConstrainGene,
     int ConstrainType,
     int StochasticRef,
-    double geneExponent,
-    double cellExponent,
+    double GeneExponent,
+    double CellExponent,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -98,9 +98,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   using Rcpp::Rcout;
 
   // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.ncol();
-  int q0 = Counts.nrow();
-  int Naux = N / Thin - Burn / Thin;
+  int n = Counts.ncol(); int q0 = Counts.nrow(); int Naux = N/Thin - Burn/Thin;
   int nBatch = BatchDesign.ncol();
 
   // TRANSFORMATION TO ARMA ELEMENTS
@@ -208,7 +206,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                         BatchDesign_arma,
                         n,
                         y_n,
-                        cellExponent);
+                        CellExponent);
 
     // UPDATE OF THETA:
     // 1st ELEMENT IS THE UPDATE,
@@ -223,7 +221,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                 btheta,
                                 n,
                                 nBatch,
-                                cellExponent,
+                                CellExponent,
                                 mintol_theta);
     PthetaAux += thetaAux.col(1);
     if (i >= Burn) {
@@ -259,7 +257,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                              ConstrainGene_arma,
                              NotConstrainGene_arma,
                              ConstrainType,
-                             geneExponent,
+                             GeneExponent,
                              mintol_mu);
 
     PmuAux += muAux.col(1);
@@ -284,7 +282,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                            y_q0,
                            u_q0,
                            ind_q0,
-                           geneExponent,
+                           GeneExponent,
                            mintol_delta);
 
     PdeltaAux += deltaAux.col(1);
@@ -309,7 +307,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
                                   y_n,
                                   u_n,
                                   ind_n,
-                                  cellExponent,
+                                  CellExponent,
                                   mintol_nu);
 
     PnuAux += nuAux.col(1);

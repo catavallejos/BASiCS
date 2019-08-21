@@ -40,6 +40,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels)
   }
 )
+
 #' @export
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
   function(
@@ -169,94 +170,6 @@ GridPlot <- function(
 
 
 
-VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
-  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
-  # bins <- NClassFD2D(
-  #   Table[[paste0(Measure, DistanceVar(Measure))]],
-  #   Table[[paste0("ProbDiff", Measure)]]
-  # )
-  bins <- 100
-  ggplot2::ggplot(
-      Table, 
-      ggplot2::aes_string(
-        x = paste0(Measure, DistanceVar(Measure)), 
-        y = paste0("ProbDiff", Measure))
-    ) +
-    # ggplot2::geom_point() +
-    ggplot2::geom_hex(
-      bins = bins,
-      aes_string(fill = "..density.."),
-      na.rm = TRUE
-    ) +
-    ggplot2::geom_point(
-      data = Table[IndDiff, ], 
-      shape = 16, 
-      col = "violetred", 
-      na.rm = TRUE
-    ) +
-    ggplot2::geom_hline(
-      yintercept = c(-Epsilon, Epsilon), 
-      lty = "dashed", 
-      color = "grey40", 
-      na.rm = TRUE
-    ) +
-    ggplot2::ylim(c(0, 1)) +
-    viridis::scale_fill_viridis(name = "Density") +
-    ggplot2::labs(
-      x = paste(cap(LogDistanceName(Measure)), GroupLabel1, "vs", GroupLabel2),
-      y = "Posterior probability"
-      # ,title = paste("Differential", MeasureName(Measure), "test")
-    )
-}
-
-MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
-
-  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
-  # bins <- NClassFD2D(
-  #   Table[[paste0(Measure, "Overall")]],
-  #   Table[[paste0(Measure, DistanceVar(Measure))]]
-  # )
-  bins <- 100
-  xscale <- ggplot2::scale_x_continuous(
-    trans = if (Measure == "ResDisp") "identity" else "log2"
-  )
-  ggplot2::ggplot(
-      Table, 
-      ggplot2::aes_string(
-        x = paste0(Measure, "Overall"), 
-        y = paste0(Measure, DistanceVar(Measure)))
-    ) + 
-    ggplot2::geom_hex(
-      bins = bins,
-      aes_string(fill = "..density.."),
-      na.rm = TRUE
-    ) +
-    # ggplot2::geom_point() +
-    ggplot2::geom_point(
-      data = Table[IndDiff, ], 
-      shape = 16, 
-      colour = "violetred", 
-      na.rm = TRUE
-    ) +
-    ggplot2::geom_hline(
-      yintercept = c(-Epsilon, Epsilon), 
-      lty = "dashed", 
-      color = "grey40",
-      na.rm = TRUE
-    ) +
-    xscale +
-    viridis::scale_fill_viridis(name = "Density") +
-    ggplot2::labs(
-      x = paste(cap(MeasureName(Measure))),
-      y = paste(cap(LogDistanceName(Measure)),
-        GroupLabel1, "vs",
-        GroupLabel2)
-      # ,
-      # title = paste("Differential", MeasureName(Measure))
-    )
-}
-
-
 VolcanoPlot <- function(
     Measure,
     Table,
@@ -307,6 +220,54 @@ VolcanoPlot <- function(
     )
 }
 
-DiffExp <- function(Results) {
-  !Results %in% c("ExcludedByUser", "ExcludedFromTesting", "NoDiff")
+MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
+
+  IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
+  # bins <- NClassFD2D(
+  #   Table[[paste0(Measure, "Overall")]],
+  #   Table[[paste0(Measure, DistanceVar(Measure))]]
+  # )
+  bins <- 100
+  xscale <- ggplot2::scale_x_continuous(
+    trans = if (Measure == "ResDisp") "identity" else "log2"
+  )
+  ggplot2::ggplot(
+      Table, 
+      ggplot2::aes_string(
+        x = paste0(Measure, "Overall"), 
+        y = paste0(Measure, DistanceVar(Measure)))
+    ) + 
+    ggplot2::geom_hex(
+      bins = bins,
+      aes_string(fill = "..density.."),
+      na.rm = TRUE
+    ) +
+    # ggplot2::geom_point() +
+    ggplot2::geom_point(
+      data = Table[IndDiff, ], 
+      shape = 16, 
+      colour = "violetred", 
+      na.rm = TRUE
+    ) +
+    ggplot2::geom_hline(
+      yintercept = c(-Epsilon, Epsilon), 
+      lty = "dashed", 
+      color = "grey40",
+      na.rm = TRUE
+    ) +
+    xscale +
+    viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
+    ggplot2::labs(
+      x = paste(cap(MeasureName(Measure))),
+      y = paste(cap(LogDistanceName(Measure)),
+        GroupLabel1, "vs",
+        GroupLabel2)
+      # ,
+      # title = paste("Differential", MeasureName(Measure))
+    )
+}
+
+
+DiffExp <- function(res) {
+  !res %in% c("ExcludedByUser", "ExcludedFromTesting", "NoDiff")
 }

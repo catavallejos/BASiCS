@@ -4,19 +4,19 @@
 
 arma::mat designMatrixOriginal(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
-    arma::vec const& mu, 
-    double const& variance) 
-{
+    arma::vec const& mu,
+    double const& variance) {
+
   arma::vec x = log(mu);
   double ran = x.max() - x.min();
   arma::vec myu = arma::zeros(k-2);
   myu(0) = x.min();
-  
+
   for(int i=1; i < (k-2); i++) {
     myu(i) = myu(i-1) + ran/(k-3);
   }
   double h = (myu(1)-myu(0)) * variance;
-  
+
   // Possibly create this matrix outside
   arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
@@ -40,14 +40,14 @@ arma::vec estimateRBFLocations(int const& k, arma::vec const& x) {
 }
 
 arma::mat designMatrix(
-    arma::vec const& mu, 
-    arma::vec const& locations, 
-    double const& variance) 
-{
+    arma::vec const& mu,
+    arma::vec const& locations,
+    double const& variance) {
+
   arma::vec x = log(mu);
   double h = (locations(1)-locations(0)) * variance;
   int k = locations.size() + 2;
-  
+
   // Possibly create this matrix outside
   arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
@@ -58,7 +58,7 @@ arma::mat designMatrix(
   return X;
 }
 
-/* Metropolis-Hastings updates of mu 
+/* Metropolis-Hastings updates of mu
 * Updates are implemented simulateaneously for all biological genes
 */
 arma::mat muUpdateReg(
@@ -79,11 +79,11 @@ arma::mat muUpdateReg(
     arma::vec const& beta,
     arma::mat const& X,
     double const& sigma2,
-    double variance,
-    arma::vec ml,
-    double exponent,
+    double const& variance,
+    arma::vec const& locations,
+    double const& exponent,
     double const& mintol) {
-  
+
   /* PROPOSAL STEP */
   mu1 = exp(arma::randn(q0) % sqrt(prop_var) + log(mu0));
   u = arma::randu(q0);
@@ -102,7 +102,7 @@ arma::mat muUpdateReg(
     }
   }
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(mu1, ml, variance);
+  arma::mat X_mu1 = designMatrix(mu1, locations, variance);
 
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check
@@ -162,9 +162,9 @@ arma::mat deltaUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     arma::vec const& beta,
-    double exponent,
-    double const& mintol)
-{
+    double const& exponent,
+    double const& mintol) {
+
   using arma::span;
 
   /* PROPOSAL STEP */
@@ -201,7 +201,7 @@ arma::mat deltaUpdateReg(
   * - If smaller than 1e-3
   * - If the proposed value is not finite
   * - When the acceptance rate cannot be numerally computed
-  */    
+  */
   ind = DegubInd(ind, q0, u, log_aux, delta1, mintol, "delta");
   for (int i=0; i < q0; i++) {
     if (ind(i) == 0) {
@@ -215,8 +215,7 @@ arma::mat deltaUpdateReg(
 
 arma::vec betaUpdateReg(double const& sigma2,
                         arma::mat const& VAux,
-                        arma::vec const& mAux)
-{
+                        arma::vec const& mAux) {
   arma::mat MVRNORM = mvrnormArma(1, mAux, sigma2 * VAux);
   arma::vec beta = MVRNORM.row(0).t();
   return beta;
@@ -230,8 +229,8 @@ double sigma2UpdateReg(arma::vec const& delta,
                        arma::vec const& m,
                        double const& sigma2_a0,
                        double const& sigma2_b0,
-                       int const& q0)
-{
+                       int const& q0) {
+
   double a = sigma2_a0 + (q0 + beta.n_elem) / 2;
   double b = sigma2_b0 + 0.5 * mInvVm0;
   b += 0.5 * Rcpp::as<double>(wrap(beta.t() * V1 * beta - 2 * beta.t() * V1 * m));
@@ -251,8 +250,8 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
                           double const& eta,
                           int const& q0,
                           arma::vec lambda1,
-                          double exponent)
-{
+                          double const& exponent) {
+
   double a;
   arma::vec b;
   if (exponent == 1) {

@@ -82,7 +82,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
         PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
         PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
         PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 )) {
+        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1)) {
     stop("Invalid prior hyper-parameter values.")
   }
   if (Regression) {
@@ -130,6 +130,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
   ConstrainGene <- NoSpikesParam$ConstrainGene
   NotConstrainGene <- NoSpikesParam$NotConstrainGene
   Constrain <- NoSpikesParam$Constrain
+
   RefGenes <- NoSpikesParam$RefGenes
   RefGene <- NoSpikesParam$RefGene
   Index <- seq_len(GPar$q.bio) - 1

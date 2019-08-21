@@ -32,13 +32,20 @@ test_that("Spikes + no regression", {
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
   Aux <- BASiCS:::Hidden_muUpdate(mu0 = Start$mu0[seq_len(q0)], 
                                   prop_var = exp(Start$ls.mu0),
-                                  Counts = CountsBio, invdelta = 1/Start$delta0, 
+                                  Counts = CountsBio,
+                                  invdelta = 1/Start$delta0, 
                                   phinu = Start$phi0 * Start$nu0,
                                   sum_bycell_bio = rowSums(CountsBio),
-                                  s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
-                                  mu1 =  mu1, u = uGene, ind = indGene,
-                                  exponent = 1, mintol = 1e-3)
-  
+                                  s2_mu = PriorParam$s2.mu,
+                                  q0 = q0, 
+                                  n = n,
+                                  mu1 =  mu1, 
+                                  u = uGene, 
+                                  ind = indGene,
+                                  exponent = 1, 
+                                  mintol = 1e-3)
+
+
   mu1 <- c(6.78, 15.67,  5.43, 13.05, 24.20)
   mu1Obs <- round(Aux[1:5,1],2) 
   expect_equal(mu1, mu1Obs)

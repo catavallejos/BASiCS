@@ -17,7 +17,7 @@ Results of BASiCS_TestDE
 
 \item{\code{GroupLabel1,GroupLabel2}}{Labels for Chain1 and Chain2}
 
-\item{\code{OffsetChain}}{Fold change between each draw of mu}
+\item{\code{OffsetChain}}{Fold change (ratio) between MCMC each draw}
 
 \item{\code{Offset}}{Ratio between median of chains}
 

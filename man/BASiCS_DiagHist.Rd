@@ -7,7 +7,7 @@
 \usage{
 BASiCS_DiagHist(object, Param = NULL, na.rm = TRUE)
 
-BASiCS_diagHist(object, Param = NULL, na.rm = TRUE)
+BASiCS_diagHist(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
@@ -20,6 +20,8 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
+
+\item{...}{Unused}
 }
 \value{
 A ggplot object.

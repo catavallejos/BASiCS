@@ -92,8 +92,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double const& mintol_delta,
     double const& mintol_nu,
     double const& mintol_theta,
-    double geneExponent,
-    double cellExponent) 
+    double GeneExponent,
+    double CellExponent)
 {
   using arma::ones;
   using arma::zeros;
@@ -248,7 +248,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                            q0,
                            n,
                            y_n,
-                           cellExponent);
+                           CellExponent);
 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]);
@@ -259,10 +259,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // theta and regression parameters are global; thus, they require scaling
     // for both cases
     double exponent = 1;
-    if (geneExponent != 1) {
-      exponent = geneExponent;
-    } else if (cellExponent != 1) {
-      exponent = cellExponent;
+    if (GeneExponent != 1) {
+      exponent = GeneExponent;
+    } else if (CellExponent != 1) {
+      exponent = CellExponent;
     }
 
     // UPDATE OF THETA:
@@ -309,10 +309,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         sigma2Aux,
                         variance,
                         ml_arma,
-                        geneExponent,
+                        GeneExponent,
                         mintol_mu);
     X = designMatrix(means, ml_arma, variance);
-    
+
     PmuAux += muAux.col(1);
     if (i >= Burn) {
       muAccept += muAux.col(1);
@@ -327,7 +327,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         BatchDesign_arma,
                         n,
                         y_n,
-                        cellExponent);
+                        CellExponent);
     // UPDATE OF DELTA:
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
@@ -346,7 +346,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                               X,
                               sigma2Aux,
                               betaAux,
-                              geneExponent,
+                              GeneExponent,
                               mintol_delta);
     PdeltaAux += deltaAux.col(1);
     if (i >= Burn) {
@@ -372,7 +372,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                           y_n,
                           u_n,
                           ind_n,
-                          cellExponent, mintol_nu);
+                          CellExponent, mintol_nu);
 
     PnuAux += nuAux.col(1);
     if (i >= Burn) {
@@ -410,7 +410,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                                 eta0,
                                 q0,
                                 y_q0,
-                                cellExponent);
+                                CellExponent);
     // UPDATE OF EPSILON
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X * betaAux;
