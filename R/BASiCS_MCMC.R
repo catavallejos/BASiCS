@@ -200,10 +200,17 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
 
   # Total counts per cell and/or gene
-  sum.bycell.all <- matrixStats::rowSums2(counts(Data))
-  sum.bygene.all <- matrixStats::colSums2(counts(Data))
-  sum.bycell.bio <- matrixStats::rowSums2(GPar$BioCounts)
-  sum.bygene.bio <- matrixStats::colSums2(GPar$BioCounts)
+  sum.bycell.bio <- matrixStats::rowSums2(counts(Data))
+  sum.bygene.bio <- matrixStats::colSums2(counts(Data))
+  if(WithSpikes) {
+    sum.bycell.tech <- matrixStats::rowSums2(assay(altExp(Data)))
+    sum.bygene.tech <- matrixStats::colSums2(assay(altExp(Data))) 
+    sum.bycell.all <- c(sum.bycell.bio, sum.bycell.tech)
+    sum.bygene.all <- sum.bygene.bio + sum.bygene.tech
+  } else {
+    sum.bycell.all <- sum.bycell.bio
+    sum.bygene.all <- sum.bygene.bio
+  }
 
   # Assignment of optional parameters (default values if input not provided)
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,

@@ -1228,3 +1228,8 @@ This is similar to what is implemented in `scran:::.rescale_clusters
 
 version 1.7.8 (2019-08-20)
 - `min.mean` parameter exposed in `BASiCS_CorrectOffset` and `BASiCS_TestDE`
+
+version 1.7.9 (2019-09-05)
+- `newBASiCS_Data`, `HiddenBASiCS_MCMC_InputCheck`, `HiddenChecksBASiCS_Data` 
+and `BASiCS_MCMC` modified to replace `isSpike` by `altExp`
+- WIP - unit test do not pass

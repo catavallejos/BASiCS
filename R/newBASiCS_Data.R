@@ -109,24 +109,23 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   }
 
   # Re-ordering genes
-  Counts <- as.matrix(rbind(Counts[!Tech, ], Counts[Tech, ]))
-  Tech <- c(Tech[!Tech], Tech[Tech])
+  CountsBio <- Counts[!Tech, ]
+  CountsTech <- Counts[Tech, ]
+
+  # Create a SingleCellExperiment data object
+  Data <- SingleCellExperiment(assays = list(counts = as.matrix(CountsBio)),
+                                             metadata = list(SpikeInput = SpikeInput))
+  altExp(Data, "spike-ins") <- SummarizedExperiment(CountsTech)
+  colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
+  colnames(Data) <- colnames(CountsBio)
+  rownames(Data) <- rownames(CountsBio)
 
   # Checks to assess if the data contains the required information
-  errors <- HiddenChecksBASiCS_Data(Counts, Tech, SpikeInput,
-                                    GeneName, BatchInfo, WithSpikes)
+  errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
   if (length(errors) > 0) {
     stop(errors)
   }
-
-  # Create a SingleCellExperiment data object
-  Data <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = as.matrix(Counts)),
-                                                     metadata = list(SpikeInput = SpikeInput))
-  SingleCellExperiment::isSpike(Data, SpikeType) <- Tech
-  SummarizedExperiment::colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
-  colnames(Data) <- colnames(Counts)
-  rownames(Data) <- rownames(Counts)
-
+  
   message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n",
             "    - You must remove poor quality cells before hand \n",
             "    - We recommend to pre-filter lowly expressed transcripts. \n",
