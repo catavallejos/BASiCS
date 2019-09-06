@@ -29,9 +29,7 @@ information. Not required if a single batch is present on the data.
 Default value: \code{BatchInfo = NULL}.}
 
 \item{SpikeType}{Character to indicate what type of spike-ins are in use.
-For more details see argument `type` in
-see `help(isSpike, package = "SingleCellExperiment")`. Default value:
-\code{SpikeType = "ERCC"}.}
+Default value: \code{SpikeType = "ERCC"} (parameter is no longer used).}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}}.

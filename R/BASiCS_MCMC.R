@@ -5,7 +5,7 @@
 #'
 #' @param Data A \code{\linkS4class{SingleCellExperiment}} object.
 #' If \code{WithSpikes = TRUE}, this MUST be formatted to include
-#' the spike-ins information (see vignette).
+#' the spike-ins and/or batch information (see vignette).
 #' @param N Total number of iterations for the MCMC sampler.
 #' Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
@@ -237,7 +237,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Burn,
                 GPar$BioCounts,
                 GPar$BatchDesign,
-                metadata(Data)$SpikeInput,
+                metadata(Data)$SpikeInput[,2],
                 Start$mu0,
                 Start$delta0,
                 Start$phi0,
@@ -291,7 +291,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Burn,
                 GPar$BioCounts,
                 GPar$BatchDesign,
-                metadata(Data)$SpikeInput,
+                metadata(Data)$SpikeInput[,2],
                 Start$mu0,
                 Start$delta0,
                 Start$phi0,

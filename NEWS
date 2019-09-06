@@ -1233,3 +1233,14 @@ version 1.7.9 (2019-09-05)
 - `newBASiCS_Data`, `HiddenBASiCS_MCMC_InputCheck`, `HiddenChecksBASiCS_Data` 
 and `BASiCS_MCMC` modified to replace `isSpike` by `altExp`
 - WIP - unit test do not pass
+
+version 1.7.10 (2019-09-6)
+- `metadata(Data)$SpikeInput` is now required to be a `data.frame`. This allows
+us to verify the correct order in spike-in inputs when the user manually
+modifies an existing `SingleCellExperiment` object.
+- Additional changes in `newBASiCS_Data`, `HiddenBASiCS_MCMC_InputCheck`, 
+`HiddenChecksBASiCS_Data` to avoid errors.
+- `HiddenBASiCS_MCMC_Start`, `HiddenBASiCS_MCMC_GlobalParams`, 
+`BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates` modified to replace 
+`isSpike` by `altExp`
+- Some unit tests adapted accordingly

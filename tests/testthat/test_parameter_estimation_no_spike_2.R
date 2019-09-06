@@ -6,20 +6,22 @@ test_that("Estimates match (no-spikes)",
   set.seed(12)
   Data1 <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                   WithBatch = TRUE)
-  Data2 <- newBASiCS_Data(Counts = assay(Data1)[!isSpike(Data1),],
-                          Tech = isSpike(Data1)[!isSpike(Data1)],
-                          BatchInfo = SingleCellExperiment::colData(Data1)$BatchInfo)
-  expect_true(all.equal(assay(Data1)[!isSpike(Data1),], assay(Data2)))
+  Data2 <- Data1
+  altExp(Data2) <- NULL
+  metadata(Data1)$SpikeInput <- NULL
+  expect_true(all.equal(counts(Data1), counts(Data2)))
 
   set.seed(16)
-  Chain1 <- run_MCMC(Data1, N = 1000, Thin = 10, Burn = 500, 
-                        Regression = FALSE, 
-                        PrintProgress = FALSE, WithSpikes = FALSE)
+  Chain1 <- run_MCMC(Data1, 
+                     N = 1000, Thin = 10, Burn = 500, 
+                     Regression = FALSE, WithSpikes = FALSE,
+                     PrintProgress = FALSE)
   PostSummary1 <- Summary(Chain1)
   set.seed(16)
-  Chain2 <- run_MCMC(Data2, N = 1000, Thin = 10, Burn = 500,
-                        Regression = FALSE, WithSpikes = FALSE, 
-                        PrintProgress = FALSE)
+  Chain2 <- run_MCMC(Data2, 
+                     N = 1000, Thin = 10, Burn = 500,
+                     Regression = FALSE, WithSpikes = FALSE, 
+                     PrintProgress = FALSE)
   PostSummary2 <- Summary(Chain2)
             
   # Check if parameter estimates match for the first 5 genes and cells

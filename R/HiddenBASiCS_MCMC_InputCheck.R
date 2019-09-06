@@ -14,20 +14,20 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
          "The latter should include information for spike-in genes. \n",
          "Please remove unwanted the remaining elements. See help(altExp). \n")
   
-  if(WithSpikes) {
+  if(WithSpikes & length(altExpNames(Data)) > 0) {
     message("altExp '", altExpNames(Data),"' is assumed to contain spike-in genes.\n",
-            "see help(altExp) for details.")  
+            "see help(altExp) for details. \n")  
   }
   
   # If SpikeInput slot is missing and WithSpikes == TRUE
   if((length(altExpNames(Data)) > 0) & WithSpikes & 
      is.null(metadata(Data)$SpikeInput))
-    stop("'Data' does not contain the 'SpikeInput' slot. \n",
+    stop("'Data' does not contain 'SpikeInput' as metadata. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   
   # If isSpike slot is missing and WithSpikes == TRUE
   if((length(altExpNames(Data)) == 0)  & WithSpikes)
-    stop("'Data' does not contain information about spike-in fenes \n", 
+    stop("'Data' does not contain information about spike-in genes \n", 
          "Please indicate include this information using 'altExp' \n",
          "or set 'WithSpikes = FALSE' \n.",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
