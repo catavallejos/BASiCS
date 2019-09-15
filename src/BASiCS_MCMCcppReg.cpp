@@ -48,44 +48,43 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     int N, 
     int Thin, 
     int Burn,  
-    NumericMatrix Counts,  
-    NumericMatrix BatchDesign, 
-    NumericVector muSpikes, 
-    NumericVector mu0, 
-    NumericVector delta0, 
-    NumericVector phi0, 
-    NumericVector s0,
-    NumericVector nu0, 
-    NumericVector theta0, 
+    arma::mat Counts,  
+    arma::mat BatchDesign, 
+    arma::vec muSpikes, 
+    arma::vec mu0, 
+    arma::vec delta0, 
+    arma::vec phi0, 
+    arma::vec s0,
+    arma::vec nu0, 
+    arma::vec theta0, 
     double s2mu,
-    NumericVector aphi, 
+    arma::vec aphi, 
     double as, 
     double bs,   
     double atheta, 
     double btheta, 
+    int k,
+    arma::vec m0, 
+    arma::mat V0, 
+    double sigma2_a0, 
+    double sigma2_b0,
+    arma::vec beta0, 
+    double sigma20, 
+    double eta0, 
+    arma::vec lambda0, 
+    double const& variance,
     double ar, 
-    NumericVector LSmu0, 
-    NumericVector LSdelta0, 
+    arma::vec LSmu0, 
+    arma::vec LSdelta0, 
     double LSphi0, 
-    NumericVector LSnu0, 
-    NumericVector LStheta0, 
-    NumericVector sumByCellAll, 
-    NumericVector sumByCellBio,
-    NumericVector sumByGeneAll, 
-    NumericVector sumByGeneBio,
+    arma::vec LSnu0, 
+    arma::vec LStheta0, 
+    arma::vec sumByCellBio,
+    arma::vec sumByGeneAll, 
+    arma::vec sumByGeneBio,
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
-    int k,
-    NumericVector m0, 
-    NumericMatrix V0, 
-    double sigma2_a0, 
-    double sigma2_b0,
-    NumericVector beta0, 
-    double sigma20, 
-    double eta0, 
-    NumericVector lambda0, 
-    double const& variance,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -96,25 +95,17 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   using Rcpp::Rcout; 
   
   // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.ncol(); 
-  int nBatch = BatchDesign.ncol();
-  int q0 = delta0.size();
+  int n = Counts.n_cols; 
+  int nBatch = BatchDesign.n_cols;
+  int q0 = delta0.n_elem;
   int Naux = N/Thin - Burn/Thin;
-  
-  // TRANSFORMATION TO ARMA ELEMENTS 
-  arma::vec sumByCellAll_arma = as_arma(sumByCellAll); 
-  arma::vec sumByCellBio_arma = as_arma(sumByCellBio);
-  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll); 
-  arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
-  arma::mat Counts_arma = as_arma(Counts);
-  arma::mat BatchDesign_arma = as_arma(BatchDesign);
   
   // OTHER GLOBAL QUANTITIES
   double SumSpikeInput = sum(muSpikes);
-  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
-  arma::mat inv_V0 = inv(as_arma(V0));
-  double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t()*inv_V0*as_arma(m0)));
-  arma::vec InvVm0 = inv_V0*as_arma(m0);
+  arma::vec BatchSizes = sum(BatchDesign,0).t();
+  arma::mat inv_V0 = inv(V0);
+  double mInvVm0 = Rcpp::as<double>(wrap(m0.t()*inv_V0*m0));
+  arma::vec InvVm0 = inv_V0*m0;
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux); 
@@ -146,20 +137,20 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec thetaAccept = zeros(nBatch); arma::vec PthetaAux = zeros(nBatch);
   
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
-  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
-  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
-  arma::vec phiAux = as_arma(phi0); Rcpp::List phiAuxList;
-  arma::vec sAux = as_arma(s0); 
-  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0);
-  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0);
-  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = mu0; 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = delta0; 
+  arma::vec phiAux = phi0; Rcpp::List phiAuxList;
+  arma::vec sAux = s0; 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = nu0;
+  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = theta0;
+  arma::vec thetaBatch = BatchDesign * theta0; 
   
   // INITIALIZATION OF ADAPTIVE VARIANCES
-  arma::vec LSmuAux = as_arma(LSmu0);
-  arma::vec LSdeltaAux = as_arma(LSdelta0); 
+  arma::vec LSmuAux = LSmu0;
+  arma::vec LSdeltaAux = LSdelta0; 
   double LSphiAux = LSphi0; 
-  arma::vec LSnuAux = as_arma(LSnu0);
-  arma::vec LSthetaAux = as_arma(LStheta0);  
+  arma::vec LSnuAux = LSnu0;
+  arma::vec LSthetaAux = LStheta0;  
   
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = zeros(q0); arma::vec PdeltaAux0 = zeros(q0);
@@ -185,10 +176,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::mat epsilon = arma::zeros(q0, Naux);
   
   // INITIALIZATION OF REGRESSION PARAMETERS
-  arma::vec mAux = as_arma(m0); 
-  arma::mat VAux = as_arma(V0); 
-  arma::vec betaAux = as_arma(beta0);
-  arma::vec lambdaAux = as_arma(lambda0); 
+  arma::vec mAux = m0; 
+  arma::mat VAux = V0; 
+  arma::vec betaAux = beta0;
+  arma::vec lambdaAux = lambda0; 
   double sigma2Aux = sigma20; 
   arma::vec epsilonAux = arma::zeros(q0);
   
@@ -212,9 +203,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // UPDATE OF PHI: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts_arma, 
+    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts, 
                            muAux.col(0), 1/deltaAux.col(0),
-                           nuAux.col(0), aphi, sumByGeneBio_arma, q0,n, 
+                           nuAux.col(0), aphi, sumByGeneBio, q0,n, 
                            y_n); 
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
@@ -224,18 +215,18 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign_arma, BatchSizes,
+                                BatchDesign, BatchSizes,
                                 sAux, nuAux.col(0), atheta, btheta, n, 
                                 nBatch, mintol_theta);
     PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
-    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+    thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // REGRESSION
-    muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts_arma, deltaAux.col(0), 
-                        phiAux % nuAux.col(0), sumByCellBio_arma, s2mu, q0, n, 
+    muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts, deltaAux.col(0), 
+                        phiAux % nuAux.col(0), sumByCellBio, s2mu, q0, n, 
                         y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, 
                         variance, mintol_mu);     
@@ -243,13 +234,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     
     // UPDATE OF S
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
-                        as, bs, BatchDesign_arma, n, y_n); 
+                        as, bs, BatchDesign, n, y_n); 
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // REGRESSION
-    deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
+    deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts, 
                               muAux.col(0), 
                               phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
                               lambdaAux, X, sigma2Aux, betaAux, mintol_delta);  
@@ -258,10 +249,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts_arma, SumSpikeInput,
-                          BatchDesign_arma,
+    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts, SumSpikeInput,
+                          BatchDesign,
                           muAux.col(0), 1/deltaAux.col(0),
-                          phiAux, sAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                          phiAux, sAux, thetaBatch, sumByGeneAll, q0, n,
                           y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     

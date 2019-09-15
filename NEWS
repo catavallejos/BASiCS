@@ -1244,3 +1244,12 @@ modifies an existing `SingleCellExperiment` object.
 `BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates` modified to replace 
 `isSpike` by `altExp`
 - Some unit tests adapted accordingly
+
+version 1.7.11 (2019-09-15)
+- `Uncertainty` parameter added to `BASiCS_showFit`. This enables optional
+inclusion of uncertainty measure around the regression trend. 
+- Re-ordering of parameter in c++ MCMC samplers (does not affect output)
+- Avoid unnecessary transformations between NumericMatrix/Vector and arma::
+- Removes `isSpike` usage in `BASiCS_Sim` documentation
+- Removes `isSpike` call from the vignette
+- Adds missing parameters to the documentation of `BASiCS_CorrectOffset`

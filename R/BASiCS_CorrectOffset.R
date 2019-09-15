@@ -1,9 +1,16 @@
-#' @name BASiCS_TestDE
+#' @name BASiCS_CorrectOffset
 #'
 #' @title Remove global mean expression offset
 #'
 #' @description Remove global offset in mean expression between two 
 #' \code{BASiCS_Chain} objects. 
+#' 
+#' @param Chain a `BASiCS_MCMC` object to which the offset correction should 
+#' be applied (with respect to `ChainRef`).
+#' @param ChainRef a `BASiCS_MCMC` object to be used as the reference in the
+#' offset correction procedure.
+#' @param min.mean Minimum mean expression threshold required for inclusion in
+#' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. 
 #'
 #' @examples
 #'
@@ -17,8 +24,8 @@
 #' A$Chain
 #' A$Offset
 #' 
-#' @return A list whose first element is an offset corrected version of `Chain1` 
-#' (using `Chain2` as a reference), whose second element is the point estimate
+#' @return A list whose first element is an offset corrected version of `Chain` 
+#' (using `ChainRef` as a reference), whose second element is the point estimate
 #' for the offset and whose third element contains iteration-specific offsets.  
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}

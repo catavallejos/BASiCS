@@ -7,7 +7,7 @@
 BASiCS_showFit(object, xlab = "log(mu)", ylab = "log(delta)",
   pch = 16, smooth = TRUE, variance = 1.2, colour = "dark blue",
   markExcludedGenes = TRUE, GenesSel = NULL,
-  colourGenesSel = "dark red", ...)
+  colourGenesSel = "dark red", Uncertainty = TRUE)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
@@ -39,7 +39,8 @@ Only used when \code{smooth = TRUE}. Default value \code{GenesSel = NULL}.}
 \code{GenesSel} within the scatterplot. Default value 
 \code{colourGenesSel = "dark red"}.}
 
-\item{...}{Additional parameters for plotting.}
+\item{Uncertainty}{logical indicator. If true, statistical uncertainty
+around the regression fit is shown in the plot.}
 }
 \value{
 A ggplot2 object

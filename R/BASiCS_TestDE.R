@@ -69,7 +69,7 @@
 #' This argument is necessary in order to have a meaningful EFDR calibration
 #' when the user decides to exclude some genes from the comparison.
 #' @param min.mean Minimum mean expression threshold required for inclusion in
-#' input calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
+#' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 #' parameter is only relevant with `Offset = TRUE`.
 #' @param ... Optional parameters.
 #'
