@@ -1253,3 +1253,6 @@ inclusion of uncertainty measure around the regression trend.
 - Removes `isSpike` usage in `BASiCS_Sim` documentation
 - Removes `isSpike` call from the vignette
 - Adds missing parameters to the documentation of `BASiCS_CorrectOffset`
+
+version 1.7.12 (2019-09-15)
+- changes maintainer's email address
