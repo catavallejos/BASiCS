@@ -282,7 +282,6 @@ setClass("BASiCS_Summary",
 #' @slot Results \code{\linkS4class{BASiCS_ResultDE}} objects
 #' @slot Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects. 
 #' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2
-#' @slot OffsetChain Fold change (ratio) between MCMC each draw
 #' @slot Offset Ratio between median of chains 
 #' @slot RowData Annotation for genes
 #' @slot Extras Slot for extra information to be added later
@@ -294,7 +293,6 @@ setClass("BASiCS_ResultsDE",
     Chain2 = "BASiCS_Chain",
     GroupLabel1 = "character",
     GroupLabel2 = "character",
-    OffsetChain = "numeric",
     Offset = "numeric",
     RowData = "data.frame",
     ## gene annotations!
@@ -336,47 +334,5 @@ setClass("BASiCS_ResultDE",
     EFNRgrid = "numeric",
     Epsilon = "numeric",
     Extras = "list"
-  )
-)
-
-#' @name BASiCS_OffsetCorrected
-#' @aliases BASiCS_OffsetCorrected-class
-#'
-#' @title The BASiCS_OffsetCorrected class
-#'
-#' @description Container of two chains which have been offset to have matching
-#' mean mu values.
-#' @slot Chain1,Chain2 Objects of class \code{\linkS4class{BASiCS_Chain}}.
-#' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2, respectively.
-#' @slot OffsetChain Fold change (ratio) between each MCMC draw
-#' @slot OffsetEst Estimated ratio between median of chains 
-#' @slot ChainTau log2(fold-change) between each MCMC draw
-#' @slot Mu1 Median mu values for Chain1
-#' @slot Mu1_old Median mu values for Chain1 before offset correction
-#' @slot Mu2 Median mu values for Chain2
-#' @slot MuBase (Mu1 * n1 + Mu2 * n2) / n
-#' @slot MuBaseOld (Mu1_old * n1 + Mu2 * n2) / n
-#' @slot MedianTau Median log2(fold-change)
-#' @slot MedianTau_old Median log2(fold-change) before offset correction
-#' @slot Delta1,Delta2 Median delta value for Chain1 and Chain2
-#' @export
-setClass("BASiCS_OffsetCorrected", 
-  representation = representation(
-    Chain1 = "BASiCS_Chain",
-    Chain2 = "BASiCS_Chain",
-    GroupLabel1 = "character", 
-    GroupLabel2 = "character",
-    OffsetChain = "numeric",
-    OffsetEst = "numeric",
-    ChainTau = "matrix",
-    Mu1 = "numeric", 
-    Mu1_old = "numeric", 
-    Mu2 = "numeric",
-    MuBase = "numeric", 
-    MuBase_old = "numeric", 
-    MedianTau = "numeric",
-    MedianTau_old = "numeric",
-    Delta1 = "numeric",
-    Delta2 = "numeric"
   )
 )

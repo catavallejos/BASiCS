@@ -735,27 +735,6 @@ setMethod("displaySummaryBASiCS",
           definition = HiddenGetParam)
 
 
-#' @docType methods
-#' @rdname show-BASiCS_OffsetCorrected-method
-#'
-#' @title Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}} object
-#'
-#' @param object an object of class \code{\linkS4class{BASiCS_OffsetCorrected}}
-#'
-#' @examples
-#'
-#' help(BASiCS_MCMC)
-#'
-#' @seealso \code{\link[methods]{show}}
-#' @export
-setMethod("show", signature = "BASiCS_OffsetCorrected", 
-  function(object) {
-    message("A BASiCS_OffsetCorrected object for ", object@GroupLabel1, " and ",
-      object@GroupLabel2, ". To test for differential expression run ", 
-      "`BASiCS_TestDE(OffsetCorrected = OffsetCorrected)`", sep = "")
-  }
-)
-
 
 #' @docType methods
 #' @rdname show-BASiCS_ResultsDE-method

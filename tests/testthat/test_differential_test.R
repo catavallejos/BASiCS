@@ -8,11 +8,11 @@ test_that("Differential test is correct", {
   Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                         GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
                         EpsilonM = log2(1.5), EpsilonD = log2(1.5), 
-                        OffSet = TRUE, Plot = FALSE, PlotOffset = FALSE)
+                        OffSet = TRUE, Plot = FALSE)
             
   # Classification frequency
             
-  FreqMean0 <- c(335,  10,   5)
+  FreqMean0 <- c(335,  8,   7)
   FreqMean <- as.vector(table(Test@Results$Mean@Table$ResultDiffMean))
   expect_equal(FreqMean, FreqMean0)
             
@@ -21,7 +21,7 @@ test_that("Differential test is correct", {
   expect_equal(FreqDisp, FreqDisp0)
             
   # Posterior probabilities  
-  ProbMean0 <- c(0.00, 0.01, 0.87, 0.49, 0.28)
+  ProbMean0 <- c(0.00, 0.01, 0.77, 0.43, 0.19)
   ProbMean <- round(Test@Results$Mean@Table$ProbDiffMean[1:5], 2)
   expect_equal(ProbMean, ProbMean0)
             
@@ -30,7 +30,7 @@ test_that("Differential test is correct", {
   expect_equal(ProbDisp, ProbDisp0)
             
   # Log2 fold changes      
-  Lfc2Mean0 <- c(-0.23, -0.08, -0.84, -0.57, -0.38)
+  Lfc2Mean0 <- c(-0.17, -0.02, -0.78, -0.51, -0.32)
   Lfc2Mean <- round(Test@Results$Mean@Table$MeanLog2FC[1:5], 2)
   expect_equal(Lfc2Mean, Lfc2Mean0)
             

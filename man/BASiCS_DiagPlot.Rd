@@ -7,7 +7,7 @@
 \usage{
 BASiCS_DiagPlot(object, Param = "mu", x = NULL, y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
-  c("mu", "delta")), na.rm = TRUE)
+  c("mu", "delta")), Smooth = TRUE, na.rm = TRUE)
 
 BASiCS_diagPlot(...)
 }

@@ -70,10 +70,9 @@
 #' order as how genes are displayed in the table of counts.
 #' This argument is necessary in order to have a meaningful EFDR calibration
 #' when the user decides to exclude some genes from the comparison.
-#' @param IncludeEpsilon Flag indicating where to include the residual 
-#' overdispersion parameter, epsilon, in the 
-#' figures and analysis. Default is \code{TRUE} if epsilon is present in
-#' the chains.
+#' @param min.mean Minimum mean expression threshold required for inclusion in
+#' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
+#' parameter is only relevant with `Offset = TRUE`.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #'
 #' @return \code{BASiCS_TestDE} returns an object of class
@@ -138,7 +137,7 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_D = 0.05,
                           EFDR_R = 0.05,
                           GenesSelect = NULL, 
-                          IncludeEpsilon = !is.null(Chain1@parameters[["epsilon"]]),
+                          min.mean = 1, 
                           ...)
 {
   OrderVariable <- match.arg(OrderVariable)
@@ -173,53 +172,49 @@ BASiCS_TestDE <- function(Chain1,
   n2 <- ncol(Chain2@parameters$nu)
   n <- n1 + n2
 
+  IncludeEpsilon <- !is.null(Chain1@parameters[["epsilon"]])
   # With offset correction
   if (Offset) {
 
-    OffsetCorrected <- BASiCS_CorrectOffset(Chain1 = Chain1, 
-                                            Chain2 = Chain2, 
-                                            GroupLabel1 = GroupLabel1, 
-                                            GroupLabel2 = GroupLabel2, 
-                                            Plot = PlotOffset)
-    Mu1 <- OffsetCorrected@Mu1
-    Mu2 <- OffsetCorrected@Mu2
-    Delta1 <- OffsetCorrected@Delta1
-    Delta2 <- OffsetCorrected@Delta2
-    MuBase <- OffsetCorrected@MuBase
-    ChainTau <- OffsetCorrected@ChainTau
-    MedianTau <- OffsetCorrected@MedianTau
+    A <- BASiCS_CorrectOffset(Chain1, Chain2, min.mean = min.mean)
+    OffsetEst <- A$Offset
+    Chain1_offset <- A$Chain
+    Chain2_offset <- Chain2  # Chain2 requires no change
 
-    # Default values when no offset correction is applied
-    OffsetEst <- OffsetCorrected@OffsetEst
-    OffsetChain <- OffsetCorrected@OffsetChain
-    Chain1_offset <- OffsetCorrected@Chain1
-    Chain2_offset <- OffsetCorrected@Chain2
-
-  } else {
-    OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
-                   matrixStats::rowSums2(Chain2@parameters$mu)
-    # Offset point estimate
-    OffsetEst <- median(OffsetChain)
-    if (!isTRUE(all.equal(OffsetEst, 0))) {
-      stop(paste("Global offset detected between Chain1 and Chain2!\n ",
-                 "Please remove with BASiCS_correctOffset or set Offset=TRUE."))
+    if (!PlotOffset) {
+      message("-------------------------------------------------------------\n",
+              "Offset estimate: ", round(OffsetEst, 4), "\n",
+              "(ratio ", GroupLabel1, " vs ", GroupLabel2, ").\n",
+              "To visualise its effect, please use 'PlotOffset = TRUE'.\n",
+              "-------------------------------------------------------------\n")
+    } else {
+      message("-------------------------------------------------------------\n",
+              "Offset estimate: ", round(OffsetEst, 4), "\n",
+              "(ratio ", GroupLabel1, " vs ", GroupLabel2, ").\n",
+              "-------------------------------------------------------------\n")
     }
+  } else {
+    message("-------------------------------------------------------------\n",
+            "It is recomended to perform a global offset correction \n",
+            "to remove global changes between the two groups of cells \n",
+            "Default offset value set equal to 1.\n",
+            "To perform offset correction, please set 'Offset = TRUE'. \n",
+            "-------------------------------------------------------------\n")
+    Chain1_offset <- Chain1
+    Chain2_offset <- Chain2
 
-    Mu1 <- matrixStats::colMedians(Chain1@parameters$mu)
-    Mu2 <- matrixStats::colMedians(Chain2@parameters$mu)
-    Delta1 <- matrixStats::colMedians(Chain1@parameters$delta)
-    Delta2 <- matrixStats::colMedians(Chain2@parameters$delta)
-    MuBase <- (Mu1 * n1 + Mu2 * n2)/n
-    ChainTau <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
-    MedianTau <- matrixStats::colMedians(ChainTau)
 
     # Default values when no offset correction is applied
     OffsetEst <- 1
-    OffsetChain <- NULL
-    Chain1_offset <- NULL
-    Chain2_offset <- NULL
   }
 
+  Mu1 <- matrixStats::colMedians(Chain1_offset@parameters$mu)
+  Mu2 <- matrixStats::colMedians(Chain2_offset@parameters$mu)
+  Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
+  Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
+  ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
+
+  MuBase <- (Mu1 * n1 + Mu2 * n2) / n
 
 
   TestDifferential <- function(Chain, 
@@ -463,7 +458,6 @@ BASiCS_TestDE <- function(Chain1,
     Chain2 = Chain2_offset,
     GroupLabel1 = GroupLabel1,
     GroupLabel2 = GroupLabel2,
-    OffsetChain = OffsetChain,
     Offset = OffsetEst,
     Extras = list()
   )

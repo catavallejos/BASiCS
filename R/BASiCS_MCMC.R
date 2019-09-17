@@ -5,7 +5,7 @@
 #'
 #' @param Data A \code{\linkS4class{SingleCellExperiment}} object.
 #' If \code{WithSpikes = TRUE}, this MUST be formatted to include
-#' the spike-ins information (see vignette).
+#' the spike-ins and/or batch information (see vignette).
 #' @param N Total number of iterations for the MCMC sampler.
 #' Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
@@ -200,10 +200,17 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
 
   # Total counts per cell and/or gene
-  sum.bycell.all <- matrixStats::rowSums2(counts(Data))
-  sum.bygene.all <- matrixStats::colSums2(counts(Data))
-  sum.bycell.bio <- matrixStats::rowSums2(GPar$BioCounts)
-  sum.bygene.bio <- matrixStats::colSums2(GPar$BioCounts)
+  sum.bycell.bio <- matrixStats::rowSums2(counts(Data))
+  sum.bygene.bio <- matrixStats::colSums2(counts(Data))
+  if(WithSpikes) {
+    sum.bycell.tech <- matrixStats::rowSums2(assay(altExp(Data)))
+    sum.bygene.tech <- matrixStats::colSums2(assay(altExp(Data))) 
+    sum.bycell.all <- c(sum.bycell.bio, sum.bycell.tech)
+    sum.bygene.all <- sum.bygene.bio + sum.bygene.tech
+  } else {
+    sum.bycell.all <- sum.bycell.bio
+    sum.bygene.all <- sum.bygene.bio
+  }
 
   # Assignment of optional parameters (default values if input not provided)
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,
@@ -230,7 +237,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Burn,
                 GPar$BioCounts,
                 GPar$BatchDesign,
-                metadata(Data)$SpikeInput,
+                metadata(Data)$SpikeInput[,2],
                 Start$mu0,
                 Start$delta0,
                 Start$phi0,
@@ -243,19 +250,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 PriorParam$b.s,
                 PriorParam$a.theta,
                 PriorParam$b.theta,
-                ArgsDef$AR,
-                Start$ls.mu0,
-                Start$ls.delta0,
-                Start$ls.phi0,
-                Start$ls.nu0,
-                rep(Start$ls.theta0, GPar$nBatch),
-                sum.bycell.all,
-                sum.bycell.bio,
-                sum.bygene.all,
-                sum.bygene.bio,
-                as.numeric(ArgsDef$StoreAdapt),
-                ArgsDef$StopAdapt,
-                as.numeric(ArgsDef$PrintProgress),
                 ArgsDef$k,
                 PriorParam$m,
                 PriorParam$V,
@@ -266,6 +260,18 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 PriorParam$eta,
                 Start$lambda0,
                 ArgsDef$variance,
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.phi0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, GPar$nBatch),
+                sum.bycell.bio,
+                sum.bygene.all,
+                sum.bygene.bio,
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
                 ArgsDef$mintol_mu, 
                 ArgsDef$mintol_delta,
                 ArgsDef$mintol_nu,
@@ -284,7 +290,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Burn,
                 GPar$BioCounts,
                 GPar$BatchDesign,
-                metadata(Data)$SpikeInput,
+                metadata(Data)$SpikeInput[,2],
                 Start$mu0,
                 Start$delta0,
                 Start$phi0,
@@ -307,7 +313,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Start$ls.phi0,
                 Start$ls.nu0,
                 rep(Start$ls.theta0, GPar$nBatch),
-                sum.bycell.all,
                 sum.bycell.bio,
                 sum.bygene.all,
                 sum.bygene.bio,
@@ -340,16 +345,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 PriorParam$b.s,
                 PriorParam$a.theta,
                 PriorParam$b.theta,
-                ArgsDef$AR,
-                Start$ls.mu0,
-                Start$ls.delta0,
-                Start$ls.nu0,
-                rep(Start$ls.theta0, GPar$nBatch),
-                sum.bycell.bio,
-                sum.bygene.bio,
-                as.numeric(ArgsDef$StoreAdapt),
-                ArgsDef$StopAdapt,
-                as.numeric(ArgsDef$PrintProgress),
                 ArgsDef$k,
                 PriorParam$m,
                 PriorParam$V,
@@ -368,6 +363,16 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 ArgsDef$NotConstrainGene,
                 ArgsDef$ConstrainType,
                 as.numeric(ArgsDef$StochasticRef), 
+                ArgsDef$AR,
+                Start$ls.mu0,
+                Start$ls.delta0,
+                Start$ls.nu0,
+                rep(Start$ls.theta0, GPar$nBatch),
+                sum.bycell.bio,
+                sum.bygene.bio,
+                as.numeric(ArgsDef$StoreAdapt),
+                ArgsDef$StopAdapt,
+                as.numeric(ArgsDef$PrintProgress),
                 ArgsDef$mintol_mu, 
                 ArgsDef$mintol_delta,
                 ArgsDef$mintol_nu,
@@ -399,6 +404,14 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
         PriorParam$b.s,
         PriorParam$a.theta,
         PriorParam$b.theta,
+        ArgsDef$Constrain,
+        ArgsDef$Index,
+        ArgsDef$RefGene,
+        ArgsDef$RefGenes,
+        ArgsDef$ConstrainGene,
+        ArgsDef$NotConstrainGene,
+        ArgsDef$ConstrainType,
+        as.numeric(ArgsDef$StochasticRef),
         ArgsDef$AR,
         Start$ls.mu0,
         Start$ls.delta0,
@@ -409,14 +422,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
         as.numeric(ArgsDef$StoreAdapt),
         ArgsDef$StopAdapt,
         as.numeric(ArgsDef$PrintProgress),
-        ArgsDef$Constrain,
-        ArgsDef$Index,
-        ArgsDef$RefGene,
-        ArgsDef$RefGenes,
-        ArgsDef$ConstrainGene,
-        ArgsDef$NotConstrainGene,
-        ArgsDef$ConstrainType,
-        as.numeric(ArgsDef$StochasticRef),
         ArgsDef$mintol_mu, 
         ArgsDef$mintol_delta,
         ArgsDef$mintol_nu,

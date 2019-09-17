@@ -91,9 +91,9 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
   # Running the sampler
   set.seed(12)
-  Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,
-                       PrintProgress = FALSE, Regression = TRUE,
-                       StoreAdapt = TRUE,
-                       Start = Start, PriorParam = PriorParam)
+  Chain <- run_MCMC(Data, 
+                    N = 50, Thin = 10, Burn = 10,
+                    PrintProgress = FALSE, Regression = TRUE,
+                    StoreAdapt = TRUE,Start = Start, PriorParam = PriorParam)
   expect_s4_class(Chain, "BASiCS_Chain")
 })
