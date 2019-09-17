@@ -173,7 +173,7 @@ VolcanoPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, ProbT
   # )
   bins <- 50
   ggplot2::ggplot(
-      Table, 
+      Table[!IndDiff, ],
       ggplot2::aes_string(
         x = paste0(Measure, DistanceVar(Measure)), 
         y = paste0("ProbDiff", Measure))
@@ -219,7 +219,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     trans = if (Measure == "ResDisp") "identity" else "log2"
   )
   ggplot2::ggplot(
-      Table, 
+      Table[!IndDiff, ],
       ggplot2::aes_string(
         x = paste0(Measure, "Overall"), 
         y = paste0(Measure, DistanceVar(Measure)))
