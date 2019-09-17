@@ -227,21 +227,26 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // If using stochastic reference, randomly select 1 ref gene
-    if(StochasticRef == 1) {
-      RefAux = as_scalar(arma::randi(1,arma::distr_param(0,RefGenes.size()-1) ));
+    if (StochasticRef == 1) {
+      RefAux = as_scalar(arma::randi(1, arma::distr_param(0, RefGenes.size() - 1)));
       RefGene = RefGenes(RefAux);
-      if(i >= Burn) RefFreq(RefGene) += 1;
+      if (i >= Burn) {
+        RefFreq(RefGene) += 1;
+      }
     }
     muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
-                                Counts_arma, deltaAux.col(0), 
+                                Counts, deltaAux.col(0), 
                                 1/deltaAux.col(0), nuAux.col(0), 
-                                sumByCellAll_arma, s2mu, q0, n, 
+                                sumByCellAll, s2mu, q0, n, 
                                 y_q0, u_q0, ind_q0, 
-                                Constrain, RefGene, ConstrainGene_arma, 
-                                NotConstrainGene_arma, ConstrainType, 
+                                Constrain, RefGene, ConstrainGene_uvec, 
+                                NotConstrainGene_uvec, ConstrainType, 
                                 k, lambdaAux, betaAux, X, 
                                 sigma2Aux, variance, mintol_mu);     
-    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    PmuAux += muAux.col(1); 
+    if (i >= Burn) {
+      muAccept += muAux.col(1);
+    }
 
     // UPDATE OF DELTA:
     // 1st COLUMN IS THE UPDATE,
