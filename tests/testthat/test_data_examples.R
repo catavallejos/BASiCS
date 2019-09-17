@@ -11,12 +11,12 @@ test_that("Generated data does not match given seed (spikes case)", {
   
   # Checks isSpike info
   TechCheck0 <- c(rep(FALSE, 50), rep(TRUE, 20))
-  TechCheck <- isSpike(Data, "ERCC")
+  TechCheck <- c(rep(FALSE, nrow(Data)), rep(TRUE, nrow(altExp(Data))))
   expect_true(all.equal(TechCheck0, TechCheck))
   
   # Checks total count for spike in genes
   TechCount0 <- c( 11087,   101,   344,   633,    20)
-  TechCount <- matrixStats::rowSums2(assay(Data)[isSpike(Data, "ERCC"),])[1:5]
+  TechCount <- matrixStats::rowSums2(assay(altExp(Data)))[1:5]
   expect_true(all.equal(TechCount0, TechCount))
 })
 
@@ -31,7 +31,7 @@ test_that("Generated data does not match given seed (no spikes case)", {
   
   # Checks isSpike info
   TechCheck0 <- rep(FALSE, 50)
-  TechCheck <- isSpike(Data)
+  TechCheck <- rep(FALSE, nrow(Data))
   expect_true(all.equal(TechCheck0, TechCheck))
 })
 

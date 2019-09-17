@@ -13,16 +13,13 @@ test_that("BASiCS_Sim works", {
   # Data with spike-ins, single batch
   set.seed(1)
   Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
-  head(SingleCellExperiment::counts(Data))
-  dim(SingleCellExperiment::counts(Data))
-  S4Vectors::metadata(Data)$SpikeInput
-  SingleCellExperiment::isSpike(Data)
+
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(6, 0, 0, 1, 11)
   expect_true(all.equal(Aux, Aux0))
   Aux <- sum(SingleCellExperiment::counts(Data))
-  Aux0 <- 3044
+  Aux0 <- 201
   expect_true(all.equal(Aux, Aux0))
 
   # Data with spike-ins, multiple batches
@@ -36,7 +33,7 @@ test_that("BASiCS_Sim works", {
   Aux0 <- c(0, 2, 2, 0, 0)
   expect_true(all.equal(Aux, Aux0))
   Aux <- sum(SingleCellExperiment::counts(Data))
-  Aux0 <- 1050
+  Aux0 <- 74
   expect_true(all.equal(Aux, Aux0))
 
   # Data without spike-ins, multiple batches

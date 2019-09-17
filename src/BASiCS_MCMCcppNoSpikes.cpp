@@ -52,13 +52,13 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     int N, 
     int Thin, 
     int Burn,  
-    NumericMatrix Counts, 
-    NumericMatrix BatchDesign, 
-    NumericVector mu0, 
-    NumericVector delta0,   
-    NumericVector s0, 
-    NumericVector nu0,    
-    NumericVector theta0,
+    arma::mat Counts, 
+    arma::mat BatchDesign, 
+    arma::vec mu0, 
+    arma::vec delta0,   
+    arma::vec s0, 
+    arma::vec nu0,    
+    arma::vec theta0,
     double s2mu, 
     double adelta, 
     double bdelta, 
@@ -68,24 +68,24 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double bs,
     double atheta, 
     double btheta, 
+    double Constrain,
+    arma::vec Index,
+    int RefGene,
+    arma::vec RefGenes,
+    arma::vec ConstrainGene,
+    arma::vec NotConstrainGene,
+    int ConstrainType,
+    int StochasticRef,
     double ar, 
-    NumericVector LSmu0, 
-    NumericVector LSdelta0, 
-    NumericVector LSnu0, 
-    NumericVector LStheta0, 
-    NumericVector sumByCellAll, 
-    NumericVector sumByGeneAll, 
+    arma::vec LSmu0, 
+    arma::vec LSdelta0, 
+    arma::vec LSnu0, 
+    arma::vec LStheta0, 
+    arma::vec sumByCellAll, 
+    arma::vec sumByGeneAll, 
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
-    double Constrain,
-    NumericVector Index,
-    int RefGene,
-    NumericVector RefGenes,
-    NumericVector ConstrainGene,
-    NumericVector NotConstrainGene,
-    int ConstrainType,
-    int StochasticRef,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -96,21 +96,17 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   using Rcpp::Rcout;
   
   // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.ncol(); int q0 = Counts.nrow(); int Naux = N/Thin - Burn/Thin;
-  int nBatch = BatchDesign.ncol();
-  
-  // TRANSFORMATION TO ARMA ELEMENTS 
-  arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
-  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
-  arma::mat Counts_arma = as_arma(Counts); 
-  arma::mat BatchDesign_arma = as_arma(BatchDesign);
-  arma::vec Index_arma = as_arma(Index);
-  arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
-  arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
-  arma::vec RefGenes_arma = as_arma(RefGenes);
+  int n = Counts.n_cols; 
+  int q0 = Counts.n_rows; 
+  int Naux = N/Thin - Burn/Thin;
+  int nBatch = BatchDesign.n_cols;
   
   // OTHER GLOBAL QUANTITIES
-  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
+  arma::vec BatchSizes = sum(BatchDesign,0).t();
+  
+  // Transformation to uvec elements
+  arma::uvec ConstrainGene_uvec = arma::conv_to<arma::uvec>::from(ConstrainGene);
+  arma::uvec NotConstrainGene_uvec = arma::conv_to<arma::uvec>::from(NotConstrainGene);
   
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(Naux, q0); 
@@ -143,18 +139,18 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
   arma::vec PthetaAux = zeros(nBatch);
   
   // INITIALIZATION OF VALUES FOR MCMC RUN
-  arma::mat muAux = zeros(q0,2); muAux.col(0) = as_arma(mu0); 
-  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = as_arma(delta0); 
-  arma::vec sAux = as_arma(s0); 
-  arma::mat nuAux = zeros(n,2); nuAux.col(0) = as_arma(nu0); 
-  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = as_arma(theta0); 
-  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0); 
+  arma::mat muAux = zeros(q0,2); muAux.col(0) = mu0; 
+  arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = delta0; 
+  arma::vec sAux = s0; 
+  arma::mat nuAux = zeros(n,2); nuAux.col(0) = nu0; 
+  arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = theta0; 
+  arma::vec thetaBatch = BatchDesign * theta0; 
   
   // INITIALIZATION OF ADAPTIVE VARIANCES
-  arma::vec LSmuAux = as_arma(LSmu0);
-  arma::vec LSdeltaAux = as_arma(LSdelta0); 
-  arma::vec LSnuAux = as_arma(LSnu0);
-  arma::vec LSthetaAux = as_arma(LStheta0);  
+  arma::vec LSmuAux = LSmu0;
+  arma::vec LSdeltaAux = LSdelta0; 
+  arma::vec LSnuAux = LSnu0;
+  arma::vec LSthetaAux = LStheta0;  
   
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = arma::zeros(q0); arma::vec PdeltaAux0 = arma::zeros(q0);
@@ -188,39 +184,39 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
-                        as, bs, BatchDesign_arma, n, y_n); 
+                        as, bs, BatchDesign, n, y_n); 
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign_arma, BatchSizes,
+                                BatchDesign, BatchSizes,
                                 sAux, nuAux.col(0), atheta, btheta, n, 
                                 nBatch, mintol_theta);
     PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
-    thetaBatch = BatchDesign_arma * thetaAux.col(0); 
+    thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // If using stochastic reference, randomly select 1 ref gene
     if(StochasticRef == 1) {
-      RefAux = as_scalar(arma::randi( 1, arma::distr_param(0, 
-                                                           RefGenes_arma.size()-1) ));
+      RefAux = as_scalar(arma::randi( 1, 
+                                      arma::distr_param(0, RefGenes.size()-1) ));
       RefGene = RefGenes(RefAux); 
       if(i >= Burn) RefFreq(RefGene) += 1;
     }
-    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts_arma, 
-                             1/deltaAux.col(0), nuAux.col(0), sumByCellAll_arma, 
+    muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts, 
+                             1/deltaAux.col(0), nuAux.col(0), sumByCellAll, 
                              s2mu, q0, n, y_q0, u_q0, ind_q0,
-                             Constrain, RefGene, ConstrainGene_arma, 
-                             NotConstrainGene_arma, ConstrainType, mintol_mu);
+                             Constrain, RefGene, ConstrainGene_uvec, 
+                             NotConstrainGene_uvec, ConstrainType, mintol_mu);
     PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}  
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts_arma, 
+    deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts, 
                            muAux.col(0), nuAux.col(0), 
                            adelta, bdelta, s2delta, prior_delta, 
                            q0, n, y_q0, u_q0, ind_q0, mintol_delta); 
@@ -229,10 +225,10 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts_arma, 
-                                  BatchDesign_arma,
+    nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts, 
+                                  BatchDesign,
                                   muAux.col(0), 1/deltaAux.col(0),
-                                  sAux, thetaBatch, sumByGeneAll_arma, q0, n,
+                                  sAux, thetaBatch, sumByGeneAll, q0, n,
                                   y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) {nuAccept += nuAux.col(1);}
     
@@ -242,7 +238,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       if(Ibatch==50) {
         PmuAux = PmuAux/(50-RefFreq); 
         PmuAux = -1+2*arma::conv_to<arma::mat>::from(PmuAux>ar);
-        LSmuAux.elem(find(Index_arma != RefGene)) = LSmuAux.elem(find(Index_arma != RefGene)) + PmuAux.elem(find(Index_arma != RefGene))*0.1; 
+        LSmuAux.elem(find(Index != RefGene)) = LSmuAux.elem(find(Index != RefGene)) + PmuAux.elem(find(Index != RefGene))*0.1; 
         PdeltaAux = PdeltaAux/50; 
         PdeltaAux = -1+2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
         LSdeltaAux = LSdeltaAux+PdeltaAux*0.1;                

@@ -68,7 +68,10 @@
 #' order as how genes are displayed in the table of counts.
 #' This argument is necessary in order to have a meaningful EFDR calibration
 #' when the user decides to exclude some genes from the comparison.
-#' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
+#' @param min.mean Minimum mean expression threshold required for inclusion in
+#' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
+#' parameter is only relevant with `Offset = TRUE`.
+#' @param ... Optional parameters.
 #'
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
 #' \describe{
@@ -227,7 +230,8 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_M = 0.05,
                           EFDR_D = 0.05,
                           EFDR_R = 0.05,
-                          GenesSelect = NULL, ...)
+                          GenesSelect = NULL, 
+                          min.mean = 1, ...)
 {
 
   HiddenHeaderTest_DE(Chain1,
@@ -262,26 +266,31 @@ BASiCS_TestDE <- function(Chain1,
   # With offset correction
   if (Offset) {
     # Calculating iteration-specific offset
-    OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
-                    matrixStats::rowSums2(Chain2@parameters$mu)
+    # OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
+    #                matrixStats::rowSums2(Chain2@parameters$mu)
+    #OffsetChain <- matrixStats::rowMedians(Chain1@parameters$mu) /
+    #  matrixStats::rowMedians(Chain2@parameters$mu)
     # Offset point estimate
-    OffsetEst <- median(OffsetChain)
+    #OffsetEst <- median(OffsetChain)
 
     # Offset correction
-    Chain1_offset <- Chain1
-    Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
+    #Chain1_offset <- Chain1
+    #Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
     #Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
+    
+    A <- BASiCS_CorrectOffset(Chain1, Chain2, min.mean = min.mean)
+    OffsetEst <- A$Offset
+    OffsetChain <- A$OffsetChain
+    Chain1_offset <- A$Chain
     Chain2_offset <- Chain2  # Chain2 requires no change
+    
+    # Post-offset correction gene-specific estimates
     Mu1 <- matrixStats::colMedians(Chain1_offset@parameters$mu)
     Mu2 <- matrixStats::colMedians(Chain2_offset@parameters$mu)
     Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
     Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
-#    Summary1 <- Summary(Chain1_offset)
-#    Summary2 <- Summary(Chain2_offset)
 
     # Pre-offset correction LFC estimates
-#    Summary1_old <- Summary(Chain1)
-#    Summary2_old <- Summary(Chain2)
     Mu1_old <- matrixStats::colMedians(Chain1@parameters$mu)
     MuBase_old <- (Mu1_old * n1 + Mu2 * n2) / n
     ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)

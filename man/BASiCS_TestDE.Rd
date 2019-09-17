@@ -10,7 +10,7 @@ BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
   OrderVariable = "GeneIndex", GroupLabel1 = "Group1",
   GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE,
   Offset = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, EFDR_R = 0.05,
-  GenesSelect = NULL, ...)
+  GenesSelect = NULL, min.mean = 1, ...)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}}
@@ -94,7 +94,11 @@ order as how genes are displayed in the table of counts.
 This argument is necessary in order to have a meaningful EFDR calibration
 when the user decides to exclude some genes from the comparison.}
 
-\item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
+\item{min.mean}{Minimum mean expression threshold required for inclusion in
+offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
+parameter is only relevant with `Offset = TRUE`.}
+
+\item{...}{Optional parameters.}
 }
 \value{
 \code{BASiCS_TestDE} returns a list of 4 elements:

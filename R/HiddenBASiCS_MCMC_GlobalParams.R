@@ -1,19 +1,13 @@
 HiddenBASiCS_MCMC_GlobalParams <- function(Data) {
   
-  # If data contains spike-ins
-  if (!is.null(SingleCellExperiment::isSpike(Data))) {
-    q <- nrow(Data)
-    q.bio <- sum(!SingleCellExperiment::isSpike(Data))
-    spikes <- SingleCellExperiment::isSpike(Data)
-    BioCounts <- counts(Data)[!spikes, ]
-  }
-  else {
-    BioCounts <- counts(Data)
-    q.bio <- q <- nrow(Data)
-    spikes <- rep(FALSE, q)
-  }
+  BioCounts <- counts(Data)
+  n <- ncol(Data)
+  q.bio <- nrow(Data)
   
-  n <- dim(counts(Data))[2]
+  # If data contains spike-ins
+  if (length(altExpNames(Data)) > 1){
+    q <- q.bio + nrow(altExp(Data))
+  } else { q <- q.bio }
   
   # If Data contains batches
   if(!is.null(colData(Data)$BatchInfo)){
@@ -21,8 +15,7 @@ HiddenBASiCS_MCMC_GlobalParams <- function(Data) {
     BatchInfo <- as.factor(colData(Data)$BatchInfo)
     BatchInfo <- factor(BatchInfo, levels = unique(BatchInfo))
     nBatch <- length(unique(BatchInfo))
-  }
-  else{
+  } else {
     BatchInfo <- rep(1, times = n)
     nBatch <- 1
   }

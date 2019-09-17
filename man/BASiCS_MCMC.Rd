@@ -9,7 +9,7 @@ BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
 If \code{WithSpikes = TRUE}, this MUST be formatted to include
-the spike-ins information (see vignette).}
+the spike-ins and/or batch information (see vignette).}
 
 \item{N}{Total number of iterations for the MCMC sampler.
 Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}

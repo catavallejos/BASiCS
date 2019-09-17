@@ -17,7 +17,7 @@ test_that("Spikes + no regression", {
   
   set.seed(3)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  CountsBio <- assay(Data)[!isSpike(Data),]
+  CountsBio <- counts(Data)
   q0 <- nrow(CountsBio); n <- ncol(CountsBio)
   PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
                      b.delta = 1, p.phi = rep(1, times = n), 
@@ -29,13 +29,17 @@ test_that("Spikes + no regression", {
   
   # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  Aux <- BASiCS:::Hidden_muUpdate(mu0 = Start$mu0[seq_len(q0)], 
+  Aux <- BASiCS:::Hidden_muUpdate(mu0 = Start$mu0, 
                                   prop_var = exp(Start$ls.mu0),
-                                  Counts = CountsBio, invdelta = 1/Start$delta0, 
+                                  Counts = CountsBio, 
+                                  invdelta = 1/Start$delta0, 
                                   phinu = Start$phi0 * Start$nu0,
                                   sum_bycell_bio = rowSums(CountsBio),
-                                  s2_mu = PriorParam$s2.mu, q0 = q0, n = n,
-                                  mu1 =  mu1, u = uGene, ind = indGene,
+                                  s2_mu = PriorParam$s2.mu, 
+                                  q0 = q0, n = n,
+                                  mu1 =  mu1, 
+                                  u = uGene, 
+                                  ind = indGene,
                                   mintol = 1e-3)
   
   mu1 <- c(6.78, 15.67,  5.43, 13.05, 24.20)

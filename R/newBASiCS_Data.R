@@ -21,9 +21,7 @@
 #' information. Not required if a single batch is present on the data.
 #' Default value: \code{BatchInfo = NULL}.
 #' @param SpikeType Character to indicate what type of spike-ins are in use.
-#' For more details see argument `type` in
-#' see `help(isSpike, package = "SingleCellExperiment")`. Default value:
-#' \code{SpikeType = "ERCC"}.
+#' Default value: \code{SpikeType = "ERCC"} (parameter is no longer used).
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
@@ -71,25 +69,33 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
                            SpikeInfo = NULL, BatchInfo = NULL,
                            SpikeType = "ERCC")
 {
-  # Validity checks for SpikeInfo
-  if (!is.null(SpikeInfo)) {
-    if (!is.data.frame(SpikeInfo)) {
-      stop("'SpikeInfo' must be a 'data.frame'")
-    }
-    if (data.table::is.data.table(SpikeInfo)) {
-      stop("'SpikeInfo' must be a 'data.frame'")
-    }
-  }
-
+  # Separating intrinsic from spike-in transcripts
+  CountsBio <- Counts[!Tech, ]
+  CountsTech <- Counts[Tech, ]
+  # Extracting gene labels
+  GeneName <- rownames(Counts)
+  
+  # Create a SingleCellExperiment data object
+  Data <- SingleCellExperiment(assays = list(counts = as.matrix(CountsBio)))
+  colnames(Data) <- colnames(CountsBio)
+  rownames(Data) <- rownames(CountsBio)  
+  
+  # Adding metadata associated to batch information
+  ## Setting a default value for BatchInfo when absent
   if (is.null(BatchInfo)) {
     BatchInfo <- rep(1, times = ncol(Counts))
-  }
-
-  GeneName <- rownames(Counts)
+  }  
+  colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
+  
+  # Adding spike-ins information
   if (!is.null(SpikeInfo)) {
+    # If SpikeInfo is provided, run validity checks
+    if (!is.data.frame(SpikeInfo) | data.table::is.data.table(SpikeInfo)) {
+      stop("'SpikeInfo' must be a 'data.frame'")
+    }
     if (sum(Tech) == 0) {
-      stop("'SpikeInfo' was provided but no genes were marked as technical spikes \n",
-           "Revise the input value provided for 'Tech'")
+      stop("'SpikeInfo' provided but no genes were marked as spike-ins \n",
+           "Please revise the input value provided for 'Tech'")
     }
     # Extracting spike-in input molecules in the correct order
     if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) {
@@ -98,35 +104,23 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     if (sum(!(SpikeInfo[, 1] %in% GeneName[Tech])) > 0) {
       stop("'SpikeInfo' includes spikes that are not in 'Counts'")
     }
-    matching <- match(GeneName[Tech], SpikeInfo[, 1])
-    SpikeInput <- SpikeInfo[matching, 2]
+    if(any(GeneName[Tech] != SpikeInfo[, 1])) {
+      # Re-order spike-ins in SpikeInfo if required
+      matching <- match(GeneName[Tech], SpikeInfo[, 1])
+      SpikeInfo <- SpikeInfo[matching, ]
+    }
+    metadata(Data)$SpikeInput <- SpikeInfo
+    altExp(Data, "spike-ins") <- SummarizedExperiment(CountsTech)
     WithSpikes <- TRUE
-  }
-  else {
-    SpikeInput <- 1; Tech <- rep(FALSE, nrow(Counts))
+  }  else {
     message("The data does not contain spike-in genes")
     WithSpikes <- FALSE
   }
 
-  # Re-ordering genes
-  Counts <- as.matrix(rbind(Counts[!Tech, ], Counts[Tech, ]))
-  Tech <- c(Tech[!Tech], Tech[Tech])
-
   # Checks to assess if the data contains the required information
-  errors <- HiddenChecksBASiCS_Data(Counts, Tech, SpikeInput,
-                                    GeneName, BatchInfo, WithSpikes)
-  if (length(errors) > 0) {
-    stop(errors)
-  }
-
-  # Create a SingleCellExperiment data object
-  Data <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = as.matrix(Counts)),
-                                                     metadata = list(SpikeInput = SpikeInput))
-  SingleCellExperiment::isSpike(Data, SpikeType) <- Tech
-  SummarizedExperiment::colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
-  colnames(Data) <- colnames(Counts)
-  rownames(Data) <- rownames(Counts)
-
+  errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
+  if (length(errors) > 0) stop(errors) 
+  
   message("\n", "NOTICE: BASiCS requires a pre-filtered dataset \n",
             "    - You must remove poor quality cells before hand \n",
             "    - We recommend to pre-filter lowly expressed transcripts. \n",

@@ -9,31 +9,35 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
   # not created using the `newBASiCS_Data` function
 
   # Check if `Data` contains more than one type of types
-  if( (length(SingleCellExperiment::spikeNames(Data)) > 1))
-    stop("'Data' contains more than one type of spike-ins but only one is allowed. \n",
-         "Please remove unwanted spike-in types using. See help(isSpike). \n")
+  if( (length(SingleCellExperiment::altExpNames(Data)) > 1))
+    stop("'Data' contains multiple 'altExp' assays but only one is allowed. \n",
+         "The latter should include information for spike-in genes. \n",
+         "Please remove unwanted the remaining elements. See help(altExp). \n")
+  
+  if(WithSpikes & length(altExpNames(Data)) > 0) {
+    message("altExp '", altExpNames(Data),"' is assumed to contain spike-in genes.\n",
+            "see help(altExp) for details. \n")  
+  }
   
   # If SpikeInput slot is missing and WithSpikes == TRUE
-
-  Spikes <- SingleCellExperiment::isSpike(Data)
-  if(!is.null(Spikes) & WithSpikes & 
+  if((length(altExpNames(Data)) > 0) & WithSpikes & 
      is.null(metadata(Data)$SpikeInput))
-    stop("'Data' does not contain the 'SpikeInput' slot. \n",
+    stop("'Data' does not contain 'SpikeInput' as metadata. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   
   # If isSpike slot is missing and WithSpikes == TRUE
-  if(is.null(Spikes) & WithSpikes)
-    stop("'Data' does not contain a logical vector to indicate \n", 
-         "technical spike-in genes. Please indicate in 'isSpike(Data)' which \n",
-         "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
+  if((length(altExpNames(Data)) == 0)  & WithSpikes)
+    stop("'Data' does not contain information about spike-in genes \n", 
+         "Please indicate include this information using 'altExp' \n",
+         "or set 'WithSpikes = FALSE' \n.",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   
-  # If isSpike slot does not contain spikes and WithSpikes == TRUE
-  if(sum(Spikes) == 0 & WithSpikes)
-    stop("'isSpike(Data)' does not contain TRUE values, meaning the sce object \n",
-         "does not contain spikes. Please indicate in 'isSpike(Data)' which \n",
-         "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
-         "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
+ # # If isSpike slot does not contain spikes and WithSpikes == TRUE
+ # if(sum(Spikes) == 0 & WithSpikes)
+ #   stop("'isSpike(Data)' does not contain TRUE values, meaning the sce object \n",
+ #        "does not contain spikes. Please indicate in 'isSpike(Data)' which \n",
+ #        "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
+ #        "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   
   # If BatchInfo slot is missing and WithSpikes == FALSE
   if(!WithSpikes & is.null(colData(Data)$BatchInfo))
@@ -48,13 +52,9 @@ HiddenBASiCS_MCMC_InputCheck <- function(Data, N, Thin,
          "SingleCellExperiment object under the name 'counts'. \n",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   
-
   # Further checks on input
-
-  errors <- HiddenChecksBASiCS_Data(counts(Data), Spikes, 
-                                    metadata(Data)$SpikeInput, 
-                                    rownames(counts(Data)), 
-                                    colData(Data)$BatchInfo, WithSpikes)
+  errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
+  
   if (length(errors) > 0) stop(errors) 
   
   if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) 
