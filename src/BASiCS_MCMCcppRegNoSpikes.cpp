@@ -194,10 +194,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
-  arma::vec means = muAux(arma::span(0,q0-1),0);
-  arma::vec locations = estimateRBFLocations(means, k);
-  arma::mat X = designMatrix(means, locations, variance);
-
+  arma::vec means = muAux.col(0);
+  arma::mat X = designMatrix(k, means, variance);
+  
   StartSampler(N);
 
   // START OF MCMC LOOP
@@ -233,15 +232,15 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       RefGene = RefGenes(RefAux);
       if(i >= Burn) RefFreq(RefGene) += 1;
     }
-    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux),
-                                Counts, deltaAux.col(0),
-                                1/deltaAux.col(0), nuAux.col(0),
-                                sumByCellAll, s2mu, q0, n,
-                                y_q0, u_q0, ind_q0,
-                                Constrain, RefGene, ConstrainGene_uvec,
-                                NotConstrainGene_uvec, ConstrainType,
-                                k, lambdaAux, betaAux, X,
-                                sigma2Aux, variance, mintol_mu, locations);
+    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
+                                Counts_arma, deltaAux.col(0), 
+                                1/deltaAux.col(0), nuAux.col(0), 
+                                sumByCellAll_arma, s2mu, q0, n, 
+                                y_q0, u_q0, ind_q0, 
+                                Constrain, RefGene, ConstrainGene_arma, 
+                                NotConstrainGene_arma, ConstrainType, 
+                                k, lambdaAux, betaAux, X, 
+                                sigma2Aux, variance, mintol_mu);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
 
     // UPDATE OF DELTA:
@@ -308,9 +307,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
 
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux(arma::span(0, q0 - 1), 0);
-        locations = estimateRBFLocations(means, k);
-        X = designMatrix(means, locations, variance);
+        means = muAux.col(0);
+        X = designMatrix(k, means, variance);
       }
     }
 
