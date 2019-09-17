@@ -74,7 +74,7 @@ BASiCS_DiagPlot <- function(object,
       metric = metric
     )
     df <- df[order(df$metric), ]
-    ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
+    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
       ggplot2::geom_point(alpha = 0.5, shape = 16) +
       viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)
         #, trans="log10"
@@ -88,7 +88,7 @@ BASiCS_DiagPlot <- function(object,
       x = matrixStats::colMedians(xMat),
       y = metric
     )
-    ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
+    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
       sX + sY +
       ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
     if (Smooth) {

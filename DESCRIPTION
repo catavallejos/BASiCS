@@ -59,7 +59,8 @@ Imports:
     viridis,
     reshape2,
     utils,
-    hexbin
+    hexbin,
+    grid
 Suggests:
     BiocStyle,
     knitr,

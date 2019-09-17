@@ -33,7 +33,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         function(g) {
           g +
             ggplot2::theme(
-              plot.margin = unit(c(0.100, 0, 0.05, 0), units = "npc")
+              plot.margin = grid::unit(c(0.100, 0, 0.05, 0), units = "npc")
             )
         }
       )
