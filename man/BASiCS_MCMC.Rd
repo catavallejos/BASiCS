@@ -4,7 +4,8 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE,
+  BatchInfoColumn = "BatchInfo", ...)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
@@ -29,6 +30,9 @@ added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE}
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
+
+\item{BatchInfoColumn}{Column containing information about batches within 
+the data (default: "BatchInfo"). This is required when WithSpikes=FALSE.}
 
 \item{...}{Optional parameters.
 \describe{

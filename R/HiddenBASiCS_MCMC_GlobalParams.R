@@ -1,4 +1,4 @@
-HiddenBASiCS_MCMC_GlobalParams <- function(Data) {
+HiddenBASiCS_MCMC_GlobalParams <- function(Data, BatchInfoColumn) {
   
   BioCounts <- counts(Data)
   n <- ncol(Data)
@@ -10,9 +10,9 @@ HiddenBASiCS_MCMC_GlobalParams <- function(Data) {
   } else { q <- q.bio }
   
   # If Data contains batches
-  if(!is.null(colData(Data)$BatchInfo)){
+  if(!is.null(colData(Data)[[BatchInfoColumn]])){
     # Store the correct number of levels in batch vector
-    BatchInfo <- as.factor(colData(Data)$BatchInfo)
+    BatchInfo <- as.factor(colData(Data)[[BatchInfoColumn]])
     BatchInfo <- factor(BatchInfo, levels = unique(BatchInfo))
     nBatch <- length(unique(BatchInfo))
   } else {
@@ -28,6 +28,13 @@ HiddenBASiCS_MCMC_GlobalParams <- function(Data) {
     BatchDesign <- matrix(1, nrow = n, ncol = 1) 
   }
   
-  list(BioCounts = as.matrix(BioCounts), q = q, q.bio = q.bio, n = n,
-       nBatch = nBatch, BatchInfo = BatchInfo, BatchDesign = BatchDesign)
+  list(
+    BioCounts = as.matrix(BioCounts),
+    q = q,
+    q.bio = q.bio,
+    n = n,
+    nBatch = nBatch,
+    BatchInfo = BatchInfo,
+    BatchDesign = BatchDesign
+  )
 }

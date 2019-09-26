@@ -20,6 +20,8 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param BatchInfoColumn Column containing information about batches within 
+#' the data (default: "BatchInfo"). This is required when WithSpikes=FALSE.
 #' @param ... Optional parameters.
 #' \describe{
 #' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.
@@ -190,14 +192,21 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
-{
+BASiCS_MCMC <- function(Data,
+                        N,
+                        Thin,
+                        Burn,
+                        Regression,
+                        WithSpikes = TRUE, 
+                        BatchInfoColumn = "BatchInfo",
+                        ...) {
+
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch
-  GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
+  GPar <- HiddenBASiCS_MCMC_GlobalParams(Data, BatchInfoColumn)
 
   # Total counts per cell and/or gene
   sum.bycell.bio <- matrixStats::rowSums2(counts(Data))
