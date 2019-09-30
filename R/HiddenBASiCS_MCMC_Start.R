@@ -64,7 +64,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     # Starting value for delta
     # Defined by the CV for high- and mid-expressed genes
     # This is motivated by equation (2) in Vallejos et al (2016)
-    varsBio <- matrixStats::rowVars(nCountsBio)
+    varsBio <- rowVars(nCountsBio)
     cv2Bio <- varsBio / (meansBio)^2
     delta0 <- rgamma(q.bio, 1, 1) + 1
     Aux <- which(meansBio > stats::quantile(meansBio, 0.1))

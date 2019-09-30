@@ -236,5 +236,38 @@ test_that("Checks for user generated SCE object", {
   
 })
 
-
-
+test_that("MCMC works with different input classes", {
+  counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes))
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+  counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes), sparse = TRUE)
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+  counts(DataSpikes) <- DelayedArray(counts(DataSpikes))
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+})
