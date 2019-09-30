@@ -67,10 +67,13 @@
 #' @export
 newBASiCS_Data <- function(Counts,
                            Tech = rep(FALSE, nrow(Counts)),
-                           SpikeInfo = NULL, 
+                           SpikeInfo = NULL,
                            BatchInfo = NULL,
                            SpikeType = "ERCC") {
 
+  if (!inherits(Counts, "matrix")) {
+    stop("Counts must be a matrix.")
+  }
   # Separating intrinsic from spike-in transcripts
   CountsBio <- Counts[!Tech, ]
   CountsTech <- Counts[Tech, ]
@@ -118,7 +121,6 @@ newBASiCS_Data <- function(Counts,
     message("The data does not contain spike-in genes")
     WithSpikes <- FALSE
   }
-
   # Checks to assess if the data contains the required information
   errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
   if (length(errors) > 0) stop(errors) 

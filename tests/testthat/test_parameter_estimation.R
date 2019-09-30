@@ -25,38 +25,38 @@ test_that("Estimates match the given seed (spikes)", {
   expect_equal(names(PostSummary@parameters), ParamNames)
             
   # Check if parameter estimates match for the first 5 genes and cells
-  Mu <- c(9.983,  6.903,  3.242,  5.589, 23.492)
+  Mu <- c(9.912,  6.998,  3.093,  5.561, 23.359)
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
   expect_equal(MuObs, Mu, tolerance = 1, scale = 1)
             
-  Delta <- c(0.870, 0.731, 1.614, 1.496, 0.472)
+  Delta <- c(0.685, 0.677, 1.532, 1.862, 0.468)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
                                                    "delta")[1:5,1],3))
   expect_equal(DeltaObs, Delta, tolerance = 1, scale = 1)
 
-  Phi <- c(0.998, 0.682, 1.131, 1.146, 0.859)
+  Phi <- c(1.070, 0.777, 1.136, 1.266, 0.774)
   PhiObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "phi")[1:5,1],3))
   expect_equal(PhiObs, Phi, tolerance = 1, scale = 1)
             
-  S <- c(1.017, 0.114, 0.606, 1.095, 0.289)
+  S <- c(1.182, 0.119, 0.623, 0.992, 0.274)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   expect_equal(SObs, S, tolerance = 1, scale = 1)
 
-  Theta <- 0.251
+  Theta <- 0.257
   ThetaObs <- round(displaySummaryBASiCS(PostSummary, "theta")[1],3)
   expect_equal(ThetaObs, Theta, tolerance = 1, scale = 1)
   
   # Obtaining denoised counts     
   DC <- BASiCS_DenoisedCounts(Data, Chain)
   # Checks for an arbitrary set of genes / cells
-  DCcheck0 <- c(22.559,  0.940,  0.000,  1.880, 27.259)
+  DCcheck0 <- c(21.003,  0.875,  0.000,  1.750, 25.379)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   expect_equal(DCcheck, DCcheck0, tolerance = 1.5, scale = 1)
   
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
   # Checks for an arbitrary set of genes / cells
-  DRcheck0 <- c(0.503, 2.591, 7.458, 4.614, 1.592)
+  DRcheck0 <- c(0.561, 2.576, 7.360, 4.222, 1.828)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   expect_equal(DRcheck, DRcheck0, tolerance = 1.5, scale = 1)
 })
