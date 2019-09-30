@@ -829,3 +829,44 @@ setMethod("show", signature = "BASiCS_ResultDE",
     message("-------------------------------------------------------------\n\n")
   }
 )
+
+
+#' @export
+setMethod("NDiffRes", "BASiCS_ResultsDE",
+  function(object, ...) {
+    lapply(object@Results, NDiffRes, ...)
+  }
+)
+#' @export
+setMethod("NDiffRes", "BASiCS_ResultDE",
+  function(object, ...) {
+    nrow(DiffRes(object, ...))
+  }
+)
+
+#' @export
+setMethod("DiffRes", "BASiCS_ResultsDE",
+  function(object, ...) {
+    lapply(object@Results, NDiffRes, ...)
+  }
+)
+#' @export
+setMethod("DiffRes", "BASiCS_ResultDE",
+  function(
+      object, 
+      Direction = c("both", "plus1", "plus2")
+    ) {
+    Direction <- match.arg(Direction)
+
+    diffName <- paste0("ResultDiff", object@Name)
+    indPlus1 <- object@Table[[diffName]] == paste0(object@GroupLabel1, "+")
+    Plus1 <- object@Table[indPlus1, ]
+    indPlus2 <- object@Table[[diffName]] == paste0(object@GroupLabel2, "+")
+    Plus2 <- object@Table[indPlus2, ]
+    switch(Direction,
+      "both" = rbind(Plus1, Plus2),
+      "plus1" = Plus1,
+      "plus2" = Plus2
+    )
+  }
+)

@@ -9,3 +9,11 @@ setGeneric("displaySummaryBASiCS",
 #' @export
 setGeneric("BASiCS_PlotDE", 
            function(object, ...) standardGeneric("BASiCS_PlotDE"))
+
+#' @export
+setGeneric("NDiffRes", 
+           function(object, ...) standardGeneric("NDiffRes"))
+
+#' @export
+setGeneric("DiffRes", 
+           function(object, ...) standardGeneric("DiffRes"))

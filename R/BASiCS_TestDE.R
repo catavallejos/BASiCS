@@ -472,4 +472,3 @@ BASiCS_TestDE <- function(Chain1,
   }
   Out
 }
-
