@@ -33,7 +33,7 @@
  * EndAdapt: when to stop the adaptation
  * PrintProgress: whether to print progress report
  * k: Number of regression components; k-2 Gaussian radial basis functions (GRBFs)
- * m0: Starting values for locations of GRBFs
+ * m0: Starting values for Locations of GRBFs
  * V0: Starting value for covariance matrix
  * sigma2_a0: Prior shape for Gamma distribution
  * sigma2_b0: Prior rate for Gamma distribution
@@ -48,48 +48,48 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int N,
     int Thin,
     int Burn,
-    NumericMatrix Counts,
-    NumericMatrix BatchDesign,
-    NumericVector mu0,
-    NumericVector delta0,
-    NumericVector s0,
-    NumericVector nu0,
-    NumericVector theta0,
+    arma::mat Counts,
+    arma::mat BatchDesign,
+    arma::vec mu0,
+    arma::vec delta0,
+    arma::vec s0,
+    arma::vec nu0,
+    arma::vec theta0,
     double s2mu,
     double as,
     double bs,
     double atheta,
     double btheta,
+    int k,
+    arma::vec m0,
+    arma::mat V0,
+    double sigma2_a0,
+    double sigma2_b0,
+    arma::vec beta0,
+    double sigma20,
+    double eta0,
+    arma::vec lambda0,
+    double const& variance,
+    double Constrain,
+    arma::vec Index,
+    int RefGene,
+    arma::vec RefGenes,
+    arma::vec ConstrainGene,
+    arma::vec NotConstrainGene,
+    int ConstrainType,
+    int StochasticRef,
     double ar,
-    NumericVector LSmu0,
-    NumericVector LSdelta0,
-    NumericVector LSnu0,
-    NumericVector LStheta0,
-    NumericVector sumByCellAll,
-    NumericVector sumByGeneAll,
+    arma::vec LSmu0,
+    arma::vec LSdelta0,
+    arma::vec LSnu0,
+    arma::vec LStheta0,
+    arma::vec sumByCellAll,
+    arma::vec sumByGeneAll,
     int StoreAdapt,
     int EndAdapt,
     int PrintProgress,
-    int k,
-    NumericVector m0,
-    NumericMatrix V0,
-    double sigma2_a0,
-    double sigma2_b0,
-    NumericVector beta0,
-    double sigma20,
-    double eta0,
-    NumericVector lambda0,
-    double const& variance,
-    double Constrain,
-    NumericVector Index,
-    int RefGene,
-    NumericVector RefGenes,
-    IntegerVector ConstrainGene,
-    IntegerVector NotConstrainGene,
-    int ConstrainType,
-    int StochasticRef,
-    NumericVector ml,
-    bool FixML,
+    arma::vec Locations,
+    bool FixLocations,
     double GeneExponent,
     double CellExponent,
     double const& mintol_mu,
@@ -102,26 +102,20 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   using Rcpp::Rcout;
 
   // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.ncol();
-  int nBatch = BatchDesign.ncol();
-  int q0 = delta0.size();
+  int n = Counts.n_cols;
+  int nBatch = BatchDesign.n_cols;
+  int q0 = delta0.n_elem;
   int Naux = N/Thin - Burn/Thin;
 
-  // TRANSFORMATION TO ARMA ELEMENTS
-  arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
-  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
-  arma::mat Counts_arma = as_arma(Counts);
-  arma::mat BatchDesign_arma = as_arma(BatchDesign);
-  arma::vec Index_arma = as_arma(Index);
-  arma::uvec ConstrainGene_arma = Rcpp::as<arma::uvec>(ConstrainGene);
-  arma::uvec NotConstrainGene_arma = Rcpp::as<arma::uvec>(NotConstrainGene);
-  arma::vec RefGenes_arma = as_arma(RefGenes);
+  // Transformation to uvec elements
+  arma::uvec ConstrainGene_uvec = arma::conv_to<arma::uvec>::from(ConstrainGene);
+  arma::uvec NotConstrainGene_uvec = arma::conv_to<arma::uvec>::from(NotConstrainGene);
 
   // OTHER GLOBAL QUANTITIES
-  arma::vec BatchSizes = sum(BatchDesign_arma,0).t();
-  arma::mat inv_V0 = inv(as_arma(V0));
-  double mInvVm0 = Rcpp::as<double>(wrap(as_arma(m0).t() * inv_V0 * as_arma(m0)));
-  arma::vec InvVm0 = inv_V0 * as_arma(m0);
+  arma::vec BatchSizes = sum(BatchDesign,0).t();
+  arma::mat inv_V0 = inv(V0);
+  double mInvVm0 = Rcpp::as<double>(wrap(m0.t()*inv_V0*m0));
+  arma::vec InvVm0 = inv_V0*m0;
 
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux);
@@ -155,27 +149,25 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
 
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
   arma::mat muAux = zeros(q0, 2);
-  muAux.col(0) = as_arma(mu0);
+  muAux.col(0) = mu0;
   arma::mat deltaAux = zeros(q0, 2);
-  deltaAux.col(0) = as_arma(delta0);
-  arma::vec sAux = as_arma(s0);
+  deltaAux.col(0) = delta0;
+  arma::vec sAux = s0;
   arma::mat nuAux = zeros(n, 2);
-  nuAux.col(0) = as_arma(nu0);
+  nuAux.col(0) = nu0;
   arma::mat thetaAux = zeros(nBatch, 2);
-  thetaAux.col(0) = as_arma(theta0);
-  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0);
+  thetaAux.col(0) = theta0;
+  arma::vec thetaBatch = BatchDesign * theta0;
 
   // INITIALIZATION OF ADAPTIVE VARIANCES
-  arma::vec LSmuAux = as_arma(LSmu0);
-  arma::vec LSdeltaAux = as_arma(LSdelta0);
-  arma::vec LSnuAux = as_arma(LSnu0);
-  arma::vec LSthetaAux = as_arma(LStheta0);
+  arma::vec LSmuAux = LSmu0;
+  arma::vec LSdeltaAux = LSdelta0;
+  arma::vec LSnuAux = LSnu0;
+  arma::vec LSthetaAux = LStheta0;
 
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
-  arma::vec PmuAux0 = zeros(q0);
-  arma::vec PdeltaAux0 = zeros(q0);
-  arma::vec PnuAux0 = zeros(n);
-  arma::vec PthetaAux0 = zeros(nBatch);
+  arma::vec PmuAux0 = zeros(q0); arma::vec PdeltaAux0 = zeros(q0);
+  arma::vec PnuAux0 = zeros(n); arma::vec PthetaAux0 = zeros(nBatch);
 
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES
   // (RE-INITIALIZE EVERY 50 ITERATIONS)
@@ -203,25 +195,22 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::mat epsilon = arma::zeros(q0, Naux);
 
   // INITIALIZATION OF REGRESSION PARAMETERS
-  arma::vec mAux = as_arma(m0);
-  arma::mat VAux = as_arma(V0);
-  arma::vec betaAux = as_arma(beta0);
-  arma::vec lambdaAux = as_arma(lambda0);
+  arma::vec mAux = m0;
+  arma::mat VAux = V0;
+  arma::vec betaAux = beta0;
+  arma::vec lambdaAux = lambda0;
   double sigma2Aux = sigma20;
   arma::vec epsilonAux = arma::zeros(q0);
-  arma::vec ml_arma;
 
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux.col(0);
 
-  if (FixML) {
-    ml_arma = as_arma(ml);
-  } else {
-    ml_arma = estimateRBFLocations(k, log(means));
+  if (!FixLocations) {
+    Locations = estimateRBFLocations(k, log(means));
   }
-  arma::mat X = designMatrix(means, ml_arma, variance);
+  arma::mat X = designMatrix(means, Locations, variance);
 
   StartSampler(N);
 
@@ -240,7 +229,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                         thetaBatch,
                         as,
                         bs,
-                        BatchDesign_arma,
+                        BatchDesign,
                         n,
                         y_n,
                         CellExponent);
@@ -249,7 +238,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0),
                                 exp(LSthetaAux),
-                                BatchDesign_arma,
+                                BatchDesign,
                                 BatchSizes,
                                 sAux,
                                 nuAux.col(0),
@@ -264,7 +253,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if (i >= Burn) {
       thetaAccept += thetaAux.col(1);
     }
-    thetaBatch = BatchDesign_arma * thetaAux.col(0);
+    thetaBatch = BatchDesign * thetaAux.col(0);
 
     // UPDATE OF MU:
     // 1st COLUMN IS THE UPDATE,
@@ -272,7 +261,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // If using stochastic reference, randomly select 1 ref gene
     if (StochasticRef == 1) {
       RefAux = as_scalar(
-        arma::randi(1, arma::distr_param(0, RefGenes_arma.size() - 1))
+        arma::randi(1, arma::distr_param(0, RefGenes.size() - 1))
       );
       RefGene = RefGenes(RefAux);
       if (i >= Burn) {
@@ -282,11 +271,11 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
 
     // muAux = muUpdateRegNoSpikes(muAux.col(0),
     //                             exp(LSmuAux),
-    //                             Counts_arma,
+    //                             Counts,
     //                             deltaAux.col(0),
     //                             1 / deltaAux.col(0),
     //                             nuAux.col(0),
-    //                             sumByCellAll_arma,
+    //                             sumByCellAll,
     //                             s2mu,
     //                             q0,
     //                             n,
@@ -295,8 +284,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     //                             ind_q0,
     //                             Constrain,
     //                             RefGene,
-    //                             ConstrainGene_arma,
-    //                             NotConstrainGene_arma,
+    //                             ConstrainGene,
+    //                             NotConstrainGene,
     //                             ConstrainType,
     //                             k,
     //                             lambdaAux,
@@ -304,15 +293,15 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     //                             X,
     //                             sigma2Aux,
     //                             variance,
-    //                             ml_arma,
+    //                             Locations,
     //                             GeneExponent,
     //                             mintol_mu);
     muAux = muUpdateReg(muAux.col(0),
                         exp(LSmuAux),
-                        Counts_arma,
+                        Counts,
                         deltaAux.col(0),
                         nuAux.col(0),
-                        sumByCellAll_arma,
+                        sumByCellAll,
                         s2mu,
                         q0,
                         n,
@@ -325,11 +314,11 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                         X,
                         sigma2Aux,
                         variance,
-                        ml_arma,
+                        Locations,
                         GeneExponent,
                         mintol_mu);
 
-    X = designMatrix(means, ml_arma, variance);
+    X = designMatrix(means, Locations, variance);
 
     PmuAux += muAux.col(1);
     if (i >= Burn) {
@@ -342,7 +331,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // THIS REQUIRES A NEW FULL CONDITIONAL
     deltaAux = deltaUpdateRegNoSpikes(deltaAux.col(0),
                                       exp(LSdeltaAux),
-                                      Counts_arma,
+                                      Counts,
                                       muAux.col(0),
                                       nuAux.col(0),
                                       q0,
@@ -366,13 +355,13 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     nuAux = nuUpdateBatchNoSpikes(nuAux.col(0),
                                   exp(LSnuAux),
-                                  Counts_arma,
-                                  BatchDesign_arma,
+                                  Counts,
+                                  BatchDesign,
                                   muAux.col(0),
                                   1 / deltaAux.col(0),
                                   sAux,
                                   thetaBatch,
-                                  sumByGeneAll_arma,
+                                  sumByGeneAll,
                                   q0,
                                   n,
                                   y_n,
@@ -380,6 +369,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                   ind_n,
                                   CellExponent,
                                   mintol_nu);
+
     PnuAux += nuAux.col(1);
     if (i >= Burn) {
       nuAccept += nuAux.col(1);
@@ -444,8 +434,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
-        if (!FixML) {
-          ml_arma = estimateRBFLocations(k, log(means));
+        if (!FixLocations) {
+          Locations = estimateRBFLocations(k, log(means));
         }
       }
     }
@@ -516,7 +506,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     Rcpp::Named("lambda") = lambda.t(),
     Rcpp::Named("epsilon") = epsilon.t(),
     Rcpp::Named("RefFreq") = RefFreq / (N - Burn),
-    Rcpp::Named("ml") = ml_arma.t()
+    Rcpp::Named("Locations") = Locations.t()
   );
 
   if (StoreAdapt == 1) {

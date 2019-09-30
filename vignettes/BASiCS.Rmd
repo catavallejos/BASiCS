@@ -226,13 +226,11 @@ DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo,
 To convert an existing `SingleCellExperiment` object (`Data`) into one that can 
 be used within BASiCS, meta-information must be stored in the object.
 
-* `isSpike(Data, "ERCC") <- Tech`: the logical vector indicating 
-biological/technical genes (see above) must be stored in the `int_metadata` 
-slot via the `isSpike` function.
+* If spike-ins are in use, observed counts must be stored in `altExp(Data)` 
 
 * `metadata(Data)`: the `SpikeInfo` object is stored in the 
 `metadata` slot of the `SingleCellExperiment` object: 
-`metadata(Data) <- list(SpikeInput = SpikeInfo[,2], BatchInfo = BatchInfo)`. 
+`metadata(Data) <- list(SpikeInput = SpikeInfo)`. 
 
 * `colData(Data)$BatchInfo`: the `BatchInfo` object is stored in the 
 `colData` slot of the `SingleCellExperiment` object.
@@ -352,7 +350,7 @@ Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
                       EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, PlotOffset = FALSE, Plot = TRUE)
+                      Offset = TRUE, PlotOffset = TRUE, Plot = TRUE)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 

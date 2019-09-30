@@ -94,8 +94,8 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
 
     # Simulated counts data
     for (i in seq_len(q)) {
-      # Biological genes
       if (i <= q.bio) {
+        # Biological genes
         if (Delta[i] > 0) {
           Rho[i, ] <- rgamma(n, shape = 1 / Delta[i], rate = 1 / Delta[i])
         }

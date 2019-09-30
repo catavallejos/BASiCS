@@ -26,7 +26,8 @@
 #' @param colourGenesSel colour used to denote the genes listed in 
 #' \code{GenesSel} within the scatterplot. Default value 
 #' \code{colourGenesSel = "dark red"}.
-#' @param ... Additional parameters for plotting.
+#' @param Uncertainty logical indicator. If true, statistical uncertainty
+#' around the regression fit is shown in the plot. 
 #'
 #' @examples
 #' data(ChainRNAReg)
@@ -52,7 +53,7 @@ BASiCS_ShowFit <- function(object,
                            markExcludedGenes = TRUE,
                            GenesSel = NULL,
                            colourGenesSel = "dark red",
-                           ...) {
+                           Uncertainty = TRUE) {
 
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
@@ -136,13 +137,15 @@ BASiCS_ShowFit <- function(object,
     ggplot2::geom_line(data = df2,
                        inherit.aes = FALSE,
                        mapping = ggplot2::aes_string(x = "mu2", y = "yhat"),
-                       colour = "dark red") +
-    ggplot2::geom_ribbon(data = df2,
-                         inherit.aes = FALSE,
-                         mapping = ggplot2::aes_string(x = "mu2",
-                                             ymin = "yhat.lower",
-                                             ymax = "yhat.upper"),
-                         alpha = 0.5)
+                       colour = "dark red") #
+  if(Uncertainty == TRUE) {
+    plot.out <- plot.out + geom_ribbon(data = df2,
+                                       inherit.aes = FALSE,
+                                       mapping = aes_string(x = "mu2",
+                                                            ymin = "yhat.lower",
+                                                            ymax = "yhat.upper"),
+                                       alpha = 0.5)
+  }
     
   plot.out
 }

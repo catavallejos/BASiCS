@@ -5,7 +5,7 @@
 #'
 #' @param Data A \code{\linkS4class{SingleCellExperiment}} object.
 #' If \code{WithSpikes = TRUE}, this MUST be formatted to include
-#' the spike-ins information (see vignette).
+#' the spike-ins and/or batch information (see vignette).
 #' @param N Total number of iterations for the MCMC sampler.
 #' Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.
 #' @param Thin Thining period for the MCMC sampler. Use \code{Thin>=2}.
@@ -128,18 +128,18 @@
 #'     and mean expression paramters. Default: \code{k = 12}. 
 #'   }
 #'   \item{
-#'     \code{FixML}
+#'     \code{FixLocations}
 #'   }{
-#'     Only used when \code{Regression = TRUE}. \code{FixML} specifies
+#'     Only used when \code{Regression = TRUE}. \code{FixLocations} specifies
 #'     whether the locations of the \code{k - 2} Gaussian Radial Basis Functions 
 #'     (GRBF) used within the correlated prior for gene-specific mean and
 #'     over-dispersion are fixed a priori.
 #'   }
 #'   \item{
-#'     \code{ml}
+#'     \code{Locations}
 #'   }{
-#'     Only used when \code{Regression = TRUE} and \code{FixML = TRUE}. 
-#'     \code{ml} specifies
+#'     Only used when \code{Regression = TRUE} and \code{FixLocations = TRUE}. 
+#'     \code{Locations} specifies
 #'     the location of the \code{k - 2} Gaussian Radial Basis Functions (GRBF) 
 #'     used within the correlated prior adopted for gene-specific 
 #'     over-dispersion and mean expression parameters. If not supplied, 
@@ -316,10 +316,17 @@ BASiCS_MCMC <- function(Data,
   GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
 
   # Total counts per cell and/or gene
-  sum.bycell.all <- matrixStats::rowSums2(counts(Data))
-  sum.bygene.all <- matrixStats::colSums2(counts(Data))
-  sum.bycell.bio <- matrixStats::rowSums2(GPar$BioCounts)
-  sum.bygene.bio <- matrixStats::colSums2(GPar$BioCounts)
+  sum.bycell.bio <- matrixStats::rowSums2(counts(Data))
+  sum.bygene.bio <- matrixStats::colSums2(counts(Data))
+  if(WithSpikes) {
+    sum.bycell.tech <- matrixStats::rowSums2(assay(altExp(Data)))
+    sum.bygene.tech <- matrixStats::colSums2(assay(altExp(Data))) 
+    sum.bycell.all <- c(sum.bycell.bio, sum.bycell.tech)
+    sum.bygene.all <- sum.bygene.bio + sum.bygene.tech
+  } else {
+    sum.bycell.all <- sum.bycell.bio
+    sum.bygene.all <- sum.bygene.bio
+  }
 
   # Assignment of optional parameters (default values if input not provided)
   ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,
@@ -346,7 +353,7 @@ BASiCS_MCMC <- function(Data,
           Burn = Burn,
           Counts = GPar$BioCounts,
           BatchDesign = GPar$BatchDesign,
-          muSpikes = SpikeInput,
+          muSpikes = metadata(Data)$SpikeInput[, 2],
           mu0 = Start$mu0,
           delta0 = Start$delta0,
           phi0 = Start$phi0,
@@ -365,7 +372,6 @@ BASiCS_MCMC <- function(Data,
           LSphi0 = Start$ls.phi0,
           LSnu0 = Start$ls.nu0,
           LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
-          sumByCellAll = sum.bycell.all,
           sumByCellBio = sum.bycell.bio,
           sumByGeneBio = sum.bygene.bio,
           sumByGeneAll = sum.bygene.all,
@@ -382,8 +388,8 @@ BASiCS_MCMC <- function(Data,
           eta0 = PriorParam$eta,
           lambda0 = Start$lambda0,
           variance = ArgsDef$variance,
-          ml = ArgsDef$ml,
-          FixML = ArgsDef$FixML,
+          Locations = ArgsDef$Locations,
+          FixLocations = ArgsDef$FixLocations,
           GeneExponent = GeneExponent,
           CellExponent = CellExponent,
           mintol_mu = ArgsDef$mintol_mu, 
@@ -407,7 +413,7 @@ BASiCS_MCMC <- function(Data,
           Burn = Burn,
           Counts = GPar$BioCounts,
           BatchDesign = GPar$BatchDesign,
-          muSpikes = SpikeInput,
+          muSpikes = metadata(Data)$SpikeInput[, 2],
           mu0 = Start$mu0,
           delta0 = Start$delta0,
           phi0 = Start$phi0,
@@ -430,7 +436,6 @@ BASiCS_MCMC <- function(Data,
           LSphi0 = Start$ls.phi0,
           LSnu0 = Start$ls.nu0,
           LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
-          sumByCellAll = sum.bycell.all,
           sumByCellBio = sum.bycell.bio ,
           sumByGeneAll = sum.bygene.all,
           sumByGeneBio = sum.bygene.bio,
@@ -497,8 +502,8 @@ BASiCS_MCMC <- function(Data,
           NotConstrainGene = ArgsDef$NotConstrainGene,
           ConstrainType = ArgsDef$ConstrainType,
           StochasticRef = as.numeric(ArgsDef$StochasticRef),
-          ml = ArgsDef$ml,
-          FixML = ArgsDef$FixML,
+          Locations = ArgsDef$Locations,
+          FixLocations = ArgsDef$FixLocations,
           GeneExponent = GeneExponent,
           CellExponent = CellExponent,
           mintol_mu = ArgsDef$mintol_mu, 
@@ -590,7 +595,7 @@ BASiCS_MCMC <- function(Data,
             "-------------------------------------------------------------\n")
   }
   # Convert output into a `BASiCS_Chain` object
-  indParam <- !(grepl("ls.", names(Chain)) | names(Chain) == "ml")
+  indParam <- !(grepl("ls.", names(Chain)) | names(Chain) == "Locations")
 
   ChainClass <- newBASiCS_Chain(parameters = Chain[indParam])
 

@@ -29,7 +29,6 @@
  * LSphi0: Starting value of adaptive proposal precision of phi (log-scale)
  * LSnu0: Starting value of adaptive proposal variance of nu (log-scale)
  * LStheta0: Starting value of adaptive proposal variance of theta (log-scale)
- * sumByCellAll: Sum of expression counts by cell (all genes)
  * sumByCellBio:  Sum of expression counts by cell (biological genes only)
  * sumByGeneAll: Sum of expression counts by gene (all genes)
  * sumByGeneBio: Sum of expression counts by gene (biological genes only)
@@ -39,39 +38,38 @@
  */
 // [[Rcpp::export]]
 Rcpp::List HiddenBASiCS_MCMCcpp(
-    int N,
-    int Thin,
-    int Burn,
-    NumericMatrix Counts,
-    NumericMatrix BatchDesign,
-    NumericVector muSpikes,
-    NumericVector mu0,
-    NumericVector delta0,
-    NumericVector phi0,
-    NumericVector s0,
-    NumericVector nu0,
-    NumericVector theta0,
+    int N, 
+    int Thin, 
+    int Burn,  
+    arma::mat Counts,  
+    arma::mat BatchDesign, 
+    arma::vec muSpikes, 
+    arma::vec mu0, 
+    arma::vec delta0, 
+    arma::vec phi0, 
+    arma::vec s0,
+    arma::vec nu0, 
+    arma::vec theta0, 
     double s2mu,
     double adelta,
     double bdelta,
     double s2delta,
     double prior_delta,
-    NumericVector aphi,
-    double as,
-    double bs,
-    double atheta,
-    double btheta,
-    double ar,
-    NumericVector LSmu0,
-    NumericVector LSdelta0,
-    double LSphi0,
-    NumericVector LSnu0,
-    NumericVector LStheta0,
-    NumericVector sumByCellAll,
-    NumericVector sumByCellBio,
-    NumericVector sumByGeneAll,
-    NumericVector sumByGeneBio,
-    int StoreAdapt,
+    arma::vec aphi, 
+    double as, 
+    double bs,   
+    double atheta, 
+    double btheta, 
+    double ar, 
+    arma::vec LSmu0, 
+    arma::vec LSdelta0, 
+    double LSphi0, 
+    arma::vec LSnu0, 
+    arma::vec LStheta0, 
+    arma::vec sumByCellBio, 
+    arma::vec sumByGeneAll, 
+    arma::vec sumByGeneBio,
+    int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
     double GeneExponent,
@@ -86,23 +84,15 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   using Rcpp::Rcout;
 
   // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.ncol();
-  int nBatch = BatchDesign.ncol();
-  int q0 = delta0.size();
-  int Naux = N / Thin - Burn / Thin;
-
-  // TRANSFORMATION TO ARMA ELEMENTS
-  arma::vec sumByCellAll_arma = as_arma(sumByCellAll);
-  arma::vec sumByCellBio_arma = as_arma(sumByCellBio);
-  arma::vec sumByGeneAll_arma = as_arma(sumByGeneAll);
-  arma::vec sumByGeneBio_arma = as_arma(sumByGeneBio);
-  arma::mat Counts_arma = as_arma(Counts);
-  arma::mat BatchDesign_arma = as_arma(BatchDesign);
-
+  int n = Counts.n_cols; 
+  int nBatch = BatchDesign.n_cols;
+  int q0 = delta0.n_elem;
+  int Naux = N/Thin - Burn/Thin;
+  
   // OTHER GLOBAL QUANTITIES
   double SumSpikeInput = sum(muSpikes);
-  arma::vec BatchSizes = sum(BatchDesign_arma, 0).t();
-
+  arma::vec BatchSizes = sum(BatchDesign,0).t();
+  
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux);
   arma::mat delta = zeros(q0, Naux);
@@ -138,26 +128,26 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec PthetaAux = zeros(nBatch);
 
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
-  arma::mat muAux = zeros(q0, 2);
-  muAux.col(0) = as_arma(mu0);
+  arma::mat muAux = zeros(q0,2);
+  muAux.col(0) = mu0; 
   arma::mat deltaAux = zeros(q0, 2);
-  deltaAux.col(0) = as_arma(delta0);
-  arma::vec phiAux = as_arma(phi0);
+  deltaAux.col(0) = delta0; 
+  arma::vec phiAux = phi0;
   Rcpp::List phiAuxList;
-  arma::vec sAux = as_arma(s0);
+  arma::vec sAux = s0; 
   arma::mat nuAux = zeros(n, 2);
-  nuAux.col(0) = as_arma(nu0);
+  nuAux.col(0) = nu0;
   arma::mat thetaAux = zeros(nBatch, 2);
-  thetaAux.col(0) = as_arma(theta0);
-  arma::vec thetaBatch = BatchDesign_arma * as_arma(theta0);
-
+  thetaAux.col(0) = theta0;
+  arma::vec thetaBatch = BatchDesign * theta0; 
+  
   // INITIALIZATION OF ADAPTIVE VARIANCES
-  arma::vec LSmuAux = as_arma(LSmu0);
-  arma::vec LSdeltaAux = as_arma(LSdelta0);
-  double LSphiAux = LSphi0;
-  arma::vec LSnuAux = as_arma(LSnu0);
-  arma::vec LSthetaAux = as_arma(LStheta0);
-
+  arma::vec LSmuAux = LSmu0;
+  arma::vec LSdeltaAux = LSdelta0; 
+  double LSphiAux = LSphi0; 
+  arma::vec LSnuAux = LSnu0;
+  arma::vec LSthetaAux = LStheta0;  
+  
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = zeros(q0);
   arma::vec PdeltaAux0 = zeros(q0);
@@ -194,12 +184,12 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     phiAuxList = phiUpdate(phiAux,
                            exp(LSphiAux),
-                           Counts_arma,
+                           Counts,
                            muAux.col(0),
                            1 / deltaAux.col(0),
                            nuAux.col(0),
                            aphi,
-                           sumByGeneBio_arma,
+                           sumByGeneBio,
                            q0,
                            n,
                            y_n,
@@ -225,7 +215,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
     thetaAux = thetaUpdateBatch(thetaAux.col(0),
                                 exp(LSthetaAux),
-                                BatchDesign_arma,
+                                BatchDesign,
                                 BatchSizes,
                                 sAux,
                                 nuAux.col(0),
@@ -239,17 +229,17 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     if (i >= Burn) {
       thetaAccept += thetaAux.col(1);
     }
-    thetaBatch = BatchDesign_arma * thetaAux.col(0);
+    thetaBatch = BatchDesign * thetaAux.col(0);
 
     // UPDATE OF MU:
     // 1st COLUMN IS THE UPDATE,
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     muAux = Hidden_muUpdate(muAux.col(0),
                             exp(LSmuAux),
-                            Counts_arma,
+                            Counts,
                             1 / deltaAux.col(0),
                             phiAux % nuAux.col(0),
-                            sumByCellBio_arma,
+                            sumByCellBio,
                             s2mu,
                             q0,
                             n,
@@ -269,7 +259,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                         thetaBatch,
                         as,
                         bs,
-                        BatchDesign_arma,
+                        BatchDesign,
                         n,
                         y_n,
                         CellExponent);
@@ -279,7 +269,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     deltaAux = deltaUpdate(deltaAux.col(0),
                            exp(LSdeltaAux),
-                           Counts_arma,
+                           Counts,
                            muAux.col(0),
                            phiAux % nuAux.col(0),
                            adelta,
@@ -303,15 +293,15 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     nuAux = nuUpdateBatch(nuAux.col(0),
                           exp(LSnuAux),
-                          Counts_arma,
+                          Counts,
                           SumSpikeInput,
-                          BatchDesign_arma,
+                          BatchDesign,
                           muAux.col(0),
                           1 / deltaAux.col(0),
                           phiAux,
                           sAux,
                           thetaBatch,
-                          sumByGeneAll_arma,
+                          sumByGeneAll,
                           q0,
                           n,
                           y_n,

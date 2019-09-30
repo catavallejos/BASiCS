@@ -1,9 +1,16 @@
-#' @name BASiCS_TestDE
+#' @name BASiCS_CorrectOffset
 #'
 #' @title Remove global mean expression offset
 #'
 #' @description Remove global offset in mean expression between two 
-#' \code{BASiCS_Chain} objects.
+#' \code{BASiCS_Chain} objects. 
+#' 
+#' @param Chain a `BASiCS_MCMC` object to which the offset correction should 
+#' be applied (with respect to `ChainRef`).
+#' @param ChainRef a `BASiCS_MCMC` object to be used as the reference in the
+#' offset correction procedure.
+#' @param min.mean Minimum mean expression threshold required for inclusion in
+#' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. 
 #'
 #' @examples
 #'
@@ -11,77 +18,50 @@
 #' data(ChainSC)
 #' data(ChainRNA)
 #' 
-#' BASiCS_CorrectOffset(ChainSC, ChainRNA, "a", "b", Plot = FALSE)
+#' A <- BASiCS_CorrectOffset(ChainSC, ChainRNA)
+#' 
+#' # Offset corrected versions for ChainSC (with respect to ChainRNA). 
+#' A$Chain
+#' A$Offset
+#' 
+#' @return A list whose first element is an offset corrected version of `Chain` 
+#' (using `ChainRef` as a reference), whose second element is the point estimate
+#' for the offset and whose third element contains iteration-specific offsets.  
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
 #' 
 #' @export
-BASiCS_CorrectOffset <- function(Chain1, 
-                                 Chain2, 
-                                 GroupLabel1 = "Group1", 
-                                 GroupLabel2 = "Group2", 
-                                 Plot = TRUE,
-                                 ...) {
-  
-  n1 <- ncol(Chain1@parameters$nu)
-  n2 <- ncol(Chain2@parameters$nu)
-  n <- n1 + n2
+BASiCS_CorrectOffset <- function(Chain, 
+                                 ChainRef,
+                                 min.mean = 1) {
 
-  # Calculating iteration-specific offset
-  OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
-                  matrixStats::rowSums2(Chain2@parameters$mu)
+  # Extract MCMC chains for mean parameters
+  mu1 <- Chain@parameters$mu
+  mu2 <- ChainRef@parameters$mu
+
+  # Lowly expressed genes are excluded from offset calculation
+  # This is similar to what is done in scran:::.rescale_clusters
+  # Rough offset estimate applied for this purpose
+  # This is based on medians to be more robust (rowMeans2 used before)
+  OffsetChain0 <- matrixStats::rowMedians(mu1) / matrixStats::rowMedians(mu2)
+  OffsetEst0 <- median(OffsetChain0)
+  OffsetRatio <- (colMedians(mu1) / OffsetEst0 + colMedians(mu2)) / 2
+  include <- which(OffsetRatio >= min.mean)
+  
+  # Calculating iteration-specific offset 
+  OffsetChain <- matrixStats::rowMedians(mu1[,include]) / 
+    matrixStats::rowMedians(mu2[,include])
   # Offset point estimate
   OffsetEst <- median(OffsetChain)
-
-  # Offset correction
-  Chain1_offset <- Chain1
-  Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
-  Chain2_offset <- Chain2  # Chain2 requires no change
-  Mu1 <- matrixStats::colMedians(Chain1_offset@parameters$mu)
-  Mu2 <- matrixStats::colMedians(Chain2_offset@parameters$mu)
-  Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
-  Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
-
-  Mu1_old <- matrixStats::colMedians(Chain1@parameters$mu)
-  MuBase_old <- (Mu1_old * n1 + Mu2 * n2) / n
-  ChainTau_old <- log2(Chain1@parameters$mu / Chain2@parameters$mu)
-  MedianTau_old <- matrixStats::colMedians(ChainTau_old)
-
-  # Offset corrected LFC estimates
-  MuBase <- (Mu1 * n1 + Mu2 * n2) / n
-  ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
-  MedianTau <- matrixStats::colMedians(ChainTau)
-
-  Corrected <- new("BASiCS_OffsetCorrected", 
-    GroupLabel1 = GroupLabel1,
-    GroupLabel2 = GroupLabel2,
-    OffsetChain = OffsetChain,
-    OffsetEst = OffsetEst,
-    Chain1 = Chain1_offset,
-    Chain2 = Chain2_offset,
-    Mu1 = Mu1,
-    Mu1_old = Mu1_old,
-    Mu2 = Mu2,
-    MuBase = MuBase,
-    MuBase_old = MuBase_old,
-    ChainTau = ChainTau,
-    MedianTau = MedianTau,
-    MedianTau_old = MedianTau_old,
-    Delta1 = Delta1,
-    Delta2 = Delta2
-  )
-
-
-  if (Plot) {
-    BASiCS_PlotOffset(Corrected, ...)
-  } else {
-    message("-------------------------------------------------------------\n",
-            "Offset estimate: ", round(OffsetEst, 4), "\n",
-            "(ratio ", GroupLabel1, " vs ", GroupLabel2, ").\n",
-            "To visualise its effect, please use 'PlotOffset = TRUE'.\n",
-            "-------------------------------------------------------------\n")
-  }
-  Corrected
+  
+  # Application of offset
+  Chain_offset <- Chain
+  Chain_offset@parameters$mu <- Chain@parameters$mu / OffsetEst
+  Chain_offset@parameters$phi <- Chain@parameters$phi * OffsetEst
+  
+  list("Chain" = Chain_offset, 
+       "Offset" = OffsetEst, 
+       "OffsetChain" = OffsetChain)
 }

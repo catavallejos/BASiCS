@@ -17,25 +17,12 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     stop("'Data' is not a SingleCellExperiment class object.")
   }
 
-  # Number of cells
-  n <- dim(counts(Data))[2]
+  CountsBio <- counts(Data)
+  n <- ncol(Data)
+  q.bio <- nrow(CountsBio)
 
-  Spikes <- SingleCellExperiment::isSpike(Data)
-
-  # Number of instrinsic genes
-  if (!is.null(Spikes)) {
-    q <- length(Spikes)
-    q.bio <- sum(!Spikes)
-
-    # Separating spike-ins from the rest of genes
-    CountsBio <- as.matrix(counts(Data)[!Spikes, , drop = FALSE])
-    CountsTech <- as.matrix(counts(Data)[Spikes, , drop = FALSE])
-  }
-  else {
-    q.bio <- q <- nrow(Data)
-    CountsBio <- as.matrix(counts(Data))
-  }
-
+  # Extract spike-in genes
+  if (WithSpikes) { CountsTech <- assay(altExp(Data)) }
 
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
@@ -54,7 +41,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
     s0 <- matrixStats::colSums2(CountsTech) /
-      sum(metadata(Data)$SpikeInput)
+      sum(metadata(Data)$SpikeInput[,2])
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)
