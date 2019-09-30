@@ -22,10 +22,10 @@ HiddenChecksBASiCS_Data <- function(Data,
   # Checks simplified as this should be already a SingleCellExperiment
   # Also, no longer need to check spike-ins are at the bottom 
   
-  if( WithSpikes ) {
+  if (WithSpikes) {
     
-    if(length(altExpNames(Data)) != 1) {
-      if(length(altExpNames(Data)) > 1) {
+    if (length(altExpNames(Data)) != 1) {
+      if (length(altExpNames(Data)) > 1) {
         errors <- c(errors, "More than one 'altExp' provided; only one allowed. \n
                     'altExp' must contain observations for spike-in genes. \n")
       } else {
@@ -33,7 +33,7 @@ HiddenChecksBASiCS_Data <- function(Data,
       }
     } else {
       
-      if(!("SpikeInput" %in% names(metadata(Data)))) {
+      if (!("SpikeInput" %in% names(metadata(Data)))) {
         errors <- c(errors, "'SpikeInput' was not provided as metadata.\n")  
       }
       # Extract spike-ins
@@ -41,13 +41,13 @@ HiddenChecksBASiCS_Data <- function(Data,
       SpikeInput <- metadata(Data)$SpikeInput
       
       # Validity checks for SpikeInput
-      if(!is.data.frame(SpikeInput)) {
+      if (!is.data.frame(SpikeInput)) {
         errors <- c(errors, "'SpikeInput' must be a 'data.frame'.\n")  
       }
-      if(ncol(SpikeInput) != 2) {
+      if (ncol(SpikeInput) != 2) {
         errors <- c(errors, "'SpikeInput' must have two columns only.\n")  
       }
-      if(nrow(SpikeInput) != nrow(CountsTech)) {
+      if (nrow(SpikeInput) != nrow(CountsTech)) {
         errors <- c(errors, "'SpikeInput' dimensions not compatible with 'altExp'. \n")  
       }
       
