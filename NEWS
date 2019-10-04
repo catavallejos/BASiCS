@@ -1271,3 +1271,6 @@ version 1.7.14 (2019-09-27)
 version 1.7.15 (2019-09-30)
 - Swtich from `matrixStats` dependency to `Matrix` as it supports more general input classes (including sparse matrices)
 - `newBASiCS_Data` now requires input counts to be a `matrix`. 
+
+version 1.7.16 (2019-10-04)
+- Minor changes to NAMESPACE to pass R CMD Check
