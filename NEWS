@@ -1274,3 +1274,8 @@ version 1.7.15 (2019-09-30)
 
 version 1.7.16 (2019-10-04)
 - Minor changes to NAMESPACE to pass R CMD Check
+
+version 1.7.17 (2019-10-04)
+- Minor change in `newBASiCS_Data` to avoid missing `colnames` when adding
+`colData`
+- New unit test to verify that `colnames` are not lost
