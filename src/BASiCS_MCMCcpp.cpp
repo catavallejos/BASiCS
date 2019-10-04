@@ -55,7 +55,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     double bdelta, 
     double s2delta,
     double prior_delta,
-    arma::vec aphi, 
+    double s2phi, 
     double as, 
     double bs,   
     double atheta, 
@@ -63,7 +63,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     double ar, 
     arma::vec LSmu0, 
     arma::vec LSdelta0, 
-    double LSphi0, 
+    arma::vec LSphi0, 
     arma::vec LSnu0, 
     arma::vec LStheta0, 
     arma::vec sumByCellBio, 
@@ -100,7 +100,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::mat theta = zeros(nBatch, Naux); 
   arma::mat LSmu;
   arma::mat LSdelta;
-  arma::vec LSphi;
+  arma::mat LSphi;
   arma::mat LSnu;
   arma::mat LStheta; 
   
@@ -108,7 +108,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   if(StoreAdapt == 1) {
     LSmu = zeros(q0, Naux); 
     LSdelta = zeros(q0, Naux); 
-    LSphi = ones(Naux);   
+    LSphi = zeros(n, Naux);   
     LSnu = zeros(n, Naux); 
     LStheta = zeros(nBatch, Naux);   
   }
@@ -116,14 +116,14 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   // ACCEPTANCE RATES FOR ADAPTIVE METROPOLIS-HASTINGS UPDATES
   arma::vec muAccept = zeros(q0); arma::vec PmuAux = zeros(q0);
   arma::vec deltaAccept = zeros(q0); arma::vec PdeltaAux = zeros(q0);
-  double phiAccept = 0; double PphiAux = 0;
+  arma::vec phiAccept = zeros(n); arma::vec PphiAux = zeros(n);
   arma::vec nuAccept = zeros(n); arma::vec PnuAux = zeros(n);
   arma::vec thetaAccept = zeros(nBatch); arma::vec PthetaAux = zeros(nBatch);
   
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
   arma::mat muAux = zeros(q0,2); muAux.col(0) = mu0; 
   arma::mat deltaAux = zeros(q0,2); deltaAux.col(0) = delta0; 
-  arma::vec phiAux = phi0; Rcpp::List phiAuxList;
+  arma::mat phiAux = zeros(n,2); phiAux.col(0) = phi0;
   arma::vec sAux = s0; 
   arma::mat nuAux = zeros(n,2); nuAux.col(0) = nu0;
   arma::mat thetaAux = zeros(nBatch, 2); thetaAux.col(0) = theta0;
@@ -132,13 +132,13 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   // INITIALIZATION OF ADAPTIVE VARIANCES
   arma::vec LSmuAux = LSmu0;
   arma::vec LSdeltaAux = LSdelta0; 
-  double LSphiAux = LSphi0; 
+  arma::vec LSphiAux = LSphi0; 
   arma::vec LSnuAux = LSnu0;
   arma::vec LSthetaAux = LStheta0;  
   
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = zeros(q0); arma::vec PdeltaAux0 = zeros(q0);
-  double PphiAux0 = 0; 
+  arma::vec PphiAux0 = zeros(n); 
   arma::vec PnuAux0 = zeros(n); arma::vec PthetaAux0 = zeros(nBatch);
   
   // BATCH INITIALIZATION FOR ADAPTIVE METROPOLIS UPDATES 
@@ -165,13 +165,11 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // UPDATE OF PHI: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts, 
-                           muAux.col(0), 1/deltaAux.col(0),
-                           nuAux.col(0), aphi, sumByGeneBio, q0,n, 
-                           y_n); 
-    phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
-    PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    phiAux = phiUpdate2(phiAux.col(0), exp(LSphiAux), Counts, 
+                        muAux.col(0), 1/deltaAux.col(0),
+                        nuAux.col(0), s2phi, sumByGeneBio, q0,n, 
+                        y_n, u_n, ind_n, mintol_nu); 
+    PphiAux += phiAux.col(1); if(i>=Burn) phiAccept += phiAux.col(1);
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -187,7 +185,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR       
     muAux = Hidden_muUpdate(muAux.col(0), exp(LSmuAux), Counts, 
-                     1/deltaAux.col(0), phiAux % nuAux.col(0), 
+                     1/deltaAux.col(0), phiAux.col(0) % nuAux.col(0), 
                      sumByCellBio, s2mu, q0, n,
                      y_q0, u_q0, ind_q0, mintol_mu);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
@@ -200,7 +198,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts, 
-                           muAux.col(0), phiAux % nuAux.col(0), 
+                           muAux.col(0), phiAux.col(0) % nuAux.col(0), 
                            adelta, bdelta, s2delta, prior_delta, 
                            q0, n, y_q0, u_q0, ind_q0, mintol_delta);  
     PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
@@ -211,7 +209,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts, SumSpikeInput,
                           BatchDesign,
                           muAux.col(0), 1/deltaAux.col(0),
-                          phiAux, sAux, thetaBatch, sumByGeneAll, q0, n,
+                          phiAux.col(0), sAux, thetaBatch, sumByGeneAll, q0, n,
                           y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
     
@@ -225,8 +223,9 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
         PdeltaAux = PdeltaAux/50; 
         PdeltaAux = -1 + 2*arma::conv_to<arma::mat>::from(PdeltaAux>ar);
         LSdeltaAux = LSdeltaAux + PdeltaAux*0.1;
-        PphiAux = PphiAux/50; PphiAux = -1 + 2*(PphiAux>ar); 
-        LSphiAux = LSphiAux - PphiAux*0.1;  
+        PphiAux = PphiAux/50; 
+        PphiAux = -1 + 2*arma::conv_to<arma::mat>::from(PphiAux>ar);
+        LSphiAux = LSphiAux + PphiAux*0.1;
         PnuAux = PnuAux/50; 
         PnuAux = -1 + 2*arma::conv_to<arma::mat>::from(PnuAux>ar);
         LSnuAux = LSnuAux + PnuAux*0.1;
@@ -245,7 +244,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     if((i%Thin==0) & (i>=Burn)) {      
       mu.col(i/Thin - Burn/Thin) = muAux.col(0); 
       delta.col(i/Thin - Burn/Thin) = deltaAux.col(0); 
-      phi.col(i/Thin - Burn/Thin) = phiAux;
+      phi.col(i/Thin - Burn/Thin) = phiAux.col(0);
       s.col(i/Thin - Burn/Thin) = sAux;
       nu.col(i/Thin - Burn/Thin) = nuAux.col(0);       
       theta.col(i/Thin - Burn/Thin) = thetaAux.col(0);       
@@ -253,7 +252,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       if(StoreAdapt == 1) {
         LSmu.col(i/Thin - Burn/Thin) = LSmuAux;
         LSdelta.col(i/Thin - Burn/Thin) = LSdeltaAux;
-        LSphi(i/Thin - Burn/Thin) = LSphiAux;
+        LSphi.col(i/Thin - Burn/Thin) = LSphiAux;
         LSnu.col(i/Thin - Burn/Thin) = LSnuAux;
         LStheta.col(i/Thin - Burn/Thin) = LSthetaAux; 
       }
@@ -264,7 +263,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       CurrentIter(i, N);
       Rcout << "mu (gene 1): " << muAux(0,0) << std::endl; 
       Rcout << "delta (gene 1): " << deltaAux(0,0) << std::endl; 
-      Rcout << "phi (cell 1): " << phiAux(0) << std::endl;
+      Rcout << "phi (cell 1): " << phiAux(0,0) << std::endl;
       Rcout << "s (cell 1): " << sAux(0) << std::endl;
       Rcout << "nu (cell 1): " << nuAux(0,0) << std::endl;
       Rcout << "theta (batch 1): " << thetaAux(0,0) << std::endl;
@@ -272,7 +271,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
       Rcout << "Current proposal variances for Metropolis Hastings updates (log-scale)." << std::endl;
       Rcout << "LSmu (gene 1): " << LSmuAux(0) << std::endl;
       Rcout << "LSdelta (gene 1): " << LSdeltaAux(0) << std::endl; 
-      Rcout << "LSphi: " << LSphiAux << std::endl;
+      Rcout << "LSphi (cell 1): " << LSphiAux(0) << std::endl;
       Rcout << "LSnu (cell 1): " << LSnuAux(0) << std::endl;
       Rcout << "LStheta (batch 1): " << LSthetaAux(0) << std::endl;
     }    
@@ -282,10 +281,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   EndSampler(N); 
   ReportAR(muAccept/(N-Burn), "mu[i]'s");
   ReportAR(deltaAccept/(N-Burn), "delta[i]'s");  
-  Rcout << " " << std::endl;
-  Rcout << "Acceptance rate for phi (joint): " << 
-    phiAccept/(N-Burn) << std::endl;
-  Rcout << " " << std::endl;
+  ReportAR(phiAccept/(N-Burn), "phi[j]'s");  
   ReportAR(nuAccept/(N-Burn), "nu[j]'s");  
   ReportAR(thetaAccept/(N-Burn), "theta[k]'s");  
   
@@ -303,7 +299,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
         Rcpp::Named("theta") = theta.t(),
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
-        Rcpp::Named("ls.phi") = LSphi,
+        Rcpp::Named("ls.phi") = LSphi.t(),
         Rcpp::Named("ls.nu") = LSnu.t(),
         Rcpp::Named("ls.theta") = LStheta.t())); 
   }
