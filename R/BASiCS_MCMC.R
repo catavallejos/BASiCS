@@ -302,7 +302,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 PriorParam$b.delta,
                 PriorParam$s2.delta,
                 ArgsDef$PriorDeltaNum,
-                1, #PriorParam$p.phi,
+                0.5, #PriorParam$p.phi,
                 PriorParam$a.s,
                 PriorParam$b.s,
                 PriorParam$a.theta,

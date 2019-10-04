@@ -212,7 +212,7 @@ arma::mat phiUpdate2(
     for (int i=0; i < q0; i++) {
       log_aux(j) -= ( Counts(i,j) + invdelta(i) ) *  
         log( ( phi1(j)*nu(j)*mu(i) + invdelta(i) ) / 
-        ( phi1(j)*nu(j)*mu(i) + invdelta(i) ));
+        ( phi0(j)*nu(j)*mu(i) + invdelta(i) ));
     } 
   }
   
