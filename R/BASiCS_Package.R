@@ -1,5 +1,4 @@
 #' @useDynLib BASiCS
-#' @exportPattern "^[^\\Hidden]"
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
 #' @importFrom data.table fread
@@ -12,7 +11,7 @@
 #' @importFrom ggplot2 xlab ylab labs
 #' @importFrom graphics abline barplot legend lines par points segments 
 #' @importFrom graphics smoothScatter 
-#' @importFrom grDevices adjustcolor colorRampPalette
+#' @importFrom grDevices adjustcolor colorRampPalette nclass.FD
 #' @importFrom ggExtra ggMarginal
 #' @importFrom KernSmooth bkde2D
 #' @importFrom MASS mvrnorm

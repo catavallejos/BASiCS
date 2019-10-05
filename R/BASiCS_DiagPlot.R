@@ -14,10 +14,13 @@
 #' respectively. If neither is supplied, Param will be plotted on the x axis
 #' and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
 #' a density plot.
-#' @param LogX,LogY A boolean value indicating whether to use a log10
+#' @param LogX,LogY A logical value indicating whether to use a log10
 #' transformation for the x or y axis, respectively.
+#' @param Smooth A logical value indicating whether to use smoothing 
+#' (specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
+#' @param ... Unused.
 #' 
 #' @return A ggplot object.
 #'
@@ -27,21 +30,22 @@
 #' data(ChainSC)
 #' 
 #' # Point estimates versus effective sample size
-#' BASiCS_diagPlot(ChainSC, Param = "mu")
+#' BASiCS_DiagPlot(ChainSC, Param = "mu")
 #' # Effective sample size as colour, mu as x, delta as y.
-#' BASiCS_diagPlot(ChainSC, x = "mu", y = "delta")
+#' BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #' 
 #' @export
-BASiCS_diagPlot <- function(object, 
+BASiCS_DiagPlot <- function(object, 
                             Param = "mu", 
                             x = NULL, 
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
                             LogY = isTRUE(y %in% c("mu", "delta")),
+                            Smooth = TRUE,
                             na.rm = TRUE) {
 
 
@@ -73,7 +77,7 @@ BASiCS_diagPlot <- function(object,
       metric = metric
     )
     df <- df[order(df$metric), ]
-    ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
+    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
       ggplot2::geom_point(alpha = 0.5, shape = 16) +
       viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)
         #, trans="log10"
@@ -87,11 +91,23 @@ BASiCS_diagPlot <- function(object,
       x = matrixStats::colMedians(xMat),
       y = metric
     )
-    ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
-      ggplot2::geom_hex( #ggplot2::aes_string(fill = "..density..")
-        ) +
-      viridis::scale_fill_viridis(name = "Count", trans = "log10") +
+    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
       sX + sY +
       ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
+    if (Smooth) {
+      g <- g +
+        ggplot2::geom_hex() +
+        viridis::scale_fill_viridis(name = "Count", trans = "log10")
+    } else {
+      g <- g +
+        ggplot2::geom_point()
+    }
+    g
   }
+}
+#' @export
+#' @rdname BASiCS_DiagPlot
+BASiCS_diagPlot <- function(...) {
+  .Deprecated("BASiCS_DiagPlot")
+  BASiCS_DiagPlot(...)
 }

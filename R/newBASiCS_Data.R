@@ -67,12 +67,12 @@
 #' @export
 newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
                            SpikeInfo = NULL, BatchInfo = NULL,
-                           SpikeType = "ERCC")
-{
+                           SpikeType = "ERCC") {
 
   if (!inherits(Counts, "matrix")) {
     stop("Counts must be a matrix.")
   }
+
   # Separating intrinsic from spike-in transcripts
   CountsBio <- Counts[!Tech, ]
   CountsTech <- Counts[Tech, ]
@@ -91,7 +91,6 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     BatchInfo = BatchInfo,
     row.names = colnames(CountsBio)
   )
-
   colnames(Data) <- colnames(CountsBio)
   rownames(Data) <- rownames(CountsBio)
 

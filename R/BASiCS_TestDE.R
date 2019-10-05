@@ -389,7 +389,7 @@ BASiCS_TestDE <- function(Chain1,
                                          GenesSelect,
                                          EFDR_M,
                                          Task = "Differential mean", 
-                                         suffix = "M")
+                                         Suffix = "M")
   ProbM <- AuxMean$Prob
   OptThresholdM <- AuxMean$OptThreshold
 
@@ -437,7 +437,7 @@ BASiCS_TestDE <- function(Chain1,
                                          select,
                                          EFDR_D,
                                          Task = "Differential dispersion",
-                                         suffix = "D")
+                                         Suffix = "D")
   ProbD <- AuxDisp$Prob
   OptThresholdD <- AuxDisp$OptThreshold
 
@@ -492,7 +492,7 @@ BASiCS_TestDE <- function(Chain1,
                                               select,
                                               EFDR_R,
                                               Task = "Differential residual dispersion",
-                                              suffix = "R")
+                                              Suffix = "R")
     ProbE <- AuxResDisp$Prob
     OptThresholdE <- AuxResDisp$OptThreshold
 

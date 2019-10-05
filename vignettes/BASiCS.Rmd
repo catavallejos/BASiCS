@@ -455,7 +455,7 @@ To visualize the fit between over-dispersion $\delta_i$ and mean expression $
 
 ```{r, fig.height = 8, fig.width = 8}
 data("ChainRNAReg")
-BASiCS_showFit(ChainRNAReg)
+BASiCS_ShowFit(ChainRNAReg)
 ```
 
 The `BASiCS_TestDE` test function will automatically perform differential 

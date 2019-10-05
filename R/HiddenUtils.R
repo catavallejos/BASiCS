@@ -61,3 +61,43 @@ HiddenCheckValidCombination <- function(...) {
 
 HiddenGeneParams <- function() c("mu", "delta", "epsilon")
 HiddenCellParams <- function() c("s", "phi", "nu")
+
+NClassFD2D <- function(x, y) {
+  max(nclass.FD(x), nclass.FD(y))
+}
+
+MeasureName <- function(measure) {
+  switch(measure,
+    "Mean" = "mean expression",
+    "Disp" = "over dispersion",
+    "ResDisp" = "residual over dispersion"
+  )
+}
+
+DistanceName <- function(measure) {
+  switch(measure,
+    "ResDisp" = "distance",
+    "fold change")
+}
+
+LogDistanceName <- function(measure) {
+  switch(measure,
+    "ResDisp" = "distance",
+    "log2(fold change)"
+  )
+}
+
+DistanceVar <- function(measure) {
+  switch(measure,
+    "ResDisp" = "Distance",
+    "Log2FC"
+  )
+}
+
+cap <- function(s) {
+  sub("([[:alpha:]])([[:alpha:]]+)", "\\U\\1\\L\\2", s, perl = TRUE)
+}
+
+NSamples <- function(Chain) {
+  nrow(Chain@parameters[[1]])
+}
