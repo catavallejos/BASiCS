@@ -108,7 +108,7 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
 })
 
 
-test_that("BASiCS_showFit works", {
+test_that("BASiCS_ShowFit works", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   set.seed(42)
   Chain <- run_MCMC(
@@ -122,8 +122,8 @@ test_that("BASiCS_showFit works", {
 
   pdf(NULL)
   expect_error({
-    BASiCS_showFit(Chain, smooth = TRUE)
-    BASiCS_showFit(Chain, smooth = FALSE)
+    BASiCS_ShowFit(Chain, smooth = TRUE)
+    BASiCS_ShowFit(Chain, smooth = FALSE)
   }, NA)
   dev.off()
 
@@ -141,29 +141,29 @@ test_that("Diagnostic plot works", {
     PrintProgress = FALSE,
     Regression = TRUE,
     WithSpikes = TRUE)
-  g <- BASiCS_diagPlot(Chain)
+  g <- BASiCS_DiagPlot(Chain)
   expect_is(g, "ggplot")
-  g <- BASiCS_diagPlot(Chain, Param = "delta")
+  g <- BASiCS_DiagPlot(Chain, Param = "delta")
   expect_is(g, "ggplot")
-  g <- BASiCS_diagPlot(Chain, Param = "epsilon")
+  g <- BASiCS_DiagPlot(Chain, Param = "epsilon")
   expect_is(g, "ggplot")
-  g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  g <- BASiCS_DiagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
   expect_error(
-    BASiCS_diagPlot(Chain, Param = "nu", x = "mu", y = "epsilon"),
+    BASiCS_DiagPlot(Chain, Param = "nu", x = "mu", y = "epsilon"),
     "Invalid combination of parameters"
   )
   expect_error(
-    BASiCS_diagPlot(Chain, Param = "delta", x = "delta", y = "nu"),
+    BASiCS_DiagPlot(Chain, Param = "delta", x = "delta", y = "nu"),
     "Invalid combination of parameters:"
   )
-  g <- BASiCS_diagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  g <- BASiCS_DiagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
 
   Chain@parameters[["epsilon"]][, 1] <- NA
-  g <- BASiCS_diagPlot(Chain, Param = "epsilon", x = "mu", y = "epsilon")
+  g <- BASiCS_DiagPlot(Chain, Param = "epsilon", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
-  g <- BASiCS_diagPlot(Chain, Param = "epsilon")
+  g <- BASiCS_DiagPlot(Chain, Param = "epsilon")
   expect_is(g, "ggplot")
 })
 
@@ -179,14 +179,44 @@ test_that("Diagnostic hist work", {
     PrintProgress = FALSE,
     Regression = TRUE,
     WithSpikes = TRUE)
-  expect_warning(g <- BASiCS_diagHist(Chain),
+  expect_warning(g <- BASiCS_DiagHist(Chain),
     "coda::effectiveSize failed for some parameters: theta, sigma2"
   )
   expect_is(g, "ggplot")
-  g <- BASiCS_diagHist(Chain, Param = "delta")
+  g <- BASiCS_DiagHist(Chain, Param = "delta")
   expect_is(g, "ggplot")
-  g <- BASiCS_diagHist(Chain, Param = "nu")
+  g <- BASiCS_DiagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
-  g <- BASiCS_diagHist(Chain, Param = "nu")
+  g <- BASiCS_DiagHist(Chain, Param = "nu")
   expect_is(g, "ggplot")
+})
+
+
+test_that("DE plots work (non-regression)", {
+  data(ChainSC)
+  data(ChainRNA)
+  Test <- BASiCS_TestDE(ChainSC, ChainRNA, Plot = FALSE, PlotOffset = FALSE)
+  BASiCS_PlotDE(Test)
+  BASiCS_PlotDE(Test@Results[[1]])
+  BASiCS_PlotDE(Test@Results[[2]])
+
+  for (type in c("MAPlot", "GridPlot", "VolcanoPlot")) {
+    BASiCS_PlotDE(Test@Results[[1]], Which = type)
+    BASiCS_PlotDE(Test@Results[[2]], Which = type)
+  }
+})
+
+test_that("DE plots work (regression)", {
+  data(ChainSCReg)
+  data(ChainRNAReg)
+  Test <- BASiCS_TestDE(ChainSCReg, ChainRNAReg, Plot = FALSE, PlotOffset = FALSE)
+  BASiCS_PlotDE(Test)
+  BASiCS_PlotDE(Test@Results[[1]])
+  BASiCS_PlotDE(Test@Results[[2]])
+  BASiCS_PlotDE(Test@Results[[3]])
+  for (type in c("MAPlot", "GridPlot", "VolcanoPlot")) {
+    BASiCS_PlotDE(Test@Results[[1]], Which = type)
+    BASiCS_PlotDE(Test@Results[[2]], Which = type)
+    BASiCS_PlotDE(Test@Results[[3]], Which = type)
+  }
 })

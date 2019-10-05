@@ -1,5 +1,4 @@
 #' @useDynLib BASiCS
-#' @exportPattern "^[^\\Hidden]"
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
 #' @importFrom data.table fread
@@ -12,18 +11,17 @@
 #' @importFrom ggplot2 xlab ylab labs
 #' @importFrom graphics abline barplot legend lines par points segments 
 #' @importFrom graphics smoothScatter 
-#' @importFrom grDevices adjustcolor colorRampPalette
+#' @importFrom grDevices adjustcolor colorRampPalette nclass.FD
 #' @importFrom ggExtra ggMarginal
 #' @importFrom KernSmooth bkde2D
 #' @importFrom MASS mvrnorm
-#' @importFrom matrixStats colMeans2 colMedians
-#' @importFrom matrixStats rowMeans2 rowMedians
-#' @importFrom Matrix t rowSums colSums rowMeans colMeans 
+#' @importFrom matrixStats colMeans2 colMedians colVars
+#' @importFrom matrixStats rowMeans2 rowMedians rowVars   
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
 #' @importFrom S4Vectors DataFrame metadata metadata<-
 #' @importFrom scran calculateSumFactors
-#' @importFrom stats acf median model.matrix rgamma rpois runif var
+#' @importFrom stats acf median model.matrix rgamma rpois runif
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
 #' @importFrom SingleCellExperiment altExp altExp<- 
 #' @importFrom SingleCellExperiment altExpNames altExpNames<-
@@ -31,6 +29,7 @@
 #' @importFrom SummarizedExperiment colData colData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
 #' @importFrom utils packageVersion write.table
+#' @importFrom hexbin hexbin
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importClassesFrom Biobase Versioned
 #' @importFrom stats4 plot

@@ -363,8 +363,8 @@ This is the recommended default setting.
 The resulting output list can be displayed using
 
 ```{r quick-start-DE}
-head(Test$TableMean)
-head(Test$TableDisp)
+head(Test@Results[["Mean"]]@Table)
+head(Test@Results[["Disp"]]@Table)
 ```
 
 Due to the confounding between mean and over-dispersion that is 
@@ -482,7 +482,7 @@ all genes can be tested for changes in expression variability independent of
 changes in mean expression.
 
 ```{r}
-head(Test$TableResDisp, n = 2)
+head(Test@Results[["ResDisp"]]@Table, n = 2)
 ```
 
 **Note:** Additional parameters for this sampler include: `k` number of 

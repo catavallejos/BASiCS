@@ -98,7 +98,10 @@ setClass("BASiCS_Chain",
               if (sum(!(names(object@parameters) %in% ValidNames) > 0) > 0) {
                 errors <- c(errors,
                   paste("Invalid elements",
-                    paste(setdiff(names(object@parameters), ValidNames), collapse = ", "),
+                    paste(
+                      setdiff(names(object@parameters), ValidNames), 
+                      collapse = ", "
+                    ),
                     "in `parameters` slot"))
               }
 
@@ -119,18 +122,33 @@ setClass("BASiCS_Chain",
               n <- ncol(object@parameters$s)
 
               # Check number of iterations per element of `parameters`
-              if (sum(lapply(
-                  object@parameters[setdiff(names(object@parameters), c("RefFreq", "designMatrix"))],
-                  nrow) != N) > 0) {
+              nrows <- vapply(
+                object@parameters[
+                  setdiff(names(object@parameters), c("RefFreq", "designMatrix"))
+                ],
+                nrow,
+                numeric(1)
+              )
+              if (sum(nrows != N) > 0) {
                 errors <- c(errors, "Different numbers of iterations")
               }
               # Check dimensions for basic gene-specific parameters
-              if (sum(lapply(object@parameters[c("mu", "delta")], ncol) != q) > 0) {
+              ncols <- vapply(
+                object@parameters[c("mu", "delta")], 
+                ncol, 
+                numeric(1)
+              )
+              if (sum(ncols != q) > 0) {
                 errors <- c(errors,
-                            "Parameters' dimensions are not compatible (genes)")
+                  "Parameters' dimensions are not compatible (genes)")
               }
               # Check dimensions for basic cell-specific parameters
-              if (sum(lapply(object@parameters[c("s", "nu")], ncol) != n) > 0) {
+              ncols <- vapply(
+                object@parameters[c("s", "nu")], 
+                ncol, 
+                numeric(1)
+              )
+              if (sum(ncols!= n) > 0) {
                 errors <- c(errors,
                             "Parameters' dimensions are not compatible (cells)")
               }
@@ -252,4 +270,69 @@ setClass("BASiCS_Summary",
       prototype = prototype(new("Versioned",
                                 versions = c("BASiCS_Summary" =
                                                utils::packageVersion("BASiCS"))))
+)
+
+
+#' @name BASiCS_ResultsDE
+#' @aliases BASiCS_ResultsDE-class
+#'
+#' @title The BASiCS_ResultsDE class
+#'
+#' @description Results of BASiCS_TestDE
+#' @slot Results \code{\linkS4class{BASiCS_ResultDE}} objects
+#' @slot Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects. 
+#' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2
+#' @slot Offset Ratio between median of chains 
+#' @slot RowData Annotation for genes
+#' @slot Extras Slot for extra information to be added later
+#' @export
+setClass("BASiCS_ResultsDE",
+  representation = representation(
+    Results = "list",
+    Chain1 = "BASiCS_Chain",
+    Chain2 = "BASiCS_Chain",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
+    Offset = "numeric",
+    RowData = "data.frame",
+    ## gene annotations!
+    Extras = "list"
+  ),
+  contains = "Versioned"
+)
+
+
+#' @name BASiCS_ResultDE
+#' @aliases BASiCS_ResultDE-class
+#'
+#' @title The BASiCS_ResultDE class
+#'
+#' @description Container of results for a single differential test.
+#' @slot Table Tabular results for each gene.
+#' @slot Name The name of the test performed (typically "Mean", "Disp" or 
+#'  "ResDisp")
+#' @slot GroupLabel1,GroupLabel2 Group labels.
+#' @slot ProbThreshold Posterior probability threshold used in differential 
+#' test.
+#' @slot EFDR,EFNR Expected false discovery and expected false negative rates
+#' for differential test.
+#' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values check before thresholds
+#' were fixed.
+#' @slot Epsilon Minimum fold change or difference threshold.
+#' @slot Extra objects for class flexibility.
+#' @export
+setClass("BASiCS_ResultDE",
+  representation = representation(
+    Table = "data.frame",
+    Name = "character",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
+    ProbThreshold = "numeric",
+    EFDR = "numeric",
+    EFNR = "numeric",
+    EFDRgrid = "numeric",
+    EFNRgrid = "numeric",
+    Epsilon = "numeric",
+    Extras = "list"
+  )
 )
