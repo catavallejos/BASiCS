@@ -5,6 +5,9 @@ r: bioc-devel
 # Strict checks in place
 warnings_are_errors: false
 
+cache:
+  - packages: true
+
 branches:
   only:
     - master
