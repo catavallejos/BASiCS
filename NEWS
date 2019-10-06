@@ -1279,3 +1279,7 @@ version 1.7.17 (2019-10-04)
 - Minor change in `newBASiCS_Data` to avoid missing `colnames` when adding
 `colData`
 - New unit test to verify that `colnames` are not lost
+
+version 1.7.18 (2019-10-06)
+- Refactor HVG/LVG plots code to use `ggplot2`
+- Vignette updated accordingly
