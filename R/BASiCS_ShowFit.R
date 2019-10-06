@@ -1,6 +1,6 @@
-
-#' @rdname BASiCS_showFit
+#' @rdname BASiCS_ShowFit
 #'
+#' @aliases BASiCS_showFit
 #' @title Plotting the trend after Bayesian regression
 #'
 #' @description Plotting the trend after Bayesian regression using a
@@ -30,7 +30,7 @@
 #'
 #' @examples
 #' data(ChainRNAReg)
-#' BASiCS_showFit(ChainRNAReg)
+#' BASiCS_ShowFit(ChainRNAReg)
 #'
 #' @return A ggplot2 object
 #'
@@ -41,7 +41,7 @@
 #' Eling et al (2018). Cell Systems
 #' https://doi.org/10.1016/j.cels.2018.06.011
 #' @export
-BASiCS_showFit <- function(object,
+BASiCS_ShowFit <- function(object,
                            xlab = "log(mu)",
                            ylab = "log(delta)",
                            pch = 16,
@@ -72,10 +72,10 @@ BASiCS_showFit <- function(object,
   myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
   h <- diff(myu)*variance
 
-  B <- matrix(1,length(grid.mu),n)
-  B[,2] <- grid.mu
-  for (j in seq_len(n-2)) {
-    B[,j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
+  B <- matrix(1, length(grid.mu), n)
+  B[, 2] <- grid.mu
+  for (j in seq_len(n - 2)) {
+    B[, j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
   }
 
   # Calculate yhat = X*beta
@@ -84,7 +84,7 @@ BASiCS_showFit <- function(object,
 
   df <- data.frame(mu = log(colMedians(object@parameters$mu)),
                    delta = log(colMedians(object@parameters$delta)),
-                   included = !is.na(object@parameters$epsilon[1,]))
+                   included = !is.na(object@parameters$epsilon[1, ]))
   rownames(df) <- colnames(object@parameters$mu)
 
   df2 <- data.frame(mu2 = grid.mu,
@@ -142,4 +142,10 @@ BASiCS_showFit <- function(object,
   }
     
   return(plot.out)
+}
+
+#' @export
+BASiCS_showFit <- function(...) {
+  .Deprecated("BASiCS_ShowFit")
+  BASiCS_ShowFit(...)
 }

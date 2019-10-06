@@ -12,6 +12,7 @@
 #' Only relevant when \code{Param = "epsilon"} (genes with very low 
 #' expression are excluding when infering the mean/over-dispersion trend. 
 #' Default: \code{na.rm = TRUE}.
+#' @param ... Unused.
 #' 
 #' @return A vector with effective sample sizes for all the elements 
 #' of \code{Param}
@@ -19,9 +20,16 @@
 #' @examples
 #' 
 #' data(ChainSC)
-#' BASiCS_effectiveSize(ChainSC, Param = "mu")
+#' BASiCS_EffectiveSize(ChainSC, Param = "mu")
 #' 
 #' @export
-BASiCS_effectiveSize <- function(object, Param, na.rm = TRUE) {
+BASiCS_EffectiveSize <- function(object, Param, na.rm = TRUE) {
   HiddenGetMeasure(object, Param, Measure = "effectiveSize", na.rm)
+}
+
+#' @rdname BASiCS_EffectiveSize
+#' @export
+BASiCS_effectiveSize <- function(...) {
+  .Deprecated("BASiCS_EffectiveSize")
+  BASiCS_EffectiveSize(...)
 }
