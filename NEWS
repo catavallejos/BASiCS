@@ -1283,3 +1283,8 @@ version 1.7.17 (2019-10-04)
 version 1.7.18 (2019-10-06)
 - Refactor HVG/LVG plots code to use `ggplot2`
 - Vignette updated accordingly
+
+version 1.7.19 (2019-10-06)
+- In all unit tests: use `expect_equal(foo, bar)` instead of 
+`expect_true(all.equal(foo, bar))`. This gives better printing (ie, if it's not 
+true it tells by what margin)
