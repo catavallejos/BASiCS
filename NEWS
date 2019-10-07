@@ -1,4 +1,4 @@
-version 0.1: (2015-04-20)
+0version 0.1: (2015-04-20)
 
 - Original release
 
@@ -1281,10 +1281,19 @@ version 1.7.17 (2019-10-04)
 - New unit test to verify that `colnames` are not lost
 
 version 1.7.18 (2019-10-06)
-- Refactor HVG/LVG plots code to use `ggplot2`
-- Vignette updated accordingly
-
-version 1.7.19 (2019-10-06)
+- Refactor HVG/LVG plots code to use `ggplot2`. 
+  When calling `BASiCS_DetectHVG` or `BASiCS_DetectLVG`, the plots are now 
+  stored in the returned list in the named element `Plots`.
+  The vignette has been updated to show the usage of this functionality.
 - In all unit tests: use `expect_equal(foo, bar)` instead of 
-`expect_true(all.equal(foo, bar))`. This gives better printing (ie, if it's not 
-true it tells by what margin)
+  `expect_true(all.equal(foo, bar))`. This gives better printing (ie, if it's not 
+  true it tells by what margin)
+- Rename some functions for consistency in capitalisation. For example, 
+  `BASiCS_showFit` has been deprecated and renamed to `BASiCS_ShowFit`.
+- Add a `Smooth` argument to `BASiCS_DiagPlot`.
+- BASiCS_TestDE is now explicit about requiring the same number of samples
+  in both chains. Previously it would fail due to arrays of non-conformable 
+  dimensions.
+- Add some internal utility functions.
+- Remove exportPattern("^[^\\Hidden]") meaning functions must be explicitly 
+  exported using roxygen tags.
