@@ -74,10 +74,10 @@ HiddenHeaderBASiCS_Sim <- function(Mu, Mu_spikes, Delta, Phi,
     if (is.null(BatchInfo)) {
       stop("When spike-ins are not included, 'BatchInfo' is required.")
     } else {
-      if (length(unique(BatchInfo)) <= 1) {
-        stop("When spike-ins are not included, 'BatchInfo' must contain",
-             " multiple batches (i.e. length(unique(BatchInfo)) > 1).")  
-      }
+      # if (length(unique(BatchInfo)) <= 1) {
+      #   stop("When spike-ins are not included, 'BatchInfo' must contain",
+      #        " multiple batches (i.e. length(unique(BatchInfo)) > 1).")  
+      # }
     }
   }
 }

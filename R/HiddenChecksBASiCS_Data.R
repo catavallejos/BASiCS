@@ -9,8 +9,8 @@ HiddenChecksBASiCS_Data <- function(Data,
   BatchInfo <- colData(Data)$BatchInfo
 
   if (sum(matrixStats::colSums2(CountsBio) == 0) > 0) {
-    errors <- c(errors, "Some cells have zero reads mapping back to the 
-                intrinsic genes. Please remove them before running the MCMC.\n")
+    # errors <- c(errors, "Some cells have zero reads mapping back to the 
+    #             intrinsic genes. Please remove them before running the MCMC.\n")
   }
   if (sum(matrixStats::rowSums2(CountsBio) == 0) > 0) {
     warning("Some genes have zero counts across all cells. \n",
@@ -78,11 +78,11 @@ HiddenChecksBASiCS_Data <- function(Data,
       
     }
   } else {
-    if (length(unique(BatchInfo)) == 1) {
-      errors <- c(errors, "If spike-in genes are not available, BASiCS 
-                  requires the data to contain at least 2 batches of cells 
-                  (for the same population)\n")
-    }
+    # if (length(unique(BatchInfo)) == 1) {
+    #   errors <- c(errors, "If spike-in genes are not available, BASiCS 
+    #               requires the data to contain at least 2 batches of cells 
+    #               (for the same population)\n")
+    # }
   }
 
   return(errors)
