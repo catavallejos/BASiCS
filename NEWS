@@ -1301,3 +1301,4 @@ version 1.7.18 (2019-10-06)
 version 1.7.19 (2019-10-08)
 - BASiCS_TestDE now checks to ensure that both input chains have been run with
   Regression = FALSE or both with Regression = TRUE.
+- Remove duplicated text from `BASiCS_Chain`'s show method.
