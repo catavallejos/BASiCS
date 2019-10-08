@@ -1,21 +1,21 @@
-HiddenCheckThresholds <- function(Epsilon, ProbThreshold, EFDR, suffix) {
-  
+HiddenCheckThresholds <- function(Epsilon, ProbThreshold, EFDR, Suffix) {
+
   if (Epsilon < 0 | !is.finite(Epsilon)) {
-    stop(paste0("'Epsilon", suffix, "' must be a positive real value"))
+    stop(paste0("'Epsilon", Suffix, "' must be a positive real value"))
   }
   if (!is.null(ProbThreshold)) {
     if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
-      stop(paste0("'ProbThreshold", suffix, "' must be contained in (0,1) \n"))
+      stop(paste0("'ProbThreshold", Suffix, "' must be contained in (0,1) \n"))
     }
   }
   if (!is.null(EFDR)) {
     if(EFDR < 0 | EFDR > 1 | !is.finite(EFDR)) {
-      stop(paste0("'EFDR_", suffix, "' must be contained in (0,1) \n"))
+      stop(paste0("'EFDR_", Suffix, "' must be contained in (0,1) \n"))
     }
   }
   if(is.null(EFDR) & is.null(ProbThreshold)) {
-    stop(paste0("A value for 'EFDR_", suffix, "' or 'ProbThreshold", suffix, 
-                "' must be provided \n"))  
+    stop(paste0("A value for 'EFDR_", Suffix, "' or 'ProbThreshold", Suffix,
+                "' must be provided \n"))
   }
 }
 
@@ -73,10 +73,10 @@ HiddenHeaderTest_DE <- function(Chain1,
   }
 
   # Checks valid threshold input values
-  HiddenCheckThresholds(EpsilonM, ProbThresholdM, EFDR_M, suffix = "M")
-  HiddenCheckThresholds(EpsilonD, ProbThresholdD, EFDR_D, suffix = "D")
+  HiddenCheckThresholds(EpsilonM, ProbThresholdM, EFDR_M, Suffix = "M")
+  HiddenCheckThresholds(EpsilonD, ProbThresholdD, EFDR_D, Suffix = "D")
   if (!is.null(Chain1@parameters$epsilon)) {
-    HiddenCheckThresholds(EpsilonR, ProbThresholdR, EFDR_R, suffix = "R")  
+    HiddenCheckThresholds(EpsilonR, ProbThresholdR, EFDR_R, Suffix = "R")  
   }
   
   if (!is.character(GroupLabel1) | length(GroupLabel1) > 1) {

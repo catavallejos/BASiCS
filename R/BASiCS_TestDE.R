@@ -315,7 +315,8 @@ BASiCS_TestDE <- function(Chain1,
     select,
     EFDR_D,
     Task = "Differential dispersion", 
-    Suffix = "D")
+    Suffix = "D"
+  )
 
 
   TableDisp <- TestDifferential(
@@ -368,7 +369,8 @@ BASiCS_TestDE <- function(Chain1,
       select,
       EFDR_R,
       Task = "residual differential dispersion", 
-      Suffix = "R")
+      Suffix = "R"
+    )
 
 
     TableResDisp <- TestDifferential(
@@ -382,7 +384,8 @@ BASiCS_TestDE <- function(Chain1,
       GroupLabel1 = GroupLabel1,
       GroupLabel2 = GroupLabel2,
       Aux = AuxResDisp,
-      Measure = "ResDisp")
+      Measure = "ResDisp"
+    )
 
     TableResDisp$MeanOverall <- TableMean$MeanOverall
     TableResDisp$ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"

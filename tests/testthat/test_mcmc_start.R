@@ -55,8 +55,8 @@ test_that("Generated starting values do not match given seed (spikes case)", {
   expect_equal(Check0, Check)
 })
 
-test_that("Generated starting values do not match given seed (no spikes case)",
-          {
+test_that("Generated starting values do not match given seed (no spikes case)", {
+
   set.seed(5)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE)
   n <- ncol(Data)
@@ -111,8 +111,8 @@ test_that("Generated starting values do not match given seed (no spikes case)",
   expect_equal(Check0, Check)
 })
 
-test_that("Generated starting values do not match given seed (regression+spike)",
-          {
+test_that("Generated starting values do not match given seed (regression+spike)", {
+
   set.seed(6)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   n <- ncol(Data)

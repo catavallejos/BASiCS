@@ -82,24 +82,22 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
                regexp = ".*does not contain information about spike-in genes.*")
 })
 
-test_that("MCMC arguments fail (no-spikes; no-regression)", {  
-  
-  # Checks if only one batch
-  Data2 <- DataNoSpikes
-  colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
-  # expect_error(run_MCMC(Data = Data2, 
-  #                       N = 20, Thin = 2, Burn = 4, 
-  #                       Regression = FALSE, WithSpikes = FALSE),
-  #              regexp = ".*requires the data to contain at least 2 batches*")
-  # Checks if only batch info is not available
-  Data2 <- DataNoSpikes
-  SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
-  expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
-                        Regression = FALSE, WithSpikes = FALSE),
-               regexp = ".*does not contain a BatchInfo vector*")
-
-})
+# test_that("MCMC arguments fail (no-spikes; no-regression)", {  
+#   # Checks if only one batch
+#   Data2 <- DataNoSpikes
+#   colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
+#   # expect_error(run_MCMC(Data = Data2, 
+#   #                       N = 20, Thin = 2, Burn = 4, 
+#   #                       Regression = FALSE, WithSpikes = FALSE),
+#   #              regexp = ".*requires the data to contain at least 2 batches*")
+#   # Checks if only batch info is not available
+#   Data2 <- DataNoSpikes
+#   SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
+#   expect_error(run_MCMC(Data = Data2, 
+#                         N = 20, Thin = 2, Burn = 4, 
+#                         Regression = FALSE, WithSpikes = FALSE),
+#                regexp = ".*does not contain a BatchInfo vector*")
+# })
 
 test_that("MCMC arguments fail (regression)", {   
 
@@ -150,12 +148,12 @@ test_that("MCMC arguments fail (regression)", {
   #                       Regression = TRUE, WithSpikes = FALSE),
   #              regexp = ".*requires the data to contain at least 2 batches*")
   
-  Data2 <- DataNoSpikes
-  colData(Data2)$BatchInfo <- NULL
-  expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE),
-               regexp = ".*does not contain a BatchInfo vector*")
+  # Data2 <- DataNoSpikes
+  # colData(Data2)$BatchInfo <- NULL
+  # expect_error(run_MCMC(Data = Data2, 
+  #                       N = 20, Thin = 2, Burn = 4, 
+  #                       Regression = TRUE, WithSpikes = FALSE),
+  #              regexp = ".*does not contain a BatchInfo vector*")
 })
 
 test_that("Checks for user generated SCE object", {    
@@ -176,12 +174,12 @@ test_that("Checks for user generated SCE object", {
                         Regression = FALSE, WithSpikes = FALSE),
                regexp = ".*is not a SingleCellExperiment class object.*")
   
-  # Test if it contains a batch vector
-  sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)))
-  expect_error(run_MCMC(Data = sce, 
-                         N = 20, Thin = 2, Burn = 4, 
-                        Regression = FALSE, WithSpikes = FALSE),
-               regexp = ".*does not contain a BatchInfo vector.*")
+  # # Test if it contains a batch vector
+  # sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)))
+  # expect_error(run_MCMC(Data = sce, 
+  #                        N = 20, Thin = 2, Burn = 4, 
+  #                       Regression = FALSE, WithSpikes = FALSE),
+  #              regexp = ".*does not contain a BatchInfo vector.*")
 
   # incorrect batch vector
   sce <- SingleCellExperiment(
@@ -241,4 +239,31 @@ test_that("Checks for user generated SCE object", {
     ),
     NA
   )
+})
+
+
+test_that("MCMC works with different input classes", {
+  counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes))
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+  counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes), sparse = TRUE)
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+  counts(DataSpikes) <- DelayedArray(counts(DataSpikes)) 
 })

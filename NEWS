@@ -1,4 +1,4 @@
-version 0.1: (2015-04-20)
+0version 0.1: (2015-04-20)
 
 - Original release
 
@@ -1261,3 +1261,39 @@ version 1.7.13 (2019-09-25)
 - Updated unit tests to account for new default choice for `min.mean` parameter
 in `scran::computeSumFactors`
 - New unit test to check for changes in `scran::computeSumFactors`
+
+version 1.7.14 (2019-09-27)
+- Changed internal functions from `matrixStats` to `Matrix` to support more 
+  classes of matrix (eg, `dgCMatrix`).
+  BASiCS_MCMC now supports DelayedArray, dgEMatrix, dgCMatrix objects and likely
+  more.
+  
+version 1.7.15 (2019-09-30)
+- Swtich from `matrixStats` dependency to `Matrix` as it supports more general input classes (including sparse matrices)
+- `newBASiCS_Data` now requires input counts to be a `matrix`. 
+
+version 1.7.16 (2019-10-04)
+- Minor changes to NAMESPACE to pass R CMD Check
+
+version 1.7.17 (2019-10-04)
+- Minor change in `newBASiCS_Data` to avoid missing `colnames` when adding
+`colData`
+- New unit test to verify that `colnames` are not lost
+
+version 1.7.18 (2019-10-06)
+- Refactor HVG/LVG plots code to use `ggplot2`. 
+  When calling `BASiCS_DetectHVG` or `BASiCS_DetectLVG`, the plots are now 
+  stored in the returned list in the named element `Plots`.
+  The vignette has been updated to show the usage of this functionality.
+- In all unit tests: use `expect_equal(foo, bar)` instead of 
+  `expect_true(all.equal(foo, bar))`. This gives better printing (ie, if it's not 
+  true it tells by what margin)
+- Rename some functions for consistency in capitalisation. For example, 
+  `BASiCS_showFit` has been deprecated and renamed to `BASiCS_ShowFit`.
+- Add a `Smooth` argument to `BASiCS_DiagPlot`.
+- BASiCS_TestDE is now explicit about requiring the same number of samples
+  in both chains. Previously it would fail due to arrays of non-conformable 
+  dimensions.
+- Add some internal utility functions.
+- Remove exportPattern("^[^\\Hidden]") meaning functions must be explicitly 
+  exported using roxygen tags.

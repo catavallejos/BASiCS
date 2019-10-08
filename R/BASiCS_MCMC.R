@@ -307,8 +307,8 @@ BASiCS_MCMC <- function(Data,
                         GeneExponent = 1,
                         CellExponent = 1,
                         Verbose = TRUE,
-                        ...)
-{
+                        ...) {
+  
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
   # Some global values used throughout the MCMC algorithm and checks
@@ -316,11 +316,11 @@ BASiCS_MCMC <- function(Data,
   GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
 
   # Total counts per cell and/or gene
-  sum.bycell.bio <- matrixStats::rowSums2(counts(Data))
-  sum.bygene.bio <- matrixStats::colSums2(counts(Data))
-  if(WithSpikes) {
-    sum.bycell.tech <- matrixStats::rowSums2(assay(altExp(Data)))
-    sum.bygene.tech <- matrixStats::colSums2(assay(altExp(Data))) 
+  sum.bycell.bio <- Matrix::rowSums(counts(Data))
+  sum.bygene.bio <- Matrix::colSums(counts(Data))
+  if (WithSpikes) {
+    sum.bycell.tech <- Matrix::rowSums(assay(altExp(Data)))
+    sum.bygene.tech <- Matrix::colSums(assay(altExp(Data))) 
     sum.bycell.all <- c(sum.bycell.bio, sum.bycell.tech)
     sum.bygene.all <- sum.bygene.bio + sum.bygene.tech
   } else {
@@ -400,7 +400,7 @@ BASiCS_MCMC <- function(Data,
       )
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
+      AtLeast2Cells <- Matrix::rowSums(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     } else {
       if (Verbose) {
@@ -514,7 +514,7 @@ BASiCS_MCMC <- function(Data,
       )
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- matrixStats::rowSums2(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
+      AtLeast2Cells <- Matrix::rowSums(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
       Chain$epsilon[,!AtLeast2Cells] <- NA
     }
     else {

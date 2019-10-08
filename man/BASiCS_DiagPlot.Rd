@@ -25,16 +25,16 @@ respectively. If neither is supplied, Param will be plotted on the x axis
 and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
 a density plot.}
 
-\item{LogX, LogY}{A boolean value indicating whether to use a log10
+\item{LogX, LogY}{A logical value indicating whether to use a log10
 transformation for the x or y axis, respectively.}
 
-\item{Smooth}{Boolean value indicating whether to use smoothing (hexagonal
-bins coloured based on density) in the plot.}
+\item{Smooth}{A logical value indicating whether to use smoothing 
+(specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
 
-\item{...}{Unused}
+\item{...}{Unused.}
 }
 \value{
 A ggplot object.

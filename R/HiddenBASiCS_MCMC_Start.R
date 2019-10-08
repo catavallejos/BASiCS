@@ -70,9 +70,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   # Starting value for delta
   # Defined by the CV for high- and mid-expressed genes
   # This is motivated by equation (2) in Vallejos et al (2016)
-  varsBio <- matrixStats::rowVars(nCountsBio)
+  varsBio <- apply(nCountsBio, 1, var)
   cv2Bio <- varsBio / meansBio ^ 2
-  delta0 <- rgamma(q.bio, 1, 1) + 1
+  delta0 <- stats::rgamma(q.bio, 1, 1) + 1
   Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
   delta0[Aux] <- cv2Bio[Aux]
   # 1e-3 added to be coherent with tolerance used within MCMC sampler
@@ -109,8 +109,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (Regression) {
     out$beta0 <- mvrnorm(1, m, V) 
     out$sigma20 <- rgamma(1, a.sigma2, b.sigma2)
-    out$lambda0 <- rgamma(q.bio, shape = eta / 2, 
-                      rate = eta / 2)
+    out$lambda0 <- rgamma(q.bio, shape = eta / 2, rate = eta / 2)
   }
 
   return(out)

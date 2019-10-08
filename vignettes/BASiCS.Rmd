@@ -29,6 +29,7 @@ knitr::opts_chunk$set(dev="png")
 library("BASiCS")
 library("BiocStyle")
 library("SingleCellExperiment")
+library("cowplot")
 ```
 
 # Introduction 
@@ -303,9 +304,10 @@ HVG/LVG evidence. A cut-off value for these posterior probabilities is set by
 controlling the EFDR (as a default option, EFDR is set as 0.10).
 
 ```{r quick-start-HVGdetection, fig.height = 20, fig.width = 20}
-par(mfrow = c(2,2))
 HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
 LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
+plot_grid(HVG$Plots[[1]], HVG$Plots[[2]])
+plot_grid(LVG$Plots[[1]], LVG$Plots[[2]])
 ```
 
 To access the results of these tests, please use. 
@@ -455,7 +457,7 @@ To visualize the fit between over-dispersion $\delta_i$ and mean expression $
 
 ```{r, fig.height = 8, fig.width = 8}
 data("ChainRNAReg")
-BASiCS_showFit(ChainRNAReg)
+BASiCS_ShowFit(ChainRNAReg)
 ```
 
 The `BASiCS_TestDE` test function will automatically perform differential 

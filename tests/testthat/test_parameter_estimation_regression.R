@@ -33,7 +33,7 @@ test_that("Estimates match the given seed (spikes+regression)", {
   MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1], 3))
   expect_equal(MuObs, Mu, tolerance = 1, scale = 1)
             
-  Delta <- c(1.343, 0.497, 1.932, 1.755, 0.426)
+  Delta <- c(1.384, 0.499, 1.771, 1.482, 0.399)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, 
                                                    "delta")[1:5,1],3))
   expect_equal(DeltaObs, Delta, tolerance = 1, scale = 1)
@@ -42,7 +42,7 @@ test_that("Estimates match the given seed (spikes+regression)", {
   PhiObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "phi")[1:5,1], 3))
   expect_equal(PhiObs, Phi, tolerance = 1, scale = 1)
             
-  S <- c(0.481, 1.031, 0.356, 0.242, 0.145)
+  S <- c(0.430, 1.003, 0.269, 0.184, 0.094)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5,1],3))
   expect_equal(SObs, S, tolerance = 1, scale = 1)
             
@@ -62,15 +62,14 @@ test_that("Estimates match the given seed (spikes+regression)", {
   DC <- BASiCS_DenoisedCounts(Data, Chain)
   
   # Checks for an arbitrary set of genes / cells
-  DCcheck0 <- c(0.000,  9.489,  0.000, 22.140,  3.163)
+  DCcheck0 <- c(0.000, 9.489,  0.000, 22.140,  3.530)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   expect_equal(DCcheck, DCcheck0, tolerance = 1, scale = 1)
-
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
   
   # Checks for an arbitrary set of genes / cells
-  DRcheck0 <- c( 28.273,  0.541,  2.229,  2.438,  4.218)
+  DRcheck0 <- c( 30.135,  0.560,  2.617,  2.719,  4.591)
   DRcheck <- as.vector(round(DR[10,1:5], 3))
   expect_equal(DRcheck, DRcheck0, tolerance = 1, scale = 1)
 })

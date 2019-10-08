@@ -21,7 +21,7 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
 
-\item{...}{Unused}
+\item{...}{Unused.}
 }
 \value{
 A ggplot object.

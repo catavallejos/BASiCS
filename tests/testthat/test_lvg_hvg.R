@@ -4,13 +4,13 @@ test_that("HVG/LVG detection is correct", {
   data(ChainSC)
 
   DetectHVG <- BASiCS_DetectHVG(ChainSC, PercentileThreshold = NULL,
-                                VarThreshold = 0.60, 
+                                VarThreshold = 0.60,
                                 EFDR = 0.10, Plot = FALSE)
   DetectLVG <- BASiCS_DetectLVG(ChainSC, PercentileThreshold = NULL,
-                                VarThreshold = 0.40, 
+                                VarThreshold = 0.40,
                                 EFDR = 0.10, Plot = FALSE)
   
-  FreqHVG0 <- c(347,   3)
+  FreqHVG0 <- c(347, 3)
   FreqHVG <- as.vector(table(DetectHVG$Table$HVG))  
   expect_equal(FreqHVG, FreqHVG0)
   
@@ -33,7 +33,7 @@ test_that("HVG/LVG detection using epsilons is correct", {
   DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
   DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
             
-  FreqHVG0 <- c(332,   18)
+  FreqHVG0 <- c(332, 18)
   FreqHVG <- as.vector(table(DetectHVG$Table$HVG))  
   expect_equal(FreqHVG, FreqHVG0)
             
@@ -48,4 +48,16 @@ test_that("HVG/LVG detection using epsilons is correct", {
   ProbLVG0 <- c(1.00, 1.00, 1.00, 1.00, 0.97)
   ProbLVG <- round(DetectLVG$Table$Prob[1:5], 2)
   expect_equal(ProbLVG, ProbLVG0)
+})
+
+
+test_that("HVG/LVG plotting works", {
+  data(ChainSCReg)
+            
+  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = TRUE)
+  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EFDR = 0.10, Plot = TRUE)
+  expect_is(DetectHVG$Plots[[1]], "gg")
+  expect_is(DetectHVG$Plots[[2]], "gg")
+  expect_is(DetectLVG$Plots[[1]], "gg")
+  expect_is(DetectLVG$Plots[[2]], "gg")
 })

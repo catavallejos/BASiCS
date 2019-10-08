@@ -8,9 +8,9 @@ HiddenChecksBASiCS_Data <- function(Data,
   GeneNames <- rownames(counts(Data)) 
   BatchInfo <- colData(Data)$BatchInfo
 
-  if (sum(matrixStats::colSums2(CountsBio) == 0) > 0) {
-    # errors <- c(errors, "Some cells have zero reads mapping back to the 
-    #             intrinsic genes. Please remove them before running the MCMC.\n")
+  if (sum(Matrix::colSums(CountsBio) == 0) > 0) {
+    errors <- c(errors, "Some cells have zero reads mapping back to the 
+                intrinsic genes. Please remove them before running the MCMC.\n")
   }
   if (sum(matrixStats::rowSums2(CountsBio) == 0) > 0) {
     warning("Some genes have zero counts across all cells. \n",
@@ -55,28 +55,28 @@ HiddenChecksBASiCS_Data <- function(Data,
       }
       
       # Validity checks for input concentrations
-      if (!(is.numeric(SpikeInput[,2]) & all(SpikeInput[,2] > 0) & 
-            sum(!is.finite(SpikeInput[,2])) == 0)) {
+      if (!(is.numeric(SpikeInput[, 2]) & all(SpikeInput[, 2] > 0) & 
+            sum(!is.finite(SpikeInput[, 2])) == 0)) {
         errors <- c(errors, "Invalid value in the 2nd column of 'SpikeInput'.\n")
       }
       
       # Check order in SpikeInput
-      if ( any( SpikeInput[,1] != rownames(altExp(Data)) ) ) {
+      if (any(SpikeInput[, 1] != rownames(altExp(Data)))) {
         errors <- c(errors, "'SpikeInput' row order does not match 'altExp'.\n")  
       }
       
       # Check all cells have non-zero total count
-      if (sum(matrixStats::colSums2(CountsTech) == 0) > 0) {
+      if (sum(Matrix::colSums(CountsTech) == 0) > 0) {
         errors <- c(errors, "Some cells have zero reads mapping back to the 
                     spike-in genes. Please remove these before running the MCMC.\n")
       }
       # Check all genes have non-zero total count
-      if (sum(matrixStats::rowSums2(CountsTech) == 0) > 0) {
+      if (sum(Matrix::rowSums(CountsTech) == 0) > 0) {
         errors <- c(errors, "Some spike-in genes have zero total reads 
                     across all cells. Please remove these before running the MCMC.\n")
       }
-      
     }
+
   } else {
     # if (length(unique(BatchInfo)) == 1) {
     #   errors <- c(errors, "If spike-in genes are not available, BASiCS 

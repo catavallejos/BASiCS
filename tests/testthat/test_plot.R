@@ -17,81 +17,45 @@ test_that("plot of BASiCS_Summary works without spikes", {
     PriorParam,
     WithSpikes = FALSE)
 
-  Chain <- run_MCMC(
-    Data = Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = FALSE,
-    WithSpikes = FALSE
-  )
-  S <- Summary(Chain)
+  data(ChainSC)
+  S <- Summary(ChainSC)
   pdf(NULL)
   expect_error(plot(S), NA)
   dev.off()
 })
 
 test_that("plot works for BASiCS_Chain (non-regression, spikes)", {
-  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  set.seed(42)
-  Chain <- run_MCMC(
-    Data = Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = FALSE,
-    WithSpikes = TRUE)
+  data(ChainSC)
   pdf(NULL)
-  plot(Chain, Param = "mu", Gene = 1)
-  plot(Chain, Param = "delta", Gene = 1)
-  plot(Chain, Param = "phi", Cell = 1)
-  plot(Chain, Param = "s", Cell = 1)
-  plot(Chain, Param = "nu", Cell = 1)
-  plot(Chain, Param = "theta")
+  expect_error({
+    plot(ChainSC, Param = "mu", Gene = 1)
+    plot(ChainSC, Param = "delta", Gene = 1)
+    plot(ChainSC, Param = "phi", Cell = 1)
+    plot(ChainSC, Param = "s", Cell = 1)
+    plot(ChainSC, Param = "nu", Cell = 1)
+    plot(ChainSC, Param = "theta")
+  }, NA)
   dev.off()
 })
 
 test_that("plot works for BASiCS_Chain (regression, no spikes)", {
-
-  Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-  set.seed(42)
-  Chain <- run_MCMC(
-    Data = Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = TRUE,
-    WithSpikes = FALSE)
-
+  data(ChainSCReg)
   pdf(NULL)
   expect_error({
-    plot(Chain, Param = "mu", Gene = 1)
-    plot(Chain, Param = "delta", Gene = 1)
-    plot(Chain, Param = "epsilon", Gene = 1)
-    plot(Chain, Param = "s", Cell = 1)
-    plot(Chain, Param = "nu", Cell = 1)
-    plot(Chain, Param = "theta")
-    plot(Chain, Param = "beta", RegressionTerm = 1)
+    plot(ChainSCReg, Param = "mu", Gene = 1)
+    plot(ChainSCReg, Param = "delta", Gene = 1)
+    plot(ChainSCReg, Param = "epsilon", Gene = 1)
+    plot(ChainSCReg, Param = "s", Cell = 1)
+    plot(ChainSCReg, Param = "nu", Cell = 1)
+    plot(ChainSCReg, Param = "theta")
+    plot(ChainSCReg, Param = "beta", RegressionTerm = 1)
   }, NA)
   dev.off()
 })
 
 test_that("plot works for BASiCS_Summary with all valid combinations", {
-  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  set.seed(42)
-  Chain <- run_MCMC(
-    Data = Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = TRUE,
-    WithSpikes = TRUE)
-
-  SChain <- Summary(Chain)
+  data(ChainSCReg)
+  SChain <- Summary(ChainSCReg)
   pdf(NULL)
   expect_error({
     plot(SChain, Param = "mu", Param2 = "delta")
@@ -108,85 +72,54 @@ test_that("plot works for BASiCS_Summary with all valid combinations", {
 
 
 test_that("BASiCS_ShowFit works", {
-  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  set.seed(42)
-  Chain <- run_MCMC(
-    Data = Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = TRUE,
-    WithSpikes = TRUE)
-
-  pdf(NULL)
+  data(ChainSCReg)
+  expect_warning(BASiCS_showFit(ChainSCReg, smooth = FALSE), "deprecated")
   expect_error({
-    BASiCS_ShowFit(Chain, smooth = TRUE)
-    BASiCS_ShowFit(Chain, smooth = FALSE)
+    BASiCS_ShowFit(ChainSCReg, smooth = TRUE)
+    BASiCS_ShowFit(ChainSCReg, smooth = FALSE)
   }, NA)
-  dev.off()
-
 })
 
 
 test_that("Diagnostic plot works", {
-  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  set.seed(42)
-  Chain <- run_MCMC(
-    Data = Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = TRUE,
-    WithSpikes = TRUE)
-  g <- BASiCS_DiagPlot(Chain)
+  data(ChainSCReg)
+  expect_warning(BASiCS_diagPlot(ChainSCReg), "deprecated")
+  g <- BASiCS_DiagPlot(ChainSCReg)
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagPlot(Chain, Param = "delta")
+  g <- BASiCS_DiagPlot(ChainSCReg, Param = "delta")
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagPlot(Chain, Param = "epsilon")
+  g <- BASiCS_DiagPlot(ChainSCReg, Param = "epsilon")
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  g <- BASiCS_DiagPlot(ChainSCReg, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
   expect_error(
-    BASiCS_DiagPlot(Chain, Param = "nu", x = "mu", y = "epsilon"),
+    BASiCS_DiagPlot(ChainSCReg, Param = "nu", x = "mu", y = "epsilon"),
     "Invalid combination of parameters"
   )
   expect_error(
-    BASiCS_DiagPlot(Chain, Param = "delta", x = "delta", y = "nu"),
+    BASiCS_DiagPlot(ChainSCReg, Param = "delta", x = "delta", y = "nu"),
     "Invalid combination of parameters:"
   )
-  g <- BASiCS_DiagPlot(Chain, Param = "delta", x = "mu", y = "epsilon")
+  g <- BASiCS_DiagPlot(ChainSCReg, Param = "delta", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
 
-  Chain@parameters[["epsilon"]][, 1] <- NA
-  g <- BASiCS_DiagPlot(Chain, Param = "epsilon", x = "mu", y = "epsilon")
+  ChainSCReg@parameters[["epsilon"]][, 1] <- NA
+  g <- BASiCS_DiagPlot(ChainSCReg, Param = "epsilon", x = "mu", y = "epsilon")
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagPlot(Chain, Param = "epsilon")
+  g <- BASiCS_DiagPlot(ChainSCReg, Param = "epsilon")
   expect_is(g, "ggplot")
 })
 
 
 test_that("Diagnostic hist work", {
-  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
-  set.seed(42)
-  Chain <- run_MCMC(
-    Data,
-    N = 100,
-    Thin = 10,
-    Burn = 10,
-    PrintProgress = FALSE,
-    Regression = TRUE,
-    WithSpikes = TRUE)
-  expect_warning(g <- BASiCS_DiagHist(Chain),
-    "coda::effectiveSize failed for some parameters: theta, sigma2"
-  )
+  data(ChainSC)
+  expect_warning(g <- BASiCS_diagHist(ChainSCReg), "deprecated")
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagHist(Chain, Param = "delta")
+  g <- BASiCS_DiagHist(ChainSC, Param = "delta")
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagHist(Chain, Param = "nu")
+  g <- BASiCS_DiagHist(ChainSC, Param = "nu")
   expect_is(g, "ggplot")
-  g <- BASiCS_DiagHist(Chain, Param = "nu")
+  g <- BASiCS_DiagHist(ChainSC, Param = "nu")
   expect_is(g, "ggplot")
 })
 
