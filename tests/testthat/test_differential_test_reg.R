@@ -45,3 +45,17 @@ test_that("Differential test is correct (regression case)", {
   Lfc2Disp <- round(tail(Test@Results$Disp@Table$DispLog2FC, 5),2)
   expect_equal(Lfc2Disp, Lfc2Disp0)
 })
+
+test_that("Differential test requires same regression setting", {
+  data(ChainSCReg)
+  data(ChainRNA)
+  expect_error(
+    BASiCS_TestDE(
+      Chain1 = ChainSCReg,
+      Chain2 = ChainRNA,
+      Plot = FALSE,
+      PlotOffset = FALSE
+    ),
+    "Both chains should be run with the same setting for Regression."
+  )
+})

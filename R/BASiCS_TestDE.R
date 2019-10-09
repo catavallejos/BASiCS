@@ -168,6 +168,11 @@ BASiCS_TestDE <- function(Chain1,
           "Log-fold change thresholds are now set in a log2 scale. \n",
           "Original BASiCS release used a natural logarithm scale.")
 
+
+  if (xor(is.null(Chain1@parameters[["epsilon"]]), is.null(Chain2@parameters[["epsilon"]]))) {
+    stop("Both chains should be run with the same setting for Regression.")
+  }
+
   n1 <- ncol(Chain1@parameters$nu)
   n2 <- ncol(Chain2@parameters$nu)
   n <- n1 + n2
