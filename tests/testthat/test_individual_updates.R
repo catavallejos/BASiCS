@@ -19,7 +19,7 @@ test_that("Spikes + no regression", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   CountsBio <- counts(Data)
   q0 <- nrow(CountsBio); n <- ncol(CountsBio)
-  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+  PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
                      b.delta = 1, p.phi = rep(1, times = n), 
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
@@ -35,6 +35,7 @@ test_that("Spikes + no regression", {
                                   invdelta = 1/Start$delta0, 
                                   phinu = Start$phi0 * Start$nu0,
                                   sum_bycell_bio = rowSums(CountsBio),
+                                  mu_mu = PriorParam$mu.mu,
                                   s2_mu = PriorParam$s2.mu, 
                                   q0 = q0, n = n,
                                   mu1 =  mu1, 

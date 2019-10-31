@@ -231,7 +231,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
     # If regression case is chosen
     if (Regression) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcppReg(
+      Time <- system.time(
+        Chain <- HiddenBASiCS_MCMCcppReg(
                 N,
                 Thin,
                 Burn,
@@ -244,6 +245,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Start$s0,
                 Start$nu0,
                 rep(Start$theta0, GPar$nBatch),
+                PriorParam$mu.mu,
                 PriorParam$s2.mu,
                 PriorParam$p.phi,
                 PriorParam$a.s,
@@ -272,10 +274,12 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 as.numeric(ArgsDef$StoreAdapt),
                 ArgsDef$StopAdapt,
                 as.numeric(ArgsDef$PrintProgress),
-                ArgsDef$mintol_mu, 
+                ArgsDef$mintol_mu,
                 ArgsDef$mintol_delta,
                 ArgsDef$mintol_nu,
-                ArgsDef$mintol_theta))
+                ArgsDef$mintol_theta
+        )
+      )
 
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
@@ -297,6 +301,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Start$s0,
                 Start$nu0,
                 rep(Start$theta0, GPar$nBatch),
+                PriorParam$mu.mu,
                 PriorParam$s2.mu,
                 PriorParam$a.delta,
                 PriorParam$b.delta,
@@ -340,6 +345,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 Start$s0,
                 Start$nu0,
                 rep(Start$theta0, GPar$nBatch),
+                PriorParam$mu.mu,
                 PriorParam$s2.mu,
                 PriorParam$a.s,
                 PriorParam$b.s,
@@ -395,6 +401,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
         Start$s0,
         Start$nu0,
         rep(Start$theta0, GPar$nBatch),
+        PriorParam$mu.mu,
         PriorParam$s2.mu,
         PriorParam$a.delta,
         PriorParam$b.delta,

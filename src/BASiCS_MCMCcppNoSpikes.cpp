@@ -59,6 +59,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     arma::vec s0, 
     arma::vec nu0,    
     arma::vec theta0,
+    double mu_mu,
     double s2mu, 
     double adelta, 
     double bdelta, 
@@ -208,7 +209,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     }
     muAux = muUpdateNoSpikes(muAux.col(0), exp(LSmuAux), Counts, 
                              1/deltaAux.col(0), nuAux.col(0), sumByCellAll, 
-                             s2mu, q0, n, y_q0, u_q0, ind_q0,
+                             mu_mu, s2mu, q0, n, y_q0, u_q0, ind_q0,
                              Constrain, RefGene, ConstrainGene_uvec, 
                              NotConstrainGene_uvec, ConstrainType, mintol_mu);
     PmuAux += muAux.col(1); if(i>=Burn) {muAccept += muAux.col(1);}  
