@@ -1,8 +1,14 @@
 #' Produce plots assessing differential expression results
 #' 
 #' @param object A BASiCS_ResultsDE or BASiCS_ResultDE object.
-#' @param Which Which plot to produce? Options: "MAPlot", "VolcanoPlot", 
+#' @param Plots Plots plot to produce? Options: "MAPlot", "VolcanoPlot", 
 #'  "GridPlot"
+#' @param Parameters Which parameter(s) to produce plots for?
+#'  Available options are "Mean", (mu mean expression),
+#'  "Disp" (delta overdispersion) and "ResDisp" 
+#'  (epsilon residual overdispersion).
+#' @param MuX Use Mu (mean expression across both chains) as the X-axis for all
+#'  MA plots? Default: TRUE.
 #' @param ... Passed to methods
 #' @examples
 #' data(ChainSC)
@@ -20,15 +26,35 @@
 #' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
 #' @export
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
-  function(object, Which = c("MAPlot", "VolcanoPlot", "GridPlot"), ...) {
-    l <- lapply(object@Results, BASiCS_PlotDE, Which = Which, ...)
-    if (length(Which) > 1) {
+  function(
+      object,
+      Plots = c("MAPlot", "VolcanoPlot", "GridPlot"),
+      Parameters = intersect(
+        c("Mean", "Disp", "ResDisp"),
+        names(object@Results)
+      ),
+      MuX = TRUE,
+      ...) {
+
+    Diff <- setdiff(Parameters, names(object@Results))
+    if (length(Diff)) {
+      stop(paste("Invalid Parameters selected:", Diff))
+    }
+    Mu <- if (MuX) object@Results$Mean@Table$MeanOverall else NULL
+    l <- lapply(
+      object@Results[Parameters],
+      BASiCS_PlotDE,
+      Plots = Plots,
+      Mu = Mu,
+      ...
+    )
+    if (length(Plots) > 1) {
       nrow <- length(object@Results)
       labels <- sapply(object@Results, function(x) {
         cap(MeasureName(x@Name))
       })
       # labels <- Reduce(c, labels)
-      labels <- c(labels, rep("", length(object@Results) * length(Which)))
+      labels <- c(labels, rep("", length(object@Results) * length(Plots)))
       l <- lapply(l, 
         function(g) {
           g +
@@ -38,7 +64,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         }
       )
     } else {
-      nrow <- length(Which)
+      nrow <- length(Plots)
       labels <- vapply(
         object@Results, 
         function(x) cap(MeasureName(x@Name)), 
@@ -53,9 +79,9 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
   function(
     object,
-    Which = c("MAPlot", "VolcanoPlot", "GridPlot")
+    Plots = c("MAPlot", "VolcanoPlot", "GridPlot"),
+    Mu = NULL
   ){
-
     BASiCS_PlotDE(
       GroupLabel1 = object@GroupLabel1,
       GroupLabel2 = object@GroupLabel2,
@@ -67,7 +93,8 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
       EFDRgrid = object@EFDRgrid,
       EFNRgrid = object@EFNRgrid,
       ProbThreshold = object@ProbThreshold,
-      Which = Which
+      Mu = Mu,
+      Plots = Plots
     )
   }
 )
@@ -83,28 +110,30 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     EFDRgrid,
     EFNRgrid,
     ProbThreshold,
-    Which = c("MAPlot", "VolcanoPlot", "GridPlot")
+    Mu,
+    Plots = c("MAPlot", "VolcanoPlot", "GridPlot")
   ) {
 
-    Which <- match.arg(Which, several.ok = TRUE)
+    Plots <- match.arg(Plots, several.ok = TRUE)
 
-    Plots <- list()
+    PlotObjects <- list()
 
-    if ("MAPlot" %in% Which) {
-      Plots <- c(Plots, 
+    if ("MAPlot" %in% Plots) {
+      PlotObjects <- c(PlotObjects, 
         list(
           MAPlot(
             Measure,
             Table,
             GroupLabel1,
             GroupLabel2,
-            Epsilon
+            Epsilon,
+            Mu
           )
         )
       )
     }
-    if ("VolcanoPlot" %in% Which) {
-      Plots <- c(Plots, 
+    if ("VolcanoPlot" %in% Plots) {
+      PlotObjects <- c(PlotObjects, 
         list(
           VolcanoPlot(
             Measure,
@@ -117,8 +146,8 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
         )
       )
     }
-    if ("GridPlot" %in% Which) {
-      Plots <- c(
+    if ("GridPlot" %in% Plots) {
+      PlotObjects <- c(
         list(
           GridPlot(
             Measure,
@@ -129,15 +158,15 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
             ProbThreshold
           )
         ),
-        Plots
+        PlotObjects
       )
     }
-    if (length(Plots) == 1) {
-      Plots <- Plots[[1]]
+    if (length(PlotObjects) == 1) {
+      PlotObjects <- PlotObjects[[1]]
     } else {
-      Plots <- cowplot::plot_grid(plotlist = Plots, nrow = 1)
+      PlotObjects <- cowplot::plot_grid(plotlist = PlotObjects, nrow = 1)
     }
-    Plots
+    PlotObjects
   }
 )
 
@@ -234,7 +263,7 @@ VolcanoPlot <- function(
     )
 }
 
-MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
+MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, Mu) {
 
   IndDiff <- DiffExp(Table[[paste0("ResultDiff", Measure)]])
   # bins <- NClassFD2D(
@@ -245,10 +274,12 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
   xscale <- ggplot2::scale_x_continuous(
     trans = if (Measure == "ResDisp") "identity" else "log2"
   )
+  Table$`_Mu` <- Mu
   ggplot2::ggplot(
       Table[!IndDiff, ],
       ggplot2::aes_string(
-        x = paste0(Measure, "Overall"), 
+        # x = paste0(Measure, "Overall"), 
+        x = if (!is.null(Mu)) "`_Mu`" else paste0(Measure, "Overall"),
         y = paste0(Measure, DistanceVar(Measure)))
     ) + 
     ggplot2::geom_hex(
@@ -273,10 +304,11 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon) {
     xscale +
     viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
     ggplot2::labs(
-      x = paste(cap(MeasureName(Measure))),
+      x = if (is.null(Mu)) paste(cap(MeasureName(Measure))) else "Mean expression",
       y = paste(cap(LogDistanceName(Measure)),
         GroupLabel1, "vs",
-        GroupLabel2)
+        GroupLabel2
+      )
       # ,
       # title = paste("Differential", MeasureName(Measure))
     )
