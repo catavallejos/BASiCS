@@ -261,7 +261,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, Mu) {
   # )
   bins <- 50
   xscale <- ggplot2::scale_x_continuous(
-    trans = if (Measure == "ResDisp") "identity" else "log2"
+    trans = if (Measure == "ResDisp" & is.null(Mu)) "identity" else "log2"
   )
   Table$`_Mu` <- Mu
   ggplot2::ggplot(
