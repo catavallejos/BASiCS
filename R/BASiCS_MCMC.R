@@ -30,8 +30,12 @@
 #' values required for the adopted prior (see Vallejos et al, 2015, 2016).
 #' All elements must be positive real numbers.
 #' \describe{
+#'   \item{\code{mu.mu}}{Mean hyper-parameter for the
+#'         log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
+#'         gene-specific expression rate parameters \eqn{\mu_i}.
+#'         Default: \code{s2.mu = 0}.}
 #'   \item{\code{s2.mu}}{Scale hyper-parameter for the
-#'         log-Normal(\code{0},\code{s2.mu}) prior that is shared by all
+#'         log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
 #'         gene-specific expression rate parameters \eqn{\mu_i}.
 #'         Default: \code{s2.mu = 0.5}.}
 #'   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`.
