@@ -4,13 +4,29 @@
 \alias{BASiCS_TestDE}
 \title{Detection of genes with changes in expression}
 \usage{
-BASiCS_TestDE(Chain1, Chain2, EpsilonM = log2(1.5),
-  EpsilonD = log2(1.5), EpsilonR = log2(1.5)/log2(exp(1)),
-  ProbThresholdM = 2/3, ProbThresholdD = 2/3, ProbThresholdR = 2/3,
-  OrderVariable = "GeneIndex", GroupLabel1 = "Group1",
-  GroupLabel2 = "Group2", Plot = TRUE, PlotOffset = TRUE,
-  Offset = TRUE, EFDR_M = 0.05, EFDR_D = 0.05, EFDR_R = 0.05,
-  GenesSelect = NULL, min.mean = 1, ...)
+BASiCS_TestDE(
+  Chain1,
+  Chain2,
+  EpsilonM = log2(1.5),
+  EpsilonD = log2(1.5),
+  EpsilonR = log2(1.5)/log2(exp(1)),
+  ProbThresholdM = 2/3,
+  ProbThresholdD = 2/3,
+  ProbThresholdR = 2/3,
+  OrderVariable = "GeneIndex",
+  GroupLabel1 = "Group1",
+  GroupLabel2 = "Group2",
+  Plot = TRUE,
+  PlotOffset = TRUE,
+  Offset = TRUE,
+  EFDR_M = 0.05,
+  EFDR_D = 0.05,
+  EFDR_R = 0.05,
+  GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
+  min.mean = 1,
+  CheckESS = FALSE,
+  ...
+)
 }
 \arguments{
 \item{Chain1}{an object of class \code{\linkS4class{BASiCS_Chain}}
@@ -87,7 +103,8 @@ equal to \code{ProbThresholdR}.Default \code{EFDR_D = 0.05}.}
 
 \item{GenesSelect}{Optional argument to provide a user-defined list
 of genes to be considered for the comparison.
-Default: \code{GenesSelect = NULL}. When used, this argument must be a vector
+Default: \code{GenesSelect = rep(TRUE, nGene)} 
+When used, this argument must be a vector
 of \code{TRUE} (include gene) / \code{FALSE} (exclude gene) indicator,
 with the same length as the number of intrinsic genes and following the same
 order as how genes are displayed in the table of counts.
@@ -97,6 +114,10 @@ when the user decides to exclude some genes from the comparison.}
 \item{min.mean}{Minimum mean expression threshold required for inclusion in
 offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 parameter is only relevant with `Offset = TRUE`.}
+
+\item{CheckESS}{Should the effective sample size of the chains be tested to
+be of a suitable magnitude in order to be included in tests for 
+differential expression? Default is FALSE.}
 
 \item{...}{Optional parameters.}
 }

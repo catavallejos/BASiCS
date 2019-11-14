@@ -37,6 +37,7 @@ HiddenHeaderTest_DE <- function(Chain1,
                                 Plot,
                                 PlotOffset,
                                 Offset,
+                                CheckESS,
                                 ...)
 {
   # Checking validity of input arguments
@@ -96,7 +97,9 @@ HiddenHeaderTest_DE <- function(Chain1,
   if (!is.null(GenesSelect) & !is.logical(GenesSelect)) {
     stop("Invalid value for 'GenesSelect'")
   }
-
+  if (!is.logical(CheckESS) & length(CheckESS) == 1) {
+    stop("Invalid value for CheckESS")
+  }
 #  if (!is.null(ProbThresholdM)) {
 #    message("A value has been provided for `ProbThresholdM` \n",
 #            "EFDR will not be calibrated in differential mean test. \n")

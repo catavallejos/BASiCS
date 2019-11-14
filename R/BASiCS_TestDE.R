@@ -62,7 +62,8 @@
 #' equal to \code{ProbThresholdR}.Default \code{EFDR_D = 0.05}.
 #' @param GenesSelect Optional argument to provide a user-defined list
 #' of genes to be considered for the comparison.
-#' Default: \code{GenesSelect = NULL}. When used, this argument must be a vector
+#' Default: \code{GenesSelect = rep(TRUE, nGene)} 
+#' When used, this argument must be a vector
 #' of \code{TRUE} (include gene) / \code{FALSE} (exclude gene) indicator,
 #' with the same length as the number of intrinsic genes and following the same
 #' order as how genes are displayed in the table of counts.
@@ -71,6 +72,9 @@
 #' @param min.mean Minimum mean expression threshold required for inclusion in
 #' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 #' parameter is only relevant with `Offset = TRUE`.
+#' @param CheckESS Should the effective sample size of the chains be tested to
+#' be of a suitable magnitude in order to be included in tests for 
+#' differential expression? Default is FALSE.
 #' @param ... Optional parameters.
 #'
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
@@ -230,8 +234,10 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_M = 0.05,
                           EFDR_D = 0.05,
                           EFDR_R = 0.05,
-                          GenesSelect = NULL, 
-                          min.mean = 1, ...)
+                          GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])), 
+                          min.mean = 1, 
+                          CheckESS = FALSE,
+                          ...)
 {
 
   HiddenHeaderTest_DE(Chain1,
@@ -251,8 +257,10 @@ BASiCS_TestDE <- function(Chain1,
                       GenesSelect,
                       Plot,
                       PlotOffset,
-                      Offset)
+                      Offset,
+                      CheckESS)
 
+  ESSThreshold <- 100
   GeneName <- colnames(Chain1@parameters$mu)
   GeneIndex <- seq_len(length(GeneName))
 
@@ -387,11 +395,19 @@ BASiCS_TestDE <- function(Chain1,
 
   Search <- is.null(ProbThresholdM)
 
+  if (CheckESS) {
+    GoodEss <- coda::effectiveSize(mcmc(Chain1@parameters[["mu"]])) > ESSThreshold &
+      coda::effectiveSize(mcmc(Chain2@parameters[["mu"]])) > ESSThreshold
+  } else {
+    GoodEss <- rep(TRUE, length(GenesSelect))
+  }
+  MuSelect <- GenesSelect & GoodEss
+
   # Changes in mean expression
   AuxMean <- HiddenThresholdSearchTestDE(ChainTau,
                                          EpsilonM,
                                          ProbThresholdM,
-                                         GenesSelect,
+                                         MuSelect,
                                          EFDR_M,
                                          Task = "Differential mean", 
                                          Suffix = "M")
@@ -407,6 +423,7 @@ BASiCS_TestDE <- function(Chain1,
   if (!is.null(GenesSelect)) {
       ResultDiffMean[!GenesSelect] <- "ExcludedByUser"
   }
+  ResultDiffMean[!GoodEss] <- "ExcludedLowESS"
   # Output table
   TableMean <- cbind.data.frame(GeneName = GeneName,
                                 MeanOverall = as.numeric(MuBase),
@@ -431,10 +448,16 @@ BASiCS_TestDE <- function(Chain1,
   # Genes to calibrate EFDR
   if (!is.null(GenesSelect)) {
     select <- NotDE & GenesSelect
-  }
-  else {
+  } else {
     select <- NotDE
   }
+
+  if (CheckESS) {
+    GoodEss <- coda::effectiveSize(mcmc(Chain1@parameters[["delta"]])) > ESSThreshold &
+      coda::effectiveSize(mcmc(Chain2@parameters[["delta"]])) > ESSThreshold
+  }
+  select <- select & GoodEss
+
 
   AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega,
                                          EpsilonD,
@@ -454,6 +477,7 @@ BASiCS_TestDE <- function(Chain1,
   ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
 
   ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
+  ResultDiffDisp[!GoodEss] <- "ExcludedLowESS"
   if (!is.null(GenesSelect)) {
     ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
   }
@@ -486,10 +510,15 @@ BASiCS_TestDE <- function(Chain1,
     # Genes to calibrate EFDR
     if (!is.null(GenesSelect)) {
       select <- NotExcluded & GenesSelect
-    }
-    else {
+    } else {
       select <- NotExcluded
     }
+    if (CheckESS) {
+      GoodEss <- coda::effectiveSize(mcmc(Chain1@parameters[["epsilon"]])) > ESSThreshold &
+        coda::effectiveSize(mcmc(Chain2@parameters[["epsilon"]])) > ESSThreshold
+    }
+    select <- select & GoodEss
+
 
     AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi,
                                               EpsilonR,
@@ -509,6 +538,7 @@ BASiCS_TestDE <- function(Chain1,
     ResultDiffResDisp[ResDispPlus2] <- paste0(GroupLabel2, "+")
 
     ResultDiffResDisp[!NotExcluded] <- "ExcludedFromTesting"
+    ResultDiffResDisp[!GoodEss] <- "ExcludedLowESS"
     if (!is.null(GenesSelect)) {
       ResultDiffResDisp[!GenesSelect] <- "ExcludedByUser"
     }

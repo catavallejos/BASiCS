@@ -63,3 +63,18 @@ test_that("Differential test requires same regression setting", {
     "Both chains should be run with the same setting for Regression."
   )
 })
+
+test_that("Differential test works with CheckESS", {
+  data(ChainSCReg)
+  data(ChainRNA)
+  expect_error(
+    BASiCS_TestDE(
+      Chain1 = ChainSCReg,
+      Chain2 = ChainRNAReg,
+      Plot = FALSE,
+      PlotOffset = FALSE,
+      CheckESS = TRUE
+    ),
+    NA 
+  )
+})
