@@ -90,6 +90,11 @@ Rcpp::List phiUpdate(
     int const& n,
     arma::vec & phi1);
 
+Rcpp::List phiUpdate_fixed(
+    arma::vec const& nu, 
+    arma::vec const& scran_factor, 
+    arma::vec & phi1);
+
 arma::vec sUpdateBatch(
     arma::vec const& s0, 
     arma::vec const& nu, 

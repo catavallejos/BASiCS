@@ -182,6 +182,17 @@ Rcpp::List phiUpdate(
                             Rcpp::Named("ind") = ind)); 
 }
 
+Rcpp::List phiUpdate_fixed(
+    arma::vec const& nu, 
+    arma::vec const& scran_factor, 
+    arma::vec & phi1) {
+  
+  phi1 = scran_factor / nu;
+  
+  return(Rcpp::List::create(Rcpp::Named("phi") = phi1, 
+                            Rcpp::Named("ind") = 1)); 
+}
+
 /* Draws for cell-specific normalising constants s[j] (batch case)
  * Metropolis-Hastings updates are not required as full conditionals 
  * have a closed form (Generalized Inverse Gaussian)

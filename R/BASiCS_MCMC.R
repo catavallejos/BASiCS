@@ -190,7 +190,8 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, 
+                        scran_factor, ...)
 {
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
@@ -284,7 +285,7 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
     }
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(
+      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp_fix_phi(
                 N,
                 Thin,
                 Burn,
@@ -322,7 +323,8 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
                 ArgsDef$mintol_mu, 
                 ArgsDef$mintol_delta,
                 ArgsDef$mintol_nu,
-                ArgsDef$mintol_theta))
+                ArgsDef$mintol_theta,
+                scran_factor))
     }
   }
   else {
