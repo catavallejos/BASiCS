@@ -163,14 +163,6 @@ Rcpp::List HiddenBASiCS_MCMCcpp_fix_phi(
     
     Ibatch++; 
     
-    // UPDATE OF PHI: 
-    // 1st ELEMENT IS THE UPDATE, 
-    // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    phiAuxList = phiUpdate_fixed(nuAux.col(0), scran_factor, y_n); 
-    phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
-    PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
-    
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -212,6 +204,14 @@ Rcpp::List HiddenBASiCS_MCMCcpp_fix_phi(
                           phiAux, sAux, thetaBatch, sumByGeneAll, q0, n,
                           y_n, u_n, ind_n, mintol_nu); 
     PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
+    
+    // UPDATE OF PHI: 
+    // 1st ELEMENT IS THE UPDATE, 
+    // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
+    phiAuxList = phiUpdate_fixed(nuAux.col(0), scran_factor, y_n); 
+    phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
+    PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
+    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {
