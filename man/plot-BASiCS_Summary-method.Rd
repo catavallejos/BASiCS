@@ -7,11 +7,24 @@
 \alias{plot,BASiCS_Summary,ANY-method}
 \title{'plot' method for BASiCS_Summary objects}
 \usage{
-\S4method{plot}{BASiCS_Summary,ANY}(x, Param = "mu", Param2 = NULL,
-  Genes = NULL, Cells = NULL, Batches = NULL,
-  RegressionTerms = NULL, xlab = "", ylab = "", xlim = "",
-  ylim = NULL, pch = 16, col = "blue", bty = "n",
-  SmoothPlot = TRUE, ...)
+\S4method{plot}{BASiCS_Summary,ANY}(
+  x,
+  Param = "mu",
+  Param2 = NULL,
+  Genes = NULL,
+  Cells = NULL,
+  Batches = NULL,
+  RegressionTerms = NULL,
+  xlab = "",
+  ylab = "",
+  xlim = "",
+  ylim = NULL,
+  pch = 16,
+  col = "blue",
+  bty = "n",
+  SmoothPlot = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Summary}} object.}
