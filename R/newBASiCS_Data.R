@@ -67,8 +67,12 @@
 #' @export
 newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
                            SpikeInfo = NULL, BatchInfo = NULL,
-                           SpikeType = "ERCC")
-{
+                           SpikeType = "ERCC") {
+
+  if (!inherits(Counts, "matrix")) {
+    stop("Counts must be a matrix.")
+  }
+
   # Separating intrinsic from spike-in transcripts
   CountsBio <- Counts[!Tech, ]
   CountsTech <- Counts[Tech, ]
@@ -77,16 +81,19 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
   
   # Create a SingleCellExperiment data object
   Data <- SingleCellExperiment(assays = list(counts = as.matrix(CountsBio)))
-  colnames(Data) <- colnames(CountsBio)
-  rownames(Data) <- rownames(CountsBio)  
   
   # Adding metadata associated to batch information
   ## Setting a default value for BatchInfo when absent
   if (is.null(BatchInfo)) {
     BatchInfo <- rep(1, times = ncol(Counts))
   }  
-  colData(Data) <- S4Vectors::DataFrame("BatchInfo" = BatchInfo)
-  
+  colData(Data) <- S4Vectors::DataFrame(
+    BatchInfo = BatchInfo,
+    row.names = colnames(CountsBio)
+  )
+  colnames(Data) <- colnames(CountsBio)
+  rownames(Data) <- rownames(CountsBio)
+
   # Adding spike-ins information
   if (!is.null(SpikeInfo)) {
     # If SpikeInfo is provided, run validity checks
@@ -116,7 +123,6 @@ newBASiCS_Data <- function(Counts, Tech = rep(FALSE, nrow(Counts)),
     message("The data does not contain spike-in genes")
     WithSpikes <- FALSE
   }
-
   # Checks to assess if the data contains the required information
   errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
   if (length(errors) > 0) stop(errors) 

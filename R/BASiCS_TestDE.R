@@ -260,6 +260,11 @@ BASiCS_TestDE <- function(Chain1,
           "Log-fold change thresholds are now set in a log2 scale. \n",
           "Original BASiCS release used a natural logarithm scale.")
 
+
+  if (xor(is.null(Chain1@parameters[["epsilon"]]), is.null(Chain2@parameters[["epsilon"]]))) {
+    stop("Both chains should be run with the same setting for Regression.")
+  }
+
   n1 <- ncol(Chain1@parameters$nu)
   n2 <- ncol(Chain2@parameters$nu)
   n <- n1 + n2
@@ -389,7 +394,7 @@ BASiCS_TestDE <- function(Chain1,
                                          GenesSelect,
                                          EFDR_M,
                                          Task = "Differential mean", 
-                                         suffix = "M")
+                                         Suffix = "M")
   ProbM <- AuxMean$Prob
   OptThresholdM <- AuxMean$OptThreshold
 
@@ -437,7 +442,7 @@ BASiCS_TestDE <- function(Chain1,
                                          select,
                                          EFDR_D,
                                          Task = "Differential dispersion",
-                                         suffix = "D")
+                                         Suffix = "D")
   ProbD <- AuxDisp$Prob
   OptThresholdD <- AuxDisp$OptThreshold
 
@@ -492,7 +497,7 @@ BASiCS_TestDE <- function(Chain1,
                                               select,
                                               EFDR_R,
                                               Task = "Differential residual dispersion",
-                                              suffix = "R")
+                                              Suffix = "R")
     ProbE <- AuxResDisp$Prob
     OptThresholdE <- AuxResDisp$OptThreshold
 

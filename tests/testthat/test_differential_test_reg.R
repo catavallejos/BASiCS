@@ -50,6 +50,16 @@ test_that("Differential test is correct (regression case)",
             
 })
 
-
-
-
+test_that("Differential test requires same regression setting", {
+  data(ChainSCReg)
+  data(ChainRNA)
+  expect_error(
+    BASiCS_TestDE(
+      Chain1 = ChainSCReg,
+      Chain2 = ChainRNA,
+      Plot = FALSE,
+      PlotOffset = FALSE
+    ),
+    "Both chains should be run with the same setting for Regression."
+  )
+})

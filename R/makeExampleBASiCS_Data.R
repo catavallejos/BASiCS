@@ -73,8 +73,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
 
   if (!WithBatch) {
     Theta <- 0.5
-  }
-  else {
+  } else {
     # 2 batches, 10 cells each
     Theta1 <- 0.50
     Theta2 <- 0.75
@@ -88,15 +87,17 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     Rho <- matrix(1, ncol = n, nrow = q.bio)
     # Simulated cell-specific random effects
     if (all(Theta > 0)) {
-      Nu <- rgamma(n, shape = 1/Theta, rate = 1/(S * Theta))
-    } else { Nu <- S }
+      Nu <- rgamma(n, shape = 1 / Theta, rate = 1 / (S * Theta))
+    } else {
+      Nu <- S
+    }
 
     # Simulated counts data
     for (i in seq_len(q)) {
       if (i <= q.bio) {
         # Biological genes
         if (Delta[i] > 0) {
-          Rho[i, ] <- rgamma(n, shape = 1/Delta[i], rate = 1/Delta[i])
+          Rho[i, ] <- rgamma(n, shape = 1 / Delta[i], rate = 1 / Delta[i])
         }
         Counts.sim[i, ] <- rpois(n, lambda = Phi * Nu * Rho[i, ] * Mu[i])
       } else {
@@ -108,7 +109,7 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     rownames(Counts.sim) <- c(paste0("Gene", seq_len(q.bio)),
                               paste0("ERCC", seq_len(q-q.bio)))
     SpikeInfo <- data.frame(paste0("ERCC", seq_len(q-q.bio)),
-                            Mu[seq(q.bio+1, q)])
+                            Mu[seq(q.bio + 1, q)])
 
     colnames(Counts.sim) <- paste0("Cell", seq_len(n))
 
@@ -117,15 +118,13 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
                              Tech = grepl("ERCC", rownames(Counts.sim)),
                              SpikeInfo = SpikeInfo,
                              BatchInfo = rep(1, 30))
-    }
-    else {
+    } else {
       Data <- newBASiCS_Data(Counts = Counts.sim,
                              Tech = grepl("ERCC", rownames(Counts.sim)),
                              SpikeInfo = SpikeInfo,
                              BatchInfo = c(rep(1, 15), rep(2, 15)))
     }
-  }
-  else {
+  } else {
     # Matrix where simulated counts will be stored
     Counts.sim <- matrix(0, ncol = n, nrow = q.bio)
     # Matrix where gene-cell specific simulated random effects will be stored
@@ -134,7 +133,9 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     Phi[seq_len(15)] <- 2 * Phi[seq_len(15)]
     if (all(Theta > 0)) {
       Nu <- rgamma(n, shape = 1 / Theta, rate = 1 / (Phi * Theta))
-    } else { Nu <- Phi }
+    } else {
+      Nu <- Phi
+    }
 
     # Simulated counts data
     for (i in seq_len(q.bio)) {

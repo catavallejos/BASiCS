@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.7.12
-Date: : 2019-09-15
+Version: 1.9.0
+Date: 2019-10-17
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="catalina.vallejos@igmm.ed.ac.uk"), 
         person("Nils", "Eling", role=c("aut")), 
@@ -57,7 +57,8 @@ Imports:
     stats4,
     SummarizedExperiment,
     viridis,
-    utils    
+    utils,
+    Matrix
 Suggests:
     BiocStyle,
     knitr,
@@ -73,3 +74,4 @@ NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
 RoxygenNote: 6.1.1
+Encoding: UTF-8
