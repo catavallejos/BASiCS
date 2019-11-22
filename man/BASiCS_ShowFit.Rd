@@ -5,10 +5,19 @@
 \alias{BASiCS_showFit}
 \title{Plotting the trend after Bayesian regression}
 \usage{
-BASiCS_ShowFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, colour = "dark blue",
-  markExcludedGenes = TRUE, GenesSel = NULL,
-  colourGenesSel = "dark red", Uncertainty = TRUE)
+BASiCS_ShowFit(
+  object,
+  xlab = "log(mu)",
+  ylab = "log(delta)",
+  pch = 16,
+  smooth = TRUE,
+  variance = 1.2,
+  colour = "dark blue",
+  markExcludedGenes = TRUE,
+  GenesSel = NULL,
+  colourGenesSel = "dark red",
+  Uncertainty = TRUE
+)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}

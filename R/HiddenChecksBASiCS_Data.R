@@ -74,11 +74,11 @@ HiddenChecksBASiCS_Data <- function(Data,
       
     }
   } else {
-    # if (length(unique(BatchInfo)) == 1)  {
-    #   errors <- c(errors, "If spike-in genes are not available, BASiCS 
-    #               requires the data to contain at least 2 batches of cells 
-    #               (for the same population)\n")
-    # }
+    if (length(unique(BatchInfo)) == 1)  {
+      errors <- c(errors, "If spike-in genes are not available, BASiCS 
+                  requires the data to contain at least 2 batches of cells 
+                  (for the same population)\n")
+    }
   }
 
   return(errors)
