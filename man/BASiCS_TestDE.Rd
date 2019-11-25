@@ -25,6 +25,7 @@ BASiCS_TestDE(
   GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
   min.mean = 1,
   CheckESS = FALSE,
+  ESSThreshold = 100,
   ...
 )
 }
@@ -117,7 +118,12 @@ parameter is only relevant with `Offset = TRUE`.}
 
 \item{CheckESS}{Should the effective sample size of the chains be tested to
 be of a suitable magnitude in order to be included in tests for 
-differential expression? Default is FALSE.}
+differential expression? Default is FALSE. If TRUE, genes with poor
+mixing will be excluded from the tests for differential expression.}
+
+\item{ESSThreshold}{If CheckESS is TRUE, this argument specifies
+the minimum effective sample size for a gene to be included in the tests for
+differential expression. Default is 100.}
 
 \item{...}{Optional parameters.}
 }

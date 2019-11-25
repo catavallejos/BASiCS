@@ -74,7 +74,11 @@
 #' parameter is only relevant with `Offset = TRUE`.
 #' @param CheckESS Should the effective sample size of the chains be tested to
 #' be of a suitable magnitude in order to be included in tests for 
-#' differential expression? Default is FALSE.
+#' differential expression? Default is FALSE. If TRUE, genes with poor
+#' mixing will be excluded from the tests for differential expression.
+#' @param ESSThreshold If CheckESS is TRUE, this argument specifies
+#' the minimum effective sample size for a gene to be included in the tests for
+#' differential expression. Default is 100.
 #' @param ... Optional parameters.
 #'
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
@@ -237,6 +241,7 @@ BASiCS_TestDE <- function(Chain1,
                           GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])), 
                           min.mean = 1, 
                           CheckESS = FALSE,
+                          ESSThreshold = 100,
                           ...)
 {
 
@@ -260,7 +265,6 @@ BASiCS_TestDE <- function(Chain1,
                       Offset,
                       CheckESS)
 
-  ESSThreshold <- 100
   GeneName <- colnames(Chain1@parameters$mu)
   GeneIndex <- seq_len(length(GeneName))
 
