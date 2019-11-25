@@ -5,9 +5,16 @@
 \alias{BASiCS_diagPlot}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
-BASiCS_DiagPlot(object, Param = "mu", x = NULL, y = NULL,
-  LogX = isTRUE(x \%in\% c("mu", "delta")), LogY = isTRUE(y \%in\%
-  c("mu", "delta")), Smooth = TRUE, na.rm = TRUE)
+BASiCS_DiagPlot(
+  object,
+  Param = "mu",
+  x = NULL,
+  y = NULL,
+  LogX = isTRUE(x \%in\% c("mu", "delta")),
+  LogY = isTRUE(y \%in\% c("mu", "delta")),
+  Smooth = TRUE,
+  na.rm = TRUE
+)
 
 BASiCS_diagPlot(...)
 }
