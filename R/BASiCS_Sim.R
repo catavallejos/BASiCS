@@ -67,9 +67,15 @@
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 #'
 #' @export
-BASiCS_Sim <- function(Mu, Mu_spikes = NULL, Delta, Phi = NULL, 
-                       S, Theta, BatchInfo = NULL)
-{
+BASiCS_Sim <- function(
+    Mu,
+    Mu_spikes = NULL,
+    Delta,
+    Phi = NULL, 
+    S,
+    Theta,
+    BatchInfo = NULL
+  ) {
   
   # Checks validity of input parameters
   HiddenHeaderBASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta, BatchInfo)
