@@ -65,19 +65,19 @@ BASiCS_LoadChain <- function(RunName,
 
   } else {
     if (file.exists(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))) {
-      Mu <- read.delim(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))
-      Delta <- read.delim(file.path(StoreDir, paste0("chain_delta_", RunName, ".txt")))
-      Phi <- read.delim(file.path(StoreDir, paste0("chain_phi_", RunName, ".txt")))
+      Mu <- read.delim(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")), sep = " ")
+      Delta <- read.delim(file.path(StoreDir, paste0("chain_delta_", RunName, ".txt")), sep = " ")
+      Phi <- read.delim(file.path(StoreDir, paste0("chain_phi_", RunName, ".txt")), sep = " ")
 
       # Add-hoc fix for the no-spikes case
       if (file.exists(file.path(StoreDir, paste0("chain_s_", RunName, ".txt")))) {
-        S <- read.delim(file.path(StoreDir, paste0("chain_s_", RunName, ".txt")))
+        S <- read.delim(file.path(StoreDir, paste0("chain_s_", RunName, ".txt")), sep = " ")
       } else {
         S <- matrix(1, ncol = ncol(Phi), nrow = nrow(Phi))
       }
 
-      Nu <- read.delim(file.path(StoreDir, paste0("chain_nu_", RunName, ".txt")))
-      Theta <- read.delim(file.path(StoreDir, paste0("chain_theta_", RunName, ".txt")))
+      Nu <- read.delim(file.path(StoreDir, paste0("chain_nu_", RunName, ".txt")), sep = " ")
+      Theta <- read.delim(file.path(StoreDir, paste0("chain_theta_", RunName, ".txt")), sep = " ")
 
       Chain <- newBASiCS_Chain(
         list(
