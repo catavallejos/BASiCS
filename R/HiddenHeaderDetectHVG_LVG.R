@@ -3,7 +3,6 @@ HiddenHeaderDetectHVG_LVG <- function(Chain,
                                       VarThreshold,
                                       ProbThreshold,
                                       EFDR,
-                                      OrderVariable,
                                       Plot)
 {
   if (!is(Chain, "BASiCS_Chain")) {
@@ -59,9 +58,6 @@ HiddenHeaderDetectHVG_LVG <- function(Chain,
               "EFDR will not be calibrated. \n")
     }
   }
-  if (!(OrderVariable %in% c("GeneNames", "GeneIndex", "Prob")))
-    stop("Invalid 'OrderVariable' value")
-
   if (is.null(ProbThreshold)) {
     message("Posterior probability threshold set by EFDR = ",
             100 * EFDR, "% (+-2.5% tolerance) ...")

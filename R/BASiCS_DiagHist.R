@@ -12,6 +12,7 @@
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Param = NULL}.
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
+#' @param ... Unused.
 #' 
 #' @return A ggplot object.
 #'
@@ -21,16 +22,16 @@
 #' data(ChainSC)
 #' 
 #' # See effective sample size distribution across all parameters
-#' BASiCS_diagHist(ChainSC)
+#' BASiCS_DiagHist(ChainSC)
 #' # For mu only
-#' BASiCS_diagHist(ChainSC, Param = "mu")
+#' BASiCS_DiagHist(ChainSC, Param = "mu")
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
 #'
 #' @export
-BASiCS_diagHist <- function(object, Param = NULL, na.rm = TRUE) {
+BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
@@ -40,7 +41,11 @@ BASiCS_diagHist <- function(object, Param = NULL, na.rm = TRUE) {
     metric <- lapply(names(object@parameters), function(param) {
       try(HiddenGetMeasure(object, param, Measure, na.rm), silent = TRUE)
     })
-    ind_error <- vapply(metric, function(x) inherits(x, "try-error"), logical(1))
+    ind_error <- vapply(
+      metric,
+      function(x) inherits(x, "try-error"),
+      logical(1)
+    )
     metric <- metric[!ind_error]
     if (all(ind_error)) {
       stop("coda::effectiveSize failed for all parameters.")
@@ -62,5 +67,12 @@ BASiCS_diagHist <- function(object, Param = NULL, na.rm = TRUE) {
     ggplot2::geom_histogram(bins = grDevices::nclass.FD(metric)) +
     ggplot2::labs(x = HiddenScaleName(Measure, Param),
                   y = "Count")
+}
+
+#' @export
+#' @rdname BASiCS_DiagHist
+BASiCS_diagHist <- function(...) {
+  .Deprecated("BASiCS_DiagHist")
+  BASiCS_DiagHist(...)
 }
 

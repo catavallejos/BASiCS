@@ -1,8 +1,6 @@
 #' @useDynLib BASiCS
-#' @exportPattern "^[^\\Hidden]"
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
-#' @importFrom data.table fread
 #' @importFrom ggplot2 aes aes_string 
 #' @importFrom ggplot2 geom_ribbon geom_segment ggplot ggtitle 
 #'                     geom_hline geom_line geom_point 
@@ -12,17 +10,18 @@
 #' @importFrom ggplot2 xlab ylab labs
 #' @importFrom graphics abline barplot legend lines par points segments 
 #' @importFrom graphics smoothScatter 
-#' @importFrom grDevices adjustcolor colorRampPalette
+#' @importFrom grDevices adjustcolor colorRampPalette nclass.FD
 #' @importFrom ggExtra ggMarginal
 #' @importFrom KernSmooth bkde2D
 #' @importFrom MASS mvrnorm
-#' @importFrom matrixStats colMeans2 colMedians colVars
-#' @importFrom matrixStats rowMeans2 rowMedians rowVars   
+#' @importFrom matrixStats colMeans2 colMedians
+#' @importFrom matrixStats rowMeans2 rowMedians
+#' @importFrom Matrix t rowSums colSums rowMeans colMeans 
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
 #' @importFrom S4Vectors DataFrame metadata metadata<-
 #' @importFrom scran calculateSumFactors
-#' @importFrom stats acf median model.matrix rgamma rpois runif
+#' @importFrom stats acf median model.matrix rgamma rpois runif var
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
 #' @importFrom SingleCellExperiment altExp altExp<- 
 #' @importFrom SingleCellExperiment altExpNames altExpNames<-

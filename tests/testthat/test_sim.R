@@ -17,10 +17,11 @@ test_that("BASiCS_Sim works", {
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(6, 0, 0, 1, 11)
-  expect_true(all.equal(Aux, Aux0))
+  expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
+
   Aux0 <- 201
-  expect_true(all.equal(Aux, Aux0))
+  expect_equal(Aux, Aux0)
 
   # Data with spike-ins, multiple batches
   BatchInfo <- c(rep(1, 3), rep(2, 2))
@@ -31,10 +32,10 @@ test_that("BASiCS_Sim works", {
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(0, 2, 2, 0, 0)
-  expect_true(all.equal(Aux, Aux0))
+  expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 74
-  expect_true(all.equal(Aux, Aux0))
+  expect_equal(Aux, Aux0)
 
   # Data without spike-ins, multiple batches
   set.seed(3)
@@ -43,14 +44,27 @@ test_that("BASiCS_Sim works", {
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(0, 1, 0, 0, 4)
-  expect_true(all.equal(Aux, Aux0))
+  expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 80
-  expect_true(all.equal(Aux, Aux0))
+  expect_equal(Aux, Aux0)
   
   # When the parameter input is not right
   expect_error(
     BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta),
     "When spike-ins are not included, 'BatchInfo' is required."
   )
+})
+
+test_that("BASiCS_Draw works", {
+  data <- makeExampleBASiCS_Data(WithBatch = TRUE)
+  chain <- run_MCMC(data,
+    N = 10,h
+    Thin = 2,
+    Burn = 4,
+    Regression = FALSE,
+    WithSpikes = FALSE
+  )
+  draw <- BASiCS_Draw(chain)
+  expect_is(draw, "SingleCellExperiment")
 })

@@ -1,15 +1,12 @@
-HiddenPlot1DetectHVG_LVG <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR)
-{
-  plot(ProbThresholds, EFDRgrid,
-       type = "l", lty = 1, bty = "n", lwd = 2,
-       ylab = "Error rate", xlab = "Probability threshold",
-       ylim = c(0, 1))
-  lines(ProbThresholds, EFNRgrid, lty = 2, lwd = 2)
-  abline(h = EFDR, col = "blue", lwd = 2, lty = 1)
-  legend("topleft", c("EFDR", "EFNR", "Target EFDR"),
-         lty = c(1, 2, 1), col = c("black", "black", "blue"),
-         bty = "n", lwd = 2)
+HiddenPlot1DetectHVG_LVG <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR) {
+  ggplot2::ggplot() +
+    ggplot2::geom_line(ggplot2::aes(ProbThresholds, EFDRgrid, color = "EFDR")) +
+    ggplot2::geom_line(ggplot2::aes(ProbThresholds, EFNRgrid, color = "EFNR")) +
+    ggplot2::geom_hline(ggplot2::aes(color = "Target EFDR", yintercept = EFDR)) +
+    ggplot2::labs(x = "Probability threshold", y = "Error rate") +
+    ggplot2::ylim(c(0, 1))
 }
+
 
 HiddenPlot2DetectHVG_LVG <- function(Task,
                                      Mu,
@@ -34,15 +31,18 @@ HiddenPlot2DetectHVG_LVG <- function(Task,
                         grDevices::col2rgb(col)[3], 50,
                         maxColorValue = 255)
 
-  plot(Mu, Prob, log = "x", pch = pch,
-       ylim = ylim, xlim = xlim, col = col,
-       cex = cex, bty = bty, cex.lab = cex.lab,
-       cex.axis = cex.axis, cex.main = cex.main,
-       xlab = xlab, ylab = ylab, main = main)
-  abline(h = OptThreshold[1], lty = 2, col = "black")
-  points(Mu[Hits], Prob[Hits], pch = pch,
-         col = grDevices::rgb(grDevices::col2rgb("red")[1],
-                              grDevices::col2rgb("red")[2],
-                              grDevices::col2rgb("red")[3],
-                              50, maxColorValue = 255), cex = cex)
+  df <- data.frame(Mu, Prob)
+  ggplot2::ggplot(df, ggplot2::aes_string(x = "Mu", y = "Prob")) +
+    ggplot2::geom_point(
+      aes(color = ifelse(Hits, Task, "Other")), 
+      pch = pch, cex = cex) +
+    ggplot2::scale_color_brewer(palette = "Set1", name = "") +
+    ggplot2::geom_hline(yintercept = OptThreshold[[1]], lty = 2, col = "black") +
+    # ggplot2::geom_point(data = df[Hits, ], pch = pch, col = "red", cex = cex) +
+    ggplot2::scale_x_log10() +
+    ggplot2::labs(
+      x = xlab,
+      y = ylab,
+      title = main
+    )
 }

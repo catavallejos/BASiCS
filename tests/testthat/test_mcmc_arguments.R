@@ -228,13 +228,43 @@ test_that("Checks for user generated SCE object", {
                regexp = ".*argument is of length zero*")
   
   # Right SpikeInfo assignment  
-  metadata(sce)$SpikeInput <- metadata(DataSpikes)$SpikeInput
-  expect_error(run_MCMC(Data = sce, 
-                         N = 20, Thin = 2, Burn = 4, 
-                        Regression = FALSE, WithSpikes = TRUE), NA)
-
-  
+  S4Vectors::metadata(sce)$SpikeInput <- S4Vectors::metadata(DataSpikes)$SpikeInput
+  expect_error(
+    run_MCMC(
+      Data = sce,
+      N = 10,
+      Thin = 2,
+      Burn = 4,
+      Regression = FALSE,
+      WithSpikes = TRUE
+    ),
+    NA
+  )
 })
 
 
-
+test_that("MCMC works with different input classes", {
+  counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes))
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+  counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes), sparse = TRUE)
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    NA
+  )
+  counts(DataSpikes) <- DelayedArray(counts(DataSpikes)) 
+})
