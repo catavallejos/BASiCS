@@ -1256,7 +1256,6 @@ inclusion of uncertainty measure around the regression trend.
 
 version 1.7.12 (2019-09-15)
 - changes maintainer's email address
-
 version 1.7.13 (2019-09-25)
 - Updated unit tests to account for new default choice for `min.mean` parameter
 in `scran::computeSumFactors`

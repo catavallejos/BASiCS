@@ -1,8 +1,8 @@
 language: r
 
-r:
+r: 
   - bioc-devel
-  - bioc-release
+  - bioc-release 
 
 # Strict checks in place
 warnings_are_errors: false
@@ -18,14 +18,8 @@ r_github_packages:
   - jimhester/covr
   
 notifications:
-  email:
-    recipients:
-      - cvallejos@turing.ac.uk
     on_success: change # default: change
     on_failure: always # default: always
 
 after_success:
   - Rscript -e 'library(covr);codecov()'
-  
-
-
