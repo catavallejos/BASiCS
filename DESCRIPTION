@@ -38,21 +38,20 @@ Depends:
     SingleCellExperiment
 Imports:
     Biobase,
-    BiocGenerics, 
-    coda, 
+    BiocGenerics,
+    coda,
     cowplot,
-    data.table,
     ggExtra,
     ggplot2,
-    graphics, 
+    graphics,
     grDevices,
     KernSmooth,
-    MASS, 
-    matrixStats, 
-    methods, 
-    Rcpp (>= 0.11.3), 
-    S4Vectors, 
-    scran, 
+    MASS,
+    matrixStats,
+    methods,
+    Rcpp (>= 0.11.3),
+    S4Vectors,
+    scran,
     stats,
     stats4,
     SummarizedExperiment,
@@ -73,5 +72,5 @@ SystemRequirements: C++11
 NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.1
 Encoding: UTF-8

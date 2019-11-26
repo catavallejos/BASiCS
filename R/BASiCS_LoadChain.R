@@ -20,11 +20,17 @@
 #' @examples
 #'
 #' Data <- makeExampleBASiCS_Data()
-#' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, Regression = FALSE,
-#'                      StoreChains = TRUE, StoreDir = tempdir(),
-#'                      RunName = 'Test')
-#' ChainLoad <- BASiCS_LoadChain(RunName = 'Test', StoreDir = tempdir())
-#'
+#' Chain <- BASiCS_MCMC(
+#'   Data,
+#'   N = 50,
+#'   Thin = 5,
+#'   Burn = 5,
+#'   Regression = FALSE,
+#'   StoreChains = TRUE,
+#'   StoreDir = tempdir(),
+#'   RunName = "Test"
+#' )
+#' ChainLoad <- BASiCS_LoadChain(RunName = "Test", StoreDir = tempdir())
 #' @seealso \code{\link[BASiCS]{BASiCS_Chain}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
@@ -33,75 +39,95 @@
 #' @export
 BASiCS_LoadChain <- function(RunName,
                              StoreDir = getwd(),
-                             StoreUpdatedChain = FALSE)
-{
-  if(file.exists(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))) {
+                             StoreUpdatedChain = FALSE) {
+
+  if (file.exists(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))) {
     Chain <- readRDS(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
 
-    if(methods::.hasSlot(Chain, "mu")) {
-
-      if(!is.null(Chain@mu)) {
-
-        message("`BASiCS_Chain` class definition was outdated. \n",
-                "Object updated to be compatible with BASiCS version ",
-                utils::packageVersion("BASiCS"), ".\n",
-                "Set 'StoreUpdatedChain' = TRUE to save updated object.\n",
-                "(this overwrites original input file).\n")
+    if (methods::.hasSlot(Chain, "mu")) {
+      if (!is.null(Chain@mu)) {
+        message(
+          "`BASiCS_Chain` class definition was outdated. \n",
+          "Object updated to be compatible with BASiCS version ",
+          utils::packageVersion("BASiCS"), ".\n",
+          "Set 'StoreUpdatedChain' = TRUE to save updated object.\n",
+          "(this overwrites original input file).\n"
+        )
         Chain <- updateObject(Chain)
-        if(StoreUpdatedChain) {
-          saveRDS(Chain,
-                  file = file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
+        if (StoreUpdatedChain) {
+          saveRDS(
+            Chain,
+            file = file.path(StoreDir, paste0("chain_", RunName, ".Rds"))
+          )
         }
       }
     }
-  }
-  else {
 
-    if(file.exists(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))) {
-
-      Mu <- data.table::fread(file.path(StoreDir,
-                                        paste0("chain_mu_", RunName, ".txt")))
-      Delta <- data.table::fread(file.path(StoreDir,
-                                           paste0("chain_delta_",
-                                                  RunName, ".txt")))
-      Phi <- data.table::fread(file.path(StoreDir,
-                                         paste0("chain_phi_", RunName, ".txt")))
+  } else {
+    if (file.exists(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))) {
+      Mu <- read.delim(
+        file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")),
+        sep = " ",
+        check.names = FALSE
+      )
+      Delta <- read.delim(
+        file.path(StoreDir, paste0("chain_delta_", RunName, ".txt")),
+        sep = " ",
+        check.names = FALSE
+      )
+      Phi <- read.delim(
+        file.path(StoreDir, paste0("chain_phi_", RunName, ".txt")),
+        sep = " ",
+        check.names = FALSE
+      )
 
       # Add-hoc fix for the no-spikes case
-      if(file.exists(file.path(StoreDir,
-                               paste0("chain_s_", RunName, ".txt")))) {
-        S <- data.table::fread(file.path(StoreDir,
-                                         paste0("chain_s_", RunName, ".txt")))
+      if (file.exists(file.path(StoreDir, paste0("chain_s_", RunName, ".txt")))) {
+        S <- read.delim(
+          file.path(StoreDir, paste0("chain_s_", RunName, ".txt")),
+          sep = " ",
+        check.names = FALSE
+        )
+      } else {
+        S <- matrix(1, ncol = ncol(Phi), nrow = nrow(Phi))
       }
-      else {
-        S = matrix(1, ncol = ncol(Phi), nrow = nrow(Phi))
-      }
 
-      Nu <- data.table::fread(file.path(StoreDir,
-                                        paste0("chain_nu_", RunName, ".txt")))
-      Theta <- data.table::fread(file.path(StoreDir,
-                                           paste0("chain_theta_",
-                                                  RunName, ".txt")))
+      Nu <- read.delim(
+        file.path(StoreDir, paste0("chain_nu_", RunName, ".txt")),
+        sep = " ",
+        check.names = FALSE
+      )
+      Theta <- read.delim(
+        file.path(StoreDir, paste0("chain_theta_", RunName, ".txt")),
+        sep = " ",
+        check.names = FALSE
+      )
 
-      Chain <- newBASiCS_Chain(list("mu" = as.matrix(Mu),
-                                    "delta" = as.matrix(Delta),
-                                    "phi" = as.matrix(Phi),
-                                    "s" = as.matrix(S),
-                                    "nu" = as.matrix(Nu),
-                                    "theta" = as.matrix(Theta)))
+      Chain <- newBASiCS_Chain(
+        list(
+          "mu" = as.matrix(Mu),
+          "delta" = as.matrix(Delta),
+          "phi" = as.matrix(Phi),
+          "s" = as.matrix(S),
+          "nu" = as.matrix(Nu),
+          "theta" = as.matrix(Theta)
+        )
+      )
 
+      message(
+        "`BASiCS_Chain` class definition was outdated. \n",
+        "Object updated to be compatible with BASiCS version ",
+        utils::packageVersion("BASiCS"), ".\n",
+        "Set 'StoreUpdatedChain' = TRUE to save updated object.\n"
+      )
 
-      message("`BASiCS_Chain` class definition was outdated. \n",
-              "Object updated to be compatible with BASiCS version ",
-              utils::packageVersion("BASiCS"), ".\n",
-              "Set 'StoreUpdatedChain' = TRUE to save updated object.\n")
-
-      if(StoreUpdatedChain) {
+      if (StoreUpdatedChain) {
         saveRDS(Chain,
-                file = file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
+          file = file.path(StoreDir, paste0("chain_", RunName, ".Rds"))
+        )
       }
-    }
-    else {
+
+    } else {
       stop("Input file does not exist")
     }
   }
