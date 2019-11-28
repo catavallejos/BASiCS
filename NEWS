@@ -1304,3 +1304,8 @@ version 1.7.19 (2019-10-08)
 
 version 1.7.20 (2019-10-17)
 - Bumps version number to trigger new build.
+
+version 1.7.21 (2019-10-17)
+- Changes coda::effectiveSize for a more efficient internal implementation.
+- Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
+  genes for differential expression testing based on effective sample size.

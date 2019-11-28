@@ -29,7 +29,7 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 
 \item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
 respectively. If neither is supplied, Param will be plotted on the x axis
-and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
+and effective sample size will be plotted on the y axis as
 a density plot.}
 
 \item{LogX, LogY}{A logical value indicating whether to use a log10

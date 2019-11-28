@@ -400,8 +400,8 @@ BASiCS_TestDE <- function(Chain1,
   Search <- is.null(ProbThresholdM)
 
   if (CheckESS) {
-    GoodEss <- coda::effectiveSize(mcmc(Chain1@parameters[["mu"]])) > ESSThreshold &
-      coda::effectiveSize(mcmc(Chain2@parameters[["mu"]])) > ESSThreshold
+    GoodEss <- ess(mcmc(Chain1@parameters[["mu"]])) > ESSThreshold &
+      ess(mcmc(Chain2@parameters[["mu"]])) > ESSThreshold
   } else {
     GoodEss <- rep(TRUE, length(GenesSelect))
   }
@@ -457,8 +457,8 @@ BASiCS_TestDE <- function(Chain1,
   }
 
   if (CheckESS) {
-    GoodEss <- coda::effectiveSize(mcmc(Chain1@parameters[["delta"]])) > ESSThreshold &
-      coda::effectiveSize(mcmc(Chain2@parameters[["delta"]])) > ESSThreshold
+    GoodEss <- ess(mcmc(Chain1@parameters[["delta"]])) > ESSThreshold &
+      ess(mcmc(Chain2@parameters[["delta"]])) > ESSThreshold
   }
   select <- select & GoodEss
 
@@ -518,8 +518,8 @@ BASiCS_TestDE <- function(Chain1,
       select <- NotExcluded
     }
     if (CheckESS) {
-      GoodEss <- coda::effectiveSize(mcmc(Chain1@parameters[["epsilon"]])) > ESSThreshold &
-        coda::effectiveSize(mcmc(Chain2@parameters[["epsilon"]])) > ESSThreshold
+      GoodEss <- ess(mcmc(Chain1@parameters[["epsilon"]])) > ESSThreshold &
+        ess(mcmc(Chain2@parameters[["epsilon"]])) > ESSThreshold
     }
     select <- select & GoodEss
 
