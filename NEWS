@@ -1305,3 +1305,7 @@ version 1.7.19 (2019-10-08)
 
 version 1.7.20 (2019-10-17)
 - Bumps version number to trigger new build.
+
+version 1.9.1 (2019-11-28)
+- In `HiddenBASiCS_MCMC_Start`, `scran::computeSumFactors` was replaced by 
+`scran::calculateSumFactors` in order to match new version of `scran`. 
