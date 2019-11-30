@@ -11,11 +11,11 @@ test_that("Differential test is correct (regression case)", {
                         OffSet = TRUE, Plot = FALSE, PlotOffset = FALSE)
             
   # Classification frequency       
-  FreqMean0 <- c(335,   9,   6)
+  FreqMean0 <- c(333,   8,   9)
   FreqMean <- as.vector(table(Test@Results$Mean@Table$ResultDiffMean))
   expect_equal(FreqMean, FreqMean0)
             
-  FreqDisp0 <- c(15, 236,  99)
+  FreqDisp0 <- c(17, 233, 100)
   FreqDisp <- as.vector(table(Test@Results$Disp@Table$ResultDiffDisp))
   expect_equal(FreqDisp, FreqDisp0)
   
@@ -24,7 +24,7 @@ test_that("Differential test is correct (regression case)", {
   expect_equal(FreqRes, FreqRes0)
             
   # Posterior probabilities    
-  ProbMean0 <- c(0.01, 0.01, 0.79, 0.41, 0.35)
+  ProbMean0 <- c(0.01, 0.01, 0.75, 0.32, 0.28)
   ProbMean <- round(Test@Results$Mean@Table$ProbDiffMean[1:5], 2)
   expect_equal(ProbMean, ProbMean0)
             
@@ -37,11 +37,25 @@ test_that("Differential test is correct (regression case)", {
   expect_equal(ProbRes, ProbRes0)
             
   # Log2 fold changes
-  Lfc2Mean0 <- c(-0.22, -0.08, -0.92, -0.54, -0.46)
+  Lfc2Mean0 <- c(-0.17, -0.02, -0.86, -0.48, -0.40)
   Lfc2Mean <- round(Test@Results$Mean@Table$MeanLog2FC[1:5], 2)
   expect_equal(Lfc2Mean, Lfc2Mean0)
             
   Lfc2Disp0 <- c(0.92, 1.02, 0.86, 6.23, 0.26)
   Lfc2Disp <- round(tail(Test@Results$Disp@Table$DispLog2FC, 5),2)
   expect_equal(Lfc2Disp, Lfc2Disp0)
+})
+
+test_that("Differential test requires same regression setting", {
+  data(ChainSCReg)
+  data(ChainRNA)
+  expect_error(
+    BASiCS_TestDE(
+      Chain1 = ChainSCReg,
+      Chain2 = ChainRNA,
+      Plot = FALSE,
+      PlotOffset = FALSE
+    ),
+    "Both chains should be run with the same setting for Regression."
+  )
 })

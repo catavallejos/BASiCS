@@ -14,13 +14,13 @@
 #' respectively. If neither is supplied, Param will be plotted on the x axis
 #' and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
 #' a density plot.
-#' @param LogX,LogY A boolean value indicating whether to use a log10
+#' @param LogX,LogY A logical value indicating whether to use a log10
 #' transformation for the x or y axis, respectively.
-#' @param Smooth Boolean value indicating whether to use smoothing (hexagonal
-#' bins coloured based on density) in the plot.
+#' @param Smooth A logical value indicating whether to use smoothing 
+#' (specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
-#' @param ... Unused
+#' @param ... Unused.
 #' 
 #' @return A ggplot object.
 #'
@@ -77,7 +77,7 @@ BASiCS_DiagPlot <- function(object,
       metric = metric
     )
     df <- df[order(df$metric), ]
-    ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
+    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
       ggplot2::geom_point(alpha = 0.5, shape = 16) +
       viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)
         #, trans="log10"

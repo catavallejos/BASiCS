@@ -10,7 +10,7 @@ BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE,
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
 If \code{WithSpikes = TRUE}, this MUST be formatted to include
-the spike-ins information (see vignette).}
+the spike-ins and/or batch information (see vignette).}
 
 \item{N}{Total number of iterations for the MCMC sampler.
 Use \code{N>=max(4,Thin)}, \code{N} being a multiple of \code{Thin}.}
@@ -141,18 +141,18 @@ updates. Useful when performing divide & conquer MCMC strategies.}
     and mean expression paramters. Default: \code{k = 12}. 
   }
   \item{
-    \code{FixML}
+    \code{FixLocations}
   }{
-    Only used when \code{Regression = TRUE}. \code{FixML} specifies
+    Only used when \code{Regression = TRUE}. \code{FixLocations} specifies
     whether the locations of the \code{k - 2} Gaussian Radial Basis Functions 
     (GRBF) used within the correlated prior for gene-specific mean and
     over-dispersion are fixed a priori.
   }
   \item{
-    \code{ml}
+    \code{Locations}
   }{
-    Only used when \code{Regression = TRUE} and \code{FixML = TRUE}. 
-    \code{ml} specifies
+    Only used when \code{Regression = TRUE} and \code{FixLocations = TRUE}. 
+    \code{Locations} specifies
     the location of the \code{k - 2} Gaussian Radial Basis Functions (GRBF) 
     used within the correlated prior adopted for gene-specific 
     over-dispersion and mean expression parameters. If not supplied, 

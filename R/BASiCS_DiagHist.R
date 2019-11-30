@@ -12,7 +12,8 @@
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Param = NULL}.
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
-#' @param ... Unused
+#' @param ... Unused.
+#' 
 #' @return A ggplot object.
 #'
 #' @examples

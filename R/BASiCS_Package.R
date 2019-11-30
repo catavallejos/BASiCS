@@ -15,19 +15,23 @@
 #' @importFrom ggExtra ggMarginal
 #' @importFrom KernSmooth bkde2D
 #' @importFrom MASS mvrnorm
-#' @importFrom matrixStats colMeans2 colMedians colVars
-#' @importFrom matrixStats rowMeans2 rowMedians rowVars   
+#' @importFrom matrixStats colMeans2 colMedians
+#' @importFrom matrixStats rowMeans2 rowMedians
+#' @importFrom Matrix t rowSums colSums rowMeans colMeans 
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
-#' @importFrom S4Vectors DataFrame metadata 
-#' @importFrom stats acf median model.matrix rgamma rpois runif 
-#' @importFrom SingleCellExperiment isSpike isSpike<- counts clearSpikes
-#' @importFrom SummarizedExperiment assay assayNames  colData 
+#' @importFrom S4Vectors DataFrame metadata metadata<-
+#' @importFrom scran calculateSumFactors
+#' @importFrom stats acf median model.matrix rgamma rpois runif var
+#' @importFrom SingleCellExperiment SingleCellExperiment counts 
+#' @importFrom SingleCellExperiment altExp altExp<- 
+#' @importFrom SingleCellExperiment altExpNames altExpNames<-
+#' @importFrom SummarizedExperiment SummarizedExperiment assay assayNames
+#' @importFrom SummarizedExperiment colData colData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
 #' @importFrom utils packageVersion write.table
 #' @importFrom hexbin hexbin
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
-#' @importMethodsFrom scran computeSumFactors
 #' @importClassesFrom Biobase Versioned
 #' @importFrom stats4 plot
 NULL

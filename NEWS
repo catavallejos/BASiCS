@@ -1,4 +1,4 @@
-version 0.1: (2015-04-20)
+0version 0.1: (2015-04-20)
 
 - Original release
 
@@ -1216,9 +1216,89 @@ after the burn-in period is over)
 version 1.7.5 (2019-07-30)
 - Returns to original updates for X (fixed after burn-in)
 
-version 1.7.6 (2019-07-30)
-- `estimateRBFLocations` added to cpp code to separate the 
-estimation of locations and the design matrix update (unit test update is not required).
+version 1.7.6 (2019-08-19)
+- Offset correction within `BASiCS_TestDE` modified to use `rowMedians` 
+instead of `rowSums2`. This makes it more robust to outlier genes. 
+- Unit tests updated accordingly.
 
-version 1.7.7 (2019-07-30) - WIP
-- added update of locations (up to burn-in), but X updated always  - WIP
+version 1.7.7 (2019-08-20)
+- Preliminary version of `BASiCS_CorrectOffset` has been added. This includes
+a trimmed option for the offset calculation that excludes lowly expressed genes.
+This is similar to what is implemented in `scran:::.rescale_clusters
+
+version 1.7.8 (2019-08-20)
+- `min.mean` parameter exposed in `BASiCS_CorrectOffset` and `BASiCS_TestDE`
+
+version 1.7.9 (2019-09-05)
+- `newBASiCS_Data`, `HiddenBASiCS_MCMC_InputCheck`, `HiddenChecksBASiCS_Data` 
+and `BASiCS_MCMC` modified to replace `isSpike` by `altExp`
+- WIP - unit test do not pass
+
+version 1.7.10 (2019-09-6)
+- `metadata(Data)$SpikeInput` is now required to be a `data.frame`. This allows
+us to verify the correct order in spike-in inputs when the user manually
+modifies an existing `SingleCellExperiment` object.
+- Additional changes in `newBASiCS_Data`, `HiddenBASiCS_MCMC_InputCheck`, 
+`HiddenChecksBASiCS_Data` to avoid errors.
+- `HiddenBASiCS_MCMC_Start`, `HiddenBASiCS_MCMC_GlobalParams`, 
+`BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates` modified to replace 
+`isSpike` by `altExp`
+- Some unit tests adapted accordingly
+
+version 1.7.11 (2019-09-15)
+- `Uncertainty` parameter added to `BASiCS_showFit`. This enables optional
+inclusion of uncertainty measure around the regression trend. 
+- Re-ordering of parameter in c++ MCMC samplers (does not affect output)
+- Avoid unnecessary transformations between NumericMatrix/Vector and arma::
+- Removes `isSpike` usage in `BASiCS_Sim` documentation
+- Removes `isSpike` call from the vignette
+- Adds missing parameters to the documentation of `BASiCS_CorrectOffset`
+
+version 1.7.12 (2019-09-15)
+- changes maintainer's email address
+
+version 1.7.13 (2019-09-25)
+- Updated unit tests to account for new default choice for `min.mean` parameter
+in `scran::computeSumFactors`
+- New unit test to check for changes in `scran::computeSumFactors`
+
+version 1.7.14 (2019-09-27)
+- Changed internal functions from `matrixStats` to `Matrix` to support more 
+  classes of matrix (eg, `dgCMatrix`).
+  BASiCS_MCMC now supports DelayedArray, dgEMatrix, dgCMatrix objects and likely
+  more.
+  
+version 1.7.15 (2019-09-30)
+- Swtich from `matrixStats` dependency to `Matrix` as it supports more general input classes (including sparse matrices)
+- `newBASiCS_Data` now requires input counts to be a `matrix`. 
+
+version 1.7.16 (2019-10-04)
+- Minor changes to NAMESPACE to pass R CMD Check
+
+version 1.7.17 (2019-10-04)
+- Minor change in `newBASiCS_Data` to avoid missing `colnames` when adding
+`colData`
+- New unit test to verify that `colnames` are not lost
+
+version 1.7.18 (2019-10-06)
+- Refactor HVG/LVG plots code to use `ggplot2`. 
+  When calling `BASiCS_DetectHVG` or `BASiCS_DetectLVG`, the plots are now 
+  stored in the returned list in the named element `Plots`.
+  The vignette has been updated to show the usage of this functionality.
+- In all unit tests: use `expect_equal(foo, bar)` instead of 
+  `expect_true(all.equal(foo, bar))`. This gives better printing (ie, if it's not 
+  true it tells by what margin)
+- Rename some functions for consistency in capitalisation. For example, 
+  `BASiCS_showFit` has been deprecated and renamed to `BASiCS_ShowFit`.
+- Add a `Smooth` argument to `BASiCS_DiagPlot`.
+- BASiCS_TestDE is now explicit about requiring the same number of samples
+  in both chains. Previously it would fail due to arrays of non-conformable 
+  dimensions.
+- Add some internal utility functions.
+- Remove exportPattern("^[^\\Hidden]") meaning functions must be explicitly 
+  exported using roxygen tags.
+
+version 1.7.19 (2019-10-08)
+- BASiCS_TestDE now checks to ensure that both input chains have been run with
+  Regression = FALSE or both with Regression = TRUE.
+- Remove duplicated text from `BASiCS_Chain`'s show method.

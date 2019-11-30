@@ -17,25 +17,12 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     stop("'Data' is not a SingleCellExperiment class object.")
   }
 
-  # Number of cells
-  n <- dim(counts(Data))[2]
+  CountsBio <- counts(Data)
+  n <- ncol(Data)
+  q.bio <- nrow(CountsBio)
 
-  Spikes <- SingleCellExperiment::isSpike(Data)
-
-  # Number of instrinsic genes
-  if (!is.null(Spikes)) {
-    q <- length(Spikes)
-    q.bio <- sum(!Spikes)
-
-    # Separating spike-ins from the rest of genes
-    CountsBio <- as.matrix(counts(Data)[!Spikes, , drop = FALSE])
-    CountsTech <- as.matrix(counts(Data)[Spikes, , drop = FALSE])
-  }
-  else {
-    q.bio <- q <- nrow(Data)
-    CountsBio <- as.matrix(counts(Data))
-  }
-
+  # Extract spike-in genes
+  if (WithSpikes) { CountsTech <- assay(altExp(Data)) }
 
   # Initialize normalization as the 'scran' estimates
   suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
@@ -54,7 +41,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
     s0 <- matrixStats::colSums2(CountsTech) /
-      sum(metadata(Data)$SpikeInput)
+      sum(metadata(Data)$SpikeInput[,2])
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)
@@ -83,9 +70,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   # Starting value for delta
   # Defined by the CV for high- and mid-expressed genes
   # This is motivated by equation (2) in Vallejos et al (2016)
-  varsBio <- matrixStats::rowVars(nCountsBio)
+  varsBio <- apply(nCountsBio, 1, var)
   cv2Bio <- varsBio / meansBio ^ 2
-  delta0 <- rgamma(q.bio, 1, 1) + 1
+  delta0 <- stats::rgamma(q.bio, 1, 1) + 1
   Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
   delta0[Aux] <- cv2Bio[Aux]
   # 1e-3 added to be coherent with tolerance used within MCMC sampler
@@ -122,8 +109,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (Regression) {
     out$beta0 <- mvrnorm(1, m, V) 
     out$sigma20 <- rgamma(1, a.sigma2, b.sigma2)
-    out$lambda0 <- rgamma(q.bio, shape = eta / 2, 
-                      rate = eta / 2)
+    out$lambda0 <- rgamma(q.bio, shape = eta / 2, rate = eta / 2)
   }
 
   return(out)

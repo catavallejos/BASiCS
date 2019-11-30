@@ -10,15 +10,15 @@ test_that("Generated starting values do not match given seed (spikes case)", {
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, WithSpikes = TRUE)
 
-  Check0 <- c(7.361, 10.647,  6.742,  8.421, 21.284)
+  Check0 <- c(7.262, 10.828,  6.816,  8.258, 21.141)
   Check <- as.vector(round(Start$mu0[1:5], 3))
   expect_equal(Check0, Check)
   
-  Check0 <- c(1.574, 1.189, 1.978, 1.706, 0.701)
+  Check0 <- c(1.542, 1.229, 2.055, 1.688, 0.662)
   Check <- as.vector(round(Start$delta0[1:5], 3))
   expect_equal(Check0, Check)
   
-  Check0 <- c(0.767, 1.286, 1.702, 1.125, 1.000)
+  Check0 <- c(0.781, 1.265, 1.586, 1.139, 1.036)
   Check <- as.vector(round(Start$phi0[1:5], 3))
   expect_equal(Check0, Check)
   
@@ -55,8 +55,8 @@ test_that("Generated starting values do not match given seed (spikes case)", {
   expect_equal(Check0, Check)
 })
 
-test_that("Generated starting values do not match given seed (no spikes case)",
-          {
+test_that("Generated starting values do not match given seed (no spikes case)", {
+
   set.seed(5)
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE)
   n <- ncol(Data)
@@ -111,8 +111,8 @@ test_that("Generated starting values do not match given seed (no spikes case)",
   expect_equal(Check0, Check)
 })
 
-test_that("Generated starting values do not match given seed (regression+spike)",
-          {
+test_that("Generated starting values do not match given seed (regression+spike)", {
+
   set.seed(6)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   n <- ncol(Data)

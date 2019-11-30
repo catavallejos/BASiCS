@@ -67,28 +67,32 @@ NClassFD2D <- function(x, y) {
 }
 
 MeasureName <- function(measure) {
-  switch(measure, 
-    "Mean" = "mean expression", 
+  switch(measure,
+    "Mean" = "mean expression",
     "Disp" = "over dispersion",
-    "ResDisp" = "residual over dispersion")
+    "ResDisp" = "residual over dispersion"
+  )
 }
 
 DistanceName <- function(measure) {
-  switch(measure, 
+  switch(measure,
     "ResDisp" = "distance",
-    "fold change")
+    "fold change"
+  )
 }
 
 LogDistanceName <- function(measure) {
   switch(measure, 
     "ResDisp" = "distance",
-    "log2(fold change)")
+    "log2(fold change)"
+  )
 }
 
 DistanceVar <- function(measure) {
   switch(measure, 
     "ResDisp" = "Distance",
-    "Log2FC")
+    "Log2FC"
+  )
 }
 
 

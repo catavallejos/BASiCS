@@ -48,18 +48,21 @@ BASiCS_DenoisedCounts <- function(Data, Chain)
     Nu <- matrixStats::colMedians(Chain@parameters$nu)
     if("phi" %in% names(Chain@parameters)) {
       # Spikes case
-      Spikes <- SingleCellExperiment::isSpike(Data)
+      CountsBio <- counts(Data)
+      CountsTech <- assay(altExp(Data))
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
-      out1 <- t(t(counts(Data)[!Spikes, ]) / (Phi * Nu))
-      out2 <- t(t(counts(Data)[Spikes, ]) / Nu)
+      out1 <- t(t(CountsBio) / (Phi * Nu))
+      out2 <- t(t(CountsTech) / Nu)
       out <- rbind(out1, out2)
+      GeneNames <- c(rownames(Data), rownames(altExp(Data)))
     }
     else {
       # No spikes case
       out <- t(t(counts(Data)) / Nu)
+      GeneNames <- rownames(Data)
     }
 
-    rownames(out) <- rownames(Data)
+    rownames(out) <- GeneNames
     colnames(out) <- colnames(Data)
 
     return(out)

@@ -22,7 +22,7 @@ Only relevant when \code{Param = "epsilon"} (genes with very low
 expression are excluding when infering the mean/over-dispersion trend. 
 Default: \code{na.rm = TRUE}.}
 
-\item{...}{Unused}
+\item{...}{Unused.}
 }
 \value{
 A vector with effective sample sizes for all the elements 

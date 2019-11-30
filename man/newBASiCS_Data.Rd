@@ -6,8 +6,7 @@
 counts and experimental information about spike-in genes}
 \usage{
 newBASiCS_Data(Counts, Tech = rep(FALSE, nrow(Counts)),
-  SpikeInfo = NULL, BatchInfo = NULL, SpikeType = "ERCC",
-  Verbose = TRUE)
+  SpikeInfo = NULL, BatchInfo = NULL, SpikeType = "ERCC")
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements
@@ -30,11 +29,7 @@ information. Not required if a single batch is present on the data.
 Default value: \code{BatchInfo = NULL}.}
 
 \item{SpikeType}{Character to indicate what type of spike-ins are in use.
-For more details see argument `type` in 
-`help(isSpike, package = "SingleCellExperiment")`. Default value: 
-\code{SpikeType = "ERCC"}.}
-
-\item{Verbose}{Verbosity flag. Set FALSE to prevent printing of messages.}
+Default value: \code{SpikeType = "ERCC"} (parameter is no longer used).}
 }
 \value{
 An object of class \code{\linkS4class{SingleCellExperiment}}.

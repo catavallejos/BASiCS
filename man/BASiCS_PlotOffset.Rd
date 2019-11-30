@@ -4,18 +4,17 @@
 \alias{BASiCS_PlotOffset}
 \title{Visualise global offset in mean expression between two chains.}
 \usage{
-BASiCS_PlotOffset(OffsetCorrected, Type = c("offset estimate",
-  "before-after", "MAPlot"), Print = FALSE)
+BASiCS_PlotOffset(Chain1, Chain2, GroupLabel1 = "Group 1",
+  GroupLabel2 = "Group 2", Type = c("offset estimate", "before-after",
+  "MAPlot"), Print = FALSE)
 }
 \arguments{
-\item{OffsetCorrected}{Object of class BASiCS_OffsetCorrected}
-
 \item{Type}{The type of plot generated.
 \code{"offset estimate"} produces a boxplot of the offset alongside
 an estimate of the global offset.
 \code{"before-after"} produces MA plots of Mean expression against
 log2(fold-change) before and after offset correction.
-\code{"MA plot"} produces an MA plot of Mean expression against 
+\code{"MA plot"} produces an MA plot of Mean expression against
 log2(fold-change).}
 
 \item{Print}{Print the plots (TRUE), or simply return them as a list (FALSE)?
@@ -25,14 +24,14 @@ Default is \code{FALSE}.}
 Plot objects.
 }
 \description{
-Visualise global offset in mean expression between two 
+Visualise global offset in mean expression between two
 \code{BASiCS_Chain} objects.
 }
 \examples{
 
 # Loading two 'BASiCS_Chain' objects (obtained using 'BASiCS_MCMC')
-data(ChainSC)
-data(ChainRNA)
+data("ChainSC")
+data("ChainRNA")
 
 Corrected <- BASiCS_CorrectOffset(ChainSC, ChainRNA, "a", "b", Plot = FALSE)
 BASiCS_PlotOffset(Corrected)
