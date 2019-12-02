@@ -1308,3 +1308,9 @@ version 1.7.20 (2019-10-17)
 version 1.9.1 (2019-11-28)
 - In `HiddenBASiCS_MCMC_Start`, `scran::computeSumFactors` was replaced by 
 `scran::calculateSumFactors` in order to match new version of `scran`. 
+
+version 1.9.2 (2019-12-02)
+- Removes dependency to `data.table`
+- Introduces `BASiCS_Draw` to enable synthetic data generation based on a 
+`BASiCS_MCMC` object (similar to splatter)
+- Adds Alan to README.md 
