@@ -10,14 +10,17 @@ warnings_are_errors: false
 cache:
   - packages: true
 
-branches:
-  only:
-    - master
+#branches:
+#  only:
+#    - master
 
 r_github_packages:
   - jimhester/covr
   
 notifications:
+  email:
+    recipients:
+      - cvallejos@turing.ac.uk 
     on_success: change # default: change
     on_failure: always # default: always
 
