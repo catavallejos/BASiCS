@@ -72,5 +72,5 @@ SystemRequirements: C++11
 NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
-RoxygenNote: 7.0.1
+RoxygenNote: 7.0.2
 Encoding: UTF-8
