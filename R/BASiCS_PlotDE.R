@@ -50,9 +50,9 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     )
     nPlots <- length(Plots)
     if (nPlots > 1) {
-      labels <- sapply(Plots, function(x) cap(MeasureName(x)))
+      labels <- sapply(Parameters, function(x) cap(MeasureName(x)))
       # labels <- Reduce(c, labels)
-      labels <- c(labels, rep("", length(object@Results) * length(Plots)))
+      labels <- c(labels, rep("", length(Parameters) * (length(Plots) - 1)))
       l <- lapply(l, 
         function(g) {
           g +
@@ -68,7 +68,12 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         character(1)
       )
     }
-    cowplot::plot_grid(plotlist = l, nrow = nPlots, labels = labels, hjust = 0)
+    cowplot::plot_grid(
+      plotlist = l,
+      nrow = length(Parameters),
+      labels = labels,
+      hjust = 0
+    )
   }
 )
 
@@ -269,7 +274,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, Mu) {
   # )
   bins <- 50
   xscale <- ggplot2::scale_x_continuous(
-    trans = if (Measure == "ResDisp" & is.null(Mu)) "identity" else "log2"
+    trans = if (Measure == "ResDisp" & is.null(Mu)) "identity" else "log10"
   )
   Table$`_Mu` <- Mu
   ggplot2::ggplot(
