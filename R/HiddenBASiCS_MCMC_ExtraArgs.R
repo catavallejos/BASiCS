@@ -21,7 +21,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                         RunName = "",
                                         PrintProgress = TRUE,
                                         PriorParam = list(
-                                          mu.mu = 0,
+                                          mu.mu = rep(0, times = nrow(Data)),
                                           s2.mu = 0.5,
                                           s2.delta = 0.5,
                                           a.delta = 1,
@@ -67,7 +67,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
   # Validity checks
   if (!(
         # PriorParam$mu.mu > 0 & 
-        length(PriorParam$mu.mu) == 1 &
+        length(PriorParam$mu.mu) == nrow(counts(Data)) &
         PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
         PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 &
         PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 &
