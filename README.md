@@ -126,7 +126,6 @@ Individual topics are summarized in the BASiCS wiki:
 
 - [Catalina Vallejos](https://sites.google.com/view/catalinavallejos) (cvallejos 'at' turing.ac.uk)
 - [Nils Eling](https://github.com/nilseling)
-- [Alan O'Callaghan](https://github.com/Alanocallaghan)
 - John Marioni
 - Sylvia Richardson
 
