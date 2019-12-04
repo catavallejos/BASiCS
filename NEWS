@@ -1324,3 +1324,8 @@ version 1.9.3 (2019-12-04)
 version 1.9.4 (2019-12-04)
 - Example chain objects updated to satisfy identifiability constrain
 - `test_vardecomp.R` updated accordingly
+
+version 1.9.5 (2019-12-04)
+- Optional parameter added to all mcmc samplers to enable user-defined 
+prior mean for log(mu).
+- Requirement of R (>= 4.0.0) added as suggested by BiocCheck
