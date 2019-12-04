@@ -56,7 +56,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     arma::vec phi0, 
     arma::vec s0,
     arma::vec nu0, 
-    arma::vec theta0, 
+    arma::vec theta0,
+    double mu_mu,
     double s2mu,
     arma::vec aphi, 
     double as, 
@@ -226,7 +227,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // REGRESSION
     muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts, deltaAux.col(0), 
-                        phiAux % nuAux.col(0), sumByCellBio, s2mu, q0, n, 
+                        phiAux % nuAux.col(0), sumByCellBio, mu_mu, s2mu, q0, n, 
                         y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, 
                         variance, mintol_mu);     
