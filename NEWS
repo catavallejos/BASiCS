@@ -1313,10 +1313,4 @@ version 1.9.2 (2019-12-02)
 - Removes dependency to `data.table`
 - Introduces `BASiCS_Draw` to enable synthetic data generation based on a 
 `BASiCS_MCMC` object (similar to splatter)
-- Adds Alan to README.md
-
-version 1.9.3 (2019-12-04)
-- Changes in `test_misc.R`, `test_sim.R` to pass tests. 
-- Corrected number of iterations in examples associated to regression case 
-(unit tests only)
-- Note; unit tests in `test_parameter_estimation_reg_no_spike.R` fail locally but not in bioc-devel
+- Adds Alan to README.md 

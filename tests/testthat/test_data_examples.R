@@ -34,28 +34,3 @@ test_that("Generated data does not match given seed (no spikes case)", {
   TechCheck <- rep(FALSE, nrow(Data))
   expect_equal(TechCheck0, TechCheck)
 })
-
-test_that("Generated data does not match given seed (all cases)", {
-  
-  # Data example
-  set.seed(13)
-  Data1 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-  Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = FALSE)
-  Data3 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
-  Data4 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = FALSE)
-  
-  DataCheck01 <- c(2665,   1095,   3680,   1012,   1895)
-  DataCheck02 <- c(1800,    823,   3705,   2969,   1132)
-  DataCheck03 <- c( 242,    488,    429,    215,    159)
-  DataCheck04 <- c( 528,    355,    123,    732,    154)
-  
-  DataCheck1 <- as.vector(colSums(assay(Data1))[1:5])
-  DataCheck2 <- as.vector(colSums(assay(Data2))[1:5])
-  DataCheck3 <- as.vector(colSums(assay(Data3))[1:5])
-  DataCheck4 <- as.vector(colSums(assay(Data4))[1:5])
-  
-  expect_equal(DataCheck01, DataCheck1)
-  expect_equal(DataCheck02, DataCheck2)
-  expect_equal(DataCheck03, DataCheck3)
-  expect_equal(DataCheck04, DataCheck4)
-})

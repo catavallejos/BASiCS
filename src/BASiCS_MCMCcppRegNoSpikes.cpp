@@ -194,9 +194,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
-  arma::vec means = muAux(arma::span(0,q0-1),0); //
-  arma::vec locations = estimateRBFLocations(means, k); //
-  arma::mat X = designMatrix(means, locations, variance); //
+  arma::vec means = muAux(arma::span(0,q0-1),0);
+  arma::vec locations = estimateRBFLocations(means, k);
+  arma::mat X = designMatrix(means, locations, variance);
   
   StartSampler(N);
   
@@ -233,7 +233,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       RefGene = RefGenes(RefAux); 
       if(i >= Burn) RefFreq(RefGene) += 1;
     }
-    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), //
+    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
                                 Counts, deltaAux.col(0), 
                                 1/deltaAux.col(0), nuAux.col(0), 
                                 sumByCellAll, s2mu, q0, n, 
@@ -243,10 +243,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 k, lambdaAux, betaAux, X, 
                                 sigma2Aux, variance, mintol_mu, locations);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
-    
-    means = muAux(arma::span(0,q0-1),0);
-    //locations = estimateRBFLocations(means, k);
-    X = designMatrix(means, locations, variance);
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
@@ -312,9 +308,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        //means = muAux(arma::span(0,q0-1),0);
+        means = muAux(arma::span(0,q0-1),0);
         locations = estimateRBFLocations(means, k);
-        //X = designMatrix(means, locations, variance);
+        X = designMatrix(means, locations, variance);
       }
     }
     
