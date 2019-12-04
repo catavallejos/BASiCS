@@ -59,7 +59,7 @@ test_that("BASiCS_Sim works", {
 test_that("BASiCS_Draw works", {
   data <- makeExampleBASiCS_Data(WithBatch = TRUE)
   chain <- run_MCMC(data,
-    N = 10,h
+    N = 10,
     Thin = 2,
     Burn = 4,
     Regression = FALSE,
