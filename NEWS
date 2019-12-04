@@ -1309,3 +1309,8 @@ version 1.7.20 (2019-10-17)
 version 1.9.1 (2019-11-28)
 - In `HiddenBASiCS_MCMC_Start`, `scran::computeSumFactors` was replaced by 
 `scran::calculateSumFactors` in order to match new version of `scran`. 
+
+version 1.9.2 (2019-12-04)
+- Adds `LazyData: true` in DESCRIPTION to pass R CMD Check (R-devel requirement)
+- Updates `BASiCS_LoadChain` to remove dependency to `data.table`
+- Alan added to README.md. Funding acknowledgement updated.

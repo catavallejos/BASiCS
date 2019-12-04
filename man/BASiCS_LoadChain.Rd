@@ -31,11 +31,17 @@ a \code{\linkS4class{BASiCS_Chain}}  object
 \examples{
 
 Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data, N = 50, Thin = 5, Burn = 5, Regression = FALSE,
-                     StoreChains = TRUE, StoreDir = tempdir(),
-                     RunName = 'Test')
-ChainLoad <- BASiCS_LoadChain(RunName = 'Test', StoreDir = tempdir())
-
+Chain <- BASiCS_MCMC(
+  Data,
+  N = 50,
+  Thin = 5,
+  Burn = 5,
+  Regression = FALSE,
+  StoreChains = TRUE,
+  StoreDir = tempdir(),
+  RunName = "Test"
+)
+ChainLoad <- BASiCS_LoadChain(RunName = "Test", StoreDir = tempdir())
 }
 \seealso{
 \code{\link[BASiCS]{BASiCS_Chain}}
