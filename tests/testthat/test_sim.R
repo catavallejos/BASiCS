@@ -55,16 +55,3 @@ test_that("BASiCS_Sim works", {
     "When spike-ins are not included, 'BatchInfo' is required."
   )
 })
-
-test_that("BASiCS_Draw works", {
-  data <- makeExampleBASiCS_Data(WithBatch = TRUE)
-  chain <- run_MCMC(data,
-    N = 10,h
-    Thin = 2,
-    Burn = 4,
-    Regression = FALSE,
-    WithSpikes = FALSE
-  )
-  draw <- BASiCS_Draw(chain)
-  expect_is(draw, "SingleCellExperiment")
-})
