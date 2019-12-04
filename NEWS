@@ -1314,3 +1314,9 @@ version 1.9.2 (2019-12-04)
 - Adds `LazyData: true` in DESCRIPTION to pass R CMD Check (R-devel requirement)
 - Updates `BASiCS_LoadChain` to remove dependency to `data.table`
 - Alan added to README.md. Funding acknowledgement updated.
+
+version 1.9.3 (2019-12-04)
+- Introduces `BASiCS_Draw` to enable synthetic data generation based on a
+`BASiCS_MCMC` object (similar to splatter)
+- Style changes to `newBASiCS_Data`
+- Changes in `test_data_examples.R` to cover all cases. 
