@@ -28,8 +28,9 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment assay assayNames
 #' @importFrom SummarizedExperiment colData colData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
-#' @importFrom utils packageVersion read.delim write.table
+#' @importFrom utils packageVersion write.table
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importClassesFrom Biobase Versioned
 #' @importFrom stats4 plot
 NULL
+

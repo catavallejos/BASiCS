@@ -2,7 +2,7 @@
 % Please edit documentation in R/BASiCS_Draw.R
 \name{BASiCS_Draw}
 \alias{BASiCS_Draw}
-\title{Generate a draw from the posterior of BASiCS using the
+\title{Generate a draw from the posterior of BASiCS using the 
 generative model.}
 \usage{
 BASiCS_Draw(
