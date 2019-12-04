@@ -25,12 +25,12 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
 #' @importFrom SingleCellExperiment altExp altExp<- 
 #' @importFrom SingleCellExperiment altExpNames altExpNames<-
+#' @importFrom stats4 plot
 #' @importFrom SummarizedExperiment SummarizedExperiment assay assayNames
 #' @importFrom SummarizedExperiment colData colData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
-#' @importFrom utils packageVersion write.table
+#' @importFrom utils packageVersion read.delim write.table
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importClassesFrom Biobase Versioned
-#' @importFrom stats4 plot
 NULL
 

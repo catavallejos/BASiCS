@@ -29,8 +29,7 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    double const& mintol,
-    arma::vec const& locations)
+    double const& mintol)
 {
   using arma::span;
   
@@ -62,7 +61,7 @@ arma::mat muUpdateRegNoSpikes(
   }
   // Revise this part
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(mu1, locations, variance);
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);

@@ -28,11 +28,11 @@
 #'
 #' @export
 BASiCS_Draw <- function(
-    Chain,
-    BatchInfo = gsub(".*_Batch([0-9a-zA-Z])", "\\1", colnames(Chain@parameters[["nu"]])),
-    N = sample(nrow(Chain@parameters[["nu"]]), 1)
-  ) {
-
+  Chain,
+  BatchInfo = gsub(".*_Batch([0-9a-zA-Z])", "\\1", colnames(Chain@parameters[["nu"]])),
+  N = sample(nrow(Chain@parameters[["nu"]]), 1)
+) {
+  
   BASiCS_Sim(
     Mu = Chain@parameters[["mu"]][N, ],
     Delta = Chain@parameters[["delta"]][N, ],
