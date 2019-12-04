@@ -1320,3 +1320,7 @@ version 1.9.3 (2019-12-04)
 `BASiCS_MCMC` object (similar to splatter)
 - Style changes to `newBASiCS_Data`
 - Changes in `test_data_examples.R` to cover all cases. 
+
+version 1.9.4 (2019-12-04)
+- Example chain objects updated to satisfy identifiability constrain
+- `test_vardecomp.R` updated accordingly
