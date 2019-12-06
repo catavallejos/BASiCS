@@ -4,8 +4,7 @@
 \alias{BASiCS_Sim}
 \title{Generates synthetic data according to the model implemented in BASiCS}
 \usage{
-BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta,
-  BatchInfo = NULL)
+BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta, BatchInfo = NULL)
 }
 \arguments{
 \item{Mu}{Gene-specific mean expression parameters \eqn{\mu_i} for all

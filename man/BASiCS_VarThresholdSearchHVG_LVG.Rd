@@ -7,11 +7,19 @@
 \title{Detection method for highly and lowly variable genes using
 a grid of variance contribution thresholds}
 \usage{
-BASiCS_VarThresholdSearchHVG(Chain, VarThresholdsGrid, EFDR = 0.1,
-  Progress = TRUE)
+BASiCS_VarThresholdSearchHVG(
+  Chain,
+  VarThresholdsGrid,
+  EFDR = 0.1,
+  Progress = TRUE
+)
 
-BASiCS_VarThresholdSearchLVG(Chain, VarThresholdsGrid, EFDR = 0.1,
-  Progress = TRUE)
+BASiCS_VarThresholdSearchLVG(
+  Chain,
+  VarThresholdsGrid,
+  EFDR = 0.1,
+  Progress = TRUE
+)
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}

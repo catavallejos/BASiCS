@@ -126,6 +126,7 @@ Individual topics are summarized in the BASiCS wiki:
 
 - [Catalina Vallejos](https://sites.google.com/view/catalinavallejos) (cvallejos 'at' turing.ac.uk)
 - [Nils Eling](https://github.com/nilseling)
+- [Alan O'Callaghan](https://github.com/Alanocallaghan)
 - John Marioni
 - Sylvia Richardson
 
@@ -148,8 +149,9 @@ This work has been funded by the MRC Biostatistics Unit (MRC grant no.
 MRC_MC_UP_0801/1; Catalina Vallejos and Sylvia Richardson), 
 EMBL European Bioinformatics Institute (core European Molecular Biology 
 Laboratory funding; Catalina Vallejos, Nils Eling and John Marioni), 
-CRUK Cambridge Institute (core CRUK funding; John Marioni) and The Alan Turing 
-Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos). 
+CRUK Cambridge Institute (core CRUK funding; John Marioni), The Alan Turing 
+Institute (EPSRC grant no. EP/N510129/1; Catalina Vallejos) and the University
+of Edinburgh (Catalina Vallejos and Alan O'Callaghan).
 
 ## References
 
