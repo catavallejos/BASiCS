@@ -8,10 +8,10 @@ HiddenChecksBASiCS_Data <- function(Data,
   GeneNames <- rownames(counts(Data)) 
   BatchInfo <- colData(Data)$BatchInfo
 
-  if (sum(Matrix::colSums(CountsBio) == 0) > 0) {
-    errors <- c(errors, "Some cells have zero reads mapping back to the 
-                intrinsic genes. Please remove them before running the MCMC.\n")
-  }
+  # if (sum(Matrix::colSums(CountsBio) == 0) > 0) {
+  #   errors <- c(errors, "Some cells have zero reads mapping back to the 
+  #               intrinsic genes. Please remove them before running the MCMC.\n")
+  # }
   if (sum(matrixStats::rowSums2(CountsBio) == 0) > 0) {
     warning("Some genes have zero counts across all cells. \n",
             "If comparing 2 groups, use `PriorDelta = 'log-normal' in BASiCS_MCMC.\n",
