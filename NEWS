@@ -1344,3 +1344,9 @@ version 1.9.8 (2019-12-12)
 - Removes `HiddenThresholdSearchDetectHVG_LVG` as no longer needed.
 - Changes in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` to reuse same hidden
 functions as in `BASiCS_TestDE` (extra potential changes exist)
+
+version 1.9.9 (2019-12-12)
+- Version bump after pull request merge
+- R version requirement set to 3.6.0
+- `dimnames<-` added for `BASiCS_Chain` objects
+- Additional input checks for `BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates`
