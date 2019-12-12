@@ -111,6 +111,9 @@ BASiCS_DetectHVG <- function(Chain,
                             ProbThreshold,
                             EFDR,
                             Plot)
+  
+  # Default lowest prob value (set as older version)
+  if(is.null(ProbThreshold)) { ProbThresholdAux <- 0.5 }
 
   OrderVariable <- match.arg(OrderVariable)
 
@@ -140,16 +143,15 @@ BASiCS_DetectHVG <- function(Chain,
     )
     
     # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(
-      ProbThreshold,
-      Prob[!is.na(Prob)],
-      EFDR
-    )
+    Aux <- .ThresholdSearch(Prob[!is.na(Prob)], 
+                            ProbThresholdAux, 
+                            EFDR, 
+                            Task = "HVG detection", 
+                            Suffix = "")
     
     if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
-      ProbThresholds <- Aux$ProbThresholds
     }
     OptThreshold <- Aux$OptThreshold
     
@@ -182,7 +184,7 @@ BASiCS_DetectHVG <- function(Chain,
       if (Search) {
         # EFDR / EFNR plot
         Plots[[1]] <- HiddenPlot1DetectHVG_LVG(
-          ProbThresholds = ProbThresholds,
+          ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
           EFDRgrid = EFDRgrid,
           EFNRgrid = EFNRgrid,
           EFDR = EFDR
@@ -225,7 +227,11 @@ BASiCS_DetectHVG <- function(Chain,
     Prob <- matrixStats::colMeans2(VarDecomp$BioVarGlobal > VarThreshold)
 
     # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, Prob, EFDR)
+    Aux <- .ThresholdSearch(Prob, 
+                            ProbThresholdAux, 
+                            EFDR, 
+                            Task = "HVG detection", 
+                            Suffix = "")
     if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
@@ -265,7 +271,7 @@ BASiCS_DetectHVG <- function(Chain,
       if (Search) {
         # EFDR / EFNR plot
         Plots[[1]] <- HiddenPlot1DetectHVG_LVG(
-          ProbThresholds = ProbThresholds,
+          ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
           EFDRgrid = EFDRgrid,
           EFNRgrid = EFNRgrid,
           EFDR = EFDR
@@ -320,6 +326,9 @@ BASiCS_DetectLVG <- function(Chain,
                             ProbThreshold,
                             EFDR,
                             Plot)
+  
+  # Default lowest prob value (set as older version)
+  if(is.null(ProbThreshold)) { ProbThresholdAux <- 0.5 }
 
   OrderVariable <- match.arg(OrderVariable)
   
@@ -341,16 +350,15 @@ BASiCS_DetectLVG <- function(Chain,
     Prob <- matrixStats::colMeans2(Chain@parameters$epsilon < EpsilonThreshold)
     
     # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(
-      ProbThreshold,
-      Prob[!is.na(Prob)],
-      EFDR
-    )
+    Aux <- .ThresholdSearch(Prob[!is.na(Prob)], 
+                            ProbThresholdAux, 
+                            EFDR, 
+                            Task = "LVG detection", 
+                            Suffix = "")
     
     if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
-      ProbThresholds <- Aux$ProbThresholds
     }
     OptThreshold <- Aux$OptThreshold
     
@@ -383,7 +391,7 @@ BASiCS_DetectLVG <- function(Chain,
       if (Search) {
         # EFDR / EFNR plot
         Plots[[1]] <- HiddenPlot1DetectHVG_LVG(
-          ProbThresholds = ProbThresholds,
+          ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
           EFDRgrid = EFDRgrid,
           EFNRgrid = EFNRgrid,
           EFDR = EFDR
@@ -427,11 +435,14 @@ BASiCS_DetectLVG <- function(Chain,
     Prob <- matrixStats::colMeans2(VarDecomp$BioVarGlobal < VarThreshold)
 
     # Threshold search
-    Aux <- HiddenThresholdSearchDetectHVG_LVG(ProbThreshold, Prob, EFDR)
+    Aux <- .ThresholdSearch(Prob, 
+                            ProbThresholdAux, 
+                            EFDR, 
+                            Task = "LVG detection", 
+                            Suffix = "")
     if (Search) {
       EFDRgrid <- Aux$EFDRgrid
       EFNRgrid <- Aux$EFNRgrid
-      ProbThresholds <- Aux$ProbThresholds
     }
     OptThreshold <- Aux$OptThreshold
 
@@ -467,7 +478,7 @@ BASiCS_DetectLVG <- function(Chain,
       if (Search) {
         # EFDR / EFNR plot
         Plots[[1]] <- HiddenPlot1DetectHVG_LVG(
-          ProbThresholds = ProbThresholds,
+          ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
           EFDRgrid = EFDRgrid,
           EFNRgrid = EFNRgrid,
           EFDR = EFDR

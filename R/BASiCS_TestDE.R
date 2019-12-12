@@ -255,6 +255,9 @@ BASiCS_TestDE <- function(Chain1,
 
   GeneName <- colnames(Chain1@parameters$mu)
   GeneIndex <- seq_len(length(GeneName))
+  
+  # If all genes are to be included
+  if(is.null(GenesSelect)) GenesSelect <- rep(TRUE, times = length(GeneName))
 
   message("-------------------------------------------------------------\n",
           "Log-fold change thresholds are now set in a log2 scale. \n",
@@ -270,19 +273,7 @@ BASiCS_TestDE <- function(Chain1,
   n <- n1 + n2
   # With offset correction
   if (Offset) {
-    # Calculating iteration-specific offset
-    # OffsetChain <- matrixStats::rowSums2(Chain1@parameters$mu) /
-    #                matrixStats::rowSums2(Chain2@parameters$mu)
-    #OffsetChain <- matrixStats::rowMedians(Chain1@parameters$mu) /
-    #  matrixStats::rowMedians(Chain2@parameters$mu)
-    # Offset point estimate
-    #OffsetEst <- median(OffsetChain)
-
     # Offset correction
-    #Chain1_offset <- Chain1
-    #Chain1_offset@parameters$mu <- Chain1@parameters$mu / OffsetEst
-    #Chain1_offset@parameters$phi <- Chain1@parameters$phi * OffsetEst
-    
     A <- BASiCS_CorrectOffset(Chain1, Chain2, min.mean = min.mean)
     OffsetEst <- A$Offset
     OffsetChain <- A$OffsetChain
@@ -388,14 +379,13 @@ BASiCS_TestDE <- function(Chain1,
   Search <- is.null(ProbThresholdM)
 
   # Changes in mean expression
-  AuxMean <- HiddenThresholdSearchTestDE(ChainTau,
-                                         EpsilonM,
-                                         ProbThresholdM,
-                                         GenesSelect,
-                                         EFDR_M,
-                                         Task = "Differential mean", 
-                                         Suffix = "M")
-  ProbM <- AuxMean$Prob
+  # Calculating posterior probabilities
+  ProbM <- .TailProb(abs(ChainTau), EpsilonM)
+  AuxMean <- .ThresholdSearch(ProbM[GenesSelect],
+                              ProbThresholdM,
+                              EFDR_M,
+                              Task = "Differential mean", 
+                              Suffix = "M")
   OptThresholdM <- AuxMean$OptThreshold
 
   # Test results
@@ -429,21 +419,14 @@ BASiCS_TestDE <- function(Chain1,
   DeltaBase <- (Delta1 * n1 + Delta2 * n2) / n
 
   # Genes to calibrate EFDR
-  if (!is.null(GenesSelect)) {
-    select <- NotDE & GenesSelect
-  }
-  else {
-    select <- NotDE
-  }
+  select <- NotDE & GenesSelect
 
-  AuxDisp <- HiddenThresholdSearchTestDE(ChainOmega,
-                                         EpsilonD,
-                                         ProbThresholdD,
-                                         select,
-                                         EFDR_D,
-                                         Task = "Differential dispersion",
-                                         Suffix = "D")
-  ProbD <- AuxDisp$Prob
+  ProbD <- .TailProb(abs(ChainOmega), EpsilonD)
+  AuxDisp <- .ThresholdSearch(ProbD[select], 
+                              ProbThresholdD,
+                              EFDR_D,
+                              Task = "Differential dispersion",
+                              Suffix = "D")
   OptThresholdD <- AuxDisp$OptThreshold
 
   # Test results
@@ -454,9 +437,7 @@ BASiCS_TestDE <- function(Chain1,
   ResultDiffDisp[DispPlus2] <- paste0(GroupLabel2, "+")
 
   ResultDiffDisp[!NotDE] <- "ExcludedFromTesting"
-  if (!is.null(GenesSelect)) {
-    ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
-  }
+  ResultDiffDisp[!GenesSelect] <- "ExcludedByUser"
 
   # Output table
   TableDisp <- cbind.data.frame(GeneName = GeneName,
@@ -471,6 +452,19 @@ BASiCS_TestDE <- function(Chain1,
                                 stringsAsFactors = FALSE)
   # Rounding to 3 decimal points
   TableDisp[, 2:8] <- round(TableDisp[, 2:8], 3)
+  
+  # Ordering the output tables
+  if (OrderVariable == "GeneIndex") {
+    orderVar <- order(GeneIndex, decreasing = FALSE)
+  }
+  if (OrderVariable == "GeneName") {
+    orderVar <- order(GeneName, decreasing = TRUE)
+  }
+  if (OrderVariable == "Mu") {
+    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
+  }
+  TableMean <- TableMean[orderVar, ]
+  TableDisp <- TableDisp[orderVar, ]
 
   # Changes in residual over-dispersion - if regression approach was used
   if (!is.null(Chain1@parameters$epsilon)){
@@ -484,21 +478,13 @@ BASiCS_TestDE <- function(Chain1,
     EpsilonBase <- (Epsilon1 * n1 + Epsilon2 * n2) / n
 
     # Genes to calibrate EFDR
-    if (!is.null(GenesSelect)) {
-      select <- NotExcluded & GenesSelect
-    }
-    else {
-      select <- NotExcluded
-    }
-
-    AuxResDisp <- HiddenThresholdSearchTestDE(ChainPsi,
-                                              EpsilonR,
-                                              ProbThresholdR,
-                                              select,
-                                              EFDR_R,
-                                              Task = "Differential residual dispersion",
-                                              Suffix = "R")
-    ProbE <- AuxResDisp$Prob
+    select <- NotExcluded & GenesSelect
+    ProbE <- .TailProb(abs(ChainPsi), EpsilonR)
+    AuxResDisp <- .ThresholdSearch(ProbE[select],
+                                   ProbThresholdR,
+                                   EFDR_R,
+                                   Task = "Differential residual dispersion",
+                                   Suffix = "R")
     OptThresholdE <- AuxResDisp$OptThreshold
 
     # Test results
@@ -527,40 +513,10 @@ BASiCS_TestDE <- function(Chain1,
 
     # Rounding to 3 decimal points
     TableResDisp[, 2:7] <- round(TableResDisp[, 2:7], 3)
-
-    if (OrderVariable == "GeneIndex") {
-      orderVar <- order(GeneIndex, decreasing = FALSE)
-    }
-    if (OrderVariable == "GeneName") {
-      orderVar <- order(GeneName, decreasing = TRUE)
-    }
-    if (OrderVariable == "Mu") {
-      orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
-    }
     TableResDisp <- TableResDisp[orderVar, ]
   }
 
-  if (OrderVariable == "GeneIndex") {
-    orderVar <- order(GeneIndex, decreasing = FALSE)
-  }
-  if (OrderVariable == "GeneName") {
-    orderVar <- order(GeneName, decreasing = TRUE)
-  }
-  if (OrderVariable == "Mu") {
-    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
-  }
-  TableMean <- TableMean[orderVar, ]
 
-  if (OrderVariable == "GeneIndex") {
-    orderVar <- order(GeneIndex, decreasing = FALSE)
-  }
-  if (OrderVariable == "GeneName") {
-    orderVar <- order(GeneName, decreasing = TRUE)
-  }
-  if (OrderVariable == "Mu") {
-    orderVar <- order(as.numeric(MuBase), decreasing = TRUE)
-  }
-  TableDisp <- TableDisp[orderVar, ]
 
   if (!is.null(GenesSelect)) {
     message("-------------------------------------------------------------\n",
