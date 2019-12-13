@@ -94,3 +94,54 @@
        EFDRgrid = EFDRgrid, 
        EFNRgrid = EFNRgrid)
 }
+
+.TestResults <- function(Probs, 
+                         Threshold, 
+                         Estimate, 
+                         Label1, 
+                         Label2, 
+                         GenesSelect,
+                         Excluded = NULL) {
+
+  # Which genes are + in each group
+  Plus1 <- which(Probs > Threshold & Estimate > 0)
+  Plus2 <- which(Probs > Threshold & Estimate < 0)
+  Result <- rep("NoDiff", length(Estimate))
+  Result[Plus1] <- paste0(Label1, "+")
+  Result[Plus2] <- paste0(Label2, "+")
+  if(!is.null(Excluded)) { Result[Excluded] <- "ExcludedFromTesting" }
+  Result[!GenesSelect] <- "ExcludedByUser"
+  return(Result)
+}
+
+.ShowTestResults <- function(Result, Epsilon, Opt, Label1, Label2, 
+                             Task, Others = NULL) {
+  
+  n1 <- sum(Result == paste0(Label1, "+"))
+  n2 <- sum(Result == paste0(Label2, "+"))
+
+  message("-------------------------------------------------------------\n")
+  
+  message(n1 + n2, paste0(" genes with a change in ", Task, ":\n"),
+          "- Higher in ", Label1, " samples: ", n1, "\n",
+          "- Higher in ", Label2, " samples: ", n2, "\n",
+          "- Fold change tolerance = ", round(2^(Epsilon)*100, 2), "% \n",
+          "- Probability threshold = ", Opt[1], "\n",
+          "- EFDR = ", round(100 * Opt[2], 2), "% \n",
+          "- EFNR = ", round(100 * Opt[3], 2), "% \n")
+  
+  if(Task == "over dispersion" & !is.null(Others)) {
+    message("-------------------------------------------------------------\n",
+            "NOTE: differential dispersion assessment only applied to the \n",
+            sum(Others), " genes for which the mean did not change. \n",
+            "and that were included for testing. \n")   
+  }
+  if(Task == "residual over dispersion" & !is.null(Others)) {
+    message("-------------------------------------------------------------\n",
+            "NOTE: differential residual dispersion assessment applied to \n",
+            sum(Others), " genes expressed in at least 2 cells per condition \n",
+            "and that were included for testing. \n")
+  }
+  
+  message("-------------------------------------------------------------\n\n")  
+}

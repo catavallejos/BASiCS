@@ -1350,3 +1350,7 @@ version 1.9.9 (2019-12-12)
 - R version requirement set to 3.6.0
 - `dimnames<-` added for `BASiCS_Chain` objects
 - Additional input checks for `BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates`
+
+version 1.9.10 (2019-12-13)
+- Further clean up in `BASiCS_TestDE`. Creates new internal functions to avoid
+duplicated code across different tests: `.TestResults`, `.ShowTestResults`
