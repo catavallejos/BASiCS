@@ -1306,11 +1306,6 @@ version 1.7.19 (2019-10-08)
 version 1.7.20 (2019-10-17)
 - Bumps version number to trigger new build.
 
-version 1.7.21 (2019-10-17)
-- Changes coda::effectiveSize for a more efficient internal implementation.
-- Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
-  genes for differential expression testing based on effective sample size.
-
 version 1.9.1 (2019-11-28)
 - In `HiddenBASiCS_MCMC_Start`, `scran::computeSumFactors` was replaced by 
 `scran::calculateSumFactors` in order to match new version of `scran`. 
@@ -1359,3 +1354,8 @@ version 1.9.9 (2019-12-12)
 version 1.9.10 (2019-12-13)
 - Further clean up in `BASiCS_TestDE`. Creates new internal functions to avoid
 duplicated code across different tests: `.TestResults`, `.ShowTestResults`
+
+version 1.9.11 (2019-12-13)
+- Changes coda::effectiveSize for a more efficient internal implementation.
+- Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
+  genes for differential expression testing based on effective sample size.
