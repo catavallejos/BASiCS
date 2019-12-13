@@ -7,13 +7,13 @@ test_that("Variance decomposition is correct",
   
   VD <- BASiCS_VarianceDecomp(ChainSC, Plot = FALSE)
   
-  BioVarGlobal0 <- c(0.771, 0.746, 0.670, 0.665, 0.645)
+  BioVarGlobal0 <- c(0.770, 0.745, 0.666, 0.663, 0.642)
   expect_equal(round(VD$BioVarGlobal[1:5],3), BioVarGlobal0)
-  TechVarGlobal0 <- c(0.203, 0.210, 0.250, 0.263, 0.276)
+  TechVarGlobal0 <- c(0.202, 0.210, 0.247, 0.263, 0.275)
   expect_equal(round(VD$TechVarGlobal[1:5],3), TechVarGlobal0)
-  BioVarBatch10 <- c(0.755, 0.739, 0.662, 0.630, 0.636)
+  BioVarBatch10 <- c(0.754, 0.738, 0.659, 0.627, 0.632)
   expect_equal(round(VD$BioVarBatch1[1:5],3), BioVarBatch10)
-  TechVarBatch10 <- c(0.205, 0.219, 0.244, 0.258, 0.271)
+  TechVarBatch10 <- c(0.202, 0.218, 0.243, 0.258, 0.270)
   expect_equal(round(VD$TechBatch1[1:5],3), TechVarBatch10)
   
   # To emulate no-spikes case

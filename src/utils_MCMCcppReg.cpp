@@ -2,7 +2,8 @@
 
 // Functions for regression case of BASiCS
 
-arma::mat designMatrixOriginal(
+// Model matrix generation for regression
+arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec const& mu, 
     double const& variance) 
@@ -18,47 +19,10 @@ arma::mat designMatrixOriginal(
   double h = (myu(1)-myu(0)) * variance;
   
   // Possibly create this matrix outside
-  arma::mat X = arma::ones(x.size(), k);
+  arma::mat X = arma::ones(x.size(),k);
   X.col(1) = x;
   for(int i=0; i < k-2; i++) {
     X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
-    //X.col(i+1) = pow(x,i+1);
-  }
-  return X;
-}
-
-
-// estimate GRBF locations
-arma::vec estimateRBFLocations(
-    arma::vec const& mu,
-    int const& k)
-{
-  arma::vec x = log(mu);
-  double range = x.max() - x.min();
-  arma::vec locations = arma::zeros(k - 2);
-  locations(0) = x.min();
-  
-  for (int i = 1; i < (k - 2); i++) {
-    locations(i) = locations(i - 1) + range / (k - 3);
-  }
-  return(locations);
-}
-
-// Model matrix generation for regression
-arma::mat designMatrix(
-    arma::vec const& mu, 
-    arma::vec const& locations, 
-    double const& variance) 
-{
-  arma::vec x = log(mu);
-  double h = (locations(1)-locations(0)) * variance;
-  int k = locations.size() + 2;
-  
-  // Possibly create this matrix outside
-  arma::mat X = arma::ones(x.size(), k);
-  X.col(1) = x;
-  for(int i = 0; i < k - 2; i++) {
-    X.col(i + 2) = exp(-0.5 * pow(x - locations(i), 2) / pow(h, 2));
     //X.col(i+1) = pow(x,i+1);
   }
   return X;
@@ -87,8 +51,7 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    double const& mintol,
-    arma::vec const& locations)
+    double const& mintol)
 {
   
   /* PROPOSAL STEP */
@@ -100,7 +63,7 @@ arma::mat muUpdateReg(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
-  log_aux -= (0.5 / s2_mu) * (pow(log(mu1 - mu_mu), 2) - pow(log(mu0 - mu_mu), 2));
+  log_aux -= (0.5 / s2_mu) * (pow(log(mu1) - mu_mu, 2) - pow(log(mu0) - mu_mu, 2));
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
@@ -110,8 +73,7 @@ arma::mat muUpdateReg(
   }
   
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(mu1, locations, variance);
-  //arma::mat X_mu1 = designMatrixOriginal(k, mu1, variance);
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check

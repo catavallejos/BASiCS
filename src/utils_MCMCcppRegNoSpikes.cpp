@@ -29,8 +29,7 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    double const& mintol,
-    arma::vec const& locations)
+    double const& mintol)
 {
   using arma::span;
   
@@ -62,7 +61,7 @@ arma::mat muUpdateRegNoSpikes(
   }
   // Revise this part
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(mu1, locations, variance);
+  arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
@@ -74,8 +73,8 @@ arma::mat muUpdateRegNoSpikes(
     iAux = ConstrainGene(i);
     if(iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux) - mu_mu) - aux, 2)); 
-      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux) - mu_mu) - aux, 2));
+      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - mu_mu - aux, 2)); 
+      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - mu_mu - aux, 2));
       // ACCEPT REJECT
       if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
@@ -94,7 +93,7 @@ arma::mat muUpdateRegNoSpikes(
     for (int i=0; i < nNotConstrainGene; i++) {
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) * 
-        (pow(log(mu1(iAux) - mu_mu), 2) - pow(log(mu0(iAux) - mu_mu), 2));
+        (pow(log(mu1(iAux)) - mu_mu, 2) - pow(log(mu0(iAux)) - mu_mu, 2));
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;

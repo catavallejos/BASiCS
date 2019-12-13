@@ -40,10 +40,10 @@
 BASiCS_LoadChain <- function(RunName,
                              StoreDir = getwd(),
                              StoreUpdatedChain = FALSE) {
-
+  
   if (file.exists(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))) {
     Chain <- readRDS(file.path(StoreDir, paste0("chain_", RunName, ".Rds")))
-
+    
     if (methods::.hasSlot(Chain, "mu")) {
       if (!is.null(Chain@mu)) {
         message(
@@ -62,7 +62,7 @@ BASiCS_LoadChain <- function(RunName,
         }
       }
     }
-
+    
   } else {
     if (file.exists(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))) {
       Mu <- read.delim(
@@ -80,18 +80,18 @@ BASiCS_LoadChain <- function(RunName,
         sep = " ",
         check.names = FALSE
       )
-
+      
       # Add-hoc fix for the no-spikes case
       if (file.exists(file.path(StoreDir, paste0("chain_s_", RunName, ".txt")))) {
         S <- read.delim(
           file.path(StoreDir, paste0("chain_s_", RunName, ".txt")),
           sep = " ",
-        check.names = FALSE
+          check.names = FALSE
         )
       } else {
         S <- matrix(1, ncol = ncol(Phi), nrow = nrow(Phi))
       }
-
+      
       Nu <- read.delim(
         file.path(StoreDir, paste0("chain_nu_", RunName, ".txt")),
         sep = " ",
@@ -102,7 +102,7 @@ BASiCS_LoadChain <- function(RunName,
         sep = " ",
         check.names = FALSE
       )
-
+      
       Chain <- newBASiCS_Chain(
         list(
           "mu" = as.matrix(Mu),
@@ -113,20 +113,20 @@ BASiCS_LoadChain <- function(RunName,
           "theta" = as.matrix(Theta)
         )
       )
-
+      
       message(
         "`BASiCS_Chain` class definition was outdated. \n",
         "Object updated to be compatible with BASiCS version ",
         utils::packageVersion("BASiCS"), ".\n",
         "Set 'StoreUpdatedChain' = TRUE to save updated object.\n"
       )
-
+      
       if (StoreUpdatedChain) {
         saveRDS(Chain,
-          file = file.path(StoreDir, paste0("chain_", RunName, ".Rds"))
+                file = file.path(StoreDir, paste0("chain_", RunName, ".Rds"))
         )
       }
-
+      
     } else {
       stop("Input file does not exist")
     }

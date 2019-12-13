@@ -75,20 +75,20 @@ newBASiCS_Data <- function(Counts,
                            SpikeInfo = NULL,
                            BatchInfo = NULL,
                            SpikeType = "ERCC") {
-
+  
   if (!inherits(Counts, "matrix")) {
     stop("Counts must be a matrix.")
   }
-
+  
   # Separating intrinsic from spike-in transcripts
   CountsBio <- Counts[!Tech, ]
   CountsTech <- Counts[Tech, ]
   # Extracting gene labels
   GeneName <- rownames(Counts)
-
+  
   # Create a SingleCellExperiment data object
   Data <- SingleCellExperiment(assays = list(counts = as.matrix(CountsBio)))
-
+  
   # Adding metadata associated to batch information
   ## Setting a default value for BatchInfo when absent
   if (is.null(BatchInfo)) {
@@ -100,7 +100,7 @@ newBASiCS_Data <- function(Counts,
   )
   colnames(Data) <- colnames(CountsBio)
   rownames(Data) <- rownames(CountsBio)
-
+  
   # Adding spike-ins information
   if (!is.null(SpikeInfo)) {
     # If SpikeInfo is provided, run validity checks
@@ -135,7 +135,7 @@ newBASiCS_Data <- function(Counts,
   # Checks to assess if the data contains the required information
   errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
   if (length(errors) > 0) stop(errors)
-
+  
   message(
     "\n", "NOTICE: BASiCS requires a pre-filtered dataset \n",
     "    - You must remove poor quality cells before hand \n",
@@ -147,6 +147,6 @@ newBASiCS_Data <- function(Counts,
     "            (genes expressed in only 1 cell are not accepted) \n",
     "\n BASiCS_Filter can be used for this purpose. \n"
   )
-
+  
   Data
 }

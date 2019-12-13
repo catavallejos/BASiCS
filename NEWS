@@ -1256,6 +1256,7 @@ inclusion of uncertainty measure around the regression trend.
 
 version 1.7.12 (2019-09-15)
 - changes maintainer's email address
+
 version 1.7.13 (2019-09-25)
 - Updated unit tests to account for new default choice for `min.mean` parameter
 in `scran::computeSumFactors`
@@ -1309,3 +1310,52 @@ version 1.7.21 (2019-10-17)
 - Changes coda::effectiveSize for a more efficient internal implementation.
 - Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
   genes for differential expression testing based on effective sample size.
+
+version 1.9.1 (2019-11-28)
+- In `HiddenBASiCS_MCMC_Start`, `scran::computeSumFactors` was replaced by 
+`scran::calculateSumFactors` in order to match new version of `scran`. 
+
+version 1.9.2 (2019-12-04)
+- Adds `LazyData: true` in DESCRIPTION to pass R CMD Check (R-devel requirement)
+- Updates `BASiCS_LoadChain` to remove dependency to `data.table`
+- Alan added to README.md. Funding acknowledgement updated.
+
+version 1.9.3 (2019-12-04)
+- Introduces `BASiCS_Draw` to enable synthetic data generation based on a
+`BASiCS_MCMC` object (similar to splatter)
+- Style changes to `newBASiCS_Data`
+- Changes in `test_data_examples.R` to cover all cases. 
+
+version 1.9.4 (2019-12-04)
+- Example chain objects updated to satisfy identifiability constrain
+- `test_vardecomp.R` updated accordingly
+
+version 1.9.5 (2019-12-04)
+- Optional parameter added to all mcmc samplers to enable user-defined 
+prior mean for log(mu).
+- Requirement of R (>= 4.0.0) added as suggested by BiocCheck
+
+version 1.9.6 (2019-12-04)
+- Minor changes in `test_misc.R` to expose hidden functions
+
+version 1.9.7 (2019-12-05)
+- Fixes bug in mu updates (log(mu) - mu.mu, rather than log(mu - mu.mu)). This
+does not affect default prior, only empirical Bayes approach.
+
+version 1.9.8 (2019-12-12)
+- Clean-up for `HiddenTailProbTestDE` -> renamed as `.TailProb`. Similar for
+`.ThresholdSearch`, `.EFDR` and `.EFNR`
+- Extra unit test for `GenesSelect` parameter in `BASiCS_TestDE`
+- Removes `HiddenThresholdSearchDetectHVG_LVG` as no longer needed.
+- Changes in `BASiCS_DetectHVG` and `BASiCS_DetectLVG` to reuse same hidden
+functions as in `BASiCS_TestDE` (extra potential changes exist)
+
+version 1.9.9 (2019-12-12)
+- Version bump after pull request merge
+- R version requirement set to 3.6.0
+- `dimnames<-` added for `BASiCS_Chain` objects
+- Additional input checks for `BASiCS_DenoisedCounts` and `BASiCS_DenoisedRates`
+
+version 1.9.10 (2019-12-13)
+- Further clean up in `BASiCS_TestDE`. Creates new internal functions to avoid
+duplicated code across different tests: `.TestResults`, `.ShowTestResults`
