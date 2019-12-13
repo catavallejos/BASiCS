@@ -418,7 +418,6 @@ BASiCS_TestDE <- function(Chain1,
   } else {
     GoodESS <- rep(TRUE, length(GenesSelect))
   }
-  MuSelect <- GenesSelect & GoodESS
 
   # Changes in mean expression
   # Calculating posterior probabilities
@@ -438,7 +437,7 @@ BASiCS_TestDE <- function(Chain1,
     Estimate = MedianTau,
     Label1 = GroupLabel1,
     Label2 = GroupLabel2,
-    GenesSelect = MuSelect,
+    GenesSelect = GenesSelect,
     GoodESS = GoodESS
   )
 
@@ -496,7 +495,7 @@ BASiCS_TestDE <- function(Chain1,
     Estimate = MedianOmega,
     Label1 = GroupLabel1,
     Label2 = GroupLabel2,
-    GenesSelect = DeltaSelect,
+    GenesSelect = GenesSelect,
     GoodESS = GoodESS,
     Excluded = !NotDE
   )
@@ -557,7 +556,7 @@ BASiCS_TestDE <- function(Chain1,
     ProbE <- .TailProb(Chain = abs(ChainPsi), Threshold = EpsilonR)
     AuxResDisp <- .ThresholdSearch(
       Probs = ProbE[EpsSelect],
-      Threshold = ProbThresholdR,
+      ProbThreshold = ProbThresholdR,
       EFDR = EFDR_R,
       Task = "Differential residual dispersion",
       Suffix = "R"
@@ -571,7 +570,7 @@ BASiCS_TestDE <- function(Chain1,
       Estimate = MedianPsi,
       Label1 = GroupLabel1,
       Label2 = GroupLabel2,
-      GenesSelect = EpsSelect,
+      GenesSelect = GenesSelect,
       GoodESS = GoodESS,
       Excluded = !NotExcluded
     )

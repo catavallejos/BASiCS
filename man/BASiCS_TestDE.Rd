@@ -49,29 +49,29 @@ changes in residual over-dispersion (must be a positive real number).
 Default value: \code{EpsilonR= log2(1.5)/log2(exp(1))} (i.e. 50\% increase).}
 
 \item{ProbThresholdM}{Optional parameter. Probability threshold for detecting
-changes in overall expression (must be a positive value, between 0 and 1). 
-If \code{EFDR_M = NULL}, the posterior probability threshold for the 
+changes in overall expression (must be a positive value, between 0 and 1).
+If \code{EFDR_M = NULL}, the posterior probability threshold for the
 differential mean expression test will be set to \code{ProbThresholdM}. If
 a value for \code{EFDR_M} is provided, the posterior probability threshold
-is chosen to achieve an EFDR equal to \code{EFDR_M} and \code{ProbThresholdM} 
-defines a minimum probability threshold for this calibration (this avoids low 
-values of \code{ProbThresholdM} to be chosen by the EFDR calibration. 
-Default value \code{ProbThresholdM = 2/3}, i.e. the probability of observing 
-a log2-FC above \code{EpsilonM} must be at least twice the probality of 
+is chosen to achieve an EFDR equal to \code{EFDR_M} and \code{ProbThresholdM}
+defines a minimum probability threshold for this calibration (this avoids low
+values of \code{ProbThresholdM} to be chosen by the EFDR calibration.
+Default value \code{ProbThresholdM = 2/3}, i.e. the probability of observing
+a log2-FC above \code{EpsilonM} must be at least twice the probality of
 observing the complementary event (log2-FC below \code{EpsilonM}).}
 
 \item{ProbThresholdD}{Optional parameter. Probability threshold for detecting
-changes in cell-to-cell biological over-dispersion (must be a positive value, 
+changes in cell-to-cell biological over-dispersion (must be a positive value,
 between 0 and 1). Same usage as \code{ProbThresholdM}, depending on the value
 provided for \code{EFDR_D}. Default value \code{ProbThresholdD = 2/3}.}
 
 \item{ProbThresholdR}{Optional parameter. Probability threshold for detecting
-changes in residual over-dispersion (must be a positive value, between 0 and 
-1). Same usage as \code{ProbThresholdM}, depending on the value provided for 
+changes in residual over-dispersion (must be a positive value, between 0 and
+1). Same usage as \code{ProbThresholdM}, depending on the value provided for
 \code{EFDR_R}. Default value \code{ProbThresholdR = 2/3}.}
 
 \item{OrderVariable}{Ordering variable for output.
-Possible values: \code{'GeneIndex'} (default), \code{'GeneName'} and 
+Possible values: \code{'GeneIndex'} (default), \code{'GeneName'} and
 \code{'Mu'} (mean expression).}
 
 \item{GroupLabel1}{Label assigned to reference group.
@@ -89,22 +89,22 @@ previously removed from the MCMC chains). Default: \code{Offset = TRUE}.}
 
 \item{EFDR_M}{Target for expected false discovery rate related to
 the comparison of means. If \code{EFDR_M = NULL}, EFDR calibration is not
-performed and the posterior probability threshold is set equal to 
+performed and the posterior probability threshold is set equal to
 \code{ProbThresholdM}. Default \code{EFDR_M = 0.05}.}
 
 \item{EFDR_D}{Target for expected false discovery rate related to
-the comparison of dispersions. If \code{EFDR_D = NULL}, EFDR calibration is 
-not performed and the posterior probability threshold is set equal to 
+the comparison of dispersions. If \code{EFDR_D = NULL}, EFDR calibration is
+not performed and the posterior probability threshold is set equal to
 \code{ProbThresholdD}.Default \code{EFDR_D = 0.05}.}
 
 \item{EFDR_R}{Target for expected false discovery rate related to
-the comparison of residual over-dispersions. If \code{EFDR_R = NULL}, EFDR 
-calibration is not performed and the posterior probability threshold is set 
+the comparison of residual over-dispersions. If \code{EFDR_R = NULL}, EFDR
+calibration is not performed and the posterior probability threshold is set
 equal to \code{ProbThresholdR}.Default \code{EFDR_D = 0.05}.}
 
 \item{GenesSelect}{Optional argument to provide a user-defined list
 of genes to be considered for the comparison.
-Default: \code{GenesSelect = rep(TRUE, nGene)} 
+Default: \code{GenesSelect = rep(TRUE, nGene)}
 When used, this argument must be a vector
 of \code{TRUE} (include gene) / \code{FALSE} (exclude gene) indicator,
 with the same length as the number of intrinsic genes and following the same
@@ -117,7 +117,7 @@ offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 parameter is only relevant with `Offset = TRUE`.}
 
 \item{CheckESS}{Should the effective sample size of the chains be tested to
-be of a suitable magnitude in order to be included in tests for 
+be of a suitable magnitude in order to be included in tests for
 differential expression? Default is FALSE. If TRUE, genes with poor
 mixing will be excluded from the tests for differential expression.}
 
@@ -244,10 +244,12 @@ of cells (mean and over-dispersion)
 data(ChainSC)
 data(ChainRNA)
 
-Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
-                      GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
-                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      OffSet = TRUE)
+Test <- BASiCS_TestDE(
+  Chain1 = ChainSC, Chain2 = ChainRNA,
+  GroupLabel1 = "SC", GroupLabel2 = "P&S",
+  EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+  OffSet = TRUE
+)
 
 # Results for the differential mean test
 head(Test$TableMean)
@@ -261,12 +263,13 @@ head(Test$TableDisp)
 data(ChainSCReg)
 data(ChainRNAReg)
 
-Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
-                      GroupLabel1 = 'SC', GroupLabel2 = 'P&S',
-                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      EpsilonR = log2(1.5)/log2(exp(1)),
-                      OffSet = TRUE)
-
+Test <- BASiCS_TestDE(
+  Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
+  GroupLabel1 = "SC", GroupLabel2 = "P&S",
+  EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+  EpsilonR = log2(1.5) / log2(exp(1)),
+  OffSet = TRUE
+)
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

@@ -1,3 +1,5 @@
+#' @importFrom matrixStats colVars
+#' @importFrom stats ar setNames
 ess <- function(x) {
   vars <- colVars(x)
   spec <- numeric(ncol(x))
