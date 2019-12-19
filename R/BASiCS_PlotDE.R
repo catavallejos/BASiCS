@@ -235,8 +235,8 @@ VolcanoPlot <- function(
         x = paste0(Measure, DistanceVar(Measure)),
         y = paste0("ProbDiff", Measure))
     ) +
-    # ggplot2::geom_point() +
-    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
+    ggplot2::geom_point() +
+    # ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
     ggplot2::geom_point(
       data = Table[IndDiff, ],
       shape = 16,

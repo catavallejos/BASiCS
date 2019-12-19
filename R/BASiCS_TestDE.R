@@ -217,6 +217,7 @@ BASiCS_TestDE <- function(Chain1,
   Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
   Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
   # ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
+  browser()
   ChainTau <- log2(
     apply(Chain1_offset@parameters$mu, 2, sort) / 
       apply(Chain2_offset@parameters$mu, 2, sort)
@@ -284,8 +285,19 @@ BASiCS_TestDE <- function(Chain1,
   }
 
 
-  AuxMean <- HiddenThresholdSearchTestDE(
+  AuxMean2 <- HiddenThresholdSearchTestDE(
     ChainTau,
+    EpsilonM,
+    ProbThresholdM,
+    GenesSelect,
+    EFDR_M,
+    Task = "Differential expression", 
+    Suffix = "M"
+  )
+
+
+  AuxMean2 <- HiddenThresholdSearchTestDE(
+    log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu),
     EpsilonM,
     ProbThresholdM,
     GenesSelect,
