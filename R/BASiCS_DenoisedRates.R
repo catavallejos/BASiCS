@@ -35,13 +35,16 @@
 #'
 #' @rdname BASiCS_DenoisedRates
 #' @export
-BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE)
-{
+BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE) {
+
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.")
   }
   if (!is(Chain, "BASiCS_Chain")) {
     stop("'Chain' is not a BASiCS_Chain class object.")
+  }
+  if (!all(dim(Chain) == dim(Data))) {
+    stop("Chain and Data are different dimensions!")
   }
 
   N <- nrow(Chain@parameters$delta)
