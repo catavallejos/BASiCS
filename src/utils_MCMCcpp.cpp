@@ -29,11 +29,7 @@ arma::mat Hidden_muUpdate(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
-<<<<<<< HEAD
-  log_aux -= (0.5/s2_mu) * (pow(log(mu1)  - mu_mu, 2) - pow(log(mu0)  - mu_mu, 2));
-=======
   log_aux -= (0.5/s2_mu) * (pow(log(mu1) - mu_mu, 2) - pow(log(mu0) - mu_mu, 2));
->>>>>>> master
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *  
