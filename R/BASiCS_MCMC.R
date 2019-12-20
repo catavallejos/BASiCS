@@ -194,14 +194,21 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC <- function(Data, 
+                        N, 
+                        Thin, 
+                        Burn, 
+                        Regression, 
+                        WithSpikes = TRUE, 
+                        PriorMu = "default", ...)
 {
   # Checks to ensure input arguments are valid
-  HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
+  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, 
+                          Regression, WithSpikes, PriorMu)
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch
-  GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
+  GPar <- .BASiCS_MCMC_GlobalParams(Data)
 
   # Total counts per cell and/or gene
   sum.bycell.bio <- Matrix::rowSums(counts(Data))
@@ -217,12 +224,13 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   }
 
   # Assignment of optional parameters (default values if input not provided)
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,
-                                         Burn,
-                                         GPar,
-                                         Regression,
-                                         WithSpikes,
-                                         ...)
+  ArgsDef <- .BASiCS_MCMC_ExtraArgs(Data,
+                                    Burn,
+                                    GPar,
+                                    Regression,
+                                    WithSpikes,
+                                    PriorMu,
+                                    ...)
   # Starting values for the MCMC (parameters and adaptive variances)
   # Loaded separately to simplify calling to the elements of its list
   # Same for prior parameters

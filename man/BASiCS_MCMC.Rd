@@ -4,7 +4,16 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC(
+  Data,
+  N,
+  Thin,
+  Burn,
+  Regression,
+  WithSpikes = TRUE,
+  PriorMu = "default",
+  ...
+)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.

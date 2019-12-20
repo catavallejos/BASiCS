@@ -1354,3 +1354,13 @@ version 1.9.9 (2019-12-12)
 version 1.9.10 (2019-12-13)
 - Further clean up in `BASiCS_TestDE`. Creates new internal functions to avoid
 duplicated code across different tests: `.TestResults`, `.ShowTestResults`
+
+WIP
+- Implementation of empirical Bayes (EB) approach for `mu` in `BASiCS_MCMC`
+- Additional parameter `PriorMu` incorporated to `BASiCS_MCMC`. This enables
+internal calculation of the EB prior. 
+- Creates `.EmpiricalBayesMu` to derive EB prior for mu.
+- `HiddenBASiCS_MCMC_InputCheck`, `HiddenBASiCS_MCMC_GlobalParams` and
+`HiddenBASiCS_MCMC_ExtraArgs` renamed as `.BASiCS_MCMC_InputCheck`, 
+`.BASiCS_MCMC_GlobalParams` and `.BASiCS_MCMC_ExtraArgs`.
+
