@@ -1364,3 +1364,4 @@ internal calculation of the EB prior.
 `HiddenBASiCS_MCMC_ExtraArgs` renamed as `.BASiCS_MCMC_InputCheck`, 
 `.BASiCS_MCMC_GlobalParams` and `.BASiCS_MCMC_ExtraArgs`.
 
+- Fixes minor bug in `.EmpiricalBayesMu`
