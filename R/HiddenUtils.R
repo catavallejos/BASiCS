@@ -7,7 +7,7 @@ HiddenScaleName <- function(Measure = c("effectiveSize",
     geweke.diag = "Geweke diagnostic"
   )
   if (!is.null(Param)) {
-    measure_name <- paste0(measure_name, ": ", Param)
+    measure_name <- paste0(measure_name, ":\n", Param)
   }
   measure_name
 }

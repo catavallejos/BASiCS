@@ -12,7 +12,7 @@ HiddenChecksBASiCS_Data <- function(Data,
   #   errors <- c(errors, "Some cells have zero reads mapping back to the 
   #               intrinsic genes. Please remove them before running the MCMC.\n")
   # }
-  if (sum(Matrix::rowSums(CountsBio) == 0) > 0) {
+  if (any(Matrix::rowSums(CountsBio) == 0)) {
     warning("Some genes have zero counts across all cells. \n",
             "If comparing 2 groups, use `PriorDelta = 'log-normal' in BASiCS_MCMC.\n",
             "If not, please remove those genes.\n")

@@ -216,7 +216,13 @@ BASiCS_TestDE <- function(Chain1,
   Mu2 <- matrixStats::colMedians(Chain2_offset@parameters$mu)
   Delta1 <- matrixStats::colMedians(Chain1_offset@parameters$delta)
   Delta2 <- matrixStats::colMedians(Chain2_offset@parameters$delta)
-  ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
+  # ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
+  browser()
+  ChainTau <- log2(
+    apply(Chain1_offset@parameters$mu, 2, sort) / 
+      apply(Chain2_offset@parameters$mu, 2, sort)
+  )
+
 
   MuBase <- (Mu1 * n1 + Mu2 * n2) / n
 
@@ -260,7 +266,8 @@ BASiCS_TestDE <- function(Chain1,
       MEASUREDISTANCE = as.numeric(Median),
       ProbDiffMEASURE = as.numeric(Prob),
       ResultDiffMEASURE = ResultDiff,
-      stringsAsFactors = FALSE)
+      stringsAsFactors = FALSE
+    )
 
     if (Measure == "epsilon") {
       Table$MeasureFC <- NULL
@@ -278,13 +285,26 @@ BASiCS_TestDE <- function(Chain1,
   }
 
 
-  AuxMean <- HiddenThresholdSearchTestDE(ChainTau,
-                                         EpsilonM,
-                                         ProbThresholdM,
-                                         GenesSelect,
-                                         EFDR_M,
-                                         Task = "Differential expression", 
-                                         Suffix = "M")
+  AuxMean2 <- HiddenThresholdSearchTestDE(
+    ChainTau,
+    EpsilonM,
+    ProbThresholdM,
+    GenesSelect,
+    EFDR_M,
+    Task = "Differential expression", 
+    Suffix = "M"
+  )
+
+
+  AuxMean2 <- HiddenThresholdSearchTestDE(
+    log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu),
+    EpsilonM,
+    ProbThresholdM,
+    GenesSelect,
+    EFDR_M,
+    Task = "Differential expression", 
+    Suffix = "M"
+  )
 
   TableMean <- TestDifferential(
     Chain = ChainTau, 
@@ -310,7 +330,11 @@ BASiCS_TestDE <- function(Chain1,
     select <- NotDE
   }
 
-  ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
+  # ChainOmega <- log2(Chain1@parameters$delta / Chain2@parameters$delta)
+  ChainOmega <- log2(
+    apply(Chain1@parameters$delta, 2, sort) / 
+      apply(Chain2@parameters$delta, 2, sort)
+  )
 
 
   AuxDisp <- HiddenThresholdSearchTestDE(
@@ -363,7 +387,10 @@ BASiCS_TestDE <- function(Chain1,
       select <- NotExcluded
     }
 
-    ChainPsi <- Chain1@parameters$epsilon - Chain2@parameters$epsilon
+    # ChainPsi <- Chain1@parameters$epsilon - Chain2@parameters$epsilon
+    ChainPsi <- apply(Chain1@parameters$epsilon, 2, sort) -
+      apply(Chain2@parameters$epsilon, 2, sort)
+
     Epsilon1 <- matrixStats::colMedians(Chain1@parameters$epsilon)
     Epsilon2 <- matrixStats::colMedians(Chain2@parameters$epsilon)
 

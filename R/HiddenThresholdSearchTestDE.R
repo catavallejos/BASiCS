@@ -1,6 +1,11 @@
-HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
-                                        GenesSelect, EFDR, Task, Suffix)
-{
+HiddenThresholdSearchTestDE <- function(ChainLFC,
+                                        Epsilon,
+                                        ProbThreshold,
+                                        GenesSelect,
+                                        EFDR,
+                                        Task,
+                                        Suffix) {
+
   # Calculating posterior probabilities
   Prob <- HiddenTailProbTestDE(ChainLFC, Epsilon)
 
@@ -86,6 +91,10 @@ HiddenThresholdSearchTestDE <- function(ChainLFC, Epsilon, ProbThreshold,
     OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])
   }
 
-  list(Prob = Prob, OptThreshold = OptThreshold,
-       EFDRgrid = EFDRgrid, EFNRgrid = EFNRgrid)
+  list(
+    Prob = Prob,
+    OptThreshold = OptThreshold,
+    EFDRgrid = EFDRgrid,
+    EFNRgrid = EFNRgrid
+  )
 }

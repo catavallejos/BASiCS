@@ -48,13 +48,11 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
       Mu = Mu,
       ...
     )
-    if (length(Plots) > 1) {
-      nrow <- length(object@Results)
-      labels <- sapply(object@Results, function(x) {
-        cap(MeasureName(x@Name))
-      })
+    nPlots <- length(Plots)
+    if (nPlots > 1) {
+      labels <- sapply(Parameters, function(x) cap(MeasureName(x)))
       # labels <- Reduce(c, labels)
-      labels <- c(labels, rep("", length(object@Results) * length(Plots)))
+      labels <- c(labels, rep("", length(Parameters) * (length(Plots) - 1)))
       l <- lapply(l, 
         function(g) {
           g +
@@ -64,14 +62,18 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         }
       )
     } else {
-      nrow <- length(Plots)
       labels <- vapply(
         object@Results, 
         function(x) cap(MeasureName(x@Name)), 
         character(1)
       )
     }
-    cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels, hjust = 0)
+    cowplot::plot_grid(
+      plotlist = l,
+      nrow = length(Parameters),
+      labels = labels,
+      hjust = 0
+    )
   }
 )
 
@@ -233,8 +235,8 @@ VolcanoPlot <- function(
         x = paste0(Measure, DistanceVar(Measure)),
         y = paste0("ProbDiff", Measure))
     ) +
-    # ggplot2::geom_point() +
-    ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
+    ggplot2::geom_point() +
+    # ggplot2::geom_hex(bins = bins, aes_string(fill = "..density.."), na.rm = TRUE) +
     ggplot2::geom_point(
       data = Table[IndDiff, ],
       shape = 16,
@@ -272,7 +274,7 @@ MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, Mu) {
   # )
   bins <- 50
   xscale <- ggplot2::scale_x_continuous(
-    trans = if (Measure == "ResDisp") "identity" else "log2"
+    trans = if (Measure == "ResDisp" & is.null(Mu)) "identity" else "log10"
   )
   Table$`_Mu` <- Mu
   ggplot2::ggplot(
