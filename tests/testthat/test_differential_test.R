@@ -68,29 +68,29 @@ test_that("Differential test is correct", {
             
   # Classification frequency
   FreqMean0 <- c(26, 311,   6,   7)
-  FreqMean <- as.vector(table(Test$TableMean$ResultDiffMean))
-  expect_true(all.equal(FreqMean, FreqMean0))
+  FreqMean <- as.vector(table(Test@Results$Mean@Table$ResultDiffMean))
+  expect_equal(FreqMean, FreqMean0)
             
   FreqDisp0 <- c(26,  13, 279,   1,  31)
-  FreqDisp <- as.vector(table(Test$TableDisp$ResultDiffDisp))
-  expect_true(all.equal(FreqDisp, FreqDisp0))
+  FreqDisp <- as.vector(table(Test@Results$Disp@Table$ResultDiffDisp))
+  expect_equal(FreqDisp, FreqDisp0)
             
   # Posterior probabilities
   ProbMean0 <- c(0.00, 0.01, 0.77, 0.43, 0.19)
-  ProbMean <- round(Test$TableMean$ProbDiffMean[1:5], 2)
-  expect_true(all.equal(ProbMean, ProbMean0))
+  ProbMean <- round(Test@Results$Mean@Table$ProbDiffMean[1:5], 2)
+  expect_equal(ProbMean, ProbMean0)
             
   ProbDisp0 <- c(0.69, 0.60, 0.60, 1.00, 0.40)
-  ProbDisp <- round(tail(Test$TableDisp$ProbDiffDisp, 5), 2)
-  expect_true(all.equal(ProbDisp, ProbDisp0))
+  ProbDisp <- round(tail(Test@Results$Disp@Table$ProbDiffDisp, 5), 2)
+  expect_equal(ProbDisp, ProbDisp0)
             
   # Log2 fold changes
   Lfc2Mean0 <- c(-0.17, -0.02, -0.78, -0.51, -0.32)
-  Lfc2Mean <- round(Test$TableMean$MeanLog2FC[1:5], 2)
-  expect_true(all.equal(Lfc2Mean, Lfc2Mean0))
+  Lfc2Mean <- round(Test@Results$Mean@Table$MeanLog2FC[1:5], 2)
+  expect_equal(Lfc2Mean, Lfc2Mean0)
             
   Lfc2Disp0 <- c(0.62,  0.67,  0.54, 4.39, -0.12)
-  Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5),2)
-  expect_true(all.equal(Lfc2Disp, Lfc2Disp0))
+  Lfc2Disp <- round(tail(Test@Results$Disp@Table$DispLog2FC, 5),2)
+  expect_equal(Lfc2Disp, Lfc2Disp0)
             
 })

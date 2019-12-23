@@ -239,6 +239,7 @@ BASiCS_TestDE <- function(Chain1,
                                GroupLabel1,
                                GroupLabel2, 
                                Aux,
+                               Prob,
                                Measure,
                                Excluded = NULL
                                ) {
@@ -246,15 +247,14 @@ BASiCS_TestDE <- function(Chain1,
     Median <- matrixStats::colMedians(Chain)
     Base <- (Param1 * n1 + Param2 * n2) / n
 
-    Prob <- Aux$Prob
     OptThreshold <- Aux$OptThreshold
 
     ResultDiff <- .TestResults(
       Probs = Prob,
       Threshold = OptThreshold[[1]],
       Estimate = Median,
-      GroupLabel1 = GroupLabel1,
-      GroupLabel2 = GroupLabel2,
+      Label1 = GroupLabel1,
+      Label2 = GroupLabel2,
       GenesSelect = GenesSelect,
       Excluded = Excluded
     )
@@ -307,6 +307,7 @@ BASiCS_TestDE <- function(Chain1,
     GroupLabel1 = GroupLabel1,
     GroupLabel2 = GroupLabel2,
     Aux = AuxMean,
+    Prob = ProbM,
     Measure = "Mean"
   )
 
@@ -346,6 +347,7 @@ BASiCS_TestDE <- function(Chain1,
     GroupLabel1 = GroupLabel1,
     GroupLabel2 = GroupLabel2,
     Aux = AuxDisp,
+    Prob = ProbD,
     Measure = "Disp",
     Excluded = NotDE
   )
@@ -383,28 +385,27 @@ BASiCS_TestDE <- function(Chain1,
     Epsilon1 <- matrixStats::colMedians(Chain1@parameters$epsilon)
     Epsilon2 <- matrixStats::colMedians(Chain2@parameters$epsilon)
 
-
-
-    ProbE <- .TailProb(abs(ChainPsi), EpsilonE)
+    ProbR <- .TailProb(abs(ChainPsi), EpsilonR)
     AuxResDisp <- .ThresholdSearch(
-      Probs = ProbE[select],
-      ProbThreshold = ProbThresholdE,
-      EFDR = EFDR_E,
+      Probs = ProbR[select],
+      ProbThreshold = ProbThresholdR,
+      EFDR = EFDR_R,
       Task = "Differential residual dispersion",
       Suffix = "R"
     )
 
     TableResDisp <- TestDifferential(
       Chain = ChainOmega,
-      Epsilon = EpsilonD,
-      Param1 = Delta1,
-      Param2 = Delta2,
-      ProbThreshold = ProbThresholdD, 
+      Epsilon = EpsilonR,
+      Param1 = Epsilon1,
+      Param2 = Epsilon2,
+      ProbThreshold = ProbThresholdR, 
       GenesSelect = GenesSelect,
-      EFDR = EFDR_D,
+      EFDR = EFDR_R,
       GroupLabel1 = GroupLabel1,
       GroupLabel2 = GroupLabel2,
-      Aux = AuxDisp,
+      Aux = AuxResDisp,
+      Prob = ProbR,
       Measure = "ResDisp",
       Excluded = !NotExcluded
     )
