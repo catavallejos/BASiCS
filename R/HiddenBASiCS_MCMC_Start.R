@@ -22,10 +22,12 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   q.bio <- nrow(CountsBio)
 
   # Extract spike-in genes
-  if (WithSpikes) { CountsTech <- assay(altExp(Data)) }
+  if (WithSpikes) {
+    CountsTech <- assay(altExp(Data))
+  }
 
   # Initialize normalization as the 'scran' estimates
-  suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio))
+  suppressWarnings(size_scran <- scran::calculateSumFactors(CountsBio))
   # Fix for cases in which 'scran' normalisation has invalid output
   if ((min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0)) {
     message("-------------------------------------------------------------\n",
@@ -33,8 +35,9 @@ HiddenBASiCS_MCMC_Start <- function(Data,
             "`positive = TRUE` has been added to `computeSumFactors` call \n",
             "Please consider a more stringent quality control criteria. \n",
             "-------------------------------------------------------------\n")
-    suppressWarnings(size_scran <- scran::computeSumFactors(CountsBio,
-                                                            positive = TRUE))
+    suppressWarnings(
+      size_scran <- scran::calculateSumFactors(CountsBio, positive = TRUE)
+    )
   }
   size_scran[size_scran <= 0] <- .Machine[["double.xmin"]]
 
@@ -48,7 +51,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
 
     # Initialize mu using average 'normalised counts' across cells
     # and true input values for spike-in genes
-    nCountsBio <- t( t(CountsBio) / (phi0 * s0) )
+    nCountsBio <- t(t(CountsBio) / (phi0 * s0))
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
     #mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)

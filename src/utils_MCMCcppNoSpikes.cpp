@@ -10,6 +10,7 @@ arma::mat muUpdateNoSpikes(
     arma::vec const& invdelta,
     arma::vec const& nu,
     arma::vec const& sum_bycell_all,
+    double const& mu_mu,
     double const& s2_mu,
     int const& q0,
     int const& n,
@@ -23,6 +24,7 @@ arma::mat muUpdateNoSpikes(
     int const& ConstrainType,
     double const& exponent,
     double const& mintol) {
+
   using arma::span;
 
   int nConstrainGene = ConstrainGene.size();
@@ -61,9 +63,8 @@ arma::mat muUpdateNoSpikes(
     iAux = ConstrainGene(i);
     if (iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - aux, 2)) * exponent;
-      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - aux, 2)) * exponent;
-
+      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - mu_mu - aux, 2)) * exponent;
+      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - mu_mu - aux, 2)) * exponent;
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
@@ -85,13 +86,12 @@ arma::mat muUpdateNoSpikes(
     for (int i = 0; i < nNotConstrainGene; i++) {
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) *
-        (pow(log(mu1(iAux)), 2) - pow(log(mu0(iAux)), 2)) * exponent;
+        (pow(log(mu1(iAux)) - mu_mu, 2) - pow(log(mu0(iAux)) - mu_mu, 2)) * exponent;
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
-      } else {
-        ind(iAux) = 0;
-        mu1(iAux) = mu0(iAux);
+      } else{
+        ind(iAux) = 0; mu1(iAux) = mu0(iAux);
       }
     }
   }

@@ -5,6 +5,9 @@
 #' @description Visualise global offset in mean expression between two
 #' \code{BASiCS_Chain} objects.
 #'
+#' @param Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects to plot.
+#' @param GroupLabel1,GroupLabel2 Labels for the 
+#' \code{\linkS4class{BASiCS_Chain}} in the plots.
 #' @param Type The type of plot generated.
 #'    \code{"offset estimate"} produces a boxplot of the offset alongside
 #'    an estimate of the global offset.

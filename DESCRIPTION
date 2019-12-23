@@ -1,8 +1,8 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 1.7.19
-Date: 2019-10-08
+Version: 1.9.10
+Date: 2019-12-13
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="catalina.vallejos@igmm.ed.ac.uk"), 
         person("Nils", "Eling", role=c("aut")), 
@@ -34,25 +34,24 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
  mean/over-dispersion trend. 
 License: GPL (>= 2)
 Depends:
-    R (>= 3.5),
+    R (>= 3.6.0),
     SingleCellExperiment
 Imports:
     Biobase,
-    BiocGenerics, 
-    coda, 
+    BiocGenerics,
+    coda,
     cowplot,
-    data.table,
     ggExtra,
     ggplot2,
-    graphics, 
+    graphics,
     grDevices,
     KernSmooth,
-    MASS, 
+    MASS,
     matrixStats, 
     methods, 
-    Rcpp (>= 0.11.3), 
-    S4Vectors, 
-    scran, 
+    Rcpp (>= 0.11.3),
+    S4Vectors,
+    scran,
     stats,
     stats4,
     SummarizedExperiment,
@@ -76,5 +75,6 @@ SystemRequirements: C++11
 NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Encoding: UTF-8
+LazyData: true

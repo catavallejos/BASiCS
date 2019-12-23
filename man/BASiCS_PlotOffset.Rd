@@ -4,11 +4,21 @@
 \alias{BASiCS_PlotOffset}
 \title{Visualise global offset in mean expression between two chains.}
 \usage{
-BASiCS_PlotOffset(Chain1, Chain2, GroupLabel1 = "Group 1",
-  GroupLabel2 = "Group 2", Type = c("offset estimate", "before-after",
-  "MAPlot"), Print = FALSE)
+BASiCS_PlotOffset(
+  Chain1,
+  Chain2,
+  GroupLabel1 = "Group 1",
+  GroupLabel2 = "Group 2",
+  Type = c("offset estimate", "before-after", "MAPlot"),
+  Print = FALSE
+)
 }
 \arguments{
+\item{Chain1, Chain2}{\code{\linkS4class{BASiCS_Chain}} objects to plot.}
+
+\item{GroupLabel1, GroupLabel2}{Labels for the 
+\code{\linkS4class{BASiCS_Chain}} in the plots.}
+
 \item{Type}{The type of plot generated.
 \code{"offset estimate"} produces a boxplot of the offset alongside
 an estimate of the global offset.

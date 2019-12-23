@@ -9,20 +9,20 @@ test_that("BASiCS_Sim works", {
   Phi <- c(1.00, 1.06, 1.09, 1.05, 0.80)
   S <- c(0.38, 0.40, 0.38, 0.39, 0.34)
   Theta <- 0.39
-
+  
   # Data with spike-ins, single batch
   set.seed(1)
   Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
-
+  
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(6, 0, 0, 1, 11)
   expect_equal(Aux, Aux0)
   Aux <- sum(SingleCellExperiment::counts(Data))
-
+  
   Aux0 <- 201
   expect_equal(Aux, Aux0)
-
+  
   # Data with spike-ins, multiple batches
   BatchInfo <- c(rep(1, 3), rep(2, 2))
   Theta2 <- rep(Theta, times = 2)
@@ -36,10 +36,11 @@ test_that("BASiCS_Sim works", {
   Aux <- sum(SingleCellExperiment::counts(Data))
   Aux0 <- 74
   expect_equal(Aux, Aux0)
-
+  
   # Data without spike-ins, multiple batches
   set.seed(3)
-  Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta2, BatchInfo)
+  Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, 
+                     Theta2, BatchInfo)
   expect_is(Data, "SingleCellExperiment")
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
@@ -53,4 +54,17 @@ test_that("BASiCS_Sim works", {
     BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, Theta),
     "When spike-ins are not included, 'BatchInfo' is required."
   )
+})
+
+test_that("BASiCS_Draw works", {
+  data <- makeExampleBASiCS_Data(WithBatch = TRUE)
+  chain <- run_MCMC(data,
+                    N = 10,
+                    Thin = 2,
+                    Burn = 4,
+                    Regression = FALSE,
+                    WithSpikes = FALSE
+  )
+  draw <- BASiCS_Draw(chain)
+  expect_is(draw, "SingleCellExperiment")
 })

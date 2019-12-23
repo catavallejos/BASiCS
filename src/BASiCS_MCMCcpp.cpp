@@ -38,38 +38,39 @@
  */
 // [[Rcpp::export]]
 Rcpp::List HiddenBASiCS_MCMCcpp(
-    int N, 
-    int Thin, 
-    int Burn,  
-    arma::mat Counts,  
-    arma::mat BatchDesign, 
-    arma::vec muSpikes, 
-    arma::vec mu0, 
-    arma::vec delta0, 
-    arma::vec phi0, 
+    int N,
+    int Thin,
+    int Burn,
+    arma::mat Counts,
+    arma::mat BatchDesign,
+    arma::vec muSpikes,
+    arma::vec mu0,
+    arma::vec delta0,
+    arma::vec phi0,
     arma::vec s0,
-    arma::vec nu0, 
-    arma::vec theta0, 
+    arma::vec nu0,
+    arma::vec theta0,
+    double mu_mu,
     double s2mu,
     double adelta,
     double bdelta,
     double s2delta,
     double prior_delta,
-    arma::vec aphi, 
-    double as, 
-    double bs,   
-    double atheta, 
-    double btheta, 
-    double ar, 
-    arma::vec LSmu0, 
-    arma::vec LSdelta0, 
-    double LSphi0, 
-    arma::vec LSnu0, 
-    arma::vec LStheta0, 
-    arma::vec sumByCellBio, 
-    arma::vec sumByGeneAll, 
+    arma::vec aphi,
+    double as,
+    double bs,
+    double atheta,
+    double btheta,
+    double ar,
+    arma::vec LSmu0,
+    arma::vec LSdelta0,
+    double LSphi0,
+    arma::vec LSnu0,
+    arma::vec LStheta0,
+    arma::vec sumByCellBio,
+    arma::vec sumByGeneAll,
     arma::vec sumByGeneBio,
-    int StoreAdapt, 
+    int StoreAdapt,
     int EndAdapt,
     int PrintProgress,
     double GeneExponent,
@@ -84,15 +85,15 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   using Rcpp::Rcout;
 
   // NUMBER OF CELLS, GENES AND STORED DRAWS
-  int n = Counts.n_cols; 
+  int n = Counts.n_cols;
   int nBatch = BatchDesign.n_cols;
   int q0 = delta0.n_elem;
   int Naux = N/Thin - Burn/Thin;
-  
+
   // OTHER GLOBAL QUANTITIES
   double SumSpikeInput = sum(muSpikes);
   arma::vec BatchSizes = sum(BatchDesign,0).t();
-  
+
   // OBJECTS WHERE DRAWS WILL BE STORED
   arma::mat mu = zeros(q0, Naux);
   arma::mat delta = zeros(q0, Naux);
@@ -129,25 +130,25 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
 
   // INITIALIZATION OF PARAMETER VALUES FOR MCMC RUN
   arma::mat muAux = zeros(q0,2);
-  muAux.col(0) = mu0; 
+  muAux.col(0) = mu0;
   arma::mat deltaAux = zeros(q0, 2);
-  deltaAux.col(0) = delta0; 
+  deltaAux.col(0) = delta0;
   arma::vec phiAux = phi0;
   Rcpp::List phiAuxList;
-  arma::vec sAux = s0; 
+  arma::vec sAux = s0;
   arma::mat nuAux = zeros(n, 2);
   nuAux.col(0) = nu0;
   arma::mat thetaAux = zeros(nBatch, 2);
   thetaAux.col(0) = theta0;
-  arma::vec thetaBatch = BatchDesign * theta0; 
-  
+  arma::vec thetaBatch = BatchDesign * theta0;
+
   // INITIALIZATION OF ADAPTIVE VARIANCES
   arma::vec LSmuAux = LSmu0;
-  arma::vec LSdeltaAux = LSdelta0; 
-  double LSphiAux = LSphi0; 
+  arma::vec LSdeltaAux = LSdelta0;
+  double LSphiAux = LSphi0;
   arma::vec LSnuAux = LSnu0;
-  arma::vec LSthetaAux = LStheta0;  
-  
+  arma::vec LSthetaAux = LStheta0;
+
   // OTHER AUXILIARY QUANTITIES FOR ADAPTIVE METROPOLIS UPDATES
   arma::vec PmuAux0 = zeros(q0);
   arma::vec PdeltaAux0 = zeros(q0);
@@ -240,6 +241,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
                             1 / deltaAux.col(0),
                             phiAux % nuAux.col(0),
                             sumByCellBio,
+                            mu_mu,
                             s2mu,
                             q0,
                             n,

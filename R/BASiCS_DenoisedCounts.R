@@ -36,15 +36,16 @@
 #'
 #' @rdname BASiCS_DenoisedCounts
 #' @export
-BASiCS_DenoisedCounts <- function(Data, Chain)
-{
+BASiCS_DenoisedCounts <- function(Data, Chain) {
     if (!is(Data, "SingleCellExperiment")) {
       stop("'Data' is not a SingleCellExperiment class object.")
     }
     if (!is(Chain, "BASiCS_Chain")) {
       stop("'Chain' is not a BASiCS_Chain class object.")
     }
-
+    if (!all(dim(Chain) == dim(Data))) {
+      stop("Chain and Data are different dimensions!")
+    }
     Nu <- matrixStats::colMedians(Chain@parameters$nu)
     if("phi" %in% names(Chain@parameters)) {
       # Spikes case

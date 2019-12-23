@@ -1,9 +1,6 @@
 #include "utils.h"
 
 // Functions for regression case of BASiCS
-
-
-
 // [[Rcpp::export]]
 arma::vec estimateRBFLocations(int const& k, arma::vec const& x) {
   arma::vec m = arma::zeros(k - 2);
@@ -44,12 +41,13 @@ arma::mat muUpdateReg(
     arma::vec const& delta,
     arma::vec const& phinu,
     arma::vec const& sum_bycell_bio,
+    double const& mu_mu,
     double const& s2_mu,
     int const& q0,
     int const& n,
-    arma::vec & mu1,
-    arma::vec & u,
-    arma::vec & ind,
+    arma::vec& mu1,
+    arma::vec& u,
+    arma::vec& ind,
     int const& k,
     arma::vec const& lambda,
     arma::vec const& beta,
@@ -68,13 +66,12 @@ arma::mat muUpdateReg(
   * However, it cancels out as using log-normal proposals.
   */
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio;
-  log_aux -= ((0.5 / s2_mu) * (pow(log(mu1), 2) - pow(log(mu0), 2))) * exponent;
-  for (int i = 0; i < q0; i++) {
-    for (int j = 0; j < n; j++) {
-      log_aux(i) -= (Counts(i, j) + 1 / delta(i)) *
-        log(
-          (phinu(j) * mu1(i) + 1 / delta(i)) /
-          (phinu(j) * mu0(i) + 1 / delta(i)));
+  log_aux -= (0.5 / s2_mu) * (pow(log(mu1) - mu_mu, 2) - pow(log(mu0) - mu_mu, 2)) * exponent;
+  for (int i=0; i < q0; i++) {
+    for (int j=0; j < n; j++) {
+      log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *
+        log( ( phinu(j)*mu1(i) + 1/delta(i) ) /
+        ( phinu(j)*mu0(i) + 1/delta(i) ));
     }
   }
   // This is new due to regression prior on delta

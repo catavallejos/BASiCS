@@ -10,7 +10,7 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   # Fixing starting values
   n <- ncol(Data)
   k <- 12
-  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
+  PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)
@@ -112,7 +112,7 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
   # Fixing starting values
   n <- ncol(Data)
   k <- 12
-  PriorParam <- list(s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
+  PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)

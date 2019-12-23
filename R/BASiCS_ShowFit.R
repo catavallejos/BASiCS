@@ -28,6 +28,7 @@
 #' \code{colourGenesSel = "dark red"}.
 #' @param Uncertainty logical indicator. If true, statistical uncertainty
 #' around the regression fit is shown in the plot. 
+#' @param ... Unused.
 #'
 #' @examples
 #' data(ChainRNAReg)
@@ -154,11 +155,5 @@ BASiCS_ShowFit <- function(object,
 #' @export
 BASiCS_showFit <- function(...) {
   .Deprecated("BASiCS_showFit")
-  BASiCS_ShowFit(...)
-}
-
-#' @export
-BASiCS_showFit <- function(...) {
-  .Deprecated("BASiCS_ShowFit")
   BASiCS_ShowFit(...)
 }

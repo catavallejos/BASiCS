@@ -51,7 +51,8 @@ arma::mat Hidden_muUpdate(
     arma::mat const& Counts, 
     arma::vec const& invdelta, 
     arma::vec const& phinu, 
-    arma::vec const& sum_bycell_bio, 
+    arma::vec const& sum_bycell_bio,
+    double const& mu_mu,
     double const& s2_mu,
     int const& q0,
     int const& n,
@@ -143,7 +144,6 @@ arma::mat thetaUpdateBatch(
    * Stored in: utils_MCMCcppReg.cpp
    */
   
-
 arma::mat designMatrix(
     arma::vec const& mu,
     arma::vec const& locations,
@@ -152,18 +152,19 @@ arma::mat designMatrix(
 arma::vec estimateRBFLocations(int const& k, arma::vec const& x);
 
 arma::mat muUpdateReg(
-    arma::vec const& mu0, 
-    arma::vec const& prop_var, 
-    arma::mat const& Counts, 
-    arma::vec const& delta, 
-    arma::vec const& phinu, 
-    arma::vec const& sum_bycell_bio, 
+    arma::vec const& mu0,
+    arma::vec const& prop_var,
+    arma::mat const& Counts,
+    arma::vec const& delta,
+    arma::vec const& phinu,
+    arma::vec const& sum_bycell_bio,
+    double const& mu_mu,
     double const& s2_mu,
     int const& q0,
     int const& n,
-    arma::vec & mu1,
-    arma::vec & u, 
-    arma::vec & ind,
+    arma::vec& mu1,
+    arma::vec& u,
+    arma::vec& ind,
     int const& k,
     arma::vec const& lambda,
     arma::vec const& beta,
@@ -225,7 +226,8 @@ arma::mat muUpdateNoSpikes(
     arma::mat const& Counts,  
     arma::vec const& invdelta, 
     arma::vec const& nu, 
-    arma::vec const& sum_bycell_all, 
+    arma::vec const& sum_bycell_all,
+    double const& mu_mu,
     double const& s2_mu,
     int const& q0,
     int const& n,
@@ -270,7 +272,8 @@ arma::mat muUpdateRegNoSpikes(
     arma::vec const& delta,
     arma::vec const& invdelta, 
     arma::vec const& nu, 
-    arma::vec const& sum_bycell_all, 
+    arma::vec const& sum_bycell_all,
+    double const& mu_mu, 
     double const& s2_mu,
     int const& q0,
     int const& n,

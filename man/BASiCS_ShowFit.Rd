@@ -5,10 +5,20 @@
 \alias{BASiCS_showFit}
 \title{Plotting the trend after Bayesian regression}
 \usage{
-BASiCS_ShowFit(object, xlab = "log(mu)", ylab = "log(delta)",
-  pch = 16, smooth = TRUE, variance = 1.2, locations = NULL,
-  colour = "dark blue", markExcludedGenes = TRUE, GenesSel = NULL,
-  colourGenesSel = "dark red", Uncertainty = TRUE)
+BASiCS_ShowFit(
+  object,
+  xlab = "log(mu)",
+  ylab = "log(delta)",
+  pch = 16,
+  smooth = TRUE,
+  variance = 1.2,
+  locations = NULL,
+  colour = "dark blue",
+  markExcludedGenes = TRUE,
+  GenesSel = NULL,
+  colourGenesSel = "dark red",
+  Uncertainty = TRUE
+)
 
 BASiCS_showFit(...)
 }
@@ -46,6 +56,8 @@ Only used when \code{smooth = TRUE}. Default value \code{GenesSel = NULL}.}
 
 \item{Uncertainty}{logical indicator. If true, statistical uncertainty
 around the regression fit is shown in the plot.}
+
+\item{...}{Unused.}
 }
 \value{
 A ggplot2 object

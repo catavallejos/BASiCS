@@ -56,6 +56,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     arma::vec s0,
     arma::vec nu0,
     arma::vec theta0,
+    double mu_mu,
     double s2mu,
     arma::vec aphi,
     double as,
@@ -283,6 +284,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         deltaAux.col(0),
                         phiAux % nuAux.col(0),
                         sumByCellBio,
+                        mu_mu,
                         s2mu,
                         q0,
                         n,
@@ -298,6 +300,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         Locations,
                         GeneExponent,
                         mintol_mu);
+
     X = designMatrix(means, Locations, variance);
 
     PmuAux += muAux.col(1);

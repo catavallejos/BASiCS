@@ -40,13 +40,20 @@
 #'     values required for the adopted prior (see Vallejos et al, 2015, 2016).
 #'     All elements must be positive real numbers.
 #'     \describe{
-#'       \item{
-#'         \code{s2.mu}
-#'       }{
-#'         Scale hyper-parameter for the
-#'         log-Normal(\code{0},\code{s2.mu}) prior that is shared by all
-#'         gene-specific expression rate parameters \eqn{\mu_i}.
-#'         Default: \code{s2.mu = 0.5}.
+#'        \item{
+#'          \code{mu.mu}
+#'        }{
+#'          Mean hyper-parameter for the
+#'          log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
+#'          gene-specific expression rate parameters \eqn{\mu_i}.
+#'          Default: \code{s2.mu = 0}.}
+#'        \item{
+#'          \code{s2.mu}
+#'        }{
+#'          Scale hyper-parameter for the
+#'          log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all=======
+#'          gene-specific expression rate parameters \eqn{\mu_i}.
+#'          Default: \code{s2.mu = 0.5}.
 #'       }
 #'       \item{
 #'         \code{s2.delta}
@@ -360,6 +367,7 @@ BASiCS_MCMC <- function(Data,
           s0 = Start$s0,
           nu0 = Start$nu0,
           theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
           s2mu = PriorParam$s2.mu,
           aphi = PriorParam$p.phi,
           as = PriorParam$a.s,
@@ -469,6 +477,7 @@ BASiCS_MCMC <- function(Data,
           s0 = Start$s0,
           nu0 = Start$nu0,
           theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
           s2mu = PriorParam$s2.mu,
           as = PriorParam$a.s,
           bs = PriorParam$b.s,
@@ -512,6 +521,7 @@ BASiCS_MCMC <- function(Data,
           mintol_theta = ArgsDef$mintol_theta
         )
       )
+
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- Matrix::rowSums(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
@@ -533,6 +543,7 @@ BASiCS_MCMC <- function(Data,
           s0 = Start$s0,
           nu0 = Start$nu0,
           theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
           s2mu = PriorParam$s2.mu,
           adelta = PriorParam$a.delta,
           bdelta = PriorParam$b.delta,

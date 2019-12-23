@@ -6,13 +6,27 @@
 \alias{BASiCS_DetectLVG}
 \title{Detection method for highly (HVG) and lowly (LVG) variable genes}
 \usage{
-BASiCS_DetectHVG(Chain, PercentileThreshold = 0.9, VarThreshold = NULL,
-  ProbThreshold = NULL, EFDR = 0.1, OrderVariable = c("Prob",
-  "GeneIndex", "GeneName"), Plot = FALSE, ...)
+BASiCS_DetectHVG(
+  Chain,
+  PercentileThreshold = 0.9,
+  VarThreshold = NULL,
+  ProbThreshold = NULL,
+  EFDR = 0.1,
+  OrderVariable = c("Prob", "GeneIndex", "GeneName"),
+  Plot = FALSE,
+  ...
+)
 
-BASiCS_DetectLVG(Chain, PercentileThreshold = 0.1, VarThreshold = NULL,
-  ProbThreshold = NULL, EFDR = 0.1, OrderVariable = c("Prob",
-  "GeneIndex", "GeneName"), Plot = FALSE, ...)
+BASiCS_DetectLVG(
+  Chain,
+  PercentileThreshold = 0.1,
+  VarThreshold = NULL,
+  ProbThreshold = NULL,
+  EFDR = 0.1,
+  OrderVariable = c("Prob", "GeneIndex", "GeneName"),
+  Plot = FALSE,
+  ...
+)
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
