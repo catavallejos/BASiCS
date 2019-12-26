@@ -67,7 +67,7 @@ arma::mat muUpdateRegNoSpikes(
   arma::mat X_mu1 = designMatrix(mu1, locations, variance);
 
   // REGRESSION RELATED FACTOR
-  log_aux -= exponent * lambda %
+  log_aux -= lambda %
     (pow(log(delta) - X_mu1 * beta, 2) -
       pow(log(delta) - X * beta, 2)) /
     (2 * sigma2);
@@ -79,8 +79,8 @@ arma::mat muUpdateRegNoSpikes(
     iAux = ConstrainGene(i);
     if (iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - mu_mu - aux, 2));
-      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - mu_mu - aux, 2));
+      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - mu_mu - aux, 2)) * exponent;
+      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - mu_mu - aux, 2)) * exponent;
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
@@ -102,7 +102,7 @@ arma::mat muUpdateRegNoSpikes(
     for (int i = 0; i < nNotConstrainGene; i++) {
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) *
-        (pow(log(mu1(iAux)) - mu_mu, 2) - pow(log(mu0(iAux)) - mu_mu, 2));
+        (pow(log(mu1(iAux)) - mu_mu, 2) - pow(log(mu0(iAux)) - mu_mu, 2)) * exponent;
       // ACCEPT REJECT
       if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
