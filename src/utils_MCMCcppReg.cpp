@@ -6,26 +6,59 @@
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec const& mu, 
-    double const& variance) 
-{
+    double const& variance) {
+
   arma::vec x = log(mu);
-  double ran = x.max() - x.min();
-  arma::vec myu = arma::zeros(k-2);
-  myu(0) = x.min();
-  
-  for(int i=1; i < (k-2); i++) {
-    myu(i) = myu(i-1) + ran/(k-3);
-  }
-  double h = (myu(1)-myu(0)) * variance;
-  
+  arma::vec locations = estimateRBFLocationsNTiles(x, k);
+  // arma::vec locations = estimateRBFLocations(x, k);
+  double h = (locations(1) - locations(0)) * variance;
+
   // Possibly create this matrix outside
-  arma::mat X = arma::ones(x.size(),k);
+  arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
-  for(int i=0; i < k-2; i++) {
-    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
-    //X.col(i+1) = pow(x,i+1);
+  for (int i = 0; i < k - 2; i++) {
+    X.col(i + 2) = exp(-0.5 * pow(x - locations(i), 2) / pow(h, 2));
   }
   return X;
+}
+
+// [[Rcpp::export]]
+arma::vec estimateRBFLocations(
+    arma::vec const& log_mu,
+    int const& k) {
+
+  double ran = log_mu.max() - log_mu.min();
+  arma::vec locations = arma::vec(k - 2);
+  locations(0) = log_mu.min();
+  for(int i = 1; i < (k - 2); i++) {
+    locations(i) = locations(i - 1) + ran / (k - 3);
+  }
+  return(locations);
+}
+
+// [[Rcpp::export]]
+arma::vec estimateRBFLocationsNTiles(
+    arma::vec const& log_mu,
+    int const& k) {
+  return(ntiles(log_mu, k - 1));
+}
+
+
+// [[Rcpp::export]]
+arma::vec ntiles(NumericVector& x, int n) {
+  arma::vec xa = as_arma(x);
+  return ntiles(xa, n);
+}
+
+arma::vec ntiles(arma::vec const& x, int n) {
+  arma::vec x_sort = sort(x);
+  int ntiles = n - 2;
+  arma::vec quantiles = arma::vec(ntiles);
+  double d = x.size() / n;
+  for (unsigned int i = 0; i < quantiles.size(); i++) {
+    quantiles(i) = x_sort(round((i + 1) * d));
+  }
+  return(quantiles);
 }
 
 /* Metropolis-Hastings updates of mu 

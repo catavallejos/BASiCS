@@ -37,6 +37,13 @@ arma::vec DegubInd(arma::vec ind,
                    double const& threshold,
                    std::string const& param);
 
+
+arma::vec ntiles(NumericVector const& x, int n);
+arma::vec ntiles(arma::vec const& x, int n);
+arma::vec estimateRBFLocationsNTiles(
+    arma::vec const& log_mu,
+    int const& k);
+
 // [[Rcpp::export]]
 arma::vec Hidden_rDirichlet(arma::vec alpha);
 arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma);

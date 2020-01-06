@@ -272,6 +272,42 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// estimateRBFLocations
+arma::vec estimateRBFLocations(arma::vec const& log_mu, int const& k);
+RcppExport SEXP _BASiCS_estimateRBFLocations(SEXP log_muSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type log_mu(log_muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(estimateRBFLocations(log_mu, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// estimateRBFLocationsNTiles
+arma::vec estimateRBFLocationsNTiles(arma::vec const& log_mu, int const& k);
+RcppExport SEXP _BASiCS_estimateRBFLocationsNTiles(SEXP log_muSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type log_mu(log_muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(estimateRBFLocationsNTiles(log_mu, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ntiles
+arma::vec ntiles(NumericVector& x, int n);
+RcppExport SEXP _BASiCS_ntiles(SEXP xSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(ntiles(x, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_DenoisedRates", (DL_FUNC) &_BASiCS_HiddenBASiCS_DenoisedRates, 7},
@@ -281,6 +317,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes, 48},
     {"_BASiCS_Hidden_rDirichlet", (DL_FUNC) &_BASiCS_Hidden_rDirichlet, 1},
     {"_BASiCS_Hidden_muUpdate", (DL_FUNC) &_BASiCS_Hidden_muUpdate, 14},
+    {"_BASiCS_estimateRBFLocations", (DL_FUNC) &_BASiCS_estimateRBFLocations, 2},
+    {"_BASiCS_estimateRBFLocationsNTiles", (DL_FUNC) &_BASiCS_estimateRBFLocationsNTiles, 2},
+    {"_BASiCS_ntiles", (DL_FUNC) &_BASiCS_ntiles, 2},
     {NULL, NULL, 0}
 };
 

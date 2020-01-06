@@ -29,3 +29,15 @@ Hidden_muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_b
     .Call('_BASiCS_Hidden_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol)
 }
 
+estimateRBFLocations <- function(log_mu, k) {
+    .Call('_BASiCS_estimateRBFLocations', PACKAGE = 'BASiCS', log_mu, k)
+}
+
+estimateRBFLocationsNTiles <- function(log_mu, k) {
+    .Call('_BASiCS_estimateRBFLocationsNTiles', PACKAGE = 'BASiCS', log_mu, k)
+}
+
+ntiles <- function(x, n) {
+    .Call('_BASiCS_ntiles', PACKAGE = 'BASiCS', x, n)
+}
+
