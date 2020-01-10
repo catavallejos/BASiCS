@@ -25,7 +25,67 @@ Hidden_rDirichlet <- function(alpha) {
     .Call('_BASiCS_Hidden_rDirichlet', PACKAGE = 'BASiCS', alpha)
 }
 
-Hidden_muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol) {
-    .Call('_BASiCS_Hidden_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol)
+muUpdate <- function(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol) {
+    .Call('_BASiCS_muUpdate', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol)
+}
+
+deltaUpdate <- function(delta0, prop_var, Counts, mu, phinu, a_delta, b_delta, s2delta, prior_delta, q0, n, delta1, u, ind, mintol) {
+    .Call('_BASiCS_deltaUpdate', PACKAGE = 'BASiCS', delta0, prop_var, Counts, mu, phinu, a_delta, b_delta, s2delta, prior_delta, q0, n, delta1, u, ind, mintol)
+}
+
+phiUpdate <- function(phi0, prop_var, Counts, mu, invdelta, nu, aphi, sum_bygene_bio, q0, n, phi1) {
+    .Call('_BASiCS_phiUpdate', PACKAGE = 'BASiCS', phi0, prop_var, Counts, mu, invdelta, nu, aphi, sum_bygene_bio, q0, n, phi1)
+}
+
+sUpdateBatch <- function(s0, nu, thetaBatch, as, bs, BatchDesign, n, s1) {
+    .Call('_BASiCS_sUpdateBatch', PACKAGE = 'BASiCS', s0, nu, thetaBatch, as, bs, BatchDesign, n, s1)
+}
+
+nuUpdateBatch <- function(nu0, prop_var, Counts, SumSpikeInput, BatchDesign, mu, invdelta, phi, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, mintol) {
+    .Call('_BASiCS_nuUpdateBatch', PACKAGE = 'BASiCS', nu0, prop_var, Counts, SumSpikeInput, BatchDesign, mu, invdelta, phi, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, mintol)
+}
+
+thetaUpdateBatch <- function(theta0, prop_var, BatchDesign, BatchSizes, s, nu, a_theta, b_theta, n, nBatch, mintol) {
+    .Call('_BASiCS_thetaUpdateBatch', PACKAGE = 'BASiCS', theta0, prop_var, BatchDesign, BatchSizes, s, nu, a_theta, b_theta, n, nBatch, mintol)
+}
+
+designMatrix <- function(k, mu, variance) {
+    .Call('_BASiCS_designMatrix', PACKAGE = 'BASiCS', k, mu, variance)
+}
+
+muUpdateReg <- function(mu0, prop_var, Counts, delta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, k, lambda, beta, X, sigma2, variance, mintol) {
+    .Call('_BASiCS_muUpdateReg', PACKAGE = 'BASiCS', mu0, prop_var, Counts, delta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, k, lambda, beta, X, sigma2, variance, mintol)
+}
+
+deltaUpdateReg <- function(delta0, prop_var, Counts, mu, phinu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, mintol) {
+    .Call('_BASiCS_deltaUpdateReg', PACKAGE = 'BASiCS', delta0, prop_var, Counts, mu, phinu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, mintol)
+}
+
+betaUpdateReg <- function(sigma2, VAux, mAux) {
+    .Call('_BASiCS_betaUpdateReg', PACKAGE = 'BASiCS', sigma2, VAux, mAux)
+}
+
+sigma2UpdateReg <- function(delta, beta, lambda, V1, mInvVm0, m, sigma2_a0, sigma2_b0, q0) {
+    .Call('_BASiCS_sigma2UpdateReg', PACKAGE = 'BASiCS', delta, beta, lambda, V1, mInvVm0, m, sigma2_a0, sigma2_b0, q0)
+}
+
+lambdaUpdateReg <- function(delta, X, beta, sigma2, eta, q0, lambda1) {
+    .Call('_BASiCS_lambdaUpdateReg', PACKAGE = 'BASiCS', delta, X, beta, sigma2, eta, q0, lambda1)
+}
+
+muUpdateNoSpikes <- function(mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, mintol) {
+    .Call('_BASiCS_muUpdateNoSpikes', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, mintol)
+}
+
+nuUpdateBatchNoSpikes <- function(nu0, prop_var, Counts, BatchDesign, mu, invdelta, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, mintol) {
+    .Call('_BASiCS_nuUpdateBatchNoSpikes', PACKAGE = 'BASiCS', nu0, prop_var, Counts, BatchDesign, mu, invdelta, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, mintol)
+}
+
+muUpdateRegNoSpikes <- function(mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, k, lambda, beta, X, sigma2, variance, mintol) {
+    .Call('_BASiCS_muUpdateRegNoSpikes', PACKAGE = 'BASiCS', mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, k, lambda, beta, X, sigma2, variance, mintol)
+}
+
+deltaUpdateRegNoSpikes <- function(delta0, prop_var, Counts, mu, nu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, mintol) {
+    .Call('_BASiCS_deltaUpdateRegNoSpikes', PACKAGE = 'BASiCS', delta0, prop_var, Counts, mu, nu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, mintol)
 }
 

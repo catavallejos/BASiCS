@@ -248,9 +248,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Hidden_muUpdate
-arma::mat Hidden_muUpdate(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& invdelta, arma::vec const& phinu, arma::vec const& sum_bycell_bio, double const& mu_mu, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind, double const& mintol);
-RcppExport SEXP _BASiCS_Hidden_muUpdate(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP invdeltaSEXP, SEXP phinuSEXP, SEXP sum_bycell_bioSEXP, SEXP mu_muSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP mintolSEXP) {
+// muUpdate
+arma::mat muUpdate(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& invdelta, arma::vec const& phinu, arma::vec const& sum_bycell_bio, double const& mu_mu, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind, double const& mintol);
+RcppExport SEXP _BASiCS_muUpdate(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP invdeltaSEXP, SEXP phinuSEXP, SEXP sum_bycell_bioSEXP, SEXP mu_muSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP mintolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -268,7 +268,351 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
     Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
-    rcpp_result_gen = Rcpp::wrap(Hidden_muUpdate(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol));
+    rcpp_result_gen = Rcpp::wrap(muUpdate(mu0, prop_var, Counts, invdelta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deltaUpdate
+arma::mat deltaUpdate(arma::vec const& delta0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& mu, arma::vec const& phinu, double const& a_delta, double const& b_delta, double const& s2delta, double const& prior_delta, int const& q0, int const& n, arma::vec& delta1, arma::vec& u, arma::vec& ind, double const& mintol);
+RcppExport SEXP _BASiCS_deltaUpdate(SEXP delta0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP muSEXP, SEXP phinuSEXP, SEXP a_deltaSEXP, SEXP b_deltaSEXP, SEXP s2deltaSEXP, SEXP prior_deltaSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP delta1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta0(delta0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type phinu(phinuSEXP);
+    Rcpp::traits::input_parameter< double const& >::type a_delta(a_deltaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type b_delta(b_deltaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type s2delta(s2deltaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type prior_delta(prior_deltaSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type delta1(delta1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(deltaUpdate(delta0, prop_var, Counts, mu, phinu, a_delta, b_delta, s2delta, prior_delta, q0, n, delta1, u, ind, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// phiUpdate
+Rcpp::List phiUpdate(arma::vec const& phi0, double const& prop_var, arma::mat const& Counts, arma::vec const& mu, arma::vec const& invdelta, arma::vec const& nu, arma::vec const& aphi, arma::vec const& sum_bygene_bio, int const& q0, int const& n, arma::vec& phi1);
+RcppExport SEXP _BASiCS_phiUpdate(SEXP phi0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP muSEXP, SEXP invdeltaSEXP, SEXP nuSEXP, SEXP aphiSEXP, SEXP sum_bygene_bioSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP phi1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type phi0(phi0SEXP);
+    Rcpp::traits::input_parameter< double const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type invdelta(invdeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type aphi(aphiSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bygene_bio(sum_bygene_bioSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type phi1(phi1SEXP);
+    rcpp_result_gen = Rcpp::wrap(phiUpdate(phi0, prop_var, Counts, mu, invdelta, nu, aphi, sum_bygene_bio, q0, n, phi1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sUpdateBatch
+arma::vec sUpdateBatch(arma::vec const& s0, arma::vec const& nu, arma::vec const& thetaBatch, double const& as, double const& bs, arma::mat const& BatchDesign, int const& n, arma::vec& s1);
+RcppExport SEXP _BASiCS_sUpdateBatch(SEXP s0SEXP, SEXP nuSEXP, SEXP thetaBatchSEXP, SEXP asSEXP, SEXP bsSEXP, SEXP BatchDesignSEXP, SEXP nSEXP, SEXP s1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type s0(s0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type thetaBatch(thetaBatchSEXP);
+    Rcpp::traits::input_parameter< double const& >::type as(asSEXP);
+    Rcpp::traits::input_parameter< double const& >::type bs(bsSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type BatchDesign(BatchDesignSEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type s1(s1SEXP);
+    rcpp_result_gen = Rcpp::wrap(sUpdateBatch(s0, nu, thetaBatch, as, bs, BatchDesign, n, s1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nuUpdateBatch
+arma::mat nuUpdateBatch(arma::vec const& nu0, arma::vec const& prop_var, arma::mat const& Counts, double const& SumSpikeInput, arma::mat const& BatchDesign, arma::vec const& mu, arma::vec const& invdelta, arma::vec const& phi, arma::vec const& s, arma::vec const& thetaBatch, arma::vec const& sum_bygene_all, int const& q0, int const& n, arma::vec& nu1, arma::vec& u, arma::vec& ind, double const& mintol);
+RcppExport SEXP _BASiCS_nuUpdateBatch(SEXP nu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP SumSpikeInputSEXP, SEXP BatchDesignSEXP, SEXP muSEXP, SEXP invdeltaSEXP, SEXP phiSEXP, SEXP sSEXP, SEXP thetaBatchSEXP, SEXP sum_bygene_allSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP nu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu0(nu0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< double const& >::type SumSpikeInput(SumSpikeInputSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type BatchDesign(BatchDesignSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type invdelta(invdeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type phi(phiSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type s(sSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type thetaBatch(thetaBatchSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bygene_all(sum_bygene_allSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type nu1(nu1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(nuUpdateBatch(nu0, prop_var, Counts, SumSpikeInput, BatchDesign, mu, invdelta, phi, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// thetaUpdateBatch
+arma::mat thetaUpdateBatch(arma::vec const& theta0, arma::vec const& prop_var, arma::mat const& BatchDesign, arma::vec const& BatchSizes, arma::vec const& s, arma::vec const& nu, double const& a_theta, double const& b_theta, int const& n, int const& nBatch, double const& mintol);
+RcppExport SEXP _BASiCS_thetaUpdateBatch(SEXP theta0SEXP, SEXP prop_varSEXP, SEXP BatchDesignSEXP, SEXP BatchSizesSEXP, SEXP sSEXP, SEXP nuSEXP, SEXP a_thetaSEXP, SEXP b_thetaSEXP, SEXP nSEXP, SEXP nBatchSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type theta0(theta0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type BatchDesign(BatchDesignSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type BatchSizes(BatchSizesSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type s(sSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< double const& >::type a_theta(a_thetaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type b_theta(b_thetaSEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int const& >::type nBatch(nBatchSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(thetaUpdateBatch(theta0, prop_var, BatchDesign, BatchSizes, s, nu, a_theta, b_theta, n, nBatch, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// designMatrix
+arma::mat designMatrix(int const& k, arma::vec const& mu, double const& variance);
+RcppExport SEXP _BASiCS_designMatrix(SEXP kSEXP, SEXP muSEXP, SEXP varianceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int const& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< double const& >::type variance(varianceSEXP);
+    rcpp_result_gen = Rcpp::wrap(designMatrix(k, mu, variance));
+    return rcpp_result_gen;
+END_RCPP
+}
+// muUpdateReg
+arma::mat muUpdateReg(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& delta, arma::vec const& phinu, arma::vec const& sum_bycell_bio, double const& mu_mu, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind, int const& k, arma::vec const& lambda, arma::vec const& beta, arma::mat const& X, double const& sigma2, double variance, double const& mintol);
+RcppExport SEXP _BASiCS_muUpdateReg(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP deltaSEXP, SEXP phinuSEXP, SEXP sum_bycell_bioSEXP, SEXP mu_muSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP XSEXP, SEXP sigma2SEXP, SEXP varianceSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type phinu(phinuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bycell_bio(sum_bycell_bioSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mu_mu(mu_muSEXP);
+    Rcpp::traits::input_parameter< double const& >::type s2_mu(s2_muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type mu1(mu1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< int const& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< double >::type variance(varianceSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(muUpdateReg(mu0, prop_var, Counts, delta, phinu, sum_bycell_bio, mu_mu, s2_mu, q0, n, mu1, u, ind, k, lambda, beta, X, sigma2, variance, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deltaUpdateReg
+arma::mat deltaUpdateReg(arma::vec const& delta0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& mu, arma::vec const& phinu, int const& q0, int const& n, arma::vec& delta1, arma::vec& u, arma::vec& ind, arma::vec const& lambda, arma::mat const& X, double const& sigma2, arma::vec const& beta, double const& mintol);
+RcppExport SEXP _BASiCS_deltaUpdateReg(SEXP delta0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP muSEXP, SEXP phinuSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP delta1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP lambdaSEXP, SEXP XSEXP, SEXP sigma2SEXP, SEXP betaSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta0(delta0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type phinu(phinuSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type delta1(delta1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(deltaUpdateReg(delta0, prop_var, Counts, mu, phinu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// betaUpdateReg
+arma::vec betaUpdateReg(double const& sigma2, arma::mat const& VAux, arma::vec const& mAux);
+RcppExport SEXP _BASiCS_betaUpdateReg(SEXP sigma2SEXP, SEXP VAuxSEXP, SEXP mAuxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double const& >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type VAux(VAuxSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mAux(mAuxSEXP);
+    rcpp_result_gen = Rcpp::wrap(betaUpdateReg(sigma2, VAux, mAux));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sigma2UpdateReg
+double sigma2UpdateReg(arma::vec const& delta, arma::vec const& beta, arma::vec const& lambda, arma::mat const& V1, double const& mInvVm0, arma::vec const& m, double const& sigma2_a0, double const& sigma2_b0, int const& q0);
+RcppExport SEXP _BASiCS_sigma2UpdateReg(SEXP deltaSEXP, SEXP betaSEXP, SEXP lambdaSEXP, SEXP V1SEXP, SEXP mInvVm0SEXP, SEXP mSEXP, SEXP sigma2_a0SEXP, SEXP sigma2_b0SEXP, SEXP q0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type V1(V1SEXP);
+    Rcpp::traits::input_parameter< double const& >::type mInvVm0(mInvVm0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type m(mSEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2_a0(sigma2_a0SEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2_b0(sigma2_b0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    rcpp_result_gen = Rcpp::wrap(sigma2UpdateReg(delta, beta, lambda, V1, mInvVm0, m, sigma2_a0, sigma2_b0, q0));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lambdaUpdateReg
+arma::vec lambdaUpdateReg(arma::vec const& delta, arma::mat const& X, arma::vec const& beta, double const& sigma2, double const& eta, int const& q0, arma::vec lambda1);
+RcppExport SEXP _BASiCS_lambdaUpdateReg(SEXP deltaSEXP, SEXP XSEXP, SEXP betaSEXP, SEXP sigma2SEXP, SEXP etaSEXP, SEXP q0SEXP, SEXP lambda1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< double const& >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type lambda1(lambda1SEXP);
+    rcpp_result_gen = Rcpp::wrap(lambdaUpdateReg(delta, X, beta, sigma2, eta, q0, lambda1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// muUpdateNoSpikes
+arma::mat muUpdateNoSpikes(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& invdelta, arma::vec const& nu, arma::vec const& sum_bycell_all, double const& mu_mu, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind, double const& Constrain, int const& RefGene, arma::uvec const& ConstrainGene, arma::uvec const& NotConstrainGene, int const& ConstrainType, double const& mintol);
+RcppExport SEXP _BASiCS_muUpdateNoSpikes(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP invdeltaSEXP, SEXP nuSEXP, SEXP sum_bycell_allSEXP, SEXP mu_muSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP ConstrainSEXP, SEXP RefGeneSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP, SEXP ConstrainTypeSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type invdelta(invdeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bycell_all(sum_bycell_allSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mu_mu(mu_muSEXP);
+    Rcpp::traits::input_parameter< double const& >::type s2_mu(s2_muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type mu1(mu1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< double const& >::type Constrain(ConstrainSEXP);
+    Rcpp::traits::input_parameter< int const& >::type RefGene(RefGeneSEXP);
+    Rcpp::traits::input_parameter< arma::uvec const& >::type ConstrainGene(ConstrainGeneSEXP);
+    Rcpp::traits::input_parameter< arma::uvec const& >::type NotConstrainGene(NotConstrainGeneSEXP);
+    Rcpp::traits::input_parameter< int const& >::type ConstrainType(ConstrainTypeSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(muUpdateNoSpikes(mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nuUpdateBatchNoSpikes
+arma::mat nuUpdateBatchNoSpikes(arma::vec const& nu0, arma::vec const& prop_var, arma::mat const& Counts, arma::mat const& BatchDesign, arma::vec const& mu, arma::vec const& invdelta, arma::vec const& s, arma::vec const& thetaBatch, arma::vec const& sum_bygene_all, int const& q0, int const& n, arma::vec& nu1, arma::vec& u, arma::vec& ind, double const& mintol);
+RcppExport SEXP _BASiCS_nuUpdateBatchNoSpikes(SEXP nu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP BatchDesignSEXP, SEXP muSEXP, SEXP invdeltaSEXP, SEXP sSEXP, SEXP thetaBatchSEXP, SEXP sum_bygene_allSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP nu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu0(nu0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type BatchDesign(BatchDesignSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type invdelta(invdeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type s(sSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type thetaBatch(thetaBatchSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bygene_all(sum_bygene_allSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type nu1(nu1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(nuUpdateBatchNoSpikes(nu0, prop_var, Counts, BatchDesign, mu, invdelta, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// muUpdateRegNoSpikes
+arma::mat muUpdateRegNoSpikes(arma::vec const& mu0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& delta, arma::vec const& invdelta, arma::vec const& nu, arma::vec const& sum_bycell_all, double const& mu_mu, double const& s2_mu, int const& q0, int const& n, arma::vec& mu1, arma::vec& u, arma::vec& ind, double const& Constrain, int const& RefGene, arma::uvec const& ConstrainGene, arma::uvec const& NotConstrainGene, int const& ConstrainType, int const& k, arma::vec const& lambda, arma::vec const& beta, arma::mat const& X, double const& sigma2, double variance, double const& mintol);
+RcppExport SEXP _BASiCS_muUpdateRegNoSpikes(SEXP mu0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP deltaSEXP, SEXP invdeltaSEXP, SEXP nuSEXP, SEXP sum_bycell_allSEXP, SEXP mu_muSEXP, SEXP s2_muSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP mu1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP ConstrainSEXP, SEXP RefGeneSEXP, SEXP ConstrainGeneSEXP, SEXP NotConstrainGeneSEXP, SEXP ConstrainTypeSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP betaSEXP, SEXP XSEXP, SEXP sigma2SEXP, SEXP varianceSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type invdelta(invdeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type sum_bycell_all(sum_bycell_allSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mu_mu(mu_muSEXP);
+    Rcpp::traits::input_parameter< double const& >::type s2_mu(s2_muSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type mu1(mu1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< double const& >::type Constrain(ConstrainSEXP);
+    Rcpp::traits::input_parameter< int const& >::type RefGene(RefGeneSEXP);
+    Rcpp::traits::input_parameter< arma::uvec const& >::type ConstrainGene(ConstrainGeneSEXP);
+    Rcpp::traits::input_parameter< arma::uvec const& >::type NotConstrainGene(NotConstrainGeneSEXP);
+    Rcpp::traits::input_parameter< int const& >::type ConstrainType(ConstrainTypeSEXP);
+    Rcpp::traits::input_parameter< int const& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< double >::type variance(varianceSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(muUpdateRegNoSpikes(mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, k, lambda, beta, X, sigma2, variance, mintol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deltaUpdateRegNoSpikes
+arma::mat deltaUpdateRegNoSpikes(arma::vec const& delta0, arma::vec const& prop_var, arma::mat const& Counts, arma::vec const& mu, arma::vec const& nu, int const& q0, int const& n, arma::vec& delta1, arma::vec& u, arma::vec& ind, arma::vec const& lambda, arma::mat const& X, double const& sigma2, arma::vec const& beta, double const& mintol);
+RcppExport SEXP _BASiCS_deltaUpdateRegNoSpikes(SEXP delta0SEXP, SEXP prop_varSEXP, SEXP CountsSEXP, SEXP muSEXP, SEXP nuSEXP, SEXP q0SEXP, SEXP nSEXP, SEXP delta1SEXP, SEXP uSEXP, SEXP indSEXP, SEXP lambdaSEXP, SEXP XSEXP, SEXP sigma2SEXP, SEXP betaSEXP, SEXP mintolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec const& >::type delta0(delta0SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type prop_var(prop_varSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type Counts(CountsSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< int const& >::type q0(q0SEXP);
+    Rcpp::traits::input_parameter< int const& >::type n(nSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type delta1(delta1SEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type ind(indSEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat const& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< double const& >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< arma::vec const& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< double const& >::type mintol(mintolSEXP);
+    rcpp_result_gen = Rcpp::wrap(deltaUpdateRegNoSpikes(delta0, prop_var, Counts, mu, nu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, mintol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -280,7 +624,22 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BASiCS_HiddenBASiCS_MCMCcppReg", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppReg, 45},
     {"_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes", (DL_FUNC) &_BASiCS_HiddenBASiCS_MCMCcppRegNoSpikes, 48},
     {"_BASiCS_Hidden_rDirichlet", (DL_FUNC) &_BASiCS_Hidden_rDirichlet, 1},
-    {"_BASiCS_Hidden_muUpdate", (DL_FUNC) &_BASiCS_Hidden_muUpdate, 14},
+    {"_BASiCS_muUpdate", (DL_FUNC) &_BASiCS_muUpdate, 14},
+    {"_BASiCS_deltaUpdate", (DL_FUNC) &_BASiCS_deltaUpdate, 15},
+    {"_BASiCS_phiUpdate", (DL_FUNC) &_BASiCS_phiUpdate, 11},
+    {"_BASiCS_sUpdateBatch", (DL_FUNC) &_BASiCS_sUpdateBatch, 8},
+    {"_BASiCS_nuUpdateBatch", (DL_FUNC) &_BASiCS_nuUpdateBatch, 17},
+    {"_BASiCS_thetaUpdateBatch", (DL_FUNC) &_BASiCS_thetaUpdateBatch, 11},
+    {"_BASiCS_designMatrix", (DL_FUNC) &_BASiCS_designMatrix, 3},
+    {"_BASiCS_muUpdateReg", (DL_FUNC) &_BASiCS_muUpdateReg, 20},
+    {"_BASiCS_deltaUpdateReg", (DL_FUNC) &_BASiCS_deltaUpdateReg, 15},
+    {"_BASiCS_betaUpdateReg", (DL_FUNC) &_BASiCS_betaUpdateReg, 3},
+    {"_BASiCS_sigma2UpdateReg", (DL_FUNC) &_BASiCS_sigma2UpdateReg, 9},
+    {"_BASiCS_lambdaUpdateReg", (DL_FUNC) &_BASiCS_lambdaUpdateReg, 7},
+    {"_BASiCS_muUpdateNoSpikes", (DL_FUNC) &_BASiCS_muUpdateNoSpikes, 19},
+    {"_BASiCS_nuUpdateBatchNoSpikes", (DL_FUNC) &_BASiCS_nuUpdateBatchNoSpikes, 15},
+    {"_BASiCS_muUpdateRegNoSpikes", (DL_FUNC) &_BASiCS_muUpdateRegNoSpikes, 26},
+    {"_BASiCS_deltaUpdateRegNoSpikes", (DL_FUNC) &_BASiCS_deltaUpdateRegNoSpikes, 15},
     {NULL, NULL, 0}
 };
 
