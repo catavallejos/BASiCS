@@ -64,7 +64,8 @@ arma::mat muUpdateRegNoSpikes(
   arma::mat X_mu1 = designMatrix(k, mu1, variance);
   
   // REGRESSION RELATED FACTOR
-  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - pow(log(delta)-X*beta,2))/(2*sigma2);
+  log_aux -= lambda%(pow(log(delta)-X_mu1*beta,2) - 
+    pow(log(delta)-X*beta,2))/(2*sigma2);
   
   // Step 2: Computing prior component of the acceptance rate 
   
@@ -73,8 +74,9 @@ arma::mat muUpdateRegNoSpikes(
     iAux = ConstrainGene(i);
     if(iAux != RefGene) {
       aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
-      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - mu_mu(iAux) - aux, 2)); 
-      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - mu_mu(iAux) - aux, 2));
+      aux += 0.5 * (mu_mu(iAux) - mu_mu(RefGene));
+      log_aux(iAux) -= (0.5 * 2 / s2_mu) * (pow(log(mu1(iAux)) - aux, 2)); 
+      log_aux(iAux) += (0.5 * 2 / s2_mu) * (pow(log(mu0(iAux)) - aux, 2));
       // ACCEPT REJECT
       if((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
         ind(iAux) = 1; sumAux += log(mu1(iAux)) - log(mu0(iAux)); 

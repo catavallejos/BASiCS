@@ -39,6 +39,10 @@ BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
+\item{PriorMu}{Indicates if the original prior (\code{PriorMu = 'default'})
+or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+assigned to gene-specific mean expression parameters.}
+
 \item{...}{Optional parameters.
 \describe{
 \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.

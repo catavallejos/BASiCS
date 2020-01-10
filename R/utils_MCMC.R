@@ -109,9 +109,10 @@
 
 .EmpiricalBayesMu <- function(Data, PriorParam) {
   
-  aux <- computeSumFactors(Data)
-  aux <- logNormCounts(aux, log = FALSE, pseudo_count = 0)
-  aux <- rowMeans(assays(aux)$normcounts)
+  # Apply scran normalisation
+  s <- calculateSumFactors(Data)
+  NormCounts <- t(t(counts(Data))/s)
+  aux <- rowMeans(NormCounts)
   
   # Correction for those genes with total count = 0
   aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
