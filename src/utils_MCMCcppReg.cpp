@@ -40,7 +40,7 @@ arma::vec estimateRBFLocations(
 arma::vec estimateRBFLocationsNTiles(
     arma::vec const& log_mu,
     int const& k) {
-  return(ntiles(log_mu, k - 1));
+  return(ntiles(log_mu, k));
 }
 
 
@@ -54,9 +54,11 @@ arma::vec ntiles(arma::vec const& x, int n) {
   arma::vec x_sort = sort(x);
   int ntiles = n - 2;
   arma::vec quantiles = arma::vec(ntiles);
-  double d = x.size() / n;
-  for (unsigned int i = 0; i < quantiles.size(); i++) {
-    quantiles(i) = x_sort(round((i + 1) * d));
+  double d = x.size() / (ntiles - 1);
+  quantiles(0) = x.min();
+  quantiles(quantiles.size() - 1) = x.max();
+  for (unsigned int i = 1; i < quantiles.size() - 1; i++) {
+    quantiles(i) = x_sort(round(i * d));
   }
   return(quantiles);
 }
