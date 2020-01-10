@@ -187,7 +187,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR       
-    muAux = Hidden_muUpdate(muAux.col(0), exp(LSmuAux), Counts, 
+    muAux = muUpdate(muAux.col(0), exp(LSmuAux), Counts,
                      1/deltaAux.col(0), phiAux % nuAux.col(0), 
                      sumByCellBio, mu_mu, s2mu, q0, n,
                      y_q0, u_q0, ind_q0, mintol_mu);     

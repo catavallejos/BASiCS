@@ -3,7 +3,7 @@
 /* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
 */
-arma::mat Hidden_muUpdate(
+arma::mat muUpdate(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
     arma::mat const& Counts, 
@@ -266,7 +266,7 @@ arma::mat nuUpdateBatch(
   }
   
   log_aux += (log(nu1) - log(nu0)) % (sum_bygene_all + 1/thetaBatch);
-  log_aux -= (nu1 -nu0)  % (SumSpikeInput + (1/(thetaBatch % s)));   
+  log_aux -= (nu1 - nu0)  % (SumSpikeInput + (1 / (thetaBatch % s)));
   
   /* CREATING OUTPUT VARIABLE & DEBUG 
   * Proposed values are automatically rejected in the following cases:

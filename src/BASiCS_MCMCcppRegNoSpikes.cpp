@@ -213,7 +213,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
     sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
                         as, bs, BatchDesign, n, y_n); 
-    
+
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -281,6 +281,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
     lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
                                 eta0, q0, y_q0);
+
     // UPDATE OF EPSILON 
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X*betaAux;
