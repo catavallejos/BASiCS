@@ -36,7 +36,7 @@ test_that("Spikes + no regression", {
   indCell <- rbinom(n, size = 1, prob = 0.5)
 
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  mu <- BASiCS:::muUpdate(
+  mu <- BASiCS:::.muUpdate(
     mu0 = Start$mu0,
     prop_var = exp(Start$ls.mu0),
     Counts = CountsBio,
@@ -62,7 +62,7 @@ test_that("Spikes + no regression", {
   expect_equal(ind, ind_obs)
 
   delta1 <- pmax(0, Start$delta0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  delta_prior1 <- BASiCS:::deltaUpdate(
+  delta_prior1 <- BASiCS:::.deltaUpdate(
     delta0 = Start$delta0,
     prop_var = exp(Start$ls.delta0),
     Counts = CountsBio,
@@ -88,7 +88,7 @@ test_that("Spikes + no regression", {
   ind_obs <- delta_prior1[1:5, 2]
   expect_equal(ind, ind_obs)
 
-  delta_prior2 <- BASiCS:::deltaUpdate(
+  delta_prior2 <- BASiCS:::.deltaUpdate(
     delta0 = Start$delta0,
     prop_var = exp(Start$ls.delta0),
     Counts = CountsBio,
@@ -116,7 +116,7 @@ test_that("Spikes + no regression", {
 
   phi1 <- rgamma(n, shape = 0.1, scale = 1)
   phi1 <- phi1 / sum(phi1)
-  phi <- BASiCS:::phiUpdate(
+  phi <- BASiCS:::.phiUpdate(
     phi0 = Start$phi0,
     prop_var = Start$ls.phi0,
     Counts = CountsBio,
@@ -138,7 +138,7 @@ test_that("Spikes + no regression", {
   expect_equal(ind, ind_obs)
 
   s1 <- pmax(0, Start$s0[seq_len(n)] + rnorm(n, sd = 0.005))
-  s <- BASiCS:::sUpdateBatch(
+  s <- BASiCS:::.sUpdateBatch(
     s0 = Start$s0,
     nu = Start$nu0,
     thetaBatch = ThetaBatch,
@@ -155,7 +155,7 @@ test_that("Spikes + no regression", {
 
 
   nu1 <- pmax(0, Start$nu0[seq_len(n)] + rnorm(n, sd = 0.005))
-  nu <- BASiCS:::nuUpdateBatch(
+  nu <- BASiCS:::.nuUpdateBatch(
     nu0 = Start$nu0,
     prop_var = exp(Start$ls.nu0),
     Counts = CountsAll,
@@ -183,7 +183,7 @@ test_that("Spikes + no regression", {
   ind_obs <- nu[1:5, 2]
   expect_equal(ind, ind_obs)
 
-  theta <- BASiCS:::thetaUpdateBatch(
+  theta <- BASiCS:::.thetaUpdateBatch(
     theta0 = Start$theta0,
     prop_var = exp(Start$ls.theta0),
     BatchDesign = BatchDesign,
@@ -231,11 +231,11 @@ test_that("Spikes + regression", {
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  X <- BASiCS:::designMatrix(k, Start$mu0, var)
+  X <- BASiCS:::.designMatrix(k, Start$mu0, var)
 
   # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  mu <- BASiCS:::muUpdateReg(
+  mu <- BASiCS:::.muUpdateReg(
     mu0 = Start$mu0,
     prop_var = exp(Start$ls.mu0),
     Counts = CountsBio,
@@ -267,7 +267,7 @@ test_that("Spikes + regression", {
   expect_equal(ind, ind_obs)
 
   delta1 <- pmax(0, Start$delta0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  delta <- BASiCS:::deltaUpdateReg(
+  delta <- BASiCS:::.deltaUpdateReg(
     delta0 = Start$delta0,
     prop_var = exp(Start$ls.delta0),
     Counts = CountsBio,
@@ -294,7 +294,7 @@ test_that("Spikes + regression", {
   expect_equal(ind, ind_obs)
 
 
-  beta <- BASiCS:::betaUpdateReg(
+  beta <- BASiCS:::.betaUpdateReg(
     sigma2 = Start$sigma2,
     VAux = PriorParam$V,
     mAux = PriorParam$m
@@ -304,7 +304,7 @@ test_that("Spikes + regression", {
   expect_equal(beta1, beta1_obs)
 
 
-  sigma2 <- BASiCS:::sigma2UpdateReg(
+  sigma2 <- BASiCS:::.sigma2UpdateReg(
     delta = Start$delta0,
     beta = Start$beta0,
     lambda = Start$lambda0,
@@ -317,7 +317,7 @@ test_that("Spikes + regression", {
   )
   expect_equal(round(sigma2, digits = 3), 0.489)
 
-  lambda <- BASiCS:::lambdaUpdateReg(
+  lambda <- BASiCS:::.lambdaUpdateReg(
     delta = Start$delta0,
     X = X,
     beta = Start$beta0,
@@ -360,7 +360,7 @@ test_that("No Spikes + no regression", {
 
   # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  mu <- BASiCS:::muUpdateNoSpikes(
+  mu <- BASiCS:::.muUpdateNoSpikes(
     mu0 = Start$mu0,
     prop_var = exp(Start$ls.mu0),
     Counts = CountsBio,
@@ -392,7 +392,7 @@ test_that("No Spikes + no regression", {
   expect_equal(ind, ind_obs)
 
   nu1 <- pmax(0, Start$nu0[seq_len(n)] + rnorm(n, sd = 0.005))
-  nu <- BASiCS:::nuUpdateBatchNoSpikes(
+  nu <- BASiCS:::.nuUpdateBatchNoSpikes(
     nu0 = Start$nu0,
     prop_var = exp(Start$ls.nu0),
     Counts = CountsBio,
@@ -445,14 +445,14 @@ test_that("No Spikes + regression", {
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  X <- BASiCS:::designMatrix(k, Start$mu0, var)
+  X <- BASiCS:::.designMatrix(k, Start$mu0, var)
 
   ## Components for no-spikes
   means <- rowMeans(CountsBio)
   RefGene <- which.min(means[means >= median(means)])
 
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  mu <- BASiCS:::muUpdateRegNoSpikes(
+  mu <- BASiCS:::.muUpdateRegNoSpikes(
     mu0 = Start$mu0,
     prop_var = exp(Start$ls.mu0),
     Counts = CountsBio,
@@ -490,7 +490,7 @@ test_that("No Spikes + regression", {
   expect_equal(ind, ind_obs)
 
   delta1 <- pmax(0, Start$delta0[seq_len(q0)] + rnorm(q0, sd = 0.005))
-  delta <- BASiCS:::deltaUpdateRegNoSpikes(
+  delta <- BASiCS:::.deltaUpdateRegNoSpikes(
     delta0 = Start$delta0,
     prop_var = exp(Start$ls.delta0),
     Counts = CountsBio,

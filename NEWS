@@ -1354,3 +1354,7 @@ version 1.9.9 (2019-12-12)
 version 1.9.10 (2019-12-13)
 - Further clean up in `BASiCS_TestDE`. Creates new internal functions to avoid
 duplicated code across different tests: `.TestResults`, `.ShowTestResults`
+
+version 1.9.11 (2020-01-11)
+- Add unit tests for each MCMC update.
+

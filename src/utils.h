@@ -44,7 +44,7 @@ arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma);
 /* Declarations for functions used by the main MCMC sampler
  * Stored in: utils_MCMCcpp.cpp
  */
-// [[Rcpp::export]]
+// [[Rcpp::export(".muUpdate")]]
 arma::mat muUpdate(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -61,7 +61,7 @@ arma::mat muUpdate(
     arma::vec & ind,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".deltaUpdate")]]
 arma::mat deltaUpdate(
     arma::vec const& delta0, 
     arma::vec const& prop_var,  
@@ -79,7 +79,7 @@ arma::mat deltaUpdate(
     arma::vec & ind,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".phiUpdate")]]
 Rcpp::List phiUpdate(
     arma::vec const& phi0, 
     double const& prop_var, 
@@ -93,7 +93,7 @@ Rcpp::List phiUpdate(
     int const& n,
     arma::vec & phi1);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".sUpdateBatch")]]
 arma::vec sUpdateBatch(
     arma::vec const& s0, 
     arma::vec const& nu, 
@@ -104,7 +104,7 @@ arma::vec sUpdateBatch(
     int const& n,
     arma::vec & s1);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".nuUpdateBatch")]]
 arma::mat nuUpdateBatch(
     arma::vec const& nu0, 
     arma::vec const& prop_var, 
@@ -124,7 +124,7 @@ arma::mat nuUpdateBatch(
     arma::vec & ind,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".thetaUpdateBatch")]]
 arma::mat thetaUpdateBatch(
     arma::vec const& theta0, 
     arma::vec const& prop_var, 
@@ -142,13 +142,13 @@ arma::mat thetaUpdateBatch(
    * Stored in: utils_MCMCcppReg.cpp
    */
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".designMatrix")]]
 arma::mat designMatrix(
     int const& k, 
     arma::vec const& mu, 
     double const& variance);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".muUpdateReg")]]
 arma::mat muUpdateReg(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -171,7 +171,7 @@ arma::mat muUpdateReg(
     double variance,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".deltaUpdateReg")]]
 arma::mat deltaUpdateReg(
     arma::vec const& delta0, 
     arma::vec const& prop_var,  
@@ -189,12 +189,12 @@ arma::mat deltaUpdateReg(
     arma::vec const& beta,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".betaUpdateReg")]]
 arma::vec betaUpdateReg(double const& sigma2,
                         arma::mat const& VAux,
                         arma::vec const& mAux);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".sigma2UpdateReg")]]
 double sigma2UpdateReg(arma::vec const& delta,
                        arma::vec const& beta,
                        arma::vec const& lambda, 
@@ -205,7 +205,7 @@ double sigma2UpdateReg(arma::vec const& delta,
                        double const& sigma2_b0,
                        int const& q0);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".lambdaUpdateReg")]]
 arma::vec lambdaUpdateReg(arma::vec const& delta,
                           arma::mat const& X,
                           arma::vec const& beta,
@@ -217,7 +217,7 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
 /* Declarations for functions used by the MCMC sampler for the non-spikes case
  * Stored in: utils_MCMCcppNoSpikes.cpp
  */
-// [[Rcpp::export]]
+// [[Rcpp::export(".muUpdateNoSpikes")]]
 arma::mat muUpdateNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -239,7 +239,7 @@ arma::mat muUpdateNoSpikes(
     int const& ConstrainType,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".nuUpdateBatchNoSpikes")]]
 arma::mat nuUpdateBatchNoSpikes(
     arma::vec const& nu0, 
     arma::vec const& prop_var, 
@@ -261,7 +261,7 @@ arma::mat nuUpdateBatchNoSpikes(
  * non-spikes case
  * Stored in: utils_MCMCcppRegNoSpikes.cpp
  */
-// [[Rcpp::export]]
+// [[Rcpp::export(".muUpdateRegNoSpikes")]]
 arma::mat muUpdateRegNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -290,7 +290,7 @@ arma::mat muUpdateRegNoSpikes(
     double variance,
     double const& mintol);
 
-// [[Rcpp::export]]
+// [[Rcpp::export(".deltaUpdateRegNoSpikes")]]
 arma::mat deltaUpdateRegNoSpikes(
     arma::vec const& delta0,
     arma::vec const& prop_var,  
