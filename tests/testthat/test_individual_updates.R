@@ -50,6 +50,7 @@ test_that("Spikes + no regression", {
     mu1 = mu1,
     u = uGene,
     ind = indGene,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -77,6 +78,7 @@ test_that("Spikes + no regression", {
     delta1 = delta1,
     u = uGene,
     ind = indGene,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -103,6 +105,7 @@ test_that("Spikes + no regression", {
     delta1 = delta1,
     u = uGene,
     ind = indGene,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -115,10 +118,10 @@ test_that("Spikes + no regression", {
   expect_equal(ind, ind_obs)
 
   phi1 <- rgamma(n, shape = 0.1, scale = 1)
-  phi1 <- phi1 / sum(phi1)
+  phi1 <- phi1 / sum(phi1) * length(phi1)
   phi <- BASiCS:::.phiUpdate(
-    phi0 = Start$phi0,
-    prop_var = Start$ls.phi0,
+    phi0 = rep(1, n),
+    prop_var = 200,
     Counts = CountsBio,
     mu = Start$mu0,
     invdelta = 1 / Start$delta0,
@@ -127,13 +130,14 @@ test_that("Spikes + no regression", {
     sum_bygene_bio = colSums(CountsBio),
     q0 = q0,
     n = n,
-    phi1 = phi1
+    phi1 = phi1,
+    exponent = 1
   )
-  phi1 <- c(0.69, 1.06, 0.96, 1.19, 1.2)
+  phi1 <- c(0.84, 1.01, 0.94, 1.05, 1.07)
   phi1_obs <- round(phi[[1]][1:5], 2)
   expect_equal(phi1, phi1_obs)
 
-  ind <- 0
+  ind <- 1
   ind_obs <- phi[[2]]
   expect_equal(ind, ind_obs)
 
@@ -146,10 +150,11 @@ test_that("Spikes + no regression", {
     bs = PriorParam$b.s,
     BatchDesign = BatchDesign,
     n = n,
-    s1 = s1
+    s1 = s1,
+    exponent = 1
   )
 
-  s1 <- c(0.3, 0.2, 0.19, 0.6, 0.4)
+  s1 <- c(0.22, 0.12, 0.25, 0.32, 0.41)
   s1Obs <- round(s[1:5], digits = 2)
   expect_equal(s1, s1Obs)
 
@@ -172,14 +177,15 @@ test_that("Spikes + no regression", {
     nu1 = nu1,
     u = uCell,
     ind = indCell,
+    exponent = 1,
     mintol = 1e-3
   )
 
-  nu1 <- c(0.11, 0.2, 0.08, 0.38, 0.26)
+  nu1 <- c(0.11, 0.2, 0.07, 0.38, 0.25)
   nu1_obs <- round(nu[1:5, 1], 2)
   expect_equal(nu1, nu1_obs)
 
-  ind <- c(1, 1, 0, 0, 1)
+  ind <- c(1, 0, 1, 0, 1)
   ind_obs <- nu[1:5, 2]
   expect_equal(ind, ind_obs)
 
@@ -194,9 +200,10 @@ test_that("Spikes + no regression", {
     b_theta = PriorParam$b.theta,
     n = n,
     nBatch = ncol(BatchDesign),
+    exponent = 1,
     mintol = 1e-3
   )
-  theta1 <- 0.8
+  theta1 <- 0.84
   theta1_obs <- round(theta[1, 1], 2)
   expect_equal(theta1, theta1_obs)
 
@@ -255,6 +262,7 @@ test_that("Spikes + regression", {
     X = X,
     sigma2 = Start$sigma20,
     variance = var,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -282,6 +290,7 @@ test_that("Spikes + regression", {
     X = X,
     sigma2 = Start$sigma20,
     beta = Start$beta0,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -313,7 +322,8 @@ test_that("Spikes + regression", {
     m = PriorParam$m,
     sigma2_a0 = PriorParam$a.sigma2,
     sigma2_b0 = PriorParam$b.sigma2,
-    q0 = q0
+    q0 = q0,
+    exponent = 1
   )
   expect_equal(round(sigma2, digits = 3), 0.489)
 
@@ -324,7 +334,8 @@ test_that("Spikes + regression", {
     sigma2 = Start$sigma20,
     eta = PriorParam$eta,
     q0 = q0,
-    lambda1 = Start$lambda0
+    lambda1 = Start$lambda0,
+    exponent = 1
   )
   lambda1 <- c(0.14, 0.13, 0.57, 0.28, 0.06)
   lambda1_obs <- round(lambda[1:5, 1], 2)
@@ -379,6 +390,7 @@ test_that("No Spikes + no regression", {
     ConstrainGene = seq_len(q0) - 1,
     NotConstrainGene = 0,
     ConstrainType = 1,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -407,6 +419,7 @@ test_that("No Spikes + no regression", {
     nu1 = nu1,
     u = uCell,
     ind = indCell,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -478,6 +491,7 @@ test_that("No Spikes + regression", {
     X = X,
     sigma2 = Start$sigma20,
     variance = var,
+    exponent = 1,
     mintol = 1e-3
   )
 
@@ -505,6 +519,7 @@ test_that("No Spikes + regression", {
     X = X,
     sigma2 = Start$sigma20,
     beta = Start$beta0,
+    exponent = 1,
     mintol = 1e-3
   )
 

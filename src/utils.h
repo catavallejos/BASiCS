@@ -59,6 +59,7 @@ arma::mat muUpdate(
     arma::vec & mu1,
     arma::vec & u, 
     arma::vec & ind,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".deltaUpdate")]]
@@ -77,6 +78,7 @@ arma::mat deltaUpdate(
     arma::vec & delta1,
     arma::vec & u, 
     arma::vec & ind,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".phiUpdate")]]
@@ -91,7 +93,8 @@ Rcpp::List phiUpdate(
     arma::vec const& sum_bygene_bio, 
     int const& q0,
     int const& n,
-    arma::vec & phi1);
+    arma::vec & phi1,
+    double const& exponent);
 
 // [[Rcpp::export(".sUpdateBatch")]]
 arma::vec sUpdateBatch(
@@ -102,7 +105,8 @@ arma::vec sUpdateBatch(
     double const& bs, 
     arma::mat const& BatchDesign,
     int const& n,
-    arma::vec & s1);
+    arma::vec & s1,
+    double const& exponent);
 
 // [[Rcpp::export(".nuUpdateBatch")]]
 arma::mat nuUpdateBatch(
@@ -122,6 +126,7 @@ arma::mat nuUpdateBatch(
     arma::vec & nu1,
     arma::vec & u,
     arma::vec & ind,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".thetaUpdateBatch")]]
@@ -136,6 +141,7 @@ arma::mat thetaUpdateBatch(
     double const& b_theta, 
     int const& n,
     int const& nBatch,
+    double const& exponent,
     double const& mintol);
   
   /* Declarations for functions used by the MCMC sampler for the regression case
@@ -169,6 +175,7 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".deltaUpdateReg")]]
@@ -187,6 +194,7 @@ arma::mat deltaUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     arma::vec const& beta,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".betaUpdateReg")]]
@@ -203,7 +211,8 @@ double sigma2UpdateReg(arma::vec const& delta,
                        arma::vec const& m,
                        double const& sigma2_a0,
                        double const& sigma2_b0,
-                       int const& q0);
+                       int const& q0,
+                       double const& exponent);
 
 // [[Rcpp::export(".lambdaUpdateReg")]]
 arma::vec lambdaUpdateReg(arma::vec const& delta,
@@ -212,7 +221,8 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
                           double const& sigma2, 
                           double const& eta, 
                           int const& q0,
-                          arma::vec lambda1);
+                          arma::vec lambda1,
+                          double const& exponent);
 
 /* Declarations for functions used by the MCMC sampler for the non-spikes case
  * Stored in: utils_MCMCcppNoSpikes.cpp
@@ -237,6 +247,7 @@ arma::mat muUpdateNoSpikes(
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
     int const& ConstrainType,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".nuUpdateBatchNoSpikes")]]
@@ -255,6 +266,7 @@ arma::mat nuUpdateBatchNoSpikes(
     arma::vec & nu1,
     arma::vec & u,
     arma::vec & ind,
+    double const& exponent,
     double const& mintol);
 
 /* Declarations for functions used by the MCMC sampler for the regression and 
@@ -288,6 +300,7 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    double const& exponent,
     double const& mintol);
 
 // [[Rcpp::export(".deltaUpdateRegNoSpikes")]]
@@ -306,6 +319,7 @@ arma::mat deltaUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     arma::vec const& beta,
+    double const& exponent,
     double const& mintol);
   
 #endif

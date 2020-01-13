@@ -53,7 +53,13 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     NumericVector sumByGeneBio,
     int StoreAdapt, 
     int EndAdapt,
-    int PrintProgress);
+    int PrintProgress,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // MCMC sampler for regression case
 Rcpp::List HiddenBASiCS_MCMCcppReg(
@@ -98,7 +104,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double sigma20, 
     double eta0, 
     NumericVector lambda0, 
-    double const& variance);
+    double const& variance,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // MCMC sampler for the non-spike case
 Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
@@ -139,7 +151,13 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     NumericVector ConstrainGene,
     NumericVector NotConstrainGene,
     int ConstrainType,
-    int StochasticRef);
+    int StochasticRef,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // MCMC sampler for regression and non-spikes case
 Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
@@ -186,7 +204,13 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     NumericVector ConstrainGene,
     NumericVector NotConstrainGene,
     int ConstrainType,
-    int StochasticRef);
+    int StochasticRef,
+    double const& mintol_mu,
+    double const& mintol_delta,
+    double const& mintol_nu,
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // Function to cumpute denoised rates
 arma::mat HiddenBASiCS_DenoisedRates(
