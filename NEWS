@@ -1358,3 +1358,5 @@ duplicated code across different tests: `.TestResults`, `.ShowTestResults`
 version 1.9.11 (2020-01-11)
 - Add unit tests for each MCMC update.
 
+version 1.9.12 (2020-01-17)
+- Fixes bug in `BASiCS_CorrectOffset` for no-spikes case
