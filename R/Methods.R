@@ -27,6 +27,7 @@ setMethod(
   "show",
   signature = "BASiCS_Chain",
   definition = function(object) {
+
     N <- nrow(object@parameters$mu)
     q.bio <- ncol(object@parameters$delta)
     n <- ncol(object@parameters$nu)
@@ -136,8 +137,9 @@ setMethod(
 setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95) {
-
-  out <- lapply(x@parameters[names(x@parameters) != "designMatrix"],
+  param_ind <- !names(x@parameters) %in% c("designMatrix", "RefFreq", "locations")
+  params <- x@parameters[param_ind]
+  out <- lapply(params,
     function(n) {
       HPD <- matrix(data = NA, ncol = 3, nrow = ncol(n),
                     dimnames = list(colnames(n), c("median", "lower", "upper")))
@@ -147,9 +149,6 @@ setMethod("Summary",
       HPD
   })
 
-  if ("RefFreq" %in% names(out)) {
-    out$RefFreq <- NULL
-  }
 
   new("BASiCS_Summary", parameters = out)
 })

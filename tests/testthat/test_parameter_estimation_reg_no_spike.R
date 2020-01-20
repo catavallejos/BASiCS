@@ -13,9 +13,14 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)
-  PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
+  PriorParam$m <- rep(0, k)
+  PriorParam$V <- diag(k)
+  PriorParam$a.sigma2 <- 2
+  PriorParam$b.sigma2 <- 2  
   PriorParam$eta <- 5
+  PriorParam$RBFNTile <- FALSE
+  PriorParam$FixLocations <- FALSE
+  PriorParam$locations <- rep(0, k)
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam,
                                             WithSpikes = FALSE)
@@ -36,7 +41,7 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "RefFreq")
+                  "beta", "sigma2", "epsilon", "RefFreq", "locations")
   ParamNames1 <- c("mu", "delta", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon")
   expect_equal(names(Chain@parameters), ParamNames)
@@ -116,9 +121,14 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
   PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)
-  PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2
+  PriorParam$m <- rep(0, k)
+  PriorParam$V <- diag(k)
+  PriorParam$a.sigma2 <- 2
+  PriorParam$b.sigma2 <- 2
   PriorParam$eta <- 5
+  PriorParam$RBFNTile <- FALSE
+  PriorParam$FixLocations <- FALSE
+  PriorParam$locations <- rep(0, k)
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, 
                                             WithSpikes = FALSE)

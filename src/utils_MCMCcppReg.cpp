@@ -5,11 +5,12 @@
 // Model matrix generation for regression
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
-    arma::vec const& mu, 
+    arma::vec locations,
+    arma::vec const& mu,
     double const& variance) {
 
+  
   arma::vec x = log(mu);
-  arma::vec locations = estimateRBFLocationsNTiles(x, k);
   // arma::vec locations = estimateRBFLocations(x, k);
   double h = (locations(1) - locations(0)) * variance;
 
@@ -22,29 +23,22 @@ arma::mat designMatrix(
   return X;
 }
 
-// [[Rcpp::export]]
-arma::vec estimateRBFLocations(
-    arma::vec const& log_mu,
-    int const& k) {
-
+arma::vec estimateRBFLocations(arma::vec const& log_mu, int const& k) {
   double ran = log_mu.max() - log_mu.min();
   arma::vec locations = arma::vec(k - 2);
-  locations(0) = log_mu.min();
-  for(int i = 1; i < (k - 2); i++) {
-    locations(i) = locations(i - 1) + ran / (k - 3);
+  double d = ran / (k - 1);
+  for (unsigned int i = 0; i < locations.size(); i++) {
+    locations(i) = (i + 1) * d;
+    //locations(i) =  locations(i - 1) + ran / (k - 3);
   }
-  return(locations);
+  return locations;
 }
 
-// [[Rcpp::export]]
-arma::vec estimateRBFLocationsNTiles(
-    arma::vec const& log_mu,
-    int const& k) {
-  return(ntiles(log_mu, k));
+arma::vec estimateRBFLocationsNTiles(arma::vec const& log_mu, int const& k) {
+  return ntiles(log_mu, k);
 }
 
-
-// [[Rcpp::export]]
+// [[Rcpp::export(".ntiles")]]
 arma::vec ntiles(NumericVector& x, int n) {
   arma::vec xa = as_arma(x);
   return ntiles(xa, n);
@@ -52,15 +46,13 @@ arma::vec ntiles(NumericVector& x, int n) {
 
 arma::vec ntiles(arma::vec const& x, int n) {
   arma::vec x_sort = sort(x);
-  int ntiles = n - 2;
-  arma::vec quantiles = arma::vec(ntiles);
-  double d = x.size() / (ntiles - 1);
-  quantiles(0) = x.min();
-  quantiles(quantiles.size() - 1) = x.max();
-  for (unsigned int i = 1; i < quantiles.size() - 1; i++) {
-    quantiles(i) = x_sort(round(i * d));
+  int n_tiles = n - 2;
+  arma::vec quantiles = arma::vec(n_tiles);
+  double d = x.size() / (n - 1);
+  for (unsigned int i = 0; i < quantiles.size(); i++) {
+    quantiles(i) = x_sort(round((i + 1) * d));
   }
-  return(quantiles);
+  return quantiles;
 }
 
 /* Metropolis-Hastings updates of mu 
@@ -86,8 +78,10 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    double const& mintol)
-{
+    bool RBFNTile,
+    bool FixLocations,
+    arma::vec locations,
+    double const& mintol) {
   
   /* PROPOSAL STEP */
   mu1 = exp( arma::randn(q0) % sqrt(prop_var) + log(mu0) );
@@ -102,13 +96,21 @@ arma::mat muUpdateReg(
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
-        log( ( phinu(j)*mu1(i) + 1/delta(i) ) / 
-        ( phinu(j)*mu0(i) + 1/delta(i) ));
+        log(
+          (phinu(j) * mu1(i) + 1 / delta(i)) / 
+          (phinu(j) * mu0(i) + 1 / delta(i)));
     }
   }
   
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  if (!FixLocations) {  
+    if (RBFNTile) {
+      locations = estimateRBFLocationsNTiles(log(mu1), k);
+    } else {
+      locations = estimateRBFLocations(log(mu1), k);
+    }
+  }
+  arma::mat X_mu1 = designMatrix(k, locations, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check

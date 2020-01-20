@@ -86,6 +86,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
+    bool RBFNTile,
+    bool FixLocations,
+    arma::vec locations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -187,8 +190,15 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
-  arma::vec means = muAux(arma::span(0,q0-1),0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::vec means = muAux(arma::span(0, q0 - 1), 0);
+  if (!FixLocations) {
+    if (RBFNTile) {
+      locations = estimateRBFLocationsNTiles(log(means), k);
+    } else {
+      locations = estimateRBFLocations(log(means), k);
+    }
+  }
+  arma::mat X = designMatrix(k, locations, means, variance);
   
   StartSampler(N);
   
@@ -230,7 +240,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
                         phiAux % nuAux.col(0), sumByCellBio, mu_mu, s2mu, q0, n, 
                         y_q0, u_q0, ind_q0,
                         k, lambdaAux, betaAux, X, sigma2Aux, 
-                        variance, mintol_mu);     
+                        variance, RBFNTile, FixLocations, locations, 
+                        mintol_mu);
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
@@ -303,8 +314,15 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux(arma::span(0,q0-1),0);
-        X = designMatrix(k, means, variance);
+        means = muAux(arma::span(0, q0 - 1), 0);
+        if (!FixLocations) {
+          if (RBFNTile) {
+            locations = estimateRBFLocationsNTiles(log(means), k);
+          } else {
+            locations = estimateRBFLocations(log(means), k);
+          }
+        }
+        X = designMatrix(k, locations, means, variance);
       }
     }
     
@@ -371,37 +389,45 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   
   if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("phi") = phi.t(),
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t(),
-        Rcpp::Named("designMatrix")=X,
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("designMatrix") = X,
+        Rcpp::Named("locations") = locations,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.phi") = LSphi,
         Rcpp::Named("ls.nu") = LSnu.t(),
-        Rcpp::Named("ls.theta") = LStheta.t())); 
+        Rcpp::Named("ls.theta") = LStheta.t()
+      )
+    ); 
   }
   else {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("phi") = phi.t(),
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t())); 
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("locations") = locations
+      )
+    ); 
     
   }
 }

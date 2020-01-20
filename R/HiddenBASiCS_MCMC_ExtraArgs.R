@@ -30,7 +30,10 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                           a.s = 1,
                                           b.s = 1,
                                           a.theta = 1,
-                                          b.theta = 1
+                                          b.theta = 1,
+                                          RBFNTiles = TRUE,
+                                          FixLocations = FALSE,
+                                          locations = numeric(k)
                                         ),
                                         eta = 5,
                                         Start = HiddenBASiCS_MCMC_Start(

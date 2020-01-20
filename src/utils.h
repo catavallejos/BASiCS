@@ -37,12 +37,13 @@ arma::vec DegubInd(arma::vec ind,
                    double const& threshold,
                    std::string const& param);
 
-
 arma::vec ntiles(NumericVector const& x, int n);
 arma::vec ntiles(arma::vec const& x, int n);
-arma::vec estimateRBFLocationsNTiles(
-    arma::vec const& log_mu,
-    int const& k);
+
+// [[Rcpp::export(".estimateRBFLocationsNTiles")]]
+arma::vec estimateRBFLocationsNTiles(arma::vec const& log_mu, int const& k);
+// [[Rcpp::export(".estimateRBFLocations")]]
+arma::vec estimateRBFLocations(arma::vec const& log_mu, int const& k);
 
 // [[Rcpp::export]]
 arma::vec Hidden_rDirichlet(arma::vec alpha);
@@ -146,6 +147,7 @@ arma::mat thetaUpdateBatch(
   
 arma::mat designMatrix(
     int const& k, 
+    arma::vec locations,
     arma::vec const& mu, 
     double const& variance);
 
@@ -169,6 +171,9 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    bool RBFNTile,
+    bool FixLocations,
+    arma::vec locations,
     double const& mintol);
 
 arma::mat deltaUpdateReg(
@@ -283,6 +288,9 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    bool RBFNTile,
+    bool FixLocations,
+    arma::vec locations,
     double const& mintol);
 
 arma::mat deltaUpdateRegNoSpikes(

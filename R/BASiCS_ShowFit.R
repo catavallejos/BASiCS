@@ -69,7 +69,9 @@ BASiCS_ShowFit <- function(object,
   # Create design matrix across the grid
   n <- ncol(object@parameters$beta)
   range <- diff(range(grid.mu))
-  myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
+  if (is.null(myu <- object@parameters$locations)) {
+    myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
+  }
   h <- diff(myu)*variance
 
   B <- matrix(1, length(grid.mu), n)

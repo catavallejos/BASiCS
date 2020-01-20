@@ -89,11 +89,13 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
+    bool RBFNTile,
+    bool FixLocations,
+    arma::vec locations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta) 
-{
+    double const& mintol_theta) {
   using arma::ones;
   using arma::zeros;
   using Rcpp::Rcout; 
@@ -196,7 +198,14 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux.col(0);
-  arma::mat X = designMatrix(k, means, variance);
+  if (!FixLocations) {
+    if (RBFNTile) {
+      locations = estimateRBFLocationsNTiles(log(means), k);
+    } else {
+      locations = estimateRBFLocations(log(means), k);
+    }
+  }
+  arma::mat X = designMatrix(k, locations, means, variance);
   
   StartSampler(N);
   
@@ -241,7 +250,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
                                 Constrain, RefGene, ConstrainGene_uvec, 
                                 NotConstrainGene_uvec, ConstrainType, 
                                 k, lambdaAux, betaAux, X, 
-                                sigma2Aux, variance, mintol_mu);     
+                                sigma2Aux, variance, RBFNTile,
+                                FixLocations, locations,
+                                mintol_mu);     
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
@@ -309,7 +320,14 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
-        X = designMatrix(k, means, variance);
+        if (!FixLocations) {
+          if (RBFNTile) {
+            locations = estimateRBFLocationsNTiles(log(means), k);
+          } else {
+            locations = estimateRBFLocations(log(means), k);
+          }
+        }
+        X = designMatrix(k, locations, means, variance);
       }
     }
     
@@ -369,7 +387,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   
   if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("s") = s.t(),
@@ -380,15 +399,19 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
         Rcpp::Named("designMatrix") = X,
+        Rcpp::Named("locations") = locations,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.nu") = LSnu.t(),
         Rcpp::Named("ls.theta") = LStheta.t(),
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn)
+      )
+    ); 
   }
   else {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("s") = s.t(),
@@ -398,6 +421,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("sigma2") = sigma,
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+        Rcpp::Named("RefFreq") = RefFreq / (N - Burn),
+        Rcpp::Named("locations") = locations
+      )
+    );
   }
 }

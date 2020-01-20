@@ -23,11 +23,11 @@ test_that("Valid BASiCS_MCMC output object", {
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix")
+                  "beta", "sigma2", "epsilon", "designMatrix", "locations")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
-  PostSummary <- Summary(Chain)  
-  expect_equal(names(PostSummary@parameters), ParamNames[-length(ParamNames)])
+  PostSummary <- Summary(Chain)
+  expect_equal(names(PostSummary@parameters), ParamNames[-(10:11)])
 
   # Data example: no-spikes
   set.seed(7)
@@ -51,13 +51,13 @@ test_that("Valid BASiCS_MCMC output object", {
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix", "RefFreq")
+                  "beta", "sigma2", "epsilon", "designMatrix", "locations", "RefFreq")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
   ind_names <- setdiff(
     seq_along(ParamNames), 
-    c(length(ParamNames)-1, length(ParamNames))
+    c(length(ParamNames) - 2, length(ParamNames) - 1, length(ParamNames))
   )
   expect_equal(
     names(PostSummary@parameters), 
