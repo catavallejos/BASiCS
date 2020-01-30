@@ -37,7 +37,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
 
   if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
-    s0 <- matrixStats::colSums2(CountsTech) /
+    s0 <- Matrix::colSums(CountsTech) /
       sum(metadata(Data)$SpikeInput[,2])
     nu0 <- s0
     phi0 <- size_scran / s0

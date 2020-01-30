@@ -47,7 +47,6 @@ Imports:
     grDevices,
     KernSmooth,
     MASS,
-    matrixStats, 
     methods, 
     Rcpp (>= 0.11.3),
     S4Vectors,
