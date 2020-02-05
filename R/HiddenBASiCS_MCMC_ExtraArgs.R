@@ -30,7 +30,9 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
                                           a.s = 1,
                                           b.s = 1,
                                           a.theta = 1,
-                                          b.theta = 1
+                                          b.theta = 1,
+                                          GeneExponent = 1,
+                                          CellExponent = 1
                                         ),
                                         eta = 5,
                                         Start = HiddenBASiCS_MCMC_Start(
@@ -65,7 +67,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
   }
 
   # Validity checks
-  if (!(
+  if (
+      !(
         # PriorParam$mu.mu > 0 & 
         length(PriorParam$mu.mu) == 1 &
         PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
@@ -76,8 +79,13 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
         PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
         PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
         PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 ))
+        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 &
+        PriorParam$GeneExponent > 0 & length(PriorParam$GeneExponent) == 1 &
+        PriorParam$CellExponent > 0 & length(PriorParam$CellExponent) == 1
+      )
+    ) {
     stop("Invalid prior hyper-parameter values.")
+  }
   if (Regression) {
     if (!(length(PriorParam$m) == k &
          ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &
