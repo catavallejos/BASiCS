@@ -1360,3 +1360,7 @@ version 1.9.11 (2020-01-11)
 
 version 1.9.12 (2020-01-17)
 - Fixes bug in `BASiCS_CorrectOffset` for no-spikes case
+
+version 1.9.13 (2020-02-05)
+- Adds option for prior scaling parameters (relevant for new divide and conquer
+approach only; does not affect UI)
