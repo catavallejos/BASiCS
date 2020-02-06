@@ -68,11 +68,10 @@
 #'   \item{\code{b.theta}}{Rate hyper-parameter for the
 #'         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
 #'         parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
-#'  \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
+#'   \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
 #'       specifies the degress of freedom for the residual term.
-#'       Default: \code{eta = 5}.}.
-#'
-#' }}
+#'       Default: \code{eta = 5}.}
+#' }
 #' \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies
 #'       the number of regression Gaussian Radial Basis Functions (GRBF) used
 #'       within the correlated prior adopted for gene-specific over-dispersion

@@ -22,13 +22,13 @@ arma::mat designMatrix(
   }
   return X;
 }
-
 arma::vec estimateRBFLocations(arma::vec const& log_mu, int const& k) {
   double ran = log_mu.max() - log_mu.min();
   arma::vec locations = arma::vec(k - 2);
   double d = ran / (k - 1);
-  for (unsigned int i = 0; i < locations.size(); i++) {
-    locations(i) = (i + 1) * d;
+  locations(0) = log_mu.min() + d;
+  for (unsigned int i = 1; i < locations.size(); i++) {
+    locations(i) = locations(i - 1) + d;
     //locations(i) =  locations(i - 1) + ran / (k - 3);
   }
   return locations;

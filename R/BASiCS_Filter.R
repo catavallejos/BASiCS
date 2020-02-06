@@ -70,8 +70,7 @@ BASiCS_Filter <- function(Counts,
                           MinTotalCountsPerCell = 2,
                           MinTotalCountsPerGene = 2,
                           MinCellsWithExpression = 2,
-                          MinAvCountsPerCellsWithExpression = 2)
-{
+                          MinAvCountsPerCellsWithExpression = 2) {
   q <- length(Tech)
   n <- ncol(Counts)
   CellIndex <- seq_len(n)
