@@ -7,7 +7,8 @@ test_that("Estimates match the given seed (spikes+regression)", {
   # Fixing starting values
   n <- ncol(Data); k <- 12
   PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n), 
+                     b.delta = 1, p.phi = rep(1, times = n),
+                     GeneExponent = 1, CellExponent = 1,
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   PriorParam$m <- rep(0, k);
   PriorParam$V <- diag(k) 
@@ -90,7 +91,8 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   # Fixing starting values
   n <- ncol(Data); k <- 12
   PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n), 
+                     b.delta = 1, p.phi = rep(1, times = n),
+                     GeneExponent = 1, CellExponent = 1,
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   PriorParam$m <- rep(0, k)
   PriorParam$V <- diag(k) 
@@ -106,7 +108,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   # Running the sampler
   set.seed(12)
   Chain <- run_MCMC(Data, 
-                    N = 50, Thin = 10, Burn = 10,
+                    N = 8, Thin = 2, Burn = 4,
                     PrintProgress = FALSE, Regression = TRUE,
                     StoreAdapt = TRUE, Start = Start, PriorParam = PriorParam,
                     MinGenesPerRBF = NA)

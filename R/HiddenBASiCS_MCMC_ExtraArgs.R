@@ -73,10 +73,12 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
 
   PriorDelta <- match.arg(PriorDelta)
   if (missing(PriorDelta) & !Regression) {
-    message("-------------------------------------------------------------\n",
-            "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
-            "Vallejos et al (2015) used a 'gamma' prior instead.\n",
-            "-------------------------------------------------------------\n")
+    message(
+      "-------------------------------------------------------------\n",
+      "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
+      "Vallejos et al (2015) used a 'gamma' prior instead.\n",
+      "-------------------------------------------------------------\n"
+    )
   }
   if (Regression) {
     .stop_k(k)
@@ -89,7 +91,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
   }
 
   # Validity checks
-  if (!(
+  if (
+      !(
         # PriorParam$mu.mu > 0 & 
         length(PriorParam$mu.mu) == 1 &
         PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
@@ -100,8 +103,13 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
         PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
         PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
         PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 ))
+        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 &
+        PriorParam$GeneExponent > 0 & length(PriorParam$GeneExponent) == 1 &
+        PriorParam$CellExponent > 0 & length(PriorParam$CellExponent) == 1
+      )
+    ) {
     stop("Invalid prior hyper-parameter values.")
+  }
   if (Regression) {
     if (!(length(PriorParam$m) == k &
          ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &

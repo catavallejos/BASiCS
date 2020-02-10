@@ -56,7 +56,9 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta);
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // MCMC sampler for regression case
 Rcpp::List HiddenBASiCS_MCMCcppReg(
@@ -107,7 +109,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta);
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
+
 
 // MCMC sampler for the non-spike case
 Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
@@ -152,7 +157,9 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta);
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // MCMC sampler for regression and non-spikes case
 Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
@@ -190,7 +197,6 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     arma::vec NotConstrainGene,
     int ConstrainType,
     int StochasticRef,
-    double ar, 
     arma::vec LSmu0, 
     arma::vec LSdelta0, 
     arma::vec LSnu0, 
@@ -206,7 +212,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta);
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent);
 
 // Function to cumpute denoised rates
 arma::mat HiddenBASiCS_DenoisedRates(
