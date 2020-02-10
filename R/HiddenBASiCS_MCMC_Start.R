@@ -2,6 +2,7 @@
 HiddenBASiCS_MCMC_Start <- function(Data,
                                     PriorParam,
                                     WithSpikes,
+                                    Regression,
                                     ls.mu0 = -4,
                                     ls.delta0 = -2,
                                     ls.phi0 = 11,
@@ -64,45 +65,53 @@ HiddenBASiCS_MCMC_Start <- function(Data,
     mu0 <- meansBio
   }
 
-    # Starting value for delta
-    # Defined by the CV for high- and mid-expressed genes
-    # This is motivated by equation (2) in Vallejos et al (2016)
-    varsBio <- apply(nCountsBio, 1, var)
-    cv2Bio <- varsBio / (meansBio)^2
-    delta0 <- rgamma(q.bio, 1, 1) + 1
-    Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
-    delta0[Aux] <- cv2Bio[Aux]
-    # 1e-3 added to be coherent with tolerance used within MCMC sampler
-    delta0 <- delta0 + 0.001
+  # Starting value for delta
+  # Defined by the CV for high- and mid-expressed genes
+  # This is motivated by equation (2) in Vallejos et al (2016)
+  varsBio <- apply(nCountsBio, 1, var)
+  cv2Bio <- varsBio / (meansBio)^2
+  delta0 <- rgamma(q.bio, 1, 1) + 1
+  Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
+  delta0[Aux] <- cv2Bio[Aux]
+  # 1e-3 added to be coherent with tolerance used within MCMC sampler
+  delta0 <- delta0 + 0.001
 
-    # Random stating value for theta (within typically observed range)
-    theta0 <- runif(1, min = 0.2, max = 1)
+  # Random stating value for theta (within typically observed range)
+  theta0 <- runif(1, min = 0.2, max = 1)
 
-    # Starting values for the proposal variances
-    ls.mu0 <- rep(ls.mu0, q.bio)
-    ls.delta0 <- rep(ls.delta0, q.bio)
-    ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
-    ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
-    ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
-    # Convert to numeric values
-    ls.phi0 <- as.numeric(ls.phi0)
-    ls.theta0 <- as.numeric(ls.theta0)
+  # Starting values for the proposal variances
+  ls.mu0 <- rep(ls.mu0, q.bio)
+  ls.delta0 <- rep(ls.delta0, q.bio)
+  ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
+  ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
+  ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
+  # Convert to numeric values
+  ls.phi0 <- as.numeric(ls.phi0)
+  ls.theta0 <- as.numeric(ls.theta0)
 
-    # Output list
-    out <- list(mu0 = mu0, delta0 = delta0,
-                phi0 = phi0, s0 = s0,
-                nu0 = nu0, theta0 = theta0,
-                ls.mu0 = ls.mu0, ls.delta0 = ls.delta0,
-                ls.phi0 = ls.phi0, ls.nu0 = ls.nu0, ls.theta0 = ls.theta0)
+  # Output list
+  out <- list(
+    mu0 = mu0,
+    delta0 = delta0,
+    phi0 = phi0,
+    s0 = s0,
+    nu0 = nu0,
+    theta0 = theta0,
+    ls.mu0 = ls.mu0,
+    ls.delta0 = ls.delta0,
+    ls.phi0 = ls.phi0,
+    ls.nu0 = ls.nu0,
+    ls.theta0 = ls.theta0
+  )
 
-    # Starting values for regression-related parameters
-    if (!is.null(PriorParam$eta)) {
-      out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V)
-      out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
-      out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2,
-                        rate = PriorParam$eta/2)
-    }
+  # Starting values for regression-related parameters
+  if (Regression) {
+    out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V)
+    out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
+    out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2,
+                      rate = PriorParam$eta/2)
+  }
 
-    return(out)
+  return(out)
 }
 

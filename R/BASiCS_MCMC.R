@@ -193,8 +193,16 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
-{
+BASiCS_MCMC <- function(
+    Data,
+    N,
+    Thin,
+    Burn,
+    Regression,
+    WithSpikes = TRUE,
+    ...
+  ) {
+
   # Checks to ensure input arguments are valid
   HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
 
@@ -216,12 +224,15 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
   }
 
   # Assignment of optional parameters (default values if input not provided)
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,
-                                         Burn,
-                                         GPar,
-                                         Regression,
-                                         WithSpikes,
-                                         ...)
+  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(
+    Data,
+    Burn,
+    GPar,
+    Regression,
+    WithSpikes,
+    ...
+  )
+
   # Starting values for the MCMC (parameters and adaptive variances)
   # Loaded separately to simplify calling to the elements of its list
   # Same for prior parameters
@@ -230,7 +241,6 @@ BASiCS_MCMC <- function(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
 
   # If spikes are available
   if (WithSpikes) {
-
     # If regression case is chosen
     if (Regression) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")

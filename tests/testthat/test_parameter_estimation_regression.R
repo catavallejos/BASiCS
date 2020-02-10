@@ -18,20 +18,23 @@ test_that("Estimates match the given seed (spikes+regression)", {
   PriorParam$FixLocations <- FALSE
   PriorParam$locations <- rep(0, k)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE, Regression = TRUE)
   # Running the sampler
   set.seed(12)
   Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                        PrintProgress = FALSE, Regression = TRUE,
-                       Start = Start, PriorParam = PriorParam)
+                       Start = Start, PriorParam = PriorParam,
+                       MinGenesPerRBF = NA)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
   
   # Checking parameter names
-  ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
+  ParamNamesC <- c("mu", "delta", "phi", "s", "nu", "theta",
+                  "beta", "sigma2", "epsilon", "locations")
+  ParamNamesS <- c("mu", "delta", "phi", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon")
-  expect_equal(names(Chain@parameters), ParamNames)
-  expect_equal(names(PostSummary@parameters), ParamNames)
+  expect_equal(names(Chain@parameters), ParamNamesC)
+  expect_equal(names(PostSummary@parameters), ParamNamesS)
             
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(6.410, 11.549,  4.264,  3.762, 26.152)
@@ -99,12 +102,13 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   PriorParam$locations <- rep(0, k)
 
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE, Regression = TRUE)
   # Running the sampler
   set.seed(12)
   Chain <- run_MCMC(Data, 
                     N = 50, Thin = 10, Burn = 10,
                     PrintProgress = FALSE, Regression = TRUE,
-                    StoreAdapt = TRUE,Start = Start, PriorParam = PriorParam)
+                    StoreAdapt = TRUE, Start = Start, PriorParam = PriorParam,
+                    MinGenesPerRBF = NA)
   expect_s4_class(Chain, "BASiCS_Chain")
 })

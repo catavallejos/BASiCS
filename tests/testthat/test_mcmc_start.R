@@ -8,7 +8,8 @@ test_that("Generated starting values do not match given seed (spikes case)", {
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE,
+    Regression = FALSE)
 
   Check0 <- c(7.262, 10.828,  6.816,  8.258, 21.141)
   Check <- as.vector(round(Start$mu0[1:5], 3))
@@ -64,7 +65,8 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
                      b.delta = 1, p.phi = rep(1, times = n),
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE,
+    Regression = FALSE)
   
   Check0 <- c(9.019, 20.049,  7.819, 13.087, 35.027)
   Check <- as.vector(round(Start$mu0[1:5], 3))
@@ -124,7 +126,8 @@ test_that("Generated starting values do not match given seed (regression+spike)"
   PriorParam$eta <- 5
 
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE,
+    Regression = TRUE)
   
   Check0 <- c(0.800,  1.939, -0.906,  0.554,  0.897)
   Check <- as.vector(round(Start$beta0[1:5], 3))

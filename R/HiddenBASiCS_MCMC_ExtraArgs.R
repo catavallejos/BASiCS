@@ -1,54 +1,77 @@
-HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
-                                        Burn,
-                                        GPar,
-                                        Regression,
-                                        WithSpikes,
-                                        PriorDelta = c("log-normal", "gamma"),
-                                        PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-                                        k = 12,
-                                        ## Duplicated arg here for backwards-compatibility.
-                                        ## If both specified, Var is ignored.
-                                        Var = 1.2,
-                                        variance = Var,
-                                        StochasticRef = TRUE,
-                                        ConstrainType = 1,
-                                        ConstrainProp = 0.2,
-                                        AR = 0.44,
-                                        StopAdapt = Burn,
-                                        StoreChains = FALSE,
-                                        StoreAdapt = FALSE,
-                                        StoreDir = getwd(),
-                                        RunName = "",
-                                        PrintProgress = TRUE,
-                                        PriorParam = list(
-                                          mu.mu = 0,
-                                          s2.mu = 0.5,
-                                          s2.delta = 0.5,
-                                          a.delta = 1,
-                                          b.delta = 1,
-                                          p.phi = rep(1, times = GPar$n),
-                                          a.s = 1,
-                                          b.s = 1,
-                                          a.theta = 1,
-                                          b.theta = 1,
-                                          RBFNTiles = TRUE,
-                                          FixLocations = FALSE,
-                                          locations = numeric(k)
-                                        ),
-                                        eta = 5,
-                                        Start = HiddenBASiCS_MCMC_Start(
-                                          Data,
-                                          PriorParam,
-                                          WithSpikes,
-                                          ),
-                                        mintol_mu = 1e-3,
-                                        mintol_delta = 1e-3,
-                                        mintol_nu = 1e-5,
-                                        mintol_theta = 1e-4
-) {
+HiddenBASiCS_MCMC_ExtraArgs <- function(
+    Data,
+    Burn,
+    GPar,
+    Regression,
+    WithSpikes,
+    PriorDelta = c("log-normal", "gamma"),
+    PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
+    k = 12,
+    ## Duplicated arg here for backwards-compatibility.
+    ## If both specified, Var is ignored.
+    Var = 1.2,
+    variance = Var,
+    StochasticRef = TRUE,
+    ConstrainType = 1,
+    ConstrainProp = 0.2,
+    AR = 0.44,
+    StopAdapt = Burn,
+    StoreChains = FALSE,
+    StoreAdapt = FALSE,
+    StoreDir = getwd(),
+    RunName = "",
+    PrintProgress = TRUE,
+    MinGenesPerRBF = 100,
+    PriorParam = list(
+      mu.mu = 0,
+      s2.mu = 0.5,
+      s2.delta = 0.5,
+      a.delta = 1,
+      b.delta = 1,
+      p.phi = rep(1, times = GPar$n),
+      a.s = 1,
+      b.s = 1,
+      a.theta = 1,
+      b.theta = 1,
+      RBFNTiles = TRUE,
+      FixLocations = FALSE,
+      m = numeric(k),
+      V = diag(k),
+      a.sigma2 = 1,
+      b.sigma2 = 1,
+      eta = eta,
+      locations = numeric(k)
+    ),
+    eta = 5,
+    Start = HiddenBASiCS_MCMC_Start(
+      Data = Data,
+      PriorParam = PriorParam,
+      WithSpikes = WithSpikes,
+      Regression = Regression
+    ),
+    mintol_mu = 1e-3,
+    mintol_delta = 1e-3,
+    mintol_nu = 1e-5,
+    mintol_theta = 1e-4
+  ) {
+
+  .stop_k(k)
+  lm <- log(Start$mu0)
+  locations <- .estimateRBFLocations(lm, k)
+  if (!is.na(MinGenesPerRBF)) {
+    d <- (locations[[2]] - locations[[1]]) / 2
+    retain <- vapply(
+      locations,
+      function(location) {
+        sum(lm > location - d & lm < location + d) > MinGenesPerRBF
+      },
+      logical(1)
+    )
+    locations <- locations[retain]
+  }
+  k <- length(locations) + 2
 
   PriorDelta <- match.arg(PriorDelta)
-
   if (missing(PriorDelta) & !Regression) {
     message("-------------------------------------------------------------\n",
             "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
@@ -56,9 +79,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
             "-------------------------------------------------------------\n")
   }
   if (Regression) {
-    if (k <= 3) {
-      stop("The number of basis functions needs to be >= 4.")
-    }
+    .stop_k(k)
   }
 
   if (Regression) {
@@ -122,7 +143,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
     GPar$q.bio, 
     Start$mu0, 
     PriorDelta, 
-    ConstrainProp)
+    ConstrainProp
+  )
   ConstrainGene <- NoSpikesParam$ConstrainGene
   NotConstrainGene <- NoSpikesParam$NotConstrainGene
   Constrain <- NoSpikesParam$Constrain
@@ -130,16 +152,40 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(Data,
   RefGene <- NoSpikesParam$RefGene
   Index <- seq_len(GPar$q.bio) - 1
 
- list(AR = AR, StopAdapt = StopAdapt, StoreChains = StoreChains,
-      StoreAdapt = StoreAdapt, StoreDir = StoreDir,
-      RunName = RunName, PrintProgress = PrintProgress,
-      PriorParam = PriorParam, PriorDeltaNum = PriorDeltaNum,
-      PriorDelta = PriorDelta,
-      StochasticRef = StochasticRef,
-      ConstrainType = ConstrainType, ConstrainProp = ConstrainProp,
-      k = k, variance = variance, Start = Start,
-      mintol_mu = mintol_mu, mintol_delta = mintol_delta,
-      mintol_nu = mintol_nu, mintol_theta = mintol_theta,
-      ConstrainGene = ConstrainGene, NotConstrainGene = NotConstrainGene,
-      Constrain = Constrain, RefGenes = RefGenes, RefGene = RefGene, Index = Index)
+  list(
+    AR = AR,
+    StopAdapt = StopAdapt,
+    StoreChains = StoreChains,
+    StoreAdapt = StoreAdapt,
+    StoreDir = StoreDir,
+    RunName = RunName,
+    PrintProgress = PrintProgress,
+    PriorParam = PriorParam,
+    PriorDeltaNum = PriorDeltaNum,
+    PriorDelta = PriorDelta,
+    StochasticRef = StochasticRef,
+    ConstrainType = ConstrainType,
+    ConstrainProp = ConstrainProp,
+    k = k,
+    locations = locations,
+    variance = variance,
+    Start = Start,
+    mintol_mu = mintol_mu,
+    mintol_delta = mintol_delta,
+    mintol_nu = mintol_nu,
+    mintol_theta = mintol_theta,
+    ConstrainGene = ConstrainGene,
+    NotConstrainGene = NotConstrainGene,
+    Constrain = Constrain,
+    RefGenes = RefGenes,
+    RefGene = RefGene,
+    Index = Index
+  )
+}
+
+## This condition has to be re-used
+.stop_k <- function(k) {
+  if (k <= 3) {
+    stop("The number of basis functions needs to be >= 4.")
+  }      
 }

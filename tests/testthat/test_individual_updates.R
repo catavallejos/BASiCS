@@ -23,7 +23,8 @@ test_that("Spikes + no regression", {
                      b.delta = 1, p.phi = rep(1, times = n), 
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE,
+    Regression = FALSE)
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   
