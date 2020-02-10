@@ -1305,3 +1305,6 @@ version 1.7.19 (2019-10-08)
 
 version 1.7.20 (2019-10-17)
 - Bumps version number to trigger new build.
+
+version 1.8.1 (2020-02-10)
+ - Fixes bug in `BASiCS_CorrectOffset` for no-spikes case

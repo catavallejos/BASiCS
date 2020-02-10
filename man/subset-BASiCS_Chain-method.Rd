@@ -6,8 +6,7 @@
 \alias{subset,BASiCS_Chain-method}
 \title{A 'subset' method for `BASiCS_Chain`` objects}
 \usage{
-\S4method{subset}{BASiCS_Chain}(x, Genes = NULL, Cells = NULL,
-  Iterations = NULL)
+\S4method{subset}{BASiCS_Chain}(x, Genes = NULL, Cells = NULL, Iterations = NULL)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}

@@ -5,8 +5,13 @@
 \title{Creates a SingleCellExperiment object from a matrix of expression
 counts and experimental information about spike-in genes}
 \usage{
-newBASiCS_Data(Counts, Tech = rep(FALSE, nrow(Counts)),
-  SpikeInfo = NULL, BatchInfo = NULL, SpikeType = "ERCC")
+newBASiCS_Data(
+  Counts,
+  Tech = rep(FALSE, nrow(Counts)),
+  SpikeInfo = NULL,
+  BatchInfo = NULL,
+  SpikeType = "ERCC"
+)
 }
 \arguments{
 \item{Counts}{Matrix of dimensions \code{q} times \code{n} whose elements
