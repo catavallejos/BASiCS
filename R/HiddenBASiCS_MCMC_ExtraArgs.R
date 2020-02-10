@@ -6,7 +6,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     WithSpikes,
     PriorDelta = c("log-normal", "gamma"),
     PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-    k = 12,
+    k = 10,
     ## Duplicated arg here for backwards-compatibility.
     ## If both specified, Var is ignored.
     Var = 1.2,
