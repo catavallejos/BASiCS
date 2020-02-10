@@ -92,8 +92,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta) 
-{
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent) {
+
   using arma::ones;
   using arma::zeros;
   using Rcpp::Rcout; 
@@ -192,6 +194,13 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   double sigma2Aux = sigma20; 
   arma::vec epsilonAux = arma::zeros(q0);
   
+  double globalExponent = 1;
+  if (geneExponent != 1) {
+    globalExponent = geneExponent;
+  } else if (cellExponent != 1) {
+    globalExponent = cellExponent;
+  }
+
   // OTHER PARAMETERS FOR REGRESSION
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
@@ -205,23 +214,48 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) EndBurn();
+    if (i == Burn) {
+      EndBurn();
+    }
     
     Ibatch++; 
     
     // UPDATE OF PHI
     // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
-                        as, bs, BatchDesign, n, y_n); 
-    
+    sAux = sUpdateBatch(
+      sAux,
+      nuAux.col(0),
+      thetaBatch,
+      as,
+      bs,
+      BatchDesign,
+      n,
+      y_n,
+      cellExponent
+    );
+
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign, BatchSizes,
-                                sAux, nuAux.col(0), atheta, btheta, n, 
-                                nBatch, mintol_theta);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) thetaAccept += thetaAux.col(1);
+    thetaAux = thetaUpdateBatch(
+      thetaAux.col(0),
+      exp(LSthetaAux),
+      BatchDesign,
+      BatchSizes,
+      sAux,
+      nuAux.col(0),
+      atheta,
+      btheta,
+      n, 
+      nBatch,
+      globalExponent,
+      mintol_theta
+    );
+
+    PthetaAux += thetaAux.col(1);
+    if(i>=Burn) {
+      thetaAccept += thetaAux.col(1);
+    }
     thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
@@ -231,60 +265,135 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     if(StochasticRef == 1) {
       RefAux = as_scalar(arma::randi(1,arma::distr_param(0,RefGenes.size()-1) ));
       RefGene = RefGenes(RefAux); 
-      if(i >= Burn) RefFreq(RefGene) += 1;
+      if(i >= Burn) {
+        RefFreq(RefGene) += 1;
+      }
     }
-    muAux = muUpdateRegNoSpikes(muAux.col(0), exp(LSmuAux), 
-                                Counts, deltaAux.col(0), 
-                                1/deltaAux.col(0), nuAux.col(0), 
-                                sumByCellAll, mu_mu, s2mu, q0, n, 
-                                y_q0, u_q0, ind_q0, 
-                                Constrain, RefGene, ConstrainGene_uvec, 
-                                NotConstrainGene_uvec, ConstrainType, 
-                                k, lambdaAux, betaAux, X, 
-                                sigma2Aux, variance, mintol_mu);     
-    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    muAux = muUpdateRegNoSpikes(
+      muAux.col(0),
+      exp(LSmuAux),
+      Counts,
+      deltaAux.col(0),
+      1 / deltaAux.col(0),
+      nuAux.col(0),
+      sumByCellAll,
+      mu_mu,
+      s2mu,
+      q0,
+      n, 
+      y_q0,
+      u_q0,
+      ind_q0, 
+      Constrain,
+      RefGene,
+      ConstrainGene_uvec,
+      NotConstrainGene_uvec,
+      ConstrainType, 
+      k,
+      lambdaAux,
+      betaAux,
+      X, 
+      sigma2Aux,
+      variance,
+      geneExponent,
+      mintol_mu
+    );
+    PmuAux += muAux.col(1);
+    if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // REGRESSION
     // THIS REQUIRES A NEW FULL CONDITIONAL
-    deltaAux = deltaUpdateRegNoSpikes(deltaAux.col(0), exp(LSdeltaAux), 
-                                      Counts, muAux.col(0), 
-                                      nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
-                                      lambdaAux, X, sigma2Aux, 
-                                      betaAux, mintol_delta);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
+    deltaAux = deltaUpdateRegNoSpikes(
+      deltaAux.col(0),
+      exp(LSdeltaAux),
+      Counts,
+      muAux.col(0), 
+      nuAux.col(0),
+      q0,
+      n,
+      y_q0,
+      u_q0,
+      ind_q0,
+      lambdaAux,
+      X,
+      sigma2Aux, 
+      betaAux,
+      geneExponent,
+      mintol_delta
+    );
+
+    PdeltaAux += deltaAux.col(1);
+    if(i>=Burn) deltaAccept += deltaAux.col(1);
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatchNoSpikes(nuAux.col(0), exp(LSnuAux), Counts, 
-                                  BatchDesign,
-                                  muAux.col(0), 1/deltaAux.col(0),
-                                  sAux, thetaBatch, sumByGeneAll, q0, n,
-                                  y_n, u_n, ind_n, mintol_nu); 
-    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
+    nuAux = nuUpdateBatchNoSpikes(
+      nuAux.col(0),
+      exp(LSnuAux),
+      Counts, 
+      BatchDesign,
+      muAux.col(0),
+      1 / deltaAux.col(0),
+      sAux,
+      thetaBatch,
+      sumByGeneAll,
+      q0,
+      n,
+      y_n,
+      u_n,
+      ind_n,
+      cellExponent,
+      mintol_nu
+    );
+    PnuAux += nuAux.col(1);
+    if(i>=Burn) nuAccept += nuAux.col(1);
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
-    V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
+    V1 = (inv_V0 * geneExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
     if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
-      mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
-      mAux = VAux*mAux;
+      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * geneExponent);
+      mAux = VAux * mAux;
       
       // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
-      betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
-      sigma2Aux = sigma2UpdateReg(deltaAux.col(0), betaAux, lambdaAux, V1, 
-                                  mInvVm0, mAux, sigma2_a0, sigma2_b0, q0);
+      betaAux = betaUpdateReg(
+        sigma2Aux,
+        VAux,
+        mAux
+      );
+      sigma2Aux = sigma2UpdateReg(
+        deltaAux.col(0),
+        betaAux,
+        lambdaAux,
+        V1, 
+        mInvVm0 * globalExponent,
+        mAux,
+        sigma2_a0,
+        sigma2_b0,
+        q0,
+        globalExponent
+      );
     }
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
-    lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
-                                eta0, q0, y_q0);
+    lambdaAux = lambdaUpdateReg(
+      deltaAux.col(0),
+      X,
+      betaAux,
+      sigma2Aux, 
+      eta0,
+      q0,
+      y_q0,
+      globalExponent
+    );
+
     // UPDATE OF EPSILON 
     // Direct calculation conditional on regression related parameters
-    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
-    
+    epsilonAux = log(deltaAux.col(0)) - X * betaAux;
+
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)

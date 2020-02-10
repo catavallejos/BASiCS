@@ -59,7 +59,9 @@ BASiCS_CorrectOffset <- function(Chain,
   # Application of offset
   Chain_offset <- Chain
   Chain_offset@parameters$mu <- Chain@parameters$mu / OffsetEst
-  Chain_offset@parameters$phi <- Chain@parameters$phi * OffsetEst
+  if("phi" %in% names(Chain@parameters)) {
+    Chain_offset@parameters$phi <- Chain@parameters$phi * OffsetEst  
+  } else { Chain_offset@parameters$s <- Chain@parameters$s * OffsetEst }
   
   list("Chain" = Chain_offset, 
        "Offset" = OffsetEst, 
