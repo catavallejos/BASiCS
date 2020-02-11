@@ -676,38 +676,41 @@ BASiCS_TestDE <- function(Chain1,
     } else {
       par(mfrow = c(1, 2))
     }
-    with(
-      TableMean,
-      graphics::smoothScatter(log2(MeanOverall), MeanLog2FC,
-        bty = "n",
-        xlab = "Mean expresssion (log2)",
-        ylab = paste(
-          "Log2 fold change",
-          GroupLabel1, "vs",
-          GroupLabel2
-        ),
-        main = "Differential mean"
-      )
+    graphics::smoothScatter(
+      log2(TableMean[["MeanOverall"]]),
+      TableMean[["MeanLog2FC"]],
+      bty = "n",
+      xlab = "Mean expresssion (log2)",
+      ylab = paste(
+        "Log2 fold change",
+        GroupLabel1, "vs",
+        GroupLabel2
+      ),
+      main = "Differential mean"
     )
-    with(
-      TableMean[!(TableMean$ResultDiffMean %in%
-        c("ExcludedByUser", "NoDiff")), ],
-      points(log2(MeanOverall), MeanLog2FC, pch = 16, col = "red")
+    indUse <- !(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff"))
+    points(
+      log2(TableMean[indUse, "MeanOverall"]),
+      TableMean[indUse, "MeanLog2FC"],
+      pch = 16,
+      col = "red"
     )
+    
     abline(h = c(-EpsilonM, EpsilonM), lty = 2)
-    with(
-      TableDisp,
-      graphics::smoothScatter(log2(MeanOverall), DispLog2FC,
-        bty = "n",
-        xlab = "Mean expresssion (log2)",
-        ylab = paste(
-          "Log2 fold change",
-          GroupLabel1, "vs",
-          GroupLabel2
-        ),
-        main = "Differential dispersion"
-      )
+    
+    graphics::smoothScatter(
+      log2(TableDisp[["MeanOverall"]]),
+      TableDisp[["DispLog2FC"]],
+      bty = "n",
+      xlab = "Mean expresssion (log2)",
+      ylab = paste(
+        "Log2 fold change",
+        GroupLabel1, "vs",
+        GroupLabel2
+      ),
+      main = "Differential dispersion"
     )
+
     with(
       TableDisp[!(TableDisp$ResultDiffDisp %in%
         c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],

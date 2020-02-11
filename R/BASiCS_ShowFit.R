@@ -108,9 +108,11 @@ BASiCS_ShowFit <- function(object,
     cols <- c("dark blue", "yellow", "dark red")
     plot.out <- plot.out +
       ggplot2::geom_hex(bins = 100) +
-      ggplot2::scale_fill_gradientn(name = "",
-                                    colours = grDevices::colorRampPalette(cols)(100),
-                                    guide = FALSE)
+      ggplot2::scale_fill_gradientn(
+        name = "",
+        colours = grDevices::colorRampPalette(cols)(100),
+        guide = FALSE
+      )
   }
   else {
     plot.out <- plot.out +
@@ -133,12 +135,14 @@ BASiCS_ShowFit <- function(object,
                        mapping = ggplot2::aes_string(x = "mu2", y = "yhat"),
                        colour = "dark red") #
   if(Uncertainty == TRUE) {
-    plot.out <- plot.out + geom_ribbon(data = df2,
-                                       inherit.aes = FALSE,
-                                       mapping = aes_string(x = "mu2",
-                                                            ymin = "yhat.lower",
-                                                            ymax = "yhat.upper"),
-                                       alpha = 0.5)
+    plot.out <- plot.out + geom_ribbon(
+      data = df2,
+      inherit.aes = FALSE,
+      mapping = aes_string(x = "mu2",
+      ymin = "yhat.lower",
+      ymax = "yhat.upper"),
+      alpha = 0.5
+    )
   }
     
   return(plot.out)
