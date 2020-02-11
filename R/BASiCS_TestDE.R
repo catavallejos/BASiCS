@@ -74,7 +74,7 @@
 #' parameter is only relevant with `Offset = TRUE`.
 #' @param CheckESS Should the effective sample size of the chains be tested to
 #' be of a suitable magnitude in order to be included in tests for
-#' differential expression? Default is TRUE If TRUE, genes with poor
+#' differential expression? Default is FALSE. If TRUE, genes with poor
 #' mixing will be excluded from the tests for differential expression.
 #' @param ESSThreshold If CheckESS is TRUE, this argument specifies
 #' the minimum effective sample size for a gene to be included in the tests for
@@ -243,7 +243,7 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_R = 0.05,
                           GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
                           min.mean = 1,
-                          CheckESS = TRUE,
+                          CheckESS = FALSE,
                           ESSThreshold = 100,
                           ...) {
   HiddenHeaderTest_DE(
@@ -676,41 +676,38 @@ BASiCS_TestDE <- function(Chain1,
     } else {
       par(mfrow = c(1, 2))
     }
-    graphics::smoothScatter(
-      log2(TableMean[["MeanOverall"]]),
-      TableMean[["MeanLog2FC"]],
-      bty = "n",
-      xlab = "Mean expresssion (log2)",
-      ylab = paste(
-        "Log2 fold change",
-        GroupLabel1, "vs",
-        GroupLabel2
-      ),
-      main = "Differential mean"
+    with(
+      TableMean,
+      graphics::smoothScatter(log2(MeanOverall), MeanLog2FC,
+        bty = "n",
+        xlab = "Mean expresssion (log2)",
+        ylab = paste(
+          "Log2 fold change",
+          GroupLabel1, "vs",
+          GroupLabel2
+        ),
+        main = "Differential mean"
+      )
     )
-    indUse <- !(TableMean$ResultDiffMean %in% c("ExcludedByUser", "NoDiff"))
-    points(
-      log2(TableMean[indUse, "MeanOverall"]),
-      TableMean[indUse, "MeanLog2FC"],
-      pch = 16,
-      col = "red"
+    with(
+      TableMean[!(TableMean$ResultDiffMean %in%
+        c("ExcludedByUser", "NoDiff")), ],
+      points(log2(MeanOverall), MeanLog2FC, pch = 16, col = "red")
     )
-    
     abline(h = c(-EpsilonM, EpsilonM), lty = 2)
-    
-    graphics::smoothScatter(
-      log2(TableDisp[["MeanOverall"]]),
-      TableDisp[["DispLog2FC"]],
-      bty = "n",
-      xlab = "Mean expresssion (log2)",
-      ylab = paste(
-        "Log2 fold change",
-        GroupLabel1, "vs",
-        GroupLabel2
-      ),
-      main = "Differential dispersion"
+    with(
+      TableDisp,
+      graphics::smoothScatter(log2(MeanOverall), DispLog2FC,
+        bty = "n",
+        xlab = "Mean expresssion (log2)",
+        ylab = paste(
+          "Log2 fold change",
+          GroupLabel1, "vs",
+          GroupLabel2
+        ),
+        main = "Differential dispersion"
+      )
     )
-
     with(
       TableDisp[!(TableDisp$ResultDiffDisp %in%
         c("ExcludedFromTesting", "ExcludedByUser", "NoDiff")), ],
