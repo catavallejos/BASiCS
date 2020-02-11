@@ -1,7 +1,7 @@
 #' @importFrom matrixStats colVars
 #' @importFrom stats ar setNames
 ess <- function(x) {
-  vars <- colVars(x)
+  vars <- matrixStats::colVars(x)
   spec <- numeric(ncol(x))
   has_var <- vars != 0
   if (any(has_var, na.rm = TRUE)) {
