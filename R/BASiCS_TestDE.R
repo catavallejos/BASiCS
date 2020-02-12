@@ -74,7 +74,7 @@
 #' parameter is only relevant with `Offset = TRUE`.
 #' @param CheckESS Should the effective sample size of the chains be tested to
 #' be of a suitable magnitude in order to be included in tests for
-#' differential expression? Default is FALSE. If TRUE, genes with poor
+#' differential expression? Default is TRUE. If TRUE, genes with poor
 #' mixing will be excluded from the tests for differential expression.
 #' @param MinESS If CheckESS is TRUE, this argument specifies
 #' the minimum effective sample size for a gene to be included in the tests for
