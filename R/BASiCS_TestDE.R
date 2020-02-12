@@ -76,7 +76,7 @@
 #' be of a suitable magnitude in order to be included in tests for
 #' differential expression? Default is FALSE. If TRUE, genes with poor
 #' mixing will be excluded from the tests for differential expression.
-#' @param ESSThreshold If CheckESS is TRUE, this argument specifies
+#' @param MinESS If CheckESS is TRUE, this argument specifies
 #' the minimum effective sample size for a gene to be included in the tests for
 #' differential expression. Default is 100.
 #' @param ... Optional parameters.
@@ -243,8 +243,8 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_R = 0.05,
                           GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
                           min.mean = 1,
-                          CheckESS = FALSE,
-                          ESSThreshold = 100,
+                          CheckESS = TRUE,
+                          MinESS = 100,
                           ...) {
   HiddenHeaderTest_DE(
     Chain1 = Chain1,
@@ -413,8 +413,8 @@ BASiCS_TestDE <- function(Chain1,
   Search <- is.null(ProbThresholdM)
 
   if (CheckESS) {
-    GoodESS <- ess(mcmc(Chain1@parameters[["mu"]])) > ESSThreshold &
-      ess(mcmc(Chain2@parameters[["mu"]])) > ESSThreshold
+    GoodESS <- ess(mcmc(Chain1@parameters[["mu"]])) > MinESS &
+      ess(mcmc(Chain2@parameters[["mu"]])) > MinESS
   } else {
     GoodESS <- rep(TRUE, length(GenesSelect))
   }
@@ -423,7 +423,7 @@ BASiCS_TestDE <- function(Chain1,
   # Calculating posterior probabilities
   ProbM <- .TailProb(Chain = abs(ChainTau), Threshold = EpsilonM)
   AuxMean <- .ThresholdSearch(
-    Probs = ProbM[GenesSelect],
+    Probs = ProbM[GenesSelect & GoodESS],
     ProbThreshold = ProbThresholdM,
     EFDR = EFDR_M,
     Task = "Differential mean",
@@ -472,8 +472,8 @@ BASiCS_TestDE <- function(Chain1,
   }
 
   if (CheckESS) {
-    GoodESS <- ess(mcmc(Chain1@parameters[["delta"]])) > ESSThreshold &
-      ess(mcmc(Chain2@parameters[["delta"]])) > ESSThreshold
+    GoodESS <- ess(mcmc(Chain1@parameters[["delta"]])) > MinESS &
+      ess(mcmc(Chain2@parameters[["delta"]])) > MinESS
   }
   DeltaSelect <- DeltaSelect & GoodESS
 
@@ -547,8 +547,8 @@ BASiCS_TestDE <- function(Chain1,
       EpsSelect <- NotExcluded
     }
     if (CheckESS) {
-      GoodESS <- ess(mcmc(Chain1@parameters[["epsilon"]])) > ESSThreshold &
-        ess(mcmc(Chain2@parameters[["epsilon"]])) > ESSThreshold
+      GoodESS <- ess(mcmc(Chain1@parameters[["epsilon"]])) > MinESS &
+        ess(mcmc(Chain2@parameters[["epsilon"]])) > MinESS
     }
     EpsSelect <- EpsSelect & GoodESS
 

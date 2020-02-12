@@ -1,3 +1,6 @@
+## Slightly optimised version of 
+## coda::effectiveSize 
+## https://cran.r-project.org/web/packages/coda/
 #' @importFrom matrixStats colVars
 #' @importFrom stats ar setNames
 ess <- function(x) {
