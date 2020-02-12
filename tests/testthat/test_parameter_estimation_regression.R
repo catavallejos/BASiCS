@@ -5,26 +5,33 @@ test_that("Estimates match the given seed (spikes+regression)", {
   set.seed(15)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
   # Fixing starting values
-  n <- ncol(Data); k <- 12
+  n <- ncol(Data)
+  k <- 12
   PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
                      b.delta = 1, p.phi = rep(1, times = n),
                      GeneExponent = 1, CellExponent = 1,
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  PriorParam$m <- rep(0, k);
+  PriorParam$m <- rep(0, k)
   PriorParam$V <- diag(k) 
-  PriorParam$a.sigma2 <- 2;
+  PriorParam$a.sigma2 <- 2
   PriorParam$b.sigma2 <- 2
   PriorParam$eta <- 5
-  PriorParam$RBFNTile <- FALSE
+  PriorParam$RBFNTiles <- FALSE
   PriorParam$FixLocations <- FALSE
-  PriorParam$locations <- rep(0, k)
+  PriorParam$locations <- rep(0, k - 2)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE, Regression = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    WithSpikes = TRUE,
+    Regression = TRUE
+  )
   # Running the sampler
   set.seed(12)
   Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
                        PrintProgress = FALSE, Regression = TRUE,
                        Start = Start, PriorParam = PriorParam,
+                       k = k,
                        MinGenesPerRBF = NA)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
@@ -101,7 +108,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   PriorParam$eta <- 5
   PriorParam$RBFNTile <- FALSE
   PriorParam$FixLocations <- FALSE
-  PriorParam$locations <- rep(0, k)
+  PriorParam$locations <- rep(0, k - 2)
 
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE, Regression = TRUE)
@@ -109,6 +116,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   set.seed(12)
   Chain <- run_MCMC(Data, 
                     N = 8, Thin = 2, Burn = 4,
+                    k = k,
                     PrintProgress = FALSE, Regression = TRUE,
                     StoreAdapt = TRUE, Start = Start, PriorParam = PriorParam,
                     MinGenesPerRBF = NA)

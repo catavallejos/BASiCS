@@ -27,7 +27,10 @@ test_that("Spikes + no regression", {
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE,
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    WithSpikes = TRUE,
     Regression = FALSE)
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
@@ -232,14 +235,20 @@ test_that("Spikes + regression", {
   )
 
   set.seed(2020)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = TRUE,
+    WithSpikes = TRUE
+  )
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  X <- BASiCS:::.designMatrix(k, Start$mu0, var)
+  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k)
+  X <- BASiCS:::.designMatrix(k, locations, Start$mu0, var)
 
   # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
@@ -264,6 +273,9 @@ test_that("Spikes + regression", {
     sigma2 = Start$sigma20,
     variance = var,
     exponent = 1,
+    RBFNTile = FALSE,
+    FixLocations = FALSE,
+    locations = locations,
     mintol = 1e-3
   )
 
@@ -358,7 +370,12 @@ test_that("No Spikes + no regression", {
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
   set.seed(2020)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = FALSE,
+    WithSpikes = FALSE
+  )
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
@@ -452,14 +469,20 @@ test_that("No Spikes + regression", {
   )
 
   set.seed(2044)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = TRUE,
+    WithSpikes = FALSE
+  )
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  X <- BASiCS:::.designMatrix(k, Start$mu0, var)
+  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k)
+  X <- BASiCS:::.designMatrix(k, locations, Start$mu0, var)
 
   ## Components for no-spikes
   means <- rowMeans(CountsBio)
@@ -493,6 +516,9 @@ test_that("No Spikes + regression", {
     sigma2 = Start$sigma20,
     variance = var,
     exponent = 1,
+    RBFNTile = FALSE,
+    FixLocations = FALSE,
+    locations = locations,
     mintol = 1e-3
   )
 

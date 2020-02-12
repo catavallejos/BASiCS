@@ -190,7 +190,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec epsilonAux = arma::zeros(q0);
   
   // OTHER PARAMETERS FOR REGRESSION
-  arma::mat V1 = arma::zeros(k,k);
+  arma::mat V1 = arma::zeros(k, k);
   // Model matrix initialization
   arma::vec means = muAux(arma::span(0, q0 - 1), 0);
   if (!FixLocations) {
@@ -202,7 +202,6 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   }
   arma::mat X = designMatrix(k, locations, means, variance);
   
-
   double globalExponent = 1;
   if (geneExponent != 1) {
     globalExponent = geneExponent;
@@ -213,11 +212,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   StartSampler(N);
   
   // START OF MCMC LOOP
-  for (int i=0; i<N; i++) {
+  for (int i = 0; i < N; i++) {
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) EndBurn();
+    if (i == Burn) {
+      EndBurn();
+    }
     
     Ibatch++; 
     
@@ -240,7 +241,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     );
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    if (i >= Burn) {
+      phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    }
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -260,7 +263,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_theta
     );
     PthetaAux += thetaAux.col(1);
-    if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    if (i >= Burn) {
+      thetaAccept += thetaAux.col(1);
+    }
     thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
@@ -294,7 +299,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_mu
     );
     PmuAux += muAux.col(1);
-    if(i>=Burn) muAccept += muAux.col(1);
+    if (i >= Burn) {
+      muAccept += muAux.col(1);
+    }
     
     // UPDATE OF S
     sAux = sUpdateBatch(
@@ -332,7 +339,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_delta
     );
     PdeltaAux += deltaAux.col(1);
-    if(i>=Burn) deltaAccept += deltaAux.col(1);  
+    if (i >= Burn) {
+      deltaAccept += deltaAux.col(1);
+    }
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -358,12 +367,15 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_nu
     );
     PnuAux += nuAux.col(1);
-    if(i>=Burn) nuAccept += nuAux.col(1);
+    if (i >= Burn) {
+      nuAccept += nuAux.col(1);
+    }
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = (inv_V0 * globalExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
-    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
+
+    if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
       mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * globalExponent);
       mAux = VAux*mAux;
       
@@ -386,6 +398,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         globalExponent
       );
     }
+
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
     lambdaAux = lambdaUpdateReg(
       deltaAux.col(0),
@@ -399,7 +412,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     );
     // UPDATE OF EPSILON 
     // Direct calculation conditional on regression related parameters
-    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
+    epsilonAux = log(deltaAux.col(0)) - X * betaAux;
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {

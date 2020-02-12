@@ -40,7 +40,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
       a.sigma2 = 1,
       b.sigma2 = 1,
       eta = eta,
-      locations = numeric(k)
+      locations = numeric(k - 2)
     ),
     eta = 5,
     Start = HiddenBASiCS_MCMC_Start(
@@ -49,6 +49,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
       WithSpikes = WithSpikes,
       Regression = Regression
     ),
+    GeneExponent = 1,
+    CellExponent = 1,
     mintol_mu = 1e-3,
     mintol_delta = 1e-3,
     mintol_nu = 1e-5,
@@ -67,6 +69,17 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
       },
       logical(1)
     )
+    # browser()
+    # plot(log(Start$mu0), log(Start$delta0))
+    # plot_distn <- function(mean, sd) {
+    #   x <- seq(0, 10, length=200)
+    #   y <- dnorm(x, mean=mean, sd=sd)
+    #   lines(x, y, type="l", lwd=2)
+    # }
+    # abline(v = locations)
+    # abline(v = locations + d, col = "grey80", lty = "dashed")
+    # abline(v = locations - d, col = "grey80", lty = "dashed")
+    # tmp <- sapply(locations, function(location) plot_distn(mean = location, sd = 0.5))
     locations <- locations[retain]
   }
   k <- length(locations) + 2
@@ -91,58 +104,57 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
   }
 
   # Validity checks
-  if (
-      !(
-        # PriorParam$mu.mu > 0 & 
-        length(PriorParam$mu.mu) == 1 &
-        PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
-        PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 &
-        PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 &
-        PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 1 &
-        all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == GPar$n &
-        PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
-        PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
-        PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 &
-        PriorParam$GeneExponent > 0 & length(PriorParam$GeneExponent) == 1 &
-        PriorParam$CellExponent > 0 & length(PriorParam$CellExponent) == 1
-      )
-    ) {
-    stop("Invalid prior hyper-parameter values.")
-  }
+  assertthat::assert_that(
+    length(PriorParam$mu.mu) == 1,
+    PriorParam$s2.mu > 0,
+    length(PriorParam$s2.mu) == 1,
+    PriorParam$s2.delta > 0,
+    length(PriorParam$s2.delta) == 1,
+    PriorParam$a.delta > 0,
+    length(PriorParam$a.delta) == 1,
+    PriorParam$b.delta > 0,
+    length(PriorParam$b.delta) == 1,
+    all(PriorParam$p.phi > 0),
+    length(PriorParam$p.phi) == GPar$n,
+    PriorParam$a.s > 0,
+    length(PriorParam$a.s) == 1,
+    PriorParam$b.s > 0,
+    length(PriorParam$b.s) == 1,
+    PriorParam$a.theta > 0,
+    length(PriorParam$a.theta) == 1,
+    PriorParam$b.theta > 0,
+    length(PriorParam$b.theta) == 1,
+    GeneExponent > 0,
+    length(GeneExponent) == 1,
+    CellExponent > 0,
+    length(CellExponent) == 1,
+    StopAdapt > 0,
+    length(StoreChains) == 1,
+    length(StoreAdapt) == 1,
+    is.dir(StoreDir),
+    PriorDelta %in% c("gamma", "log-normal"),
+    mintol_mu > 0,
+    mintol_delta > 0,
+    mintol_nu > 0,
+    mintol_theta > 0
+  )
+
   if (Regression) {
-    if (!(length(PriorParam$m) == k &
-         ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &
-         PriorParam$a.sigma2 > 0 & length(PriorParam$a.sigma2) == 1 &
-         PriorParam$b.sigma2 > 0 & length(PriorParam$b.sigma2) == 1 )) {
-      stop("Invalid prior hyper-parameter values.")
-    }
+    assertthat::assert_that(
+      length(PriorParam$m) == k,
+      ncol(PriorParam$V) == k,
+      nrow(PriorParam$V) == k,
+      PriorParam$a.sigma2 > 0,
+      length(PriorParam$a.sigma2) == 1,
+      PriorParam$b.sigma2 > 0,
+      length(PriorParam$b.sigma2) == 1
+    )
   }
 
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) {
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   }
-  if (!(StopAdapt > 0)) {
-    stop("Invalid StopAdapt value.")
-  }
-  if (!(is.logical(StoreChains) & length(StoreChains) == 1)) {
-    stop("Invalid StoreChains value.")
-  }
-  if (!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) {
-    stop("Invalid StoreAdapt value.")
-  }
-  if (!(file.info(StoreDir)["isdir"])) {
-    stop("Invalid StoreDir value.")
-  }
-  if (!(PriorDelta %in% c("gamma", "log-normal"))) {
-    stop("Invalid PriorDelta value.")
-  }
-  
-  if(!(mintol_mu > 0) | !(mintol_delta > 0) | 
-     !(mintol_nu > 0) | !(mintol_theta > 0)) {
-    stop("Invalid value for mintol parameters (mu, delta, nu or theta)")
-  }
-  
+
   # Definition of parameters that are specific to the no-spikes case
   NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
     GPar$BioCounts,
@@ -187,13 +199,21 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     Constrain = Constrain,
     RefGenes = RefGenes,
     RefGene = RefGene,
-    Index = Index
+    Index = Index,
+    GeneExponent = GeneExponent,
+    CellExponent = CellExponent
   )
 }
 
 ## This condition has to be re-used
 .stop_k <- function(k) {
   if (k <= 3) {
-    stop("The number of basis functions needs to be >= 4.")
+    stop(
+      paste(
+        "The number of basis functions needs to be >= 4.",
+        "Consider setting MinGenesPerRBF to NA or a lower positive integer.",
+        sep = "\n"
+      )
+    )
   }      
 }

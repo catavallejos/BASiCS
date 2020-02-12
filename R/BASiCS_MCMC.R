@@ -390,8 +390,8 @@ BASiCS_MCMC <- function(
           mintol_delta = ArgsDef$mintol_delta,
           mintol_nu = ArgsDef$mintol_nu,
           mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
+          geneExponent = ArgsDef$GeneExponent,
+          cellExponent = ArgsDef$CellExponent
         )
       )
 
@@ -443,8 +443,8 @@ BASiCS_MCMC <- function(
           mintol_delta = ArgsDef$mintol_delta,
           mintol_nu = ArgsDef$mintol_nu,
           mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
+          geneExponent = ArgsDef$GeneExponent,
+          cellExponent = ArgsDef$CellExponent
         )
       )
     }
@@ -506,8 +506,8 @@ BASiCS_MCMC <- function(
           mintol_delta = ArgsDef$mintol_delta,
           mintol_nu = ArgsDef$mintol_nu,
           mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
+          geneExponent = ArgsDef$GeneExponent,
+          cellExponent = ArgsDef$CellExponent
         )
       )
       # Remove epsilons for genes that are not expressed in at least 2 cells
@@ -560,8 +560,8 @@ BASiCS_MCMC <- function(
           mintol_delta = ArgsDef$mintol_delta,
           mintol_nu = ArgsDef$mintol_nu,
           mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
+          geneExponent = ArgsDef$GeneExponent,
+          cellExponent = ArgsDef$CellExponent
         )
       )
     }

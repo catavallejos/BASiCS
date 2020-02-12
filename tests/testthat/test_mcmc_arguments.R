@@ -23,7 +23,6 @@ test_that("Errors in basic MCMC arguments", {
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = TRUE,
                         MinGenesPerRBF = NA), NA)
-  
   # Check batch info when it contains text
   DataSpikesBatchNotFactor <- DataSpikes
   colData(DataSpikesBatchNotFactor)$BatchInfo <- 
@@ -36,13 +35,13 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
   
   # Check standard MCMC setting - additional parameters
   expect_error(run_MCMC(Data = DataSpikes, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE), NA)
   expect_error(run_MCMC(Data = DataSpikes, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = TRUE), NA)
   expect_error(run_MCMC(Data = DataNoSpikes, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = TRUE),
                regexp = ".*does not contain information about spike-in genes*")
   
@@ -73,11 +72,11 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
   metadata(Data2)$SpikeInput <- NULL
   altExp(Data2) <- NULL  
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE), NA)
   # Checks if data does not have spike-ins
   expect_error(run_MCMC(Data = DataNoSpikes, 
-                         N = 20, Thin = 2, Burn = 4, 
+                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = TRUE, MinGenesPerRBF = NA),
                regexp = ".*does not contain information about spike-in genes.*")
 })
@@ -88,14 +87,14 @@ test_that("MCMC arguments fail (no-spikes; no-regression)", {
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
                regexp = ".*requires the data to contain at least 2 batches*")
   # Checks if only batch info is not available
   Data2 <- DataNoSpikes
   SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
                regexp = ".*does not contain a BatchInfo vector*")
 
@@ -104,14 +103,14 @@ test_that("MCMC arguments fail (no-spikes; no-regression)", {
 test_that("MCMC arguments fail (regression)", {   
 
   expect_error(run_MCMC(Data = DataSpikes, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, k = 2, MinGenesPerRBF = NA), 
                regexp = "The number of basis functions needs to be >= 4.")
   
   Data2 <- DataSpikes
   S4Vectors::metadata(Data2)$SpikeInput <- NULL 
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = TRUE,
                         MinGenesPerRBF = NA),
                regexp = ".*does not contain \'SpikeInput\' as metadata.*")
@@ -119,18 +118,18 @@ test_that("MCMC arguments fail (regression)", {
   Data2 <- DataSpikes
   altExp(Data2) <- NULL   
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = TRUE,
                         MinGenesPerRBF = NA),
                regexp = ".*does not contain information about spike-in genes*")
   
   # Check standard MCMC setting - without spikes
   expect_error(run_MCMC(Data = DataSpikes, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE,
                         MinGenesPerRBF = NA), NA)
   expect_error(run_MCMC(Data = DataSpikesNoBatch, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE,
                         MinGenesPerRBF = NA),
                regexp = ".*requires the data to contain at least 2 batches*")
@@ -138,21 +137,21 @@ test_that("MCMC arguments fail (regression)", {
   Data2 <- DataNoSpikes
   S4Vectors::metadata(Data2)$SpikeInput <- NULL 
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE,
                         MinGenesPerRBF = NA), NA)
   
   Data2 <- DataNoSpikes
   altExp(Data2) <- NULL 
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE,
                         MinGenesPerRBF = NA), NA)
   
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE,
                         MinGenesPerRBF = NA),
                regexp = ".*requires the data to contain at least 2 batches*")
@@ -160,10 +159,19 @@ test_that("MCMC arguments fail (regression)", {
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- NULL
   expect_error(run_MCMC(Data = Data2, 
-                        N = 20, Thin = 2, Burn = 4, 
+                        N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE,
                         MinGenesPerRBF = NA),
                regexp = ".*does not contain a BatchInfo vector*")
+
+  expect_error(
+    run_MCMC(DataNoSpikes, N = 10, Thin = 2, Burn = 4, 
+             PrintProgress = FALSE, Regression = TRUE,
+             WithSpikes = FALSE,
+             Start = Start, PriorParam = PriorParam,
+             k = k, MinGenesPerRBF = 100),
+    "Consider setting MinGenesPerRBF to NA or a lower positive integer."
+  )
 })
 
 test_that("Checks for user generated SCE object", {    

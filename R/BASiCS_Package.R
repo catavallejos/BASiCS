@@ -30,6 +30,7 @@
 #' @importFrom SummarizedExperiment colData colData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
 #' @importFrom utils packageVersion read.delim write.table
+#' @importFrom assertthat assert_that
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importClassesFrom Biobase Versioned
 NULL
