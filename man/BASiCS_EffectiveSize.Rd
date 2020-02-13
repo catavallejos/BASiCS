@@ -12,13 +12,14 @@ BASiCS_effectiveSize(...)
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}.}
 
-\item{Param}{The parameter to use to calculate effectiveSize. Possible
+\item{Param}{The parameter to use to calculate effective sample size.
+Possible
 values: \code{'mu'}, \code{'delta'}, \code{'phi'}, \code{'s'}, 
 \code{'nu'}, \code{'theta'}, \code{'beta'}, \code{'sigma2'} and 
 \code{'epsilon'}.}
 
-\item{na.rm}{Remove \code{NA} values before calculating effectiveSize. 
-Only relevant when \code{Param = "epsilon"} (genes with very low 
+\item{na.rm}{Remove \code{NA} values before calculating effective sample 
+size. Only relevant when \code{Param = "epsilon"} (genes with very low 
 expression are excluding when infering the mean/over-dispersion trend. 
 Default: \code{na.rm = TRUE}.}
 
@@ -29,7 +30,7 @@ A vector with effective sample sizes for all the elements
 of \code{Param}
 }
 \description{
-A wrapper of \code{coda::effectiveSize} to be used with 
+A function to calculate effective sample size
 \code{\linkS4class{BASiCS_Chain}} objects.
 }
 \examples{

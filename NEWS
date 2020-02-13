@@ -1364,3 +1364,8 @@ version 1.9.12 (2020-01-17)
 version 1.9.13 (2020-02-05)
 - Adds option for prior scaling parameters (relevant for new divide and conquer
 approach only; does not affect UI)
+
+version 1.9.14 (2020-02-10)
+- Changes coda::effectiveSize for a more efficient internal implementation.
+- Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
+  genes for differential expression testing based on effective sample size.

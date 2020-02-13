@@ -12,7 +12,7 @@
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Param = 'mu'}
 #' @param x,y Optional MCMC parameter values to be plotted on the x or y axis, 
 #' respectively. If neither is supplied, Param will be plotted on the x axis
-#' and \code{coda::effectiveSize(Param)} will be plotted on the y axis as
+#' and effective sample size will be plotted on the y axis as
 #' a density plot.
 #' @param LogX,LogY A logical value indicating whether to use a log10
 #' transformation for the x or y axis, respectively.
@@ -59,7 +59,7 @@ BASiCS_DiagPlot <- function(object,
   } else {
     LogX <- Param %in% c("mu", "delta")
   }
-  Measure <- "effectiveSize"
+  Measure <- "ess"
   HiddenCheckValidCombination(x, y, Param)
   metric <- HiddenGetMeasure(object, Param, Measure, na.rm)
   sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()

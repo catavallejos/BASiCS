@@ -1,9 +1,30 @@
-HiddenScaleName <- function(Measure = c("effectiveSize",
+## Slightly optimised version of 
+## coda::effectiveSize 
+## https://cran.r-project.org/web/packages/coda/
+#' @importFrom matrixStats colVars
+#' @importFrom stats ar setNames
+ess <- function(x) {
+  vars <- matrixStats::colVars(x)
+  spec <- numeric(ncol(x))
+  has_var <- vars != 0
+  if (any(has_var, na.rm = TRUE)) {
+    spec[which(has_var)] <- apply(x[, which(has_var)],
+      2,
+      function(y) {
+        a <- ar(y, aic = TRUE)
+        a$var.pred / (1 - sum(a$ar)) ^ 2
+      }
+    )    
+  }
+  setNames(ifelse(spec == 0, 0, nrow(x) * vars / spec), colnames(x))
+}
+
+HiddenScaleName <- function(Measure = c("ess",
                                         "geweke.diag"),
                             Param = NULL) {
   Measure <- match.arg(Measure)
   measure_name <- switch(Measure, 
-    effectiveSize = "Effective sample size",
+    ess = "Effective sample size",
     geweke.diag = "Geweke diagnostic"
   )
   if (!is.null(Param)) {
@@ -14,7 +35,7 @@ HiddenScaleName <- function(Measure = c("effectiveSize",
 
 HiddenGetMeasure <- function(object, 
                              Param,
-                             Measure = c("effectiveSize",
+                             Measure = c("ess",
                                          "geweke.diag"), 
                              na.rm = FALSE) {
 
