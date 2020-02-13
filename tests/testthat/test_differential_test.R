@@ -49,6 +49,7 @@ test_that("Differential test is correct", {
 })
 
 
+
 test_that("Differential test is correct", {
 
   # Test usage of GenesSelect
@@ -99,3 +100,40 @@ test_that("Differential test is correct", {
   Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5), 2)
   expect_equal(Lfc2Disp, Lfc2Disp0)
 })
+
+
+
+test_that("CheckESS works", {
+  data(ChainSC)
+  data(ChainRNA)
+
+  MinESS <- 100
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSC,
+    Chain2 = ChainRNA,
+    EpsilonM = log2(1.5),
+    EpsilonD = log2(1.5),
+    OffSet = TRUE,
+    Plot = FALSE,
+    CheckESS = TRUE,
+    MinESS = MinESS,
+    PlotOffset = FALSE
+  )
+  
+  me1 <- coda::effectiveSize(ChainSC@parameters$mu)
+  me2 <- coda::effectiveSize(ChainRNA@parameters$mu)
+  # Classification frequency
+  expect_equivalent(
+    Test$TableMean$ResultDiffMean == "ExcludedLowESS",
+    !(me1 > MinESS & me2 > MinESS)
+  )
+
+  md1 <- coda::effectiveSize(ChainSC@parameters$delta)
+  md2 <- coda::effectiveSize(ChainRNA@parameters$delta)
+  # Classification frequency
+  expect_equivalent(
+    Test$TableDisp$ResultDiffDisp == "ExcludedLowESS",
+    !(md1 > MinESS & md2 > MinESS)
+  )
+})
+

@@ -70,17 +70,29 @@ test_that("Differential test requires same regression setting", {
   )
 })
 
-test_that("Differential test works with CheckESS", {
+test_that("CheckESS works", {
   data(ChainSCReg)
-  data(ChainRNA)
-  expect_error(
-    BASiCS_TestDE(
-      Chain1 = ChainSCReg,
-      Chain2 = ChainRNAReg,
-      Plot = FALSE,
-      PlotOffset = FALSE,
-      CheckESS = TRUE
-    ),
-    NA
+  data(ChainRNAReg)
+
+  MinESS <- 100
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSCReg,
+    Chain2 = ChainRNAReg,
+    EpsilonM = log2(1.5),
+    EpsilonD = log2(1.5),
+    OffSet = TRUE,
+    Plot = FALSE,
+    CheckESS = TRUE,
+    MinESS = MinESS,
+    PlotOffset = FALSE
+  )
+  ee1 <- coda::effectiveSize(ChainSCReg@parameters$epsilon)
+  ee2 <- coda::effectiveSize(ChainRNAReg@parameters$epsilon)
+
+  # Classification frequency
+  expect_equivalent(
+    Test$TableResDisp$ResultDiffResDisp == "ExcludedLowESS",
+    !(ee1 > MinESS & ee2 > MinESS)
   )
 })
+
