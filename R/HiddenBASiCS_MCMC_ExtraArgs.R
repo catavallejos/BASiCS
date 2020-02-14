@@ -61,6 +61,9 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     # abline(v = locations - d, col = "grey80", lty = "dashed")
     # tmp <- sapply(locations, function(location) plot_distn(mean = location, sd = 0.5))
     locations <- locations[retain]
+    PriorParam$m <- PriorParam$m[retain]
+    PriorParam$V <- PriorParam$V[retain, retain]
+    Start$beta0 <- Start$beta0[retain]
   }
   k <- length(locations) + 2
 
@@ -76,7 +79,6 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
   if (Regression) {
     .stop_k(k)
   }
-
   # Validity checks
   assertthat::assert_that(
     length(PriorParam$mu.mu) == 1,
