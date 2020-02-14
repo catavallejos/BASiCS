@@ -31,7 +31,7 @@ arma::mat muUpdateRegNoSpikes(
     double variance,
     bool FixLocations,
     bool RBFMinMax,
-    arma::vec locations,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol) {
 
@@ -68,9 +68,9 @@ arma::mat muUpdateRegNoSpikes(
   // Revise this part
   // This is new due to regression prior on delta
   if (!FixLocations) {  
-    locations = estimateRBFLocations(log(mu1), k, RBFMinMax);
+    RBFLocations = estimateRBFLocations(log(mu1), k, RBFMinMax);
   }
-  arma::mat X_mu1 = designMatrix(k, locations, mu1, variance);
+  arma::mat X_mu1 = designMatrix(k, RBFLocations, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   log_aux -= exponent * lambda % 

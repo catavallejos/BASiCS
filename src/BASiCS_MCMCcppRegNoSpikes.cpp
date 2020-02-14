@@ -33,7 +33,7 @@
  * EndAdapt: when to stop the adaptation
  * PrintProgress: whether to print progress report 
  * k: Number of regression components; k-2 Gaussian radial basis functions (GRBFs)
- * m0: Starting values for locations of GRBFs
+ * m0: Starting values for GRBFs coefficients
  * V0: Starting value for covariance matrix 
  * sigma2_a0: Prior shape for Gamma distribution
  * sigma2_b0: Prior rate for Gamma distribution
@@ -91,7 +91,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int PrintProgress,
     bool FixLocations,
     bool RBFMinMax,
-    arma::vec locations,
+    arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -209,9 +209,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // Model matrix initialization
   arma::vec means = muAux.col(0);
   if (!FixLocations) {
-    locations = estimateRBFLocations(log(means), k, RBFMinMax);
+    RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
   }
-  arma::mat X = designMatrix(k, locations, means, variance);
+  arma::mat X = designMatrix(k, RBFLocations, means, variance);
   
   StartSampler(N);
   
@@ -302,7 +302,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       variance,
       FixLocations,
       RBFMinMax,
-      locations,
+      RBFLocations,
       geneExponent,
       mintol_mu);
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
@@ -425,9 +425,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
         if (!FixLocations) {
-          locations = estimateRBFLocations(log(means), k, RBFMinMax);
+          RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
         }
-        X = designMatrix(k, locations, means, variance);
+        X = designMatrix(k, RBFLocations, means, variance);
       }
     }
     
@@ -499,7 +499,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
         Rcpp::Named("designMatrix") = X,
-        Rcpp::Named("locations") = locations,
+        Rcpp::Named("RBFLocations") = RBFLocations,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.nu") = LSnu.t(),
@@ -522,7 +522,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
         Rcpp::Named("RefFreq") = RefFreq / (N - Burn),
-        Rcpp::Named("locations") = locations
+        Rcpp::Named("RBFLocations") = RBFLocations
       )
     );
   }

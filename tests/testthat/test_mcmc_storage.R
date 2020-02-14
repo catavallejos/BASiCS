@@ -1,4 +1,4 @@
-context("Output of BASiCS_MCMC\n")
+context("Output of BASiCS_MCMC")
 
 test_that("Valid BASiCS_MCMC output object", {
   # Data example: spikes
@@ -24,7 +24,7 @@ test_that("Valid BASiCS_MCMC output object", {
                     MinGenesPerRBF = NA)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix", "locations")
+                  "beta", "sigma2", "epsilon", "designMatrix", "RBFLocations")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
@@ -53,7 +53,7 @@ test_that("Valid BASiCS_MCMC output object", {
                     MinGenesPerRBF = NA)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix", "locations", "RefFreq")
+                  "beta", "sigma2", "epsilon", "designMatrix", "RBFLocations", "RefFreq")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)

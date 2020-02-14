@@ -88,7 +88,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     int PrintProgress,
     bool FixLocations,
     bool RBFMinMax,
-    arma::vec locations,
+    arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -194,9 +194,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   // Model matrix initialization
   arma::vec means = muAux(arma::span(0, q0 - 1), 0);
   if (!FixLocations) {
-    locations = estimateRBFLocations(log(means), k, RBFMinMax);
+    RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
   }
-  arma::mat X = designMatrix(k, locations, means, variance);
+  arma::mat X = designMatrix(k, RBFLocations, means, variance);
   
   double globalExponent = 1;
   if (geneExponent != 1) {
@@ -290,7 +290,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       variance,
       FixLocations,
       RBFMinMax,
-      locations,
+      RBFLocations,
       geneExponent,
       mintol_mu
     );
@@ -438,9 +438,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux(arma::span(0, q0 - 1), 0);
         if (!FixLocations) {
-          locations = estimateRBFLocations(log(means), k, RBFMinMax);
+          RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
         }
-        X = designMatrix(k, locations, means, variance);
+        X = designMatrix(k, RBFLocations, means, variance);
       }
     }
     
@@ -520,7 +520,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
         Rcpp::Named("designMatrix") = X,
-        Rcpp::Named("locations") = locations,
+        Rcpp::Named("RBFLocations") = RBFLocations,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.phi") = LSphi,
@@ -543,7 +543,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         Rcpp::Named("sigma2") = sigma,
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
-        Rcpp::Named("locations") = locations
+        Rcpp::Named("RBFLocations") = RBFLocations
       )
     ); 
     

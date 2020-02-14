@@ -137,7 +137,7 @@ setMethod(
 setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95) {
-  param_ind <- !names(x@parameters) %in% c("designMatrix", "RefFreq", "locations")
+  param_ind <- !names(x@parameters) %in% c("designMatrix", "RefFreq", "RBFLocations")
   params <- x@parameters[param_ind]
   out <- lapply(params,
     function(n) {

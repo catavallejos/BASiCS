@@ -1,4 +1,4 @@
-context("Differential test\n")
+context("Differential test")
 
 test_that("Differential test is correct", {
   data(ChainSC)

@@ -1,5 +1,4 @@
-context("Parameter estimation (no-spikes), 
-        original data has spikes\n")
+context("Parameter estimation (no-spikes), original data has spikes")
 
 test_that("Estimates match (no-spikes)", 
 {

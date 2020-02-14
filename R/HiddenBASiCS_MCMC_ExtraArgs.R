@@ -6,7 +6,6 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     WithSpikes,
     PriorDelta = c("log-normal", "gamma"),
     PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-    k = 12,
     ## Duplicated arg here for backwards-compatibility.
     ## If both specified, Var is ignored.
     Var = 1.2,
@@ -22,7 +21,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     RunName = "",
     PrintProgress = TRUE,
     MinGenesPerRBF = NA,
-    PriorParam = BASiCS_PriorParam(Data, k = k),
+    PriorParam = BASiCS_PriorParam(Data, k = 12),
     Start = HiddenBASiCS_MCMC_Start(
       Data = Data,
       PriorParam = PriorParam,
@@ -37,35 +36,35 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     mintol_theta = 1e-4
   ) {
 
-  .stop_k(k)
+  .stop_k(PriorParam$k)
   lm <- log(Start$mu0)
-  locations <- .estimateRBFLocations(lm, k, PriorParam$RBFMinMax)
+  RBFLocations <- .estimateRBFLocations(lm, PriorParam$k, PriorParam$RBFMinMax)
   if (!is.na(MinGenesPerRBF)) {
-    d <- (locations[[2]] - locations[[1]]) / 2
+    d <- (RBFLocations[[2]] - RBFLocations[[1]]) / 2
     retain <- vapply(
-      locations,
-      function(location) {
-        sum(lm > location - d & lm < location + d) > MinGenesPerRBF
+      RBFLocations,
+      function(RBFLocation) {
+        sum(lm > RBFLocation - d & lm < RBFLocation + d) > MinGenesPerRBF
       },
       logical(1)
     )
-    # browser()
     # plot(log(Start$mu0), log(Start$delta0))
     # plot_distn <- function(mean, sd) {
     #   x <- seq(0, 10, length=200)
     #   y <- dnorm(x, mean=mean, sd=sd)
     #   lines(x, y, type="l", lwd=2)
     # }
-    # abline(v = locations)
-    # abline(v = locations + d, col = "grey80", lty = "dashed")
-    # abline(v = locations - d, col = "grey80", lty = "dashed")
-    # tmp <- sapply(locations, function(location) plot_distn(mean = location, sd = 0.5))
-    locations <- locations[retain]
-    PriorParam$m <- PriorParam$m[retain]
-    PriorParam$V <- PriorParam$V[retain, retain]
-    Start$beta0 <- Start$beta0[retain]
+    # abline(v = RBFLocations)
+    # abline(v = RBFLocations + d, col = "grey80", lty = "dashed")
+    # abline(v = RBFLocations - d, col = "grey80", lty = "dashed")
+    # tmp <- sapply(RBFLocations, function(RBFLocation) plot_distn(mean = RBFLocation, sd = 0.5))
+    RBFLocations <- RBFLocations[retain]
+    retain_prior <- c(TRUE, TRUE, retain)
+    PriorParam$m <- PriorParam$m[retain_prior]
+    PriorParam$V <- PriorParam$V[retain_prior, retain_prior]
+    Start$beta0 <- Start$beta0[retain_prior]
   }
-  k <- length(locations) + 2
+  PriorParam$k <- length(RBFLocations) + 2
 
   PriorDelta <- match.arg(PriorDelta)
   if (missing(PriorDelta) & !Regression) {
@@ -77,7 +76,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     )
   }
   if (Regression) {
-    .stop_k(k)
+    .stop_k(PriorParam$k)
   }
   # Validity checks
   assertthat::assert_that(
@@ -121,9 +120,9 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
 
   if (Regression) {
     assertthat::assert_that(
-      length(PriorParam$m) == k,
-      ncol(PriorParam$V) == k,
-      nrow(PriorParam$V) == k,
+      length(PriorParam$m) == PriorParam$k,
+      ncol(PriorParam$V) == PriorParam$k,
+      nrow(PriorParam$V) == PriorParam$k,
       PriorParam$a.sigma2 > 0,
       length(PriorParam$a.sigma2) == 1,
       PriorParam$b.sigma2 > 0,
@@ -166,8 +165,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     StochasticRef = StochasticRef,
     ConstrainType = ConstrainType,
     ConstrainProp = ConstrainProp,
-    k = k,
-    locations = locations,
+    RBFLocations = RBFLocations,
     variance = variance,
     Start = Start,
     mintol_mu = mintol_mu,

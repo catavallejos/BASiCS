@@ -157,7 +157,7 @@ arma::mat thetaUpdateBatch(
 // [[Rcpp::export(".designMatrix")]]
 arma::mat designMatrix(
     int const& k, 
-    arma::vec locations,
+    arma::vec RBFLocations,
     arma::vec const& mu, 
     double const& variance);
 
@@ -184,7 +184,7 @@ arma::mat muUpdateReg(
     double variance,
     bool FixLocations,
     bool RBFMinMax,
-    arma::vec locations,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol);
 
@@ -312,7 +312,7 @@ arma::mat muUpdateRegNoSpikes(
     double variance,
     bool FixLocations,
     bool RBFMinMax,
-    arma::vec locations,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol);
 

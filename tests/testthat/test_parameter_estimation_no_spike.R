@@ -1,5 +1,4 @@
-context("Parameter estimation and denoised data (no-spikes), 
-        original data doesn't have spikes\n")
+context("Parameter estimation and denoised data (no-spikes), original data doesn't have spikes")
 
 test_that("Estimates match the given seed (no-spikes)", {
   # Data example
@@ -32,7 +31,6 @@ test_that("Estimates match the given seed (no-spikes)", {
     Thin = 10,
     Burn = 500,
     Regression = FALSE,
-    k = 12,
     PrintProgress = FALSE,
     WithSpikes = FALSE
   )
@@ -42,7 +40,6 @@ test_that("Estimates match the given seed (no-spikes)", {
     Thin = 10,
     Burn = 500,
     Regression = FALSE,
-    k = 12,
     PrintProgress = FALSE,
     WithSpikes = FALSE
   )

@@ -1,4 +1,4 @@
-context("Parameter estimation and denoised data (no-spikes+regression)\n")
+context("Parameter estimation and denoised data (no-spikes+regression)")
 
 test_that("Estimates match the given seed (no-spikes+regression)", {
   # Data example
@@ -32,7 +32,6 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PrintProgress = FALSE,
     WithSpikes = FALSE,
     MinGenesPerRBF = NA,
-    k = k,
     Regression = TRUE
   )
   set.seed(14)
@@ -44,7 +43,6 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PrintProgress = FALSE,
     WithSpikes = FALSE,
     MinGenesPerRBF = NA,
-    k = k,
     Regression = TRUE
   )
 
@@ -54,7 +52,7 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
 
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "RefFreq", "locations")
+                  "beta", "sigma2", "epsilon", "RefFreq", "RBFLocations")
   ParamNames1 <- c("mu", "delta", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon")
   expect_equal(names(Chain@parameters), ParamNames)
@@ -142,7 +140,6 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
   # Fixing starting values
   n <- ncol(Data)
-  k <- 12
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
 
   set.seed(2018)

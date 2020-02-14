@@ -1,4 +1,4 @@
-context("BASiCS_Filter\n")
+context("BASiCS_Filter")
 
 test_that("BASiCS_Filter", 
 {

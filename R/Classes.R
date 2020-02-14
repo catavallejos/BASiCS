@@ -82,7 +82,7 @@ setClass(
       "epsilon",
       "RefFreq",
       "designMatrix",
-      "locations",
+      "RBFLocations",
       "ls.mu",
       "ls.delta",
       "ls.phi",
@@ -132,7 +132,7 @@ setClass(
 
     iterParams <- setdiff(
       names(object@parameters), 
-      c("locations", "RefFreq", "designMatrix")
+      c("RBFLocations", "RefFreq", "designMatrix")
     )
     nRows <- lapply(object@parameters[iterParams], nrow)
     # Check number of iterations per element of `parameters`

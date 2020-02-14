@@ -1,4 +1,4 @@
-context("MCMC arguments\n")
+context("MCMC arguments")
 
 DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                      WithBatch = TRUE)
@@ -104,7 +104,8 @@ test_that("MCMC arguments fail (regression)", {
 
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, k = 2, MinGenesPerRBF = NA), 
+                        PriorParam = BASiCS_PriorParam(DataSpikes, k = 2),
+                        Regression = TRUE, MinGenesPerRBF = NA), 
                regexp = "The number of basis functions needs to be >= 4.")
   
   Data2 <- DataSpikes
@@ -168,7 +169,8 @@ test_that("MCMC arguments fail (regression)", {
     run_MCMC(DataNoSpikes, N = 10, Thin = 2, Burn = 4, 
              PrintProgress = FALSE, Regression = TRUE,
              WithSpikes = FALSE,
-             k = 12, MinGenesPerRBF = 100),
+             PriorParam = BASiCS_PriorParam(DataNoSpikes, k = 2),
+             MinGenesPerRBF = 100),
     "Consider setting MinGenesPerRBF to NA or a lower positive integer."
   )
 })

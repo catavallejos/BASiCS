@@ -1,4 +1,4 @@
-context("Parameter estimation and denoised data (spikes+regression)\n")
+context("Parameter estimation and denoised data (spikes+regression)")
 
 test_that("Estimates match the given seed (spikes+regression)", {
   # Data example
@@ -26,7 +26,6 @@ test_that("Estimates match the given seed (spikes+regression)", {
     Regression = TRUE,
     Start = Start,
     PriorParam = PriorParam,
-    k = k,
     MinGenesPerRBF = NA
   )
   # Calculating a posterior summary
@@ -34,7 +33,7 @@ test_that("Estimates match the given seed (spikes+regression)", {
   
   # Checking parameter names
   ParamNamesC <- c("mu", "delta", "phi", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "locations")
+                  "beta", "sigma2", "epsilon", "RBFLocations")
   ParamNamesS <- c("mu", "delta", "phi", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon")
   expect_equal(names(Chain@parameters), ParamNamesC)
@@ -92,8 +91,9 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   set.seed(18)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
   # Fixing starting values
-  n <- ncol(Data); k <- 12
-  PriorParam <- BASiCS_PriorParam(Data, k = 12)
+  n <- ncol(Data)
+  k <- 12
+  PriorParam <- BASiCS_PriorParam(Data, k = k)
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
     Data,
@@ -109,7 +109,6 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
     N = 8,
     Thin = 2,
     Burn = 4,
-    k = k,
     PrintProgress = FALSE,
     Regression = TRUE,
     StoreAdapt = TRUE,

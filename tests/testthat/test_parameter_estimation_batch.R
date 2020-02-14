@@ -1,4 +1,4 @@
-context("Parameter estimation and denoised data (spikes+batch)\n")
+context("Parameter estimation and denoised data (spikes+batch)")
 
 test_that("Estimates match the given seed (spikes+batch)", {
   set.seed(9)

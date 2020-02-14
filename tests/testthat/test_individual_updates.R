@@ -1,4 +1,4 @@
-context("Individual MCMC updates (cpp code)\n")
+context("Individual MCMC updates (cpp code)")
 
 test_that("Dirichlet sampler", {
   # Generating arbitrary hyper-param
@@ -247,8 +247,8 @@ test_that("Spikes + regression", {
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
-  X <- BASiCS:::.designMatrix(k, locations, Start$mu0, var)
+  RBFLocations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
+  X <- BASiCS:::.designMatrix(k, RBFLocations, Start$mu0, var)
 
   # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
@@ -275,7 +275,7 @@ test_that("Spikes + regression", {
     exponent = 1,
     FixLocations = FALSE,
     RBFMinMax = TRUE,
-    locations = locations,
+    RBFLocations = RBFLocations,
     mintol = 1e-3
   )
 
@@ -481,8 +481,8 @@ test_that("No Spikes + regression", {
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
-  X <- BASiCS:::.designMatrix(k, locations, Start$mu0, var)
+  RBFLocations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
+  X <- BASiCS:::.designMatrix(k, RBFLocations, Start$mu0, var)
 
   ## Components for no-spikes
   means <- rowMeans(CountsBio)
@@ -518,7 +518,7 @@ test_that("No Spikes + regression", {
     exponent = 1,
     FixLocations = FALSE,
     RBFMinMax = TRUE,
-    locations = locations,
+    RBFLocations = RBFLocations,
     mintol = 1e-3
   )
 

@@ -1,4 +1,4 @@
-context("Basic example of HVG/LVG detection\n")
+context("Basic example of HVG/LVG detection")
 
 test_that("HVG/LVG detection is correct", {
   data(ChainSC)
