@@ -7,8 +7,7 @@ HiddenBASiCS_MCMC_Start <- function(Data,
                                     ls.delta0 = -2,
                                     ls.phi0 = 11,
                                     ls.nu0 = -10,
-                                    ls.theta0 = -4)
-{
+                                    ls.theta0 = -4) {
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.")
   }
@@ -108,8 +107,11 @@ HiddenBASiCS_MCMC_Start <- function(Data,
   if (Regression) {
     out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V)
     out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
-    out$lambda0 <- rgamma(q.bio, shape = PriorParam$eta/2,
-                      rate = PriorParam$eta/2)
+    out$lambda0 <- rgamma(
+      q.bio,
+      shape = PriorParam$eta / 2,
+      rate = PriorParam$eta / 2
+    )
   }
 
   return(out)

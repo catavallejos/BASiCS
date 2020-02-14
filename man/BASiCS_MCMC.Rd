@@ -34,15 +34,6 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 \item{...}{Optional parameters.
 \describe{
   \item{
-    \code{PriorDelta}
-  }{
-    Specifies the prior used for \code{delta}.
-    Possible values are 'gamma' 
-    (Gamma(\code{a.theta},\code{b.theta}) prior) and
-    'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
-    Default value: \code{PriorDelta = 'log-normal'}.
-  }
-  \item{
     \code{PriorParam}
   }{
     List of 7 elements, containing the hyper-parameter
@@ -135,6 +126,16 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
         specifies the degress of freedom for the residual term.
         Default: \code{eta = 5}.
       }
+    }
+  }
+  \item{
+    \code{PriorDelta}
+  }{
+    Specifies the prior used for \code{delta}.
+    Possible values are 'gamma' 
+    (Gamma(\code{a.theta},\code{b.theta}) prior) and
+    'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
+    Default value: \code{PriorDelta = 'log-normal'}.
   }
   \item{
     \code{k}
@@ -142,7 +143,7 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
     Only used when \code{Regression = TRUE}. \code{k} specifies
     the number of regression Gaussian Radial Basis Functions (GRBF) used
     within the correlated prior adopted for gene-specific over-dispersion
-    and mean expression paramters. Default: \code{k = 12}.
+    and mean expression parameters. Default: \code{k = 12}.
   }
   \item{
     \code{Var}
@@ -183,12 +184,14 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
   }{
     Directory where output files are stored.
     Only required if \code{StoreChains = TRUE} and/or
-    \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
+    \code{StoreAdapt = TRUE}. Default: \code{StoreDir = getwd()}.
+  }
   \item{
     \code{RunName}
   }{
     String used to index `.Rds` files storing chains
-    and/or adaptive proposal variances.}
+    and/or adaptive proposal variances.
+  }
   \item{
     \code{PrintProgress}
   }{
@@ -200,16 +203,17 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
     Starting values for the MCMC sampler. We do not advise
     to use this argument. Default options have been tuned to facilitate
     convergence. If changed, it must be a list containing the following
-    elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0},
-    \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0},
-    \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
+    elements: 
+    \code{mu0}, \code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, 
+    \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0},
+    \code{ls.nu0} and \code{ls.theta0}
   }
- \item{
-   \code{GeneExponent,CellExponent}
- }{
-   Exponents applied to the prior for MCMC updates. Intended for use only 
-   when performing divide & conquer MCMC strategies.
- }
+  \item{
+    \code{GeneExponent/CellExponent}
+  }{
+    Exponents applied to the prior for MCMC updates. Intended for use only 
+    when performing divide & conquer MCMC strategies.
+  }
 }}
 }
 \value{

@@ -6,7 +6,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     WithSpikes,
     PriorDelta = c("log-normal", "gamma"),
     PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-    k = 10,
+    k = 12,
     ## Duplicated arg here for backwards-compatibility.
     ## If both specified, Var is ignored.
     Var = 1.2,
@@ -21,28 +21,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     StoreDir = getwd(),
     RunName = "",
     PrintProgress = TRUE,
-    MinGenesPerRBF = 100,
-    PriorParam = list(
-      mu.mu = 0,
-      s2.mu = 0.5,
-      s2.delta = 0.5,
-      a.delta = 1,
-      b.delta = 1,
-      p.phi = rep(1, times = GPar$n),
-      a.s = 1,
-      b.s = 1,
-      a.theta = 1,
-      b.theta = 1,
-      RBFNTiles = TRUE,
-      FixLocations = FALSE,
-      m = numeric(k),
-      V = diag(k),
-      a.sigma2 = 1,
-      b.sigma2 = 1,
-      eta = eta,
-      locations = numeric(k - 2)
-    ),
-    eta = 5,
+    MinGenesPerRBF = NA,
+    PriorParam = BASiCS_PriorParam(Data, k = k),
     Start = HiddenBASiCS_MCMC_Start(
       Data = Data,
       PriorParam = PriorParam,
@@ -59,7 +39,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
 
   .stop_k(k)
   lm <- log(Start$mu0)
-  locations <- .estimateRBFLocations(lm, k)
+  locations <- .estimateRBFLocations(lm, k, PriorParam$RBFMinMax)
   if (!is.na(MinGenesPerRBF)) {
     d <- (locations[[2]] - locations[[1]]) / 2
     retain <- vapply(
@@ -97,12 +77,6 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     .stop_k(k)
   }
 
-  if (Regression) {
-    PriorParam$m <- rep(0, k); PriorParam$V <- diag(k)
-    PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2
-    PriorParam$eta <- eta
-  }
-
   # Validity checks
   assertthat::assert_that(
     length(PriorParam$mu.mu) == 1,
@@ -131,12 +105,16 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     StopAdapt > 0,
     length(StoreChains) == 1,
     length(StoreAdapt) == 1,
-    is.dir(StoreDir),
+    dir.exists(StoreDir),
     PriorDelta %in% c("gamma", "log-normal"),
     mintol_mu > 0,
     mintol_delta > 0,
     mintol_nu > 0,
-    mintol_theta > 0
+    mintol_theta > 0,
+    is.logical(PriorParam$RBFMinMax),
+    length(PriorParam$RBFMinMax) == 1,
+    is.logical(PriorParam$FixLocations),
+    length(PriorParam$FixLocations) == 1
   )
 
   if (Regression) {

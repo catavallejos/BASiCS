@@ -5,11 +5,7 @@ test_that("Estimates match the given seed (spikes+batch)", {
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                  WithBatch = TRUE)
   # Fixing starting values
-  n <- ncol(Data)
-  PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n),
-                     GeneExponent = 1, CellExponent = 1,
-                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
+  PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE,
     Regression = FALSE)

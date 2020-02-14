@@ -12,28 +12,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   )
 
   # Fixing starting values
-  n <- ncol(Data)
   k <- 12
-  PriorParam <- list(
-    mu.mu = 0,
-    s2.mu = 0.5,
-    s2.delta = 0.5,
-    a.delta = 1,
-    b.delta = 1,
-    p.phi = rep(1, times = n),
-    a.s = 1,
-    b.s = 1,
-    a.theta = 1,
-    b.theta = 1
-  )
-  PriorParam$m <- rep(0, k)
-  PriorParam$V <- diag(k)
-  PriorParam$a.sigma2 <- 2
-  PriorParam$b.sigma2 <- 2
-  PriorParam$eta <- 5
-  PriorParam$RBFNTile <- FALSE
-  PriorParam$FixLocations <- FALSE
-  PriorParam$locations <- rep(0, k - 2)
+  PriorParam <- BASiCS_PriorParam(Data, k = k)
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
     Data,
@@ -44,15 +24,29 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
 
   # Running the sampler
   set.seed(14)
-  Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500,
-                       PrintProgress = FALSE, WithSpikes = FALSE,
-                       MinGenesPerRBF = NA, k = k,
-                       Regression = TRUE)
+  Chain <- run_MCMC(
+    Data,
+    N = 1000,
+    Thin = 10,
+    Burn = 500,
+    PrintProgress = FALSE,
+    WithSpikes = FALSE,
+    MinGenesPerRBF = NA,
+    k = k,
+    Regression = TRUE
+  )
   set.seed(14)
-  ChainSCE <- run_MCMC(sce, N = 1000, Thin = 10, Burn = 500,
-                       PrintProgress = FALSE, WithSpikes = FALSE,
-                       MinGenesPerRBF = NA, k = k,
-                       Regression = TRUE)
+  ChainSCE <- run_MCMC(
+    sce,
+    N = 1000,
+    Thin = 10,
+    Burn = 500,
+    PrintProgress = FALSE,
+    WithSpikes = FALSE,
+    MinGenesPerRBF = NA,
+    k = k,
+    Regression = TRUE
+  )
 
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
@@ -148,37 +142,31 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
   Data <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
   # Fixing starting values
   n <- ncol(Data)
-  k <- 10
-  PriorParam <- list(
-    mu.mu = 0,
-    s2.mu = 0.5,
-    s2.delta = 0.5,
-    a.delta = 1,
-    b.delta = 1,
-    p.phi = rep(1, times = n),
-    a.s = 1,
-    b.s = 1,
-    a.theta = 1,
-    b.theta = 1
-  )
-  PriorParam$m <- rep(0, k)
-  PriorParam$V <- diag(k)
-  PriorParam$a.sigma2 <- 2
-  PriorParam$b.sigma2 <- 2
-  PriorParam$eta <- 5
-  PriorParam$RBFNTile <- FALSE
-  PriorParam$FixLocations <- FALSE
-  PriorParam$locations <- rep(0, k)
+  k <- 12
+  PriorParam <- BASiCS_PriorParam(Data, k = 12)
+
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam,
-                                            Regression = TRUE,
-                                            WithSpikes = FALSE)
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = TRUE,
+    WithSpikes = FALSE
+  )
+  
   # Running the sampler
   set.seed(42)
-  Chain <- run_MCMC(Data, N = 50, Thin = 10, Burn = 10,
-                     PrintProgress = FALSE, WithSpikes = FALSE,
-                     Regression = TRUE, StoreAdapt = TRUE,
-                     MinGenesPerRBF = NA,
-                     Start = Start, PriorParam = PriorParam)
+  Chain <- run_MCMC(
+    Data,
+    N = 50,
+    Thin = 10,
+    Burn = 10,
+    PrintProgress = FALSE,
+    WithSpikes = FALSE,
+    Regression = TRUE,
+    StoreAdapt = TRUE,
+    MinGenesPerRBF = NA,
+    Start = Start,
+    PriorParam = PriorParam
+  )
   expect_s4_class(Chain, "BASiCS_Chain")
 })

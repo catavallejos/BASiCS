@@ -168,8 +168,7 @@ test_that("MCMC arguments fail (regression)", {
     run_MCMC(DataNoSpikes, N = 10, Thin = 2, Burn = 4, 
              PrintProgress = FALSE, Regression = TRUE,
              WithSpikes = FALSE,
-             Start = Start, PriorParam = PriorParam,
-             k = k, MinGenesPerRBF = 100),
+             k = 12, MinGenesPerRBF = 100),
     "Consider setting MinGenesPerRBF to NA or a lower positive integer."
   )
 })

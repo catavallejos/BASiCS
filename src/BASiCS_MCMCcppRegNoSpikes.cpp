@@ -89,8 +89,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
-    bool RBFNTile,
     bool FixLocations,
+    bool RBFMinMax,
     arma::vec locations,
     double const& mintol_mu,
     double const& mintol_delta,
@@ -209,11 +209,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   // Model matrix initialization
   arma::vec means = muAux.col(0);
   if (!FixLocations) {
-    if (RBFNTile) {
-      locations = estimateRBFLocationsNTiles(log(means), k);
-    } else {
-      locations = estimateRBFLocations(log(means), k);
-    }
+    locations = estimateRBFLocations(log(means), k, RBFMinMax);
   }
   arma::mat X = designMatrix(k, locations, means, variance);
   
@@ -304,8 +300,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
       X,
       sigma2Aux,
       variance,
-      RBFNTile,
       FixLocations,
+      RBFMinMax,
       locations,
       geneExponent,
       mintol_mu);
@@ -429,11 +425,7 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
         if (!FixLocations) {
-          if (RBFNTile) {
-            locations = estimateRBFLocationsNTiles(log(means), k);
-          } else {
-            locations = estimateRBFLocations(log(means), k);
-          }
+          locations = estimateRBFLocations(log(means), k, RBFMinMax);
         }
         X = designMatrix(k, locations, means, variance);
       }

@@ -22,38 +22,31 @@ arma::mat designMatrix(
   }
   return X;
 }
-arma::vec estimateRBFLocations(arma::vec const& log_mu, int const& k) {
+
+arma::vec estimateRBFLocations(
+    arma::vec const& log_mu,
+    int const& k,
+    bool RBFMinMax) {
+
   double ran = log_mu.max() - log_mu.min();
   arma::vec locations = arma::vec(k - 2);
   double d = ran / (k - 1);
-  locations(0) = log_mu.min() + d;
-  for (unsigned int i = 1; i < locations.size(); i++) {
-    locations(i) = locations(i - 1) + d;
-    //locations(i) =  locations(i - 1) + ran / (k - 3);
+  if (RBFMinMax) {
+    locations(0) = log_mu.min();
+    for (unsigned int i = 1; i < locations.size(); i++) {
+      // locations(i) = locations(i - 1) + d;
+      locations(i) =  locations(i - 1) + ran / (k - 3);
+    }  
+  } else {
+    locations(0) = log_mu.min() + d;
+    for (unsigned int i = 1; i < locations.size(); i++) {
+      locations(i) = locations(i - 1) + d;
+      //locations(i) =  locations(i - 1) + ran / (k - 3);
+    }    
   }
   return locations;
 }
 
-arma::vec estimateRBFLocationsNTiles(arma::vec const& log_mu, int const& k) {
-  return ntiles(log_mu, k);
-}
-
-// [[Rcpp::export(".ntiles")]]
-arma::vec ntiles(NumericVector& x, int n) {
-  arma::vec xa = as_arma(x);
-  return ntiles(xa, n);
-}
-
-arma::vec ntiles(arma::vec const& x, int n) {
-  arma::vec x_sort = sort(x);
-  int n_tiles = n - 2;
-  arma::vec quantiles = arma::vec(n_tiles);
-  double d = x.size() / (n - 1);
-  for (unsigned int i = 0; i < quantiles.size(); i++) {
-    quantiles(i) = x_sort(round((i + 1) * d));
-  }
-  return quantiles;
-}
 
 /* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
@@ -78,8 +71,8 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
-    bool RBFNTile,
     bool FixLocations,
+    bool RBFMinMax,
     arma::vec locations,
     double const& exponent,
     double const& mintol) {
@@ -107,11 +100,7 @@ arma::mat muUpdateReg(
   
   // This is new due to regression prior on delta
   if (!FixLocations) {  
-    if (RBFNTile) {
-      locations = estimateRBFLocationsNTiles(log(mu1), k);
-    } else {
-      locations = estimateRBFLocations(log(mu1), k);
-    }
+    locations = estimateRBFLocations(log(mu1), k, RBFMinMax);
   }
   arma::mat X_mu1 = designMatrix(k, locations, mu1, variance);
   

@@ -247,7 +247,7 @@ test_that("Spikes + regression", {
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k)
+  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
   X <- BASiCS:::.designMatrix(k, locations, Start$mu0, var)
 
   # Hidden_muUpdate
@@ -273,8 +273,8 @@ test_that("Spikes + regression", {
     sigma2 = Start$sigma20,
     variance = var,
     exponent = 1,
-    RBFNTile = FALSE,
     FixLocations = FALSE,
+    RBFMinMax = TRUE,
     locations = locations,
     mintol = 1e-3
   )
@@ -481,7 +481,7 @@ test_that("No Spikes + regression", {
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k)
+  locations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
   X <- BASiCS:::.designMatrix(k, locations, Start$mu0, var)
 
   ## Components for no-spikes
@@ -516,8 +516,8 @@ test_that("No Spikes + regression", {
     sigma2 = Start$sigma20,
     variance = var,
     exponent = 1,
-    RBFNTile = FALSE,
     FixLocations = FALSE,
+    RBFMinMax = TRUE,
     locations = locations,
     mintol = 1e-3
   )
