@@ -67,35 +67,42 @@
 #' Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 #'
 #' @export
-BASiCS_Sim <- function(Mu, Mu_spikes = NULL, Delta, Phi = NULL, 
-                       S, Theta, BatchInfo = NULL)
-{
+BASiCS_Sim <- function(
+    Mu,
+    Mu_spikes = NULL,
+    Delta,
+    Phi = NULL,
+    S,
+    Theta,
+    BatchInfo = NULL) {
   
   # Checks validity of input parameters
   HiddenHeaderBASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta, BatchInfo)
   
   # With and without batch structure
-  if(length(Theta) == 1) {
+  if (length(Theta) == 1) {
     DataAux <- HiddenBASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
-  }
-  
-  else {
+  } else {
     # Setup of a design matrix
-    if(!is.factor(BatchInfo)) {
+    if (!is.factor(BatchInfo)) {
       BatchInfoAux <- as.factor(BatchInfo)  
-      message("'BatchInfo' was treated as a factor with ",
-              length(levels(BatchInfoAux)), " levels: \n", 
-              paste(levels(BatchInfoAux), colapse = " "))
+      message(
+        "'BatchInfo' was treated as a factor with ",
+        length(levels(BatchInfoAux)), " levels: \n",
+        paste(levels(BatchInfoAux), colapse = " ")
+      )
     }
     BatchDesign <- model.matrix(~BatchInfoAux - 1) 
     ThetaAux <- as.vector(BatchDesign %*% Theta)
     DataAux <- HiddenBASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, ThetaAux)
   }
  
-  Data <- newBASiCS_Data(Counts = DataAux$Counts,
-                         Tech = DataAux$Tech,
-                         SpikeInfo = DataAux$SpikeInfo,
-                         BatchInfo = BatchInfo)
+  Data <- newBASiCS_Data(
+    Counts = DataAux$Counts,
+    Tech = DataAux$Tech,
+    SpikeInfo = DataAux$SpikeInfo,
+    BatchInfo = BatchInfo
+  )
 
   return(Data)
 }
