@@ -1369,3 +1369,9 @@ version 1.9.14 (2020-02-10)
 - Changes coda::effectiveSize for a more efficient internal implementation.
 - Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
   genes for differential expression testing based on effective sample size.
+  
+version 1.9.15 (2020-02-16)
+- Use expect_equal in scran test (now all suitable tests)
+- Minor change in `test_differential_test_reg.R` to use 3 instead of 2 decimal
+points. This hopefully avoids issues associated to a bug in `round`. For details
+see: https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17668

@@ -51,8 +51,8 @@ test_that("Differential test is correct (regression case)", {
   Lfc2Mean <- round(Test$TableMean$MeanLog2FC[1:5], 2)
   expect_equal(Lfc2Mean, Lfc2Mean0)
 
-  Lfc2Disp0 <- c(0.92, 1.02, 0.86, 6.23, 0.26)
-  Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5), 2)
+  Lfc2Disp0 <- c(0.915, 1.016, 0.855, 6.226, 0.255)
+  Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5), 3)
   expect_equal(Lfc2Disp, Lfc2Disp0)
 })
 
