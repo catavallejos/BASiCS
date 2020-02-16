@@ -1392,3 +1392,10 @@ internal calculation of the EB prior.
 - Updates documentation of `BASiCS_MCMC` to include `PriorMu` as a parameter
 - Removes dependency to `scater` functions in `.EmpiricalBayesMu`.
 
+version 1.9.18 (2020-02-16)
+- Merges empirical Bayes changes with those from divide-and-conquer
+- Minor changes in unit tests to account for empirical Bayes prior (
+taking ParamPrior$mu.mu as a vector, rather than a scalar)
+
+
+

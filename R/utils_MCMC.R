@@ -156,14 +156,16 @@
                                      a.s = 1,
                                      b.s = 1,
                                      a.theta = 1,
-                                     b.theta = 1
-                                     ),
+                                     b.theta = 1,
+                                     GeneExponent = 1,
+                                     CellExponent = 1
+                                    ),
                                    eta = 5,
                                    Start = HiddenBASiCS_MCMC_Start(
-                                     Data,
-                                     PriorParam,
-                                     WithSpikes,
-                                     ),
+                                          Data,
+                                          PriorParam,
+                                          WithSpikes,
+                                        ),
                                    mintol_mu = 1e-3,
                                    mintol_delta = 1e-3,
                                    mintol_nu = 1e-5,
@@ -197,19 +199,25 @@
   }
   
   # Validity checks
-  if (!(
-    # PriorParam$mu.mu > 0 & 
-    length(PriorParam$mu.mu) == nrow(counts(Data)) &
-    PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
-    PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 &
-    PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 &
-    PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 1 &
-    all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == GPar$n &
-    PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
-    PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
-    PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-    PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 ))
-  stop("Invalid prior hyper-parameter values.")
+  if (
+    !(
+      # PriorParam$mu.mu > 0 & 
+      length(PriorParam$mu.mu) == nrow(counts(Data)) &
+      PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
+      PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 &
+      PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 &
+      PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 1 &
+      all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == GPar$n &
+      PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
+      PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
+      PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
+      PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 &
+      PriorParam$GeneExponent > 0 & length(PriorParam$GeneExponent) == 1 &
+      PriorParam$CellExponent > 0 & length(PriorParam$CellExponent) == 1
+    )
+  ) {
+    stop("Invalid prior hyper-parameter values.")
+  }
   if (Regression) {
     if (!(length(PriorParam$m) == k &
           ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &
@@ -272,5 +280,4 @@
        ConstrainGene = ConstrainGene, NotConstrainGene = NotConstrainGene,
        Constrain = Constrain, RefGenes = RefGenes, RefGene = RefGene, Index = Index)
 }
-
 
