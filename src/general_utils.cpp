@@ -428,9 +428,7 @@ arma::vec DegubInd(arma::vec ind,
 }
 
 /*Dirichlet sampler*/
-arma::vec Hidden_rDirichlet(
-    arma::vec alpha)
-{
+arma::vec Hidden_rDirichlet(arma::vec alpha) {
   arma::vec aux = arma::ones(alpha.size());
   unsigned int i;
   for(i=0; i<alpha.size(); i++) {

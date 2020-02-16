@@ -34,7 +34,8 @@ residual over-dispersion is not confounded by mean expression. Recommended
 setting is \code{Regression = TRUE}.}
 
 \item{WithSpikes}{If \code{WithSpikes = TRUE}, BASiCS will use reads from
-added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE},
+added spike-ins to estimate technical variability. 
+If \code{WithSpikess = FALSE},
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
@@ -49,7 +50,7 @@ assigned to gene-specific mean expression parameters.}
 Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and
 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}.
 Default value: \code{PriorDelta = 'log-normal'}.
-\item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter
+\item{\code{PriorParam}}{List containing the hyper-parameter
 values required for the adopted prior (see Vallejos et al, 2015, 2016).
 All elements must be positive real numbers.
 \describe{
@@ -94,7 +95,12 @@ All elements must be positive real numbers.
  \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
       specifies the degress of freedom for the residual term.
       Default: \code{eta = 5}.}.
-
+ \item{
+   \code{GeneExponent,CellExponent}
+ }{
+   Exponents applied to the prior for MCMC updates. Intended for use only 
+   when performing divide & conquer MCMC strategies.
+ }
 }}
 \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies
       the number of regression Gaussian Radial Basis Functions (GRBF) used

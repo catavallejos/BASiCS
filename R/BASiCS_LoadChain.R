@@ -64,9 +64,10 @@ BASiCS_LoadChain <- function(RunName,
     }
     
   } else {
-    if (file.exists(file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")))) {
+    file <- file.path(StoreDir, paste0("chain_mu_", RunName, ".txt"))
+    if (file.exists(file)) {
       Mu <- read.delim(
-        file.path(StoreDir, paste0("chain_mu_", RunName, ".txt")),
+        file,
         sep = " ",
         check.names = FALSE
       )
@@ -82,9 +83,10 @@ BASiCS_LoadChain <- function(RunName,
       )
       
       # Add-hoc fix for the no-spikes case
-      if (file.exists(file.path(StoreDir, paste0("chain_s_", RunName, ".txt")))) {
+      file <- file.path(StoreDir, paste0("chain_s_", RunName, ".txt"))
+      if (file.exists(file)) {
         S <- read.delim(
-          file.path(StoreDir, paste0("chain_s_", RunName, ".txt")),
+          file,
           sep = " ",
           check.names = FALSE
         )

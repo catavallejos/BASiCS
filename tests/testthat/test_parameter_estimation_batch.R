@@ -6,9 +6,9 @@ test_that("Estimates match the given seed (spikes+batch)", {
                                  WithBatch = TRUE)
   # Fixing starting values
   n <- ncol(Data)
-  PriorParam <- list(mu.mu = rep(0, times = nrow(Data)), s2.mu = 0.5, 
-                     s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n), 
+  PriorParam <- list(mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
+                     b.delta = 1, p.phi = rep(1, times = n),
+                     GeneExponent = 1, CellExponent = 1,
                      a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
   set.seed(2018)
   Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
@@ -35,7 +35,7 @@ test_that("Estimates match the given seed (spikes+batch)", {
             
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(6.219, 10.216,  2.837,  5.497, 19.963)
-  MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5,1],3))
+  MuObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "mu")[1:5, 1],3))
   expect_equal(MuObs, Mu, tolerance = 1, scale = 1)
             
   Delta <- c(0.959, 0.789, 1.315, 1.191, 0.680)

@@ -35,7 +35,7 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
-  Measure <- "effectiveSize"
+  Measure <- "ess"
 
   if (is.null(Param)) {
     metric <- lapply(names(object@parameters), function(param) {
@@ -48,10 +48,10 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
     )
     metric <- metric[!ind_error]
     if (all(ind_error)) {
-      stop("coda::effectiveSize failed for all parameters.")
+      stop("ess failed for all parameters.")
     } else if (any(ind_error)) {
       warning(
-        paste("coda::effectiveSize failed for some parameters:",
+        paste("ess failed for some parameters:",
           paste(names(object@parameters)[ind_error], collapse = ", ")
         )
       )

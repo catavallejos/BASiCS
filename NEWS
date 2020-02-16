@@ -1355,7 +1355,31 @@ version 1.9.10 (2019-12-13)
 - Further clean up in `BASiCS_TestDE`. Creates new internal functions to avoid
 duplicated code across different tests: `.TestResults`, `.ShowTestResults`
 
-version 1.9.10.1 (2020-01-10)
+version 1.9.11 (2020-01-11)
+- Add unit tests for each MCMC update.
+
+version 1.9.12 (2020-01-17)
+- Fixes bug in `BASiCS_CorrectOffset` for no-spikes case
+
+version 1.9.13 (2020-02-05)
+- Adds option for prior scaling parameters (relevant for new divide and conquer
+approach only; does not affect UI)
+
+version 1.9.14 (2020-02-10)
+- Changes coda::effectiveSize for a more efficient internal implementation.
+- Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
+  genes for differential expression testing based on effective sample size.
+  
+version 1.9.15 (2020-02-16)
+- Use expect_equal in scran test (now all suitable tests)
+- Minor change in `test_differential_test_reg.R` to use 3 instead of 2 decimal
+points. This hopefully avoids issues associated to a bug in `round`. For details
+see: https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17668
+
+version 1.9.16 (2020-02-16)
+- Adds extra line in `test_sim.R` to avoid warning in BiocCheck
+
+version 1.9.17 (2020-02-16)
 - Implementation of empirical Bayes (EB) approach for `mu` in `BASiCS_MCMC`
 - Additional parameter `PriorMu` incorporated to `BASiCS_MCMC`. This enables
 internal calculation of the EB prior. 
@@ -1367,3 +1391,4 @@ internal calculation of the EB prior.
 - Fixes EB approach for no-spikes case (regression and no regression)
 - Updates documentation of `BASiCS_MCMC` to include `PriorMu` as a parameter
 - Removes dependency to `scater` functions in `.EmpiricalBayesMu`.
+

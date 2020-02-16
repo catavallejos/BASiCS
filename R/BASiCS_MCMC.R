@@ -15,8 +15,9 @@
 #' formulation for mean and over-dispersion parameters to estimate a measure of
 #' residual over-dispersion is not confounded by mean expression. Recommended
 #' setting is \code{Regression = TRUE}.
-#' @param WithSpikes If \code{WithSpikes = TRUE}, BASiCS will use reads from
-#' added spike-ins to estimate technical variability. If \code{WithSpikess = FALSE},
+#' @param WithSpikes  If \code{WithSpikes = TRUE}, BASiCS will use reads from
+#' added spike-ins to estimate technical variability. 
+#' If \code{WithSpikess = FALSE},
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
@@ -29,7 +30,7 @@
 #' Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and
 #' 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}.
 #' Default value: \code{PriorDelta = 'log-normal'}.
-#' \item{\code{PriorParam}}{List of 7 elements, containing the hyper-parameter
+#' \item{\code{PriorParam}}{List containing the hyper-parameter
 #' values required for the adopted prior (see Vallejos et al, 2015, 2016).
 #' All elements must be positive real numbers.
 #' \describe{
@@ -74,7 +75,12 @@
 #'  \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
 #'       specifies the degress of freedom for the residual term.
 #'       Default: \code{eta = 5}.}.
-#'
+#'  \item{
+#'    \code{GeneExponent,CellExponent}
+#'  }{
+#'    Exponents applied to the prior for MCMC updates. Intended for use only 
+#'    when performing divide & conquer MCMC strategies.
+#'  }
 #' }}
 #' \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies
 #'       the number of regression Gaussian Radial Basis Functions (GRBF) used
@@ -197,14 +203,16 @@
 #'
 #' Eling et al (2018). Cell Systems
 #' @export
-BASiCS_MCMC <- function(Data, 
-                        N, 
-                        Thin, 
-                        Burn, 
-                        Regression, 
-                        WithSpikes = TRUE, 
-                        PriorMu = "default", ...)
-{
+BASiCS_MCMC <- function(
+    Data,
+    N,
+    Thin,
+    Burn,
+    Regression,
+    WithSpikes = TRUE,
+    PriorMu = "default",
+    ...) {
+
   # Checks to ensure input arguments are valid
   .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, 
                           Regression, WithSpikes, PriorMu)
@@ -248,51 +256,53 @@ BASiCS_MCMC <- function(Data,
       message("Running with spikes BASiCS sampler (regression case) ... \n")
       Time <- system.time(
         Chain <- HiddenBASiCS_MCMCcppReg(
-                N,
-                Thin,
-                Burn,
-                GPar$BioCounts,
-                GPar$BatchDesign,
-                metadata(Data)$SpikeInput[,2],
-                Start$mu0,
-                Start$delta0,
-                Start$phi0,
-                Start$s0,
-                Start$nu0,
-                rep(Start$theta0, GPar$nBatch),
-                PriorParam$mu.mu,
-                PriorParam$s2.mu,
-                PriorParam$p.phi,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                ArgsDef$k,
-                PriorParam$m,
-                PriorParam$V,
-                PriorParam$a.sigma2,
-                PriorParam$b.sigma2,
-                Start$beta0,
-                Start$sigma20,
-                PriorParam$eta,
-                Start$lambda0,
-                ArgsDef$variance,
-                ArgsDef$AR,
-                Start$ls.mu0,
-                Start$ls.delta0,
-                Start$ls.phi0,
-                Start$ls.nu0,
-                rep(Start$ls.theta0, GPar$nBatch),
-                sum.bycell.bio,
-                sum.bygene.all,
-                sum.bygene.bio,
-                as.numeric(ArgsDef$StoreAdapt),
-                ArgsDef$StopAdapt,
-                as.numeric(ArgsDef$PrintProgress),
-                ArgsDef$mintol_mu,
-                ArgsDef$mintol_delta,
-                ArgsDef$mintol_nu,
-                ArgsDef$mintol_theta
+          N = N,
+          Thin = Thin,
+          Burn = Burn,
+          Counts = GPar$BioCounts,
+          BatchDesign = GPar$BatchDesign,
+          muSpikes = metadata(Data)$SpikeInput[,2],
+          mu0 = Start$mu0,
+          delta0 = Start$delta0,
+          phi0 = Start$phi0,
+          s0 = Start$s0,
+          nu0 = Start$nu0,
+          theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
+          s2mu = PriorParam$s2.mu,
+          aphi = PriorParam$p.phi,
+          as = PriorParam$a.s,
+          bs = PriorParam$b.s,
+          atheta = PriorParam$a.theta,
+          btheta = PriorParam$b.theta,
+          k = ArgsDef$k,
+          m0 = PriorParam$m,
+          V0 = PriorParam$V,
+          sigma2_a0 = PriorParam$a.sigma2,
+          sigma2_b0 = PriorParam$b.sigma2,
+          beta0 = Start$beta0,
+          sigma20 = Start$sigma20,
+          eta0 = PriorParam$eta,
+          lambda0 = Start$lambda0,
+          variance = ArgsDef$variance,
+          ar = ArgsDef$AR,
+          LSmu0 = Start$ls.mu0,
+          LSdelta0 = Start$ls.delta0,
+          LSphi0 = Start$ls.phi0,
+          LSnu0 = Start$ls.nu0,
+          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
+          sumByCellBio = sum.bycell.bio,
+          sumByGeneAll = sum.bygene.all,
+          sumByGeneBio = sum.bygene.bio,
+          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
+          EndAdapt = ArgsDef$StopAdapt,
+          PrintProgress = as.numeric(ArgsDef$PrintProgress),
+          mintol_mu = ArgsDef$mintol_mu,
+          mintol_delta = ArgsDef$mintol_delta,
+          mintol_nu = ArgsDef$mintol_nu,
+          mintol_theta = ArgsDef$mintol_theta,
+          geneExponent = PriorParam$GeneExponent,
+          cellExponent = PriorParam$CellExponent
         )
       )
 
@@ -303,101 +313,111 @@ BASiCS_MCMC <- function(Data,
     }
     else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcpp(
-                N,
-                Thin,
-                Burn,
-                GPar$BioCounts,
-                GPar$BatchDesign,
-                metadata(Data)$SpikeInput[,2],
-                Start$mu0,
-                Start$delta0,
-                Start$phi0,
-                Start$s0,
-                Start$nu0,
-                rep(Start$theta0, GPar$nBatch),
-                PriorParam$mu.mu,
-                PriorParam$s2.mu,
-                PriorParam$a.delta,
-                PriorParam$b.delta,
-                PriorParam$s2.delta,
-                ArgsDef$PriorDeltaNum,
-                PriorParam$p.phi,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                ArgsDef$AR,
-                Start$ls.mu0,
-                Start$ls.delta0,
-                Start$ls.phi0,
-                Start$ls.nu0,
-                rep(Start$ls.theta0, GPar$nBatch),
-                sum.bycell.bio,
-                sum.bygene.all,
-                sum.bygene.bio,
-                as.numeric(ArgsDef$StoreAdapt),
-                ArgsDef$StopAdapt,
-                as.numeric(ArgsDef$PrintProgress),
-                ArgsDef$mintol_mu, 
-                ArgsDef$mintol_delta,
-                ArgsDef$mintol_nu,
-                ArgsDef$mintol_theta))
+      Time <- system.time(
+        Chain <- HiddenBASiCS_MCMCcpp(
+          N = N,
+          Thin = Thin,
+          Burn = Burn,
+          Counts = GPar$BioCounts,
+          BatchDesign = GPar$BatchDesign,
+          muSpikes = metadata(Data)$SpikeInput[,2],
+          mu0 = Start$mu0,
+          delta0 = Start$delta0,
+          phi0 = Start$phi0,
+          s0 = Start$s0,
+          nu0 = Start$nu0,
+          theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
+          s2mu = PriorParam$s2.mu,
+          adelta = PriorParam$a.delta,
+          bdelta = PriorParam$b.delta,
+          s2delta = PriorParam$s2.delta,
+          prior_delta = ArgsDef$PriorDeltaNum,
+          aphi = PriorParam$p.phi,
+          as = PriorParam$a.s,
+          bs = PriorParam$b.s,
+          atheta = PriorParam$a.theta,
+          btheta = PriorParam$b.theta,
+          ar = ArgsDef$AR,
+          LSmu0 = Start$ls.mu0,
+          LSdelta0 = Start$ls.delta0,
+          LSphi0 = Start$ls.phi0,
+          LSnu0 = Start$ls.nu0,
+          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
+          sumByCellBio = sum.bycell.bio,
+          sumByGeneAll = sum.bygene.all,
+          sumByGeneBio = sum.bygene.bio,
+          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
+          EndAdapt = ArgsDef$StopAdapt,
+          PrintProgress = as.numeric(ArgsDef$PrintProgress),
+          mintol_mu = ArgsDef$mintol_mu, 
+          mintol_delta = ArgsDef$mintol_delta,
+          mintol_nu = ArgsDef$mintol_nu,
+          mintol_theta = ArgsDef$mintol_theta,
+          geneExponent = PriorParam$GeneExponent,
+          cellExponent = PriorParam$CellExponent
+        )
+      )
     }
   }
   else {
     # If spikes are not available
     if (Regression) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(
-                N,
-                Thin,
-                Burn,
-                GPar$BioCounts,
-                GPar$BatchDesign,
-                Start$mu0,
-                Start$delta0,
-                Start$s0,
-                Start$nu0,
-                rep(Start$theta0, GPar$nBatch),
-                PriorParam$mu.mu,
-                PriorParam$s2.mu,
-                PriorParam$a.s,
-                PriorParam$b.s,
-                PriorParam$a.theta,
-                PriorParam$b.theta,
-                ArgsDef$k,
-                PriorParam$m,
-                PriorParam$V,
-                PriorParam$a.sigma2,
-                PriorParam$b.sigma2,
-                Start$beta0,
-                Start$sigma20,
-                PriorParam$eta,
-                Start$lambda0,
-                ArgsDef$variance,
-                ArgsDef$Constrain,
-                ArgsDef$Index,
-                ArgsDef$RefGene,
-                ArgsDef$RefGenes,
-                ArgsDef$ConstrainGene,
-                ArgsDef$NotConstrainGene,
-                ArgsDef$ConstrainType,
-                as.numeric(ArgsDef$StochasticRef), 
-                ArgsDef$AR,
-                Start$ls.mu0,
-                Start$ls.delta0,
-                Start$ls.nu0,
-                rep(Start$ls.theta0, GPar$nBatch),
-                sum.bycell.bio,
-                sum.bygene.bio,
-                as.numeric(ArgsDef$StoreAdapt),
-                ArgsDef$StopAdapt,
-                as.numeric(ArgsDef$PrintProgress),
-                ArgsDef$mintol_mu, 
-                ArgsDef$mintol_delta,
-                ArgsDef$mintol_nu,
-                ArgsDef$mintol_theta))
+      Time <- system.time(
+        Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(
+          N = N,
+          Thin = Thin,
+          Burn = Burn,
+          Counts = GPar$BioCounts,
+          BatchDesign = GPar$BatchDesign,
+          mu0 = Start$mu0,
+          delta0 = Start$delta0,
+          s0 = Start$s0,
+          nu0 = Start$nu0,
+          theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
+          s2mu = PriorParam$s2.mu,
+          as = PriorParam$a.s,
+          bs = PriorParam$b.s,
+          atheta = PriorParam$a.theta,
+          btheta = PriorParam$b.theta,
+          k = ArgsDef$k,
+          m0 = PriorParam$m,
+          V0 = PriorParam$V,
+          sigma2_a0 = PriorParam$a.sigma2,
+          sigma2_b0 = PriorParam$b.sigma2,
+          beta0 = Start$beta0,
+          sigma20 = Start$sigma20,
+          eta0 = PriorParam$eta,
+          lambda0 = Start$lambda0,
+          variance = ArgsDef$variance,
+          Constrain = ArgsDef$Constrain,
+          Index = ArgsDef$Index,
+          RefGene = ArgsDef$RefGene,
+          RefGenes = ArgsDef$RefGenes,
+          ConstrainGene = ArgsDef$ConstrainGene,
+          NotConstrainGene = ArgsDef$NotConstrainGene,
+          ConstrainType = ArgsDef$ConstrainType,
+          StochasticRef = as.numeric(ArgsDef$StochasticRef), 
+          ar = ArgsDef$AR,
+          LSmu0 = Start$ls.mu0,
+          LSdelta0 = Start$ls.delta0,
+          LSnu0 = Start$ls.nu0,
+          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
+          sumByCellAll = sum.bycell.bio,
+          sumByGeneAll = sum.bygene.bio,
+          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
+          EndAdapt = ArgsDef$StopAdapt,
+          PrintProgress = as.numeric(ArgsDef$PrintProgress),
+          mintol_mu = ArgsDef$mintol_mu, 
+          mintol_delta = ArgsDef$mintol_delta,
+          mintol_nu = ArgsDef$mintol_nu,
+          mintol_theta = ArgsDef$mintol_theta,
+          geneExponent = PriorParam$GeneExponent,
+          cellExponent = PriorParam$CellExponent
+        )
+      )
       # Remove epsilons for genes that are not expressed in at least 2 cells
       # Discuss this with John (potentially include an optional arg about this)
       AtLeast2Cells <- Matrix::rowSums(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
@@ -405,49 +425,54 @@ BASiCS_MCMC <- function(Data,
     }
     else {
       message("Running no spikes BASiCS sampler (no regression) ... \n")
-      Time <- system.time(Chain <- HiddenBASiCS_MCMCcppNoSpikes(
-        N,
-        Thin,
-        Burn,
-        GPar$BioCounts,
-        GPar$BatchDesign,
-        Start$mu0,
-        Start$delta0,
-        Start$s0,
-        Start$nu0,
-        rep(Start$theta0, GPar$nBatch),
-        PriorParam$mu.mu,
-        PriorParam$s2.mu,
-        PriorParam$a.delta,
-        PriorParam$b.delta,
-        PriorParam$s2.delta,
-        ArgsDef$PriorDeltaNum,
-        PriorParam$a.s,
-        PriorParam$b.s,
-        PriorParam$a.theta,
-        PriorParam$b.theta,
-        ArgsDef$Constrain,
-        ArgsDef$Index,
-        ArgsDef$RefGene,
-        ArgsDef$RefGenes,
-        ArgsDef$ConstrainGene,
-        ArgsDef$NotConstrainGene,
-        ArgsDef$ConstrainType,
-        as.numeric(ArgsDef$StochasticRef),
-        ArgsDef$AR,
-        Start$ls.mu0,
-        Start$ls.delta0,
-        Start$ls.nu0,
-        rep(Start$ls.theta0, GPar$nBatch),
-        sum.bycell.bio,
-        sum.bygene.bio,
-        as.numeric(ArgsDef$StoreAdapt),
-        ArgsDef$StopAdapt,
-        as.numeric(ArgsDef$PrintProgress),
-        ArgsDef$mintol_mu, 
-        ArgsDef$mintol_delta,
-        ArgsDef$mintol_nu,
-        ArgsDef$mintol_theta))
+      Time <- system.time(
+        Chain <- HiddenBASiCS_MCMCcppNoSpikes(
+          N = N,
+          Thin = Thin,
+          Burn = Burn,
+          Counts = GPar$BioCounts,
+          BatchDesign = GPar$BatchDesign,
+          mu0 = Start$mu0,
+          delta0 = Start$delta0,
+          s0 = Start$s0,
+          nu0 = Start$nu0,
+          theta0 = rep(Start$theta0, GPar$nBatch),
+          mu_mu = PriorParam$mu.mu,
+          s2mu = PriorParam$s2.mu,
+          adelta = PriorParam$a.delta,
+          bdelta = PriorParam$b.delta,
+          s2delta = PriorParam$s2.delta,
+          prior_delta = ArgsDef$PriorDeltaNum,
+          as = PriorParam$a.s,
+          bs = PriorParam$b.s,
+          atheta = PriorParam$a.theta,
+          btheta = PriorParam$b.theta,
+          Constrain = ArgsDef$Constrain,
+          Index = ArgsDef$Index,
+          RefGene = ArgsDef$RefGene,
+          RefGenes = ArgsDef$RefGenes,
+          ConstrainGene = ArgsDef$ConstrainGene,
+          NotConstrainGene = ArgsDef$NotConstrainGene,
+          ConstrainType = ArgsDef$ConstrainType,
+          StochasticRef = as.numeric(ArgsDef$StochasticRef),
+          ar = ArgsDef$AR,
+          LSmu0 = Start$ls.mu0,
+          LSdelta0 = Start$ls.delta0,
+          LSnu0 = Start$ls.nu0,
+          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
+          sumByCellAll = sum.bycell.bio,
+          sumByGeneAll = sum.bygene.bio,
+          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
+          EndAdapt = ArgsDef$StopAdapt,
+          PrintProgress = as.numeric(ArgsDef$PrintProgress),
+          mintol_mu = ArgsDef$mintol_mu, 
+          mintol_delta = ArgsDef$mintol_delta,
+          mintol_nu = ArgsDef$mintol_nu,
+          mintol_theta = ArgsDef$mintol_theta,
+          geneExponent = PriorParam$GeneExponent,
+          cellExponent = PriorParam$CellExponent
+        )
+      )
     }
   }
 
