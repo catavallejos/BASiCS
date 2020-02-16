@@ -1375,3 +1375,6 @@ version 1.9.15 (2020-02-16)
 - Minor change in `test_differential_test_reg.R` to use 3 instead of 2 decimal
 points. This hopefully avoids issues associated to a bug in `round`. For details
 see: https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17668
+
+version 1.9.16 (2020-02-16)
+- Adds extra line in `test_sim.R` to avoid warning in BiocCheck
