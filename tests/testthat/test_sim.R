@@ -57,6 +57,18 @@ test_that("BASiCS_Sim works", {
   )
 })
 
+test_that("BASiCS_Sim doesn't fail with zero colsum", {
+  set.seed(62)
+  Mu <- c(8.36, 10.65, 4.88, 6.29, 21.72, 12.93, 30.19)
+  Mu_spikes <-  c(1010.72, 7.90, 31.59)
+  Delta <- c(1.29, 0.88, 1.51, 1.49, 0.54, 0.40, 0.85)
+  Phi <- c(1.00, 1.06, 1.09, 1.05, 0.80)
+  S <- c(0.38, 0.40, 0.38, 0.39, 0.34)
+  Theta <- 0.39
+  expect_error(BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta), NA)
+})
+
+
 test_that("BASiCS_Draw works", {
   data <- makeExampleBASiCS_Data(WithBatch = TRUE)
   chain <- run_MCMC(data,
