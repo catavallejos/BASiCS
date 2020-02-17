@@ -22,7 +22,7 @@ test_that("Spikes + no regression", {
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
   PriorParam <- list(
-    mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
+    mu.mu = rep(0, q0), s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
     b.delta = 1, p.phi = rep(1, times = n),
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
@@ -223,7 +223,7 @@ test_that("Spikes + regression", {
   k <- 12
   var <- 1.2
   PriorParam <- list(
-    mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
+    mu.mu = rep(0, q0), s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
     eta = 5, m = rep(0, k), V = diag(k),
     a.sigma2 = 1, b.sigma2 = 1,
     b.delta = 1, p.phi = rep(1, times = n),
@@ -352,7 +352,7 @@ test_that("No Spikes + no regression", {
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
   PriorParam <- list(
-    mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
+    mu.mu = rep(0, q0), s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
     b.delta = 1, p.phi = rep(1, times = n),
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
@@ -443,7 +443,7 @@ test_that("No Spikes + regression", {
   k <- 12
   var <- 1.2
   PriorParam <- list(
-    mu.mu = 0, s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
+    mu.mu = rep(0, q0), s2.mu = 0.5, s2.delta = 0.5, a.delta = 1,
     eta = 5, m = rep(0, k), V = diag(k),
     a.sigma2 = 1, b.sigma2 = 1,
     b.delta = 1, p.phi = rep(1, times = n),
