@@ -1369,3 +1369,33 @@ version 1.9.14 (2020-02-10)
 - Changes coda::effectiveSize for a more efficient internal implementation.
 - Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
   genes for differential expression testing based on effective sample size.
+  
+version 1.9.15 (2020-02-16)
+- Use expect_equal in scran test (now all suitable tests)
+- Minor change in `test_differential_test_reg.R` to use 3 instead of 2 decimal
+points. This hopefully avoids issues associated to a bug in `round`. For details
+see: https://bugs.r-project.org/bugzilla/show_bug.cgi?id=17668
+
+version 1.9.16 (2020-02-16)
+- Adds extra line in `test_sim.R` to avoid warning in BiocCheck
+
+version 1.9.17 (2020-02-16)
+- Implementation of empirical Bayes (EB) approach for `mu` in `BASiCS_MCMC`
+- Additional parameter `PriorMu` incorporated to `BASiCS_MCMC`. This enables
+internal calculation of the EB prior. 
+- Creates `.EmpiricalBayesMu` to derive EB prior for mu.
+- `HiddenBASiCS_MCMC_InputCheck`, `HiddenBASiCS_MCMC_GlobalParams` and
+`HiddenBASiCS_MCMC_ExtraArgs` renamed as `.BASiCS_MCMC_InputCheck`, 
+`.BASiCS_MCMC_GlobalParams` and `.BASiCS_MCMC_ExtraArgs`.
+- Fixes minor bug in `.EmpiricalBayesMu`
+- Fixes EB approach for no-spikes case (regression and no regression)
+- Updates documentation of `BASiCS_MCMC` to include `PriorMu` as a parameter
+- Removes dependency to `scater` functions in `.EmpiricalBayesMu`.
+
+version 1.9.18 (2020-02-16)
+- Merges empirical Bayes changes with those from divide-and-conquer
+- Minor changes in unit tests to account for empirical Bayes prior (
+taking ParamPrior$mu.mu as a vector, rather than a scalar)
+
+
+

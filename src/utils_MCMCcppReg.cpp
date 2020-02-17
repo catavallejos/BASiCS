@@ -38,7 +38,7 @@ arma::mat muUpdateReg(
     arma::vec const& delta, 
     arma::vec const& phinu, 
     arma::vec const& sum_bycell_bio,
-    double const& mu_mu,
+    arma::vec const& mu_mu,
     double const& s2_mu,
     int const& q0,
     int const& n,

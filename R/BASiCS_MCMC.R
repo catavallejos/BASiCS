@@ -21,6 +21,9 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param PriorMu Indicates if the original prior (\code{PriorMu = 'default'})
+#' or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+#' assigned to gene-specific mean expression parameters.  
 #' @param ... Optional parameters.
 #' \describe{
 #' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.
@@ -207,14 +210,16 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
+    PriorMu = c("default", "EmpiricalBayes"),
     ...) {
 
   # Checks to ensure input arguments are valid
-  HiddenBASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
+  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, 
+                          Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch
-  GPar <- HiddenBASiCS_MCMC_GlobalParams(Data)
+  GPar <- .BASiCS_MCMC_GlobalParams(Data)
 
   # Total counts per cell and/or gene
   sum.bycell.bio <- Matrix::rowSums(counts(Data))
@@ -230,12 +235,13 @@ BASiCS_MCMC <- function(
   }
 
   # Assignment of optional parameters (default values if input not provided)
-  ArgsDef <- HiddenBASiCS_MCMC_ExtraArgs(Data,
-                                         Burn,
-                                         GPar,
-                                         Regression,
-                                         WithSpikes,
-                                         ...)
+  ArgsDef <- .BASiCS_MCMC_ExtraArgs(Data,
+                                    Burn,
+                                    GPar,
+                                    Regression,
+                                    WithSpikes,
+                                    PriorMu,
+                                    ...)
   # Starting values for the MCMC (parameters and adaptive variances)
   # Loaded separately to simplify calling to the elements of its list
   # Same for prior parameters
