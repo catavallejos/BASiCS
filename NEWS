@@ -1399,3 +1399,7 @@ taking ParamPrior$mu.mu as a vector, rather than a scalar)
 
 
 
+version 1.9.19 (2020-02-16)
+- Adds a while loop in BASiCS_Sim to ensure it doesn't fail if some
+  generated cells have zero counts.
+
