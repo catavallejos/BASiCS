@@ -282,7 +282,7 @@ test_that("PriorMu", {
     "'arg' should be one of \"default\", \"EmpiricalBayes\""
   )
   expect_error(
-    BASiCS_MCMC(
+    run_MCMC(
       Data = makeExampleBASiCS_Data(),
       N = 10,
       Thin = 2,
@@ -293,7 +293,7 @@ test_that("PriorMu", {
     NA
   )
   expect_error(
-    BASiCS_MCMC(
+    run_MCMC(
       Data = makeExampleBASiCS_Data(),
       N = 10,
       Thin = 2,

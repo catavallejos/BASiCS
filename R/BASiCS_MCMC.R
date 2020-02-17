@@ -210,7 +210,7 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
-    PriorMu = "default",
+    PriorMu = c("default", "EmpiricalBayes"),
     ...) {
 
   # Checks to ensure input arguments are valid
