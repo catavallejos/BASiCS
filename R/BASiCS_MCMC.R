@@ -215,7 +215,7 @@ BASiCS_MCMC <- function(
 
   # Checks to ensure input arguments are valid
   .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, 
-                          Regression, WithSpikes, PriorMu)
+                          Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch

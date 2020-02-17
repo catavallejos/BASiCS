@@ -1,5 +1,5 @@
 .BASiCS_MCMC_InputCheck <- function(Data, N, Thin,
-                                    Burn, Regression, WithSpikes, PriorMu) {
+                                    Burn, Regression, WithSpikes) {
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.\n")
   }
@@ -89,9 +89,6 @@
     stop("Please use a logical value for the Regression parameter.\n")
   }
 
-  if (!(PriorMu %in% c("default", "EmpiricalBayes"))) {
-    stop("Invalid value for PriorMu. Please use 'default' or 'EmpiricalBayes'")
-  }
 }
 
 .BASiCS_MCMC_GlobalParams <- function(Data) {
