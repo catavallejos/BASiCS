@@ -20,13 +20,13 @@
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
 #' @importFrom S4Vectors DataFrame metadata metadata<-
-#' @importFrom scran calculateSumFactors
+#' @importFrom scran calculateSumFactors 
 #' @importFrom stats acf median model.matrix rgamma rpois runif var
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
 #' @importFrom SingleCellExperiment altExp altExp<- 
 #' @importFrom SingleCellExperiment altExpNames altExpNames<-
 #' @importFrom stats4 plot
-#' @importFrom SummarizedExperiment SummarizedExperiment assay assayNames
+#' @importFrom SummarizedExperiment SummarizedExperiment assay assays assayNames
 #' @importFrom SummarizedExperiment colData colData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
 #' @importFrom utils packageVersion read.delim write.table

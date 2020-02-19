@@ -57,7 +57,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     arma::vec s0,
     arma::vec nu0, 
     arma::vec theta0,
-    double mu_mu,
+    arma::vec mu_mu,
     double s2mu,
     arma::vec aphi, 
     double as, 
@@ -89,8 +89,10 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta) 
-{
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent) {
+
   using arma::ones;
   using arma::zeros;
   using Rcpp::Rcout; 
@@ -105,7 +107,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   double SumSpikeInput = sum(muSpikes);
   arma::vec BatchSizes = sum(BatchDesign,0).t();
   arma::mat inv_V0 = inv(V0);
-  double mInvVm0 = Rcpp::as<double>(wrap(m0.t()*inv_V0*m0));
+  double mInvVm0 = Rcpp::as<double>(wrap(m0.t() * inv_V0 * m0));
   arma::vec InvVm0 = inv_V0*m0;
   
   // OBJECTS WHERE DRAWS WILL BE STORED
@@ -190,6 +192,14 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec means = muAux(arma::span(0,q0-1),0);
   arma::mat X = designMatrix(k, means, variance);
   
+
+  double globalExponent = 1;
+  if (geneExponent != 1) {
+    globalExponent = geneExponent;
+  } else if (cellExponent != 1) {
+    globalExponent = cellExponent;
+  }
+  
   StartSampler(N);
   
   // START OF MCMC LOOP
@@ -204,10 +214,20 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // UPDATE OF PHI: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts, 
-                           muAux.col(0), 1/deltaAux.col(0),
-                           nuAux.col(0), aphi, sumByGeneBio, q0,n, 
-                           y_n); 
+    phiAuxList = phiUpdate(
+      phiAux,
+      exp(LSphiAux),
+      Counts, 
+      muAux.col(0),
+      1 / deltaAux.col(0),
+      nuAux.col(0),
+      aphi,
+      sumByGeneBio,
+      q0,
+      n, 
+      y_n,
+      cellExponent
+    );
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
     if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
@@ -215,64 +235,155 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign, BatchSizes,
-                                sAux, nuAux.col(0), atheta, btheta, n, 
-                                nBatch, mintol_theta);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    thetaAux = thetaUpdateBatch(
+      thetaAux.col(0),
+      exp(LSthetaAux), 
+      BatchDesign,
+      BatchSizes,
+      sAux,
+      nuAux.col(0),
+      atheta,
+      btheta,
+      n, 
+      nBatch,
+      globalExponent,
+      mintol_theta
+    );
+    PthetaAux += thetaAux.col(1);
+    if(i>=Burn) {thetaAccept += thetaAux.col(1);}
     thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // REGRESSION
-    muAux = muUpdateReg(muAux.col(0), exp(LSmuAux), Counts, deltaAux.col(0), 
-                        phiAux % nuAux.col(0), sumByCellBio, mu_mu, s2mu, q0, n, 
-                        y_q0, u_q0, ind_q0,
-                        k, lambdaAux, betaAux, X, sigma2Aux, 
-                        variance, mintol_mu);     
-    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    muAux = muUpdateReg(
+      muAux.col(0),
+      exp(LSmuAux),
+      Counts,
+      deltaAux.col(0), 
+      phiAux % nuAux.col(0),
+      sumByCellBio,
+      mu_mu,
+      s2mu,
+      q0,
+      n, 
+      y_q0,
+      u_q0,
+      ind_q0,
+      k,
+      lambdaAux,
+      betaAux,
+      X,
+      sigma2Aux, 
+      variance,
+      geneExponent,
+      mintol_mu
+    );
+    PmuAux += muAux.col(1);
+    if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
-    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
-                        as, bs, BatchDesign, n, y_n); 
+    sAux = sUpdateBatch(
+      sAux,
+      nuAux.col(0),
+      thetaBatch,
+      as,
+      bs,
+      BatchDesign,
+      n,
+      y_n,
+      cellExponent
+    );
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
     // REGRESSION
-    deltaAux = deltaUpdateReg(deltaAux.col(0), exp(LSdeltaAux), Counts, 
-                              muAux.col(0), 
-                              phiAux % nuAux.col(0), q0, n, y_q0, u_q0, ind_q0,
-                              lambdaAux, X, sigma2Aux, betaAux, mintol_delta);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);  
+    deltaAux = deltaUpdateReg(
+      deltaAux.col(0),
+      exp(LSdeltaAux),
+      Counts, 
+      muAux.col(0), 
+      phiAux % nuAux.col(0),
+      q0,
+      n,
+      y_q0,
+      u_q0,
+      ind_q0,
+      lambdaAux,
+      X,
+      sigma2Aux,
+      betaAux,
+      geneExponent,
+      mintol_delta
+    );
+    PdeltaAux += deltaAux.col(1);
+    if(i>=Burn) deltaAccept += deltaAux.col(1);  
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts, SumSpikeInput,
-                          BatchDesign,
-                          muAux.col(0), 1/deltaAux.col(0),
-                          phiAux, sAux, thetaBatch, sumByGeneAll, q0, n,
-                          y_n, u_n, ind_n, mintol_nu); 
-    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
+    nuAux = nuUpdateBatch(
+      nuAux.col(0),
+      exp(LSnuAux),
+      Counts,
+      SumSpikeInput,
+      BatchDesign,
+      muAux.col(0),
+      1 / deltaAux.col(0),
+      phiAux,
+      sAux,
+      thetaBatch,
+      sumByGeneAll,
+      q0,
+      n,
+      y_n,
+      u_n,
+      ind_n,
+      geneExponent,
+      mintol_nu
+    );
+    PnuAux += nuAux.col(1);
+    if(i>=Burn) nuAccept += nuAux.col(1);
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
-    V1 = inv_V0 + X.t() * diagmat(lambdaAux) * X;
+    V1 = (inv_V0 * globalExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
     if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
-      mAux = X.t()*(lambdaAux % log(deltaAux.col(0))) + InvVm0;
+      mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * globalExponent);
       mAux = VAux*mAux;
       
       // UPDATES OF BETA AND SIGMA2 (REGRESSION RELATED PARAMETERS)
-      betaAux = betaUpdateReg(sigma2Aux, VAux, mAux);
-      sigma2Aux = sigma2UpdateReg(deltaAux.col(0), betaAux, lambdaAux, V1, 
-                                  mInvVm0, mAux, sigma2_a0, sigma2_b0, q0);
-      
+      betaAux = betaUpdateReg(
+        sigma2Aux,
+        VAux,
+        mAux
+      );
+      sigma2Aux = sigma2UpdateReg(
+        deltaAux.col(0),
+        betaAux,
+        lambdaAux,
+        V1, 
+        mInvVm0 * globalExponent,
+        mAux,
+        sigma2_a0,
+        sigma2_b0,
+        q0,
+        globalExponent
+      );
     }
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
-    lambdaAux = lambdaUpdateReg(deltaAux.col(0), X, betaAux, sigma2Aux, 
-                                eta0, q0, y_q0);
+    lambdaAux = lambdaUpdateReg(
+      deltaAux.col(0),
+      X,
+      betaAux,
+      sigma2Aux, 
+      eta0,
+      q0,
+      y_q0,
+      globalExponent
+    );
     // UPDATE OF EPSILON 
     // Direct calculation conditional on regression related parameters
     epsilonAux = log(deltaAux.col(0)) - X*betaAux;

@@ -50,7 +50,7 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     arma::vec s0,
     arma::vec nu0, 
     arma::vec theta0,
-    double mu_mu,
+    arma::vec mu_mu,
     double s2mu,
     double adelta, 
     double bdelta, 
@@ -76,8 +76,10 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
-    double const& mintol_theta) 
-{
+    double const& mintol_theta,
+    double const& geneExponent,
+    double const& cellExponent) {
+
   using arma::ones;
   using arma::zeros;
   using Rcpp::Rcout; 
@@ -152,6 +154,13 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
   arma::vec ind_q0 = zeros(q0); arma::vec ind_n = zeros(n);
   arma::vec u_q0 = zeros(q0); arma::vec u_n = zeros(n);
   
+  double globalExponent = 1;
+  if (geneExponent != 1) {
+    globalExponent = geneExponent;
+  } else if (cellExponent != 1) {
+    globalExponent = cellExponent;
+  }
+
   StartSampler(N);
   
   // START OF MCMC LOOP
@@ -166,10 +175,20 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // UPDATE OF PHI: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    phiAuxList = phiUpdate(phiAux, exp(LSphiAux), Counts, 
-                           muAux.col(0), 1/deltaAux.col(0),
-                           nuAux.col(0), aphi, sumByGeneBio, q0,n, 
-                           y_n); 
+    phiAuxList = phiUpdate(
+      phiAux,
+      exp(LSphiAux),
+      Counts, 
+      muAux.col(0),
+      1 / deltaAux.col(0),
+      nuAux.col(0),
+      aphi,
+      sumByGeneBio,
+      q0,
+      n,
+      y_n,
+      cellExponent
+    );
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
     if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
@@ -177,44 +196,111 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
-    thetaAux = thetaUpdateBatch(thetaAux.col(0), exp(LSthetaAux), 
-                                BatchDesign, BatchSizes,
-                                sAux, nuAux.col(0), atheta, btheta, n, 
-                                nBatch, mintol_theta);
-    PthetaAux += thetaAux.col(1); if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    thetaAux = thetaUpdateBatch(
+      thetaAux.col(0),
+      exp(LSthetaAux), 
+      BatchDesign,
+      BatchSizes,
+      sAux,
+      nuAux.col(0),
+      atheta,
+      btheta,
+      n, 
+      nBatch,
+      globalExponent,
+      mintol_theta
+    );
+    PthetaAux += thetaAux.col(1);
+    if(i>=Burn) {
+      thetaAccept += thetaAux.col(1);
+    }
     thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR       
-    muAux = Hidden_muUpdate(muAux.col(0), exp(LSmuAux), Counts, 
-                     1/deltaAux.col(0), phiAux % nuAux.col(0), 
-                     sumByCellBio, mu_mu, s2mu, q0, n,
-                     y_q0, u_q0, ind_q0, mintol_mu);     
-    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    muAux = muUpdate(
+      muAux.col(0),
+      exp(LSmuAux),
+      Counts,
+      1 / deltaAux.col(0),
+      phiAux % nuAux.col(0), 
+      sumByCellBio,
+      mu_mu,
+      s2mu,
+      q0,
+      n,
+      y_q0,
+      u_q0,
+      ind_q0,
+      geneExponent,
+      mintol_mu
+    );
+    PmuAux += muAux.col(1);
+    if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF S
-    sAux = sUpdateBatch(sAux, nuAux.col(0), thetaBatch,
-                        as, bs, BatchDesign, n, y_n); 
+    sAux = sUpdateBatch(
+      sAux,
+      nuAux.col(0),
+      thetaBatch,
+      as,
+      bs,
+      BatchDesign,
+      n,
+      y_n,
+      cellExponent
+    );
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    deltaAux = deltaUpdate(deltaAux.col(0), exp(LSdeltaAux), Counts, 
-                           muAux.col(0), phiAux % nuAux.col(0), 
-                           adelta, bdelta, s2delta, prior_delta, 
-                           q0, n, y_q0, u_q0, ind_q0, mintol_delta);  
-    PdeltaAux += deltaAux.col(1); if(i>=Burn) deltaAccept += deltaAux.col(1);
+    deltaAux = deltaUpdate(
+      deltaAux.col(0),
+      exp(LSdeltaAux),
+      Counts, 
+      muAux.col(0),
+      phiAux % nuAux.col(0), 
+      adelta,
+      bdelta,
+      s2delta,
+      prior_delta, 
+      q0,
+      n,
+      y_q0,
+      u_q0,
+      ind_q0,
+      geneExponent,
+      mintol_delta
+    );
+    PdeltaAux += deltaAux.col(1);
+    if(i>=Burn) deltaAccept += deltaAux.col(1);
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-    nuAux = nuUpdateBatch(nuAux.col(0), exp(LSnuAux), Counts, SumSpikeInput,
-                          BatchDesign,
-                          muAux.col(0), 1/deltaAux.col(0),
-                          phiAux, sAux, thetaBatch, sumByGeneAll, q0, n,
-                          y_n, u_n, ind_n, mintol_nu); 
-    PnuAux += nuAux.col(1); if(i>=Burn) nuAccept += nuAux.col(1);
+    nuAux = nuUpdateBatch(
+      nuAux.col(0),
+      exp(LSnuAux),
+      Counts,
+      SumSpikeInput,
+      BatchDesign,
+      muAux.col(0),
+      1 / deltaAux.col(0),
+      phiAux,
+      sAux,
+      thetaBatch,
+      sumByGeneAll,
+      q0,
+      n,
+      y_n,
+      u_n,
+      ind_n,
+      cellExponent,
+      mintol_nu
+    );
+    PnuAux += nuAux.col(1);
+    if(i>=Burn) nuAccept += nuAux.col(1);
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {
