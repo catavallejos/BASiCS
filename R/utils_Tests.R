@@ -1,6 +1,6 @@
 .TailProb <- function(Chain, Threshold) {
   if (Threshold > 0) {
-    Prob <- matrixStats::colMeans2(ifelse(Chain > Threshold, 1, 0))
+    Prob <- matrixStats::colMeans2(ifelse(abs(Chain) > Threshold, 1, 0))
   }
   else {
     Prob_aux <- matrixStats::colMeans2(ifelse(Chain > 0, 1, 0))

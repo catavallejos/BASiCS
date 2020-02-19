@@ -421,7 +421,7 @@ BASiCS_TestDE <- function(Chain1,
 
   # Changes in mean expression
   # Calculating posterior probabilities
-  ProbM <- .TailProb(Chain = abs(ChainTau), Threshold = EpsilonM)
+  ProbM <- .TailProb(Chain = ChainTau, Threshold = EpsilonM)
   AuxMean <- .ThresholdSearch(
     Probs = ProbM[GenesSelect & GoodESS],
     ProbThreshold = ProbThresholdM,
@@ -478,7 +478,7 @@ BASiCS_TestDE <- function(Chain1,
   DeltaSelect <- DeltaSelect & GoodESS
 
 
-  ProbD <- .TailProb(Chain = abs(ChainOmega), Threshold = EpsilonD)
+  ProbD <- .TailProb(Chain = ChainOmega, Threshold = EpsilonD)
   AuxDisp <- .ThresholdSearch(
     Probs = ProbD[DeltaSelect],
     ProbThreshold = ProbThresholdD,
@@ -553,7 +553,7 @@ BASiCS_TestDE <- function(Chain1,
     EpsSelect <- EpsSelect & GoodESS
 
     select <- NotExcluded & GenesSelect
-    ProbE <- .TailProb(Chain = abs(ChainPsi), Threshold = EpsilonR)
+    ProbE <- .TailProb(Chain = ChainPsi, Threshold = EpsilonR)
     AuxResDisp <- .ThresholdSearch(
       Probs = ProbE[EpsSelect],
       ProbThreshold = ProbThresholdR,

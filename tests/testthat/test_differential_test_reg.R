@@ -96,3 +96,35 @@ test_that("CheckESS works", {
   )
 })
 
+
+
+test_that("EpsilonM = 0 case (reg)", {
+  data(ChainSCReg)
+  data(ChainRNAReg)
+
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSCReg,
+    Chain2 = ChainRNAReg,
+    GroupLabel1 = "SC",
+    GroupLabel2 = "P&S",
+    EpsilonM = 0,
+    EpsilonD = 0,
+    EpsilonR = 0,
+    OffSet = TRUE,
+    Plot = FALSE,
+    CheckESS = FALSE,
+    PlotOffset = FALSE
+  )
+  expect_equal(
+    as.numeric(table(Test$TableMean$ResultDiffMean)),
+    c(150, 119, 81)
+  )
+  expect_equal(
+    as.numeric(table(Test$TableDisp$ResultDiffDisp)),
+    c(200, 98, 52)
+  )
+  expect_equal(
+    as.numeric(table(Test$TableResDisp$ResultDiffResDisp)),
+    c(333, 6, 11)
+  )
+})
