@@ -1,9 +1,9 @@
 .TailProb <- function(Chain, Threshold) {
   if (Threshold > 0) {
-    Prob <- matrixStats::colMeans2(ifelse(abs(Chain) > Threshold, 1, 0))
+    Prob <- matrixStats::colMeans2(abs(Chain) > Threshold)
   }
   else {
-    Prob_aux <- matrixStats::colMeans2(ifelse(Chain > 0, 1, 0))
+    Prob_aux <- matrixStats::colMeans2(Chain > 0)
     Prob <- 2 * pmax(Prob_aux, 1 - Prob_aux) - 1
   }
   return(Prob)
