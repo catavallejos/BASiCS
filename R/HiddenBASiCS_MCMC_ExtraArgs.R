@@ -38,7 +38,11 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
 
   .stop_k(PriorParam$k)
   lm <- log(Start$mu0)
-  RBFLocations <- .estimateRBFLocations(lm, PriorParam$k, PriorParam$RBFMinMax)
+  if (all(PriorParam$RBFLocations == 0)) {
+    RBFLocations <- .estimateRBFLocations(lm, PriorParam$k, PriorParam$RBFMinMax)
+  } else {
+    RBFLocations <- PriorParam$RBFLocations
+  }
   if (!is.na(MinGenesPerRBF)) {
     d <- (RBFLocations[[2]] - RBFLocations[[1]]) / 2
     retain <- vapply(
