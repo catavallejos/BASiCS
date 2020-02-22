@@ -87,7 +87,7 @@ multi_MCMC <- function(
     WithSpikes = WithSpikes
   )
   cat("Starting BASiCS...\n")
-  output <- lapply(
+  output <- future.apply::future_lapply(
     Subsets,
     function(Subset) {
       PP$p.phi <- rep(1, ncol(Subset))
