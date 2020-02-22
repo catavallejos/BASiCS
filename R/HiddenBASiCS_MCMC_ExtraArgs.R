@@ -38,7 +38,7 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
 
   .stop_k(PriorParam$k)
   lm <- log(Start$mu0)
-  if (all(PriorParam$RBFLocations == 0)) {
+  if (is.null(PriorParam$RBFLocations)) {
     RBFLocations <- .estimateRBFLocations(lm, PriorParam$k, PriorParam$RBFMinMax)
   } else {
     RBFLocations <- PriorParam$RBFLocations
@@ -120,6 +120,14 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     length(PriorParam$RBFMinMax) == 1,
     is.logical(PriorParam$FixLocations),
     length(PriorParam$FixLocations) == 1
+  )
+  assertthat::assert_that(
+    length(Start$mu0) == GPar$q.bio,
+    length(Start$delta0) == GPar$q.bio,
+    is.null(Start$phi0) || length(Start$phi) == GPar$n,
+    length(Start$nu0) == GPar$n,
+    length(Start$s0) == GPar$n,
+    length(Start$theta0) == GPar$nBatch
   )
 
   if (Regression) {
