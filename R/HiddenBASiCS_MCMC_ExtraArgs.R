@@ -126,8 +126,8 @@ HiddenBASiCS_MCMC_ExtraArgs <- function(
     length(Start$delta0) == GPar$q.bio,
     is.null(Start$phi0) || length(Start$phi) == GPar$n,
     length(Start$nu0) == GPar$n,
-    length(Start$s0) == GPar$n,
-    length(Start$theta0) == GPar$nBatch
+    length(Start$s0) == GPar$n
+    # , length(Start$theta0) == GPar$nBatch
   )
 
   if (Regression) {
