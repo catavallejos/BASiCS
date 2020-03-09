@@ -36,7 +36,8 @@ multi_MCMC <- function(
   astwo <- 2
   bstwo <- 2
   PP <- BASiCS_PriorParam(Data, FixLocations = TRUE)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, 
+  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+    Data,
     Regression = TRUE,
     PriorParam = PP,
     WithSpikes = WithSpikes
@@ -71,7 +72,6 @@ multi_MCMC <- function(
   retain_prior <- c(TRUE, TRUE, retain)
   PP$m <- PP$m[retain_prior]
   PP$V <- PP$V[retain_prior, retain_prior]
-  Start$beta0 <- Start$beta0[retain_prior]
   PP$k <- length(PP$m)
 
   ## To do:
