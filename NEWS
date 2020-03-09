@@ -1,4 +1,4 @@
-0version 0.1: (2015-04-20)
+version 0.1: (2015-04-20)
 
 - Original release
 
@@ -1408,3 +1408,5 @@ version 1.9.20 (2020-02-16)
 version 1.9.21 (2020-03-05)
 - Minor fix in `BASiCS_MCMC` to fix warning (definition of `PriorMu`)
 
+version 1.9.22 (2020-03-09)
+- Bugfix in plot method when Param="sigma2"

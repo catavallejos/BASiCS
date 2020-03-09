@@ -11,7 +11,7 @@ BASiCS_MCMC(
   Burn,
   Regression,
   WithSpikes = TRUE,
-  PriorMu = "default",
+  PriorMu = c("default", "EmpiricalBayes"),
   ...
 )
 }
