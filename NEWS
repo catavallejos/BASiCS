@@ -1405,3 +1405,6 @@ version 1.9.20 (2020-02-16)
 - Fix bug in handling of tail probability tests that meant probabilities
   were not calculated correctly when Epsilon* = 0.
 
+version 1.9.21 (2020-03-05)
+- Minor fix in `BASiCS_MCMC` to fix warning (definition of `PriorMu`)
+
