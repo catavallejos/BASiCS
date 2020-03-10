@@ -327,7 +327,6 @@ BASiCS_MCMC <- function(
       MCMCFun <- ".BASiCS_MCMCcppReg"
     } else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
-      print("when")
       MCMCArgs <- c(MCMCArgs, NonRegressionArgs)
       MCMCFun <- ".BASiCS_MCMCcpp"
     }
