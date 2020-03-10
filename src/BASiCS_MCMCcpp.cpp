@@ -36,8 +36,7 @@
  * EndAdapt: when to stop the adaptation
  * PrintProgress: whether to print progress report 
  */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcpp(
+Rcpp::List BASiCS_MCMCcpp(
     int N, 
     int Thin, 
     int Burn,  

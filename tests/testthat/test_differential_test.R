@@ -13,7 +13,7 @@ test_that("Differential test is correct", {
     EpsilonD = log2(1.5),
     OffSet = TRUE,
     Plot = FALSE,
-    CheckESS = FALSE,
+    ESSThreshold = NA,
     PlotOffset = FALSE
   )
 
@@ -66,7 +66,7 @@ test_that("Differential test is correct", {
     GroupLabel1 = "SC",
     GroupLabel2 = "P&S",
     GenesSelect = GenesSelect,
-    CheckESS = FALSE,
+    ESSThreshold = NA,
     EpsilonM = log2(1.5), EpsilonD = log2(1.5),
     OffSet = TRUE, Plot = FALSE, PlotOffset = FALSE
   )

@@ -17,7 +17,8 @@
 using namespace Rcpp;
 
 // Main MCMC sampler
-Rcpp::List HiddenBASiCS_MCMCcpp(
+// [[Rcpp::export(".BASiCS_MCMCcpp")]]
+Rcpp::List BASiCS_MCMCcpp(
     int N, 
     int Thin, 
     int Burn,  
@@ -61,7 +62,8 @@ Rcpp::List HiddenBASiCS_MCMCcpp(
     double const& cellExponent);
 
 // MCMC sampler for regression case
-Rcpp::List HiddenBASiCS_MCMCcppReg(
+// [[Rcpp::export(".BASiCS_MCMCcppReg")]]
+Rcpp::List BASiCS_MCMCcppReg(
     int N, 
     int Thin, 
     int Burn,  
@@ -103,9 +105,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
-    bool RBFNTile,
     bool FixLocations,
-    arma::vec locations,
+    bool RBFMinMax,
+    arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -115,7 +117,8 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
 
 
 // MCMC sampler for the non-spike case
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
+// [[Rcpp::export(".BASiCS_MCMCcppNoSpikes")]]
+Rcpp::List BASiCS_MCMCcppNoSpikes(
     int N, 
     int Thin, 
     int Burn,  
@@ -162,32 +165,33 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     double const& cellExponent);
 
 // MCMC sampler for regression and non-spikes case
-Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
-    int N, 
-    int Thin, 
-    int Burn,  
-    arma::mat Counts,  
-    arma::mat BatchDesign, 
-    arma::vec mu0, 
-    arma::vec delta0, 
-    arma::vec s0, 
-    arma::vec nu0, 
+// [[Rcpp::export(".BASiCS_MCMCcppRegNoSpikes")]]
+Rcpp::List BASiCS_MCMCcppRegNoSpikes(
+    int N,
+    int Thin,
+    int Burn,
+    arma::mat Counts,
+    arma::mat BatchDesign,
+    arma::vec mu0,
+    arma::vec delta0,
+    arma::vec s0,
+    arma::vec nu0,
     arma::vec theta0,
     double mu_mu,
     double s2mu,
     double as,
     double bs,
-    double atheta, 
+    double atheta,
     double btheta, 
     int k,
-    arma::vec m0, 
+    arma::vec m0,
     arma::mat V0, 
-    double sigma2_a0, 
+    double sigma2_a0,
     double sigma2_b0,
-    arma::vec beta0, 
-    double sigma20, 
-    double eta0, 
-    arma::vec lambda0, 
+    arma::vec beta0,
+    double sigma20,
+    double eta0,
+    arma::vec lambda0,
     double const& variance,
     double Constrain,
     arma::vec Index,
@@ -197,18 +201,19 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     arma::vec NotConstrainGene,
     int ConstrainType,
     int StochasticRef,
-    arma::vec LSmu0, 
-    arma::vec LSdelta0, 
-    arma::vec LSnu0, 
-    arma::vec LStheta0, 
-    arma::vec sumByCellAll, 
-    arma::vec sumByGeneAll, 
-    int StoreAdapt, 
+    double ar,
+    arma::vec LSmu0,
+    arma::vec LSdelta0,
+    arma::vec LSnu0,
+    arma::vec LStheta0,
+    arma::vec sumByCellAll,
+    arma::vec sumByGeneAll,
+    int StoreAdapt,
     int EndAdapt,
     int PrintProgress,
-    bool RBFNTile,
+    bool RBFMinMax,
     bool FixLocations,
-    arma::vec locations,
+    arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -217,7 +222,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     double const& cellExponent);
 
 // Function to cumpute denoised rates
-arma::mat HiddenBASiCS_DenoisedRates(
+// [[Rcpp::export(".BASiCS_DenoisedRates")]]
+arma::mat BASiCS_DenoisedRates(
     NumericMatrix CountsBio, 
     NumericMatrix Mu,
     NumericMatrix TransInvDelta,

@@ -43,8 +43,8 @@ arma::vec estimateRBFLocations(
     int const& k,
     bool RBFMinMax);
 
-// [[Rcpp::export]]
-arma::vec Hidden_rDirichlet(arma::vec alpha);
+// [[Rcpp::export(.rDirichlet)]]
+arma::vec rDirichlet(arma::vec alpha);
 arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma);
 
 /* Declarations for functions used by the main MCMC sampler

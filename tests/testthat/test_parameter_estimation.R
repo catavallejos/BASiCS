@@ -8,7 +8,7 @@ test_that("Estimates match the given seed (spikes)", {
   # Fixing starting values
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = TRUE,
@@ -82,7 +82,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes)",
   # Fixing starting values
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = TRUE,

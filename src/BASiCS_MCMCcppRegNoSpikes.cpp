@@ -43,8 +43,7 @@
  * lambda0: Starting values for gene-wise error term
  * variance: Fixed width (scale) for GRBFs
  */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
+Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     int N, 
     int Thin, 
     int Burn,  
@@ -89,8 +88,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
-    bool FixLocations,
     bool RBFMinMax,
+    bool FixLocations,
     arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,

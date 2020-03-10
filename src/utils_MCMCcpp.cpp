@@ -148,7 +148,7 @@ Rcpp::List phiUpdate(
   int ind;
   
   // PROPOSAL STEP
-  phi1 = n * Hidden_rDirichlet(prop_var * phi0); 
+  phi1 = n * rDirichlet(prop_var * phi0); 
   double u = R::runif(0,1);
   
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  

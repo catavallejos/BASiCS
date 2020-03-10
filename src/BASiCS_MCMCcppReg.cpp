@@ -43,8 +43,7 @@
  * lambda0: Starting values for gene-wise error term
  * variance: Fixed width (scale) for GRBFs
  */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppReg(
+Rcpp::List BASiCS_MCMCcppReg(
     int N, 
     int Thin, 
     int Burn,  

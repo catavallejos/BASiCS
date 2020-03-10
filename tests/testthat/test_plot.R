@@ -96,6 +96,7 @@ test_that("Diagnostic plot works", {
 
 
 test_that("Diagnostic hist work", {
+  data(ChainSCReg)
   data(ChainSC)
   expect_warning(g <- BASiCS_diagHist(ChainSCReg), "deprecated")
   expect_is(g, "ggplot")

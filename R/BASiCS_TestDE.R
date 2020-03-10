@@ -72,13 +72,13 @@
 #' @param min.mean Minimum mean expression threshold required for inclusion in
 #' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 #' parameter is only relevant with `Offset = TRUE`.
-#' @param CheckESS Should the effective sample size of the chains be tested to
-#' be of a suitable magnitude in order to be included in tests for
-#' differential expression? Default is TRUE If TRUE, genes with poor
-#' mixing will be excluded from the tests for differential expression.
-#' @param ESSThreshold If CheckESS is TRUE, this argument specifies
+#' @param ESSThreshold This argument specifies
 #' the minimum effective sample size for a gene to be included in the tests for
-#' differential expression. Default is 100.
+#' differential expression. This helps to remove genes with poor mixing from
+#' differential expression tests.
+#' Default is 100. If set to NA, genes are
+#' not checked for effective sample size before differential expression tests
+#' are performed.
 #' @param ... Optional parameters.
 #'
 #' @return \code{BASiCS_TestDE} returns a list of 4 elements:
@@ -243,7 +243,6 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_R = 0.05,
                           GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
                           min.mean = 1,
-                          CheckESS = TRUE,
                           ESSThreshold = 100,
                           ...) {
   HiddenHeaderTest_DE(
@@ -264,8 +263,7 @@ BASiCS_TestDE <- function(Chain1,
     GenesSelect = GenesSelect,
     Plot = Plot,
     PlotOffset = PlotOffset,
-    Offset = Offset,
-    CheckESS = CheckESS
+    Offset = Offset
   )
 
   GeneName <- colnames(Chain1@parameters$mu)
@@ -412,7 +410,7 @@ BASiCS_TestDE <- function(Chain1,
 
   Search <- is.null(ProbThresholdM)
 
-  if (CheckESS) {
+  if (!is.na(ESSThreshold)) {
     GoodESS <- ess(mcmc(Chain1@parameters[["mu"]])) > ESSThreshold &
       ess(mcmc(Chain2@parameters[["mu"]])) > ESSThreshold
   } else {
@@ -471,7 +469,7 @@ BASiCS_TestDE <- function(Chain1,
     DeltaSelect <- NotDE
   }
 
-  if (CheckESS) {
+  if (!is.na(ESSThreshold)) {
     GoodESS <- ess(mcmc(Chain1@parameters[["delta"]])) > ESSThreshold &
       ess(mcmc(Chain2@parameters[["delta"]])) > ESSThreshold
   }
@@ -546,7 +544,7 @@ BASiCS_TestDE <- function(Chain1,
     } else {
       EpsSelect <- NotExcluded
     }
-    if (CheckESS) {
+    if (!is.na(ESSThreshold)) {
       GoodESS <- ess(mcmc(Chain1@parameters[["epsilon"]])) > ESSThreshold &
         ess(mcmc(Chain2@parameters[["epsilon"]])) > ESSThreshold
     }

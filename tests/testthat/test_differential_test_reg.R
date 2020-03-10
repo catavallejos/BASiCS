@@ -12,7 +12,7 @@ test_that("Differential test is correct (regression case)", {
     EpsilonM = log2(1.5),
     EpsilonD = log2(1.5),
     EpsilonR = log2(1.5) / log2(exp(1)),
-    CheckESS = FALSE,
+    ESSThreshold = NA,
     OffSet = TRUE, 
     Plot = FALSE,
     PlotOffset = FALSE
@@ -70,7 +70,7 @@ test_that("Differential test requires same regression setting", {
   )
 })
 
-test_that("Differential test works with CheckESS", {
+test_that("Differential test when testing ESS", {
   data(ChainSCReg)
   data(ChainRNA)
   expect_error(
@@ -78,8 +78,7 @@ test_that("Differential test works with CheckESS", {
       Chain1 = ChainSCReg,
       Chain2 = ChainRNAReg,
       Plot = FALSE,
-      PlotOffset = FALSE,
-      CheckESS = TRUE
+      PlotOffset = FALSE
     ),
     NA
   )

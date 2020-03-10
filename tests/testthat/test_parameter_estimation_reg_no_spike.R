@@ -15,7 +15,7 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   k <- 12
   PriorParam <- BASiCS_PriorParam(Data, k = k)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     Regression = TRUE,
@@ -143,7 +143,7 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
 
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     Regression = TRUE,

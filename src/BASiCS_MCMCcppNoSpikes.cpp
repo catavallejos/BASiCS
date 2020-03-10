@@ -47,8 +47,7 @@
 * ConstrainType: 
 * StochasticRef: 
 */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
+Rcpp::List BASiCS_MCMCcppNoSpikes(
     int N, 
     int Thin, 
     int Burn,  
@@ -204,7 +203,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       y_n,
       cellExponent
     );
-    
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -287,6 +285,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     if(i>=Burn) {
       deltaAccept += deltaAux.col(1);
     }
+    Rcpp::Rcout << "delta" << std::endl;
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -313,6 +312,7 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
     if(i>=Burn) {
       nuAccept += nuAux.col(1);
     }
+    Rcpp::Rcout << "nu" << std::endl;
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {

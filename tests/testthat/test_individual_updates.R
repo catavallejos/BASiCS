@@ -5,7 +5,7 @@ test_that("Dirichlet sampler", {
   phi0 <- 1:10
   phi0 <- phi0 / sum(phi0)
   set.seed(2018)
-  x <- as.vector(BASiCS:::Hidden_rDirichlet(phi0))
+  x <- as.vector(BASiCS:::.rDirichlet(phi0))
 
   set.seed(2018)
   x0 <- rgamma(length(phi0), shape = phi0, scale = 1)
@@ -27,7 +27,7 @@ test_that("Spikes + no regression", {
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = TRUE,
@@ -235,7 +235,7 @@ test_that("Spikes + regression", {
   )
 
   set.seed(2020)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     Regression = TRUE,
@@ -250,7 +250,6 @@ test_that("Spikes + regression", {
   RBFLocations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
   X <- BASiCS:::.designMatrix(k, RBFLocations, Start$mu0, var)
 
-  # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
   mu <- BASiCS:::.muUpdateReg(
     mu0 = Start$mu0,
@@ -370,7 +369,7 @@ test_that("No Spikes + no regression", {
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
   set.seed(2020)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     Regression = FALSE,
@@ -387,7 +386,6 @@ test_that("No Spikes + no regression", {
   means <- rowMeans(CountsBio)
   RefGene <- which.min(means[means >= median(means)])
 
-  # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
   mu <- BASiCS:::.muUpdateNoSpikes(
     mu0 = Start$mu0,
@@ -469,7 +467,7 @@ test_that("No Spikes + regression", {
   )
 
   set.seed(2044)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     Regression = TRUE,

@@ -1,4 +1,4 @@
-context("Parameter estimation and denoised data (no-spikes), original data doesn't have spikes")
+context("Parameter estimation + denoised data (no-spikes), original has no spikes")
 
 test_that("Estimates match the given seed (no-spikes)", {
   # Data example
@@ -18,7 +18,7 @@ test_that("Estimates match the given seed (no-spikes)", {
   n <- ncol(Data)
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = FALSE,
@@ -129,7 +129,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (no spikes)", {
   # Fixing starting values
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = FALSE,

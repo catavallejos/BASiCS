@@ -24,7 +24,6 @@ BASiCS_TestDE(
   EFDR_R = 0.05,
   GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
   min.mean = 1,
-  CheckESS = TRUE,
   ESSThreshold = 100,
   ...
 )
@@ -116,14 +115,13 @@ when the user decides to exclude some genes from the comparison.}
 offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 parameter is only relevant with `Offset = TRUE`.}
 
-\item{CheckESS}{Should the effective sample size of the chains be tested to
-be of a suitable magnitude in order to be included in tests for
-differential expression? Default is TRUE If TRUE, genes with poor
-mixing will be excluded from the tests for differential expression.}
-
-\item{ESSThreshold}{If CheckESS is TRUE, this argument specifies
+\item{ESSThreshold}{This argument specifies
 the minimum effective sample size for a gene to be included in the tests for
-differential expression. Default is 100.}
+differential expression. This helps to remove genes with poor mixing from
+differential expression tests.
+Default is 100. If set to NA, genes are
+not checked for effective sample size before differential expression tests
+are performed.}
 
 \item{...}{Optional parameters.}
 }

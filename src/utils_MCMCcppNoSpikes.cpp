@@ -23,8 +23,7 @@ arma::mat muUpdateNoSpikes(
     arma::uvec const& NotConstrainGene,
     int const& ConstrainType,
     double const& exponent,
-    double const& mintol)
-{
+    double const& mintol) {
   using arma::span;
   
   int nConstrainGene = ConstrainGene.size();

@@ -6,7 +6,7 @@ test_that("Generated starting values do not match given seed (spikes case)", {
   n <- ncol(Data)
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = TRUE,
@@ -66,7 +66,7 @@ test_that("Generated starting values do not match given seed (no spikes case)", 
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
 
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = FALSE,
@@ -125,7 +125,7 @@ test_that("Generated starting values do not match given seed (regression+spike)"
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
   
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
     Data,
     PriorParam,
     WithSpikes = TRUE,
