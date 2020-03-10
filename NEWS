@@ -1369,3 +1369,9 @@ version 1.9.14 (2020-02-10)
 - Changes coda::effectiveSize for a more efficient internal implementation.
 - Adds `CheckESS` and `MinESS` arguments to `BASiCS_TestDE` to filter
   genes for differential expression testing based on effective sample size.
+
+version 1.9.15 (2020-03-10)
+- Adds RBFMinMax option, which controls whether RBF are set at the minimum and 
+  maximum starting mu values.
+- Adds MinGenesPerRBF option. This controls the minimum number of genes
+  between around the centre of each RBF.

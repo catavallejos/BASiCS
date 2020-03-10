@@ -2,7 +2,7 @@ Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
 Version: 1.9.14
-Date: 2020-02-10
+Date: 2020-03-10
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="catalina.vallejos@igmm.ed.ac.uk"), 
         person("Nils", "Eling", role=c("aut")), 
@@ -57,7 +57,6 @@ Imports:
     viridis,
     utils,
     Matrix,
-    future.apply,
     assertthat
 Suggests:
     BiocStyle,
