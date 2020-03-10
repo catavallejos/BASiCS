@@ -1,7 +1,10 @@
+## Slightly optimised version of 
+## coda::effectiveSize 
+## https://cran.r-project.org/web/packages/coda/
 #' @importFrom matrixStats colVars
 #' @importFrom stats ar setNames
 ess <- function(x) {
-  vars <- colVars(x)
+  vars <- matrixStats::colVars(x)
   spec <- numeric(ncol(x))
   has_var <- vars != 0
   if (any(has_var, na.rm = TRUE)) {
@@ -11,14 +14,14 @@ ess <- function(x) {
         a <- ar(y, aic = TRUE)
         a$var.pred / (1 - sum(a$ar)) ^ 2
       }
-    )    
+    )
   }
   setNames(ifelse(spec == 0, 0, nrow(x) * vars / spec), colnames(x))
 }
 
-.ScaleName <- function(Measure = c("ess",
-                                        "geweke.diag"),
-                            Param = NULL) {
+.ScaleName <- function(Measure = c("ess", "geweke.diag"),
+                       Param = NULL) {
+
   Measure <- match.arg(Measure)
   measure_name <- switch(Measure, 
     ess = "Effective sample size",
@@ -31,10 +34,9 @@ ess <- function(x) {
 }
 
 .GetMeasure <- function(object, 
-                             Param,
-                             Measure = c("ess",
-                                         "geweke.diag"), 
-                             na.rm = FALSE) {
+                        Param,
+                        Measure = c("ess", "geweke.diag"), 
+                        na.rm = FALSE) {
 
   Measure <- match.arg(Measure)
   MeasureFun <- match.fun(Measure)

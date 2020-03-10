@@ -12,3 +12,4 @@ inst/doc
 tests/testthat/*.Rds
 vignettes/.build.timestamp
 BASiCS.Rproj
+chain_ls_.Rds

@@ -4,7 +4,16 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC(
+  Data,
+  N,
+  Thin,
+  Burn,
+  Regression,
+  WithSpikes = TRUE,
+  PriorMu = c("default", "EmpiricalBayes"),
+  ...
+)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
@@ -25,11 +34,20 @@ residual over-dispersion is not confounded by mean expression. Recommended
 setting is \code{Regression = TRUE}.}
 
 \item{WithSpikes}{If \code{WithSpikes = TRUE}, BASiCS will use reads from
+<<<<<<< HEAD
 added spike-ins to estimate technical variability. If 
 \code{WithSpikess = FALSE},
+=======
+added spike-ins to estimate technical variability. 
+If \code{WithSpikess = FALSE},
+>>>>>>> 7a68c10f77989349130afea84b015a38c7d4c9f6
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
+
+\item{PriorMu}{Indicates if the original prior (\code{PriorMu = 'default'})
+or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+assigned to gene-specific mean expression parameters.}
 
 \item{...}{Optional parameters.
 \describe{

@@ -12,7 +12,7 @@ test_that("Differential test is correct (regression case)", {
     EpsilonM = log2(1.5),
     EpsilonD = log2(1.5),
     EpsilonR = log2(1.5) / log2(exp(1)),
-    ESSThreshold = NA,
+    MinESS = NA,
     OffSet = TRUE, 
     Plot = FALSE,
     PlotOffset = FALSE
@@ -81,5 +81,63 @@ test_that("Differential test when testing ESS", {
       PlotOffset = FALSE
     ),
     NA
+  )
+  })
+
+test_that("CheckESS works", {
+  data(ChainSCReg)
+  data(ChainRNAReg)
+
+  MinESS <- 100
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSCReg,
+    Chain2 = ChainRNAReg,
+    EpsilonM = log2(1.5),
+    EpsilonD = log2(1.5),
+    OffSet = TRUE,
+    Plot = FALSE,
+    MinESS = MinESS,
+    PlotOffset = FALSE
+  )
+  ee1 <- coda::effectiveSize(ChainSCReg@parameters$epsilon)
+  ee2 <- coda::effectiveSize(ChainRNAReg@parameters$epsilon)
+
+  # Classification frequency
+  expect_equivalent(
+    Test$TableResDisp$ResultDiffResDisp == "ExcludedLowESS",
+    !(ee1 > MinESS & ee2 > MinESS)
+  )
+})
+
+
+
+test_that("EpsilonM = 0 case (reg)", {
+  data(ChainSCReg)
+  data(ChainRNAReg)
+
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSCReg,
+    Chain2 = ChainRNAReg,
+    GroupLabel1 = "SC",
+    GroupLabel2 = "P&S",
+    EpsilonM = 0,
+    EpsilonD = 0,
+    EpsilonR = 0,
+    OffSet = TRUE,
+    Plot = FALSE,
+    MinESS = NA,
+    PlotOffset = FALSE
+  )
+  expect_equal(
+    as.numeric(table(Test$TableMean$ResultDiffMean)),
+    c(150, 119, 81)
+  )
+  expect_equal(
+    as.numeric(table(Test$TableDisp$ResultDiffDisp)),
+    c(200, 98, 52)
+  )
+  expect_equal(
+    as.numeric(table(Test$TableResDisp$ResultDiffResDisp)),
+    c(333, 6, 11)
   )
 })

@@ -15,8 +15,6 @@
   Cell = NULL,
   Batch = 1,
   RegressionTerm = NULL,
-  ylab = "",
-  xlab = "",
   ...
 )
 }
@@ -40,11 +38,7 @@ Required only if \code{Param = 'theta'}}
 \item{RegressionTerm}{Specifies which regression coefficient is requested.
 Required only if \code{Param = 'beta'}}
 
-\item{ylab}{As in \code{\link[graphics]{par}}.}
-
-\item{xlab}{As in \code{\link[graphics]{par}}.}
-
-\item{...}{Other graphical parameters (see \code{\link[graphics]{par}}).}
+\item{...}{Unused.}
 }
 \value{
 A plot object

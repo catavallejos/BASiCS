@@ -54,7 +54,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     arma::vec s0, 
     arma::vec nu0, 
     arma::vec theta0,
-    double mu_mu,
+    arma::vec mu_mu,
     double s2mu,
     double as,
     double bs,

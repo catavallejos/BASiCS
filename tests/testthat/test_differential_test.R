@@ -13,7 +13,7 @@ test_that("Differential test is correct", {
     EpsilonD = log2(1.5),
     OffSet = TRUE,
     Plot = FALSE,
-    ESSThreshold = NA,
+    MinESS = NA,
     PlotOffset = FALSE
   )
 
@@ -49,6 +49,7 @@ test_that("Differential test is correct", {
 })
 
 
+
 test_that("Differential test is correct", {
 
   # Test usage of GenesSelect
@@ -66,7 +67,7 @@ test_that("Differential test is correct", {
     GroupLabel1 = "SC",
     GroupLabel2 = "P&S",
     GenesSelect = GenesSelect,
-    ESSThreshold = NA,
+    MinESS = NA,
     EpsilonM = log2(1.5), EpsilonD = log2(1.5),
     OffSet = TRUE, Plot = FALSE, PlotOffset = FALSE
   )
@@ -98,4 +99,66 @@ test_that("Differential test is correct", {
   Lfc2Disp0 <- c(0.62, 0.67, 0.54, 4.39, -0.12)
   Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5), 2)
   expect_equal(Lfc2Disp, Lfc2Disp0)
+})
+
+
+test_that("CheckESS works", {
+  data(ChainSC)
+  data(ChainRNA)
+
+  MinESS <- 100
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSC,
+    Chain2 = ChainRNA,
+    EpsilonM = log2(1.5),
+    EpsilonD = log2(1.5),
+    OffSet = TRUE,
+    Plot = FALSE,
+    MinESS = MinESS,
+    PlotOffset = FALSE
+  )
+  
+  me1 <- coda::effectiveSize(ChainSC@parameters$mu)
+  me2 <- coda::effectiveSize(ChainRNA@parameters$mu)
+  # Classification frequency
+  expect_equivalent(
+    Test$TableMean$ResultDiffMean == "ExcludedLowESS",
+    !(me1 > MinESS & me2 > MinESS)
+  )
+
+  md1 <- coda::effectiveSize(ChainSC@parameters$delta)
+  md2 <- coda::effectiveSize(ChainRNA@parameters$delta)
+  # Classification frequency
+  expect_equivalent(
+    Test$TableDisp$ResultDiffDisp == "ExcludedLowESS",
+    !(md1 > MinESS & md2 > MinESS)
+  )
+})
+
+
+
+test_that("EpsilonM = 0 case (reg)", {
+  data(ChainSC)
+  data(ChainRNA)
+
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSC,
+    Chain2 = ChainRNA,
+    GroupLabel1 = "SC",
+    GroupLabel2 = "P&S",
+    EpsilonM = 0,
+    EpsilonD = 0,
+    OffSet = TRUE,
+    Plot = FALSE,
+    MinESS = NA,
+    PlotOffset = FALSE
+  )
+  expect_equal(
+    as.numeric(table(Test$TableMean$ResultDiffMean)),
+    c(180, 98, 72)
+  )
+  expect_equal(
+    as.numeric(table(Test$TableDisp$ResultDiffDisp)),
+    c(170, 147, 33)
+  )
 })

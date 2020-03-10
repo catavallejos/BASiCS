@@ -16,11 +16,14 @@
 #' residual over-dispersion is not confounded by mean expression. Recommended
 #' setting is \code{Regression = TRUE}.
 #' @param WithSpikes  If \code{WithSpikes = TRUE}, BASiCS will use reads from
-#' added spike-ins to estimate technical variability. If 
-#' \code{WithSpikess = FALSE},
+#' added spike-ins to estimate technical variability. 
+#' If \code{WithSpikess = FALSE},
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param PriorMu Indicates if the original prior (\code{PriorMu = 'default'})
+#' or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+#' assigned to gene-specific mean expression parameters.  
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -196,8 +199,8 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
-    ...
-  ) {
+    PriorMu = c("default", "EmpiricalBayes"),
+    ...) {
 
   # Checks to ensure input arguments are valid
   .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
@@ -226,9 +229,10 @@ BASiCS_MCMC <- function(
     GPar,
     Regression,
     WithSpikes,
+    PriorMu,
     ...
   )
-
+  
   # Starting values for the MCMC (parameters and adaptive variances)
   # Loaded separately to simplify calling to the elements of its list
   # Same for prior parameters

@@ -288,3 +288,39 @@ test_that("MCMC works with different input classes", {
   )
   counts(DataSpikes) <- DelayedArray(counts(DataSpikes)) 
 })
+
+test_that("PriorMu", {
+  expect_error(
+    run_MCMC(
+      Data = makeExampleBASiCS_Data(),
+      N = 10,
+      Thin = 2,
+      Burn = 4,
+      Regression = TRUE,
+      PriorMu = "sadfs"
+    ),
+    "'arg' should be one of \"default\", \"EmpiricalBayes\""
+  )
+  expect_error(
+    run_MCMC(
+      Data = makeExampleBASiCS_Data(),
+      N = 10,
+      Thin = 2,
+      Burn = 4,
+      Regression = TRUE,
+      PriorMu = "default"
+    ),
+    NA
+  )
+  expect_error(
+    run_MCMC(
+      Data = makeExampleBASiCS_Data(),
+      N = 10,
+      Thin = 2,
+      Burn = 4,
+      Regression = TRUE,
+      PriorMu = "EmpiricalBayes"
+    ),
+    NA
+  )
+})

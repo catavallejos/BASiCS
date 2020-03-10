@@ -10,7 +10,8 @@ HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL,
     # Merge biological and technical genes
     Mu <- c(Mu, Mu_spikes)
   } else {
-    q <- length(Mu); q.bio <- length(Mu)
+    q <- length(Mu)
+    q.bio <- length(Mu)
   }
   if (is.null(Phi)) {
     Phi <- rep(1, times = n)
@@ -34,6 +35,17 @@ HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL,
       Counts.sim[i, ] <- rpois(n, lambda = Phi * Nu * rho[i, ] * Mu[i])
     }
   }
+  ## BASiCS_Data will fail if a cell has no intrinsic counts
+  while (any(ind_zero <- colSums(Counts.sim) == 0)) {
+    for (i in seq_len(q.bio)) {
+      if (Delta[i] > 0) {
+        Counts.sim[, ind_zero] <- rpois(n,
+          lambda = Phi[ind_zero] * Nu[ind_zero] * rho[i, ind_zero] * Mu[i]
+        )
+      }
+    }
+  }
+
   # Simulated counts data - spike-in genes
   if (!is.null(Mu_spikes)) {
     for (i in (seq_len(q - q.bio) + q.bio)) {
@@ -44,9 +56,11 @@ HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL,
   rownames(Counts.sim) <- paste0("Gene", seq_len(q))
   
   if (!is.null(Mu_spikes)) {
-    SpikeInfo <- data.frame(paste0("Gene", seq(q.bio + 1, q)), 
-                            Mu[seq(q.bio + 1, q)])  
-    Tech <- ifelse(seq_len(q) > q.bio, TRUE, FALSE)
+    SpikeInfo <- data.frame(
+      paste0("Gene", seq(q.bio + 1, q)),
+      Mu[seq(q.bio + 1, q)]
+    )
+    Tech <- seq_len(q) > q.bio
   } else {
     SpikeInfo <- NULL
     Tech <- rep(FALSE, q)

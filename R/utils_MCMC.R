@@ -36,14 +36,7 @@
          "or set 'WithSpikes = FALSE' \n.",
          "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
   }
-  
- # # If isSpike slot does not contain spikes and WithSpikes == TRUE
- # if(sum(Spikes) == 0 & WithSpikes)
- #   stop("'isSpike(Data)' does not contain TRUE values, meaning the sce object \n",
- #        "does not contain spikes. Please indicate in 'isSpike(Data)' which \n",
- #        "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
- #        "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
-  
+    
   # If BatchInfo slot is missing and WithSpikes == FALSE
   if(!WithSpikes & is.null(colData(Data)$BatchInfo)) {
     stop("'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 
@@ -242,43 +235,56 @@
   )
 }
 
-.BASiCS_MCMC_ExtraArgs <- function(
-    Data,
-    Burn,
-    GPar,
-    Regression,
-    WithSpikes,
-    PriorDelta = c("log-normal", "gamma"),
-    PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-    ## Duplicated arg here for backwards-compatibility.
-    ## If both specified, Var is ignored.
-    Var = 1.2,
-    variance = Var,
-    StochasticRef = TRUE,
-    ConstrainType = 1,
-    ConstrainProp = 0.2,
-    AR = 0.44,
-    StopAdapt = Burn,
-    StoreChains = FALSE,
-    StoreAdapt = FALSE,
-    StoreDir = getwd(),
-    RunName = "",
-    PrintProgress = TRUE,
-    MinGenesPerRBF = NA,
-    PriorParam = BASiCS_PriorParam(Data, k = 12),
-    Start = .BASiCS_MCMC_Start(
-      Data = Data,
-      PriorParam = PriorParam,
-      WithSpikes = WithSpikes,
-      Regression = Regression
-    ),
-    GeneExponent = 1,
-    CellExponent = 1,
-    mintol_mu = 1e-3,
-    mintol_delta = 1e-3,
-    mintol_nu = 1e-5,
-    mintol_theta = 1e-4
-  ) {
+.EmpiricalBayesMu <- function(Data, s2_mu) {
+
+  # Apply scran normalisation
+  s <- calculateSumFactors(Data)
+  NormCounts <- t(t(counts(Data)) / s)
+  aux <- rowMeans(NormCounts)
+
+  # Correction for those genes with total count = 0
+  aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
+
+  log(aux) - s2_mu / 2
+}
+
+.BASiCS_MCMC_ExtraArgs <- function(Data,
+                                   Burn,
+                                   GPar,
+                                   Regression,
+                                   WithSpikes,
+                                   PriorMu = c("default", "EmpiricalBayes"),
+                                   PriorDelta = c("log-normal", "gamma"),
+                                   PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
+                                   k = 12,
+                                   ## Duplicated arg here for backwards-compatibility.
+                                   ## If both specified, Var is ignored.
+                                   Var = 1.2,
+                                   variance = Var,
+                                   StochasticRef = TRUE,
+                                   ConstrainType = 1,
+                                   ConstrainProp = 0.2,
+                                   AR = 0.44,
+                                   StopAdapt = Burn,
+                                   StoreChains = FALSE,
+                                   StoreAdapt = FALSE,
+                                   StoreDir = getwd(),
+                                   RunName = "",
+                                   PrintProgress = TRUE,
+                                   MinGenesPerRBF = NA,
+                                   PriorParam = BASiCS_PriorParam(Data, k = 12),
+                                   Start = .BASiCS_MCMC_Start(
+                                     Data = Data,
+                                     PriorParam = PriorParam,
+                                     WithSpikes = WithSpikes,
+                                     Regression = Regression
+                                   ),
+                                   mintol_mu = 1e-3,
+                                   mintol_delta = 1e-3,
+                                   mintol_nu = 1e-5,
+                                   mintol_theta = 1e-4) {
+  PriorMu <- match.arg(PriorMu)
+  PriorDelta <- match.arg(PriorDelta)
 
   .stop_k(PriorParam$k)
   lm <- log(Start$mu0)
@@ -304,7 +310,6 @@
   }
   PriorParam$k <- length(RBFLocations) + 2
 
-  PriorDelta <- match.arg(PriorDelta)
   if (missing(PriorDelta) & !Regression) {
     message(
       "-------------------------------------------------------------\n",
@@ -318,7 +323,7 @@
   }
   # Validity checks
   assertthat::assert_that(
-    length(PriorParam$mu.mu) == 1,
+    length(PriorParam$mu.mu) == nrow(Data),
     PriorParam$s2.mu > 0,
     length(PriorParam$s2.mu) == 1,
     PriorParam$s2.delta > 0,
@@ -337,10 +342,10 @@
     length(PriorParam$a.theta) == 1,
     PriorParam$b.theta > 0,
     length(PriorParam$b.theta) == 1,
-    GeneExponent > 0,
-    length(GeneExponent) == 1,
-    CellExponent > 0,
-    length(CellExponent) == 1,
+    PriorParam$GeneExponent > 0,
+    length(PriorParam$GeneExponent) == 1,
+    PriorParam$CellExponent > 0,
+    length(PriorParam$CellExponent) == 1,
     StopAdapt > 0,
     length(StoreChains) == 1,
     length(StoreAdapt) == 1,
@@ -376,6 +381,11 @@
     )
   }
 
+  # Redefine prior under the empirical Bayes approach
+  if (PriorMu == "EmpiricalBayes") {
+    PriorParam$mu.mu <- .EmpiricalBayesMu(Data, PriorParam$s2.mu)
+  }
+
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) {
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   }
@@ -393,7 +403,7 @@
   ConstrainGene <- NoSpikesParam$ConstrainGene
   NotConstrainGene <- NoSpikesParam$NotConstrainGene
   Constrain <- NoSpikesParam$Constrain
-  RefGenes <- NoSpikesParam$RefGenes; 
+  RefGenes <- NoSpikesParam$RefGenes
   RefGene <- NoSpikesParam$RefGene
   Index <- seq_len(GPar$q.bio) - 1
 
@@ -424,8 +434,8 @@
     RefGenes = RefGenes,
     RefGene = RefGene,
     Index = Index,
-    GeneExponent = GeneExponent,
-    CellExponent = CellExponent
+    GeneExponent = PriorParam$GeneExponent,
+    CellExponent = PriorParam$CellExponent
   )
 }
 
@@ -439,7 +449,7 @@
         sep = "\n"
       )
     )
-  }      
+  }
 }
 
 
@@ -502,4 +512,3 @@
     RefGene = RefGene
   )
 }
-

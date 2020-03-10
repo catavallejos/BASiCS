@@ -37,6 +37,7 @@ HiddenHeaderTest_DE <- function(Chain1,
                                 Plot,
                                 PlotOffset,
                                 Offset,
+                                CheckESS,
                                 ...)
 {
   # Checking validity of input arguments

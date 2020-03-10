@@ -342,9 +342,7 @@ setMethod(
 #' Required only if \code{Param = 'theta'}
 #' @param RegressionTerm Specifies which regression coefficient is requested.
 #' Required only if \code{Param = 'beta'}
-#' @param ylab As in \code{\link[graphics]{par}}.
-#' @param xlab As in \code{\link[graphics]{par}}.
-#' @param ... Other graphical parameters (see \code{\link[graphics]{par}}).
+#' @param ... Unused.
 #'
 #' @return A plot object
 #'
@@ -363,7 +361,8 @@ setMethod(
                         Param = "mu",
                         Gene = NULL, Cell = NULL, Batch = 1,
                         RegressionTerm = NULL,
-                        ylab = "", xlab = "", ...) {
+                        ...) {
+
     if (Param %in% c("mu", "delta", "epsilon") & is.null(Gene)) {
       stop("'Gene' value is required")
     }
@@ -385,13 +384,16 @@ setMethod(
       Column <- Batch
     } else if (Param == "beta") {
       Column <- RegressionTerm
+    } else if (Param == "sigma2") {
+      Column <- 1
     }
-    if (xlab == "") {
-      xlab <- "Iteration"
-    }
-    if (ylab == "") {
-      ylab <- bquote(.(Param)[.(Column)])
-    }
+    ## Currently unused
+    # if (xlab == "") {
+    #   xlab <- "Iteration"
+    # }
+    # if (ylab == "") {
+    #   ylab <- bquote(.(Param)[.(Column)])
+    # }
     
     DF1 <- data.frame("Iteration" = seq_len(nrow(x@parameters[[Param]])),
                       "Draws" = x@parameters[[Param]][, Column])

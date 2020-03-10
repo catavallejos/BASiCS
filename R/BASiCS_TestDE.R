@@ -72,8 +72,8 @@
 #' @param min.mean Minimum mean expression threshold required for inclusion in
 #' offset calculation. Similar to `min.mean` in `scran::computeSumFactors`. This
 #' parameter is only relevant with `Offset = TRUE`.
-#' @param ESSThreshold This argument specifies
-#' the minimum effective sample size for a gene to be included in the tests for
+#' @param MinESS The minimum effective sample size for a gene to be included 
+#' in the tests for
 #' differential expression. This helps to remove genes with poor mixing from
 #' differential expression tests.
 #' Default is 100. If set to NA, genes are
@@ -243,7 +243,7 @@ BASiCS_TestDE <- function(Chain1,
                           EFDR_R = 0.05,
                           GenesSelect = rep(TRUE, ncol(Chain1@parameters[["mu"]])),
                           min.mean = 1,
-                          ESSThreshold = 100,
+                          MinESS = 100,
                           ...) {
   HiddenHeaderTest_DE(
     Chain1 = Chain1,
@@ -410,18 +410,18 @@ BASiCS_TestDE <- function(Chain1,
 
   Search <- is.null(ProbThresholdM)
 
-  if (!is.na(ESSThreshold)) {
-    GoodESS <- ess(mcmc(Chain1@parameters[["mu"]])) > ESSThreshold &
-      ess(mcmc(Chain2@parameters[["mu"]])) > ESSThreshold
+  if (!is.na(MinESS)) {
+    GoodESS <- ess(mcmc(Chain1@parameters[["mu"]])) > MinESS &
+      ess(mcmc(Chain2@parameters[["mu"]])) > MinESS
   } else {
     GoodESS <- rep(TRUE, length(GenesSelect))
   }
 
   # Changes in mean expression
   # Calculating posterior probabilities
-  ProbM <- .TailProb(Chain = abs(ChainTau), Threshold = EpsilonM)
+  ProbM <- .TailProb(Chain = ChainTau, Threshold = EpsilonM)
   AuxMean <- .ThresholdSearch(
-    Probs = ProbM[GenesSelect],
+    Probs = ProbM[GenesSelect & GoodESS],
     ProbThreshold = ProbThresholdM,
     EFDR = EFDR_M,
     Task = "Differential mean",
@@ -469,14 +469,14 @@ BASiCS_TestDE <- function(Chain1,
     DeltaSelect <- NotDE
   }
 
-  if (!is.na(ESSThreshold)) {
-    GoodESS <- ess(mcmc(Chain1@parameters[["delta"]])) > ESSThreshold &
-      ess(mcmc(Chain2@parameters[["delta"]])) > ESSThreshold
+  if (!is.na(MinESS)) {
+    GoodESS <- ess(mcmc(Chain1@parameters[["delta"]])) > MinESS &
+      ess(mcmc(Chain2@parameters[["delta"]])) > MinESS
   }
   DeltaSelect <- DeltaSelect & GoodESS
 
 
-  ProbD <- .TailProb(Chain = abs(ChainOmega), Threshold = EpsilonD)
+  ProbD <- .TailProb(Chain = ChainOmega, Threshold = EpsilonD)
   AuxDisp <- .ThresholdSearch(
     Probs = ProbD[DeltaSelect],
     ProbThreshold = ProbThresholdD,
@@ -544,14 +544,14 @@ BASiCS_TestDE <- function(Chain1,
     } else {
       EpsSelect <- NotExcluded
     }
-    if (!is.na(ESSThreshold)) {
-      GoodESS <- ess(mcmc(Chain1@parameters[["epsilon"]])) > ESSThreshold &
-        ess(mcmc(Chain2@parameters[["epsilon"]])) > ESSThreshold
+    if (!is.na(MinESS)) {
+      GoodESS <- ess(mcmc(Chain1@parameters[["epsilon"]])) > MinESS &
+        ess(mcmc(Chain2@parameters[["epsilon"]])) > MinESS
     }
     EpsSelect <- EpsSelect & GoodESS
 
     select <- NotExcluded & GenesSelect
-    ProbE <- .TailProb(Chain = abs(ChainPsi), Threshold = EpsilonR)
+    ProbE <- .TailProb(Chain = ChainPsi, Threshold = EpsilonR)
     AuxResDisp <- .ThresholdSearch(
       Probs = ProbE[EpsSelect],
       ProbThreshold = ProbThresholdR,
