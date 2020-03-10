@@ -34,13 +34,8 @@ residual over-dispersion is not confounded by mean expression. Recommended
 setting is \code{Regression = TRUE}.}
 
 \item{WithSpikes}{If \code{WithSpikes = TRUE}, BASiCS will use reads from
-<<<<<<< HEAD
-added spike-ins to estimate technical variability. If 
-\code{WithSpikess = FALSE},
-=======
 added spike-ins to estimate technical variability. 
 If \code{WithSpikess = FALSE},
->>>>>>> 7a68c10f77989349130afea84b015a38c7d4c9f6
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}

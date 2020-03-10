@@ -7,7 +7,7 @@
 BASiCS_PriorParam(
   Data,
   k = 12,
-  mu.mu = 0,
+  mu.mu = rep(0, nrow(Data)),
   s2.mu = 0.5,
   s2.delta = 0.5,
   a.delta = 1,
