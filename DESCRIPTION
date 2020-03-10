@@ -57,6 +57,7 @@ Imports:
     viridis,
     utils,
     Matrix,
+    matrixStats,
     assertthat
 Suggests:
     BiocStyle,
