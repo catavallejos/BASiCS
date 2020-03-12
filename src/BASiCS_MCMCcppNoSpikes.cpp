@@ -47,8 +47,7 @@
 * ConstrainType: 
 * StochasticRef: 
 */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
+Rcpp::List BASiCS_MCMCcppNoSpikes(
     int N, 
     int Thin, 
     int Burn,  
@@ -204,7 +203,6 @@ Rcpp::List HiddenBASiCS_MCMCcppNoSpikes(
       y_n,
       cellExponent
     );
-    
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
     // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR

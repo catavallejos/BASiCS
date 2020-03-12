@@ -1,4 +1,4 @@
-context("Output of BASiCS_MCMC\n")
+context("Output of BASiCS_MCMC")
 
 test_that("Valid BASiCS_MCMC output object", {
   # Data example: spikes
@@ -19,15 +19,15 @@ test_that("Valid BASiCS_MCMC output object", {
   # Running the samples: spikes + regression
   set.seed(18)
   Chain <- run_MCMC(Data, N = 200, Thin = 2, Burn = 100, 
-                    Regression = TRUE, WithSpikes = TRUE, 
+                    Regression = TRUE, WithSpikes = TRUE,
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix")
+                  "beta", "sigma2", "epsilon", "designMatrix", "RBFLocations")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
-  PostSummary <- Summary(Chain)  
-  expect_equal(names(PostSummary@parameters), ParamNames[-length(ParamNames)])
+  PostSummary <- Summary(Chain)
+  expect_equal(names(PostSummary@parameters), ParamNames[-(10:11)])
 
   # Data example: no-spikes
   set.seed(7)
@@ -51,13 +51,13 @@ test_that("Valid BASiCS_MCMC output object", {
                     PrintProgress = FALSE, StoreAdapt = TRUE)
   # Checking parameter names
   ParamNames <- c("mu", "delta", "s", "nu", "theta",
-                  "beta", "sigma2", "epsilon", "designMatrix", "RefFreq")
+                  "beta", "sigma2", "epsilon", "designMatrix", "RBFLocations", "RefFreq")
   expect_equal(names(Chain@parameters), ParamNames)
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
   ind_names <- setdiff(
     seq_along(ParamNames), 
-    c(length(ParamNames)-1, length(ParamNames))
+    c(length(ParamNames) - 2, length(ParamNames) - 1, length(ParamNames))
   )
   expect_equal(
     names(PostSummary@parameters), 

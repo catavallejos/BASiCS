@@ -29,6 +29,9 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    bool FixLocations,
+    bool RBFMinMax,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol) {
 
@@ -64,7 +67,10 @@ arma::mat muUpdateRegNoSpikes(
   }
   // Revise this part
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  if (!FixLocations) {  
+    RBFLocations = estimateRBFLocations(log(mu1), k, RBFMinMax);
+  }
+  arma::mat X_mu1 = designMatrix(k, RBFLocations, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   log_aux -= exponent * lambda % 
@@ -104,7 +110,7 @@ arma::mat muUpdateRegNoSpikes(
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
-  if(ConstrainType == 2) {
+  if (ConstrainType == 2) {
     for (int i=0; i < nNotConstrainGene; i++) {
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) * 

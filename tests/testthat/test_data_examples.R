@@ -1,4 +1,4 @@
-context("Data examples\n")
+context("Data examples")
 
 test_that("Generated data does not match given seed (all cases)", {
   

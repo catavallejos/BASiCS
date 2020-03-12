@@ -25,7 +25,7 @@
 #' 
 #' @export
 BASiCS_EffectiveSize <- function(object, Param, na.rm = TRUE) {
-  HiddenGetMeasure(object, Param, Measure = "ess", na.rm)
+  .GetMeasure(object, Param, Measure = "ess", na.rm)
 }
 
 #' @rdname BASiCS_EffectiveSize

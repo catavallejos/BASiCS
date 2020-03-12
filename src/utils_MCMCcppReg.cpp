@@ -5,28 +5,48 @@
 // Model matrix generation for regression
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
-    arma::vec const& mu, 
-    double const& variance) 
-{
+    arma::vec RBFLocations,
+    arma::vec const& mu,
+    double const& variance) {
+
+  
   arma::vec x = log(mu);
-  double ran = x.max() - x.min();
-  arma::vec myu = arma::zeros(k-2);
-  myu(0) = x.min();
-  
-  for(int i=1; i < (k-2); i++) {
-    myu(i) = myu(i-1) + ran/(k-3);
-  }
-  double h = (myu(1)-myu(0)) * variance;
-  
+  // arma::vec RBFLocations = estimateRBFLocations(x, k);
+  double h = (RBFLocations(1) - RBFLocations(0)) * variance;
+
   // Possibly create this matrix outside
-  arma::mat X = arma::ones(x.size(),k);
+  arma::mat X = arma::ones(x.size(), k);
   X.col(1) = x;
-  for(int i=0; i < k-2; i++) {
-    X.col(i+2) = exp(-0.5*pow(x-myu(i), 2)/pow(h,2));
-    //X.col(i+1) = pow(x,i+1);
+  for (int i = 0; i < k - 2; i++) {
+    X.col(i + 2) = exp(-0.5 * pow(x - RBFLocations(i), 2) / pow(h, 2));
   }
   return X;
 }
+
+arma::vec estimateRBFLocations(
+    arma::vec const& log_mu,
+    int const& k,
+    bool RBFMinMax) {
+
+  double ran = log_mu.max() - log_mu.min();
+  arma::vec RBFLocations = arma::vec(k - 2);
+  double d = ran / (k - 1);
+  if (RBFMinMax) {
+    RBFLocations(0) = log_mu.min();
+    for (unsigned int i = 1; i < RBFLocations.size(); i++) {
+      // RBFLocations(i) = RBFLocations(i - 1) + d;
+      RBFLocations(i) =  RBFLocations(i - 1) + ran / (k - 3);
+    }  
+  } else {
+    RBFLocations(0) = log_mu.min() + d;
+    for (unsigned int i = 1; i < RBFLocations.size(); i++) {
+      RBFLocations(i) = RBFLocations(i - 1) + d;
+      //RBFLocations(i) =  RBFLocations(i - 1) + ran / (k - 3);
+    }    
+  }
+  return RBFLocations;
+}
+
 
 /* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
@@ -51,6 +71,9 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    bool FixLocations,
+    bool RBFMinMax,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol) {
   
@@ -76,7 +99,10 @@ arma::mat muUpdateReg(
   }
   
   // This is new due to regression prior on delta
-  arma::mat X_mu1 = designMatrix(k, mu1, variance);
+  if (!FixLocations) {  
+    RBFLocations = estimateRBFLocations(log(mu1), k, RBFMinMax);
+  }
+  arma::mat X_mu1 = designMatrix(k, RBFLocations, mu1, variance);
   
   // REGRESSION RELATED FACTOR
   // Some terms might cancel out here; check

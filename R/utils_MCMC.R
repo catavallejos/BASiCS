@@ -1,9 +1,14 @@
-.BASiCS_MCMC_InputCheck <- function(Data, N, Thin,
-                                    Burn, Regression, WithSpikes) {
+.BASiCS_MCMC_InputCheck <- function(Data,
+                                    N,
+                                    Thin,
+                                    Burn,
+                                    Regression,
+                                    WithSpikes) {
+
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.\n")
   }
-
+  
   # The following checks are only relevant when the input data was
   # not created using the `newBASiCS_Data` function
 
@@ -15,64 +20,57 @@
       "Please remove unwanted the remaining elements. See help(altExp). \n"
     )
   }
-
+  
   if (WithSpikes & length(altExpNames(Data)) > 0) {
     message(
-      "altExp '", altExpNames(Data), "' is assumed to contain spike-in genes.\n",
+      "altExp '", altExpNames(Data),"' is assumed to contain spike-in genes.\n",
       "see help(altExp) for details. \n"
     )
   }
-
+  
   # If SpikeInput slot is missing and WithSpikes == TRUE
-  if ((length(altExpNames(Data)) > 0) & WithSpikes &
-    is.null(metadata(Data)$SpikeInput)) {
+  if ((length(altExpNames(Data)) > 0) & WithSpikes & is.null(metadata(Data)$SpikeInput)) {
     stop(
       "'Data' does not contain 'SpikeInput' as metadata. \n",
       "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
     )
   }
-
+  
   # If isSpike slot is missing and WithSpikes == TRUE
-  if ((length(altExpNames(Data)) == 0) & WithSpikes) {
+  if((length(altExpNames(Data)) == 0)  & WithSpikes) {
     stop(
-      "'Data' does not contain information about spike-in genes \n",
+      "'Data' does not contain information about spike-in genes \n", 
       "Please indicate include this information using 'altExp' \n",
       "or set 'WithSpikes = FALSE' \n.",
       "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
     )
   }
-
-  # # If isSpike slot does not contain spikes and WithSpikes == TRUE
-  # if(sum(Spikes) == 0 & WithSpikes)
-  #   stop("'isSpike(Data)' does not contain TRUE values, meaning the sce object \n",
-  #        "does not contain spikes. Please indicate in 'isSpike(Data)' which \n",
-  #        "genes are spike-ins or set 'WithSpikes = FALSE' \n.",
-  #        "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n")
-
+    
   # If BatchInfo slot is missing and WithSpikes == FALSE
-  if (!WithSpikes & is.null(colData(Data)$BatchInfo)) {
+  if(!WithSpikes & is.null(colData(Data)$BatchInfo)) {
     stop(
-      "'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n",
+      "'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 
       "Please assign the batch information to: 'colData(Data)$BatchInfo = BatchInfo'. \n",
       "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
     )
   }
 
   # Checking how counts are stored
-  if (!("counts" %in% assayNames(Data))) {
+  if(!("counts" %in% assayNames(Data)))
     stop(
       "'Data' does not contain a 'counts' slot. \n",
-      "Please make sure to include the raw data in the \n",
+      "Please make sure to include the raw data in the \n", 
       "SingleCellExperiment object under the name 'counts'. \n",
       "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
     )
-  }
-
+  
   # Further checks on input
-  errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
-
-  if (length(errors) > 0) stop(errors)
-
+  errors <- .ChecksBASiCS_Data(Data, WithSpikes)
+  
+  if (length(errors) > 0) {
+    stop(errors) 
+  }
+  
   if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) {
     stop("Invalid parameter values.\n")
   }
@@ -86,25 +84,142 @@
     stop("Please use an integer value for Burn (1<=Burn<N); multiple of thin.\n")
   }
   if (!is.logical(Regression)) {
-    stop("Please use a logical value for the Regression parameter.\n")
+    stop("Please use a logical value for the Regression parameter.\n")  
+  } 
+}
+
+.BASiCS_MCMC_Start <- function(Data,
+                               PriorParam,
+                               WithSpikes,
+                               Regression,
+                               ls.mu0 = -4,
+                               ls.delta0 = -2,
+                               ls.phi0 = 11,
+                               ls.nu0 = -10,
+                               ls.theta0 = -4) {
+  
+  if (!is(Data, "SingleCellExperiment")) {
+    stop("'Data' is not a SingleCellExperiment class object.")
   }
 
+  CountsBio <- counts(Data)
+  n <- ncol(Data)
+  q.bio <- nrow(CountsBio)
+
+  # Extract spike-in genes
+  if (WithSpikes) {
+    CountsTech <- assay(altExp(Data))
+  }
+
+  # Initialize normalization as the 'scran' estimates
+  suppressWarnings(size_scran <- scran::calculateSumFactors(CountsBio))
+  # Fix for cases in which 'scran' normalisation has invalid output
+  if ((min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0)) {
+    message("-------------------------------------------------------------\n",
+            "There was an issue when applying `scran` normalization  \n",
+            "`positive = TRUE` has been added to `computeSumFactors` call \n",
+            "Please consider a more stringent quality control criteria. \n",
+            "-------------------------------------------------------------\n")
+    suppressWarnings(
+      size_scran <- scran::calculateSumFactors(CountsBio, positive = TRUE)
+    )
+  }
+
+  if (WithSpikes) {
+    # Initialize s as the empirical capture efficiency rates
+    s0 <- Matrix::colSums(CountsTech) /
+      sum(metadata(Data)$SpikeInput[,2])
+    nu0 <- s0
+    phi0 <- size_scran / s0
+    phi0 <- n * phi0 / sum(phi0)
+
+    # Initialize mu using average 'normalised counts' across cells
+    # and true input values for spike-in genes
+    nCountsBio <- t(t(CountsBio) / (phi0 * s0))
+    meansBio <- rowMeans(nCountsBio)
+    # +1 to avoid zeros as starting values
+    #mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
+    mu0 <- meansBio + 1
+  }
+  else {
+    s0 <- size_scran
+    nu0 <- s0
+    phi0 <- NULL
+
+    # Initialize mu using average 'normalised counts' across cells
+    nCountsBio <- t( t(CountsBio) / s0 )
+    meansBio <- rowMeans(nCountsBio)
+    # +1 to avoid zeros as starting values
+    meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
+    mu0 <- meansBio
+  }
+
+  # Starting value for delta
+  # Defined by the CV for high- and mid-expressed genes
+  # This is motivated by equation (2) in Vallejos et al (2016)
+  varsBio <- apply(nCountsBio, 1, var)
+  cv2Bio <- varsBio / (meansBio)^2
+  delta0 <- rgamma(q.bio, 1, 1) + 1
+  Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
+  delta0[Aux] <- cv2Bio[Aux]
+  # 1e-3 added to be coherent with tolerance used within MCMC sampler
+  delta0 <- delta0 + 0.001
+
+  # Random stating value for theta (within typically observed range)
+  theta0 <- runif(1, min = 0.2, max = 1)
+
+  # Starting values for the proposal variances
+  ls.mu0 <- rep(ls.mu0, q.bio)
+  ls.delta0 <- rep(ls.delta0, q.bio)
+  ls.phi0 <- ifelse(n < 200, pmax(2 * log(n), ls.phi0), 11)
+  ls.nu0 <- pmax(2 * log(0.02 * abs(log(nu0))), ls.nu0)
+  ls.theta0 <- pmax(2 * log(0.02 * abs(log(theta0))), ls.theta0)
+  # Convert to numeric values
+  ls.phi0 <- as.numeric(ls.phi0)
+  ls.theta0 <- as.numeric(ls.theta0)
+
+  # Output list
+  out <- list(
+    mu0 = mu0,
+    delta0 = delta0,
+    phi0 = phi0,
+    s0 = s0,
+    nu0 = nu0,
+    theta0 = theta0,
+    ls.mu0 = ls.mu0,
+    ls.delta0 = ls.delta0,
+    ls.phi0 = ls.phi0,
+    ls.nu0 = ls.nu0,
+    ls.theta0 = ls.theta0
+  )
+
+  # Starting values for regression-related parameters
+  if (Regression) {
+    out$beta0 <- mvrnorm(1, PriorParam$m, PriorParam$V)
+    out$sigma20 <- rgamma(1, PriorParam$a.sigma2, PriorParam$b.sigma2)
+    out$lambda0 <- rgamma(
+      q.bio,
+      shape = PriorParam$eta / 2,
+      rate = PriorParam$eta / 2
+    )
+  }
+
+  return(out)
 }
 
 .BASiCS_MCMC_GlobalParams <- function(Data) {
+  
   BioCounts <- counts(Data)
   n <- ncol(Data)
   q.bio <- nrow(Data)
-
+  
   # If data contains spike-ins
-  if (length(altExpNames(Data)) > 1) {
+  if (length(altExpNames(Data)) > 1){
     q <- q.bio + nrow(altExp(Data))
-  } else {
-    q <- q.bio
-  }
-
+  } else { q <- q.bio }
+  
   # If Data contains batches
-  if (!is.null(colData(Data)$BatchInfo)) {
+  if(!is.null(colData(Data)$BatchInfo)){
     # Store the correct number of levels in batch vector
     BatchInfo <- as.factor(colData(Data)$BatchInfo)
     BatchInfo <- factor(BatchInfo, levels = unique(BatchInfo))
@@ -113,22 +228,27 @@
     BatchInfo <- rep(1, times = n)
     nBatch <- 1
   }
-
+  
   # Parameters associated to the presence of batches
-  if (nBatch > 1) {
-    BatchDesign <- model.matrix(~ BatchInfo - 1)
-  } else {
+  if(nBatch > 1) {
+    BatchDesign <- model.matrix(~BatchInfo - 1)  
+  } else { 
     # If there are no batches or the user asked to ignore them
-    BatchDesign <- matrix(1, nrow = n, ncol = 1)
+    BatchDesign <- matrix(1, nrow = n, ncol = 1) 
   }
-
+  
   list(
-    BioCounts = as.matrix(BioCounts), q = q, q.bio = q.bio, n = n,
-    nBatch = nBatch, BatchInfo = BatchInfo, BatchDesign = BatchDesign
+    BioCounts = as.matrix(BioCounts),
+    q = q,
+    q.bio = q.bio,
+    n = n,
+    nBatch = nBatch,
+    BatchInfo = BatchInfo,
+    BatchDesign = BatchDesign
   )
 }
 
-.EmpiricalBayesMu <- function(Data, PriorParam) {
+.EmpiricalBayesMu <- function(Data, s2_mu) {
 
   # Apply scran normalisation
   s <- calculateSumFactors(Data)
@@ -138,9 +258,7 @@
   # Correction for those genes with total count = 0
   aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
 
-  PriorParam$mu.mu <- log(aux) - PriorParam$s2.mu / 2
-
-  return(PriorParam)
+  log(aux) - s2_mu / 2
 }
 
 .BASiCS_MCMC_ExtraArgs <- function(Data,
@@ -148,17 +266,6 @@
                                    GPar,
                                    Regression,
                                    WithSpikes,
-                                   PriorMu = c("default", "EmpiricalBayes"),
-                                   PriorDelta = c("log-normal", "gamma"),
-                                   PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-                                   k = 12,
-                                   ## Duplicated arg here for backwards-compatibility.
-                                   ## If both specified, Var is ignored.
-                                   Var = 1.2,
-                                   variance = Var,
-                                   StochasticRef = TRUE,
-                                   ConstrainType = 1,
-                                   ConstrainProp = 0.2,
                                    AR = 0.44,
                                    StopAdapt = Burn,
                                    StoreChains = FALSE,
@@ -166,34 +273,44 @@
                                    StoreDir = getwd(),
                                    RunName = "",
                                    PrintProgress = TRUE,
-                                   PriorParam = list(
-                                     mu.mu = rep(0, times = nrow(Data)),
-                                     s2.mu = 0.5,
-                                     s2.delta = 0.5,
-                                     a.delta = 1,
-                                     b.delta = 1,
-                                     p.phi = rep(1, times = GPar$n),
-                                     a.s = 1,
-                                     b.s = 1,
-                                     a.theta = 1,
-                                     b.theta = 1,
-                                     GeneExponent = 1,
-                                     CellExponent = 1
-                                   ),
-                                   eta = 5,
-                                   Start = HiddenBASiCS_MCMC_Start(
-                                     Data,
-                                     PriorParam,
-                                     WithSpikes,
+                                   PriorParam = BASiCS_PriorParam(Data, k = 12),
+                                   Start = .BASiCS_MCMC_Start(
+                                     Data = Data,
+                                     PriorParam = PriorParam,
+                                     WithSpikes = WithSpikes,
+                                     Regression = Regression
                                    ),
                                    mintol_mu = 1e-3,
                                    mintol_delta = 1e-3,
                                    mintol_nu = 1e-5,
                                    mintol_theta = 1e-4) {
-  PriorMu <- match.arg(PriorMu)
-  PriorDelta <- match.arg(PriorDelta)
 
-  if (missing(PriorDelta) & !Regression) {
+  .stop_k(PriorParam$k)
+  lm <- log(Start$mu0)
+  if (is.null(PriorParam$RBFLocations)) {
+    RBFLocations <- .estimateRBFLocations(lm, PriorParam$k, PriorParam$RBFMinMax)
+  } else {
+    RBFLocations <- PriorParam$RBFLocations
+  }
+  if (!is.na(PriorParam$MinGenesPerRBF)) {
+    d <- (RBFLocations[[2]] - RBFLocations[[1]]) / 2
+    retain <- vapply(
+      RBFLocations,
+      function(RBFLocation) {
+        sum(lm > RBFLocation - d & lm < RBFLocation + d) > PriorParam$MinGenesPerRBF
+      },
+      logical(1)
+    )
+    RBFLocations <- RBFLocations[retain]
+    retain_prior <- c(TRUE, TRUE, retain)
+    PriorParam$m <- PriorParam$m[retain_prior]
+    PriorParam$V <- PriorParam$V[retain_prior, retain_prior]
+    Start$beta0 <- Start$beta0[retain_prior]
+  }
+  PriorParam$RBFLocations <- RBFLocations
+  PriorParam$k <- length(RBFLocations) + 2
+
+  if (!Regression) {
     message(
       "-------------------------------------------------------------\n",
       "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
@@ -201,87 +318,83 @@
       "-------------------------------------------------------------\n"
     )
   }
-  if (Regression) {
-    if (k <= 3) {
-      stop("The number of basis functions needs to be >= 4.")
-    }
-  }
 
   if (Regression) {
-    PriorParam$m <- rep(0, k)
-    PriorParam$V <- diag(k)
-    PriorParam$a.sigma2 <- 2
-    PriorParam$b.sigma2 <- 2
-    PriorParam$eta <- eta
+    .stop_k(PriorParam$k)
   }
-
-  # Redefine prior under the empirical Bayes approach
-  if (PriorMu == "EmpiricalBayes") {
-    PriorParam <- .EmpiricalBayesMu(Data, PriorParam)
-  }
-
   # Validity checks
-  if (
-    !(
-      # PriorParam$mu.mu > 0 &
-      length(PriorParam$mu.mu) == nrow(counts(Data)) &
-        PriorParam$s2.mu > 0 & length(PriorParam$s2.mu) == 1 &
-        PriorParam$s2.delta > 0 & length(PriorParam$s2.delta) == 1 &
-        PriorParam$a.delta > 0 & length(PriorParam$a.delta) == 1 &
-        PriorParam$b.delta > 0 & length(PriorParam$b.delta) == 1 &
-        all(PriorParam$p.phi > 0) & length(PriorParam$p.phi) == GPar$n &
-        PriorParam$a.s > 0 & length(PriorParam$a.s) == 1 &
-        PriorParam$b.s > 0 & length(PriorParam$b.s) == 1 &
-        PriorParam$a.theta > 0 & length(PriorParam$a.theta) == 1 &
-        PriorParam$b.theta > 0 & length(PriorParam$b.theta) == 1 &
-        PriorParam$GeneExponent > 0 & length(PriorParam$GeneExponent) == 1 &
-        PriorParam$CellExponent > 0 & length(PriorParam$CellExponent) == 1
-    )
-  ) {
-    stop("Invalid prior hyper-parameter values.")
-  }
-  if (Regression) {
-    if (!(length(PriorParam$m) == k &
-      ncol(PriorParam$V) == k & nrow(PriorParam$V) == k &
-      PriorParam$a.sigma2 > 0 & length(PriorParam$a.sigma2) == 1 &
-      PriorParam$b.sigma2 > 0 & length(PriorParam$b.sigma2) == 1)) {
-      stop("Invalid prior hyper-parameter values.")
-    }
-  }
+  assertthat::assert_that(
+    length(PriorParam$mu.mu) == nrow(Data),
+    PriorParam$s2.mu > 0,
+    length(PriorParam$s2.mu) == 1,
+    PriorParam$s2.delta > 0,
+    length(PriorParam$s2.delta) == 1,
+    PriorParam$a.delta > 0,
+    length(PriorParam$a.delta) == 1,
+    PriorParam$b.delta > 0,
+    length(PriorParam$b.delta) == 1,
+    all(PriorParam$p.phi > 0),
+    length(PriorParam$p.phi) == GPar$n,
+    PriorParam$a.s > 0,
+    length(PriorParam$a.s) == 1,
+    PriorParam$b.s > 0,
+    length(PriorParam$b.s) == 1,
+    PriorParam$a.theta > 0,
+    length(PriorParam$a.theta) == 1,
+    PriorParam$b.theta > 0,
+    length(PriorParam$b.theta) == 1,
+    PriorParam$GeneExponent > 0,
+    length(PriorParam$GeneExponent) == 1,
+    PriorParam$CellExponent > 0,
+    length(PriorParam$CellExponent) == 1,
+    StopAdapt > 0,
+    length(StoreChains) == 1,
+    length(StoreAdapt) == 1,
+    dir.exists(StoreDir),
+    mintol_mu > 0,
+    mintol_delta > 0,
+    mintol_nu > 0,
+    mintol_theta > 0,
+    is.logical(PriorParam$RBFMinMax),
+    length(PriorParam$RBFMinMax) == 1,
+    is.logical(PriorParam$FixLocations),
+    is.na(PriorParam$MinGenesPerRBF) ||
+      (length(PriorParam$MinGenesPerRBF) & is.numeric(PriorParam$MinGenesPerRBF)),
+    length(PriorParam$FixLocations) == 1
+  )
+  assertthat::assert_that(
+    length(Start$mu0) == GPar$q.bio,
+    length(Start$delta0) == GPar$q.bio,
+    is.null(Start$phi0) || length(Start$phi) == GPar$n,
+    length(Start$nu0) == GPar$n,
+    length(Start$s0) == GPar$n
+    # , length(Start$theta0) == GPar$nBatch
+  )
 
+  if (Regression) {
+    assertthat::assert_that(
+      length(PriorParam$m) == PriorParam$k,
+      ncol(PriorParam$V) == PriorParam$k,
+      nrow(PriorParam$V) == PriorParam$k,
+      PriorParam$a.sigma2 > 0,
+      length(PriorParam$a.sigma2) == 1,
+      PriorParam$b.sigma2 > 0,
+      length(PriorParam$b.sigma2) == 1
+    )
+  }
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) {
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   }
-  if (!(StopAdapt > 0)) {
-    stop("Invalid StopAdapt value.")
-  }
-  if (!(is.logical(StoreChains) & length(StoreChains) == 1)) {
-    stop("Invalid StoreChains value.")
-  }
-  if (!(is.logical(StoreAdapt) & length(StoreAdapt) == 1)) {
-    stop("Invalid StoreAdapt value.")
-  }
-  if (!(file.info(StoreDir)["isdir"])) {
-    stop("Invalid StoreDir value.")
-  }
-  if (!(PriorDelta %in% c("gamma", "log-normal"))) {
-    stop("Invalid PriorDelta value.")
-  }
-
-  if (!(mintol_mu > 0) | !(mintol_delta > 0) |
-    !(mintol_nu > 0) | !(mintol_theta > 0)) {
-    stop("Invalid value for mintol parameters (mu, delta, nu or theta)")
-  }
 
   # Definition of parameters that are specific to the no-spikes case
-  NoSpikesParam <- HiddenBASiCS_MCMC_NoSpikesParam(
+  NoSpikesParam <- .BASiCS_MCMC_NoSpikesParam(
     GPar$BioCounts,
-    ConstrainType,
-    StochasticRef,
-    GPar$q.bio,
-    Start$mu0,
-    PriorDelta,
-    ConstrainProp
+    PriorParam$ConstrainType,
+    PriorParam$StochasticRef, 
+    GPar$q.bio, 
+    Start$mu0, 
+    PriorParam$PriorDelta, 
+    PriorParam$ConstrainProp
   )
   ConstrainGene <- NoSpikesParam$ConstrainGene
   NotConstrainGene <- NoSpikesParam$NotConstrainGene
@@ -291,17 +404,98 @@
   Index <- seq_len(GPar$q.bio) - 1
 
   list(
-    AR = AR, StopAdapt = StopAdapt, StoreChains = StoreChains,
-    StoreAdapt = StoreAdapt, StoreDir = StoreDir,
-    RunName = RunName, PrintProgress = PrintProgress,
-    PriorParam = PriorParam, PriorDeltaNum = PriorDeltaNum,
-    PriorDelta = PriorDelta,
-    StochasticRef = StochasticRef,
-    ConstrainType = ConstrainType, ConstrainProp = ConstrainProp,
-    k = k, variance = variance, Start = Start,
-    mintol_mu = mintol_mu, mintol_delta = mintol_delta,
-    mintol_nu = mintol_nu, mintol_theta = mintol_theta,
-    ConstrainGene = ConstrainGene, NotConstrainGene = NotConstrainGene,
-    Constrain = Constrain, RefGenes = RefGenes, RefGene = RefGene, Index = Index
+    AR = AR,
+    StopAdapt = StopAdapt,
+    StoreChains = StoreChains,
+    StoreAdapt = StoreAdapt,
+    StoreDir = StoreDir,
+    RunName = RunName,
+    PrintProgress = PrintProgress,
+    PriorParam = PriorParam,
+    Start = Start,
+    mintol_mu = mintol_mu,
+    mintol_delta = mintol_delta,
+    mintol_nu = mintol_nu,
+    mintol_theta = mintol_theta,
+    ConstrainGene = ConstrainGene,
+    NotConstrainGene = NotConstrainGene,
+    Constrain = Constrain,
+    RefGenes = RefGenes,
+    RefGene = RefGene,
+    Index = Index
+  )
+}
+
+## This condition has to be re-used
+.stop_k <- function(k) {
+  if (k <= 3) {
+    stop(
+      paste(
+        "The number of basis functions needs to be >= 4.",
+        "Consider setting MinGenesPerRBF to NA or a lower positive integer.",
+        sep = "\n"
+      )
+    )
+  }
+}
+
+
+.BASiCS_MCMC_NoSpikesParam <- function(Counts,
+                                       ConstrainType,
+                                       StochasticRef,
+                                       q.bio,
+                                       mu0,
+                                       PriorDelta,
+                                       ConstrainProp) {
+
+  if (PriorDelta == "gamma") {
+    stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
+  }
+
+  # 1: Full constrain; 2: Genes with average count >= 1
+  if (ConstrainType == 1) {
+    ConstrainGene <- seq_len(q.bio) - 1
+    NotConstrainGene <- 0
+    NonZero <- which(matrixStats::rowSums2(Counts) > 0)
+  }
+  if (ConstrainType == 2) {
+    ConstrainGene <- which(matrixStats::rowSums2(Counts) >= 1) - 1
+    NotConstrainGene <- which(matrixStats::rowSums2(Counts) < 1) - 1
+    NonZero <- ConstrainGene + 1
+  }
+  Constrain <- mean(log(mu0[NonZero]))
+
+  # Whether or not a stochatic reference is used
+  # If stochastic, range of possible reference values only includes
+  # the nearest 10% genes located around the constrain
+
+  if (StochasticRef) {
+    aux.ref <- cbind(ConstrainGene, abs(log(mu0[ConstrainGene+1]) - Constrain))
+    aux.ref <- aux.ref[order(aux.ref[, 2]), ]
+    # In total ConstrainProp*100% of genes to be used as reference candidates
+    CandidateRef <- round(ConstrainProp * q.bio)
+    # Fix for the code to run on the synthetic small dataset
+    # generaed by makeExample_BASiCS function (less than 200 genes)
+    if (length(ConstrainGene) > CandidateRef) {
+      RefGenes <- aux.ref[seq_len(CandidateRef), 1]
+    }
+    else {
+      RefGenes <- aux.ref[, 1]
+    }
+    RefGene <- RefGenes[1]
+  }
+  else {
+    aux.ref <- which(abs(log(mu0[ConstrainGene+1]) - Constrain) ==
+                       min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
+    RefGene <- ConstrainGene[aux.ref]
+    RefGenes <- RefGene
+  }
+
+  list(
+    ConstrainGene = ConstrainGene,
+    NotConstrainGene = NotConstrainGene,
+    Constrain = Constrain,
+    RefGenes = RefGenes,
+    RefGene = RefGene
   )
 }

@@ -148,7 +148,7 @@ Rcpp::List phiUpdate(
   int ind;
   
   // PROPOSAL STEP
-  phi1 = n * Hidden_rDirichlet(prop_var * phi0); 
+  phi1 = n * rDirichlet(prop_var * phi0); 
   double u = R::runif(0,1);
   
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  
@@ -170,8 +170,9 @@ Rcpp::List phiUpdate(
             (phi1(j) * nu(j) * mu(i) + invdelta(i)) / 
             (phi0(j) * nu(j) * mu(i) + invdelta(i))
           );
-      } 
+      }
     }
+
     // There is an extra factor 
     // n^(-(sum(prop_var * phi1))) / n^(-(sum(prop_var * phi0)));
     // it cancels out as sum(prop_var*y) = sum(prop_var*phi0)

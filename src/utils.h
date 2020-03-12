@@ -37,8 +37,14 @@ arma::vec DegubInd(arma::vec ind,
                    double const& threshold,
                    std::string const& param);
 
-// [[Rcpp::export]]
-arma::vec Hidden_rDirichlet(arma::vec alpha);
+// [[Rcpp::export(".estimateRBFLocations")]]
+arma::vec estimateRBFLocations(
+    arma::vec const& log_mu,
+    int const& k,
+    bool RBFMinMax);
+
+// [[Rcpp::export(.rDirichlet)]]
+arma::vec rDirichlet(arma::vec alpha);
 arma::mat mvrnormArma(int n, arma::vec mu, arma::mat sigma);
 
 /* Declarations for functions used by the main MCMC sampler
@@ -151,6 +157,7 @@ arma::mat thetaUpdateBatch(
 // [[Rcpp::export(".designMatrix")]]
 arma::mat designMatrix(
     int const& k, 
+    arma::vec RBFLocations,
     arma::vec const& mu, 
     double const& variance);
 
@@ -175,6 +182,9 @@ arma::mat muUpdateReg(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    bool FixLocations,
+    bool RBFMinMax,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol);
 
@@ -300,6 +310,9 @@ arma::mat muUpdateRegNoSpikes(
     arma::mat const& X,
     double const& sigma2,
     double variance,
+    bool FixLocations,
+    bool RBFMinMax,
+    arma::vec RBFLocations,
     double const& exponent,
     double const& mintol);
 

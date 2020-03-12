@@ -51,24 +51,24 @@ BASiCS_DenoisedRates <- function(Data, Chain, Propensities = FALSE) {
   q.bio <- ncol(Chain@parameters$delta)
   n <- ncol(Chain@parameters$s)
 
-  if("phi" %in% names(Chain@parameters)) {
-    Rho <- HiddenBASiCS_DenoisedRates(counts(Data),
-                                      Chain@parameters$mu,
-                                      t(1 / Chain@parameters$delta),
-                                      Chain@parameters$phi*Chain@parameters$nu,
-                                      N,
-                                      q.bio,
-                                      n)
+  if ("phi" %in% names(Chain@parameters)) {
+    Rho <- .BASiCS_DenoisedRates(counts(Data),
+                                 Chain@parameters$mu,
+                                 t(1 / Chain@parameters$delta),
+                                 Chain@parameters$phi*Chain@parameters$nu,
+                                 N,
+                                 q.bio,
+                                 n)
   } else {
     # No spikes case
     CountsBio <- counts(Data)
-    Rho <- HiddenBASiCS_DenoisedRates(counts(Data),
-                                      Chain@parameters$mu,
-                                      t(1/Chain@parameters$delta),
-                                      Chain@parameters$nu,
-                                      N,
-                                      q.bio,
-                                      n)
+    Rho <- .BASiCS_DenoisedRates(counts(Data),
+                                 Chain@parameters$mu,
+                                 t(1 / Chain@parameters$delta),
+                                 Chain@parameters$nu,
+                                 N,
+                                 q.bio,
+                                 n)
   }
 
   if (Propensities) {

@@ -39,7 +39,7 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
 
   if (is.null(Param)) {
     metric <- lapply(names(object@parameters), function(param) {
-      try(HiddenGetMeasure(object, param, Measure, na.rm), silent = TRUE)
+      try(.GetMeasure(object, param, Measure, na.rm), silent = TRUE)
     })
     ind_error <- vapply(
       metric,
@@ -58,14 +58,14 @@ BASiCS_DiagHist <- function(object, Param = NULL, na.rm = TRUE) {
     }
     metric <- Reduce(c, metric)              
   } else {
-    metric <- HiddenGetMeasure(object, Param, Measure, na.rm)
+    metric <- .GetMeasure(object, Param, Measure, na.rm)
   }
   if (length(metric) == 1) {
     stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
   }
   ggplot2::ggplot(mapping = ggplot2::aes(x = metric)) + 
     ggplot2::geom_histogram(bins = grDevices::nclass.FD(metric)) +
-    ggplot2::labs(x = HiddenScaleName(Measure, Param),
+    ggplot2::labs(x = .ScaleName(Measure, Param),
                   y = "Count")
 }
 

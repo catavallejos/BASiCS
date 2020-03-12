@@ -1,15 +1,14 @@
 #include "utils.h"
 
-// [[Rcpp::export]]
-arma::mat HiddenBASiCS_DenoisedRates(
+arma::mat BASiCS_DenoisedRates(
     NumericMatrix CountsBio, 
     NumericMatrix Mu,
     NumericMatrix TransInvDelta,
     NumericMatrix PhiNu, 
     int N,
     int q0,
-    int n)
-{
+    int n) {
+
   // Transformations to arma objects
   arma::mat CountsBio_arma = as_arma(CountsBio);
   arma::mat Mu_arma = as_arma(Mu);

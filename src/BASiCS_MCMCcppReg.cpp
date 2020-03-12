@@ -43,8 +43,7 @@
  * lambda0: Starting values for gene-wise error term
  * variance: Fixed width (scale) for GRBFs
  */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppReg(
+Rcpp::List BASiCS_MCMCcppReg(
     int N, 
     int Thin, 
     int Burn,  
@@ -86,6 +85,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
+    bool FixLocations,
+    bool RBFMinMax,
+    arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -187,12 +189,14 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   arma::vec epsilonAux = arma::zeros(q0);
   
   // OTHER PARAMETERS FOR REGRESSION
-  arma::mat V1 = arma::zeros(k,k);
+  arma::mat V1 = arma::zeros(k, k);
   // Model matrix initialization
-  arma::vec means = muAux(arma::span(0,q0-1),0);
-  arma::mat X = designMatrix(k, means, variance);
+  arma::vec means = muAux(arma::span(0, q0 - 1), 0);
+  if (!FixLocations) {
+    RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
+  }
+  arma::mat X = designMatrix(k, RBFLocations, means, variance);
   
-
   double globalExponent = 1;
   if (geneExponent != 1) {
     globalExponent = geneExponent;
@@ -203,11 +207,13 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   StartSampler(N);
   
   // START OF MCMC LOOP
-  for (int i=0; i<N; i++) {
+  for (int i = 0; i < N; i++) {
     
     Rcpp::checkUserInterrupt();
     
-    if(i==Burn) EndBurn();
+    if (i == Burn) {
+      EndBurn();
+    }
     
     Ibatch++; 
     
@@ -230,7 +236,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     );
     phiAux = Rcpp::as<arma::vec>(phiAuxList["phi"]);
     PphiAux += Rcpp::as<double>(phiAuxList["ind"]); 
-    if(i>=Burn) phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    if (i >= Burn) {
+      phiAccept += Rcpp::as<double>(phiAuxList["ind"]);
+    }
     
     // UPDATE OF THETA: 
     // 1st ELEMENT IS THE UPDATE, 
@@ -250,7 +258,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_theta
     );
     PthetaAux += thetaAux.col(1);
-    if(i>=Burn) {thetaAccept += thetaAux.col(1);}
+    if (i >= Burn) {
+      thetaAccept += thetaAux.col(1);
+    }
     thetaBatch = BatchDesign * thetaAux.col(0); 
     
     // UPDATE OF MU: 
@@ -277,11 +287,16 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       X,
       sigma2Aux, 
       variance,
+      FixLocations,
+      RBFMinMax,
+      RBFLocations,
       geneExponent,
       mintol_mu
     );
     PmuAux += muAux.col(1);
-    if(i>=Burn) muAccept += muAux.col(1);
+    if (i >= Burn) {
+      muAccept += muAux.col(1);
+    }
     
     // UPDATE OF S
     sAux = sUpdateBatch(
@@ -319,7 +334,9 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_delta
     );
     PdeltaAux += deltaAux.col(1);
-    if(i>=Burn) deltaAccept += deltaAux.col(1);  
+    if (i >= Burn) {
+      deltaAccept += deltaAux.col(1);
+    }
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -345,12 +362,15 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
       mintol_nu
     );
     PnuAux += nuAux.col(1);
-    if(i>=Burn) nuAccept += nuAux.col(1);
+    if (i >= Burn) {
+      nuAccept += nuAux.col(1);
+    }
     
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = (inv_V0 * globalExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
-    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
+
+    if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
       mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * globalExponent);
       mAux = VAux*mAux;
       
@@ -373,6 +393,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         globalExponent
       );
     }
+
     // UPDATE OF LAMBDA (REGRESSION RELATED PARAMETER)
     lambdaAux = lambdaUpdateReg(
       deltaAux.col(0),
@@ -386,7 +407,7 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
     );
     // UPDATE OF EPSILON 
     // Direct calculation conditional on regression related parameters
-    epsilonAux = log(deltaAux.col(0)) - X*betaAux;
+    epsilonAux = log(deltaAux.col(0)) - X * betaAux;
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {
@@ -414,8 +435,11 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
         
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
-        means = muAux(arma::span(0,q0-1),0);
-        X = designMatrix(k, means, variance);
+        means = muAux(arma::span(0, q0 - 1), 0);
+        if (!FixLocations) {
+          RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
+        }
+        X = designMatrix(k, RBFLocations, means, variance);
       }
     }
     
@@ -482,37 +506,45 @@ Rcpp::List HiddenBASiCS_MCMCcppReg(
   
   if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("phi") = phi.t(),
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t(),
-        Rcpp::Named("designMatrix")=X,
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("designMatrix") = X,
+        Rcpp::Named("RBFLocations") = RBFLocations,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.phi") = LSphi,
         Rcpp::Named("ls.nu") = LSnu.t(),
-        Rcpp::Named("ls.theta") = LStheta.t())); 
+        Rcpp::Named("ls.theta") = LStheta.t()
+      )
+    ); 
   }
   else {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("phi") = phi.t(),
         Rcpp::Named("s") = s.t(),
         Rcpp::Named("nu") = nu.t(),
         Rcpp::Named("theta") = theta.t(),
-        Rcpp::Named("beta")=beta.t(),
-        Rcpp::Named("sigma2")=sigma,
-        Rcpp::Named("lambda")=lambda.t(),
-        Rcpp::Named("epsilon")=epsilon.t())); 
+        Rcpp::Named("beta") = beta.t(),
+        Rcpp::Named("sigma2") = sigma,
+        Rcpp::Named("lambda") = lambda.t(),
+        Rcpp::Named("epsilon") = epsilon.t(),
+        Rcpp::Named("RBFLocations") = RBFLocations
+      )
+    ); 
     
   }
 }

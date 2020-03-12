@@ -60,14 +60,14 @@ BASiCS_DiagPlot <- function(object,
     LogX <- Param %in% c("mu", "delta")
   }
   Measure <- "ess"
-  HiddenCheckValidCombination(x, y, Param)
-  metric <- HiddenGetMeasure(object, Param, Measure, na.rm)
+  .CheckValidCombination(x, y, Param)
+  metric <- .GetMeasure(object, Param, Measure, na.rm)
   sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()
   sY <- if (LogY) ggplot2::scale_y_log10() else ggplot2::scale_y_continuous()
 
   if (!is.null(x)) {
-    xMat <- HiddenGetParam(object, x)
-    yMat <- HiddenGetParam(object, y)
+    xMat <- .GetParam(object, x)
+    yMat <- .GetParam(object, y)
     xMat <- xMat[, names(metric), drop = FALSE]
     yMat <- yMat[, names(metric), drop = FALSE]
 
@@ -79,13 +79,13 @@ BASiCS_DiagPlot <- function(object,
     df <- df[order(df$metric), ]
     g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
       ggplot2::geom_point(alpha = 0.5, shape = 16) +
-      viridis::scale_color_viridis(name = HiddenScaleName(Measure, Param)
+      viridis::scale_color_viridis(name = .ScaleName(Measure, Param)
         #, trans="log10"
         ) +
       sX + sY +
       ggplot2::labs(x = x, y = y)              
   } else {
-    xMat <- HiddenGetParam(object, Param)
+    xMat <- .GetParam(object, Param)
     xMat <- xMat[, names(metric), drop = FALSE]
     df <- data.frame(
       x = matrixStats::colMedians(xMat),
@@ -93,7 +93,7 @@ BASiCS_DiagPlot <- function(object,
     )
     g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
       sX + sY +
-      ggplot2::labs(x = Param, y = HiddenScaleName(Measure))
+      ggplot2::labs(x = Param, y = .ScaleName(Measure))
     if (Smooth) {
       g <- g +
         ggplot2::geom_hex() +

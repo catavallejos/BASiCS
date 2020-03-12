@@ -1,4 +1,4 @@
-context("Differential test (regression case)\n")
+context("Differential test (regression case)")
 
 test_that("Differential test is correct (regression case)", {
   data(ChainSCReg)
@@ -12,7 +12,7 @@ test_that("Differential test is correct (regression case)", {
     EpsilonM = log2(1.5),
     EpsilonD = log2(1.5),
     EpsilonR = log2(1.5) / log2(exp(1)),
-    CheckESS = FALSE,
+    MinESS = NA,
     OffSet = TRUE, 
     Plot = FALSE,
     PlotOffset = FALSE
@@ -51,8 +51,8 @@ test_that("Differential test is correct (regression case)", {
   Lfc2Mean <- round(Test$TableMean$MeanLog2FC[1:5], 2)
   expect_equal(Lfc2Mean, Lfc2Mean0)
 
-  Lfc2Disp0 <- c(0.915, 1.016, 0.855, 6.226, 0.255)
-  Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5), 3)
+  Lfc2Disp0 <- c(0.92, 1.02, 0.86, 6.23, 0.26)
+  Lfc2Disp <- round(tail(Test$TableDisp$DispLog2FC, 5), 2)
   expect_equal(Lfc2Disp, Lfc2Disp0)
 })
 
@@ -70,6 +70,20 @@ test_that("Differential test requires same regression setting", {
   )
 })
 
+test_that("Differential test when testing ESS", {
+  data(ChainSCReg)
+  data(ChainRNA)
+  expect_error(
+    BASiCS_TestDE(
+      Chain1 = ChainSCReg,
+      Chain2 = ChainRNAReg,
+      Plot = FALSE,
+      PlotOffset = FALSE
+    ),
+    NA
+  )
+  })
+
 test_that("CheckESS works", {
   data(ChainSCReg)
   data(ChainRNAReg)
@@ -82,7 +96,6 @@ test_that("CheckESS works", {
     EpsilonD = log2(1.5),
     OffSet = TRUE,
     Plot = FALSE,
-    CheckESS = TRUE,
     MinESS = MinESS,
     PlotOffset = FALSE
   )
@@ -112,7 +125,7 @@ test_that("EpsilonM = 0 case (reg)", {
     EpsilonR = 0,
     OffSet = TRUE,
     Plot = FALSE,
-    CheckESS = FALSE,
+    MinESS = NA,
     PlotOffset = FALSE
   )
   expect_equal(

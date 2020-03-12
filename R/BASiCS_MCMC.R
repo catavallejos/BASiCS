@@ -21,101 +21,87 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
-#' @param PriorMu Indicates if the original prior (\code{PriorMu = 'default'})
-#' or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
-#' assigned to gene-specific mean expression parameters.  
 #' @param ... Optional parameters.
 #' \describe{
-#' \item{\code{PriorDelta}}{Specifies the prior used for \code{delta}.
-#' Possible values are 'gamma' (Gamma(\code{a.theta},\code{b.theta}) prior) and
-#' 'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior) .}.
-#' Default value: \code{PriorDelta = 'log-normal'}.
-#' \item{\code{PriorParam}}{List containing the hyper-parameter
-#' values required for the adopted prior (see Vallejos et al, 2015, 2016).
-#' All elements must be positive real numbers.
-#' \describe{
-#'   \item{\code{mu.mu}}{Mean hyper-parameter for the
-#'         log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
-#'         gene-specific expression rate parameters \eqn{\mu_i}.
-#'         Default: \code{s2.mu = 0}.}
-#'   \item{\code{s2.mu}}{Scale hyper-parameter for the
-#'         log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
-#'         gene-specific expression rate parameters \eqn{\mu_i}.
-#'         Default: \code{s2.mu = 0.5}.}
-#'   \item{\code{s2.delta}}{Only used when `PriorDelta == 'log-normal'`.
-#'         Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta})
-#'         prior that is shared by all gene-specific over-dispersion parameters
-#'         \eqn{\delta_i}. Default: \code{s2.delta = 0.5}. }
-#'   \item{\code{a.delta}}{Only used when `PriorDelta == 'gamma'`.
-#'         Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
-#'         prior that is shared by all gene-specific biological over-dispersion
-#'         parameters \eqn{\delta_i}. Default: \code{a.delta = 1}.}
-#'   \item{\code{b.delta}}{Only used when `PriorDelta == 'gamma'`.
-#'         Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
-#'         prior that is shared by all gene-specific biological over-dispersion
-#'         hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.}
-#'   \item{\code{p.phi}}{Dirichlet hyper-parameter for the joint of all
-#'         (scaled by \code{n}) cell-specific mRNA content normalising
-#'         constants \eqn{\phi_j / n}.
-#'         Default: \code{p.phi} \code{= rep(1, n)}.}
-#'   \item{\code{a.s}}{Shape hyper-parameter for the
-#'         Gamma(\code{a.s},\code{b.s}) prior that is shared by all
-#'         cell-specific capture efficiency normalising constants \eqn{s_j}.
-#'         Default: \code{a.s = 1}.}
-#'   \item{\code{b.s}}{Rate hyper-parameter for the Gamma(\code{a.s},
-#'         \code{b.s}) prior that is shared by all cell-specific capture
-#'         efficiency normalising constants \eqn{s_j}.
-#'         Default: \code{b.s = 1}.}
-#'   \item{\code{a.theta}}{Shape hyper-parameter for the
-#'         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
-#'         parameter \eqn{\theta}. Default: \code{a.theta = 1}.}
-#'   \item{\code{b.theta}}{Rate hyper-parameter for the
-#'         Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
-#'         parameter \eqn{\theta}. Default: \code{b.theta = 1}.}
-#'  \item{\code{eta}}{Only used when \code{Regression = TRUE}. \code{eta}
-#'       specifies the degress of freedom for the residual term.
-#'       Default: \code{eta = 5}.}.
-#'  \item{
-#'    \code{GeneExponent,CellExponent}
-#'  }{
-#'    Exponents applied to the prior for MCMC updates. Intended for use only 
-#'    when performing divide & conquer MCMC strategies.
-#'  }
-#' }}
-#' \item{\code{k}}{Only used when \code{Regression = TRUE}. \code{k} specifies
-#'       the number of regression Gaussian Radial Basis Functions (GRBF) used
-#'       within the correlated prior adopted for gene-specific over-dispersion
-#'       and mean expression paramters. Default: \code{k = 12}. }
-#' \item{\code{Var}}{Only used when \code{Regression = TRUE}. \code{Var}
-#'       specifies the GRBF scaling parameter. Default: \code{Var = 1.2}. }
-#' \item{\code{AR}}{Optimal acceptance rate for adaptive Metropolis Hastings
-#'       updates. It must be a positive number between 0 and 1. Default
-#'       (and recommended): \code{AR = 0.44}}.
-#' \item{\code{StopAdapt}}{Iteration at which adaptive proposals are not longer
-#'       adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.}
-#' \item{\code{StoreChains}}{If \code{StoreChains = TRUE}, the generated
-#'       \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName}
-#'       argument used to index the file name).
-#'       Default: \code{StoreChains = FALSE}.}
-#' \item{\code{StoreAdapt}}{If \code{StoreAdapt = TRUE}, trajectory of
-#'       adaptive proposal variances (in log-scale) for all parameters is
-#'       stored as a list in a `.Rds` file (\code{RunName} argument used to
-#'       index file name). Default: \code{StoreAdapt = FALSE}.}
-#' \item{\code{StoreDir}}{Directory where output files are stored.
-#'       Only required if \code{StoreChains = TRUE} and/or
-#'       \code{StoreAdapt = TRUE}). Default: \code{StoreDir = getwd()}.}
-#' \item{\code{RunName}}{String used to index `.Rds` files storing chains
-#'       and/or adaptive proposal variances.}
-#' \item{\code{PrintProgress}}{If \code{PrintProgress = FALSE}, console-based
-#'       progress report is suppressed.}
-#' \item{\code{Start}}{Starting values for the MCMC sampler. We do not advise
-#'       to use this argument. Default options have been tuned to facilitate
-#'       convergence. If changed, it must be a list containing the following
-#'       elements: \code{mu0}, \code{delta0}, \code{phi0}, \code{s0},
-#'       \code{nu0}, \code{theta0}, \code{ls.mu0}, \code{ls.delta0},
-#'       \code{ls.phi0}, \code{ls.nu0} and \code{ls.theta0}}
+#'   \item{
+#'     \code{PriorDelta}
+#'   }{
+#'     Specifies the prior used for \code{delta}.
+#'     Possible values are 'gamma' 
+#'     (Gamma(\code{a.theta},\code{b.theta}) prior) and
+#'     'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
+#'     Default value: \code{PriorDelta = 'log-normal'}.
+#'   }
+#'   \item{
+#'     \code{Var}
+#'   }{
+#'     Only used when \code{Regression = TRUE}. \code{Var}
+#'     specifies the GRBF scaling parameter. Default: \code{Var = 1.2}.
+#'   }
+#'   \item{
+#'     \code{AR}
+#'   }{
+#'     Optimal acceptance rate for adaptive Metropolis Hastings
+#'     updates. It must be a positive number between 0 and 1. Default
+#'     (and recommended): \code{AR = 0.44}.
+#'   }
+#'   \item{
+#'     \code{StopAdapt}
+#'   }{
+#'     Iteration at which adaptive proposals are not longer
+#'     adapted. Use \code{StopAdapt>=1}. Default: \code{StopAdapt = Burn}.
+#'   }
+#'   \item{
+#'     \code{StoreChains}
+#'   }{
+#'     If \code{StoreChains = TRUE}, the generated
+#'     \code{BASiCS_Chain} object is stored as a `.Rds` file (\code{RunName}
+#'     argument used to index the file name).
+#'     Default: \code{StoreChains = FALSE}.}
+#'   \item{
+#'     \code{StoreAdapt}
+#'   }{
+#'     If \code{StoreAdapt = TRUE}, trajectory of
+#'     adaptive proposal variances (in log-scale) for all parameters is
+#'     stored as a list in a `.Rds` file (\code{RunName} argument used to
+#'     index file name). Default: \code{StoreAdapt = FALSE}.
+#'   }
+#'   \item{
+#'     \code{StoreDir}
+#'   }{
+#'     Directory where output files are stored.
+#'     Only required if \code{StoreChains = TRUE} and/or
+#'     \code{StoreAdapt = TRUE}. Default: \code{StoreDir = getwd()}.
+#'   }
+#'   \item{
+#'     \code{RunName}
+#'   }{
+#'     String used to index `.Rds` files storing chains
+#'     and/or adaptive proposal variances.
+#'   }
+#'   \item{
+#'     \code{PrintProgress}
+#'   }{
+#'     If \code{PrintProgress = FALSE}, console-based
+#'     progress report is suppressed.}
+#'   \item{
+#'     \code{Start}
+#'   }{
+#'     Starting values for the MCMC sampler. We do not advise
+#'     to use this argument. Default options have been tuned to facilitate
+#'     convergence. If changed, it must be a list containing the following
+#'     elements: 
+#'     \code{mu0}, \code{delta0}, \code{phi0}, \code{s0}, \code{nu0}, 
+#'     \code{theta0}, \code{ls.mu0}, \code{ls.delta0}, \code{ls.phi0},
+#'     \code{ls.nu0} and \code{ls.theta0}
+#'   }
+#'   \item{
+#'     \code{GeneExponent/CellExponent}
+#'   }{
+#'     Exponents applied to the prior for MCMC updates. Intended for use only 
+#'     when performing divide & conquer MCMC strategies.
+#'   }
 #' }
-#'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_Chain}}.
 #'
 #' @examples
@@ -210,12 +196,10 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
-    PriorMu = c("default", "EmpiricalBayes"),
     ...) {
 
   # Checks to ensure input arguments are valid
-  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, 
-                          Regression, WithSpikes)
+  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch
@@ -235,245 +219,131 @@ BASiCS_MCMC <- function(
   }
 
   # Assignment of optional parameters (default values if input not provided)
-  ArgsDef <- .BASiCS_MCMC_ExtraArgs(Data,
-                                    Burn,
-                                    GPar,
-                                    Regression,
-                                    WithSpikes,
-                                    PriorMu,
-                                    ...)
+  ArgsDef <- .BASiCS_MCMC_ExtraArgs(
+    Data = Data,
+    Burn = Burn,
+    GPar = GPar,
+    Regression = Regression,
+    WithSpikes = WithSpikes,
+    ...
+  )
+  
   # Starting values for the MCMC (parameters and adaptive variances)
   # Loaded separately to simplify calling to the elements of its list
   # Same for prior parameters
   Start <- ArgsDef$Start
   PriorParam <- ArgsDef$PriorParam
 
+  MCMCArgs <- list(
+    N = N,
+    Thin = Thin,
+    Burn = Burn,
+    Counts = GPar$BioCounts,
+    BatchDesign = GPar$BatchDesign,
+    mu0 = Start$mu0,
+    delta0 = Start$delta0,
+    s0 = Start$s0,
+    nu0 = Start$nu0,
+    theta0 = rep(Start$theta0, GPar$nBatch),
+    mu_mu = PriorParam$mu.mu,
+    s2mu = PriorParam$s2.mu,
+    as = PriorParam$a.s,
+    bs = PriorParam$b.s,
+    atheta = PriorParam$a.theta,
+    btheta = PriorParam$b.theta,
+    ar = ArgsDef$AR,
+    LSmu0 = Start$ls.mu0,
+    LSdelta0 = Start$ls.delta0,
+    LSnu0 = Start$ls.nu0,
+    LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
+    sumByGeneAll = sum.bygene.all,
+    StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
+    EndAdapt = ArgsDef$StopAdapt,
+    PrintProgress = as.numeric(ArgsDef$PrintProgress),
+    mintol_mu = ArgsDef$mintol_mu,
+    mintol_delta = ArgsDef$mintol_delta,
+    mintol_nu = ArgsDef$mintol_nu,
+    mintol_theta = ArgsDef$mintol_theta,
+    geneExponent = PriorParam$GeneExponent,
+    cellExponent = PriorParam$CellExponent
+  )
+
+  SpikeArgs <- list(
+    sumByCellBio = sum.bycell.bio,
+    sumByGeneBio = sum.bygene.bio,
+    phi0 = Start$phi0,
+    aphi = PriorParam$p.phi,
+    LSphi0 = Start$ls.phi0,
+    muSpikes = metadata(Data)$SpikeInput[, 2]
+  )
+  NonRegressionArgs <- list(
+    prior_delta = (PriorParam$PriorDelta == "log-normal") + 1,
+    s2delta = PriorParam$s2.delta,
+    adelta = PriorParam$a.delta,
+    bdelta = PriorParam$b.delta
+  )
+
+  RegressionArgs <- list(
+    k = PriorParam$k,
+    m0 = PriorParam$m,
+    V0 = PriorParam$V,
+    sigma2_a0 = PriorParam$a.sigma2,
+    sigma2_b0 = PriorParam$b.sigma2,
+    beta0 = Start$beta0,
+    sigma20 = Start$sigma20,
+    eta0 = PriorParam$eta,
+    lambda0 = Start$lambda0,
+    variance = PriorParam$variance,
+    FixLocations = PriorParam$FixLocations,
+    RBFMinMax = PriorParam$RBFMinMax,
+    RBFLocations = PriorParam$RBFLocations
+  )
+
+  NoSpikeArgs <- list(
+    sumByCellAll = sum.bycell.all,
+    Constrain = ArgsDef$Constrain,
+    Index = ArgsDef$Index,
+    RefGene = ArgsDef$RefGene,
+    RefGenes = ArgsDef$RefGenes,
+    ConstrainGene = ArgsDef$ConstrainGene,
+    NotConstrainGene = ArgsDef$NotConstrainGene,
+    ConstrainType = PriorParam$ConstrainType,
+    StochasticRef = as.numeric(PriorParam$StochasticRef)
+  )
+
+
   # If spikes are available
   if (WithSpikes) {
-
+    MCMCArgs <- c(MCMCArgs, SpikeArgs)
     # If regression case is chosen
     if (Regression) {
       message("Running with spikes BASiCS sampler (regression case) ... \n")
-      Time <- system.time(
-        Chain <- HiddenBASiCS_MCMCcppReg(
-          N = N,
-          Thin = Thin,
-          Burn = Burn,
-          Counts = GPar$BioCounts,
-          BatchDesign = GPar$BatchDesign,
-          muSpikes = metadata(Data)$SpikeInput[,2],
-          mu0 = Start$mu0,
-          delta0 = Start$delta0,
-          phi0 = Start$phi0,
-          s0 = Start$s0,
-          nu0 = Start$nu0,
-          theta0 = rep(Start$theta0, GPar$nBatch),
-          mu_mu = PriorParam$mu.mu,
-          s2mu = PriorParam$s2.mu,
-          aphi = PriorParam$p.phi,
-          as = PriorParam$a.s,
-          bs = PriorParam$b.s,
-          atheta = PriorParam$a.theta,
-          btheta = PriorParam$b.theta,
-          k = ArgsDef$k,
-          m0 = PriorParam$m,
-          V0 = PriorParam$V,
-          sigma2_a0 = PriorParam$a.sigma2,
-          sigma2_b0 = PriorParam$b.sigma2,
-          beta0 = Start$beta0,
-          sigma20 = Start$sigma20,
-          eta0 = PriorParam$eta,
-          lambda0 = Start$lambda0,
-          variance = ArgsDef$variance,
-          ar = ArgsDef$AR,
-          LSmu0 = Start$ls.mu0,
-          LSdelta0 = Start$ls.delta0,
-          LSphi0 = Start$ls.phi0,
-          LSnu0 = Start$ls.nu0,
-          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
-          sumByCellBio = sum.bycell.bio,
-          sumByGeneAll = sum.bygene.all,
-          sumByGeneBio = sum.bygene.bio,
-          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
-          EndAdapt = ArgsDef$StopAdapt,
-          PrintProgress = as.numeric(ArgsDef$PrintProgress),
-          mintol_mu = ArgsDef$mintol_mu,
-          mintol_delta = ArgsDef$mintol_delta,
-          mintol_nu = ArgsDef$mintol_nu,
-          mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
-        )
-      )
-
-      # Remove epsilons for genes that are not expressed in at least 2 cells
-      # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- Matrix::rowSums(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
-      Chain$epsilon[,!AtLeast2Cells] <- NA
-    }
-    else {
+      MCMCArgs <- c(MCMCArgs, RegressionArgs)
+      MCMCFun <- ".BASiCS_MCMCcppReg"
+    } else {
       message("Running with spikes BASiCS sampler (no regression) ... \n")
-      Time <- system.time(
-        Chain <- HiddenBASiCS_MCMCcpp(
-          N = N,
-          Thin = Thin,
-          Burn = Burn,
-          Counts = GPar$BioCounts,
-          BatchDesign = GPar$BatchDesign,
-          muSpikes = metadata(Data)$SpikeInput[,2],
-          mu0 = Start$mu0,
-          delta0 = Start$delta0,
-          phi0 = Start$phi0,
-          s0 = Start$s0,
-          nu0 = Start$nu0,
-          theta0 = rep(Start$theta0, GPar$nBatch),
-          mu_mu = PriorParam$mu.mu,
-          s2mu = PriorParam$s2.mu,
-          adelta = PriorParam$a.delta,
-          bdelta = PriorParam$b.delta,
-          s2delta = PriorParam$s2.delta,
-          prior_delta = ArgsDef$PriorDeltaNum,
-          aphi = PriorParam$p.phi,
-          as = PriorParam$a.s,
-          bs = PriorParam$b.s,
-          atheta = PriorParam$a.theta,
-          btheta = PriorParam$b.theta,
-          ar = ArgsDef$AR,
-          LSmu0 = Start$ls.mu0,
-          LSdelta0 = Start$ls.delta0,
-          LSphi0 = Start$ls.phi0,
-          LSnu0 = Start$ls.nu0,
-          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
-          sumByCellBio = sum.bycell.bio,
-          sumByGeneAll = sum.bygene.all,
-          sumByGeneBio = sum.bygene.bio,
-          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
-          EndAdapt = ArgsDef$StopAdapt,
-          PrintProgress = as.numeric(ArgsDef$PrintProgress),
-          mintol_mu = ArgsDef$mintol_mu, 
-          mintol_delta = ArgsDef$mintol_delta,
-          mintol_nu = ArgsDef$mintol_nu,
-          mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
-        )
-      )
+      MCMCArgs <- c(MCMCArgs, NonRegressionArgs)
+      MCMCFun <- ".BASiCS_MCMCcpp"
     }
-  }
-  else {
+  } else {
     # If spikes are not available
+    MCMCArgs <- c(MCMCArgs, NoSpikeArgs)
     if (Regression) {
       message("Running no spikes BASiCS sampler (regression case) ... \n")
-      Time <- system.time(
-        Chain <- HiddenBASiCS_MCMCcppRegNoSpikes(
-          N = N,
-          Thin = Thin,
-          Burn = Burn,
-          Counts = GPar$BioCounts,
-          BatchDesign = GPar$BatchDesign,
-          mu0 = Start$mu0,
-          delta0 = Start$delta0,
-          s0 = Start$s0,
-          nu0 = Start$nu0,
-          theta0 = rep(Start$theta0, GPar$nBatch),
-          mu_mu = PriorParam$mu.mu,
-          s2mu = PriorParam$s2.mu,
-          as = PriorParam$a.s,
-          bs = PriorParam$b.s,
-          atheta = PriorParam$a.theta,
-          btheta = PriorParam$b.theta,
-          k = ArgsDef$k,
-          m0 = PriorParam$m,
-          V0 = PriorParam$V,
-          sigma2_a0 = PriorParam$a.sigma2,
-          sigma2_b0 = PriorParam$b.sigma2,
-          beta0 = Start$beta0,
-          sigma20 = Start$sigma20,
-          eta0 = PriorParam$eta,
-          lambda0 = Start$lambda0,
-          variance = ArgsDef$variance,
-          Constrain = ArgsDef$Constrain,
-          Index = ArgsDef$Index,
-          RefGene = ArgsDef$RefGene,
-          RefGenes = ArgsDef$RefGenes,
-          ConstrainGene = ArgsDef$ConstrainGene,
-          NotConstrainGene = ArgsDef$NotConstrainGene,
-          ConstrainType = ArgsDef$ConstrainType,
-          StochasticRef = as.numeric(ArgsDef$StochasticRef), 
-          ar = ArgsDef$AR,
-          LSmu0 = Start$ls.mu0,
-          LSdelta0 = Start$ls.delta0,
-          LSnu0 = Start$ls.nu0,
-          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
-          sumByCellAll = sum.bycell.bio,
-          sumByGeneAll = sum.bygene.bio,
-          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
-          EndAdapt = ArgsDef$StopAdapt,
-          PrintProgress = as.numeric(ArgsDef$PrintProgress),
-          mintol_mu = ArgsDef$mintol_mu, 
-          mintol_delta = ArgsDef$mintol_delta,
-          mintol_nu = ArgsDef$mintol_nu,
-          mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
-        )
-      )
-      # Remove epsilons for genes that are not expressed in at least 2 cells
-      # Discuss this with John (potentially include an optional arg about this)
-      AtLeast2Cells <- Matrix::rowSums(ifelse(GPar$BioCounts > 0, 1, 0)) > 1
-      Chain$epsilon[,!AtLeast2Cells] <- NA
-    }
-    else {
+      MCMCArgs <- c(MCMCArgs, RegressionArgs)
+      MCMCFun <- ".BASiCS_MCMCcppRegNoSpikes"
+    } else {
       message("Running no spikes BASiCS sampler (no regression) ... \n")
-      Time <- system.time(
-        Chain <- HiddenBASiCS_MCMCcppNoSpikes(
-          N = N,
-          Thin = Thin,
-          Burn = Burn,
-          Counts = GPar$BioCounts,
-          BatchDesign = GPar$BatchDesign,
-          mu0 = Start$mu0,
-          delta0 = Start$delta0,
-          s0 = Start$s0,
-          nu0 = Start$nu0,
-          theta0 = rep(Start$theta0, GPar$nBatch),
-          mu_mu = PriorParam$mu.mu,
-          s2mu = PriorParam$s2.mu,
-          adelta = PriorParam$a.delta,
-          bdelta = PriorParam$b.delta,
-          s2delta = PriorParam$s2.delta,
-          prior_delta = ArgsDef$PriorDeltaNum,
-          as = PriorParam$a.s,
-          bs = PriorParam$b.s,
-          atheta = PriorParam$a.theta,
-          btheta = PriorParam$b.theta,
-          Constrain = ArgsDef$Constrain,
-          Index = ArgsDef$Index,
-          RefGene = ArgsDef$RefGene,
-          RefGenes = ArgsDef$RefGenes,
-          ConstrainGene = ArgsDef$ConstrainGene,
-          NotConstrainGene = ArgsDef$NotConstrainGene,
-          ConstrainType = ArgsDef$ConstrainType,
-          StochasticRef = as.numeric(ArgsDef$StochasticRef),
-          ar = ArgsDef$AR,
-          LSmu0 = Start$ls.mu0,
-          LSdelta0 = Start$ls.delta0,
-          LSnu0 = Start$ls.nu0,
-          LStheta0 = rep(Start$ls.theta0, GPar$nBatch),
-          sumByCellAll = sum.bycell.bio,
-          sumByGeneAll = sum.bygene.bio,
-          StoreAdapt = as.numeric(ArgsDef$StoreAdapt),
-          EndAdapt = ArgsDef$StopAdapt,
-          PrintProgress = as.numeric(ArgsDef$PrintProgress),
-          mintol_mu = ArgsDef$mintol_mu, 
-          mintol_delta = ArgsDef$mintol_delta,
-          mintol_nu = ArgsDef$mintol_nu,
-          mintol_theta = ArgsDef$mintol_theta,
-          geneExponent = PriorParam$GeneExponent,
-          cellExponent = PriorParam$CellExponent
-        )
-      )
+      MCMCArgs <- c(MCMCArgs, NonRegressionArgs)
+      MCMCFun <- ".BASiCS_MCMCcppNoSpikes"
     }
+  }
+  Time <- system.time(Chain <- do.call(what = MCMCFun, args = MCMCArgs))
+  if (Regression) {
+    # Remove epsilons for genes that are not expressed in at least 2 cells
+    # Discuss this with John (potentially include an optional arg about this)
+    AtLeast2Cells <- Matrix::rowSums(GPar$BioCounts > 0) > 1
+    Chain$epsilon[, !AtLeast2Cells] <- NA
   }
 
   # Format column names of MCMC chains
@@ -505,25 +375,25 @@ BASiCS_MCMC <- function(
   ChainClass <- newBASiCS_Chain(parameters = Chain[!grepl("ls.", names(Chain))])
 
   # Store chain and/or adaptive variances
-  HiddenBASiCS_MCMC_OutputStore(ChainClass,
-                                Chain,
-                                ArgsDef$StoreChains,
-                                ArgsDef$StoreAdapt,
-                                ArgsDef$StoreDir,
-                                ArgsDef$RunName)
+  .BASiCS_MCMC_OutputStore(ChainClass,
+                           Chain,
+                           ArgsDef$StoreChains,
+                           ArgsDef$StoreAdapt,
+                           ArgsDef$StoreDir,
+                           ArgsDef$RunName)
 
   # Store reference gene information (no spikes case only)
   if (!WithSpikes) {
-    if (ArgsDef$StoreChains)
-      HiddenBASiCS_MCMC_RefFreqStore(Data,
-                                     Chain,
-                                     ArgsDef$RefGene,
-                                     ArgsDef$RefGenes,
-                                     ArgsDef$ConstrainType,
-                                     ArgsDef$StoreDir,
-                                     ArgsDef$RunName)
-  }
-  else {
+    if (ArgsDef$StoreChains) {
+      .BASiCS_MCMC_RefFreqStore(Data,
+                                Chain,
+                                ArgsDef$RefGene,
+                                ArgsDef$RefGenes,
+                                ArgsDef$ConstrainType,
+                                ArgsDef$StoreDir,
+                                ArgsDef$RunName)
+    }
+  } else {
     message("-------------------------------------------------------------\n",
             "BASiCS version ", packageVersion("BASiCS"), " : \n",
             "vertical integration (spikes case) \n",

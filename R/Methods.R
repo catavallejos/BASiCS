@@ -27,6 +27,7 @@ setMethod(
   "show",
   signature = "BASiCS_Chain",
   definition = function(object) {
+
     N <- nrow(object@parameters$mu)
     q.bio <- ncol(object@parameters$delta)
     n <- ncol(object@parameters$nu)
@@ -136,8 +137,9 @@ setMethod(
 setMethod("Summary",
           signature = "BASiCS_Chain",
           definition = function(x, prob = 0.95) {
-
-  out <- lapply(x@parameters[names(x@parameters) != "designMatrix"],
+  param_ind <- !names(x@parameters) %in% c("designMatrix", "RefFreq", "RBFLocations")
+  params <- x@parameters[param_ind]
+  out <- lapply(params,
     function(n) {
       HPD <- matrix(data = NA, ncol = 3, nrow = ncol(n),
                     dimnames = list(colnames(n), c("median", "lower", "upper")))
@@ -147,9 +149,6 @@ setMethod("Summary",
       HPD
   })
 
-  if ("RefFreq" %in% names(out)) {
-    out$RefFreq <- NULL
-  }
 
   new("BASiCS_Summary", parameters = out)
 })
@@ -377,9 +376,9 @@ setMethod(
       stop("'RegressionTerm' value is required")
     }
 
-    if (Param %in% HiddenGeneParams()) {
+    if (Param %in% .GeneParams()) {
       Column <- Gene
-    } else if (Param %in% HiddenCellParams()) {
+    } else if (Param %in% .CellParams()) {
       Column <- Cell
     } else if (Param == "theta") {
       Column <- Batch
@@ -459,7 +458,7 @@ setMethod(
 setMethod(
   "displayChainBASiCS",
   signature = "BASiCS_Chain",
-  definition = HiddenGetParam
+  definition = .GetParam
 )
 
 #########################################################################
@@ -610,13 +609,13 @@ setMethod(
     if (is.null(Param2)) {
       object <- x@parameters[[Param]]
 
-      if (Param %in% HiddenGeneParams()) {
+      if (Param %in% .GeneParams()) {
         Columns <- Genes
         ylabInd <- "i"
         if (xlab == "") {
           xlab <- "Gene"
         }
-      } else if (Param %in% HiddenCellParams()) {
+      } else if (Param %in% .CellParams()) {
         Columns <- Cells
         ylabInd <- "j"
         if (xlab == "") {
@@ -686,7 +685,7 @@ setMethod(
       if (!Param2 %in% names(x@parameters)) {
         stop("'Param2' is not a parameter in this BASiCS_Summary object")
       }
-      HiddenCheckValidCombination(Param, Param2)
+      .CheckValidCombination(Param, Param2)
       if (SmoothPlot) {
         col <- grDevices::rgb(grDevices::col2rgb(col)[1],
                               grDevices::col2rgb(col)[2],
@@ -694,11 +693,11 @@ setMethod(
                               50,
                               maxColorValue = 255)
       }
-      if (Param %in% HiddenGeneParams()) {
+      if (Param %in% .GeneParams()) {
         Columns <- Genes
         ylabInd <- "i"
       }
-      if (Param %in% HiddenCellParams()) {
+      if (Param %in% .CellParams()) {
         Columns <- Cells
         ylabInd <- "j"
       }
@@ -753,9 +752,10 @@ setMethod(
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
+#' @include utils_Misc.R
 #' @export
 setMethod(
   "displaySummaryBASiCS",
   signature = "BASiCS_Summary",
-  definition = HiddenGetParam
+  definition = .GetParam
 )

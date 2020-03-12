@@ -1,4 +1,4 @@
-context("Differential test\n")
+context("Differential test")
 
 test_that("Differential test is correct", {
   data(ChainSC)
@@ -13,7 +13,7 @@ test_that("Differential test is correct", {
     EpsilonD = log2(1.5),
     OffSet = TRUE,
     Plot = FALSE,
-    CheckESS = FALSE,
+    MinESS = NA,
     PlotOffset = FALSE
   )
 
@@ -67,7 +67,7 @@ test_that("Differential test is correct", {
     GroupLabel1 = "SC",
     GroupLabel2 = "P&S",
     GenesSelect = GenesSelect,
-    CheckESS = FALSE,
+    MinESS = NA,
     EpsilonM = log2(1.5), EpsilonD = log2(1.5),
     OffSet = TRUE, Plot = FALSE, PlotOffset = FALSE
   )
@@ -102,7 +102,6 @@ test_that("Differential test is correct", {
 })
 
 
-
 test_that("CheckESS works", {
   data(ChainSC)
   data(ChainRNA)
@@ -115,7 +114,6 @@ test_that("CheckESS works", {
     EpsilonD = log2(1.5),
     OffSet = TRUE,
     Plot = FALSE,
-    CheckESS = TRUE,
     MinESS = MinESS,
     PlotOffset = FALSE
   )
@@ -152,7 +150,7 @@ test_that("EpsilonM = 0 case (reg)", {
     EpsilonD = 0,
     OffSet = TRUE,
     Plot = FALSE,
-    CheckESS = FALSE,
+    MinESS = NA,
     PlotOffset = FALSE
   )
   expect_equal(

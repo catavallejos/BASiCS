@@ -133,7 +133,7 @@ newBASiCS_Data <- function(Counts,
     WithSpikes <- FALSE
   }
   # Checks to assess if the data contains the required information
-  errors <- HiddenChecksBASiCS_Data(Data, WithSpikes)
+  errors <- .ChecksBASiCS_Data(Data, WithSpikes)
   if (length(errors) > 0) stop(errors)
   
   message(

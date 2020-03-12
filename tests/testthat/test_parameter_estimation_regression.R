@@ -1,34 +1,42 @@
-context("Parameter estimation and denoised data (spikes+regression)\n")
+context("Parameter estimation and denoised data (spikes+regression)")
 
 test_that("Estimates match the given seed (spikes+regression)", {
   # Data example
   set.seed(15)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
   # Fixing starting values
-  n <- ncol(Data); k <- 12
-  PriorParam <- list(mu.mu = rep(0, nrow(Data)), 
-                     s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n),
-                     GeneExponent = 1, CellExponent = 1,
-                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  PriorParam$m <- rep(0, k); PriorParam$V <- diag(k) 
-  PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
-  PriorParam$eta <- 5
+  n <- ncol(Data)
+  k <- 12
+  PriorParam <- BASiCS_PriorParam(Data, k = 12)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    WithSpikes = TRUE,
+    Regression = TRUE
+  )
   # Running the sampler
   set.seed(12)
-  Chain <- run_MCMC(Data, N = 1000, Thin = 10, Burn = 500, 
-                       PrintProgress = FALSE, Regression = TRUE,
-                       Start = Start, PriorParam = PriorParam)
+  Chain <- run_MCMC(
+    Data,
+    N = 1000,
+    Thin = 10,
+    Burn = 500, 
+    PrintProgress = FALSE,
+    Regression = TRUE,
+    Start = Start,
+    PriorParam = PriorParam
+  )
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
   
   # Checking parameter names
-  ParamNames <- c("mu", "delta", "phi", "s", "nu", "theta",
+  ParamNamesC <- c("mu", "delta", "phi", "s", "nu", "theta",
+                  "beta", "sigma2", "epsilon", "RBFLocations")
+  ParamNamesS <- c("mu", "delta", "phi", "s", "nu", "theta",
                   "beta", "sigma2", "epsilon")
-  expect_equal(names(Chain@parameters), ParamNames)
-  expect_equal(names(PostSummary@parameters), ParamNames)
+  expect_equal(names(Chain@parameters), ParamNamesC)
+  expect_equal(names(PostSummary@parameters), ParamNamesS)
             
   # Check if parameter estimates match for the first 5 genes and cells
   Mu <- c(6.410, 11.549,  4.264,  3.762, 26.152)
@@ -82,22 +90,29 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
   set.seed(18)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
   # Fixing starting values
-  n <- ncol(Data); k <- 12
-  PriorParam <- list(mu.mu = rep(0, nrow(Data)),
-                     s2.mu = 0.5, s2.delta = 0.5, a.delta = 1, 
-                     b.delta = 1, p.phi = rep(1, times = n),
-                     GeneExponent = 1, CellExponent = 1,
-                     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1)
-  PriorParam$m <- rep(0, k); PriorParam$V <- diag(k) 
-  PriorParam$a.sigma2 <- 2; PriorParam$b.sigma2 <- 2  
-  PriorParam$eta <- 5
+  n <- ncol(Data)
+  k <- 12
+  PriorParam <- BASiCS_PriorParam(Data, k = k)
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    WithSpikes = TRUE,
+    Regression = TRUE
+  )
+
   # Running the sampler
   set.seed(12)
-  Chain <- run_MCMC(Data, 
-                    N = 8, Thin = 2, Burn = 4,
-                    PrintProgress = FALSE, Regression = TRUE,
-                    StoreAdapt = TRUE,Start = Start, PriorParam = PriorParam)
+  Chain <- run_MCMC(
+    Data,
+    N = 8,
+    Thin = 2,
+    Burn = 4,
+    PrintProgress = FALSE,
+    Regression = TRUE,
+    StoreAdapt = TRUE,
+    Start = Start,
+    PriorParam = PriorParam
+  )
   expect_s4_class(Chain, "BASiCS_Chain")
 })

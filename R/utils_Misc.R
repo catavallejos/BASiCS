@@ -14,14 +14,14 @@ ess <- function(x) {
         a <- ar(y, aic = TRUE)
         a$var.pred / (1 - sum(a$ar)) ^ 2
       }
-    )    
+    )
   }
   setNames(ifelse(spec == 0, 0, nrow(x) * vars / spec), colnames(x))
 }
 
-HiddenScaleName <- function(Measure = c("ess",
-                                        "geweke.diag"),
-                            Param = NULL) {
+.ScaleName <- function(Measure = c("ess", "geweke.diag"),
+                       Param = NULL) {
+
   Measure <- match.arg(Measure)
   measure_name <- switch(Measure, 
     ess = "Effective sample size",
@@ -33,15 +33,14 @@ HiddenScaleName <- function(Measure = c("ess",
   measure_name
 }
 
-HiddenGetMeasure <- function(object, 
-                             Param,
-                             Measure = c("ess",
-                                         "geweke.diag"), 
-                             na.rm = FALSE) {
+.GetMeasure <- function(object, 
+                        Param,
+                        Measure = c("ess", "geweke.diag"), 
+                        na.rm = FALSE) {
 
   Measure <- match.arg(Measure)
   MeasureFun <- match.fun(Measure)
-  mat <- HiddenGetParam(object, Param)
+  mat <- .GetParam(object, Param)
   if (na.rm) {
     mat <- mat[, !apply(mat, 2, function(col) any(is.na(col)))]
     if (!ncol(mat)) {
@@ -55,7 +54,7 @@ HiddenGetMeasure <- function(object,
   metric
 }
 
-HiddenGetParam <- function(object, Param = "mu") {
+.GetParam <- function(object, Param = "mu") {
   if (is.null(Param) || 
       is.na(Param) || 
       length(Param) > 1 ||
@@ -65,13 +64,13 @@ HiddenGetParam <- function(object, Param = "mu") {
   object@parameters[[Param]]
 }
 
-HiddenCheckValidCombination <- function(...) {
+.CheckValidCombination <- function(...) {
   Params <- list(...)
   Check1 <- vapply(Params, 
-                   FUN = function(x) is.null(x) || x %in% HiddenGeneParams(),
+                   FUN = function(x) is.null(x) || x %in% .GeneParams(),
                    FUN.VALUE = TRUE)
   Check2 <- vapply(Params, 
-                   FUN = function(x) is.null(x) || x  %in% HiddenCellParams(),
+                   FUN = function(x) is.null(x) || x  %in% .CellParams(),
                    FUN.VALUE = TRUE)
   
   if (!(all(Check1) || all(Check2))) {
@@ -80,14 +79,14 @@ HiddenCheckValidCombination <- function(...) {
   } 
 }
 
-HiddenGeneParams <- function() c("mu", "delta", "epsilon")
-HiddenCellParams <- function() c("s", "phi", "nu")
+.GeneParams <- function() c("mu", "delta", "epsilon")
+.CellParams <- function() c("s", "phi", "nu")
 
-NClassFD2D <- function(x, y) {
+.NClassFD2D <- function(x, y) {
   max(nclass.FD(x), nclass.FD(y))
 }
 
-MeasureName <- function(measure) {
+.MeasureName <- function(measure) {
   switch(measure,
     "Mean" = "mean expression",
     "Disp" = "over dispersion",
@@ -95,30 +94,30 @@ MeasureName <- function(measure) {
   )
 }
 
-DistanceName <- function(measure) {
+.DistanceName <- function(measure) {
   switch(measure,
     "ResDisp" = "distance",
     "fold change")
 }
 
-LogDistanceName <- function(measure) {
+.LogDistanceName <- function(measure) {
   switch(measure,
     "ResDisp" = "distance",
     "log2(fold change)"
   )
 }
 
-DistanceVar <- function(measure) {
+.DistanceVar <- function(measure) {
   switch(measure,
     "ResDisp" = "Distance",
     "Log2FC"
   )
 }
 
-cap <- function(s) {
+.cap <- function(s) {
   sub("([[:alpha:]])([[:alpha:]]+)", "\\U\\1\\L\\2", s, perl = TRUE)
 }
 
-NSamples <- function(Chain) {
+.NSamples <- function(Chain) {
   nrow(Chain@parameters[[1]])
 }

@@ -70,13 +70,12 @@ BASiCS_Filter <- function(Counts,
                           MinTotalCountsPerCell = 2,
                           MinTotalCountsPerGene = 2,
                           MinCellsWithExpression = 2,
-                          MinAvCountsPerCellsWithExpression = 2)
-{
+                          MinAvCountsPerCellsWithExpression = 2) {
   q <- length(Tech)
   n <- ncol(Counts)
   CellIndex <- seq_len(n)
   GeneIndex <- seq_len(q)
-  colSumsAll <- matrixStats::colSums2(Counts)
+  colSumsAll <- Matrix::colSums(Counts)
   if((sum(Tech) > 0) & is.null(SpikeInput)) {
     stop("`SpikeInput` is required when the data contains spike-ins")
   }
@@ -84,8 +83,8 @@ BASiCS_Filter <- function(Counts,
   # Cell filter
   IncludeCells <- rep(TRUE, times = n)
   if(sum(Tech) > 0) {
-    colSumsBio <- matrixStats::colSums2(Counts[!Tech, ])
-    colSumsTech <- matrixStats::colSums2(Counts[Tech, ])
+    colSumsBio <- Matrix::colSums(Counts[!Tech, ])
+    colSumsTech <- Matrix::colSums(Counts[Tech, ])
     # Remove cells with zero counts in either biological or technical genes
     IncludeCells[which((colSumsBio == 0) | (colSumsTech == 0))] <- FALSE
     if (sum(IncludeCells) == 0) {

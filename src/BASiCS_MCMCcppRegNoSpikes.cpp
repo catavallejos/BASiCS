@@ -33,7 +33,7 @@
  * EndAdapt: when to stop the adaptation
  * PrintProgress: whether to print progress report 
  * k: Number of regression components; k-2 Gaussian radial basis functions (GRBFs)
- * m0: Starting values for locations of GRBFs
+ * m0: Starting values for GRBFs coefficients
  * V0: Starting value for covariance matrix 
  * sigma2_a0: Prior shape for Gamma distribution
  * sigma2_b0: Prior rate for Gamma distribution
@@ -43,8 +43,7 @@
  * lambda0: Starting values for gene-wise error term
  * variance: Fixed width (scale) for GRBFs
  */
-// [[Rcpp::export]]
-Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
+Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     int N, 
     int Thin, 
     int Burn,  
@@ -89,6 +88,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     int StoreAdapt, 
     int EndAdapt,
     int PrintProgress,
+    bool RBFMinMax,
+    bool FixLocations,
+    arma::vec RBFLocations,
     double const& mintol_mu,
     double const& mintol_delta,
     double const& mintol_nu,
@@ -205,7 +207,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   arma::mat V1 = arma::zeros(k,k);
   // Model matrix initialization
   arma::vec means = muAux.col(0);
-  arma::mat X = designMatrix(k, means, variance);
+  if (!FixLocations) {
+    RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
+  }
+  arma::mat X = designMatrix(k, RBFLocations, means, variance);
   
   StartSampler(N);
   
@@ -272,34 +277,34 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
     muAux = muUpdateRegNoSpikes(
       muAux.col(0),
       exp(LSmuAux),
-      Counts,
-      deltaAux.col(0),
+      Counts, deltaAux.col(0),
       1 / deltaAux.col(0),
       nuAux.col(0),
       sumByCellAll,
       mu_mu,
       s2mu,
       q0,
-      n, 
+      n,
       y_q0,
       u_q0,
-      ind_q0, 
+      ind_q0,
       Constrain,
       RefGene,
       ConstrainGene_uvec,
       NotConstrainGene_uvec,
-      ConstrainType, 
+      ConstrainType,
       k,
       lambdaAux,
       betaAux,
-      X, 
+      X,
       sigma2Aux,
       variance,
+      FixLocations,
+      RBFMinMax,
+      RBFLocations,
       geneExponent,
-      mintol_mu
-    );
-    PmuAux += muAux.col(1);
-    if(i>=Burn) muAccept += muAux.col(1);
+      mintol_mu);
+    PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
@@ -418,7 +423,10 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         // REGRESSION
         // Update of model matrix every 50 iterations during Burn in period
         means = muAux.col(0);
-        X = designMatrix(k, means, variance);
+        if (!FixLocations) {
+          RBFLocations = estimateRBFLocations(log(means), k, RBFMinMax);
+        }
+        X = designMatrix(k, RBFLocations, means, variance);
       }
     }
     
@@ -478,7 +486,8 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
   
   if(StoreAdapt == 1) {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("s") = s.t(),
@@ -489,15 +498,19 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
         Rcpp::Named("designMatrix") = X,
+        Rcpp::Named("RBFLocations") = RBFLocations,
         Rcpp::Named("ls.mu") = LSmu.t(),
         Rcpp::Named("ls.delta") = LSdelta.t(),
         Rcpp::Named("ls.nu") = LSnu.t(),
         Rcpp::Named("ls.theta") = LStheta.t(),
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+        Rcpp::Named("RefFreq") = RefFreq/(N-Burn)
+      )
+    ); 
   }
   else {
     // OUTPUT (AS A LIST)
-    return(Rcpp::List::create(
+    return(
+      Rcpp::List::create(
         Rcpp::Named("mu") = mu.t(),
         Rcpp::Named("delta") = delta.t(),
         Rcpp::Named("s") = s.t(),
@@ -507,6 +520,9 @@ Rcpp::List HiddenBASiCS_MCMCcppRegNoSpikes(
         Rcpp::Named("sigma2") = sigma,
         Rcpp::Named("lambda") = lambda.t(),
         Rcpp::Named("epsilon") = epsilon.t(),
-        Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
+        Rcpp::Named("RefFreq") = RefFreq / (N - Burn),
+        Rcpp::Named("RBFLocations") = RBFLocations
+      )
+    );
   }
 }

@@ -1,11 +1,11 @@
-context("Individual MCMC updates (cpp code)\n")
+context("Individual MCMC updates (cpp code)")
 
 test_that("Dirichlet sampler", {
   # Generating arbitrary hyper-param
   phi0 <- 1:10
   phi0 <- phi0 / sum(phi0)
   set.seed(2018)
-  x <- as.vector(BASiCS:::Hidden_rDirichlet(phi0))
+  x <- as.vector(BASiCS:::.rDirichlet(phi0))
 
   set.seed(2018)
   x0 <- rgamma(length(phi0), shape = phi0, scale = 1)
@@ -27,7 +27,11 @@ test_that("Spikes + no regression", {
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
   set.seed(2018)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    WithSpikes = TRUE,
+    Regression = FALSE)
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
@@ -231,16 +235,21 @@ test_that("Spikes + regression", {
   )
 
   set.seed(2020)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = TRUE)
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = TRUE,
+    WithSpikes = TRUE
+  )
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  X <- BASiCS:::.designMatrix(k, Start$mu0, var)
+  RBFLocations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
+  X <- BASiCS:::.designMatrix(k, RBFLocations, Start$mu0, var)
 
-  # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
   mu <- BASiCS:::.muUpdateReg(
     mu0 = Start$mu0,
@@ -263,6 +272,9 @@ test_that("Spikes + regression", {
     sigma2 = Start$sigma20,
     variance = var,
     exponent = 1,
+    FixLocations = FALSE,
+    RBFMinMax = TRUE,
+    RBFLocations = RBFLocations,
     mintol = 1e-3
   )
 
@@ -357,7 +369,12 @@ test_that("No Spikes + no regression", {
     a.s = 1, b.s = 1, a.theta = 1, b.theta = 1
   )
   set.seed(2020)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = FALSE,
+    WithSpikes = FALSE
+  )
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
@@ -369,7 +386,6 @@ test_that("No Spikes + no regression", {
   means <- rowMeans(CountsBio)
   RefGene <- which.min(means[means >= median(means)])
 
-  # Hidden_muUpdate
   mu1 <- pmax(0, Start$mu0[seq_len(q0)] + rnorm(q0, sd = 0.005))
   mu <- BASiCS:::.muUpdateNoSpikes(
     mu0 = Start$mu0,
@@ -451,14 +467,20 @@ test_that("No Spikes + regression", {
   )
 
   set.seed(2044)
-  Start <- BASiCS:::HiddenBASiCS_MCMC_Start(Data, PriorParam, WithSpikes = FALSE)
+  Start <- BASiCS:::.BASiCS_MCMC_Start(
+    Data,
+    PriorParam,
+    Regression = TRUE,
+    WithSpikes = FALSE
+  )
   uGene <- rep(0, times = q0)
   indGene <- rbinom(q0, size = 1, prob = 0.5)
   BatchDesign <- model.matrix(~ 0 + Data$BatchInfo)
   ThetaBatch <- BatchDesign %*% Start$theta0
   uCell <- rep(0, times = n)
   indCell <- rbinom(n, size = 1, prob = 0.5)
-  X <- BASiCS:::.designMatrix(k, Start$mu0, var)
+  RBFLocations <- BASiCS:::.estimateRBFLocations(log(Start$mu0), k, TRUE)
+  X <- BASiCS:::.designMatrix(k, RBFLocations, Start$mu0, var)
 
   ## Components for no-spikes
   means <- rowMeans(CountsBio)
@@ -492,6 +514,9 @@ test_that("No Spikes + regression", {
     sigma2 = Start$sigma20,
     variance = var,
     exponent = 1,
+    FixLocations = FALSE,
+    RBFMinMax = TRUE,
+    RBFLocations = RBFLocations,
     mintol = 1e-3
   )
 
