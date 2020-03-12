@@ -285,7 +285,6 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     if(i>=Burn) {
       deltaAccept += deltaAux.col(1);
     }
-    Rcpp::Rcout << "delta" << std::endl;
     
     // UPDATE OF NU: 
     // 1st COLUMN IS THE UPDATE, 
@@ -312,7 +311,6 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     if(i>=Burn) {
       nuAccept += nuAux.col(1);
     }
-    Rcpp::Rcout << "nu" << std::endl;
     
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {

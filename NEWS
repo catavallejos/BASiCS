@@ -1412,7 +1412,11 @@ version 1.9.22 (2020-03-09)
 - Bugfix in plot method when Param="sigma2"
 
 version 1.9.23 (2020-03-10)
-- Adds RBFMinMax option, which controls whether RBF are set at the minimum and 
+- Adds `BASiCS_PriorParam` function. This function makes it easier to alter
+  parameters for the prior distributions used in BASiCS. See issue #154.
+- Adds RBFMinMax argument to `BASiCS_PriorParam`,
+  which controls whether RBF are set at the minimum and 
   maximum starting mu values.
-- Adds MinGenesPerRBF option. This controls the minimum number of genes
+- Adds MinGenesPerRBF argument to `BASiCS_PriorParam`.
+  This controls the minimum number of genes
   between around the centre of each RBF.

@@ -16,19 +16,21 @@ test_that("Errors in basic MCMC arguments", {
                regexp = "argument \"Burn\" is missing, with no default")
   expect_error(run_MCMC(Data = DataSpikes, N = 10, Thin = 2, Burn = 4),
                regexp = "argument \"Regression\" is missing, with no default")
+  pp <- BASiCS_PriorParam(DataSpikes, MinGenesPerRBF = NA)
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, MinGenesPerRBF = NA), NA)
+                        Regression = TRUE, PriorParam = pp),
+               NA)
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = TRUE,
-                        MinGenesPerRBF = NA), NA)
+                        Regression = TRUE, WithSpikes = TRUE, PriorParam = pp),
+               NA)
   # Check batch info when it contains text
   DataSpikesBatchNotFactor <- DataSpikes
   colData(DataSpikesBatchNotFactor)$BatchInfo <- 
     paste("Batch", colData(DataSpikesBatchNotFactor)$BatchInfo)
   expect_error(run_MCMC(Data = DataSpikesBatchNotFactor, 
-                        N = 20, Thin = 2, Burn = 4, Regression = TRUE, MinGenesPerRBF = NA), NA)
+                        N = 20, Thin = 2, Burn = 4, Regression = TRUE), NA)
 })
 
 test_that("MCMC arguments fail (spikes; no-regression)", {
@@ -77,7 +79,7 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
   # Checks if data does not have spike-ins
   expect_error(run_MCMC(Data = DataNoSpikes, 
                          N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = TRUE, MinGenesPerRBF = NA),
+                        Regression = TRUE, WithSpikes = TRUE),
                regexp = ".*does not contain information about spike-in genes.*")
 })
 
@@ -105,72 +107,63 @@ test_that("MCMC arguments fail (regression)", {
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
                         PriorParam = BASiCS_PriorParam(DataSpikes, k = 2),
-                        Regression = TRUE, MinGenesPerRBF = NA), 
+                        Regression = TRUE), 
                regexp = "The number of basis functions needs to be >= 4.")
   
   Data2 <- DataSpikes
   S4Vectors::metadata(Data2)$SpikeInput <- NULL 
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = TRUE,
-                        MinGenesPerRBF = NA),
+                        Regression = TRUE, WithSpikes = TRUE),
                regexp = ".*does not contain \'SpikeInput\' as metadata.*")
   
   Data2 <- DataSpikes
   altExp(Data2) <- NULL   
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = TRUE,
-                        MinGenesPerRBF = NA),
+                        Regression = TRUE, WithSpikes = TRUE),
                regexp = ".*does not contain information about spike-in genes*")
   
   # Check standard MCMC setting - without spikes
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE,
-                        MinGenesPerRBF = NA), NA)
+                        Regression = TRUE, WithSpikes = FALSE), NA)
   expect_error(run_MCMC(Data = DataSpikesNoBatch, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE,
-                        MinGenesPerRBF = NA),
+                        Regression = TRUE, WithSpikes = FALSE),
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
   S4Vectors::metadata(Data2)$SpikeInput <- NULL 
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE,
-                        MinGenesPerRBF = NA), NA)
+                        Regression = TRUE, WithSpikes = FALSE), NA)
   
   Data2 <- DataNoSpikes
   altExp(Data2) <- NULL 
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE,
-                        MinGenesPerRBF = NA), NA)
+                        Regression = TRUE, WithSpikes = FALSE), NA)
   
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE,
-                        MinGenesPerRBF = NA),
+                        Regression = TRUE, WithSpikes = FALSE),
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- NULL
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
-                        Regression = TRUE, WithSpikes = FALSE,
-                        MinGenesPerRBF = NA),
+                        Regression = TRUE, WithSpikes = FALSE),
                regexp = ".*does not contain a BatchInfo vector*")
 
   expect_error(
     run_MCMC(DataNoSpikes, N = 10, Thin = 2, Burn = 4, 
              PrintProgress = FALSE, Regression = TRUE,
              WithSpikes = FALSE,
-             PriorParam = BASiCS_PriorParam(DataNoSpikes, k = 2),
-             MinGenesPerRBF = 100),
+             PriorParam = BASiCS_PriorParam(DataNoSpikes, k = 2, MinGenesPerRBF = 100)),
     "Consider setting MinGenesPerRBF to NA or a lower positive integer."
   )
 })
@@ -269,8 +262,7 @@ test_that("MCMC works with different input classes", {
       N = 10,
       Thin = 2,
       Burn = 4, 
-      Regression = TRUE,
-      MinGenesPerRBF = NA
+      Regression = TRUE
     ),
     NA
   )
@@ -281,8 +273,7 @@ test_that("MCMC works with different input classes", {
       N = 10,
       Thin = 2,
       Burn = 4, 
-      Regression = TRUE,
-      MinGenesPerRBF = NA
+      Regression = TRUE
     ),
     NA
   )
@@ -291,36 +282,15 @@ test_that("MCMC works with different input classes", {
 
 test_that("PriorMu", {
   expect_error(
-    run_MCMC(
-      Data = makeExampleBASiCS_Data(),
-      N = 10,
-      Thin = 2,
-      Burn = 4,
-      Regression = TRUE,
-      PriorMu = "sadfs"
-    ),
+    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "das"),
     "'arg' should be one of \"default\", \"EmpiricalBayes\""
   )
   expect_error(
-    run_MCMC(
-      Data = makeExampleBASiCS_Data(),
-      N = 10,
-      Thin = 2,
-      Burn = 4,
-      Regression = TRUE,
-      PriorMu = "default"
-    ),
+    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "default"),
     NA
   )
   expect_error(
-    run_MCMC(
-      Data = makeExampleBASiCS_Data(),
-      N = 10,
-      Thin = 2,
-      Burn = 4,
-      Regression = TRUE,
-      PriorMu = "EmpiricalBayes"
-    ),
+    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "EmpiricalBayes"),
     NA
   )
 })

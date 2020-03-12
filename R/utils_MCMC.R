@@ -266,17 +266,6 @@
                                    GPar,
                                    Regression,
                                    WithSpikes,
-                                   PriorMu = c("default", "EmpiricalBayes"),
-                                   PriorDelta = c("log-normal", "gamma"),
-                                   PriorDeltaNum = if (PriorDelta == "gamma") 1 else 2,
-                                   k = 12,
-                                   ## Duplicated arg here for backwards-compatibility.
-                                   ## If both specified, Var is ignored.
-                                   Var = 1.2,
-                                   variance = Var,
-                                   StochasticRef = TRUE,
-                                   ConstrainType = 1,
-                                   ConstrainProp = 0.2,
                                    AR = 0.44,
                                    StopAdapt = Burn,
                                    StoreChains = FALSE,
@@ -284,7 +273,6 @@
                                    StoreDir = getwd(),
                                    RunName = "",
                                    PrintProgress = TRUE,
-                                   MinGenesPerRBF = NA,
                                    PriorParam = BASiCS_PriorParam(Data, k = 12),
                                    Start = .BASiCS_MCMC_Start(
                                      Data = Data,
@@ -296,8 +284,6 @@
                                    mintol_delta = 1e-3,
                                    mintol_nu = 1e-5,
                                    mintol_theta = 1e-4) {
-  PriorMu <- match.arg(PriorMu)
-  PriorDelta <- match.arg(PriorDelta)
 
   .stop_k(PriorParam$k)
   lm <- log(Start$mu0)
@@ -306,12 +292,12 @@
   } else {
     RBFLocations <- PriorParam$RBFLocations
   }
-  if (!is.na(MinGenesPerRBF)) {
+  if (!is.na(PriorParam$MinGenesPerRBF)) {
     d <- (RBFLocations[[2]] - RBFLocations[[1]]) / 2
     retain <- vapply(
       RBFLocations,
       function(RBFLocation) {
-        sum(lm > RBFLocation - d & lm < RBFLocation + d) > MinGenesPerRBF
+        sum(lm > RBFLocation - d & lm < RBFLocation + d) > PriorParam$MinGenesPerRBF
       },
       logical(1)
     )
@@ -321,9 +307,10 @@
     PriorParam$V <- PriorParam$V[retain_prior, retain_prior]
     Start$beta0 <- Start$beta0[retain_prior]
   }
+  PriorParam$RBFLocations <- RBFLocations
   PriorParam$k <- length(RBFLocations) + 2
 
-  if (missing(PriorDelta) & !Regression) {
+  if (!Regression) {
     message(
       "-------------------------------------------------------------\n",
       "NOTE: default choice PriorDelta = 'log-normal'  (recommended value). \n",
@@ -331,6 +318,7 @@
       "-------------------------------------------------------------\n"
     )
   }
+
   if (Regression) {
     .stop_k(PriorParam$k)
   }
@@ -363,7 +351,6 @@
     length(StoreChains) == 1,
     length(StoreAdapt) == 1,
     dir.exists(StoreDir),
-    PriorDelta %in% c("gamma", "log-normal"),
     mintol_mu > 0,
     mintol_delta > 0,
     mintol_nu > 0,
@@ -393,12 +380,6 @@
       length(PriorParam$b.sigma2) == 1
     )
   }
-
-  # Redefine prior under the empirical Bayes approach
-  if (PriorMu == "EmpiricalBayes") {
-    PriorParam$mu.mu <- .EmpiricalBayesMu(Data, PriorParam$s2.mu)
-  }
-
   if (!(AR > 0 & AR < 1 & length(AR) == 1)) {
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   }
@@ -406,12 +387,12 @@
   # Definition of parameters that are specific to the no-spikes case
   NoSpikesParam <- .BASiCS_MCMC_NoSpikesParam(
     GPar$BioCounts,
-    ConstrainType,
-    StochasticRef, 
+    PriorParam$ConstrainType,
+    PriorParam$StochasticRef, 
     GPar$q.bio, 
     Start$mu0, 
-    PriorDelta, 
-    ConstrainProp
+    PriorParam$PriorDelta, 
+    PriorParam$ConstrainProp
   )
   ConstrainGene <- NoSpikesParam$ConstrainGene
   NotConstrainGene <- NoSpikesParam$NotConstrainGene
@@ -429,13 +410,6 @@
     RunName = RunName,
     PrintProgress = PrintProgress,
     PriorParam = PriorParam,
-    PriorDeltaNum = PriorDeltaNum,
-    PriorDelta = PriorDelta,
-    StochasticRef = StochasticRef,
-    ConstrainType = ConstrainType,
-    ConstrainProp = ConstrainProp,
-    RBFLocations = RBFLocations,
-    variance = variance,
     Start = Start,
     mintol_mu = mintol_mu,
     mintol_delta = mintol_delta,
@@ -446,9 +420,7 @@
     Constrain = Constrain,
     RefGenes = RefGenes,
     RefGene = RefGene,
-    Index = Index,
-    GeneExponent = PriorParam$GeneExponent,
-    CellExponent = PriorParam$CellExponent
+    Index = Index
   )
 }
 

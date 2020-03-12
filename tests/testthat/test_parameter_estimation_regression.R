@@ -25,8 +25,7 @@ test_that("Estimates match the given seed (spikes+regression)", {
     PrintProgress = FALSE,
     Regression = TRUE,
     Start = Start,
-    PriorParam = PriorParam,
-    MinGenesPerRBF = NA
+    PriorParam = PriorParam
   )
   # Calculating a posterior summary
   PostSummary <- Summary(Chain)
@@ -113,8 +112,7 @@ test_that("Chain creation works when StoreAdapt=TRUE (spikes+regression)", {
     Regression = TRUE,
     StoreAdapt = TRUE,
     Start = Start,
-    PriorParam = PriorParam,
-    MinGenesPerRBF = NA
+    PriorParam = PriorParam
   )
   expect_s4_class(Chain, "BASiCS_Chain")
 })

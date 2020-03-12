@@ -6,11 +6,10 @@
                                       StoreDir,
                                       RunName) {
   
-  # Directory
-  OldDir <- getwd()
-  setwd(StoreDir)
-  ## in case function exits early/fails
-  on.exit(setwd(StoreDir))
+  # setwd returns current dir invisibly
+  OldDir <- setwd(StoreDir)
+## in case function exits early/fails, on.exit will return us to the right dir
+  on.exit(setwd(OldDir))
   
   message("-------------------------------------------------------------\n", 
           paste("BASiCS version", packageVersion("BASiCS"), 
@@ -55,10 +54,9 @@
                                      StoreAdapt,
                                      StoreDir,
                                      RunName) {
-  # Directory
-  OldDir <- getwd()
-  setwd(StoreDir)
-  ## in case function exits early/fails
+  # setwd returns current dir invisibly
+  OldDir <- setwd(StoreDir)
+  ## in case function exits early/fails, on.exit will return us to the right dir
   on.exit(setwd(OldDir))
 
   # Store MCMC chain

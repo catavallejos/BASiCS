@@ -21,9 +21,6 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
-#' @param PriorMu Indicates if the original prior (\code{PriorMu = 'default'})
-#' or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
-#' assigned to gene-specific mean expression parameters.  
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -199,7 +196,6 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
-    PriorMu = c("default", "EmpiricalBayes"),
     ...) {
 
   # Checks to ensure input arguments are valid
@@ -224,12 +220,11 @@ BASiCS_MCMC <- function(
 
   # Assignment of optional parameters (default values if input not provided)
   ArgsDef <- .BASiCS_MCMC_ExtraArgs(
-    Data,
-    Burn,
-    GPar,
-    Regression,
-    WithSpikes,
-    PriorMu,
+    Data = Data,
+    Burn = Burn,
+    GPar = GPar,
+    Regression = Regression,
+    WithSpikes = WithSpikes,
     ...
   )
   
@@ -269,8 +264,8 @@ BASiCS_MCMC <- function(
     mintol_delta = ArgsDef$mintol_delta,
     mintol_nu = ArgsDef$mintol_nu,
     mintol_theta = ArgsDef$mintol_theta,
-    geneExponent = ArgsDef$GeneExponent,
-    cellExponent = ArgsDef$CellExponent
+    geneExponent = PriorParam$GeneExponent,
+    cellExponent = PriorParam$CellExponent
   )
 
   SpikeArgs <- list(
@@ -282,7 +277,7 @@ BASiCS_MCMC <- function(
     muSpikes = metadata(Data)$SpikeInput[, 2]
   )
   NonRegressionArgs <- list(
-    prior_delta = ArgsDef$PriorDeltaNum,
+    prior_delta = (PriorParam$PriorDelta == "log-normal") + 1,
     s2delta = PriorParam$s2.delta,
     adelta = PriorParam$a.delta,
     bdelta = PriorParam$b.delta
@@ -298,10 +293,10 @@ BASiCS_MCMC <- function(
     sigma20 = Start$sigma20,
     eta0 = PriorParam$eta,
     lambda0 = Start$lambda0,
-    variance = ArgsDef$variance,
+    variance = PriorParam$variance,
     FixLocations = PriorParam$FixLocations,
     RBFMinMax = PriorParam$RBFMinMax,
-    RBFLocations = ArgsDef$RBFLocations
+    RBFLocations = PriorParam$RBFLocations
   )
 
   NoSpikeArgs <- list(
@@ -312,8 +307,8 @@ BASiCS_MCMC <- function(
     RefGenes = ArgsDef$RefGenes,
     ConstrainGene = ArgsDef$ConstrainGene,
     NotConstrainGene = ArgsDef$NotConstrainGene,
-    ConstrainType = ArgsDef$ConstrainType,
-    StochasticRef = as.numeric(ArgsDef$StochasticRef)
+    ConstrainType = PriorParam$ConstrainType,
+    StochasticRef = as.numeric(PriorParam$StochasticRef)
   )
 
 

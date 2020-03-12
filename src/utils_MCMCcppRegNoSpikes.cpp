@@ -110,7 +110,7 @@ arma::mat muUpdateRegNoSpikes(
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
-  if(ConstrainType == 2) {
+  if (ConstrainType == 2) {
     for (int i=0; i < nNotConstrainGene; i++) {
       iAux = NotConstrainGene(i);
       log_aux(iAux) -= (0.5 / s2_mu) * 

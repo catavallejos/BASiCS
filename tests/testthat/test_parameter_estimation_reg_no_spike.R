@@ -31,7 +31,6 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     Burn = 500,
     PrintProgress = FALSE,
     WithSpikes = FALSE,
-    MinGenesPerRBF = NA,
     Regression = TRUE
   )
   set.seed(14)
@@ -42,7 +41,6 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     Burn = 500,
     PrintProgress = FALSE,
     WithSpikes = FALSE,
-    MinGenesPerRBF = NA,
     Regression = TRUE
   )
 
@@ -161,7 +159,6 @@ test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE"
     WithSpikes = FALSE,
     Regression = TRUE,
     StoreAdapt = TRUE,
-    MinGenesPerRBF = NA,
     Start = Start,
     PriorParam = PriorParam
   )

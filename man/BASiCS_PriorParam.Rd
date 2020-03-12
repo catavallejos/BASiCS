@@ -20,6 +20,7 @@ BASiCS_PriorParam(
   RBFMinMax = TRUE,
   FixLocations = !is.null(RBFLocations),
   RBFLocations = NULL,
+  variance = 1.2,
   m = numeric(k),
   V = diag(k),
   a.sigma2 = 2,
@@ -56,6 +57,8 @@ radial basis functions (GRBFs).}
 during burn-in?}
 
 \item{RBFLocations}{RBFLocations of GRBFs in units of \code{log(mu)}}
+
+\item{variance}{Variance of the GRBFs.}
 
 \item{m, V}{Mean and (co)variance priors for regression coefficients.}
 

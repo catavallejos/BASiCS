@@ -20,9 +20,14 @@
 #' @param FixLocations Should RBFLocations be fixed throughout MCMC, or adaptive
 #' during burn-in?
 #' @param RBFLocations RBFLocations of GRBFs in units of \code{log(mu)}
+#' @param variance Variance of the GRBFs.
 #' @param m,V Mean and (co)variance priors for regression coefficients.
 #' @param a.sigma2,b.sigma2 Priors for inverse gamma prior on regression scale.
 #' @param eta Degrees of freedom for t distribution of regresion errors.
+#' @param PriorMu Indicates if the original prior (\code{PriorMu = 'default'})
+#' or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+#' assigned to gene-specific mean expression parameters.
+#' @param PriorDelta
 #' @param GeneExponent,CellExponent Exponents for gene and cell-specific 
 #' parameters. These should not be outside of divide and conquer MCMC 
 #' applications.
@@ -35,7 +40,8 @@
 BASiCS_PriorParam <- function(
     Data,
     k = 12,
-    mu.mu = rep(0, nrow(Data)),
+    mu.mu = if (PriorMu == "default") rep(0, nrow(Data))
+        else .EmpiricalBayesMu(Data, s2.mu),
     s2.mu = 0.5,
     s2.delta = 0.5,
     a.delta = 1, 
@@ -48,15 +54,24 @@ BASiCS_PriorParam <- function(
     RBFMinMax = TRUE,
     FixLocations = !is.null(RBFLocations),
     RBFLocations = NULL,
+    variance = 1.2,
     m = numeric(k),
     V = diag(k),
     a.sigma2 = 2,
     b.sigma2 = 2,
     eta = 5,
+    PriorMu = c("default", "EmpiricalBayes"),
+    PriorDelta = c("log-normal", "gamma"),
+    StochasticRef = TRUE,
+    ConstrainType = 1,
+    ConstrainProp = 0.2,
+    MinGenesPerRBF = NA,
     GeneExponent = 1,
     CellExponent = 1
   ) {
 
+  PriorMu <- match.arg(PriorMu)
+  PriorDelta <- match.arg(PriorDelta)
   n <- ncol(Data)
   q <- nrow(Data)
   list(
@@ -68,6 +83,12 @@ BASiCS_PriorParam <- function(
     p.phi = p.phi,
     GeneExponent = GeneExponent,
     CellExponent = CellExponent,
+    PriorMu = PriorMu,
+    PriorDelta = PriorDelta,
+    StochasticRef = StochasticRef,
+    ConstrainType = ConstrainType,
+    ConstrainProp = ConstrainProp,
+    MinGenesPerRBF = MinGenesPerRBF,
     a.s = a.s,
     b.s = b.s,
     a.theta = a.theta,
@@ -75,6 +96,7 @@ BASiCS_PriorParam <- function(
     RBFMinMax = RBFMinMax,
     FixLocations = FixLocations,
     RBFLocations = RBFLocations,
+    variance = variance,
     m = m,
     V = V,
     k = k,
