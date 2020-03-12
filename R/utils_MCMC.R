@@ -358,6 +358,8 @@
     is.logical(PriorParam$RBFMinMax),
     length(PriorParam$RBFMinMax) == 1,
     is.logical(PriorParam$FixLocations),
+    is.na(PriorParam$MinGenesPerRBF) ||
+      (length(PriorParam$MinGenesPerRBF) & is.numeric(PriorParam$MinGenesPerRBF)),
     length(PriorParam$FixLocations) == 1
   )
   assertthat::assert_that(

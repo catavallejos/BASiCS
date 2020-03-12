@@ -7,7 +7,8 @@
 BASiCS_PriorParam(
   Data,
   k = 12,
-  mu.mu = rep(0, nrow(Data)),
+  mu.mu = if (PriorMu == "default") rep(0, nrow(Data)) else .EmpiricalBayesMu(Data,
+    s2.mu),
   s2.mu = 0.5,
   s2.delta = 0.5,
   a.delta = 1,
@@ -18,14 +19,20 @@ BASiCS_PriorParam(
   a.theta = 1,
   b.theta = 1,
   RBFMinMax = TRUE,
-  FixLocations = !is.null(RBFLocations),
+  FixLocations = !is.null(RBFLocations) | !is.na(MinGenesPerRBF),
   RBFLocations = NULL,
+  MinGenesPerRBF = NA,
   variance = 1.2,
   m = numeric(k),
   V = diag(k),
   a.sigma2 = 2,
   b.sigma2 = 2,
   eta = 5,
+  PriorMu = c("default", "EmpiricalBayes"),
+  PriorDelta = c("log-normal", "gamma"),
+  StochasticRef = TRUE,
+  ConstrainType = 1,
+  ConstrainProp = 0.2,
   GeneExponent = 1,
   CellExponent = 1
 )
@@ -54,9 +61,17 @@ radial basis functions (GRBFs).}
 \code{log(mu)}?}
 
 \item{FixLocations}{Should RBFLocations be fixed throughout MCMC, or adaptive
-during burn-in?}
+during burn-in? By default this is \code{FALSE}, but it is set to \code{TRUE}
+if \code{RBFLocations} or \code{MinGenesPerRBF} are specified.}
 
-\item{RBFLocations}{RBFLocations of GRBFs in units of \code{log(mu)}}
+\item{RBFLocations}{Numeric vector specifying locations of GRBFs in units 
+of \code{log(mu)}.}
+
+\item{MinGenesPerRBF}{Numeric scalar specifying the minimum number of genes
+for GRBFs to be retained. If fewer than \code{MinGenesPerRBF} genes have 
+values of \code{log(mu)} within the range of an RBF, it is removed. 
+The range covered by each RBF is defined as centre of the RBF plus or minus
+half the distance between RBFs.}
 
 \item{variance}{Variance of the GRBFs.}
 
@@ -65,6 +80,22 @@ during burn-in?}
 \item{a.sigma2, b.sigma2}{Priors for inverse gamma prior on regression scale.}
 
 \item{eta}{Degrees of freedom for t distribution of regresion errors.}
+
+\item{PriorMu}{Indicates if the original prior (\code{PriorMu = 'default'})
+or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+assigned to gene-specific mean expression parameters.}
+
+\item{PriorDelta}{Scalar character specifying the prior type to use for 
+delta overdispersion parameter. Options are "log-normal" (recommended)
+and "gamma" (used in Vallejos et al. (2015)).}
+
+\item{StochasticRef}{Logical scalar specifying whether the reference gene
+for the no-spikes version should be chosen randomly at MCMC iterations.}
+
+\item{ConstrainType}{Type of constraint for no-spikes version. Deprecated.}
+
+\item{ConstrainProp}{Proportion of genes to be considered as reference genes
+if \code{StochasticRef=TRUE}.}
 
 \item{GeneExponent, CellExponent}{Exponents for gene and cell-specific 
 parameters. These should not be outside of divide and conquer MCMC 

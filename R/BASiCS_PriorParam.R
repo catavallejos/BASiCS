@@ -18,8 +18,15 @@
 #' @param RBFMinMax Should GRBFs be placed at the minimum and maximum of 
 #' \code{log(mu)}?
 #' @param FixLocations Should RBFLocations be fixed throughout MCMC, or adaptive
-#' during burn-in?
-#' @param RBFLocations RBFLocations of GRBFs in units of \code{log(mu)}
+#' during burn-in? By default this is \code{FALSE}, but it is set to \code{TRUE}
+#' if \code{RBFLocations} or \code{MinGenesPerRBF} are specified.
+#' @param RBFLocations Numeric vector specifying locations of GRBFs in units 
+#' of \code{log(mu)}.
+#' @param MinGenesPerRBF Numeric scalar specifying the minimum number of genes
+#' for GRBFs to be retained. If fewer than \code{MinGenesPerRBF} genes have 
+#' values of \code{log(mu)} within the range of an RBF, it is removed. 
+#' The range covered by each RBF is defined as centre of the RBF plus or minus
+#' half the distance between RBFs.
 #' @param variance Variance of the GRBFs.
 #' @param m,V Mean and (co)variance priors for regression coefficients.
 #' @param a.sigma2,b.sigma2 Priors for inverse gamma prior on regression scale.
@@ -27,7 +34,14 @@
 #' @param PriorMu Indicates if the original prior (\code{PriorMu = 'default'})
 #' or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
 #' assigned to gene-specific mean expression parameters.
-#' @param PriorDelta
+#' @param PriorDelta Scalar character specifying the prior type to use for 
+#' delta overdispersion parameter. Options are "log-normal" (recommended)
+#' and "gamma" (used in Vallejos et al. (2015)).
+#' @param StochasticRef Logical scalar specifying whether the reference gene
+#' for the no-spikes version should be chosen randomly at MCMC iterations.
+#' @param ConstrainType Type of constraint for no-spikes version. Deprecated.
+#' @param ConstrainProp Proportion of genes to be considered as reference genes
+#' if \code{StochasticRef=TRUE}.
 #' @param GeneExponent,CellExponent Exponents for gene and cell-specific 
 #' parameters. These should not be outside of divide and conquer MCMC 
 #' applications.
@@ -52,8 +66,9 @@ BASiCS_PriorParam <- function(
     a.theta = 1,
     b.theta = 1,
     RBFMinMax = TRUE,
-    FixLocations = !is.null(RBFLocations),
+    FixLocations = !is.null(RBFLocations) | !is.na(MinGenesPerRBF),
     RBFLocations = NULL,
+    MinGenesPerRBF = NA,
     variance = 1.2,
     m = numeric(k),
     V = diag(k),
@@ -65,11 +80,13 @@ BASiCS_PriorParam <- function(
     StochasticRef = TRUE,
     ConstrainType = 1,
     ConstrainProp = 0.2,
-    MinGenesPerRBF = NA,
     GeneExponent = 1,
     CellExponent = 1
   ) {
 
+  if (!missing(ConstrainType)) {
+    warning("Use of ConstrainType is deprecated.")
+  }
   PriorMu <- match.arg(PriorMu)
   PriorDelta <- match.arg(PriorDelta)
   n <- ncol(Data)

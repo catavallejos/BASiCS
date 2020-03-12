@@ -4,16 +4,7 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(
-  Data,
-  N,
-  Thin,
-  Burn,
-  Regression,
-  WithSpikes = TRUE,
-  PriorMu = c("default", "EmpiricalBayes"),
-  ...
-)
+BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
@@ -39,10 +30,6 @@ If \code{WithSpikess = FALSE},
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
-
-\item{PriorMu}{Indicates if the original prior (\code{PriorMu = 'default'})
-or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
-assigned to gene-specific mean expression parameters.}
 
 \item{...}{Optional parameters.
 \describe{
