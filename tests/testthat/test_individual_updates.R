@@ -405,7 +405,6 @@ test_that("No Spikes + no regression", {
     RefGene = RefGene,
     ConstrainGene = seq_len(q0) - 1,
     NotConstrainGene = 0,
-    ConstrainType = 1,
     exponent = 1,
     mintol = 1e-3
   )
@@ -506,7 +505,6 @@ test_that("No Spikes + regression", {
     RefGene = RefGene,
     ConstrainGene = seq_len(q0) - 1,
     NotConstrainGene = 0,
-    ConstrainType = 1,
     k = k,
     lambda = Start$lambda0,
     beta = Start$beta0,

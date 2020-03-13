@@ -44,7 +44,6 @@
 * RefGenes:
 * ConstrainGene:
 * NotConstrainGene:
-* ConstrainType: 
 * StochasticRef: 
 */
 Rcpp::List BASiCS_MCMCcppNoSpikes(
@@ -74,7 +73,6 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     arma::vec RefGenes,
     arma::vec ConstrainGene,
     arma::vec NotConstrainGene,
-    int ConstrainType,
     int StochasticRef,
     double ar, 
     arma::vec LSmu0, 
@@ -253,7 +251,6 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
       RefGene,
       ConstrainGene_uvec, 
       NotConstrainGene_uvec,
-      ConstrainType,
       geneExponent,
       mintol_mu
     );

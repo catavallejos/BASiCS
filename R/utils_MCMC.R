@@ -389,7 +389,6 @@
   # Definition of parameters that are specific to the no-spikes case
   NoSpikesParam <- .BASiCS_MCMC_NoSpikesParam(
     GPar$BioCounts,
-    PriorParam$ConstrainType,
     PriorParam$StochasticRef, 
     GPar$q.bio, 
     Start$mu0, 
@@ -441,7 +440,6 @@
 
 
 .BASiCS_MCMC_NoSpikesParam <- function(Counts,
-                                       ConstrainType,
                                        StochasticRef,
                                        q.bio,
                                        mu0,
@@ -452,17 +450,9 @@
     stop("PriorDelta = 'gamma' is not supported for the no-spikes case")
   }
 
-  # 1: Full constrain; 2: Genes with average count >= 1
-  if (ConstrainType == 1) {
-    ConstrainGene <- seq_len(q.bio) - 1
-    NotConstrainGene <- 0
-    NonZero <- which(matrixStats::rowSums2(Counts) > 0)
-  }
-  if (ConstrainType == 2) {
-    ConstrainGene <- which(matrixStats::rowSums2(Counts) >= 1) - 1
-    NotConstrainGene <- which(matrixStats::rowSums2(Counts) < 1) - 1
-    NonZero <- ConstrainGene + 1
-  }
+  ConstrainGene <- which(matrixStats::rowSums2(Counts) >= 1) - 1
+  NotConstrainGene <- which(matrixStats::rowSums2(Counts) < 1) - 1
+  NonZero <- ConstrainGene + 1
   Constrain <- mean(log(mu0[NonZero]))
 
   # Whether or not a stochatic reference is used

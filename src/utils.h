@@ -256,7 +256,6 @@ arma::mat muUpdateNoSpikes(
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
-    int const& ConstrainType,
     double const& exponent,
     double const& mintol);
 
@@ -303,7 +302,6 @@ arma::mat muUpdateRegNoSpikes(
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
-    int const& ConstrainType,
     int const& k, 
     arma::vec const& lambda,
     arma::vec const& beta,

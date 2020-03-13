@@ -9,12 +9,12 @@
     .Call('_BASiCS_BASiCS_MCMCcppReg', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, muSpikes, mu0, delta0, phi0, s0, nu0, theta0, mu_mu, s2mu, aphi, as, bs, atheta, btheta, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance, ar, LSmu0, LSdelta0, LSphi0, LSnu0, LStheta0, sumByCellBio, sumByGeneAll, sumByGeneBio, StoreAdapt, EndAdapt, PrintProgress, FixLocations, RBFMinMax, RBFLocations, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent)
 }
 
-.BASiCS_MCMCcppNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, adelta, bdelta, s2delta, prior_delta, as, bs, atheta, btheta, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent) {
-    .Call('_BASiCS_BASiCS_MCMCcppNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, adelta, bdelta, s2delta, prior_delta, as, bs, atheta, btheta, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent)
+.BASiCS_MCMCcppNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, adelta, bdelta, s2delta, prior_delta, as, bs, atheta, btheta, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent) {
+    .Call('_BASiCS_BASiCS_MCMCcppNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, adelta, bdelta, s2delta, prior_delta, as, bs, atheta, btheta, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent)
 }
 
-.BASiCS_MCMCcppRegNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, as, bs, atheta, btheta, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, RBFMinMax, FixLocations, RBFLocations, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent) {
-    .Call('_BASiCS_BASiCS_MCMCcppRegNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, as, bs, atheta, btheta, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, ConstrainType, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, RBFMinMax, FixLocations, RBFLocations, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent)
+.BASiCS_MCMCcppRegNoSpikes <- function(N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, as, bs, atheta, btheta, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, RBFMinMax, FixLocations, RBFLocations, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent) {
+    .Call('_BASiCS_BASiCS_MCMCcppRegNoSpikes', PACKAGE = 'BASiCS', N, Thin, Burn, Counts, BatchDesign, mu0, delta0, s0, nu0, theta0, mu_mu, s2mu, as, bs, atheta, btheta, k, m0, V0, sigma2_a0, sigma2_b0, beta0, sigma20, eta0, lambda0, variance, Constrain, Index, RefGene, RefGenes, ConstrainGene, NotConstrainGene, StochasticRef, ar, LSmu0, LSdelta0, LSnu0, LStheta0, sumByCellAll, sumByGeneAll, StoreAdapt, EndAdapt, PrintProgress, RBFMinMax, FixLocations, RBFLocations, mintol_mu, mintol_delta, mintol_nu, mintol_theta, geneExponent, cellExponent)
 }
 
 .BASiCS_DenoisedRates <- function(CountsBio, Mu, TransInvDelta, PhiNu, N, q0, n) {
@@ -77,16 +77,16 @@
     .Call('_BASiCS_lambdaUpdateReg', PACKAGE = 'BASiCS', delta, X, beta, sigma2, eta, q0, lambda1, exponent)
 }
 
-.muUpdateNoSpikes <- function(mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, exponent, mintol) {
-    .Call('_BASiCS_muUpdateNoSpikes', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, exponent, mintol)
+.muUpdateNoSpikes <- function(mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, exponent, mintol) {
+    .Call('_BASiCS_muUpdateNoSpikes', PACKAGE = 'BASiCS', mu0, prop_var, Counts, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, exponent, mintol)
 }
 
 .nuUpdateBatchNoSpikes <- function(nu0, prop_var, Counts, BatchDesign, mu, invdelta, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, exponent, mintol) {
     .Call('_BASiCS_nuUpdateBatchNoSpikes', PACKAGE = 'BASiCS', nu0, prop_var, Counts, BatchDesign, mu, invdelta, s, thetaBatch, sum_bygene_all, q0, n, nu1, u, ind, exponent, mintol)
 }
 
-.muUpdateRegNoSpikes <- function(mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, k, lambda, beta, X, sigma2, variance, FixLocations, RBFMinMax, RBFLocations, exponent, mintol) {
-    .Call('_BASiCS_muUpdateRegNoSpikes', PACKAGE = 'BASiCS', mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, ConstrainType, k, lambda, beta, X, sigma2, variance, FixLocations, RBFMinMax, RBFLocations, exponent, mintol)
+.muUpdateRegNoSpikes <- function(mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, k, lambda, beta, X, sigma2, variance, FixLocations, RBFMinMax, RBFLocations, exponent, mintol) {
+    .Call('_BASiCS_muUpdateRegNoSpikes', PACKAGE = 'BASiCS', mu0, prop_var, Counts, delta, invdelta, nu, sum_bycell_all, mu_mu, s2_mu, q0, n, mu1, u, ind, Constrain, RefGene, ConstrainGene, NotConstrainGene, k, lambda, beta, X, sigma2, variance, FixLocations, RBFMinMax, RBFLocations, exponent, mintol)
 }
 
 .deltaUpdateRegNoSpikes <- function(delta0, prop_var, Counts, mu, nu, q0, n, delta1, u, ind, lambda, X, sigma2, beta, exponent, mintol) {

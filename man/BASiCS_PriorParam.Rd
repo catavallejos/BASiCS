@@ -31,7 +31,6 @@ BASiCS_PriorParam(
   PriorMu = c("default", "EmpiricalBayes"),
   PriorDelta = c("log-normal", "gamma"),
   StochasticRef = TRUE,
-  ConstrainType = 1,
   ConstrainProp = 0.2,
   GeneExponent = 1,
   CellExponent = 1
@@ -91,8 +90,6 @@ and "gamma" (used in Vallejos et al. (2015)).}
 
 \item{StochasticRef}{Logical scalar specifying whether the reference gene
 for the no-spikes version should be chosen randomly at MCMC iterations.}
-
-\item{ConstrainType}{Type of constraint for no-spikes version. Deprecated.}
 
 \item{ConstrainProp}{Proportion of genes to be considered as reference genes
 if \code{StochasticRef=TRUE}.}

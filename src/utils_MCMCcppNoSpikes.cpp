@@ -21,7 +21,6 @@ arma::mat muUpdateNoSpikes(
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
-    int const& ConstrainType,
     double const& exponent,
     double const& mintol) {
   using arma::span;
@@ -85,24 +84,23 @@ arma::mat muUpdateNoSpikes(
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
-  if (ConstrainType == 2) {
-    for (int i=0; i < nNotConstrainGene; i++) {
-      iAux = NotConstrainGene(i);
-      log_aux(iAux) -= (0.5 / s2_mu) * 
-        (
-            pow(log(mu1(iAux)) - mu_mu(iAux), 2) - 
-            pow(log(mu0(iAux)) - mu_mu(iAux), 2)
-        ) * exponent;
+  for (int i=0; i < nNotConstrainGene; i++) {
+    iAux = NotConstrainGene(i);
+    log_aux(iAux) -= (0.5 / s2_mu) * 
+      (
+          pow(log(mu1(iAux)) - mu_mu(iAux), 2) - 
+          pow(log(mu0(iAux)) - mu_mu(iAux), 2)
+      ) * exponent;
 
-      // ACCEPT REJECT
-      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
-        ind(iAux) = 1;
-      } else {
-        ind(iAux) = 0;
-        mu1(iAux) = mu0(iAux);
-      }
+    // ACCEPT REJECT
+    if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
+      ind(iAux) = 1;
+    } else {
+      ind(iAux) = 0;
+      mu1(iAux) = mu0(iAux);
     }
   }
+  
   // OUTPUT
   return join_rows(mu1, ind);
 }

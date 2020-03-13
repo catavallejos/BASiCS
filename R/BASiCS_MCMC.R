@@ -307,7 +307,6 @@ BASiCS_MCMC <- function(
     RefGenes = ArgsDef$RefGenes,
     ConstrainGene = ArgsDef$ConstrainGene,
     NotConstrainGene = ArgsDef$NotConstrainGene,
-    ConstrainType = PriorParam$ConstrainType,
     StochasticRef = as.numeric(PriorParam$StochasticRef)
   )
 
@@ -389,7 +388,6 @@ BASiCS_MCMC <- function(
                                 Chain,
                                 ArgsDef$RefGene,
                                 ArgsDef$RefGenes,
-                                ArgsDef$ConstrainType,
                                 ArgsDef$StoreDir,
                                 ArgsDef$RunName)
     }

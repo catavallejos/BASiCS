@@ -1,5 +1,6 @@
 context("MCMC arguments")
 
+set.seed(1)
 DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
                                      WithBatch = TRUE)
 DataSpikesNoBatch <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
@@ -281,6 +282,7 @@ test_that("MCMC works with different input classes", {
 })
 
 test_that("PriorMu", {
+  set.seed(1)
   expect_error(
     BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "das"),
     "'arg' should be one of \"default\", \"EmpiricalBayes\""

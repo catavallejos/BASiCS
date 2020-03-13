@@ -1424,3 +1424,8 @@ version 1.9.23 (2020-03-10)
 version 1.9.24 (2020-03-13)
 - Removes R from Depends in DESCRIPTION.
 - Minor fix in the documentation of `BASiCS_PriorParam` to pass BiocCheck.
+
+version 1.9.25 (2020-03-13)
+- `ConstrainType` deprecated within `BASiCS_MCMC` (internal option only)
+- In `tests_mcmc_arguments.R`, adds `set.seed` to avoid random failure of 
+`makeExampleBASiCS_Data`

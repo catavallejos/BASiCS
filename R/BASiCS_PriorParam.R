@@ -39,7 +39,6 @@
 #' and "gamma" (used in Vallejos et al. (2015)).
 #' @param StochasticRef Logical scalar specifying whether the reference gene
 #' for the no-spikes version should be chosen randomly at MCMC iterations.
-#' @param ConstrainType Type of constraint for no-spikes version. Deprecated.
 #' @param ConstrainProp Proportion of genes to be considered as reference genes
 #' if \code{StochasticRef=TRUE}.
 #' @param GeneExponent,CellExponent Exponents for gene and cell-specific 
@@ -79,18 +78,18 @@ BASiCS_PriorParam <- function(
     a.sigma2 = 2,
     b.sigma2 = 2,
     eta = 5,
-    PriorMu = c("default", "EmpiricalBayes"),
+    PriorMu = c('default', 'EmpiricalBayes'),
     PriorDelta = c("log-normal", "gamma"),
     StochasticRef = TRUE,
-    ConstrainType = 1,
     ConstrainProp = 0.2,
     GeneExponent = 1,
     CellExponent = 1
   ) {
 
-  if (!missing(ConstrainType)) {
-    warning("Use of ConstrainType is deprecated.")
-  }
+ # Removed as I do not expect any users to select this option  
+ # if (!missing(ConstrainType)) {
+ #   warning("Use of ConstrainType is deprecated.")
+ # }
   PriorMu <- match.arg(PriorMu)
   PriorDelta <- match.arg(PriorDelta)
   n <- ncol(Data)
@@ -107,7 +106,6 @@ BASiCS_PriorParam <- function(
     PriorMu = PriorMu,
     PriorDelta = PriorDelta,
     StochasticRef = StochasticRef,
-    ConstrainType = ConstrainType,
     ConstrainProp = ConstrainProp,
     MinGenesPerRBF = MinGenesPerRBF,
     a.s = a.s,
