@@ -1420,3 +1420,7 @@ version 1.9.23 (2020-03-10)
 - Adds MinGenesPerRBF argument to `BASiCS_PriorParam`.
   This controls the minimum number of genes
   between around the centre of each RBF.
+
+version 1.9.24 (2020-03-13)
+- Removes R from Depends in DESCRIPTION.
+- Minor fix in the documentation of `BASiCS_PriorParam` to pass BiocCheck.

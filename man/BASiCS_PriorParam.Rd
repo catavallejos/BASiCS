@@ -101,6 +101,10 @@ if \code{StochasticRef=TRUE}.}
 parameters. These should not be outside of divide and conquer MCMC 
 applications.}
 }
+\value{
+A list containing the prior hyper-parameters that are required to
+run the algoritm implemented in \code{\link[BASiCS]{BASiCS_MCMC}}.
+}
 \description{
 This is a convenience function to allow partial specification of prior 
 parameters, and to ensure default parameters are consistent across usage
@@ -108,6 +112,7 @@ within the package.
 }
 \examples{
 
-BASiCS_PriorParam(makeExampleBASiCS_Data(), 12)
+BASiCS_PriorParam(makeExampleBASiCS_Data(), k = 12)
+
 
 }

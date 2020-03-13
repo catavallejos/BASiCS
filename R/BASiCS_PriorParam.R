@@ -45,10 +45,14 @@
 #' @param GeneExponent,CellExponent Exponents for gene and cell-specific 
 #' parameters. These should not be outside of divide and conquer MCMC 
 #' applications.
+#' 
+#' @return A list containing the prior hyper-parameters that are required to
+#' run the algoritm implemented in \code{\link[BASiCS]{BASiCS_MCMC}}.
 #'
 #' @examples
 #' 
-#' BASiCS_PriorParam(makeExampleBASiCS_Data(), 12)
+#' BASiCS_PriorParam(makeExampleBASiCS_Data(), k = 12)
+#' 
 #' 
 #' @export
 BASiCS_PriorParam <- function(
