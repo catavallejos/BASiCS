@@ -1429,3 +1429,7 @@ version 1.9.25 (2020-03-13)
 - `ConstrainType` deprecated within `BASiCS_MCMC` (internal option only)
 - In `tests_mcmc_arguments.R`, adds `set.seed` to avoid random failure of 
 `makeExampleBASiCS_Data`
+
+version 1.9.26 (2020-03-25)
+- Bugfix in BASiCS_Sim
+

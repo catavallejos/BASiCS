@@ -39,7 +39,7 @@ HiddenBASiCS_Sim <- function(Mu, Mu_spikes = NULL,
   while (any(ind_zero <- colSums(Counts.sim) == 0)) {
     for (i in seq_len(q.bio)) {
       if (Delta[i] > 0) {
-        Counts.sim[, ind_zero] <- rpois(n,
+        Counts.sim[i, ind_zero] <- rpois(sum(ind_zero),
           lambda = Phi[ind_zero] * Nu[ind_zero] * rho[i, ind_zero] * Mu[i]
         )
       }
