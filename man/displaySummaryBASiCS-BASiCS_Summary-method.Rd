@@ -5,7 +5,8 @@
 \alias{displaySummaryBASiCS-BASiCS_Summary-method}
 \alias{displaySummaryBASiCS}
 \alias{displaySummaryBASiCS,BASiCS_Summary-method}
-\title{Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}} object}
+\title{Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}}
+object}
 \usage{
 \S4method{displaySummaryBASiCS}{BASiCS_Summary}(object, Param = "mu")
 }

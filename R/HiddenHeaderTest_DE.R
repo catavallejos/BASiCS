@@ -55,7 +55,10 @@ HiddenHeaderTest_DE <- function(Chain1,
   if (ncol(Chain1@parameters$mu) != ncol(Chain2@parameters$mu)) {
     stop("The 'BASiCS_Chain' objects contain different number of genes.")
   }
-  if (!identical(colnames(Chain1@parameters$mu), colnames(Chain2@parameters$mu))) {
+  if (!identical(
+      colnames(Chain1@parameters$mu),
+      colnames(Chain2@parameters$mu))
+    ) {
     stop("The  'BASiCS_Chain' objects contain genes in different order.")
   }
 
@@ -97,13 +100,18 @@ HiddenHeaderTest_DE <- function(Chain1,
   if (!is.null(GenesSelect) & !is.logical(GenesSelect)) {
     stop("Invalid value for 'GenesSelect'")
   }
-#  if (!is.null(ProbThresholdM)) {
-#    message("A value has been provided for `ProbThresholdM` \n",
-#            "EFDR will not be calibrated in differential mean test. \n")
-#  }
+  
+  # if (!is.null(ProbThresholdM)) {
+  #   message(
+  #     "A value has been provided for `ProbThresholdM` \n",
+  #     "EFDR will not be calibrated in differential mean test. \n"
+  #   )
+  # }
 
-#  if (!is.null(ProbThresholdD)) {
-#    message("A value has been provided for `ProbThresholdD` \n",
-#            "EFDR will not be calibrated in differential over-dispersion test. \n")
-#  }
+  # if (!is.null(ProbThresholdD)) {
+  #   message(
+  #     "A value has been provided for `ProbThresholdD` \n",
+  #     "EFDR will not be calibrated in differential over-dispersion test. \n"
+  #   )
+  # }
 }

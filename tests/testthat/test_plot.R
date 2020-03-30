@@ -1,10 +1,21 @@
 context("plots")
 
+test_that("plot of chain works", {
+  data(ChainSCReg)
+  expect_error({
+      plot(ChainSCReg, Gene = 1)  
+      plot(ChainSCReg, Param = "nu", Cell = 1)
+      plot(ChainSCReg, Param = "beta", RegressionTerm = 1)
+      plot(ChainSCReg, Param = "sigma2")
+  }, NA)
+})
+
 test_that("plot of BASiCS_Summary works without spikes", {
   data(ChainSC)
   S <- Summary(ChainSC)
   pdf(NULL)
   expect_error(plot(S), NA)
+  expect_error(plot(S, Param = "nu"), NA)
   dev.off()
 })
 
@@ -106,4 +117,46 @@ test_that("Diagnostic hist work", {
   expect_is(g, "ggplot")
   g <- BASiCS_DiagHist(ChainSC, Param = "nu")
   expect_is(g, "ggplot")
+})
+
+
+test_that("DE plots work (non-regression)", {
+  data(ChainSC)
+  data(ChainRNA)
+  Test <- BASiCS_TestDE(ChainSC, ChainRNA, Plot = FALSE, PlotOffset = FALSE)
+  BASiCS_PlotDE(Test)
+  BASiCS_PlotDE(Test@Results[[1]])
+  BASiCS_PlotDE(Test@Results[[2]])
+
+  for (type in c("MA", "Grid", "Volcano")) {
+    BASiCS_PlotDE(Test@Results[[1]], Plots = type)
+    BASiCS_PlotDE(Test@Results[[2]], Plots = type)
+  }
+})
+
+test_that("DE plots work (regression)", {
+  data(ChainSCReg)
+  data(ChainRNAReg)
+  Test <- BASiCS_TestDE(
+    ChainSCReg,
+    ChainRNAReg,
+    Plot = FALSE,
+    PlotOffset = FALSE
+  )
+  BASiCS_PlotDE(Test)
+  BASiCS_PlotDE(Test@Results[[1]])
+  BASiCS_PlotDE(Test@Results[[2]])
+  BASiCS_PlotDE(Test@Results[[3]])
+  for (type in c("MA", "Grid", "Volcano")) {
+    BASiCS_PlotDE(Test@Results[[1]], Plots = type)
+    BASiCS_PlotDE(Test@Results[[2]], Plots = type)
+    BASiCS_PlotDE(Test@Results[[3]], Plots = type)
+  }
+})
+
+
+test_that("BASiCS_PlotOffset", {
+  data(ChainSC)
+  data(ChainRNA)
+  expect_is(BASiCS_PlotOffset(ChainSC, ChainRNA), "gg")
 })

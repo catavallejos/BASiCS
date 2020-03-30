@@ -26,7 +26,9 @@ HiddenVarDecomp <- function(Chain)
     PhiS <- matrixStats::rowMedians(Chain@parameters$s)
   }
 
-  Aux <- (1 / (PhiS * Chain@parameters$mu)) + Chain@parameters$delta * (Theta + 1)
+  Aux <- (1 / (PhiS * Chain@parameters$mu)) +
+    Chain@parameters$delta *
+    (Theta + 1)
   TechVarGlobal <- Theta / (Aux + Theta)
   BioVarGlobal <- (Chain@parameters$delta * (Theta + 1)) / (Aux + Theta)
 
@@ -49,7 +51,7 @@ HiddenVarDecomp <- function(Chain)
               Chain@parameters$delta * (Chain@parameters$theta[, Batch] + 1)
       TechVarBatch[, , Batch] <-
         Chain@parameters$theta[,Batch] / (Aux + Chain@parameters$theta[, Batch])
-      BioVarBatch[, , Batch] <-
+      BioVarBatch[, , Batch] <- 
         (Chain@parameters$delta * (Chain@parameters$theta[, Batch] + 1)) /
         (Aux + Chain@parameters$theta[, Batch])
     }

@@ -13,7 +13,7 @@
 #' \item{delta}{MCMC chain for gene-specific biological over-dispersion 
 #' parameters \eqn{\delta_i}, biological genes only 
 #' (matrix with \code{q.bio} columns, all elements must be positive numbers)}
-#' \item{phi}{MCMC chain for cell-specific mRNA content normalisation parameters 
+#' \item{phi}{MCMC chain for cell-specific mRNA content normalisation parameters
 #' \eqn{\phi_j} (matrix with \code{n} columns, all elements must be positive 
 #' numbers and the sum of its elements must be equal to \code{n})}.
 #' This parameter is only used when spike-in genes are available.
@@ -89,8 +89,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @export
-newBASiCS_Chain <- function(parameters) 
-{
+newBASiCS_Chain <- function(parameters) {
   Chain <- new("BASiCS_Chain", parameters = parameters)
   return(Chain)
 }

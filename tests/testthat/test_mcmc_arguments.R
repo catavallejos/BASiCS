@@ -99,7 +99,7 @@ test_that("MCMC arguments fail (no-spikes; no-regression)", {
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
-               regexp = ".*does not contain a BatchInfo vector*")
+               regexp = ".*should contain a BatchInfo vector*")
 
 })
 
@@ -158,7 +158,7 @@ test_that("MCMC arguments fail (regression)", {
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE),
-               regexp = ".*does not contain a BatchInfo vector*")
+               regexp = ".*should contain a BatchInfo vector*")
 
   expect_error(
     run_MCMC(DataNoSpikes, N = 10, Thin = 2, Burn = 4, 
@@ -192,7 +192,7 @@ test_that("Checks for user generated SCE object", {
   expect_error(run_MCMC(Data = sce, 
                          N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
-               regexp = ".*does not contain a BatchInfo vector.*")
+               regexp = "should contain a BatchInfo vector")
 
   # incorrect batch vector
   sce <- SingleCellExperiment(
@@ -259,7 +259,7 @@ test_that("MCMC works with different input classes", {
   counts(DataSpikes) <- Matrix::Matrix(counts(DataSpikes))
   expect_error(
     run_MCMC(
-      Data = DataSpikes, 
+      Data = DataSpikes,
       N = 10,
       Thin = 2,
       Burn = 4, 
@@ -285,7 +285,7 @@ test_that("PriorMu", {
   set.seed(1)
   expect_error(
     BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "das"),
-    "'arg' should be one of \"default\", \"EmpiricalBayes\""
+    "'arg' should be one of"
   )
   expect_error(
     BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "default"),

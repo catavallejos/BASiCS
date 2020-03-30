@@ -1,5 +1,10 @@
-HiddenHeaderBASiCS_Sim <- function(Mu, Mu_spikes, Delta, Phi, 
-                                   S, Theta, BatchInfo) {
+HiddenHeaderBASiCS_Sim <- function(Mu,
+                                   Mu_spikes,
+                                   Delta,
+                                   Phi, 
+                                   S,
+                                   Theta,
+                                   BatchInfo) {
   
   # Data dimensions - number of cells
   n <- length(S)
@@ -75,8 +80,10 @@ HiddenHeaderBASiCS_Sim <- function(Mu, Mu_spikes, Delta, Phi,
       stop("When spike-ins are not included, 'BatchInfo' is required.")
     } else {
       if (length(unique(BatchInfo)) <= 1) {
-        stop("When spike-ins are not included, 'BatchInfo' must contain",
-             " multiple batches (i.e. length(unique(BatchInfo)) > 1).")  
+        stop(
+          "When spike-ins are not included, 'BatchInfo' must contain",
+          " multiple batches (i.e. length(unique(BatchInfo)) > 1)."
+        )
       }
     }
   }

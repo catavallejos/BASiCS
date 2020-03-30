@@ -1433,3 +1433,10 @@ version 1.9.25 (2020-03-13)
 version 1.9.26 (2020-03-25)
 - Bugfix in BASiCS_Sim
 
+version 2.0.0 (2020-04-01)
+- Improve UI for BASiCS_TestDE BASiCS_TestHVG/BASiCS_TestLVG and related 
+  functions by creating classes. Usage of objects documented in vignette.
+- Reduce code duplication and refactor plots to use ggplot2. 
+- Add rudimentary unit tests for loading and some class methods.
+  Fix several minor bugs.
+- Change barplot in variance decomposition function to use ggplot2.

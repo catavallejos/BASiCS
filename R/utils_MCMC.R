@@ -29,7 +29,9 @@
   }
   
   # If SpikeInput slot is missing and WithSpikes == TRUE
-  if ((length(altExpNames(Data)) > 0) & WithSpikes & is.null(metadata(Data)$SpikeInput)) {
+  if (length(altExpNames(Data)) > 0 &
+      WithSpikes &
+      is.null(metadata(Data)$SpikeInput)) {
     stop(
       "'Data' does not contain 'SpikeInput' as metadata. \n",
       "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
@@ -49,8 +51,9 @@
   # If BatchInfo slot is missing and WithSpikes == FALSE
   if(!WithSpikes & is.null(colData(Data)$BatchInfo)) {
     stop(
-      "'Data' does not contain a BatchInfo vector needed when 'WithSpikes = FALSE'. \n", 
-      "Please assign the batch information to: 'colData(Data)$BatchInfo = BatchInfo'. \n",
+      "'Data' should contain a BatchInfo vector when 'WithSpikes = FALSE'. \n", 
+      "Please assign the batch information to: \n
+      'colData(Data)$BatchInfo = BatchInfo'. \n",
       "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
     )
   }
@@ -70,7 +73,6 @@
   if (length(errors) > 0) {
     stop(errors) 
   }
-  
   if (!(length(N) == 1 | length(Thin) == 1 | length(Burn) == 1)) {
     stop("Invalid parameter values.\n")
   }
@@ -81,7 +83,7 @@
     stop("Please use an integer value for Thin (Thin>=2).\n")
   }
   if (!(Burn %% Thin == 0 & Burn < N & Burn >= 1)) {
-    stop("Please use an integer value for Burn (1<=Burn<N); multiple of thin.\n")
+    stop("Burn should be an integer; 1<=Burn<N; multiple of thin.\n")
   }
   if (!is.logical(Regression)) {
     stop("Please use a logical value for the Regression parameter.\n")  
@@ -115,11 +117,13 @@
   suppressWarnings(size_scran <- scran::calculateSumFactors(CountsBio))
   # Fix for cases in which 'scran' normalisation has invalid output
   if ((min(size_scran) <= 0) | (sum(is.na(size_scran)) > 0)) {
-    message("-------------------------------------------------------------\n",
-            "There was an issue when applying `scran` normalization  \n",
-            "`positive = TRUE` has been added to `computeSumFactors` call \n",
-            "Please consider a more stringent quality control criteria. \n",
-            "-------------------------------------------------------------\n")
+    message(
+      "-------------------------------------------------------------\n",
+      "There was an issue when applying `scran` normalization  \n",
+      "`positive = TRUE` has been added to `computeSumFactors` call \n",
+      "Please consider a more stringent quality control criteria. \n",
+      "-------------------------------------------------------------\n"
+    )
     suppressWarnings(
       size_scran <- scran::calculateSumFactors(CountsBio, positive = TRUE)
     )
@@ -140,8 +144,7 @@
     # +1 to avoid zeros as starting values
     #mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
     mu0 <- meansBio + 1
-  }
-  else {
+  } else {
     s0 <- size_scran
     nu0 <- s0
     phi0 <- NULL
@@ -288,7 +291,11 @@
   .stop_k(PriorParam$k)
   lm <- log(Start$mu0)
   if (is.null(PriorParam$RBFLocations)) {
-    RBFLocations <- .estimateRBFLocations(lm, PriorParam$k, PriorParam$RBFMinMax)
+    RBFLocations <- .estimateRBFLocations(
+      lm,
+      PriorParam$k,
+      PriorParam$RBFMinMax
+    )
   } else {
     RBFLocations <- PriorParam$RBFLocations
   }
@@ -297,11 +304,13 @@
     retain <- vapply(
       RBFLocations,
       function(RBFLocation) {
-        sum(lm > RBFLocation - d & lm < RBFLocation + d) > PriorParam$MinGenesPerRBF
+        ind_within <- lm > RBFLocation - d & lm < RBFLocation + d
+        sum(ind_within) > PriorParam$MinGenesPerRBF
       },
       logical(1)
     )
     RBFLocations <- RBFLocations[retain]
+    ## Intercept & linear term
     retain_prior <- c(TRUE, TRUE, retain)
     PriorParam$m <- PriorParam$m[retain_prior]
     PriorParam$V <- PriorParam$V[retain_prior, retain_prior]
@@ -358,8 +367,10 @@
     is.logical(PriorParam$RBFMinMax),
     length(PriorParam$RBFMinMax) == 1,
     is.logical(PriorParam$FixLocations),
-    is.na(PriorParam$MinGenesPerRBF) ||
-      (length(PriorParam$MinGenesPerRBF) & is.numeric(PriorParam$MinGenesPerRBF)),
+    is.na(PriorParam$MinGenesPerRBF) || (
+      length(PriorParam$MinGenesPerRBF) &
+      is.numeric(PriorParam$MinGenesPerRBF)
+    ),
     length(PriorParam$FixLocations) == 1
   )
   assertthat::assert_that(
@@ -468,13 +479,11 @@
     # generaed by makeExample_BASiCS function (less than 200 genes)
     if (length(ConstrainGene) > CandidateRef) {
       RefGenes <- aux.ref[seq_len(CandidateRef), 1]
-    }
-    else {
+    } else {
       RefGenes <- aux.ref[, 1]
     }
     RefGene <- RefGenes[1]
-  }
-  else {
+  } else {
     aux.ref <- which(abs(log(mu0[ConstrainGene+1]) - Constrain) ==
                        min(abs(log(mu0[ConstrainGene+1]) - Constrain)))[1]
     RefGene <- ConstrainGene[aux.ref]

@@ -359,43 +359,51 @@ BASiCS_MCMC <- function(
   colnames(Chain$nu) <- CellLabels
   colnames(Chain$theta) <- paste0("Batch", unique(GPar$BatchInfo))
 
-  message("-------------------------------------------------------------\n",
-          "MCMC running time \n",
-          "-------------------------------------------------------------\n",
-          "user: ", round(Time['user.self'], 3), "\n",
-          "system: ", round(Time['sys.self'], 3), "\n",
-          "elapsed: ", round(Time['elapsed'], 3), "\n")
+  message(
+    "-------------------------------------------------------------\n",
+    "MCMC running time \n",
+    "-------------------------------------------------------------\n",
+    "user: ", round(Time['user.self'], 3), "\n",
+    "system: ", round(Time['sys.self'], 3), "\n",
+    "elapsed: ", round(Time['elapsed'], 3), "\n"
+  )
 
-  message("-------------------------------------------------------------\n",
-          "Output \n",
-          "-------------------------------------------------------------\n")
+  message(
+    "-------------------------------------------------------------\n",
+    "Output \n",
+    "-------------------------------------------------------------\n"
+  )
 
   # Convert output into a `BASiCS_Chain` object
   ChainClass <- newBASiCS_Chain(parameters = Chain[!grepl("ls.", names(Chain))])
-
   # Store chain and/or adaptive variances
-  .BASiCS_MCMC_OutputStore(ChainClass,
-                           Chain,
-                           ArgsDef$StoreChains,
-                           ArgsDef$StoreAdapt,
-                           ArgsDef$StoreDir,
-                           ArgsDef$RunName)
-
+  .BASiCS_MCMC_OutputStore(
+    ChainClass = ChainClass,
+    Chain = Chain,
+    StoreChains = ArgsDef$StoreChains,
+    StoreAdapt = ArgsDef$StoreAdapt,
+    StoreDir = ArgsDef$StoreDir,
+    RunName = ArgsDef$RunName
+  )
   # Store reference gene information (no spikes case only)
   if (!WithSpikes) {
     if (ArgsDef$StoreChains) {
-      .BASiCS_MCMC_RefFreqStore(Data,
-                                Chain,
-                                ArgsDef$RefGene,
-                                ArgsDef$RefGenes,
-                                ArgsDef$StoreDir,
-                                ArgsDef$RunName)
+      .BASiCS_MCMC_RefFreqStore(
+        Data = Data,
+        Chain = Chain,
+        RefGene = ArgsDef$RefGene,
+        RefGenes = ArgsDef$RefGenes,
+        StoreDir = ArgsDef$StoreDir,
+        RunName = ArgsDef$RunName
+      )
     }
   } else {
-    message("-------------------------------------------------------------\n",
-            "BASiCS version ", packageVersion("BASiCS"), " : \n",
-            "vertical integration (spikes case) \n",
-            "-------------------------------------------------------------\n")
+    message(
+      "-------------------------------------------------------------\n",
+      "BASiCS version ", packageVersion("BASiCS"), " : \n",
+      "vertical integration (spikes case) \n",
+      "-------------------------------------------------------------\n"
+    )
   }
 
   # Return `BASiCS_MCMC` object
