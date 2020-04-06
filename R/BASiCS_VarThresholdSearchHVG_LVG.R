@@ -9,13 +9,14 @@
 #' HVG/LVG are found based on the variance decomposition. 
 #'
 #' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
+#' @param Task See \code{?BASiCS_DetectVG}.
 #' @param VarThresholdsGrid Grid of values for the variance contribution
 #' threshold (they must be contained in (0,1))
 #' @param EFDR Target for expected false discovery rate related to
 #' HVG/LVG detection. Default: \code{EFDR = 0.10}.
 #' @param Progress If \code{Progress = TRUE}, partial output is
 #' printed in the console. Default: \code{Progress = TRUE}.
-#'
+#' @param ... Passed to methods.
 #' @examples
 #'
 #' data(ChainSC)
@@ -49,11 +50,12 @@
 #'
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
 #' @export
-BASiCS_VarThresholdSearchHVG = function(Chain,
+BASiCS_VarThresholdSearchVG <- function(Chain,
+                                        Task = c("HVG", "LVG"),
                                         VarThresholdsGrid,
                                         EFDR = 0.1,
-                                        Progress = TRUE)
-{
+                                        Progress = TRUE) {
+
   if (!is(Chain, "BASiCS_Chain")) {
     stop("'object' is not a BASiCS_Chain class object.")
   }
@@ -63,66 +65,51 @@ BASiCS_VarThresholdSearchHVG = function(Chain,
     stop("Variance contribution thresholds must be contained in (0,1).")
   }
 
-  Table <- matrix(0, nrow = length(VarThresholdsGrid), ncol = 5)
+  Table <- as.data.frame(matrix(0, nrow = length(VarThresholdsGrid), ncol = 5))
   colnames(Table) <- c("Var. Threshold (%)", "EFDR (%)", "EFNR (%)",
                        "Optimal evidence thres.", "# Detected genes")
 
   for (i in seq_along(VarThresholdsGrid)) {
     VarThreshold <- VarThresholdsGrid[i]
     if (Progress) {
-      message("Evaluating variance contribution threshold = ",
-              100 * VarThreshold, " % ... \n")
+      message(
+        "Evaluating variance contribution threshold = ",
+        100 * VarThreshold, " % ... \n")
     }
 
-    suppressMessages(DetectHVG <- BASiCS_DetectHVG(Chain, EFDR = EFDR,
-                                                   VarThreshold = VarThreshold))
+    suppressMessages(
+      DetectHVG <- BASiCS_DetectVG(
+        Chain,
+        Task = Task,
+        EFDR = EFDR,
+        VarThreshold = VarThreshold
+      )
+    )
 
-    Table[i, ] <- c(100 * VarThreshold,
-                    round(100 * DetectHVG$EFDR, 2),
-                    round(100 * DetectHVG$EFNR, 2),
-                    DetectHVG$EviThreshold,
-                    sum(as.numeric(DetectHVG$Table[, 7])))
+    Table[i, ] <- c(
+      100 * VarThreshold,
+      round(100 * DetectHVG@EFDR, 2),
+      round(100 * DetectHVG@EFNR, 2),
+      DetectHVG@ProbThreshold,
+      sum(.VG(DetectHVG))
+    )
   }
   return(Table)
 }
 
+#' @name BASiCS_VarThresholdSearchHVG
+#' @aliases BASiCS_VarThresholdSearchLVG BASiCS_VarThresholdSearchHVG_LVG
+#' @rdname BASiCS_VarThresholdSearchHVG_LVG
+#' @export
+BASiCS_VarThresholdSearchHVG <- function(...) {
+  # .Deprecated("BASiCS_VarThresholdSearchVG")
+  BASiCS_VarThresholdSearchVG(..., Task = "HVG")
+}
 #' @name BASiCS_VarThresholdSearchLVG
 #' @aliases BASiCS_VarThresholdSearchLVG BASiCS_VarThresholdSearchHVG_LVG
 #' @rdname BASiCS_VarThresholdSearchHVG_LVG
 #' @export
-BASiCS_VarThresholdSearchLVG <- function(Chain,
-                                         VarThresholdsGrid,
-                                         EFDR = 0.1,
-                                         Progress = TRUE)
-{
-  if (!is(Chain, "BASiCS_Chain")) {
-    stop("'object' is not a BASiCS_Chain class object.")
-  }
-  if (sum(VarThresholdsGrid < 0) > 0 |
-      sum(VarThresholdsGrid > 1) > 0 |
-      sum(!is.finite(VarThresholdsGrid)) > 0) {
-    stop("Variance contribution thresholds must be contained in (0,1).")
-  }
-
-  Table <- matrix(0, nrow = length(VarThresholdsGrid), ncol = 5)
-  colnames(Table) <- c("VarThres (%)", "EFDR (%)", "EFNR (%)",
-                       "Optimal evi thres", "# Detected genes")
-
-  for (i in seq_along(VarThresholdsGrid)) {
-    VarThreshold <- VarThresholdsGrid[i]
-    if (Progress) {
-      message("Evaluating variance contribution threshold = ",
-              100 * VarThreshold, " % ... \n")
-    }
-
-    suppressMessages(DetectLVG <- BASiCS_DetectLVG(Chain, EFDR = EFDR,
-                                                   VarThreshold = VarThreshold))
-
-    Table[i, ] <- c(100 * VarThreshold,
-                    round(100 * DetectLVG$EFDR, 2),
-                    round(100 * DetectLVG$EFNR, 2),
-                    DetectLVG$EviThreshold,
-                    sum(as.numeric(DetectLVG$Table[, 7])))
-  }
-  return(Table)
+BASiCS_VarThresholdSearchLVG <- function(...) {
+  # .Deprecated("BASiCS_VarThresholdSearchVG")
+  BASiCS_VarThresholdSearchVG(..., Task = "LVG")
 }

@@ -13,6 +13,8 @@ cache:
 #branches:
 #  only:
 #    - master
+before_install:
+  - sudo apt-get -y install libmagick++-dev
 
 r_github_packages:
   - jimhester/covr
@@ -25,4 +27,4 @@ notifications:
     on_failure: always # default: always
 
 after_success:
-  - Rscript -e 'library(covr);codecov()'
+  - Rscript -e 'library(covr); codecov()'

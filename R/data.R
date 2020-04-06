@@ -1,4 +1,5 @@
-#' Extract from the chain obtained for the Grun et al (2014) data: pool-and-split samples
+#' Extract from the chain obtained for the Grun et al (2014) data:
+#' pool-and-split samples
 #'
 #' Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 #' chain obtained for the pool-and-split samples
@@ -13,7 +14,8 @@
 #' 
 "ChainRNA"
 
-#' Extract from the chain obtained for the Grun et al (2014) data: single-cell samples
+#' Extract from the chain obtained for the Grun et al (2014) data:
+#' single-cell samples
 #'
 #' Small extract (75 MCMC iterations, 350 randomly selected genes) from the 
 #' chain obtained for the pool-and-split samples

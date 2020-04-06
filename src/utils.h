@@ -17,7 +17,9 @@ NumericVector Rgig(const int n,
                    const double lambda, 
                    const double chi, 
                    const double psi);
-double RgigDouble(const double lambda, const double chi, const double psi);
+
+// double RgigDouble(const double lambda, const double chi, const double psi);
+
 void StartSampler(int const& N);
 void EndBurn();
 void CurrentIter(int const& i, int const& N);

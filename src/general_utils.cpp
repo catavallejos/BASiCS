@@ -155,25 +155,31 @@ NumericVector Rgig(const int n,
 {
   NumericVector samps(n);
   /* special case which is basically a gamma distribution */
-  if((chi < ZTOL) & (lambda > 0.0)) {
+  if ((chi < ZTOL) & (lambda > 0.0)) {
     int i;
-    for(i=0; i<n; i++) samps(i) = R::rgamma(lambda, 2.0/psi);
+    for (i = 0; i < n; i++) {
+      samps(i) = R::rgamma(lambda, 2.0/psi);
+    }
     return samps;
   }
   
   /* special cases which is basically an inverse gamma distribution */
-  if((psi < ZTOL) & (lambda < 0.0)) { 
+  if ((psi < ZTOL) & (lambda < 0.0)) { 
     int i;
-    for(i=0; i<n; i++) samps(i) = 1.0/R::rgamma(0.0-lambda, 2.0/chi);
+    for (i = 0; i < n; i++) {
+      samps(i) = 1.0/R::rgamma(0.0-lambda, 2.0/chi);
+    }
     return samps;
   }
   
   /* special case which is basically an inverse gaussian distribution */
-  if(lambda == -0.5) {
+  if (lambda == -0.5) {
     double alpha;
     int i;
     alpha = sqrt(chi/psi);
-    for(i=0; i<n; i++) samps(i) = rinvgauss(alpha, chi);
+    for (i = 0; i < n; i++) {
+      samps(i) = rinvgauss(alpha, chi);
+    }
     return samps;
   }  
   
@@ -230,75 +236,77 @@ NumericVector Rgig(const int n,
 /* Random sample generator from a Generalized Inverse Gaussian distribution 
 * (modified version of rgig.c using Rcpp classes)
 */
-double RgigDouble(const double lambda, const double chi, const double psi)
-{
-  double samps;
-  /* special case which is basically a gamma distribution */
-  if((chi < ZTOL) & (lambda > 0.0)) {
-    samps = R::rgamma(lambda, 2.0/psi);
-    return samps;
-  }
+// double RgigDouble(const double lambda, const double chi, const double psi)
+// {
+//   double samps;
+//   /* special case which is basically a gamma distribution */
+//   if((chi < ZTOL) & (lambda > 0.0)) {
+//     samps = R::rgamma(lambda, 2.0/psi);
+//     return samps;
+//   }
   
-  /* special cases which is basically an inverse gamma distribution */
-  if((psi < ZTOL) & (lambda < 0.0)) { 
-    samps = 1.0/R::rgamma(0.0-lambda, 2.0/chi);
-    return samps;
-  }
+//   /* special cases which is basically an inverse gamma distribution */
+//   if((psi < ZTOL) & (lambda < 0.0)) { 
+//     samps = 1.0/R::rgamma(0.0-lambda, 2.0/chi);
+//     return samps;
+//   }
   
-  /* special case which is basically an inverse gaussian distribution */
-  if(lambda == -0.5) {
-    double alpha;
-    alpha = sqrt(chi/psi);
-    samps = rinvgauss(alpha, chi);
-    return samps;
-  }  
+//   /* special case which is basically an inverse gaussian distribution */
+//   if(lambda == -0.5) {
+//     double alpha;
+//     alpha = sqrt(chi/psi);
+//     samps = rinvgauss(alpha, chi);
+//     return samps;
+//   }  
   
-  /*
-  * begin general purpose rgig code, which was basically 
-  * translated from the R function rgig in the ghyp package v_1.5.2
-  */
+//   /*
+//   * begin general purpose rgig code, which was basically 
+//   * translated from the R function rgig in the ghyp package v_1.5.2
+//   */
   
-  double alpha, beta, beta2, m, m1, lm1, lm12, upper, yM, yP, a, b, c, R1, R2, Y;
-  int need;
+//   double alpha, beta, beta2, m, m1, lm1, lm12, upper, yM, yP, a, b, c, R1, R2, Y;
+//   int need;
   
-  alpha = sqrt(chi/psi);
-  beta2 = psi*chi;
-  beta = sqrt(psi*chi);
-  lm1 = lambda - 1.0;
-  lm12 = lm1*lm1;
-  m = (lm1 + sqrt(lm12 + beta2))/beta;
-  m1 = m + 1.0/m;
+//   alpha = sqrt(chi/psi);
+//   beta2 = psi*chi;
+//   beta = sqrt(psi*chi);
+//   lm1 = lambda - 1.0;
+//   lm12 = lm1*lm1;
+//   m = (lm1 + sqrt(lm12 + beta2))/beta;
+//   m1 = m + 1.0/m;
   
-  upper = m;
-  while (gig_y_gfn(upper, m, beta, lambda) <= 0) { upper *= 2.0; }
+//   upper = m;
+//   while (gig_y_gfn(upper, m, beta, lambda) <= 0) { upper *= 2.0; }
   
-  yM = zeroin_gig(0.0, m, gig_y_gfn, ZTOL, m, beta, lambda);
-  yP = zeroin_gig(m, upper, gig_y_gfn, ZTOL, m, beta, lambda);
+//   yM = zeroin_gig(0.0, m, gig_y_gfn, ZTOL, m, beta, lambda);
+//   yP = zeroin_gig(m, upper, gig_y_gfn, ZTOL, m, beta, lambda);
   
-  a = (yP - m) * pow(yP/m, 0.5 * lm1);
-  a *=  exp(-0.25 * beta * (yP + 1.0/yP - m1));
-  b = (yM - m) * pow(yM/m, 0.5 * lm1);
-  b *= exp(-0.25 * beta * (yM + 1/yM - m1));
-  c = -0.25 * beta * m1 + 0.5 * lm1 * log(m);
+//   a = (yP - m) * pow(yP/m, 0.5 * lm1);
+//   a *=  exp(-0.25 * beta * (yP + 1.0/yP - m1));
+//   b = (yM - m) * pow(yM/m, 0.5 * lm1);
+//   b *= exp(-0.25 * beta * (yM + 1/yM - m1));
+//   c = -0.25 * beta * m1 + 0.5 * lm1 * log(m);
   
-  need = 1;
-  while (need) 
-  {
-    R1 = unif_rand();
-    R2 = unif_rand();
+//   need = 1;
+//   while (need) 
+//   {
+//     R1 = unif_rand();
+//     R2 = unif_rand();
     
-    Y = m + a * R2/R1 + b * (1.0 - R2)/R1;
-    if (Y > 0.0) 
-    {
-      if (-log(R1) >= - 0.5 * lm1 * log(Y) + 0.25 * beta * (Y + 1.0/Y) + c) 
-      {
-        need = 0;
-      }
-    }
-  }
-  samps = Y*alpha;
-  return(samps);
-}
+//     Y = m + a * R2/R1 + b * (1.0 - R2)/R1;
+//     if (Y > 0.0) 
+//     {
+//       if (-log(R1) >= - 0.5 * lm1 * log(Y) + 0.25 * beta * (Y + 1.0/Y) + c) 
+//       {
+//         need = 0;
+//       }
+//     }
+//   }
+//   samps = Y*alpha;
+//   return(samps);
+// }
+
+
 
 /* END OF ADAPTED CODE*/
 

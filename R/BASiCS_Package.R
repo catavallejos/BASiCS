@@ -14,9 +14,8 @@
 #' @importFrom ggExtra ggMarginal
 #' @importFrom KernSmooth bkde2D
 #' @importFrom MASS mvrnorm
-#' @importFrom matrixStats colMeans2 colMedians
-#' @importFrom matrixStats rowMeans2 rowMedians
-#' @importFrom Matrix t rowSums colSums rowMeans colMeans 
+#' @importFrom matrixStats colMeans2 colMedians colVars
+#' @importFrom matrixStats rowMeans2 rowMedians rowVars   
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
 #' @importFrom S4Vectors DataFrame metadata metadata<-
@@ -27,11 +26,13 @@
 #' @importFrom SingleCellExperiment altExpNames altExpNames<-
 #' @importFrom stats4 plot
 #' @importFrom SummarizedExperiment SummarizedExperiment assay assays assayNames
-#' @importFrom SummarizedExperiment colData colData<-
+#' @importFrom SummarizedExperiment colData colData<- rowData rowData<-
 #' @importFrom viridis scale_color_viridis scale_fill_viridis 
-#' @importFrom utils packageVersion read.delim write.table
+#' @importFrom hexbin hexbin
+#' @importFrom utils packageVersion read.delim write.table write.table
 #' @importFrom assertthat assert_that
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
+#' @importMethodsFrom Matrix t rowMeans
 #' @importClassesFrom Biobase Versioned
 NULL
 

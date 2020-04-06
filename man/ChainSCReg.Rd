@@ -5,8 +5,10 @@
 \alias{ChainSCReg}
 \title{Extract from the chain obtained for the Grun et al (2014) data: 
 single-cell samples (regression model)}
-\format{An object of class \code{\linkS4class{BASiCS_Chain}} 
-containing 75 MCMC iterations.}
+\format{
+An object of class \code{\linkS4class{BASiCS_Chain}} 
+containing 75 MCMC iterations.
+}
 \usage{
 ChainSCReg
 }
