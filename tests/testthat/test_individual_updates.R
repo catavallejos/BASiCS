@@ -324,7 +324,6 @@ test_that("Spikes + regression", {
   beta1_obs <- round(beta[1:5, 1], 2)
   expect_equal(beta1, beta1_obs)
 
-
   sigma2 <- BASiCS:::.sigma2UpdateReg(
     delta = Start$delta0,
     beta = Start$beta0,

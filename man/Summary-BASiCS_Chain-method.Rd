@@ -11,7 +11,8 @@
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
-\item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}} function.}
+\item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}}
+function.}
 }
 \value{
 An object of class \code{\linkS4class{BASiCS_Summary}}.

@@ -16,8 +16,9 @@
 \item{...}{Additional arguments of \code{\link[BiocGenerics]{updateObject}}
 generic method. Not used within BASiCS.}
 
-\item{verbose}{Additional argument of \code{\link[BiocGenerics]{updateObject}}
-generic method. Not used within BASiCS.}
+\item{verbose}{Additional argument of 
+\code{\link[BiocGenerics]{updateObject}} generic method. Not used within 
+BASiCS.}
 }
 \value{
 Prints a summary of the properties of \code{object}.

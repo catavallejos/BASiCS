@@ -6,16 +6,15 @@
 \usage{
 BASiCS_VarianceDecomp(
   Chain,
-  OrderVariable = "BioVarGlobal",
+  OrderVariable = c("BioVarGlobal", "GeneName", "TechVarGlobal", "ShotNoiseGlobal"),
   Plot = TRUE,
   main = "Overall variance decomposition",
   ylab = "\% of variance",
   beside = FALSE,
-  col = c("lightblue", "mistyrose", "lightcyan"),
+  palette = "Set1",
   legend = c("Biological", "Technical", "Shot noise"),
-  args.legend = list(x = "bottomright", bg = "white"),
-  names.arg = if (nBatch > 1) {     c("Overall", paste("Batch ", seq_len(nBatch))) }
-    else "Overall"
+  names.arg = if (nBatch == 1) "Overall" else c("Overall", paste("Batch",
+    seq_len(nBatch)))
 )
 }
 \arguments{
@@ -29,8 +28,19 @@ Default: \code{OrderVariable = "BioVarGlobal"}.}
 \item{Plot}{If \code{TRUE}, a barplot of the variance decomposition
 (global and by batches, if any) is generated. Default: \code{Plot = TRUE}.}
 
-\item{main, ylab, beside, col, legend, args.legend, names.arg}{Passed to
-\code{\link[graphics]{barplot}}}
+\item{main}{Plot title.}
+
+\item{ylab}{y axis label.}
+
+\item{beside}{If \code{TRUE}, bars are placed beside each other.
+If \code{FALSE}, bars are stacked.}
+
+\item{palette}{\code{\link[RColorBrewer]{brewer.pal}} palette to be used
+as colour palette.}
+
+\item{legend}{Labels for variance components.}
+
+\item{names.arg}{X axis labels.}
 }
 \value{
 A \code{\link[base]{data.frame}} whose first 4 columns correspond to
@@ -45,7 +55,8 @@ A \code{\link[base]{data.frame}} whose first 4 columns correspond to
                               overall across all cells)}
 }
 If more than 1 batch of cells are being analysed, the remaining columns
-contain the corresponding variance decomposition calculated within each batch.
+contain the corresponding variance decomposition calculated within each
+batch.
 }
 \description{
 Function to decompose total variability of gene

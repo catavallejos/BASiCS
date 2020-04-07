@@ -140,7 +140,10 @@ setClass(
       errors <- c(errors, "Different numbers of iterations")
     }
     # Check dimensions for basic gene-specific parameters
-    geneParams <- intersect(c("mu", "delta", "epsilon"), names(object@parameters))
+    geneParams <- intersect(
+      c("mu", "delta", "epsilon"),
+      names(object@parameters)
+    )
     nGenes <- lapply(object@parameters[geneParams], ncol)
     if (sum(nGenes != q) > 0) {
       errors <- c(errors, "Parameters' dimensions are not compatible (genes)")
@@ -152,7 +155,10 @@ setClass(
       errors <- c(errors, "Parameters' dimensions are not compatible (cells)")
     }
     # Check labels for gene-specific params
-    if (!identical(colnames(object@parameters$mu), colnames(object@parameters$delta))) {
+    if (!identical(
+          colnames(object@parameters$mu),
+          colnames(object@parameters$delta))
+        ) {
       errors <- c(errors,"Gene-specific parameter labels don't match")
     }
 
@@ -182,7 +188,8 @@ setClass(
 #' @description Container of a summary of a \code{\linkS4class{BASiCS_Chain}}
 #' object. In each element of the \code{parameters} slot, first column contains
 #' posterior medians; second and third columns respectively contain the lower
-#' and upper limits of an high posterior density interval (for a given probability).
+#' and upper limits of an high posterior density interval (for a given 
+#' probability).
 #'
 #' @slot parameters List of parameters in which each entry contains a matrix:
 #' first column contains posterior medians, second column contains the
@@ -258,4 +265,176 @@ setClass(
       versions = c("BASiCS_Summary" = utils::packageVersion("BASiCS"))
     )
   )
+)
+
+
+#' @name BASiCS_ResultsDE
+#' @aliases BASiCS_ResultsDE-class
+#'
+#' @title The BASiCS_ResultsDE class
+#'
+#' @description Results of BASiCS_TestDE
+#' @slot Results \code{\linkS4class{BASiCS_ResultDE}} objects
+#' @slot Chain1,Chain2 \code{\linkS4class{BASiCS_Chain}} objects. 
+#' @slot GroupLabel1,GroupLabel2 Labels for Chain1 and Chain2
+#' @slot Offset Ratio between median of chains 
+#' @slot RowData Annotation for genes
+#' @slot Extras Slot for extra information to be added later
+setClass("BASiCS_ResultsDE",
+  representation = representation(
+    Results = "list",
+    Chain1 = "BASiCS_Chain",
+    Chain2 = "BASiCS_Chain",
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
+    Offset = "numeric",
+    ## gene annotations!
+    RowData = "DataFrame",
+    Extras = "list"
+  ),
+  contains = "Versioned",
+  validity = function(object) {
+    g1 <- object@RowData$GeneName
+    matching_genes <- vapply(object@Results,
+      function(x) {
+        all(x@Table$GeneName == g1)
+      },
+      logical(1)
+    )
+    if (!all(matching_genes)) {
+      stop("Some GeneName columns do not match!")
+    }
+    assertthat::assert_that(
+      all(vapply(object@Results, function(x) inherits(x, "BASiCS_ResultDE"), logical(1))),
+      length(object@GroupLabel1) == 1,
+      length(object@GroupLabel2) == 1,
+      .NSamples(object@Chain1) == .NSamples(object@Chain2)
+    )
+  }
+)
+
+#' @name BASiCS_Result
+#' @aliases BASiCS_Result-class
+#'
+#' @title The BASiCS_Result class
+#'
+#' @description Container of results for a single test (HVG/LVG/DE).
+#' This should be an abstract class (but this is R so no)
+#' and shouldn't be directly instantiated.
+#' Defines a very small amount of common behaviour for
+#' \linkS4class{BASiCS_ResultDE} and \linkS4class{BASiCS_ResultVG}.
+#' @slot Table Tabular results for each gene.
+#' @slot Name The name of the test performed (typically "Mean", "Disp" or 
+#'  "ResDisp")
+#' @slot ProbThreshold Posterior probability threshold used in differential 
+#' test.
+#' @slot EFDR,EFNR Expected false discovery and expected false negative rates
+#' for differential test.
+#' @slot Extra Additional objects for class flexibility.
+setClass("BASiCS_Result",
+  representation = representation(
+    Table = "data.frame",
+    Name = "character",
+    ProbThreshold = "numeric",
+    EFDR = "numeric",
+    EFNR = "numeric",
+    Extras = "list"
+  ),
+  validity = function(object) {
+
+    assertthat::assert_that(
+      !is.null(object@Table$GeneName),
+      object@Name %in% c("Mean", "Disp", "ResDisp", "HVG", "LVG"),
+      length(object@ProbThreshold) == 1,
+      length(object@EFDR) == 1,
+      length(object@EFNR) == 1,
+      object@ProbThreshold >= 0,
+      object@ProbThreshold <= 1,
+      all(object@EFDR <= 1, na.rm = TRUE),
+      all(object@EFDR >= 0, na.rm = TRUE),
+      all(object@EFNR <= 1, na.rm = TRUE),
+      all(object@EFNR >= 0, na.rm = TRUE)
+    )
+  }
+)
+
+
+
+#' @name BASiCS_ResultDE
+#' @aliases BASiCS_ResultDE-class
+#'
+#' @title The BASiCS_ResultDE class
+#'
+#' @description Container of results for a single differential test.
+#' @slot Table Tabular results for each gene.
+#' @slot Name The name of the test performed (typically "Mean", "Disp" or 
+#'  "ResDisp")
+#' @slot GroupLabel1,GroupLabel2 Group labels.
+#' @slot ProbThreshold Posterior probability threshold used in differential 
+#' test.
+#' @slot EFDR,EFNR Expected false discovery and expected false negative rates
+#' for differential test.
+#' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values check before thresholds
+#' were fixed.
+#' @slot Epsilon Minimum fold change or difference threshold.
+#' @slot Extra objects for class flexibility.
+setClass("BASiCS_ResultDE",
+  representation = representation(
+    GroupLabel1 = "character",
+    GroupLabel2 = "character",
+    EFDRgrid = "numeric",
+    EFNRgrid = "numeric",
+    Epsilon = "numeric"
+  ),
+  contains = "BASiCS_Result",
+  validity = function(object) {
+    assertthat::assert_that(
+      length(object@GroupLabel1) == 1,
+      length(object@GroupLabel2) == 1,
+      length(object@EFDRgrid) == length(object@EFNRgrid),
+      length(object@Epsilon) == 1,
+      object@Epsilon >= 0
+    )
+  }
+)
+
+#' @name BASiCS_ResultVG
+#' @aliases BASiCS_ResultVG-class
+#'
+#' @title The BASiCS_ResultVG class
+#'
+#' @description Container of results for a single HVG/LVG test.
+#' @slot Method Character value detailing whether the test performed using 
+#' variance decomposition (\code{method="Variance"}) or percentiles of epsilon 
+#' (\code{Method="Percentile"}).
+#' @slot RowData Optional \linkS4class{DataFrame} containing 
+#' additional information about genes used in the test.
+setClass("BASiCS_ResultVG",
+  representation = representation(
+    Method = "character",
+    RowData = "DataFrame",
+    EFDRgrid = "numeric",
+    EFNRgrid = "numeric",
+    Threshold = "numeric",
+    ProbThresholds = "numeric",
+    ProbThreshold = "numeric"
+  ),
+  contains = "BASiCS_Result",
+  validity = function(object) {
+    assertthat::assert_that(
+      length(object@Method) == 1,
+      !is.null(object@RowData$GeneName),
+      length(object@EFDRgrid) == length(object@EFNRgrid),
+      length(object@EFNRgrid) == length(object@ProbThresholds),
+      all(object@EFDRgrid >= 0, na.rm = TRUE),
+      all(object@EFDRgrid <= 1, na.rm = TRUE),
+      all(object@EFNRgrid >= 0, na.rm = TRUE),
+      all(object@EFNRgrid <= 1, na.rm = TRUE),
+      all(object@ProbThresholds >= 0, na.rm = TRUE),
+      all(object@ProbThresholds <= 1, na.rm = TRUE),
+      length(object@ProbThreshold) == 1,
+      object@ProbThreshold >= 0,
+      object@ProbThreshold <= 1
+    )
+  }
 )

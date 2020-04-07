@@ -3,9 +3,12 @@
 \docType{data}
 \name{ChainSC}
 \alias{ChainSC}
-\title{Extract from the chain obtained for the Grun et al (2014) data: single-cell samples}
-\format{An object of class \code{\linkS4class{BASiCS_Chain}} 
-containing 75 MCMC iterations.}
+\title{Extract from the chain obtained for the Grun et al (2014) data:
+single-cell samples}
+\format{
+An object of class \code{\linkS4class{BASiCS_Chain}} 
+containing 75 MCMC iterations.
+}
 \usage{
 ChainSC
 }

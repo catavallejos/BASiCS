@@ -19,17 +19,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}  
 ---
 
-```{r, echo=FALSE, results="hide", message=FALSE}
+```{r, echo = FALSE, results = "hide", message = FALSE}
 require(knitr)
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE, dpi = 30)
 knitr::opts_chunk$set(dev="png")
 ```
 
-```{r library, echo=FALSE}
+```{r library, echo = FALSE}
 library("BASiCS")
 library("BiocStyle")
 library("SingleCellExperiment")
 library("cowplot")
+library("ggplot2")
+theme_set(theme_bw())
 ```
 
 # Introduction 
@@ -295,38 +297,46 @@ sets a lower threshold for the proportion of variability that is assigned to
 the biological component (`Sigma`). In the examples below:
 
 - HVG are defined as those genes for which **at least** 60\% of their total 
-variability is attributed to the biological variability component. 
+  variability is attributed to the biological variability component. 
 - LVG are defined as those genes for which **at most** 40\% of their total 
-variability is attributed to the biological variability component.
+  variability is attributed to the biological variability component.
 
 For each gene, these functions return posterior probabilities as a measure of 
 HVG/LVG evidence. A cut-off value for these posterior probabilities is set by 
 controlling the EFDR (as a default option, EFDR is set as 0.10).
 
-```{r quick-start-HVGdetection, fig.height = 20, fig.width = 20}
-HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = TRUE)
-LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = TRUE)
-plot_grid(HVG$Plots[[1]], HVG$Plots[[2]])
-plot_grid(LVG$Plots[[1]], LVG$Plots[[2]])
+```{r quick-start-HVGdetection, fig.height = 8, fig.width = 20}
+HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = FALSE)
+LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = FALSE)
+
+plot_grid(
+  BASiCS_PlotVG(HVG, "Grid"),
+  BASiCS_PlotVG(HVG, "VG")
+)
+plot_grid(
+  BASiCS_PlotVG(LVG, "Grid"),
+  BASiCS_PlotVG(LVG, "VG")
+)
 ```
 
-To access the results of these tests, please use. 
+To access the results of these tests, please use `format`.
 
 ```{r quick-start-HVGdetectionTable}
-head(HVG$Table)
-head(LVG$Table)
+format(HVG)
+format(LVG)
 ```
 
-<!---
 
-```{r quick-start-HVGdetectionPlot, fig.width=8, fig.height=8}
+```{r quick-start-HVGdetectionPlot, fig.width = 8, fig.height = 8, eval = FALSE}
 SummarySC <- Summary(ChainSC)
 plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
-with(HVG$Table[HVG$Table$HVG,], points(Mu, Delta))
-with(LVG$Table[LVG$Table$LVG,], points(Mu, Delta))
+HTable <- format(HVG)
+LTable <- format(LVG)
+with(HTable, points(Mu, Delta))
+with(LTable, points(Mu, Delta))
 ```
 
---->
+
 
 **Note**: this decision rule implemented in this function has changed with 
 respect to the original release of BASiCS (where `EviThreshold` was defined 
@@ -347,7 +357,7 @@ data(ChainSC)
 data(ChainRNA)
 ```
 
-```{r quick-start-TestDE, fig.width=16, fig.height=8}
+```{r quick-start-TestDE, fig.width = 16, fig.height = 8}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = log2(1.5), EpsilonD = log2(1.5),
@@ -362,11 +372,47 @@ absolute increases of 50\% or above). To adjust for differences in overall mRNA
 content, an internal offset correction is performed when `OffSet=TRUE`. 
 This is the recommended default setting.   
 
-The resulting output list can be displayed using
 
-```{r quick-start-DE}
-head(Test$TableMean)
-head(Test$TableDisp)
+Previously, the output of this function was a set of plots and a nested list
+structure. The new output is an object of S4 class `BASiCS_ResultsDE`.
+
+```{r testing, message = TRUE}
+Test
+```
+
+You can access the results of these tests using `format`. You must specify which
+of the mean, dispersion and residual overdispersion results you want using the 
+`Which` argument, as follows.
+
+```{r format}
+head(format(Test, Which = "Mean"))
+head(format(Test, Which = "Disp"))
+## This object doesn't contain residual overdispersion tests as the chains
+## were run using the non-regression version of BASiCS
+# head(format(DE, Which = "Disp"))
+```
+
+There's a `rowData` field and accessor, so we can add gene information that
+will be added when formatting each of the fields (eg different gene 
+identifiers).
+
+```{r rowData}
+rowData(Test)
+rowData(Test) <- cbind(rowData(Test), Index = 1:nrow(rowData(Test)))
+format(Test, "Mean")
+```
+
+As of BASiCS v2, the differential expression plots have been re-done in ggplot2
+and can be generated using `BASiCS_PlotDE`.
+The default plots are "Grid" (EFDR vs EFNR), "MA", and "Volcano". 
+These are done for "Mean", "Disp", and "ResDisp".
+We can choose to plot eg only mean, or mean and
+overdispersion, etc, and only MA plot, MA plot and volcano, etc.
+
+```{r plots, fig.height=16, fig.width=20}
+BASiCS_PlotDE(Test)
+BASiCS_PlotDE(Test, Plots = c("MA", "Volcano"))
+BASiCS_PlotDE(Test, Plots = "MA", Parameters = "Mean")
 ```
 
 Due to the confounding between mean and over-dispersion that is 
@@ -379,13 +425,14 @@ changes in over-dispersion to be confounded by mean expression (the genes for
 which mean expression changes are marked as `ExcludedFromTesting` in the 
 `Test$TableDisp$ResultDiffDisp` slot). 
 
-```{r quick-start-TestDE-2, fig.width=16, fig.height=8}
+```{r quick-start-TestDE-2, fig.width = 16, fig.height = 8}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
                       GroupLabel1 = "SC", GroupLabel2 = "PaS",
                       EpsilonM = 0, EpsilonD = log2(1.5),
                       EFDR_M = 0.10, EFDR_D = 0.10,
                       Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
 ```
+
 
 **Note**: If the regression BASiCS model has been
 used (`Regression = TRUE` as a function parameter in `BASiCS_MCMC`), 
@@ -455,7 +502,7 @@ included within `BASiCS` as the `ChainSCReg` and `ChainRNAReg` datasets.
 To visualize the fit between over-dispersion $\delta_i$ and mean expression $
 \mu_i$ the following function can be used.
 
-```{r, fig.height = 8, fig.width = 8}
+```{r, fig.height = 12, fig.width = 12}
 data("ChainRNAReg")
 BASiCS_ShowFit(ChainRNAReg)
 ```
@@ -483,8 +530,9 @@ in the `Test$TableResDisp$ResultDiffResDisp` slot. By performing the regression,
 all genes can be tested for changes in expression variability independent of 
 changes in mean expression.
 
-```{r}
-head(Test$TableResDisp, n = 2)
+```{r testde-resdisp, fig.width=24, fig.height=16}
+head(format(Test, Which = "ResDisp"))
+BASiCS_PlotDE(Test, Parameters = "ResDisp")
 ```
 
 **Note:** Additional parameters for this sampler include: `k` number of 
@@ -600,9 +648,9 @@ It is also possible to produce a matrix of normalised and denoised expression
 counts for which the effect of technical variation is removed. For this purpose, 
 we implemented the function `BASiCS_DenoisedCounts`. For each gene $i$ and 
 cell $j$ this function returns
-
-$$ x^*_{ij} = \frac{ x_{ij} } {\hat{\phi}_j \hat{\nu}_j}, $$
-
+$$
+  x^*_{ij} = \frac{ x_{ij} } {\hat{\phi}_j \hat{\nu}_j},
+$$
 where $x_{ij}$ is the observed expression count of gene $i$ in cell $j$, 
 $\hat{\phi}_j$ denotes the posterior median of $\phi_j$ and $\hat{\nu}_j$ is 
 the posterior median of $\nu_j$.
@@ -618,9 +666,9 @@ data normalisation.**
 Alternativelly, the user can compute the normalised and denoised expression 
 rates underlying the expression of all genes across cells using 
 `BASiCS_DenoisedRates`. The output of this function is given by 
-
-$$ \Lambda_{ij} = \hat{\mu_i} \hat{\rho}_{ij},  $$
-
+$$
+  \Lambda_{ij} = \hat{\mu_i} \hat{\rho}_{ij},
+$$
 where $\hat{\mu_i}$ represents the posterior median of $\mu_j$ and 
 $\hat{\rho}_{ij}$ is given by its posterior mean (Monte Carlo estimate based 
 on the MCMC sample of all model parameters).

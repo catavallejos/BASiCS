@@ -2,27 +2,28 @@
 % Please edit documentation in R/BASiCS_VarThresholdSearchHVG_LVG.R
 \name{BASiCS_VarThresholdSearchHVG}
 \alias{BASiCS_VarThresholdSearchHVG}
+\alias{BASiCS_VarThresholdSearchVG}
 \alias{BASiCS_VarThresholdSearchHVG_LVG}
 \alias{BASiCS_VarThresholdSearchLVG}
 \title{Detection method for highly and lowly variable genes using
 a grid of variance contribution thresholds}
 \usage{
-BASiCS_VarThresholdSearchHVG(
+BASiCS_VarThresholdSearchVG(
   Chain,
+  Task = c("HVG", "LVG"),
   VarThresholdsGrid,
   EFDR = 0.1,
   Progress = TRUE
 )
 
-BASiCS_VarThresholdSearchLVG(
-  Chain,
-  VarThresholdsGrid,
-  EFDR = 0.1,
-  Progress = TRUE
-)
+BASiCS_VarThresholdSearchHVG(...)
+
+BASiCS_VarThresholdSearchLVG(...)
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
+
+\item{Task}{See \code{?BASiCS_DetectVG}.}
 
 \item{VarThresholdsGrid}{Grid of values for the variance contribution
 threshold (they must be contained in (0,1))}
@@ -32,6 +33,8 @@ HVG/LVG detection. Default: \code{EFDR = 0.10}.}
 
 \item{Progress}{If \code{Progress = TRUE}, partial output is
 printed in the console. Default: \code{Progress = TRUE}.}
+
+\item{...}{Passed to methods.}
 }
 \value{
 \describe{

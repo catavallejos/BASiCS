@@ -37,7 +37,7 @@
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
 #'
 #' @export
-BASiCS_LoadChain <- function(RunName,
+BASiCS_LoadChain <- function(RunName = "",
                              StoreDir = getwd(),
                              StoreUpdatedChain = FALSE) {
   
@@ -53,7 +53,7 @@ BASiCS_LoadChain <- function(RunName,
           "Set 'StoreUpdatedChain' = TRUE to save updated object.\n",
           "(this overwrites original input file).\n"
         )
-        Chain <- updateObject(Chain)
+        Chain <- .updateObject(Chain)
         if (StoreUpdatedChain) {
           saveRDS(
             Chain,
@@ -71,16 +71,19 @@ BASiCS_LoadChain <- function(RunName,
         sep = " ",
         check.names = FALSE
       )
+      rownames(Mu) <- NULL
       Delta <- read.delim(
         file.path(StoreDir, paste0("chain_delta_", RunName, ".txt")),
         sep = " ",
         check.names = FALSE
       )
+      rownames(Delta) <- NULL
       Phi <- read.delim(
         file.path(StoreDir, paste0("chain_phi_", RunName, ".txt")),
         sep = " ",
         check.names = FALSE
       )
+      rownames(Phi) <- NULL
       
       # Add-hoc fix for the no-spikes case
       file <- file.path(StoreDir, paste0("chain_s_", RunName, ".txt"))
@@ -90,6 +93,7 @@ BASiCS_LoadChain <- function(RunName,
           sep = " ",
           check.names = FALSE
         )
+        rownames(S) <- NULL        
       } else {
         S <- matrix(1, ncol = ncol(Phi), nrow = nrow(Phi))
       }
@@ -99,11 +103,13 @@ BASiCS_LoadChain <- function(RunName,
         sep = " ",
         check.names = FALSE
       )
+      rownames(Nu) <- NULL
       Theta <- read.delim(
         file.path(StoreDir, paste0("chain_theta_", RunName, ".txt")),
         sep = " ",
         check.names = FALSE
       )
+      rownames(Theta) <- NULL
       
       Chain <- newBASiCS_Chain(
         list(

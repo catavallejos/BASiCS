@@ -51,8 +51,8 @@ BASiCS_CorrectOffset <- function(Chain,
   include <- which(OffsetRatio >= min.mean)
   
   # Calculating iteration-specific offset 
-  OffsetChain <- matrixStats::rowMedians(mu1[,include]) / 
-    matrixStats::rowMedians(mu2[,include])
+  OffsetChain <- matrixStats::rowMedians(mu1[, include]) / 
+    matrixStats::rowMedians(mu2[, include])
   # Offset point estimate
   OffsetEst <- median(OffsetChain)
   
@@ -61,9 +61,13 @@ BASiCS_CorrectOffset <- function(Chain,
   Chain_offset@parameters$mu <- Chain@parameters$mu / OffsetEst
   if("phi" %in% names(Chain@parameters)) {
     Chain_offset@parameters$phi <- Chain@parameters$phi * OffsetEst  
-  } else { Chain_offset@parameters$s <- Chain@parameters$s * OffsetEst }
+  } else {
+    Chain_offset@parameters$s <- Chain@parameters$s * OffsetEst
+  }
   
-  list("Chain" = Chain_offset, 
-       "Offset" = OffsetEst, 
-       "OffsetChain" = OffsetChain)
+  list(
+    Chain = Chain_offset, 
+    Offset = OffsetEst, 
+    OffsetChain = OffsetChain
+  )
 }
