@@ -305,7 +305,7 @@ For each gene, these functions return posterior probabilities as a measure of
 HVG/LVG evidence. A cut-off value for these posterior probabilities is set by 
 controlling the EFDR (as a default option, EFDR is set as 0.10).
 
-```{r quick-start-HVGdetection, fig.height = 15, fig.width = 10}
+```{r quick-start-HVGdetection, fig.height = 8, fig.width = 20}
 HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = FALSE)
 LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = FALSE)
 
@@ -409,7 +409,7 @@ These are done for "Mean", "Disp", and "ResDisp".
 We can choose to plot eg only mean, or mean and
 overdispersion, etc, and only MA plot, MA plot and volcano, etc.
 
-```{r plots}
+```{r plots, fig.height=16, fig.width=20}
 BASiCS_PlotDE(Test)
 BASiCS_PlotDE(Test, Plots = c("MA", "Volcano"))
 BASiCS_PlotDE(Test, Plots = "MA", Parameters = "Mean")
@@ -502,7 +502,7 @@ included within `BASiCS` as the `ChainSCReg` and `ChainRNAReg` datasets.
 To visualize the fit between over-dispersion $\delta_i$ and mean expression $
 \mu_i$ the following function can be used.
 
-```{r, fig.height = 8, fig.width = 8}
+```{r, fig.height = 12, fig.width = 12}
 data("ChainRNAReg")
 BASiCS_ShowFit(ChainRNAReg)
 ```
@@ -530,7 +530,7 @@ in the `Test$TableResDisp$ResultDiffResDisp` slot. By performing the regression,
 all genes can be tested for changes in expression variability independent of 
 changes in mean expression.
 
-```{r testde-resdisp}
+```{r testde-resdisp, fig.width=24, fig.height=16}
 head(format(Test, Which = "ResDisp"))
 BASiCS_PlotDE(Test, Parameters = "ResDisp")
 ```

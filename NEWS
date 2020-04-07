@@ -1440,3 +1440,7 @@ version 2.0.0 (2020-04-01)
 - Add rudimentary unit tests for loading and some class methods.
   Fix several minor bugs.
 - Change barplot in variance decomposition function to use ggplot2.
+
+version 1.99.0 (2020-04-07)
+- Minor changes in vignette to increase figure sizes
+- Version number updated to follow Bioc guidelines
