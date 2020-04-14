@@ -17,7 +17,7 @@
 #' @param ylab y axis label.
 #' @param beside If \code{TRUE}, bars are placed beside each other.
 #' If \code{FALSE}, bars are stacked.
-#' @param palette Palette to be passed to \code{\link[ggplot2]{scale_fill_brewer}}
+#' @param palette Palette to be passed to \code{\link{scale_fill_brewer}}
 #' to create a discrete colour mapping.
 #' @param legend Labels for variance components.
 #' @param names.arg X axis labels.

@@ -35,7 +35,7 @@ Default: \code{OrderVariable = "BioVarGlobal"}.}
 \item{beside}{If \code{TRUE}, bars are placed beside each other.
 If \code{FALSE}, bars are stacked.}
 
-\item{palette}{Palette to be passed to \code{\link[ggplot2]{scale_fill_brewer}}
+\item{palette}{Palette to be passed to \code{\link{scale_fill_brewer}}
 to create a discrete colour mapping.}
 
 \item{legend}{Labels for variance components.}
