@@ -1449,8 +1449,6 @@ version 1.99.1 (2020-04-14)
 - Minor change in documentation of `BASiCS_VarianceDecomp` to use `ggplot2` as
   reference link (instead of `RColorBrewer`)
 
-
-
 version 2.0.1 (2020-05-15)
 - Bugfix in BASiCS_DetectHVG and BASiCS_DetectLVG.
   Epsilon/Delta,Sigma values were erroneously not returned.
