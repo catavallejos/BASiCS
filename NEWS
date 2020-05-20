@@ -1453,3 +1453,4 @@ version 2.0.1 (2020-05-15)
 - Bugfix in BASiCS_DetectHVG and BASiCS_DetectLVG.
   Epsilon/Delta,Sigma values were erroneously not returned.
 - More detailed colouring of differential expression plots.
+- Bugfix in labels for DE plots.
