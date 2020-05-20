@@ -67,7 +67,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     } else {
       nrow <- 1
       labels <- vapply(
-        object@Results, 
+        object@Results[Parameters],
         function(x) .cap(.MeasureName(x@Name)), 
         character(1)
       )
@@ -249,6 +249,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     ) +
     ggplot2::geom_point(
       ggplot2::aes_string(color = rVar),
+      shape = 16,
       alpha = 0.7
     ) +
     # ggplot2::geom_hex(
@@ -332,6 +333,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     # viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
     ggplot2::geom_point(
       ggplot2::aes_string(color = rVar),
+      shape = 16,
       alpha = 0.7
     ) +
     ggplot2::geom_hline(
