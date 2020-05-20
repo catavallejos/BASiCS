@@ -179,6 +179,13 @@ BASiCS_DetectVG <- function(
   } else {
     Method <- "Variance"
   }
+  GeneIndex <- seq_along(Chain@parameters$mu)
+  GeneName <- colnames(Chain@parameters$mu)
+  Table <- cbind.data.frame(
+    GeneIndex = GeneIndex,
+    GeneName = GeneName
+  )
+
   if (Method == "Percentile") {
     # Find the epsilon threshold that correspond to the 'PercentileThreshold'
     
@@ -195,6 +202,7 @@ BASiCS_DetectVG <- function(
     operator <- if (Task == "HVG") `>` else `<`
     Variable <- operator(Chain@parameters$epsilon, EpsilonThreshold)
     Threshold <- ProbThreshold
+    Table <- cbind.data.frame(Table, Epsilon = Epsilon)
   } else {
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
@@ -208,6 +216,10 @@ BASiCS_DetectVG <- function(
     operator <- if (Task == "HVG") `>` else `<`
     Variable <- operator(VarDecomp$BioVarGlobal, VarThreshold)
     Threshold <- VarThreshold
+    Table <- cbind.data.frame(Table,
+      Delta = Delta,
+      Sigma = Sigma
+    )
   }
   Prob <- matrixStats::colMeans2(Variable)
   
@@ -226,18 +238,14 @@ BASiCS_DetectVG <- function(
   Mu <- matrixStats::colMedians(Chain@parameters$mu)
   VG <- Prob > OptThreshold[1]
   
-  GeneIndex <- seq_along(Mu)
-  GeneName <- colnames(Chain@parameters$mu)
   
-  Table <- cbind.data.frame(
-    GeneIndex = GeneIndex,
-    GeneName = GeneName,
+  Table <- cbind.data.frame(Table,
     Mu = Mu,
     Prob = Prob,
     VG = VG,
     stringsAsFactors = FALSE
   )
-  colnames(Table)[[5]] <- Task
+  colnames(Table)[[which(colnames(Table)=="VG")]] <- Task
   
   # Re-order the table of results
   orderVar <- switch(
