@@ -10,3 +10,6 @@ setGeneric("displaySummaryBASiCS",
 #' @export
 setGeneric("BASiCS_PlotDE", 
            function(object, ...) standardGeneric("BASiCS_PlotDE"))
+
+#' @export
+setGeneric("format")
