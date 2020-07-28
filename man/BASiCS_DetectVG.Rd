@@ -39,10 +39,13 @@ percent), 0.1 for LVG (bottom 10 percent)}
 BASiCS non-regression model was used to generate the Chain object.}
 
 \item{ProbThreshold}{Optional parameter. Posterior probability threshold
-(must be a positive value, between 0 and 1)}
+(must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
+posterior probability threshold for the test will be set to \code{ProbThreshold}}
 
 \item{EFDR}{Target for expected false discovery rate related
-to HVG/LVG detection (default = 0.10)}
+to HVG/LVG detection. If \code{EFDR = NULL}, EFDR calibration is
+not performed and the posterior probability threshold is set equal to
+\code{ProbThreshold}.Default \code{EFDR = 0.10}.}
 
 \item{OrderVariable}{Ordering variable for output.
 Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.}

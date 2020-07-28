@@ -1454,3 +1454,20 @@ version 2.1.1 (2020-07-28)
   Epsilon/Delta,Sigma values were erroneously not returned.
 - More detailed colouring of differential expression plots.
 - Bugfix in labels for DE plots.
+
+version 2.1.2 (2020-07-29)
+- Moves auxiliary functions related to HVG/LVG analysis to `utils_VG.R`. This
+includes `.VGPlot`, `.VGGridPlot`, `.HeaderDetectHVG_LVG` and `.VG`. 
+- Updated warning messages in `.HeaderDetectHVG_LVG`
+- Updated rules for `EFDR` and `ProbThreshold` parameters in `BASiCS_DetectVG`.
+If `EFDR = NULL`, EFDR calibration is not used and posterior probability 
+threshold is set to be equal to `ProbThreshold`. This behaviour is consistent
+with the rules used in `BASiCS_TestDE`. 
+- Creates `.CheckProbEFDR` to perform validity checks for `ProbThreshold` and
+`EFDR` in all tests (HVG/LVG and DE).
+- Cleans code within `.ThresholdSearch` and `BASiCS_DetectVG`
+- Removes `Threshold` from the output provided by `BASiCS_DetectVG`
+- Removes duplicated plotting code in `BASiCS_DetectVG`. Now calls 
+`BASiCS_PlotVG`. 
+- Changes `.VGGridPlot` and `.VGPlot` to use `ggplot2:theme_classic()`
+

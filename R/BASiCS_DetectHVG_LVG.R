@@ -19,9 +19,12 @@
 #' (must be a positive value, between 0 and 1). This is only used when the 
 #' BASiCS non-regression model was used to generate the Chain object.
 #' @param ProbThreshold Optional parameter. Posterior probability threshold
-#' (must be a positive value, between 0 and 1)
+#' (must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
+#' posterior probability threshold for the test will be set to \code{ProbThreshold}
 #' @param EFDR Target for expected false discovery rate related
-#' to HVG/LVG detection (default = 0.10)
+#' to HVG/LVG detection. If \code{EFDR = NULL}, EFDR calibration is
+#' not performed and the posterior probability threshold is set equal to
+#' \code{ProbThreshold}.Default \code{EFDR = 0.10}.
 #' @param OrderVariable Ordering variable for output.
 #' Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
 #' @param Plot If \code{Plot = TRUE} error control and
@@ -163,7 +166,7 @@ BASiCS_DetectVG <- function(
     ...
   ) {
   
-  Task <- match.arg(Task)
+  # Check valid input values
   .HeaderDetectHVG_LVG(Chain,
                        PercentileThreshold,
                        VarThreshold,
@@ -171,76 +174,61 @@ BASiCS_DetectVG <- function(
                        EFDR,
                        Plot)
   
-
+  # Define LVG/HVG criteria
+  Task <- match.arg(Task)
   OrderVariable <- match.arg(OrderVariable)
-  
+  operator <- if (Task == "HVG") `>` else `<`
   if (!is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)) {
     Method <- "Percentile"
   } else {
     Method <- "Variance"
   }
+  
+  # Prepare template for output table
   GeneIndex <- seq_along(Chain@parameters$mu)
   GeneName <- colnames(Chain@parameters$mu)
   Table <- cbind.data.frame(
     GeneIndex = GeneIndex,
-    GeneName = GeneName
+    GeneName = GeneName,
+    Mu = matrixStats::colMedians(Chain@parameters$mu),
+    Delta = matrixStats::colMedians(Chain@parameters$mu)
   )
 
   if (Method == "Percentile") {
+    
     # Find the epsilon threshold that correspond to the 'PercentileThreshold'
-    
-    nGenes <- ncol(Chain@parameters$epsilon)
-    
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
     EpsilonThreshold <- stats::quantile(
       Epsilon,
       PercentileThreshold,
       na.rm = TRUE
     )
-    
-    # HVG probability for a given epsilon threshold
-    operator <- if (Task == "HVG") `>` else `<`
-    Variable <- operator(Chain@parameters$epsilon, EpsilonThreshold)
-    Threshold <- ProbThreshold
     Table <- cbind.data.frame(Table, Epsilon = Epsilon)
+    # HVG probability for a given epsilon threshold
+    Variable <- operator(Chain@parameters$epsilon, EpsilonThreshold)
+    
   } else {
+    
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
-
-    ## outputs
-    Sigma <- matrixStats::colMedians(VarDecomp$BioVarGlobal)
-    Mu <- matrixStats::colMedians(Chain@parameters$mu)
-    Delta <- matrixStats::colMedians(Chain@parameters$delta)
-
+    Table <- cbind.data.frame(Table, 
+      Sigma = matrixStats::colMedians(VarDecomp$BioVarGlobal))
     # H/LVG probability for a given variance threshold
-    operator <- if (Task == "HVG") `>` else `<`
     Variable <- operator(VarDecomp$BioVarGlobal, VarThreshold)
-    Threshold <- VarThreshold
-    Table <- cbind.data.frame(Table,
-      Delta = Delta,
-      Sigma = Sigma
-    )
+    
   }
+  # Calculate tail posterior probabilities
   Prob <- matrixStats::colMeans2(Variable)
   
-  # Threshold search
+  # EFDR calibration
   Aux <- .ThresholdSearch(Prob[!is.na(Prob)], 
                           ProbThreshold, 
                           EFDR, 
-                          Task = paste(Task, "detection"), 
-                          Suffix = "")
-  
-  EFDRgrid <- Aux$EFDRgrid
-  EFNRgrid <- Aux$EFNRgrid
-  OptThreshold <- Aux$OptThreshold
-  
+                          Task = paste(Task, "detection"))
+
   # Output preparation
-  Mu <- matrixStats::colMedians(Chain@parameters$mu)
-  VG <- Prob > OptThreshold[1]
-  
-  
+  VG <- Prob > Aux$OptThreshold[1]
   Table <- cbind.data.frame(Table,
-    Mu = Mu,
     Prob = Prob,
     VG = VG,
     stringsAsFactors = FALSE
@@ -256,49 +244,33 @@ BASiCS_DetectVG <- function(
   )
   Table <- Table[order(orderVar, decreasing = TRUE, na.last = TRUE), ]
   
-  Plots <- list()
-  ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
+  # output object
+  out <- new("BASiCS_ResultVG",
+        Table = Table,
+        Name = Task,
+        ProbThreshold = Aux$OptThreshold[[1]],
+        ProbThresholds = Aux$ProbThresholds,
+        EFDRgrid = Aux$EFDRgrid,
+        EFNRgrid = Aux$EFNRgrid,
+        EFDR = Aux$OptThreshold[[2]],
+        EFNR = Aux$OptThreshold[[2]],
+        Method = Method,
+        RowData = DataFrame(GeneName = GeneName)
+    )
+  
   if (Plot) {
+    Plots <- list()
     # EFDR / EFNR plot
-    Plots[[1]] <- .VGGridPlot(
-      ProbThresholds = ProbThresholds,
-      EFDRgrid = EFDRgrid,
-      EFNRgrid = EFNRgrid,
-      EFDR = EFDR
-    )
-    
+    Plots$Grid <- BASiCS_PlotVG(out, Plot = "Grid")
     # Output plot : mean vs prob
-    Plots <- c(Plots, 
-      list(
-        .VGPlot(
-          Task = Task,
-          Mu = Mu,
-          Prob = Prob,
-          OptThreshold = OptThreshold,
-          Hits = VG,
-          ...
-        )
-      )
-    )
+    Plots$VG <- BASiCS_PlotVG(out, Plot = "VG")
+    # Append to existing output object
+    out@Extras = list(Plots = Plots)
   }
 
-  new("BASiCS_ResultVG",
-    Table = Table,
-    Name = Task,
-    ProbThreshold = OptThreshold[[1]],
-    ProbThresholds = ProbThresholds,
-    Threshold = Threshold,
-    EFDRgrid = EFDRgrid,
-    EFNRgrid = EFNRgrid,
-    EFDR = OptThreshold[[2]],
-    EFNR = OptThreshold[[2]],
-    Method = Method,
-    RowData = DataFrame(GeneName = GeneName),
-    Extras = list(Plots = Plots)
-  )
+  return(out)
+ 
 }
-
-
 
 #' @name BASiCS_DetectHVGLVG
 #' @aliases BASiCS_DetectHVG BASiCS_DetectLVG BASiCS_DetectHVG_LVG
@@ -312,6 +284,7 @@ BASiCS_DetectLVG <- function(..., PercentileThreshold =  0.1) {
     Task = "LVG"
   )
 }
+
 #' @name BASiCS_DetectHVGLVG
 #' @aliases BASiCS_DetectHVG BASiCS_DetectLVG BASiCS_DetectHVG_LVG
 #' @rdname BASiCS_DetectVG
@@ -329,7 +302,8 @@ BASiCS_DetectHVG <- function(..., PercentileThreshold =  0.9) {
 #' @param object \linkS4class{BASiCS_ResultVG} object.
 #' @param Plot Character scalar specifying the type of plot to be made.
 #' Options are "Grid" and "VG".
-#' @param ... Passed to \code{.VGPlot}.
+#' @param ... Optional graphical parameters passed to \code{.VGPlot} 
+#' (internal function). 
 #' 
 #' @return A plot.
 #' @examples
@@ -361,131 +335,8 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
   }
 }
 
-.VGGridPlot <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR) {
-  ggplot2::ggplot() +
-    ggplot2::geom_line(
-      ggplot2::aes(ProbThresholds, EFDRgrid, color = "EFDR")
-    ) +
-    ggplot2::geom_line(
-      ggplot2::aes(ProbThresholds, EFNRgrid, color = "EFNR")
-    ) +
-    ggplot2::geom_hline(
-      ggplot2::aes(color = "Target EFDR", yintercept = EFDR)
-    ) +
-    ggplot2::scale_color_brewer(palette = "Set1", name = NULL) +
-    ggplot2::labs(x = "Probability threshold", y = "Error rate") +
-    ggplot2::ylim(c(0, 1))
-}
 
 
-.VGPlot <- function(
-    Task,
-    Mu,
-    Prob,
-    OptThreshold,
-    Hits,
-    ylim = c(0, 1),
-    xlim = c(min(Mu), max(Mu)),
-    cex = 1.5,
-    pch = 16,
-    col = 8,
-    bty = "n",
-    xlab = "Mean expression",
-    ylab = paste(Task, "probability"),
-    title = ""
-  ) {
 
-  df <- data.frame(Mu, Prob)
-  ggplot2::ggplot(df, ggplot2::aes_string(x = "Mu", y = "Prob")) +
-    ggplot2::geom_point(
-      ggplot2::aes(color = ifelse(Hits, Task, "Other")), 
-      pch = pch, cex = cex) +
-    ggplot2::scale_color_brewer(palette = "Set1", name = "") +
-    ggplot2::geom_hline(
-      yintercept = OptThreshold[[1]], lty = 2, col = "black"
-    ) +
-    ggplot2::scale_x_log10() +
-    ggplot2::labs(
-      x = xlab,
-      y = ylab,
-      title = title
-    )
-}
 
-.VG <- function(x) {
-  x@Table[[x@Name]]
-}
 
-.HeaderDetectHVG_LVG <- function(Chain,
-                           PercentileThreshold,
-                           VarThreshold,
-                           ProbThreshold,
-                           EFDR,
-                           Plot) {
-
-  if (!is(Chain, "BASiCS_Chain")) {
-    stop("'Chain' is not a BASiCS_Chain class object.")
-  }
-  
-  # Test if the chain contains beta parameters
-  if (is.null(Chain@parameters$beta) & is.null(VarThreshold)) {
-    stop(
-      "'Chain' was not generated using the BASiCS regression model.
-      Please supply a values between 0 and 1 for 'VarThreshold'."
-    )
-  }
-  
-  # Add a warning that by default, the variance decomposition threshold is
-  # used if the user does not supply the PercentileThreshold parameter
-  if (is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)) {
-    warning(
-      "'Chain' was not generated using the BASiCS regression model.\n", 
-      "By default, variable genes are detected by testing against ",
-      "a variance threshold of ", 100 * VarThreshold, "%"
-    )
-  }
-  
-  # Add a warning that it's better to use the regression trend when estimating 
-  # highly variable genes 
-  # if (!is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)) {
-  #   warning(
-  #     "'Chain' was generated using the BASiCS regression model.\n",
-  #     "By default, the ", 100 * PercentileThreshold, 
-  #     " percentile of variable genes will be returned."
-  #   )
-  # }
-  
-  if (!is.null(VarThreshold)){ 
-    if (VarThreshold < 0 | VarThreshold > 1 | !is.finite(VarThreshold)) {
-      stop("Variance contribution threshold must be in (0,1)")
-    }
-  }
-  
-  if (!is.null(PercentileThreshold)){
-    if(PercentileThreshold < 0 | PercentileThreshold > 1 | 
-       !is.finite(PercentileThreshold)) {
-      stop("Percentile threshold must be in (0,1)")
-    }
-  }
-  
-  if (!is.logical(Plot) | length(Plot) != 1) {
-    stop("Please insert `TRUE` or `FALSE` for `Plot` parameter")
-  }
-  if (!is.null(ProbThreshold)) {
-    if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
-      stop(
-        "Posterior probability threshold must be contained in (0,1) \n
-        For automatic threshold search use `ProbThreshold = NULL`."
-      )
-    } else {
-      message(
-        "Posterior probability threshold has been supplied \n",
-        "EFDR will not be calibrated. \n"
-      )
-    }
-  }
-  if (is.null(ProbThreshold)) {
-    message("Posterior probability threshold set by EFDR = ",
-            100 * EFDR, "% (+-2.5% tolerance) ...")
-  }
-}
