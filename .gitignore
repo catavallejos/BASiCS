@@ -10,6 +10,7 @@ inst/doc
 ..Rcheck
 */.DS_Store
 tests/testthat/*.Rds
+tests/testthat/*.pdf
 vignettes/.build.timestamp
 BASiCS.Rproj
 chain_ls_.Rds
