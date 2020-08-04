@@ -1,5 +1,14 @@
 context("Basic example of HVG/LVG detection")
 
+test_that("HVG/LVG consistency of input values= no regression", {
+  
+  data(ChainSC)
+  # If none of the required args is provided. 
+  expect_error(BASiCS_DetectVG(ChainSC),
+               regexp = "argument \"N\" is missing, with no default")
+  
+})
+
 test_that("HVG/LVG detection is correct", {
   data(ChainSC)
 
@@ -33,8 +42,10 @@ test_that("HVG/LVG detection is correct", {
 test_that("HVG/LVG detection using epsilons is correct", {
   data(ChainSCReg)
 
-  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
-  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
+  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.90,
+                                EFDR = 0.10, Plot = FALSE)
+  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.10,
+                                EFDR = 0.10, Plot = FALSE)
 
   FreqHVG0 <- c(332, 18)
   FreqHVG <- as.vector(table(DetectHVG@Table$HVG))  

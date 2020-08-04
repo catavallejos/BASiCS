@@ -13,59 +13,51 @@
     stop("'Chain' is not a BASiCS_Chain class object.")
   }
   
+  if(is.null(PercentileThreshold) & is.null(VarThreshold)) 
+    stop("At least one of ")
+  
+  # Test if the chain does not contain epsilon parameters
+  #if (is.null(Chain@parameters$epsilon)) {
+  #  if(is.null(VarThreshold)) {
+  #  stop("'Chain' does not include residual over-dispersion parameters.
+  #       A value for 'VarThreshold' must be provided. \n")
+  #  }
+   # if (!is.null(VarThreshold)){ 
+   #   if (VarThreshold < 0 | VarThreshold > 1 | !is.finite(VarThreshold)) {
+   #     stop("Variance contribution threshold must be in (0,1)")
+   #   }
+   # }
+   # if(!is.null(PercentileThreshold)) {
+   #   stop("'Chain' does not include residual over-dispersion parameters.
+   #        'PercentileThreshold' will be ignored.
+   #        'VarThreshold' must be provided instead.")
+   # }
+  #}
+  
   # Test if the chain contains beta parameters
-  if (is.null(Chain@parameters$beta) & is.null(VarThreshold)) {
-    stop(
-      "'Chain' was not generated using the BASiCS regression model.\n
-      Please supply a values between 0 and 1 for 'VarThreshold'. \n"
-    )
-  }
-  
-  # Add a warning that by default, the variance decomposition threshold is
-  # used if the user does not supply the PercentileThreshold parameter
-  if (is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)) {
-    warning(
-      "'Chain' was not generated using the BASiCS regression model.\n", 
-      "Value for 'PercentileThreshold' will be ignored.\n",
-      "The user must provide a value for 'VarThreshold' instead. \n"
-    )
-  }
-  
-  if (!is.null(Chain@parameters$beta) & is.null(PercentileThreshold)) {
-    warning(
-      "'Chain' was generated using the BASiCS regression model.\n", 
-      "A value for 'PercentileThreshold' must be provided.\n"
-    )
-  }
-  
-  # Add a warning that it's better to use the regression trend when estimating 
-  # highly variable genes 
-  # if (!is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)) {
-  #   warning(
-  #     "'Chain' was generated using the BASiCS regression model.\n",
-  #     "By default, the ", 100 * PercentileThreshold, 
-  #     " percentile of variable genes will be returned."
-  #   )
+  #if (!is.null(Chain@parameters$epsilon)) {
+ #   if(is.null(PercentileThreshold)) {
+  #     stop("'Chain' includes residual over-dispersion parameters.\n
+  #        A value for 'PercentileThreshold' must be provided. \n")
+  #   }
+  #   if (!is.null(PercentileThreshold)){
+  #     if(PercentileThreshold < 0 | PercentileThreshold > 1 | 
+  #        !is.finite(PercentileThreshold)) {
+  #       stop("Percentile threshold must be in (0,1)")
+  #     }
+  #   }
+  #   if(!is.null(VarThreshold)) {
+  #     stop("'Chain' includes residual over-dispersion parameters.\n
+  #          'VarThreshold' will be ignored. \n
+  #          'PercentileThreshold'must be provided instead. \n")
+  #   }
   # }
-  
-  if (!is.null(VarThreshold)){ 
-    if (VarThreshold < 0 | VarThreshold > 1 | !is.finite(VarThreshold)) {
-      stop("Variance contribution threshold must be in (0,1)")
-    }
-  }
-  
-  if (!is.null(PercentileThreshold)){
-    if(PercentileThreshold < 0 | PercentileThreshold > 1 | 
-       !is.finite(PercentileThreshold)) {
-      stop("Percentile threshold must be in (0,1)")
-    }
-  }
-  
-  .CheckProbEFDR(ProbThreshold, EFDR)
-  
-  if (!is.logical(Plot) | length(Plot) != 1) {
-    stop("Please insert `TRUE` or `FALSE` for `Plot` parameter")
-  }
+
+  # .CheckProbEFDR(ProbThreshold, EFDR)
+  # 
+  # if (!is.logical(Plot) | length(Plot) != 1) {
+  #   stop("Please insert `TRUE` or `FALSE` for `Plot` parameter")
+  # }
   
 }
 

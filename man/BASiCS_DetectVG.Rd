@@ -11,18 +11,18 @@
 BASiCS_DetectVG(
   Chain,
   Task = c("HVG", "LVG"),
-  PercentileThreshold = 0.1,
-  VarThreshold = 0.5,
-  ProbThreshold = 0.5,
+  PercentileThreshold = NULL,
+  VarThreshold = NULL,
+  ProbThreshold = 2/3,
   EFDR = 0.1,
   OrderVariable = c("Prob", "GeneIndex", "GeneName"),
   Plot = FALSE,
   ...
 )
 
-BASiCS_DetectLVG(..., PercentileThreshold = 0.1)
+BASiCS_DetectLVG(Chain, ...)
 
-BASiCS_DetectHVG(..., PercentileThreshold = 0.9)
+BASiCS_DetectHVG(Chain, ...)
 }
 \arguments{
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}

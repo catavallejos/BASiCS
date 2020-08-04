@@ -1471,3 +1471,10 @@ with the rules used in `BASiCS_TestDE`.
 `BASiCS_PlotVG`. 
 - Changes `.VGGridPlot` and `.VGPlot` to use `ggplot2:theme_classic()`
 
+version 2.1.3 (2020-07-29)
+- New default values for `PercentileThreshold` (= NULL), `VarThreshold` (= NULL)
+and `ProbThreshold` (= 2/3) in `BASiCS_DetectVG`). The latter is compatible with 
+the default values in `BASiCS_TestDE`.
+- Changes default behaviour of `BASiCS_DetectLVG`, `BASiCS_DetectHVG` in 
+accordance with the changes introduced for `BASiCS_DetectVG`. 
+
