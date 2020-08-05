@@ -1478,3 +1478,14 @@ the default values in `BASiCS_TestDE`.
 - Changes default behaviour of `BASiCS_DetectLVG`, `BASiCS_DetectHVG` in 
 accordance with the changes introduced for `BASiCS_DetectVG`. 
 
+version 2.1.4 (2020-08-05)
+- Extended unit tests to verify the validity of input parameters for 
+`BASiCS_DetectLVG` and `BASiCS_DetectHVG`. 
+- Updated documentation for `BASiCS_DetectVG` to account for new default values
+and the type of output (now object with class `BASiCS_ResultVG`). 
+- Unit tests for LVG updated as new default value for `ProbThreshold` is used 
+whenever the EFDR calibration fails (2/3 as opposed to 0.5).
+- Minor changes in `BASiCS_VarThresholdSearch` to avoid errors in the presence
+or absence of epsilon. This function is likely to be deprecated. 
+- Updates default probability threshold in `.ThresholdSearch` when EFDR 
+calibration fails. This is now set to `ProbThreshold` (not 0.9)

@@ -77,14 +77,26 @@ BASiCS_VarThresholdSearchVG <- function(Chain,
         100 * VarThreshold, " % ... \n")
     }
 
-    suppressMessages(
-      DetectHVG <- BASiCS_DetectVG(
-        Chain,
-        Task = Task,
-        EFDR = EFDR,
-        VarThreshold = VarThreshold
-      )
-    )
+    if(is.null(Chain@parameters$epsilon)) {
+      suppressMessages(
+        DetectHVG <- BASiCS_DetectVG(
+          Chain,
+          Task = Task,
+          EFDR = EFDR,
+          VarThreshold = VarThreshold
+        )
+      )      
+    } else {
+      suppressMessages(
+        DetectHVG <- BASiCS_DetectVG(
+          Chain,
+          Task = Task,
+          EFDR = EFDR,
+          PercentileThreshold = VarThreshold
+        )
+      )      
+    }
+
 
     Table[i, ] <- c(
       100 * VarThreshold,

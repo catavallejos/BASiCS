@@ -5,60 +5,45 @@
 .HeaderDetectHVG_LVG <- function(Chain,
                                  PercentileThreshold,
                                  VarThreshold,
-                                 ProbThreshold,
-                                 EFDR,
                                  Plot) {
   
-  if (!is(Chain, "BASiCS_Chain")) {
+  if (!is(Chain, "BASiCS_Chain")) 
     stop("'Chain' is not a BASiCS_Chain class object.")
-  }
   
   if(is.null(PercentileThreshold) & is.null(VarThreshold)) 
-    stop("At least one of ")
+    stop("A value must be provided for 'PercentileThreshold' or 'VarThreshold'")
   
   # Test if the chain does not contain epsilon parameters
-  #if (is.null(Chain@parameters$epsilon)) {
-  #  if(is.null(VarThreshold)) {
-  #  stop("'Chain' does not include residual over-dispersion parameters.
-  #       A value for 'VarThreshold' must be provided. \n")
-  #  }
-   # if (!is.null(VarThreshold)){ 
-   #   if (VarThreshold < 0 | VarThreshold > 1 | !is.finite(VarThreshold)) {
-   #     stop("Variance contribution threshold must be in (0,1)")
-   #   }
-   # }
-   # if(!is.null(PercentileThreshold)) {
-   #   stop("'Chain' does not include residual over-dispersion parameters.
-   #        'PercentileThreshold' will be ignored.
-   #        'VarThreshold' must be provided instead.")
-   # }
-  #}
+  if (is.null(Chain@parameters$epsilon)) {
+    
+    if(!is.null(PercentileThreshold)) 
+      stop("'Chain' does not include residual over-dispersion parameters.
+           'PercentileThreshold' will be ignored.
+           'VarThreshold' must be provided instead.")
+    
+    if (!is.null(VarThreshold)) {
+      if (VarThreshold < 0 | VarThreshold > 1 | !is.finite(VarThreshold))
+        stop("Variance contribution threshold must be in (0,1)")
+    }
+  }
   
   # Test if the chain contains beta parameters
-  #if (!is.null(Chain@parameters$epsilon)) {
- #   if(is.null(PercentileThreshold)) {
-  #     stop("'Chain' includes residual over-dispersion parameters.\n
-  #        A value for 'PercentileThreshold' must be provided. \n")
-  #   }
-  #   if (!is.null(PercentileThreshold)){
-  #     if(PercentileThreshold < 0 | PercentileThreshold > 1 | 
-  #        !is.finite(PercentileThreshold)) {
-  #       stop("Percentile threshold must be in (0,1)")
-  #     }
-  #   }
-  #   if(!is.null(VarThreshold)) {
-  #     stop("'Chain' includes residual over-dispersion parameters.\n
-  #          'VarThreshold' will be ignored. \n
-  #          'PercentileThreshold'must be provided instead. \n")
-  #   }
-  # }
-
-  # .CheckProbEFDR(ProbThreshold, EFDR)
-  # 
-  # if (!is.logical(Plot) | length(Plot) != 1) {
-  #   stop("Please insert `TRUE` or `FALSE` for `Plot` parameter")
-  # }
+  if (!is.null(Chain@parameters$epsilon)) {
+    
+    if(!is.null(VarThreshold)) 
+      stop("'Chain' includes residual over-dispersion parameters.\n
+           'VarThreshold' will be ignored. \n
+           'PercentileThreshold'must be provided instead. \n")
+    
+    if(!is.null(PercentileThreshold)) {
+      if(PercentileThreshold < 0 | PercentileThreshold > 1 | 
+         !is.finite(PercentileThreshold)) 
+        stop("Percentile threshold must be in (0,1)")
+    }
+  }
   
+  if(!is.logical(Plot)) 
+    stop("`Plot` must be TRUE or FALSE")
 }
 
 .VGGridPlot <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR) {

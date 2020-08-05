@@ -306,8 +306,8 @@ HVG/LVG evidence. A cut-off value for these posterior probabilities is set by
 controlling the EFDR (as a default option, EFDR is set as 0.10).
 
 ```{r quick-start-HVGdetection, fig.height = 8, fig.width = 20}
-HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6, Plot = FALSE)
-LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2, Plot = FALSE)
+HVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.6)
+LVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.2)
 
 plot_grid(
   BASiCS_PlotVG(HVG, "Grid"),

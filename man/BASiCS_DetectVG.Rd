@@ -15,7 +15,7 @@ BASiCS_DetectVG(
   VarThreshold = NULL,
   ProbThreshold = 2/3,
   EFDR = 0.1,
-  OrderVariable = c("Prob", "GeneIndex", "GeneName"),
+  OrderVariable = "Prob",
   Plot = FALSE,
   ...
 )
@@ -31,12 +31,13 @@ BASiCS_DetectHVG(Chain, ...)
 or lowly variable genes (\code{Task="LVG"}).}
 
 \item{PercentileThreshold}{Threshold to detect a percentile of variable genes
-(must be a positive value, between 0 and 1). Defaults: 0.9 for HVG (top 10 
-percent), 0.1 for LVG (bottom 10 percent)}
+(must be a positive value, between 0 and 1). 
+Default: \code{PercentileThreshold = NULL}.}
 
 \item{VarThreshold}{Variance contribution threshold
 (must be a positive value, between 0 and 1). This is only used when the 
-BASiCS non-regression model was used to generate the Chain object.}
+BASiCS non-regression model was used to generate the Chain object.
+Default: \code{VarThreshold = NULL}.}
 
 \item{ProbThreshold}{Optional parameter. Posterior probability threshold
 (must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
@@ -45,10 +46,11 @@ posterior probability threshold for the test will be set to \code{ProbThreshold}
 \item{EFDR}{Target for expected false discovery rate related
 to HVG/LVG detection. If \code{EFDR = NULL}, EFDR calibration is
 not performed and the posterior probability threshold is set equal to
-\code{ProbThreshold}.Default \code{EFDR = 0.10}.}
+\code{ProbThreshold}. Default \code{EFDR = 0.10}.}
 
 \item{OrderVariable}{Ordering variable for output.
-Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.}
+Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
+Default \code{ProbThreshold = 'Prob'}}
 
 \item{Plot}{If \code{Plot = TRUE} error control and
 expression versus HVG/LVG probability plots are generated}
@@ -56,94 +58,7 @@ expression versus HVG/LVG probability plots are generated}
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
 }
 \value{
-\code{BASiCS_DetectHVG} returns a list of 4 elements:
-\describe{
-    \item{
-        \code{Table}
-    }{
-        Matrix whose columns can contain
-    }
-    \describe{
-        \item{
-            \code{GeneIndex}
-        }{
-            Vector of length \code{q.bio}.
-            Gene index as in the order present in the analysed
-            \code{\link[SingleCellExperiment]{SingleCellExperiment}}.
-        }
-        \item{
-            \code{GeneName}
-        }{
-            Vector of length \code{q.bio}.
-            Gene name as in the order present in the analysed
-             \code{\link[SingleCellExperiment]{SingleCellExperiment}}.
-        }
-        \item{
-            \code{Mu}
-        }{
-            Vector of length \code{q.bio}. For each biological gene,
-             posterior median of gene-specific mean expression
-             parameters \eqn{\mu_i}.
-         }
-        \item{
-            \code{Delta}
-        }{
-            Vector of length \code{q.bio}. For each biological
-            gene, posterior median of gene-specific biological
-            over-dispersion parameter \eqn{\delta_i}.
-         }
-        \item{
-            \code{Sigma}
-        }{
-            Vector of length \code{q.bio}.
-            For each biological gene, proportion of the total variability
-            that is due to a biological heterogeneity component.
-        }
-        \item{
-            \code{Epsilon}
-        }{
-            Vector of length \code{q.bio}.
-            For each biological gene, posterior median of gene-specific
-            residual over-dispersion parameter \eqn{\epsilon_i}.
-        }
-        \item{
-            \code{Prob}
-        }{
-            Vector of length \code{q.bio}.
-            For each biological gene, probability of being highly variable
-            according to the given thresholds.
-        }
-        \item{
-            \code{HVG}
-        }{
-            Vector of length \code{q.bio}.
-            For each biological gene, indicator of being detected as highly
-            variable according to the given thresholds.
-        }
-        \item{
-            \code{LVG}
-        }{
-            Vector of length \code{q.bio}.
-            For each biological gene, indicator of being detected as lowly
-            variable according to the given thresholds.
-        }
-    }
-    \item{
-        \code{ProbThreshold}
-    }{
-        Posterior probability threshold.
-    }
-    \item{
-        \code{EFDR}
-    }{
-        Expected false discovery rate for the given thresholds.
-    }
-    \item{
-        \code{EFNR}
-    }{
-        Expected false negative rate for the given thresholds.
-    }
-}
+An object of class \code{\link[BASiCS]{BASiCS_ResultVG}}.
 }
 \description{
 Functions to detect highly and lowly variable genes. If the 

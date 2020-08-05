@@ -50,9 +50,9 @@
     if (sum(!is.na(AbsDiff)) == 0) {
       message(
         "EFDR calibration failed for ", Task, " task. \n",
-        "Probability threshold automatically set equal to 0.90 \n"
+        "Probability threshold automatically set equal to 'ProbThreshold", Suffix, "'."
       )
-      OptThreshold <- c(0.9, NA, NA)
+      OptThreshold <- c(ProbThreshold, NA, NA)
       return(
         list(
           OptThreshold = OptThreshold,
@@ -91,10 +91,10 @@
     } else {
       # 1.1.2. If optimal prob is too low - fix to input probs
       
-      EFDRgrid <- .EFDR(ProbThreshold, Probs)
-      EFNRgrid <- .EFNR(ProbThreshold, Probs)
+      EFDRgrid_2 <- .EFDR(ProbThreshold, Probs)
+      EFNRgrid_2 <- .EFNR(ProbThreshold, Probs)
       
-      OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])  
+      OptThreshold <- c(ProbThreshold, EFDRgrid_2, EFNRgrid_2)  
       message(
         "For ", Task, " task:\n",
         "the posterior probability threshold chosen via EFDR calibration",
@@ -107,7 +107,12 @@
     EFDRgrid <- .EFDR(ProbThreshold, Probs)
     EFNRgrid <- .EFNR(ProbThreshold, Probs)
     OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])
-    ProbThresholds <- NULL
+    ProbThresholds <- ProbThreshold
+    
+    message(
+      "EFDR = NULL for", Task, " task:\n",
+      "Probability threshold automatically set equal to",
+      "'ProbThreshold", Suffix, "'.")
   } 
   
   # return results
