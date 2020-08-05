@@ -1,23 +1,4 @@
-HiddenCheckThresholds <- function(Epsilon, ProbThreshold, EFDR, Suffix) {
 
-  if (Epsilon < 0 | !is.finite(Epsilon)) {
-    stop(paste0("'Epsilon", Suffix, "' must be a positive real value"))
-  }
-  if (!is.null(ProbThreshold)) {
-    if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
-      stop(paste0("'ProbThreshold", Suffix, "' must be contained in (0,1) \n"))
-    }
-  }
-  if (!is.null(EFDR)) {
-    if(EFDR < 0 | EFDR > 1 | !is.finite(EFDR)) {
-      stop(paste0("'EFDR_", Suffix, "' must be contained in (0,1) \n"))
-    }
-  }
-  if(is.null(EFDR) & is.null(ProbThreshold)) {
-    stop(paste0("A value for 'EFDR_", Suffix, "' or 'ProbThreshold", Suffix,
-                "' must be provided \n"))
-  }
-}
 
 HiddenHeaderTest_DE <- function(Chain1,
                                 Chain2,

@@ -1,20 +1,46 @@
 context("Basic example of HVG/LVG detection")
 
+test_that("HVG/LVG - check if key parameters are missing", {
+  
+  data(ChainSC)
+  expect_error(BASiCS_DetectVG(ChainSC, Task = "HVG"),
+               regexp = "A value must be provided for")
+  expect_error(BASiCS_DetectVG(ChainSC, Task = "HVG",
+                               PercentileThreshold = 0.9),
+               regexp = "\'Chain\' does not include residual")
+  expect_error(BASiCS_DetectVG(ChainSC, Task = "HVG",
+                               VarThreshold = 0.6), NA)
+  expect_message(BASiCS_DetectVG(ChainSC, Task = "HVG",
+                                 VarThreshold = 0.6,
+                                 EFDR = NULL), 
+               regexp = "EFDR = NULL for")
+
+  data(ChainSCReg)
+  expect_error(BASiCS_DetectVG(ChainSCReg, Task = "HVG"),
+               regexp = "A value must be provided for")
+  expect_error(BASiCS_DetectVG(ChainSCReg, Task = "HVG",
+                               VarThreshold = 0.9),
+               regexp = "\'Chain\' includes residual")
+  expect_error(BASiCS_DetectVG(ChainSCReg, Task = "HVG",
+                               PercentileThreshold = 0.9), NA)
+  expect_message(BASiCS_DetectVG(ChainSCReg, Task = "HVG",
+                                 PercentileThreshold = 0.9,
+                                 EFDR = NULL), 
+                 regexp = "EFDR = NULL for")
+  
+})
+
 test_that("HVG/LVG detection is correct", {
   data(ChainSC)
 
-  DetectHVG <- BASiCS_DetectHVG(ChainSC, PercentileThreshold = NULL,
-                                VarThreshold = 0.60,
-                                EFDR = 0.10, Plot = FALSE)
-  DetectLVG <- BASiCS_DetectLVG(ChainSC, PercentileThreshold = NULL,
-                                VarThreshold = 0.40,
-                                EFDR = 0.10, Plot = FALSE)
+  DetectHVG <- BASiCS_DetectHVG(ChainSC, VarThreshold = 0.60)
+  DetectLVG <- BASiCS_DetectLVG(ChainSC, VarThreshold = 0.40)
   
   FreqHVG0 <- c(347, 3)
   FreqHVG <- as.vector(table(DetectHVG@Table$HVG))  
   expect_equal(FreqHVG, FreqHVG0)
   
-  FreqLVG0 <- c( 119, 231)
+  FreqLVG0 <- c(146, 204)
   FreqLVG <- as.vector(table(DetectLVG@Table$LVG))  
   expect_equal(FreqLVG, FreqLVG0)
 
@@ -33,8 +59,8 @@ test_that("HVG/LVG detection is correct", {
 test_that("HVG/LVG detection using epsilons is correct", {
   data(ChainSCReg)
 
-  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
-  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
+  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.90)
+  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.10)
 
   FreqHVG0 <- c(332, 18)
   FreqHVG <- as.vector(table(DetectHVG@Table$HVG))  
@@ -51,12 +77,13 @@ test_that("HVG/LVG detection using epsilons is correct", {
   ProbLVG0 <- c(1.00, 1.00, 1.00, 1.00, 0.97)
   ProbLVG <- round(DetectLVG@Table$Prob[1:5], 2)
   expect_equal(ProbLVG, ProbLVG0)
+  
   expect_true(!is.null(DetectHVG@Table$Epsilon))
 })
 
 test_that("HVG/LVG utils work", {
   data(ChainSCReg)
-  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = FALSE)
+  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.9)
   expect_is(format(DetectHVG), "data.frame")
   expect_error(DetectHVG[1:10, ], NA)
   p <- 0.8
@@ -72,8 +99,10 @@ test_that("HVG/LVG utils work", {
 test_that("HVG/LVG plotting works", {
   data(ChainSCReg)
             
-  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EFDR = 0.10, Plot = TRUE)
-  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EFDR = 0.10, Plot = TRUE)
+  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.9,
+                                Plot = TRUE)
+  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.9,
+                                Plot = TRUE)
   expect_is(DetectHVG@Extras$Plots[[1]], "gg")
   expect_is(DetectHVG@Extras$Plots[[2]], "gg")
   expect_is(DetectLVG@Extras$Plots[[1]], "gg")
@@ -83,12 +112,12 @@ test_that("HVG/LVG plotting works", {
 
 
 test_that("VarThresholdSearch works", {
-  data(ChainSCReg)
+  data(ChainSC)
   grid <- seq(0.25, 0.75, length.out = 3)
-  DetectHVG <- BASiCS_VarThresholdSearchHVG(ChainSCReg,
+  DetectHVG <- BASiCS_VarThresholdSearchHVG(ChainSC,
     VarThresholdsGrid = grid)
   expect_is(DetectHVG, "data.frame")
-  DetectLVG <- BASiCS_VarThresholdSearchLVG(ChainSCReg,
+  DetectLVG <- BASiCS_VarThresholdSearchLVG(ChainSC,
     VarThresholdsGrid = grid)
   expect_is(DetectHVG, "data.frame")
 })

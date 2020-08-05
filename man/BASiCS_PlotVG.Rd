@@ -12,7 +12,8 @@ BASiCS_PlotVG(object, Plot = c("Grid", "VG"), ...)
 \item{Plot}{Character scalar specifying the type of plot to be made.
 Options are "Grid" and "VG".}
 
-\item{...}{Passed to \code{.VGPlot}.}
+\item{...}{Optional graphical parameters passed to \code{.VGPlot} 
+(internal function).}
 }
 \value{
 A plot.

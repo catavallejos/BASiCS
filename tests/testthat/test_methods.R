@@ -8,7 +8,7 @@ test_that("show", {
   expect_output(show(Summary(ChainSC)), "An object of class BASiCS_Summary")
   d <- BASiCS_TestDE(ChainSCReg, ChainSCReg)
   expect_output(show(d), "An object of class BASiCS_ResultsDE, containing")
-  v <- BASiCS_DetectHVG(ChainSCReg)
+  v <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.9)
   expect_output(show(v), "An object of class BASiCS_ResultVG.")
 })
 

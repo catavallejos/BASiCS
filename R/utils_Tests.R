@@ -17,113 +17,110 @@
   return(sum(Prob * I(EviThreshold >= Prob)) / sum(I(EviThreshold >= Prob)))
 }
 
-.ThresholdSearch <- function(Probs, ProbThreshold, EFDR, Task, Suffix) {
+.ThresholdSearch <- function(Probs, ProbThreshold, EFDR, Task, Suffix = NULL) {
   # Summary of cases
   # 1. If EFDR is provided - run calibration
   #   1.1. If the calibration doesn't completely fail - search prob
   #     1.1.1. If optimal prob is not too low - set prob to optimal
-  #     1.1.2. If optimal prob is too low - fix to input probs
+  #     1.1.2. If optimal prob is too low - fix to input ProbThreshold
   #   1.2 If calibration completely fails - default prob to 0.9 (conservative)
-  # 2. If EFDR is not provided - fix to input probs
+  # 2. If EFDR is not provided - fix to input ProbThreshold
   
-  # 2. If EFDR is not provided - fix to given probs
-  if (is.null(EFDR)) {
-    EFDRgrid <- .EFDR(ProbThreshold, Probs)
-    EFNRgrid <- .EFNR(ProbThreshold, Probs)
-    
-    OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])
-    return(
-      list(
-        OptThreshold = OptThreshold,
-        EFDRgrid = EFDRgrid, 
-        EFNRgrid = EFNRgrid
+  if(!is.null(EFDR)) {
+    # 1. If EFDR is provided - run calibration 
+     ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
+  
+    ## Evaluate EFDR/EFNR for a grid of thresholds
+    EFDRgrid <- vapply(
+      ProbThresholds,
+      FUN = .EFDR, 
+      FUN.VALUE = 1,
+      Prob = Probs
+    )
+    EFNRgrid <- vapply(
+      ProbThresholds,
+      FUN = .EFNR,
+      FUN.VALUE = 1,
+      Prob = Probs
+    )
+    AbsDiff <- abs(EFDRgrid - EFDR)
+  
+
+    # 1.2 If calibration completely fails - default prob to 0.9 (conservative)
+    if (sum(!is.na(AbsDiff)) == 0) {
+      message(
+        "EFDR calibration failed for ", Task, " task. \n",
+        "Probability threshold automatically set equal to 'ProbThreshold", Suffix, "'."
       )
-    )
-  }
-
-
-
-# 1. If EFDR is provided - run calibration    
-  ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
-  
-  EFDRgrid <- vapply(
-    ProbThresholds,
-    FUN = .EFDR, 
-    FUN.VALUE = 1,
-    Prob = Probs
-  )
-  EFNRgrid <- vapply(
-    ProbThresholds,
-    FUN = .EFNR,
-    FUN.VALUE = 1,
-    Prob = Probs
-  )
-  
-  AbsDiff <- abs(EFDRgrid - EFDR)
-  
-
-  # 1.2 If calibration completely fails - default prob to 0.9 (conservative)
-  if (sum(!is.na(AbsDiff)) == 0) {
-    message(
-      "EFDR calibration failed for ", Task, " task. \n",
-      "Probability threshold automatically set equal to 0.90 \n"
-    )
-    OptThreshold <- c(0.9, NA, NA)
-    return(
-      list(
-        OptThreshold = OptThreshold,
-        EFDRgrid = EFDRgrid, 
-        EFNRgrid = EFNRgrid
+      OptThreshold <- c(ProbThreshold, NA, NA)
+      return(
+        list(
+          OptThreshold = OptThreshold,
+          EFDRgrid = EFDRgrid, 
+          EFNRgrid = EFNRgrid
+        )
       )
-    )
-  }
+    }
 
-
-  # 1.1. If the calibration doesn't completely fail
+    # 1.1. If the calibration doesn't completely fail
+    # Search EFDR closest to the desired value
+    EFDRopt <- EFDRgrid[AbsDiff  == min(AbsDiff , na.rm = TRUE) & 
+      !is.na(AbsDiff)]
+    # If multiple threholds lead to same EFDR, choose the one with lowest EFNR
+    EFNRopt <- EFNRgrid[EFDRgrid == mean(EFDRopt) & !is.na(EFDRgrid)]
+    if (sum(!is.na(EFNRopt)) > 0) {
+      optimal <- which(EFDRgrid == mean(EFDRopt) & EFNRgrid == mean(EFNRopt))
+    } else {
+      optimal <- which(EFDRgrid == mean(EFDRopt))
+    }
+    # Quick fix for EFDR/EFNR ties; possibly not an issue in real datasets
+    optimal <- median(round(median(optimal)))
   
-  # Search EFDR closest to the desired value
-  EFDRopt <- EFDRgrid[AbsDiff  == min(AbsDiff , na.rm = TRUE) & 
-    !is.na(AbsDiff)]
-  # If multiple threholds lead to same EFDR, choose the one with lowest EFNR
-  EFNRopt <- EFNRgrid[EFDRgrid == mean(EFDRopt) & !is.na(EFDRgrid)]
-  if (sum(!is.na(EFNRopt)) > 0) {
-    optimal <- which(EFDRgrid == mean(EFDRopt) & EFNRgrid == mean(EFNRopt))
-  } else {
-    optimal <- which(EFDRgrid == mean(EFDRopt))
-  }
-  # Quick fix for EFDR/EFNR ties; possibly not an issue in real datasets
-  optimal <- median(round(median(optimal)))
-  
-  if (ProbThresholds[optimal] >= ProbThreshold) {
-    # 1.1.1. If optimal prob is not too low - set prob to optimal
-    
-    OptThreshold <- c(ProbThresholds[optimal],
-                      EFDRgrid[optimal], 
-                      EFNRgrid[optimal])
-    if (abs(OptThreshold[2] - EFDR) > 0.025) {
-      message("For ", Task, " task:\n",
-              "It is not possible to find a probability threshold (>0.5) \n",
-              "that achieves the desired EFDR level (+-0.025). \n",
-              "The output below reflects the closest possible value. \n")
+    if (ProbThresholds[optimal] >= ProbThreshold) {
+      # 1.1.1. If optimal prob is not too low - set prob to optimal
+      
+      OptThreshold <- c(ProbThresholds[optimal],
+                        EFDRgrid[optimal], 
+                        EFNRgrid[optimal])
+      if (abs(OptThreshold[2] - EFDR) > 0.025) {
+        message("For ", Task, " task:\n",
+                "It is not possible to find a probability threshold (>0.5) \n",
+                "that achieves the desired EFDR level (+-0.025). \n",
+                "The output below reflects the closest possible value. \n")
+      }
+    } else {
+      # 1.1.2. If optimal prob is too low - fix to input probs
+      
+      EFDRgrid_2 <- .EFDR(ProbThreshold, Probs)
+      EFNRgrid_2 <- .EFNR(ProbThreshold, Probs)
+      
+      OptThreshold <- c(ProbThreshold, EFDRgrid_2, EFNRgrid_2)  
+      message(
+        "For ", Task, " task:\n",
+        "the posterior probability threshold chosen via EFDR calibration",
+        "is too low. Probability threshold automatically set equal to",
+        "'ProbThreshold", Suffix, "'.")
+      
     }
   } else {
-    # 1.1.2. If optimal prob is too low - fix to input probs
-    
+    # 2. If EFDR is not provided - fix to given ProbThreshold
     EFDRgrid <- .EFDR(ProbThreshold, Probs)
     EFNRgrid <- .EFNR(ProbThreshold, Probs)
+    OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])
+    ProbThresholds <- ProbThreshold
     
-    OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])  
     message(
-      "For ", Task, " task:\n",
-      "the posterior probability threshold chosen via EFDR calibration",
-      "is too low. Probability threshold automatically set equal to",
+      "EFDR = NULL for", Task, " task:\n",
+      "Probability threshold automatically set equal to",
       "'ProbThreshold", Suffix, "'.")
-  }
-
+  } 
+  
+  # return results
   list(
     OptThreshold = OptThreshold,
     EFDRgrid = EFDRgrid, 
-    EFNRgrid = EFNRgrid
+    EFNRgrid = EFNRgrid,
+    ProbThresholds = ProbThresholds
   )
 }
 
@@ -281,5 +278,51 @@
     ess(mcmc(Chain2@parameters[[parameter]])) > MinESS
   } else {
     rep(TRUE, q)
+  }
+}
+
+.CheckProbEFDR <- function(ProbThreshold, EFDR, Suffix = NULL) {
+  
+  if (!is.null(ProbThreshold)) {
+    if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
+      stop(paste0("'ProbThreshold", Suffix, "' must be contained in (0,1) \n"))
+    }
+  }
+  if (!is.null(EFDR)) {
+    if(EFDR < 0 | EFDR > 1 | !is.finite(EFDR)) {
+      if(!is.null(Suffix))
+        stop(paste0("'EFDR_", Suffix, "' must be contained in (0,1) \n"))
+      else
+        stop(paste0("'EFDR' must be contained in (0,1) \n"))
+    }
+  }
+  if(is.null(EFDR) & is.null(ProbThreshold)) {
+    if(!is.null(Suffix))
+      stop(paste0("A value for 'EFDR_", Suffix, "' or 'ProbThreshold", Suffix,
+                  "' must be provided \n"))
+    else
+      stop(paste0("A value for 'EFDR' or 'ProbThreshold' must be provided \n"))
+      
+  }
+}
+
+HiddenCheckThresholds <- function(Epsilon, ProbThreshold, EFDR, Suffix) {
+  
+  if (Epsilon < 0 | !is.finite(Epsilon)) {
+    stop(paste0("'Epsilon", Suffix, "' must be a positive real value"))
+  }
+  if (!is.null(ProbThreshold)) {
+    if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
+      stop(paste0("'ProbThreshold", Suffix, "' must be contained in (0,1) \n"))
+    }
+  }
+  if (!is.null(EFDR)) {
+    if(EFDR < 0 | EFDR > 1 | !is.finite(EFDR)) {
+      stop(paste0("'EFDR_", Suffix, "' must be contained in (0,1) \n"))
+    }
+  }
+  if(is.null(EFDR) & is.null(ProbThreshold)) {
+    stop(paste0("A value for 'EFDR_", Suffix, "' or 'ProbThreshold", Suffix,
+                "' must be provided \n"))
   }
 }

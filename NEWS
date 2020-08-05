@@ -1454,3 +1454,45 @@ version 2.1.1 (2020-07-28)
   Epsilon/Delta,Sigma values were erroneously not returned.
 - More detailed colouring of differential expression plots.
 - Bugfix in labels for DE plots.
+
+version 2.1.2 (2020-07-29)
+- Moves auxiliary functions related to HVG/LVG analysis to `utils_VG.R`. This
+includes `.VGPlot`, `.VGGridPlot`, `.HeaderDetectHVG_LVG` and `.VG`. 
+- Updated warning messages in `.HeaderDetectHVG_LVG`
+- Updated rules for `EFDR` and `ProbThreshold` parameters in `BASiCS_DetectVG`.
+If `EFDR = NULL`, EFDR calibration is not used and posterior probability 
+threshold is set to be equal to `ProbThreshold`. This behaviour is consistent
+with the rules used in `BASiCS_TestDE`. 
+- Creates `.CheckProbEFDR` to perform validity checks for `ProbThreshold` and
+`EFDR` in all tests (HVG/LVG and DE).
+- Cleans code within `.ThresholdSearch` and `BASiCS_DetectVG`
+- Removes `Threshold` from the output provided by `BASiCS_DetectVG`
+- Removes duplicated plotting code in `BASiCS_DetectVG`. Now calls 
+`BASiCS_PlotVG`. 
+- Changes `.VGGridPlot` and `.VGPlot` to use `ggplot2:theme_classic()`
+
+version 2.1.3 (2020-07-29)
+- New default values for `PercentileThreshold` (= NULL), `VarThreshold` (= NULL)
+and `ProbThreshold` (= 2/3) in `BASiCS_DetectVG`). The latter is compatible with 
+the default values in `BASiCS_TestDE`.
+- Changes default behaviour of `BASiCS_DetectLVG`, `BASiCS_DetectHVG` in 
+accordance with the changes introduced for `BASiCS_DetectVG`. 
+
+version 2.1.4 (2020-08-05)
+- Extended unit tests to verify the validity of input parameters for 
+`BASiCS_DetectLVG` and `BASiCS_DetectHVG`. 
+- Updated documentation for `BASiCS_DetectVG` to account for new default values
+and the type of output (now object with class `BASiCS_ResultVG`). 
+- Unit tests for LVG updated as new default value for `ProbThreshold` is used 
+whenever the EFDR calibration fails (2/3 as opposed to 0.5).
+- Minor changes in `BASiCS_VarThresholdSearch` to avoid errors in the presence
+or absence of epsilon. This function is likely to be deprecated. 
+- Updates default probability threshold in `.ThresholdSearch` when EFDR 
+calibration fails. This is now set to `ProbThreshold` (not 0.9)
+
+version 2.1.5 (2020-08-05)
+- Minor change on the definition of `OrderVariable` within `BASiCS_DetectVG`
+
+version 2.1.6 (2020-08-05)
+- Prevents usage of `BASiCS_VarThresholdSearchVG` when using residual
+overdispersion parameters
