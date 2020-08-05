@@ -1489,3 +1489,6 @@ whenever the EFDR calibration fails (2/3 as opposed to 0.5).
 or absence of epsilon. This function is likely to be deprecated. 
 - Updates default probability threshold in `.ThresholdSearch` when EFDR 
 calibration fails. This is now set to `ProbThreshold` (not 0.9)
+
+version 2.1.5 (2020-08-05)
+- Minor change on the definition of `OrderVariable` within `BASiCS_DetectVG`

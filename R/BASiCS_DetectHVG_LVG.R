@@ -76,7 +76,7 @@ BASiCS_DetectVG <- function(
     VarThreshold = NULL, # 0.5,
     ProbThreshold = 2/3, # 0.5,
     EFDR = 0.1,
-    OrderVariable = "Prob",
+    OrderVariable = c("Prob", "GeneIndex", "GeneName"),
     Plot = FALSE,
     ...
   ) {
@@ -86,7 +86,7 @@ BASiCS_DetectVG <- function(
   .HeaderDetectHVG_LVG(Chain = Chain,
                        PercentileThreshold = PercentileThreshold,
                        VarThreshold = VarThreshold, Plot = Plot)
-  OrderVariable <- match.arg(OrderVariable, c("Prob", "GeneIndex", "GeneName"))
+  OrderVariable <- match.arg(OrderVariable)
   .CheckProbEFDR(ProbThreshold, EFDR)
   
   # Define LVG/HVG criteria

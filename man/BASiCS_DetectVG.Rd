@@ -15,7 +15,7 @@ BASiCS_DetectVG(
   VarThreshold = NULL,
   ProbThreshold = 2/3,
   EFDR = 0.1,
-  OrderVariable = "Prob",
+  OrderVariable = c("Prob", "GeneIndex", "GeneName"),
   Plot = FALSE,
   ...
 )
