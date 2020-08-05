@@ -69,15 +69,18 @@ BASiCS_VarThresholdSearchVG <- function(Chain,
   colnames(Table) <- c("Var. Threshold (%)", "EFDR (%)", "EFNR (%)",
                        "Optimal evidence thres.", "# Detected genes")
 
-  for (i in seq_along(VarThresholdsGrid)) {
-    VarThreshold <- VarThresholdsGrid[i]
-    if (Progress) {
-      message(
-        "Evaluating variance contribution threshold = ",
-        100 * VarThreshold, " % ... \n")
-    }
-
-    if(is.null(Chain@parameters$epsilon)) {
+  if(!is.null(Chain@parameters$epsilon)) {
+    stop("Function not available for residual overdispersion parameters")
+  } else {
+    
+    for (i in seq_along(VarThresholdsGrid)) {
+      VarThreshold <- VarThresholdsGrid[i]
+      if (Progress) {
+        message(
+          "Evaluating variance contribution threshold = ",
+          100 * VarThreshold, " % ... \n")
+      }
+      
       suppressMessages(
         DetectHVG <- BASiCS_DetectVG(
           Chain,
@@ -85,26 +88,15 @@ BASiCS_VarThresholdSearchVG <- function(Chain,
           EFDR = EFDR,
           VarThreshold = VarThreshold
         )
-      )      
-    } else {
-      suppressMessages(
-        DetectHVG <- BASiCS_DetectVG(
-          Chain,
-          Task = Task,
-          EFDR = EFDR,
-          PercentileThreshold = VarThreshold
-        )
-      )      
+      )
+      Table[i, ] <- c(
+        100 * VarThreshold,
+        round(100 * DetectHVG@EFDR, 2),
+        round(100 * DetectHVG@EFNR, 2),
+        DetectHVG@ProbThreshold,
+        sum(.VG(DetectHVG))
+      )
     }
-
-
-    Table[i, ] <- c(
-      100 * VarThreshold,
-      round(100 * DetectHVG@EFDR, 2),
-      round(100 * DetectHVG@EFNR, 2),
-      DetectHVG@ProbThreshold,
-      sum(.VG(DetectHVG))
-    )
   }
   return(Table)
 }
