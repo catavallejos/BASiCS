@@ -1019,6 +1019,8 @@ setMethod("format",
       } else {
         ind <- x@Table$Prob > ProbThreshold
       }
+    } else {
+      ind <- seq_len(nrow(x@Table))
     }
     merge(
       format(

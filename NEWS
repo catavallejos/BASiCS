@@ -1496,3 +1496,6 @@ version 2.1.5 (2020-08-05)
 version 2.1.6 (2020-08-05)
 - Prevents usage of `BASiCS_VarThresholdSearchVG` when using residual
 overdispersion parameters
+
+version 2.1.7 (2020-09-01)
+- Bugfix in format method for ResultVG class.
