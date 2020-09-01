@@ -55,9 +55,8 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     if (length(Plots) > 1) {
       nrow <- length(object@Results[Parameters])
       labels <- vapply(object@Results[Parameters],
-        function(x) {
-          .cap(.MeasureName(x@Name))
-        }, character(1)
+        function(x) .cap(.MeasureName(x@Name)),
+        character(1)
       )
       # labels <- Reduce(c, labels)
       labels <- c(
@@ -79,7 +78,11 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         )
       }
     )
-    cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels, hjust = 0)
+    if (length(l) > 1) {
+      cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels, hjust = 0)
+    } else {
+      l[[1]]
+    }
   }
 )
 
