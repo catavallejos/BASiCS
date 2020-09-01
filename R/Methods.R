@@ -209,11 +209,11 @@ setMethod(
                         Cells = NULL,
                         Iterations = NULL) {
 
-    N <- nrow(displayChainBASiCS(x, Param = "mu"))
-    q <- ncol(displayChainBASiCS(x, Param = "mu"))
-    n <- ncol(displayChainBASiCS(x, Param = "nu"))
-    GeneName <- colnames(displayChainBASiCS(x, Param = "mu"))
-    CellName <- colnames(displayChainBASiCS(x, Param = "nu"))
+    N <- nrow(displayChainBASiCS(x, Parameter = "mu"))
+    q <- ncol(displayChainBASiCS(x, Parameter = "mu"))
+    n <- ncol(displayChainBASiCS(x, Parameter = "nu"))
+    GeneName <- colnames(displayChainBASiCS(x, Parameter = "mu"))
+    CellName <- colnames(displayChainBASiCS(x, Parameter = "nu"))
 
     # Checking for valid arguments + assigning default values
     if (is.null(Iterations)) {
@@ -445,7 +445,7 @@ setMethod(
 #' @description Accessors for the slots of a \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param Param Name of the slot to be used for the accessed.
+#' @param Parameter Name of the slot to be used for the accessed.
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
@@ -754,7 +754,7 @@ setMethod(
 #' object
 #'
 #' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
-#' @param Param Name of the slot to be used for the accessed.
+#' @param Parameter Name of the slot to be used for the accessed.
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
@@ -965,23 +965,61 @@ setMethod("[",
 #' Methods for formatting \linkS4class{BASiCS_Result} and 
 #' \linkS4class{BASiCS_ResultsDE} objects.
 #' @param x Object being subsetted.
-#' @param Which Character scalar indicating which of the 
+#' @param Parameter Character scalar indicating which of the 
 #' \linkS4class{BASiCS_Result} should be formatted.
 #' @param Filter Logical scalar indicating whether results should be
 #' filtered based on differential expression or HVG/LVG status if
 #' \code{ProbThreshold=NULL}, or a probability threshold if
 #' \code{ProbThreshold=NULL}
 #' @param ProbThreshold Probability threshold to be used if \code{Filter=TRUE}
+#' @param ... Passed to \code{\link{format}}.
 #' @return A \code{data.frame}.
 #' @rdname format-methods
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultsDE"),
-  function(x, Which, Filter = TRUE, ProbThreshold = NULL) {
-    Which <- match.arg(Which, choices = names(x@Results))
+  function(x, Parameter, Filter = TRUE, ProbThreshold = NULL, ...) {
+    .Deprecated("as.data.frame", old = "format")
+    format(
+      as.data.frame(
+        x,
+        Parameter = Parameter,
+        Filter = Filter,
+        ProbThreshold = ProbThreshold
+      ),
+      ...
+    )
+  }
+)
+
+
+
+#' Converting BASiCS results objects to data.frames
+#' 
+#' @param x An object of class \linkS4class{BASiCS_ResultVG}, 
+#'  \linkS4class{BASiCS_ResultDE}, or \linkS4class{BASiCS_ResultsDE}.
+#' @param Parameter For \linkS4class{BASiCS_ResultsDE} objects only. 
+#'  Character scalar specifying which table of results to 
+#'  output. Available options are "Mean", (mu, mean expression),
+#'  "Disp" (delta, overdispersion) and "ResDisp" 
+#'  (epsilon, residual overdispersion).
+#' @param Filter Logical scalar. If \code{TRUE}, output only entries
+#' corresponding to genes that pass the decision rule used in the probabilistic
+#' test.
+#' @param ProbThreshold Only used if \code{Filter=TRUE}.
+#' Numeric scalar specifying the probability threshold to be used when filtering
+#' genes. Default is to use the threshold used in the original decision rule
+#' when the test was performed.
+#' @return A data.frame of test results.
+#' @rdname as.data.frame-methods
+#' @importFrom BiocGenerics as.data.frame
+#' @export
+setMethod("as.data.frame", signature = signature("BASiCS_ResultsDE"),
+  function(x, Parameter, Filter = TRUE, ProbThreshold = NULL) {
+    Parameter <- match.arg(Parameter, choices = names(x@Results))
     merge(
-      format(
-        x@Results[[Which]],
+      as.data.frame(
+        x@Results[[Parameter]],
         Filter = Filter,
         ProbThreshold = ProbThreshold
       ),
@@ -991,11 +1029,25 @@ setMethod("format",
   }
 )
 
+
 #' @rdname format-methods
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultDE"),
-  function(x, Which, Filter = TRUE, ProbThreshold = NULL) {
+  function(x, Filter = TRUE, ProbThreshold = NULL, ...) {
+    .Deprecated("as.data.frame", old = "format")
+    format(
+      as.data.frame(x, Filter = Filter, ProbThreshold = ProbThreshold),
+      ...
+    )
+  }
+)
+
+
+#' @rdname as.data.frame-methods
+#' @export
+setMethod("as.data.frame", signature = signature("BASiCS_ResultDE"),
+  function(x, Filter = TRUE, ProbThreshold = NULL) {
     if (Filter) {
       if (is.null(ProbThreshold)) {
         ProbThreshold <- x@ProbThreshold
@@ -1012,27 +1064,35 @@ setMethod("format",
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultVG"),
-  function(x, Which, Filter = TRUE, ProbThreshold = NULL) {
+  function(x, Filter = TRUE, ProbThreshold = NULL, ...) {
+    .Deprecated("as.data.frame", old = "format")
+    format(
+      as.data.frame(x, Filter = Filter, ProbThreshold = ProbThreshold),
+      ...
+    )
+  }
+)
+
+#' @rdname as.data.frame-methods
+#' @export
+setMethod("as.data.frame", signature = signature("BASiCS_ResultVG"),
+  function(x, Filter = TRUE, ProbThreshold = NULL) {
     if (Filter) {
       if (is.null(ProbThreshold)) {
         ind <- .VG(x)
       } else {
         ind <- x@Table$Prob > ProbThreshold
       }
+    } else {
+      ind <- seq_len(nrow(x@Table))
     }
     merge(
-      format(
-        x@Table[ind, ],
-        Filter = Filter,
-        ProbThreshold = ProbThreshold
-      ),
+      x@Table[ind, ],
       x@RowData,
       by = "GeneName"
     )
   }
 )
-
-
 
 #' rowData getter and setter for \linkS4class{BASiCS_ResultsDE} 
 #' and \linkS4class{BASiCS_ResultVG} objects.

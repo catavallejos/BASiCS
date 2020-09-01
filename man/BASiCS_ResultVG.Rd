@@ -12,10 +12,23 @@ Container of results for a single HVG/LVG test.
 
 \describe{
 \item{\code{Method}}{Character value detailing whether the test performed using 
-variance decomposition (\code{method="Variance"}) or percentiles of epsilon 
+a threshold directly on epsilon values (\code{Method="Epsilon"}),
+variance decomposition (\code{Method="Variance"}) or percentiles of epsilon 
 (\code{Method="Percentile"}).}
 
 \item{\code{RowData}}{Optional \linkS4class{DataFrame} containing 
 additional information about genes used in the test.}
+
+\item{\code{EFDRgrid,EFNRgrid}}{Grid of EFDR and EFNR values calculated before 
+thresholds were fixed.}
+
+\item{\code{Threshold}}{Threshold used to calculate tail posterior probabilities 
+for the HVG or LVG decision rule.}
+
+\item{\code{ProbThresholds}}{Probability thresholds used to calculate 
+\code{EFDRGrid} and \code{EFNRGrid}.}
+
+\item{\code{ProbThreshold}}{Posterior probability threshold used in the HVG/LVG 
+decision rule.}
 }}
 

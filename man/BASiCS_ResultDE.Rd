@@ -24,8 +24,8 @@ test.}
 \item{\code{EFDR,EFNR}}{Expected false discovery and expected false negative rates
 for differential test.}
 
-\item{\code{EFDRgrid,EFNRgrid}}{Grid of EFDR and EFNR values check before thresholds
-were fixed.}
+\item{\code{EFDRgrid,EFNRgrid}}{Grid of EFDR and EFNR values calculated before 
+thresholds were fixed.}
 
 \item{\code{Epsilon}}{Minimum fold change or difference threshold.}
 

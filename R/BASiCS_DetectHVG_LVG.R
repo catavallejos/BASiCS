@@ -22,6 +22,8 @@
 #' @param ProbThreshold Optional parameter. Posterior probability threshold
 #' (must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
 #' posterior probability threshold for the test will be set to \code{ProbThreshold}
+#' @param EpsilonThreshold Threshold for residual overdispersion above which
+#' 
 #' @param EFDR Target for expected false discovery rate related
 #' to HVG/LVG detection. If \code{EFDR = NULL}, EFDR calibration is
 #' not performed and the posterior probability threshold is set equal to
@@ -30,7 +32,12 @@
 #' Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
 #' Default \code{ProbThreshold = 'Prob'}
 #' @param Plot If \code{Plot = TRUE} error control and
-#' expression versus HVG/LVG probability plots are generated
+#' expression versus HVG/LVG probability plots are generated.
+#' @param MinESS The minimum effective sample size for a gene to be included 
+#' in the HVG or LVG tests. This helps to remove genes with poor mixing from
+#' detection of HVGs/LVGs.
+#' Default is 100. If set to NA, genes are
+#' not checked for effective sample size the tests are performed.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_ResultVG}}.
@@ -54,6 +61,11 @@
 #'                               EFDR = 0.10, Plot = TRUE)
 #' DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.10,
 #'                               EFDR = 0.10, Plot = TRUE)
+#' 
+#' ## Highly and lowly variable genes detection based on residual overdispersion
+#' ## threshold
+#' DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EpsilonThreshold = log(2), Plot = TRUE)
+#' DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EpsilonThreshold = -log(2), Plot = TRUE)
 #'
 #' @details See vignette
 #'
@@ -75,25 +87,35 @@ BASiCS_DetectVG <- function(
     PercentileThreshold = NULL, # 0.1,
     VarThreshold = NULL, # 0.5,
     ProbThreshold = 2/3, # 0.5,
+    EpsilonThreshold = NULL,
     EFDR = 0.1,
     OrderVariable = c("Prob", "GeneIndex", "GeneName"),
     Plot = FALSE,
+    MinESS = 100,
     ...
   ) {
   
   # Check valid input values
   Task <- match.arg(Task)
-  .HeaderDetectHVG_LVG(Chain = Chain,
-                       PercentileThreshold = PercentileThreshold,
-                       VarThreshold = VarThreshold, Plot = Plot)
+  .HeaderDetectHVG_LVG(
+    Chain = Chain,
+    PercentileThreshold = PercentileThreshold,
+    EpsilonThreshold = EpsilonThreshold,
+    VarThreshold = VarThreshold,
+    Plot = Plot
+  )
   OrderVariable <- match.arg(OrderVariable)
   .CheckProbEFDR(ProbThreshold, EFDR)
   
   # Define LVG/HVG criteria
   operator <- if (Task == "HVG") `>` else `<`
   if (!is.null(Chain@parameters$beta) & !is.null(PercentileThreshold)) {
-     Method <- "Percentile"
-  } else { Method <- "Variance" }
+    Method <- "Percentile"
+  } else if (!is.null(EpsilonThreshold)) {
+    Method <- "Epsilon"
+  } else {
+    Method <- "Variance"
+  }
 
   # Prepare template for output table
   GeneIndex <- seq_along(Chain@parameters$mu)
@@ -103,23 +125,31 @@ BASiCS_DetectVG <- function(
     GeneName = GeneName,
     Mu = matrixStats::colMedians(Chain@parameters$mu),
     Delta = matrixStats::colMedians(Chain@parameters$mu)
-    )
+  )
   
+
   if (Method == "Percentile") {
-    
     # Find the epsilon threshold that correspond to the 'PercentileThreshold'
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
     EpsilonThreshold <- stats::quantile(
-      Epsilon, 
-      PercentileThreshold, 
-      na.rm = TRUE)
+      Epsilon,
+      PercentileThreshold,
+      na.rm = TRUE
+    )
     Table <- cbind.data.frame(Table, Epsilon = Epsilon)
     # Auxiliary variable to calculate H/LVG prob for a given epsilon threshold
     ProbAux <- operator(Chain@parameters$epsilon, EpsilonThreshold)
     Threshold <- PercentileThreshold 
     
-  } else {
-  
+  } else if (Method == "Epsilon") {
+    ## Directly supply epsilon threshold
+    Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
+    Table <- cbind.data.frame(Table, Epsilon = Epsilon)
+    # Auxiliary variable to calculate H/LVG prob for the given epsilon threshold
+    ProbAux <- operator(Chain@parameters$epsilon, EpsilonThreshold)
+    Threshold <- EpsilonThreshold
+    
+  } else if (Method == "Variance") {
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
     Table <- cbind.data.frame(Table, 
@@ -131,12 +161,14 @@ BASiCS_DetectVG <- function(
 
   # Calculate tail posterior probabilities
   Prob <- matrixStats::colMeans2(ProbAux)
-  
+
   # EFDR calibration
-  Aux <- .ThresholdSearch(Prob[!is.na(Prob)], 
-                          ProbThreshold, 
-                          EFDR, 
-                          Task = paste(Task, "detection"))
+  Aux <- .ThresholdSearch(
+    Prob[!is.na(Prob)],
+    ProbThreshold,
+    EFDR,
+    Task = paste(Task, "detection")
+  )
    
   # Output preparation
   VG <- Prob > Aux$OptThreshold[1]
@@ -229,18 +261,12 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
     )
   } else if (Plot == "VG") {
     .VGPlot(
-        Task = object@Name,
-        Mu = object@Table$Mu,
-        Prob = object@Table$Prob,
-        OptThreshold = object@ProbThreshold,
-        Hits = object@Table[[object@Name]],
-        ...
+      Task = object@Name,
+      Mu = object@Table$Mu,
+      Prob = object@Table$Prob,
+      OptThreshold = object@ProbThreshold,
+      Hits = object@Table[[object@Name]],
+      ...
     )
   }
 }
-
-
-
-
-
-

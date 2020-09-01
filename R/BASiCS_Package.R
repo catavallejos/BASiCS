@@ -8,17 +8,15 @@
 #'                     scale_x_continuous scale_y_continuous
 #' @importFrom ggplot2 theme_minimal theme_classic 
 #' @importFrom ggplot2 xlab ylab labs
-#' @importFrom graphics abline barplot legend lines par points segments 
-#' @importFrom graphics smoothScatter 
 #' @importFrom grDevices adjustcolor colorRampPalette nclass.FD
 #' @importFrom ggExtra ggMarginal
-#' @importFrom KernSmooth bkde2D
+#' @importFrom graphics segments
 #' @importFrom MASS mvrnorm
 #' @importFrom matrixStats colMeans2 colMedians colVars
 #' @importFrom matrixStats rowMeans2 rowMedians rowVars   
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
-#' @importFrom S4Vectors DataFrame metadata metadata<-
+#' @importFrom S4Vectors DataFrame
 #' @importFrom scran calculateSumFactors 
 #' @importFrom stats acf median model.matrix rgamma rpois runif var
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 

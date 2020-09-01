@@ -4,7 +4,7 @@ data(ChainSC)
 data(ChainRNA)
 
 test_that("Differential test is correct", {
-            
+
   Test <- BASiCS_TestDE(
     Chain1 = ChainSC,
     Chain2 = ChainRNA,
@@ -203,19 +203,19 @@ test_that("Utility methods work", {
   expect_is(Test, "BASiCS_ResultsDE")
   expect_is(Test[["Mean"]], "BASiCS_ResultDE")
   f <- Test[["Mean"]][1:10, ]
-  df <- format(f, Filter = FALSE)
+  expect_warning(df <- format(f, Filter = FALSE))
   expect_equal(
     Test@Results$Mean@Table[1:10, "GeneName"],
-    df[["GeneName"]]
+    as.character(df[["GeneName"]])
   )
   d <- rowData(Test)
   ind <- seq_len(nrow(d))
   d$ind <- ind
   rowData(Test) <- d
   expect_equal(rowData(Test)$ind, ind)
-  df <- format(Test, "Mean")
+  df <- as.data.frame(Test, Parameter = "Mean")
   expect_is(df, "data.frame")
   p <- 0.9
-  df <- format(Test, "Mean", ProbThreshold = p)
+  df <- as.data.frame(Test, Parameter = "Mean", ProbThreshold = p)
   expect_true(all(df$ProbDiffMean > p))
 })

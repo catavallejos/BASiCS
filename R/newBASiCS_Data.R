@@ -26,45 +26,6 @@
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
-#' @examples
-#'
-#' ## Data with spike-ins
-#'
-#' # Expression counts
-#' set.seed(1)
-#' Counts <- matrix(rpois(50 * 10, 2), ncol = 10)
-#' rownames(Counts) <- c(paste0("Gene", 1:40), paste0("ERCC", 1:10))
-#' # Technical information
-#' Tech <- grepl("ERCC", rownames(Counts))
-#' # Spikes input number of molecules
-#' set.seed(2)
-#' SpikeInfo <- data.frame(
-#'   gene = rownames(Counts)[Tech],
-#'   amount = rgamma(10, 1, 1)
-#' )
-#'
-#' # Creating a BASiCS_Data object (no batch effect)
-#' DataExample <- newBASiCS_Data(Counts, Tech = Tech, SpikeInfo = SpikeInfo)
-#'
-#' # Creating a BASiCS_Data object (with batch effect)
-#' BatchInfo <- c(rep(1, 5), rep(2, 5))
-#' DataExample <- newBASiCS_Data(
-#'   Counts,
-#'   Tech = Tech,
-#'   SpikeInfo = SpikeInfo,
-#'   BatchInfo = BatchInfo
-#' )
-#'
-#' ## Data without spike-ins (BatchInfo is required)
-#'
-#' # Expression counts
-#' set.seed(1)
-#' Counts <- matrix(rpois(50 * 10, 2), ncol = 10)
-#' rownames(Counts) <- paste0("Gene", 1:50)
-#' BatchInfo <- c(rep(1, 5), rep(2, 5))
-#'
-#' # Creating a BASiCS_Data object (with batch effect)
-#' DataExample <- newBASiCS_Data(Counts, BatchInfo = BatchInfo)
 #' @seealso \code{\linkS4class{SingleCellExperiment}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
@@ -76,7 +37,7 @@ newBASiCS_Data <- function(Counts,
                            SpikeInfo = NULL,
                            BatchInfo = NULL,
                            SpikeType = "ERCC") {
-  
+  .Deprecated()
   if (!inherits(Counts, "matrix")) {
     stop("Counts must be a matrix.")
   }
@@ -115,10 +76,10 @@ newBASiCS_Data <- function(Counts,
       )
     }
     # Extracting spike-in input molecules in the correct order
-    if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) {
+    if (any(!(GeneName[Tech] %in% SpikeInfo[, 1]))) {
       stop("'SpikeInfo' is missing information for some of the spikes")
     }
-    if (sum(!(SpikeInfo[, 1] %in% GeneName[Tech])) > 0) {
+    if (any(!(SpikeInfo[, 1] %in% GeneName[Tech]))) {
       stop("'SpikeInfo' includes spikes that are not in 'Counts'")
     }
     if (any(GeneName[Tech] != SpikeInfo[, 1])) {
@@ -126,8 +87,8 @@ newBASiCS_Data <- function(Counts,
       matching <- match(GeneName[Tech], SpikeInfo[, 1])
       SpikeInfo <- SpikeInfo[matching, ]
     }
-    metadata(Data)$SpikeInput <- SpikeInfo
-    altExp(Data, "spike-ins") <- SummarizedExperiment(CountsTech)
+    altExp(Data, "spike-ins") <- SummarizedExperiment(CountsTech, 
+      rowData = SpikeInfo)
     WithSpikes <- TRUE
   } else {
     message("The data does not contain spike-in genes")

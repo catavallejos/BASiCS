@@ -8,12 +8,12 @@
 \title{Accessors for the slots of a \code{\linkS4class{BASiCS_Summary}}
 object}
 \usage{
-\S4method{displaySummaryBASiCS}{BASiCS_Summary}(object, Param = "mu")
+\S4method{displaySummaryBASiCS}{BASiCS_Summary}(object, Parameter = "mu")
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Param}{Name of the slot to be used for the accessed.
+\item{Parameter}{Name of the slot to be used for the accessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}.}

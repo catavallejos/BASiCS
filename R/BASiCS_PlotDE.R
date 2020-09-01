@@ -4,10 +4,11 @@
 #' \linkS4class{BASiCS_ResultDE} object.
 #' @param Plots Plots plot to produce? Options: "MA", "Volcano", 
 #'  "Grid".
-#' @param Parameters Which parameter(s) to produce plots for?
-#'  Available options are "Mean", (mu mean expression),
-#'  "Disp" (delta overdispersion) and "ResDisp" 
-#'  (epsilon residual overdispersion).
+#' @param Parameters Character vector specifying the parameter(s) to produce 
+#'  plots for,
+#'  Available options are "Mean", (mu, mean expression),
+#'  "Disp" (delta, overdispersion) and "ResDisp" 
+#'  (epsilon, residual overdispersion).
 #' @param MuX Use Mu (mean expression across both chains) as the X-axis for all
 #'  MA plots? Default: TRUE.
 #' @param Mu,GroupLabel1,GroupLabel2,ProbThresholds,Epsilon,EFDR,Table,Measure,EFDRgrid,EFNRgrid,ProbThreshold Internal arguments.
@@ -26,7 +27,7 @@
 #' 
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
+#' @author Alan O'Callaghan
 #' @rdname BASiCS_PlotDE
 #' @export
 setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
@@ -55,9 +56,8 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     if (length(Plots) > 1) {
       nrow <- length(object@Results[Parameters])
       labels <- vapply(object@Results[Parameters],
-        function(x) {
-          .cap(.MeasureName(x@Name))
-        }, character(1)
+        function(x) .cap(.MeasureName(x@Name)),
+        character(1)
       )
       # labels <- Reduce(c, labels)
       labels <- c(
@@ -79,7 +79,11 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
         )
       }
     )
-    cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels, hjust = 0)
+    if (length(l) > 1) {
+      cowplot::plot_grid(plotlist = l, nrow = nrow, labels = labels, hjust = 0)
+    } else {
+      l[[1]]
+    }
   }
 )
 

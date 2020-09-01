@@ -84,11 +84,12 @@ test_that("HVG/LVG detection using epsilons is correct", {
 test_that("HVG/LVG utils work", {
   data(ChainSCReg)
   DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.9)
-  expect_is(format(DetectHVG), "data.frame")
+  expect_warning(x <- format(DetectHVG))
+  expect_is(x, "data.frame")
   expect_error(DetectHVG[1:10, ], NA)
   p <- 0.8
-  d <- format(DetectHVG, ProbThreshold = p)
-  expect_true(all(d$Prob > p))
+  d <- as.data.frame(DetectHVG, ProbThreshold = p)
+  expect_true(all(as.numeric(d$Prob) > p))
   rd <- rowData(DetectHVG)
   ind <- seq_len(nrow(rd))
   rd$ind <- ind
@@ -120,4 +121,51 @@ test_that("VarThresholdSearch works", {
   DetectLVG <- BASiCS_VarThresholdSearchLVG(ChainSC,
     VarThresholdsGrid = grid)
   expect_is(DetectHVG, "data.frame")
+})
+
+
+
+test_that("HVG/LVG detection is correct (Epsilon)", {
+  data(ChainSC)
+
+  expect_error(
+    BASiCS_DetectHVG(ChainSC, EpsilonThreshold = log(2)),
+    "'Chain' does not include residual over-dispersion parameters."
+  )
+  expect_error(
+    BASiCS_DetectLVG(ChainSC, EpsilonThreshold = -log(2)),
+    "'Chain' does not include residual over-dispersion parameters."
+  )
+
+  data(ChainSCReg)
+
+  DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EpsilonThreshold = log(2))
+  DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EpsilonThreshold = -log(2))
+  
+  expect_equal(
+    DetectHVG@Table$Prob,
+    unname(colMeans(ChainSCReg@parameters$epsilon > log(2))[DetectHVG@Table$GeneName])
+  )
+  expect_equal(
+    DetectLVG@Table$Prob,
+    unname(colMeans(ChainSCReg@parameters$epsilon < -log(2))[DetectLVG@Table$GeneName])
+  )
+  FreqHVG0 <- c(338, 12)
+  FreqHVG <- as.vector(table(DetectHVG@Table$HVG))  
+  expect_equal(FreqHVG, FreqHVG0)
+  
+  FreqLVG0 <- c(342, 8)
+  FreqLVG <- as.vector(table(DetectLVG@Table$LVG))  
+  expect_equal(FreqLVG, FreqLVG0)
+
+  ProbHVG0 <- c(1, 1, 1, 1, 0.99)
+  ProbHVG <- round(DetectHVG@Table$Prob[1:5], 2)
+  expect_equal(ProbHVG, ProbHVG0)
+  
+  ProbLVG0 <- c(0.15, 0.15, 0.15, 0.15, 0.15)
+  ProbLVG <- round(DetectLVG@Table$Prob[141:145], 2)
+  expect_equal(ProbLVG, ProbLVG0)
+
+  expect_true(!is.null(DetectHVG@Table$Delta))
+  expect_true(!is.null(DetectHVG@Table$Epsilon))
 })
