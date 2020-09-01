@@ -1023,11 +1023,7 @@ setMethod("format",
       ind <- seq_len(nrow(x@Table))
     }
     merge(
-      format(
-        x@Table[ind, ],
-        Filter = Filter,
-        ProbThreshold = ProbThreshold
-      ),
+      x@Table[ind, ],
       x@RowData,
       by = "GeneName"
     )
