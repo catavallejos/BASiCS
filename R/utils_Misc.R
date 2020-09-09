@@ -20,31 +20,31 @@ ess <- function(x) {
 }
 
 .ScaleName <- function(Measure = c("ess", "geweke.diag"),
-                       Param = NULL) {
+                       Parameter = NULL) {
 
   Measure <- match.arg(Measure)
   measure_name <- switch(Measure, 
     ess = "Effective sample size",
     geweke.diag = "Geweke diagnostic"
   )
-  if (!is.null(Param)) {
-    measure_name <- paste0(measure_name, ": ", Param)
+  if (!is.null(Parameter)) {
+    measure_name <- paste0(measure_name, ": ", Parameter)
   }
   measure_name
 }
 
 .GetMeasure <- function(object, 
-                        Param,
+                        Parameter,
                         Measure = c("ess", "geweke.diag"), 
                         na.rm = FALSE) {
 
   Measure <- match.arg(Measure)
   MeasureFun <- match.fun(Measure)
-  mat <- .GetParam(object, Param)
+  mat <- .GetParam(object, Parameter)
   if (na.rm) {
     mat <- mat[, !apply(mat, 2, function(col) any(is.na(col)))]
     if (!ncol(mat)) {
-      stop(paste("No non-NA samples for", Param))
+      stop(paste("No non-NA samples for", Parameter))
     }
   }
   metric <- MeasureFun(coda::mcmc(mat))
@@ -54,14 +54,14 @@ ess <- function(x) {
   metric
 }
 
-.GetParam <- function(object, Param = "mu") {
-  if (is.null(Param) || 
-      is.na(Param) || 
-      length(Param) > 1 ||
-      !(Param %in% names(object@parameters))) {
-    stop("'Param' argument is invalid")
+.GetParam <- function(object, Parameter = "mu") {
+  if (is.null(Parameter) || 
+      is.na(Parameter) || 
+      length(Parameter) > 1 ||
+      !(Parameter %in% names(object@parameters))) {
+    stop("'Parameter' argument is invalid")
   }
-  object@parameters[[Param]]
+  object@parameters[[Parameter]]
 }
 
 .CheckValidCombination <- function(...) {

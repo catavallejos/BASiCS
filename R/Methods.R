@@ -209,11 +209,11 @@ setMethod(
                         Cells = NULL,
                         Iterations = NULL) {
 
-    N <- nrow(displayChainBASiCS(x, Param = "mu"))
-    q <- ncol(displayChainBASiCS(x, Param = "mu"))
-    n <- ncol(displayChainBASiCS(x, Param = "nu"))
-    GeneName <- colnames(displayChainBASiCS(x, Param = "mu"))
-    CellName <- colnames(displayChainBASiCS(x, Param = "nu"))
+    N <- nrow(displayChainBASiCS(x, Parameter = "mu"))
+    q <- ncol(displayChainBASiCS(x, Parameter = "mu"))
+    n <- ncol(displayChainBASiCS(x, Parameter = "nu"))
+    GeneName <- colnames(displayChainBASiCS(x, Parameter = "mu"))
+    CellName <- colnames(displayChainBASiCS(x, Parameter = "nu"))
 
     # Checking for valid arguments + assigning default values
     if (is.null(Iterations)) {
@@ -445,7 +445,7 @@ setMethod(
 #' @description Accessors for the slots of a \code{\linkS4class{BASiCS_Chain}}
 #'
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param Param Name of the slot to be used for the accessed.
+#' @param Parameter Name of the slot to be used for the accessed.
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
@@ -965,7 +965,7 @@ setMethod("[",
 #' Methods for formatting \linkS4class{BASiCS_Result} and 
 #' \linkS4class{BASiCS_ResultsDE} objects.
 #' @param x Object being subsetted.
-#' @param Which Character scalar indicating which of the 
+#' @param Parameter Character scalar indicating which of the 
 #' \linkS4class{BASiCS_Result} should be formatted.
 #' @param Filter Logical scalar indicating whether results should be
 #' filtered based on differential expression or HVG/LVG status if
@@ -977,11 +977,11 @@ setMethod("[",
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultsDE"),
-  function(x, Which, Filter = TRUE, ProbThreshold = NULL) {
-    Which <- match.arg(Which, choices = names(x@Results))
+  function(x, Parameter, Filter = TRUE, ProbThreshold = NULL) {
+    Parameter <- match.arg(Parameter, choices = names(x@Results))
     merge(
       format(
-        x@Results[[Which]],
+        x@Results[[Parameter]],
         Filter = Filter,
         ProbThreshold = ProbThreshold
       ),
@@ -995,7 +995,7 @@ setMethod("format",
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultDE"),
-  function(x, Which, Filter = TRUE, ProbThreshold = NULL) {
+  function(x, Filter = TRUE, ProbThreshold = NULL) {
     if (Filter) {
       if (is.null(ProbThreshold)) {
         ProbThreshold <- x@ProbThreshold
@@ -1012,7 +1012,7 @@ setMethod("format",
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultVG"),
-  function(x, Which, Filter = TRUE, ProbThreshold = NULL) {
+  function(x, Filter = TRUE, ProbThreshold = NULL) {
     if (Filter) {
       if (is.null(ProbThreshold)) {
         ind <- .VG(x)

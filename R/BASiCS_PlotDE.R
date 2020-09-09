@@ -4,10 +4,11 @@
 #' \linkS4class{BASiCS_ResultDE} object.
 #' @param Plots Plots plot to produce? Options: "MA", "Volcano", 
 #'  "Grid".
-#' @param Parameters Which parameter(s) to produce plots for?
-#'  Available options are "Mean", (mu mean expression),
-#'  "Disp" (delta overdispersion) and "ResDisp" 
-#'  (epsilon residual overdispersion).
+#' @param Parameters Character vector specifying the parameter(s) to produce 
+#'  plots for,
+#'  Available options are "Mean", (mu, mean expression),
+#'  "Disp" (delta, overdispersion) and "ResDisp" 
+#'  (epsilon, residual overdispersion).
 #' @param MuX Use Mu (mean expression across both chains) as the X-axis for all
 #'  MA plots? Default: TRUE.
 #' @param Mu,GroupLabel1,GroupLabel2,ProbThresholds,Epsilon,EFDR,Table,Measure,EFDRgrid,EFNRgrid,ProbThreshold Internal arguments.

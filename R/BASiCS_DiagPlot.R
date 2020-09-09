@@ -5,13 +5,13 @@
 #' for more details on this diagnostic measure.
 #'
 #' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
-#' @param Param Optional name of a chain parameter to restrict the histogram;
+#' @param Parameter Optional name of a chain parameter to restrict the histogram;
 #' if not supplied, all parameters will be assessed.
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-#' \code{'sigma2'} and \code{'epsilon'}. Default \code{Param = 'mu'}
+#' \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}
 #' @param x,y Optional MCMC parameter values to be plotted on the x or y axis, 
-#' respectively. If neither is supplied, Param will be plotted on the x axis
+#' respectively. If neither is supplied, Parameter will be plotted on the x axis
 #' and effective sample size will be plotted on the y axis as
 #' a density plot.
 #' @param LogX,LogY A logical value indicating whether to use a log10
@@ -30,7 +30,7 @@
 #' data(ChainSC)
 #' 
 #' # Point estimates versus effective sample size
-#' BASiCS_DiagPlot(ChainSC, Param = "mu")
+#' BASiCS_DiagPlot(ChainSC, Parameter = "mu")
 #' # Effective sample size as colour, mu as x, delta as y.
 #' BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
 #' 
@@ -40,7 +40,7 @@
 #' 
 #' @export
 BASiCS_DiagPlot <- function(object, 
-                            Param = "mu", 
+                            Parameter = "mu", 
                             x = NULL, 
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
@@ -57,11 +57,11 @@ BASiCS_DiagPlot <- function(object,
       stop("Must specify both x and y or neither!")
     }
   } else {
-    LogX <- Param %in% c("mu", "delta")
+    LogX <- Parameter %in% c("mu", "delta")
   }
   Measure <- "ess"
-  .CheckValidCombination(x, y, Param)
-  metric <- .GetMeasure(object, Param, Measure, na.rm)
+  .CheckValidCombination(x, y, Parameter)
+  metric <- .GetMeasure(object, Parameter, Measure, na.rm)
   sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()
   sY <- if (LogY) ggplot2::scale_y_log10() else ggplot2::scale_y_continuous()
 
@@ -79,13 +79,13 @@ BASiCS_DiagPlot <- function(object,
     df <- df[order(df$metric), ]
     g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
       ggplot2::geom_point(alpha = 0.5, shape = 16) +
-      viridis::scale_color_viridis(name = .ScaleName(Measure, Param)
+      viridis::scale_color_viridis(name = .ScaleName(Measure, Parameter)
         #, trans="log10"
         ) +
       sX + sY +
       ggplot2::labs(x = x, y = y)              
   } else {
-    xMat <- .GetParam(object, Param)
+    xMat <- .GetParam(object, Parameter)
     xMat <- xMat[, names(metric), drop = FALSE]
     df <- data.frame(
       x = matrixStats::colMedians(xMat),
@@ -93,7 +93,7 @@ BASiCS_DiagPlot <- function(object,
     )
     g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
       sX + sY +
-      ggplot2::labs(x = Param, y = .ScaleName(Measure))
+      ggplot2::labs(x = Parameter, y = .ScaleName(Measure))
     if (Smooth) {
       g <- g +
         ggplot2::geom_hex() +
