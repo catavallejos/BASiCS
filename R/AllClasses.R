@@ -374,8 +374,8 @@ setClass("BASiCS_Result",
 #' test.
 #' @slot EFDR,EFNR Expected false discovery and expected false negative rates
 #' for differential test.
-#' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values check before thresholds
-#' were fixed.
+#' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values calculated before 
+#' thresholds were fixed.
 #' @slot Epsilon Minimum fold change or difference threshold.
 #' @slot Extra objects for class flexibility.
 setClass("BASiCS_ResultDE",
@@ -405,10 +405,20 @@ setClass("BASiCS_ResultDE",
 #'
 #' @description Container of results for a single HVG/LVG test.
 #' @slot Method Character value detailing whether the test performed using 
-#' variance decomposition (\code{method="Variance"}) or percentiles of epsilon 
+#' a threshold directly on epsilon values (\code{Method="Epsilon"}),
+#' variance decomposition (\code{Method="Variance"}) or percentiles of epsilon 
 #' (\code{Method="Percentile"}).
 #' @slot RowData Optional \linkS4class{DataFrame} containing 
 #' additional information about genes used in the test.
+#' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values calculated before 
+#' thresholds were fixed.
+#' @slot Threshold Threshold used to calculate tail posterior probabilities 
+#' for the HVG or LVG decision rule.
+#' @slot ProbThresholds Probability thresholds used to calculate 
+#' \code{EFDRGrid} and \code{EFNRGrid}.
+#' @slot ProbThreshold Posterior probability threshold used in the HVG/LVG 
+#' decision rule.
+#' 
 setClass("BASiCS_ResultVG",
   representation = representation(
     Method = "character",

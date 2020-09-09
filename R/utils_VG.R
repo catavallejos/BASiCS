@@ -5,13 +5,17 @@
 .HeaderDetectHVG_LVG <- function(Chain,
                                  PercentileThreshold,
                                  VarThreshold,
+                                 EpsilonThreshold,
                                  Plot) {
   
   if (!is(Chain, "BASiCS_Chain")) 
     stop("'Chain' is not a BASiCS_Chain class object.")
   
-  if(is.null(PercentileThreshold) & is.null(VarThreshold)) 
-    stop("A value must be provided for 'PercentileThreshold' or 'VarThreshold'")
+  if(is.null(PercentileThreshold) 
+    & is.null(VarThreshold) 
+    & is.null(EpsilonThreshold)) {
+    stop("A value must be provided for 'PercentileThreshold', 'VarThreshold' or 'EpsilonThreshold'")
+  }
   
   # Test if the chain does not contain epsilon parameters
   if (is.null(Chain@parameters$epsilon)) {

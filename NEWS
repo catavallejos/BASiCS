@@ -1499,3 +1499,6 @@ overdispersion parameters
 
 version 2.1.7 (2020-09-01)
 - Bugfix in format method for ResultVG class.
+
+version 2.1.8 (2020-09-09)
+- Add `EpsilonThreshold` argument for `BASiCS_DetectHVG` and `BASiCS_DetectLVG`
