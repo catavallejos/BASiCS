@@ -47,5 +47,5 @@ Catalina A. Vallejos \email{cnvallej@uc.cl}
 
 Nils Eling \email{eling@ebi.ac.uk}
 
-Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
+Alan O'Callaghan
 }

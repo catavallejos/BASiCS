@@ -8,7 +8,7 @@ ess <- function(x) {
   spec <- numeric(ncol(x))
   has_var <- vars != 0
   if (any(has_var, na.rm = TRUE)) {
-    spec[which(has_var)] <- apply(x[, which(has_var)],
+    spec[which(has_var)] <- apply(x[, which(has_var), drop = FALSE],
       2,
       function(y) {
         a <- ar(y, aic = TRUE)
@@ -33,14 +33,19 @@ ess <- function(x) {
   measure_name
 }
 
-.GetMeasure <- function(object, 
+#' @importFrom coda geweke.diag
+.GetMeasure <- function(Chain, 
                         Parameter,
                         Measure = c("ess", "geweke.diag"), 
                         na.rm = FALSE) {
 
   Measure <- match.arg(Measure)
   MeasureFun <- match.fun(Measure)
-  mat <- .GetParam(object, Parameter)
+  mat <- .GetParam(Chain, Parameter)
+  if (Measure == "ess" & !is.null(attr(mat, "ESS"))) {
+    return(attr(mat, "ESS"))
+  }
+
   if (na.rm) {
     mat <- mat[, !apply(mat, 2, function(col) any(is.na(col)))]
     if (!ncol(mat)) {
@@ -58,10 +63,10 @@ ess <- function(x) {
   if (is.null(Parameter) || 
       is.na(Parameter) || 
       length(Parameter) > 1 ||
-      !(Parameter %in% names(object@parameters))) {
+      !(Parameter %in% names(Chain@parameters))) {
     stop("'Parameter' argument is invalid")
   }
-  object@parameters[[Parameter]]
+  Chain@parameters[[Parameter]]
 }
 
 .CheckValidCombination <- function(...) {

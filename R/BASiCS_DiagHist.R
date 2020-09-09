@@ -10,6 +10,9 @@
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.
+#' @param Measure Character scalar specifying the diagnostic measure to plot.
+#' Current options are effective sample size and the Geweke diagnostic 
+#' criterion.
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
 #' @param ... Unused.
@@ -27,15 +30,25 @@
 #' BASiCS_DiagHist(ChainSC, Parameter = "mu")
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
+#' @references
+#'  Geweke, J. Evaluating the accuracy of sampling-based approaches to
+#'  calculating posterior moments. In _Bayesian Statistics 4_ (ed JM
+#'  Bernado, JO Berger, AP Dawid and AFM Smith). Clarendon Press,
+#'  Oxford, UK.
 #'
-#' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+#' @author Alan O'Callaghan
 #'
 #' @export
-BASiCS_DiagHist <- function(object, Parameter = NULL, na.rm = TRUE) {
+BASiCS_DiagHist <- function(
+    object,
+    Parameter = NULL,
+    Measure = c("ess", "geweke.diag"),
+    na.rm = TRUE) {
+
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
-  Measure <- "ess"
+  
 
   if (is.null(Parameter)) {
     metric <- lapply(names(object@parameters), function(param) {

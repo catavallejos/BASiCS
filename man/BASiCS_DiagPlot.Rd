@@ -8,6 +8,7 @@
 BASiCS_DiagPlot(
   object,
   Parameter = "mu",
+  Measure = c("ess", "geweke.diag"),
   x = NULL,
   y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")),
@@ -66,5 +67,5 @@ BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
 \code{\linkS4class{BASiCS_Chain}}
 }
 \author{
-Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+Alan O'Callaghan
 }

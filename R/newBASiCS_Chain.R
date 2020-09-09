@@ -90,6 +90,18 @@
 #'
 #' @export
 newBASiCS_Chain <- function(parameters) {
+  SampleParameters <- intersect(
+    c("mu", "delta", "epsilon", "nu", "s", "theta", "phi", "beta", "sigma2", "lambda"),
+    names(parameters)
+  )
+  parameters[SampleParameters] <- lapply(
+    SampleParameters,
+    function(Parameter) {
+      x <- parameters[[Parameter]]
+      attr(x, "ESS") <- ess(x)
+      x
+    }
+  )
   Chain <- new("BASiCS_Chain", parameters = parameters)
   return(Chain)
 }

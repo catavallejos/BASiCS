@@ -10,6 +10,9 @@
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}
+#' @param Measure Character scalar specifying the diagnostic measure to plot.
+#' Current options are effective sample size and the Geweke diagnostic 
+#' criterion.
 #' @param x,y Optional MCMC parameter values to be plotted on the x or y axis, 
 #' respectively. If neither is supplied, Parameter will be plotted on the x axis
 #' and effective sample size will be plotted on the y axis as
@@ -36,11 +39,12 @@
 #' 
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
-#' @author Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+#' @author Alan O'Callaghan
 #' 
 #' @export
 BASiCS_DiagPlot <- function(object, 
-                            Parameter = "mu", 
+                            Parameter = "mu",
+                            Measure = c("ess", "geweke.diag"),
                             x = NULL, 
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
@@ -59,7 +63,6 @@ BASiCS_DiagPlot <- function(object,
   } else {
     LogX <- Parameter %in% c("mu", "delta")
   }
-  Measure <- "ess"
   .CheckValidCombination(x, y, Parameter)
   metric <- .GetMeasure(object, Parameter, Measure, na.rm)
   sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()

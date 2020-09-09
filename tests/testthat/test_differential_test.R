@@ -4,7 +4,7 @@ data(ChainSC)
 data(ChainRNA)
 
 test_that("Differential test is correct", {
-            
+
   Test <- BASiCS_TestDE(
     Chain1 = ChainSC,
     Chain2 = ChainRNA,

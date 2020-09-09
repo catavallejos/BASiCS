@@ -83,6 +83,7 @@ setClass(
       "RefFreq",
       "designMatrix",
       "RBFLocations",
+      "ESS",
       "ls.mu",
       "ls.delta",
       "ls.phi",

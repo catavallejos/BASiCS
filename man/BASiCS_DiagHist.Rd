@@ -5,7 +5,12 @@
 \alias{BASiCS_diagHist}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
-BASiCS_DiagHist(object, Parameter = NULL, na.rm = TRUE)
+BASiCS_DiagHist(
+  object,
+  Parameter = NULL,
+  Measure = c("ess", "geweke.diag"),
+  na.rm = TRUE
+)
 
 BASiCS_diagHist(...)
 }
@@ -17,6 +22,10 @@ if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.}
+
+\item{Measure}{Character scalar specifying the diagnostic measure to plot.
+Current options are effective sample size and the Geweke diagnostic 
+criterion.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
@@ -42,9 +51,15 @@ BASiCS_DiagHist(ChainSC)
 BASiCS_DiagHist(ChainSC, Parameter = "mu")
 
 }
+\references{
+Geweke, J. Evaluating the accuracy of sampling-based approaches to
+ calculating posterior moments. In _Bayesian Statistics 4_ (ed JM
+ Bernado, JO Berger, AP Dawid and AFM Smith). Clarendon Press,
+ Oxford, UK.
+}
 \seealso{
 \code{\linkS4class{BASiCS_Chain}}
 }
 \author{
-Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+Alan O'Callaghan
 }
