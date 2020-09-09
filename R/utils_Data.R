@@ -49,23 +49,15 @@
         errors <- c(errors, "spike-in counts must be provided as 'altExp'. \n")
       }
     } else {
-      if (!("SpikeInput" %in% names(metadata(Data)))) {
-        errors <- c(errors, "'SpikeInput' was not provided as metadata.\n")
+      if (is.null(colnames(rowData(altExp(Data))))) {
+        errors <- c(errors, "rowData of altExp is missing!\n")
       }
       # Extract spike-ins
       CountsTech <- assay(altExp(Data))
-      SpikeInput <- metadata(Data)$SpikeInput
+      SpikeInput <- rowData(altExp(Data))
       # Validity checks for SpikeInput
-      if (!is.data.frame(SpikeInput)) {
-        errors <- c(errors, "'SpikeInput' must be a 'data.frame'.\n")
-      }
       if (ncol(SpikeInput) != 2) {
-        errors <- c(errors, "'SpikeInput' must have two columns only.\n")
-      }
-      if (nrow(SpikeInput) != nrow(CountsTech)) {
-        errors <- c(errors,
-          "'SpikeInput' dimensions not compatible with 'altExp'. \n"
-        )
+        errors <- c(errors, "rowData of altExp must have two columns only.\n")
       }
       # Validity checks for input concentrations
       if (!(is.numeric(SpikeInput[, 2]) & all(SpikeInput[, 2] > 0) & 
@@ -79,14 +71,14 @@
         errors <- c(errors, "'SpikeInput' row order does not match 'altExp'.\n")
       }
       # Check all cells have non-zero total count
-      if (sum(Matrix::colSums(CountsTech) == 0) > 0) {
+      if (any(Matrix::colSums(CountsTech) == 0)) {
         errors <- c(errors,
           "Some cells have zero reads mapping back to the 
           spike-in genes. Please remove these before running the MCMC.\n"
         )
       }
       # Check all genes have non-zero total count
-      if (sum(Matrix::rowSums(CountsTech) == 0) > 0) {
+      if (any(Matrix::rowSums(CountsTech) == 0)) {
         errors <- c(errors,
           "Some spike-in genes have zero total reads
           across all cells. Please remove these before running the MCMC.\n"
