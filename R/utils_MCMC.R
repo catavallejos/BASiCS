@@ -31,10 +31,9 @@
   # If SpikeInput slot is missing and WithSpikes == TRUE
   if (length(altExpNames(Data)) > 0 &
       WithSpikes &
-      is.null(metadata(Data)$SpikeInput)) {
+      is.null(rowData(altExp(Data)))) {
     stop(
-      "'Data' does not contain 'SpikeInput' as metadata. \n",
-      "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
+      "'altExp(Data)' does not contain 'rowData' \n"
     )
   }
   
@@ -43,8 +42,7 @@
     stop(
       "'Data' does not contain information about spike-in genes \n", 
       "Please indicate include this information using 'altExp' \n",
-      "or set 'WithSpikes = FALSE' \n.",
-      "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
+      "or set 'WithSpikes = FALSE' \n."
     )
   }
     
@@ -53,8 +51,7 @@
     stop(
       "'Data' should contain a BatchInfo vector when 'WithSpikes = FALSE'. \n", 
       "Please assign the batch information to: \n
-      'colData(Data)$BatchInfo = BatchInfo'. \n",
-      "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
+      'colData(Data)$BatchInfo = BatchInfo'. \n"
     )
   }
 
@@ -63,8 +60,7 @@
     stop(
       "'Data' does not contain a 'counts' slot. \n",
       "Please make sure to include the raw data in the \n", 
-      "SingleCellExperiment object under the name 'counts'. \n",
-      "See: https://github.com/catavallejos/BASiCS/wiki/2.-Input-preparation\n"
+      "SingleCellExperiment object under the name 'counts'."
     )
   
   # Further checks on input
@@ -132,7 +128,7 @@
   if (WithSpikes) {
     # Initialize s as the empirical capture efficiency rates
     s0 <- Matrix::colSums(CountsTech) /
-      sum(metadata(Data)$SpikeInput[,2])
+      sum(rowData(altExp(Data))[, 2])
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)

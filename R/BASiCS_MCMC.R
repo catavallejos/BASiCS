@@ -274,7 +274,7 @@ BASiCS_MCMC <- function(
     phi0 = Start$phi0,
     aphi = PriorParam$p.phi,
     LSphi0 = Start$ls.phi0,
-    muSpikes = metadata(Data)$SpikeInput[, 2]
+    muSpikes = rowData(altExp(Data))[, 2]
   )
   NonRegressionArgs <- list(
     prior_delta = (PriorParam$PriorDelta == "log-normal") + 1,

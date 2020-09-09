@@ -63,10 +63,10 @@ ess <- function(x) {
   if (is.null(Parameter) || 
       is.na(Parameter) || 
       length(Parameter) > 1 ||
-      !(Parameter %in% names(Chain@parameters))) {
+      !(Parameter %in% names(object@parameters))) {
     stop("'Parameter' argument is invalid")
   }
-  Chain@parameters[[Parameter]]
+  object@parameters[[Parameter]]
 }
 
 .CheckValidCombination <- function(...) {

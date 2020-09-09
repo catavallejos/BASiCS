@@ -52,7 +52,7 @@ BASiCS_DenoisedCounts <- function(Data, Chain) {
       CountsBio <- counts(Data)
       CountsTech <- assay(altExp(Data))
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
-      out1 <- t(t(CountsBio) / (Phi * Nu))
+      out1 <- t(t(CountsBio) / matrixStats::colMedians(Chain@parameters$phi * Chain@parameters$nu))
       out2 <- t(t(CountsTech) / Nu)
       out <- rbind(out1, out2)
       GeneNames <- c(rownames(Data), rownames(altExp(Data)))
