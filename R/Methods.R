@@ -754,7 +754,7 @@ setMethod(
 #' object
 #'
 #' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
-#' @param Param Name of the slot to be used for the accessed.
+#' @param Parameter Name of the slot to be used for the accessed.
 #' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}.
@@ -972,15 +972,52 @@ setMethod("[",
 #' \code{ProbThreshold=NULL}, or a probability threshold if
 #' \code{ProbThreshold=NULL}
 #' @param ProbThreshold Probability threshold to be used if \code{Filter=TRUE}
+#' @param ... Passed to \code{\link{format}}.
 #' @return A \code{data.frame}.
 #' @rdname format-methods
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultsDE"),
+  function(x, Parameter, Filter = TRUE, ProbThreshold = NULL, ...) {
+    .Deprecated("as.data.frame", old = "format")
+    format(
+      as.data.frame(
+        x,
+        Parameter = Parameter,
+        Filter = Filter,
+        ProbThreshold = ProbThreshold
+      ),
+      ...
+    )
+  }
+)
+
+
+
+#' Converting BASiCS results objects to data.frames
+#' 
+#' @param x An object of class \linkS4class{BASiCS_ResultVG}, 
+#'  \linkS4class{BASiCS_ResultDE}, or \linkS4class{BASiCS_ResultsDE}.
+#' @param Parameter For \linkS4class{BASiCS_ResultsDE} objects only. 
+#'  Character scalar specifying which table of results to 
+#'  output. Available options are "Mean", (mu, mean expression),
+#'  "Disp" (delta, overdispersion) and "ResDisp" 
+#'  (epsilon, residual overdispersion).
+#' @param Filter Logical scalar. If \code{TRUE}, output only entries
+#' corresponding to genes that pass the decision rule used in the probabilistic
+#' test.
+#' @param ProbThreshold Only used if \code{Filter=TRUE}.
+#' Numeric scalar specifying the probability threshold to be used when filtering
+#' genes. Default is to use the threshold used in the original decision rule
+#' when the test was performed.
+#' @rdname as.data.frame-methods
+#' @importFrom BiocGenerics as.data.frame
+#' @export
+setMethod("as.data.frame", signature = signature("BASiCS_ResultsDE"),
   function(x, Parameter, Filter = TRUE, ProbThreshold = NULL) {
     Parameter <- match.arg(Parameter, choices = names(x@Results))
     merge(
-      format(
+      as.data.frame(
         x@Results[[Parameter]],
         Filter = Filter,
         ProbThreshold = ProbThreshold
@@ -991,10 +1028,24 @@ setMethod("format",
   }
 )
 
+
 #' @rdname format-methods
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultDE"),
+  function(x, Filter = TRUE, ProbThreshold = NULL, ...) {
+    .Deprecated("as.data.frame", old = "format")
+    format(
+      as.data.frame(x, Filter = Filter, ProbThreshold = ProbThreshold),
+      ...
+    )
+  }
+)
+
+
+#' @rdname as.data.frame-methods
+#' @export
+setMethod("as.data.frame", signature = signature("BASiCS_ResultDE"),
   function(x, Filter = TRUE, ProbThreshold = NULL) {
     if (Filter) {
       if (is.null(ProbThreshold)) {
@@ -1012,6 +1063,18 @@ setMethod("format",
 #' @export
 setMethod("format",
   signature = signature("BASiCS_ResultVG"),
+  function(x, Filter = TRUE, ProbThreshold = NULL, ...) {
+    .Deprecated("as.data.frame", old = "format")
+    format(
+      as.data.frame(x, Filter = Filter, ProbThreshold = ProbThreshold),
+      ...
+    )
+  }
+)
+
+#' @rdname as.data.frame-methods
+#' @export
+setMethod("as.data.frame", signature = signature("BASiCS_ResultVG"),
   function(x, Filter = TRUE, ProbThreshold = NULL) {
     if (Filter) {
       if (is.null(ProbThreshold)) {
@@ -1029,8 +1092,6 @@ setMethod("format",
     )
   }
 )
-
-
 
 #' rowData getter and setter for \linkS4class{BASiCS_ResultsDE} 
 #' and \linkS4class{BASiCS_ResultVG} objects.

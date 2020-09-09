@@ -5,18 +5,18 @@
 \alias{BASiCS_diagHist}
 \title{Create diagnostic plots of MCMC parameters}
 \usage{
-BASiCS_DiagHist(object, Param = NULL, na.rm = TRUE)
+BASiCS_DiagHist(object, Parameter = NULL, na.rm = TRUE)
 
 BASiCS_diagHist(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Param}{Optional name of a chain parameter to restrict the histogram;
+\item{Parameter}{Optional name of a chain parameter to restrict the histogram;
 if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-\code{'sigma2'} and \code{'epsilon'}. Default \code{Param = NULL}.}
+\code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
@@ -39,7 +39,7 @@ data(ChainSC)
 # See effective sample size distribution across all parameters
 BASiCS_DiagHist(ChainSC)
 # For mu only
-BASiCS_DiagHist(ChainSC, Param = "mu")
+BASiCS_DiagHist(ChainSC, Parameter = "mu")
 
 }
 \seealso{

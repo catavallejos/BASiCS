@@ -7,12 +7,12 @@
 \alias{displayChainBASiCS,BASiCS_Chain-method}
 \title{Accessors for the slots of a BASiCS_Chain object}
 \usage{
-\S4method{displayChainBASiCS}{BASiCS_Chain}(object, Param = "mu")
+\S4method{displayChainBASiCS}{BASiCS_Chain}(object, Parameter = "mu")
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 
-\item{Param}{Name of the slot to be used for the accessed.
+\item{Parameter}{Name of the slot to be used for the accessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}.}

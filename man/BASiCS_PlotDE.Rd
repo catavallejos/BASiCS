@@ -43,10 +43,11 @@ BASiCS_PlotDE(object, ...)
 \item{Plots}{Plots plot to produce? Options: "MA", "Volcano", 
 "Grid".}
 
-\item{Parameters}{Which parameter(s) to produce plots for?
-Available options are "Mean", (mu mean expression),
-"Disp" (delta overdispersion) and "ResDisp" 
-(epsilon residual overdispersion).}
+\item{Parameters}{Character vector specifying the parameter(s) to produce 
+plots for,
+Available options are "Mean", (mu, mean expression),
+"Disp" (delta, overdispersion) and "ResDisp" 
+(epsilon, residual overdispersion).}
 
 \item{MuX}{Use Mu (mean expression across both chains) as the X-axis for all
 MA plots? Default: TRUE.}
