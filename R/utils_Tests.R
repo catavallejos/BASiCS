@@ -286,8 +286,7 @@
       Measure = "ess",
       na.rm = FALSE
     )
-    ess1 > MinESS &
-    ess2 > MinESS
+    ess1 > MinESS & ess2 > MinESS
   } else {
     rep(TRUE, q)
   }

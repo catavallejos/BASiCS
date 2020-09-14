@@ -4,12 +4,17 @@
 \alias{BASiCS_DenoisedCounts}
 \title{Calculates denoised expression expression counts}
 \usage{
-BASiCS_DenoisedCounts(Data, Chain)
+BASiCS_DenoisedCounts(Data, Chain, IncludeSpikes = TRUE)
 }
 \arguments{
-\item{Data}{an object of class \code{\linkS4class{SingleCellExperiment}}}
+\item{Data}{An object of class \code{\linkS4class{SingleCellExperiment}}}
 
-\item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
+\item{Chain}{An object of class \code{\linkS4class{BASiCS_Chain}}}
+
+\item{IncludeSpikes}{A logical scalar specifying whether denoised spike-in
+genes should be generated as part of the output value. This only applies
+when the \code{\linkS4class{BASiCS_Chain}} object was generated with
+the setting \code{WithSpikes=TRUE}.}
 }
 \value{
 A matrix of denoised expression counts. In line with global scaling

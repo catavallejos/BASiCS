@@ -24,7 +24,7 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.}
 
 \item{Measure}{Character scalar specifying the diagnostic measure to plot.
-Current options are effective sample size and the Geweke diagnostic 
+Current options are effective sample size and the Geweke diagnostic
 criterion.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed

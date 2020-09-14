@@ -28,6 +28,10 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}}
 
+\item{Measure}{Character scalar specifying the diagnostic measure to plot.
+Current options are effective sample size and the Geweke diagnostic
+criterion.}
+
 \item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
 respectively. If neither is supplied, Parameter will be plotted on the x axis
 and effective sample size will be plotted on the y axis as
