@@ -343,6 +343,7 @@ BASiCS_MCMC <- function(
     # Discuss this with John (potentially include an optional arg about this)
     AtLeast2Cells <- Matrix::rowSums(GPar$BioCounts > 0) > 1
     Chain$epsilon[, !AtLeast2Cells] <- NA
+    Chain$delta[, !AtLeast2Cells] <- NA
   }
 
   # Format column names of MCMC chains
