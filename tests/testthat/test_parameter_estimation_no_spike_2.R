@@ -6,7 +6,7 @@ test_that("Estimates match (no-spikes)", {
                                   WithBatch = TRUE)
   Data2 <- Data1
   altExp(Data2) <- NULL
-  metadata(Data1)$SpikeInput <- NULL
+  rowData(altExp(Data1)) <- NULL
   expect_equal(counts(Data1), counts(Data2))
 
   set.seed(16)

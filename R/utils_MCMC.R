@@ -141,7 +141,6 @@
     nCountsBio <- t(t(CountsBio) / (phi0 * s0))
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
-    #mu0 <- c(meansBio + 1, metadata(Data)$SpikeInput)
     mu0 <- meansBio + 1
   } else {
     s0 <- size_scran

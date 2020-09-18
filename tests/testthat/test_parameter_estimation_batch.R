@@ -60,7 +60,7 @@ test_that("Estimates match the given seed (spikes+batch)", {
   DC <- BASiCS_DenoisedCounts(Data, Chain)
   
   # Checks for an arbitrary set of genes / cells
-  DCcheck0 <- c(0.000,  8.234, 24.703, 24.703, 49.407)
+  DCcheck0 <- c(0.000,  8.279, 24.837, 24.837, 49.675)
   DCcheck <- as.vector(round(DC[1:5,1], 3))
   expect_equal(DCcheck, DCcheck0)
   
