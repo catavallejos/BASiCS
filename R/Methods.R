@@ -1010,6 +1010,7 @@ setMethod("format",
 #' Numeric scalar specifying the probability threshold to be used when filtering
 #' genes. Default is to use the threshold used in the original decision rule
 #' when the test was performed.
+#' @return A data.frame of test results.
 #' @rdname as.data.frame-methods
 #' @importFrom BiocGenerics as.data.frame
 #' @export

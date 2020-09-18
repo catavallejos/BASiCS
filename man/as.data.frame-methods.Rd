@@ -31,6 +31,9 @@ Numeric scalar specifying the probability threshold to be used when filtering
 genes. Default is to use the threshold used in the original decision rule
 when the test was performed.}
 }
+\value{
+A data.frame of test results.
+}
 \description{
 Converting BASiCS results objects to data.frames
 }

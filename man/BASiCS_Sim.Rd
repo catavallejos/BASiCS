@@ -63,8 +63,8 @@ Theta <- 0.39
 Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
 head(SingleCellExperiment::counts(Data))
 dim(SingleCellExperiment::counts(Data))
-metadata(Data)$SpikeInput
 altExp(Data)
+rowData(altExp(Data))
 
 # Data with spike-ins, multiple batches
 BatchInfo <- c(1,1,1,2,2)

@@ -16,6 +16,7 @@
 #' @importFrom matrixStats rowMeans2 rowMedians rowVars   
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp
+#' @importFrom S4Vectors DataFrame
 #' @importFrom scran calculateSumFactors 
 #' @importFrom stats acf median model.matrix rgamma rpois runif var
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
