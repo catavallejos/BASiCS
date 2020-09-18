@@ -10,6 +10,7 @@
 #' @importFrom ggplot2 xlab ylab labs
 #' @importFrom grDevices adjustcolor colorRampPalette nclass.FD
 #' @importFrom ggExtra ggMarginal
+#' @importFrom graphics segments
 #' @importFrom MASS mvrnorm
 #' @importFrom matrixStats colMeans2 colMedians colVars
 #' @importFrom matrixStats rowMeans2 rowMedians rowVars   

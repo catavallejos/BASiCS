@@ -9,9 +9,6 @@
     stop("'Data' is not a SingleCellExperiment class object.\n")
   }
   
-  # The following checks are only relevant when the input data was
-  # not created using the `newBASiCS_Data` function
-
   # Check if `Data` contains more than one type of types
   if ((length(SingleCellExperiment::altExpNames(Data)) > 1)) {
     stop(

@@ -132,16 +132,6 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
       assays = list(counts = Counts.sim[seq_len(q-q.bio) + q.bio,])
     )
     rowData(altExp(Data)) <- SpikeInfo
-    
-      #Data <- newBASiCS_Data(Counts = Counts.sim,
-      #                       Tech = grepl("ERCC", rownames(Counts.sim)),
-      #                       SpikeInfo = SpikeInfo,
-      #                       BatchInfo = rep(1, 30))
-      #Data <- newBASiCS_Data(Counts = Counts.sim,
-      #                       Tech = grepl("ERCC", rownames(Counts.sim)),
-      #                       SpikeInfo = SpikeInfo,
-      #                       BatchInfo = c(rep(1, 15), rep(2, 15)))
-
   } else {
     # Matrix where simulated counts will be stored
     Counts.sim <- matrix(0, ncol = n, nrow = q.bio)
@@ -172,10 +162,6 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
       BatchInfo = c(rep(1, 15), rep(2, 15)),
       row.names = colnames(Counts.sim)
     )
-  #  Data <- newBASiCS_Data(Counts = Counts.sim,
-  #                         Tech = rep(FALSE, q.bio),
-  #                         BatchInfo = c(rep(1, 15), rep(2, 15)))
-
   }
   return(Data)
 }

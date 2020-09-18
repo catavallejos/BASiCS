@@ -26,45 +26,6 @@
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
 #'
-#' @examples
-#'
-#' ## Data with spike-ins
-#'
-#' # Expression counts
-#' set.seed(1)
-#' Counts <- matrix(rpois(50 * 10, 2), ncol = 10)
-#' rownames(Counts) <- c(paste0("Gene", 1:40), paste0("ERCC", 1:10))
-#' # Technical information
-#' Tech <- grepl("ERCC", rownames(Counts))
-#' # Spikes input number of molecules
-#' set.seed(2)
-#' SpikeInfo <- data.frame(
-#'   gene = rownames(Counts)[Tech],
-#'   amount = rgamma(10, 1, 1)
-#' )
-#'
-#' # Creating a BASiCS_Data object (no batch effect)
-#' DataExample <- newBASiCS_Data(Counts, Tech = Tech, SpikeInfo = SpikeInfo)
-#'
-#' # Creating a BASiCS_Data object (with batch effect)
-#' BatchInfo <- c(rep(1, 5), rep(2, 5))
-#' DataExample <- newBASiCS_Data(
-#'   Counts,
-#'   Tech = Tech,
-#'   SpikeInfo = SpikeInfo,
-#'   BatchInfo = BatchInfo
-#' )
-#'
-#' ## Data without spike-ins (BatchInfo is required)
-#'
-#' # Expression counts
-#' set.seed(1)
-#' Counts <- matrix(rpois(50 * 10, 2), ncol = 10)
-#' rownames(Counts) <- paste0("Gene", 1:50)
-#' BatchInfo <- c(rep(1, 5), rep(2, 5))
-#'
-#' # Creating a BASiCS_Data object (with batch effect)
-#' DataExample <- newBASiCS_Data(Counts, BatchInfo = BatchInfo)
 #' @seealso \code{\linkS4class{SingleCellExperiment}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
