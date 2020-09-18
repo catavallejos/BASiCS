@@ -8,7 +8,7 @@
 #'
 #' @param Data An object of class \code{\linkS4class{SingleCellExperiment}}
 #' @param Chain An object of class \code{\linkS4class{BASiCS_Chain}}
-#' @param IncludeSpikes A logical scalar specifying whether denoised spike-in
+#' @param WithSpikes A logical scalar specifying whether denoised spike-in
 #'  genes should be generated as part of the output value. This only applies
 #'  when the \code{\linkS4class{BASiCS_Chain}} object was generated with
 #'  the setting \code{WithSpikes=TRUE}.
@@ -40,7 +40,7 @@
 #'
 #' @rdname BASiCS_DenoisedCounts
 #' @export
-BASiCS_DenoisedCounts <- function(Data, Chain, IncludeSpikes = TRUE) {
+BASiCS_DenoisedCounts <- function(Data, Chain, WithSpikes = TRUE) {
     if (!is(Data, "SingleCellExperiment")) {
       stop("'Data' is not a SingleCellExperiment class object.")
     }
@@ -58,7 +58,7 @@ BASiCS_DenoisedCounts <- function(Data, Chain, IncludeSpikes = TRUE) {
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
       out <- t(t(CountsBio) / matrixStats::colMedians(Chain@parameters$phi * Chain@parameters$nu))
       GeneNames <- rownames(Data)
-      if (IncludeSpikes) {
+      if (WithSpikes) {
         out2 <- t(t(CountsTech) / Nu)
         out <- rbind(out, out2)
         GeneNames <- c(GeneNames, rownames(altExp(Data)))
