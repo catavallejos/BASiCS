@@ -26,8 +26,8 @@
 #' \code{Theta} can be a scalar (single batch of samples), or a vector (multiple
 #' batches of samples). If a value for \code{BatchInfo} is provided, the length
 #' of \code{Theta} must match the number of unique values in \code{BatchInfo}.
-#' @param BatchInfo same as in \code{\link[BASiCS]{newBASiCS_Data}}. If 
-#' spike-ins, are not in use, the number of unique values contained in 
+#' @param BatchInfo Vector detailing which batch each cell should be simulated
+#' from. If spike-ins are not in use, the number of unique values contained in 
 #' \code{BatchInfo} must be larger than 1 (i.e. multiple batches are present).
 #'
 #' @return An object of class \code{\linkS4class{SingleCellExperiment}},
@@ -96,13 +96,24 @@ BASiCS_Sim <- function(
     ThetaAux <- as.vector(BatchDesign %*% Theta)
     DataAux <- HiddenBASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, ThetaAux)
   }
- 
-  Data <- newBASiCS_Data(
-    Counts = DataAux$Counts,
-    Tech = DataAux$Tech,
-    SpikeInfo = DataAux$SpikeInfo,
-    BatchInfo = BatchInfo
-  )
-
-  return(Data)
+  
+  if (!is.null(Mu_spikes)) {
+    Spikes <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = DataAux$Counts[DataAux$Tech, ]),
+      rowData = DataAux$SpikeInfo
+    )
+    
+    out <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = DataAux$Counts[!DataAux$Tech, ]),
+      altExps = list("spike-ins" = Spikes)
+    )
+  } else {
+    out <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(counts = DataAux$Counts)
+    )
+  }
+  if (!is.null(BatchInfo)) {
+    colData(out)$BatchInfo <- data.frame(BatchInfo)
+  }
+  out
 }

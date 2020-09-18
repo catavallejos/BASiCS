@@ -3,7 +3,7 @@ context("Individual MCMC updates (cpp code) - empirical bayes")
 
 test_that("Spikes + no regression", {
   set.seed(3)
-  expect_warning(Data <- makeExampleBASiCS_Data(WithSpikes = TRUE))
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   CountsBio <- counts(Data)
   CountsAll <- rbind(CountsBio, assay(altExp(Data, "spike-ins")))
   q0 <- nrow(CountsBio)
@@ -56,7 +56,7 @@ test_that("Spikes + no regression", {
 
 test_that("Spikes + regression", {
   set.seed(3)
-  expect_warning(Data <- makeExampleBASiCS_Data(WithSpikes = TRUE))
+  Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
   CountsBio <- counts(Data)
   CountsAll <- rbind(CountsBio, assay(altExp(Data, "spike-ins")))
   q0 <- nrow(CountsBio)
@@ -121,7 +121,7 @@ test_that("Spikes + regression", {
 
 test_that("No Spikes + no regression", {
   set.seed(5)
-  expect_warning(Data <- makeExampleBASiCS_Data(WithSpikes = FALSE))
+  Data <- makeExampleBASiCS_Data(WithSpikes = FALSE)
   CountsBio <- counts(Data)
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
@@ -187,7 +187,7 @@ test_that("No Spikes + no regression", {
 
 test_that("No Spikes + regression", {
   set.seed(12)
-  expect_warning(Data <- makeExampleBASiCS_Data(WithSpikes = FALSE))
+  Data <- makeExampleBASiCS_Data(WithSpikes = FALSE)
   CountsBio <- counts(Data)
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)

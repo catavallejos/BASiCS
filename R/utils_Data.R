@@ -49,7 +49,7 @@
         errors <- c(errors, "spike-in counts must be provided as 'altExp'. \n")
       }
     } else {
-      if (is.null(colnames(rowData(altExp(Data))))) {
+      if (!length(colnames(rowData(altExp(Data))))) {
         errors <- c(errors, "rowData of altExp is missing!\n")
       }
       # Extract spike-ins
@@ -60,14 +60,17 @@
         errors <- c(errors, "rowData of altExp must have two columns only.\n")
       }
       # Validity checks for input concentrations
-      if (!(is.numeric(SpikeInput[, 2]) & all(SpikeInput[, 2] > 0) & 
-            sum(!is.finite(SpikeInput[, 2])) == 0)) {
+      if (ncol(SpikeInput) == 2 && 
+         (!(is.numeric(SpikeInput[, 2])
+          & all(SpikeInput[, 2] > 0)
+          & sum(!is.finite(SpikeInput[, 2])) == 0))
+        ) {
         errors <- c(errors,
           "Invalid value in the 2nd column of 'SpikeInput'.\n"
         )
       }
       # Check order in SpikeInput
-      if (any(SpikeInput[, 1] != rownames(altExp(Data)))) {
+      if (ncol(SpikeInput) == 2 && any(SpikeInput[, 1] != rownames(altExp(Data)))) {
         errors <- c(errors, "'SpikeInput' row order does not match 'altExp'.\n")
       }
       # Check all cells have non-zero total count

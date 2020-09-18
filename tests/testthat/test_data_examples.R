@@ -4,18 +4,10 @@ test_that("Generated data does not match given seed (all cases)", {
   
   # Data example
   set.seed(13)
-  expect_warning(
-    Data1 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
-  )
-  expect_warning(
-    Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = FALSE)
-  )
-  expect_warning(
-    Data3 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
-  )
-  expect_warning(
-    Data4 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = FALSE)
-  )
+  Data1 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = TRUE)
+  Data2 <- makeExampleBASiCS_Data(WithSpikes = FALSE, WithBatch = FALSE)
+  Data3 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
+  Data4 <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = FALSE)
   
   DataCheck01 <- c(2665,   1095,   3680,   1012,   1895)
   DataCheck02 <- c(1800,    823,   3705,   2969,   1132)

@@ -35,13 +35,13 @@
   }
   
   # If SpikeInput slot is missing and WithSpikes == TRUE
-#  if (length(altExpNames(Data)) > 0 &
-#      WithSpikes) &
-#      is.null(rowData(altExp(Data)))) {
-#    stop(
-#      "'altExp(Data)' does not contain 'rowData' \n"
-#    )
-#  }
+  if (length(altExpNames(Data)) > 0 &&
+     WithSpikes &&
+     is.null(rowData(altExp(Data)))) {
+    stop(
+      "'altExp(Data)' does not contain 'rowData' \n"
+    )
+  }
   
   # If isSpike slot is missing and WithSpikes == TRUE
   if((length(altExpNames(Data)) == 0)  & WithSpikes) {
