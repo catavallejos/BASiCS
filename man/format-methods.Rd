@@ -7,16 +7,16 @@
 \title{Methods for formatting \linkS4class{BASiCS_Result} and 
 \linkS4class{BASiCS_ResultsDE} objects.}
 \usage{
-\S4method{format}{BASiCS_ResultsDE}(x, Which, Filter = TRUE, ProbThreshold = NULL)
+\S4method{format}{BASiCS_ResultsDE}(x, Parameter, Filter = TRUE, ProbThreshold = NULL, ...)
 
-\S4method{format}{BASiCS_ResultDE}(x, Which, Filter = TRUE, ProbThreshold = NULL)
+\S4method{format}{BASiCS_ResultDE}(x, Filter = TRUE, ProbThreshold = NULL, ...)
 
-\S4method{format}{BASiCS_ResultVG}(x, Which, Filter = TRUE, ProbThreshold = NULL)
+\S4method{format}{BASiCS_ResultVG}(x, Filter = TRUE, ProbThreshold = NULL, ...)
 }
 \arguments{
 \item{x}{Object being subsetted.}
 
-\item{Which}{Character scalar indicating which of the 
+\item{Parameter}{Character scalar indicating which of the 
 \linkS4class{BASiCS_Result} should be formatted.}
 
 \item{Filter}{Logical scalar indicating whether results should be
@@ -25,6 +25,8 @@ filtered based on differential expression or HVG/LVG status if
 \code{ProbThreshold=NULL}}
 
 \item{ProbThreshold}{Probability threshold to be used if \code{Filter=TRUE}}
+
+\item{...}{Passed to \code{\link{format}}.}
 }
 \value{
 A \code{data.frame}.

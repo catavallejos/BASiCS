@@ -6,8 +6,12 @@
 #' cell-specific technical variation. The latter includes global-scaling
 #' normalisation and therefore no further normalisation is required.
 #'
-#' @param Data an object of class \code{\linkS4class{SingleCellExperiment}}
-#' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
+#' @param Data An object of class \code{\linkS4class{SingleCellExperiment}}
+#' @param Chain An object of class \code{\linkS4class{BASiCS_Chain}}
+#' @param WithSpikes A logical scalar specifying whether denoised spike-in
+#'  genes should be generated as part of the output value. This only applies
+#'  when the \code{\linkS4class{BASiCS_Chain}} object was generated with
+#'  the setting \code{WithSpikes=TRUE}.
 #'
 #' @examples
 #'
@@ -36,7 +40,7 @@
 #'
 #' @rdname BASiCS_DenoisedCounts
 #' @export
-BASiCS_DenoisedCounts <- function(Data, Chain) {
+BASiCS_DenoisedCounts <- function(Data, Chain, WithSpikes = TRUE) {
     if (!is(Data, "SingleCellExperiment")) {
       stop("'Data' is not a SingleCellExperiment class object.")
     }
@@ -52,10 +56,13 @@ BASiCS_DenoisedCounts <- function(Data, Chain) {
       CountsBio <- counts(Data)
       CountsTech <- assay(altExp(Data))
       Phi <- matrixStats::colMedians(Chain@parameters$phi)
-      out1 <- t(t(CountsBio) / (Phi * Nu))
-      out2 <- t(t(CountsTech) / Nu)
-      out <- rbind(out1, out2)
-      GeneNames <- c(rownames(Data), rownames(altExp(Data)))
+      out <- t(t(CountsBio) / matrixStats::colMedians(Chain@parameters$phi * Chain@parameters$nu))
+      GeneNames <- rownames(Data)
+      if (WithSpikes) {
+        out2 <- t(t(CountsTech) / Nu)
+        out <- rbind(out, out2)
+        GeneNames <- c(GeneNames, rownames(altExp(Data)))
+      }
     }
     else {
       # No spikes case

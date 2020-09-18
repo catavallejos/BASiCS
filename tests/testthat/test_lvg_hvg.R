@@ -84,11 +84,12 @@ test_that("HVG/LVG detection using epsilons is correct", {
 test_that("HVG/LVG utils work", {
   data(ChainSCReg)
   DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.9)
-  expect_is(format(DetectHVG), "data.frame")
+  expect_warning(x <- format(DetectHVG))
+  expect_is(x, "data.frame")
   expect_error(DetectHVG[1:10, ], NA)
   p <- 0.8
-  d <- format(DetectHVG, ProbThreshold = p)
-  expect_true(all(d$Prob > p))
+  d <- as.data.frame(DetectHVG, ProbThreshold = p)
+  expect_true(all(as.numeric(d$Prob) > p))
   rd <- rowData(DetectHVG)
   ind <- seq_len(nrow(rd))
   rd$ind <- ind

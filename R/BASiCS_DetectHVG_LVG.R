@@ -78,14 +78,18 @@ BASiCS_DetectVG <- function(
     EFDR = 0.1,
     OrderVariable = c("Prob", "GeneIndex", "GeneName"),
     Plot = FALSE,
+    MinESS = 100,
     ...
   ) {
   
   # Check valid input values
   Task <- match.arg(Task)
-  .HeaderDetectHVG_LVG(Chain = Chain,
-                       PercentileThreshold = PercentileThreshold,
-                       VarThreshold = VarThreshold, Plot = Plot)
+  .HeaderDetectHVG_LVG(
+    Chain = Chain,
+    PercentileThreshold = PercentileThreshold,
+    VarThreshold = VarThreshold,
+    Plot = Plot
+  )
   OrderVariable <- match.arg(OrderVariable)
   .CheckProbEFDR(ProbThreshold, EFDR)
   
@@ -103,23 +107,23 @@ BASiCS_DetectVG <- function(
     GeneName = GeneName,
     Mu = matrixStats::colMedians(Chain@parameters$mu),
     Delta = matrixStats::colMedians(Chain@parameters$mu)
-    )
+  )
   
+
   if (Method == "Percentile") {
-    
     # Find the epsilon threshold that correspond to the 'PercentileThreshold'
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
     EpsilonThreshold <- stats::quantile(
-      Epsilon, 
-      PercentileThreshold, 
-      na.rm = TRUE)
+      Epsilon,
+      PercentileThreshold,
+      na.rm = TRUE
+    )
     Table <- cbind.data.frame(Table, Epsilon = Epsilon)
     # Auxiliary variable to calculate H/LVG prob for a given epsilon threshold
     ProbAux <- operator(Chain@parameters$epsilon, EpsilonThreshold)
     Threshold <- PercentileThreshold 
     
   } else {
-  
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
     Table <- cbind.data.frame(Table, 
@@ -131,12 +135,14 @@ BASiCS_DetectVG <- function(
 
   # Calculate tail posterior probabilities
   Prob <- matrixStats::colMeans2(ProbAux)
-  
+
   # EFDR calibration
-  Aux <- .ThresholdSearch(Prob[!is.na(Prob)], 
-                          ProbThreshold, 
-                          EFDR, 
-                          Task = paste(Task, "detection"))
+  Aux <- .ThresholdSearch(
+    Prob[!is.na(Prob)],
+    ProbThreshold,
+    EFDR,
+    Task = paste(Task, "detection")
+  )
    
   # Output preparation
   VG <- Prob > Aux$OptThreshold[1]
@@ -229,12 +235,12 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
     )
   } else if (Plot == "VG") {
     .VGPlot(
-        Task = object@Name,
-        Mu = object@Table$Mu,
-        Prob = object@Table$Prob,
-        OptThreshold = object@ProbThreshold,
-        Hits = object@Table[[object@Name]],
-        ...
+      Task = object@Name,
+      Mu = object@Table$Mu,
+      Prob = object@Table$Prob,
+      OptThreshold = object@ProbThreshold,
+      Hits = object@Table[[object@Name]],
+      ...
     )
   }
 }

@@ -76,7 +76,7 @@ newBASiCS_Data <- function(Counts,
                            SpikeInfo = NULL,
                            BatchInfo = NULL,
                            SpikeType = "ERCC") {
-  
+  .Deprecated()
   if (!inherits(Counts, "matrix")) {
     stop("Counts must be a matrix.")
   }
@@ -115,10 +115,10 @@ newBASiCS_Data <- function(Counts,
       )
     }
     # Extracting spike-in input molecules in the correct order
-    if (sum(!(GeneName[Tech] %in% SpikeInfo[, 1])) > 0) {
+    if (any(!(GeneName[Tech] %in% SpikeInfo[, 1]))) {
       stop("'SpikeInfo' is missing information for some of the spikes")
     }
-    if (sum(!(SpikeInfo[, 1] %in% GeneName[Tech])) > 0) {
+    if (any(!(SpikeInfo[, 1] %in% GeneName[Tech]))) {
       stop("'SpikeInfo' includes spikes that are not in 'Counts'")
     }
     if (any(GeneName[Tech] != SpikeInfo[, 1])) {
@@ -126,8 +126,8 @@ newBASiCS_Data <- function(Counts,
       matching <- match(GeneName[Tech], SpikeInfo[, 1])
       SpikeInfo <- SpikeInfo[matching, ]
     }
-    metadata(Data)$SpikeInput <- SpikeInfo
-    altExp(Data, "spike-ins") <- SummarizedExperiment(CountsTech)
+    altExp(Data, "spike-ins") <- SummarizedExperiment(CountsTech, 
+      rowData = SpikeInfo)
     WithSpikes <- TRUE
   } else {
     message("The data does not contain spike-in genes")

@@ -7,7 +7,8 @@
 \usage{
 BASiCS_DiagPlot(
   object,
-  Param = "mu",
+  Parameter = "mu",
+  Measure = c("ess", "geweke.diag"),
   x = NULL,
   y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")),
@@ -21,14 +22,18 @@ BASiCS_diagPlot(...)
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Param}{Optional name of a chain parameter to restrict the histogram;
+\item{Parameter}{Optional name of a chain parameter to restrict the histogram;
 if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-\code{'sigma2'} and \code{'epsilon'}. Default \code{Param = 'mu'}}
+\code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}}
+
+\item{Measure}{Character scalar specifying the diagnostic measure to plot.
+Current options are effective sample size and the Geweke diagnostic
+criterion.}
 
 \item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
-respectively. If neither is supplied, Param will be plotted on the x axis
+respectively. If neither is supplied, Parameter will be plotted on the x axis
 and effective sample size will be plotted on the y axis as
 a density plot.}
 
@@ -57,7 +62,7 @@ for more details on this diagnostic measure.
 data(ChainSC)
 
 # Point estimates versus effective sample size
-BASiCS_DiagPlot(ChainSC, Param = "mu")
+BASiCS_DiagPlot(ChainSC, Parameter = "mu")
 # Effective sample size as colour, mu as x, delta as y.
 BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
 
@@ -66,5 +71,5 @@ BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
 \code{\linkS4class{BASiCS_Chain}}
 }
 \author{
-Alan O'Callaghan \email{a.b.ocallaghan@sms.ed.ac.uk}
+Alan O'Callaghan
 }

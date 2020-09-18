@@ -4,28 +4,28 @@
 #' \code{\linkS4class{BASiCS_Chain}} objects.
 #' 
 #' @param object an object of class \code{\linkS4class{BASiCS_Chain}}.
-#' @param Param The parameter to use to calculate effective sample size.
+#' @param Parameter The parameter to use to calculate effective sample size.
 #' Possible
 #' values: \code{'mu'}, \code{'delta'}, \code{'phi'}, \code{'s'}, 
 #' \code{'nu'}, \code{'theta'}, \code{'beta'}, \code{'sigma2'} and 
 #' \code{'epsilon'}. 
 #' @param na.rm Remove \code{NA} values before calculating effective sample 
-#' size. Only relevant when \code{Param = "epsilon"} (genes with very low 
+#' size. Only relevant when \code{Parameter = "epsilon"} (genes with very low 
 #' expression are excluding when infering the mean/over-dispersion trend. 
 #' Default: \code{na.rm = TRUE}.
 #' @param ... Unused.
 #' 
 #' @return A vector with effective sample sizes for all the elements 
-#' of \code{Param}
+#' of \code{Parameter}
 #' 
 #' @examples
 #' 
 #' data(ChainSC)
-#' BASiCS_EffectiveSize(ChainSC, Param = "mu")
+#' BASiCS_EffectiveSize(ChainSC, Parameter = "mu")
 #' 
 #' @export
-BASiCS_EffectiveSize <- function(object, Param, na.rm = TRUE) {
-  .GetMeasure(object, Param, Measure = "ess", na.rm)
+BASiCS_EffectiveSize <- function(object, Parameter, na.rm = TRUE) {
+  .GetMeasure(object, Parameter, Measure = "ess", na.rm)
 }
 
 #' @rdname BASiCS_EffectiveSize
