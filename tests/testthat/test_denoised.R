@@ -1,7 +1,7 @@
 context("DenoisedCounts/Rates")
 
 test_that("DenoisedCounts and Rates require matching dimensions", {
-  data <- makeExampleBASiCS_Data()
+  expect_warning(data <- makeExampleBASiCS_Data())
   chain <- run_MCMC(
     data,
     N = 10,

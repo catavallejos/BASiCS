@@ -98,7 +98,10 @@ newBASiCS_Chain <- function(parameters) {
     SampleParameters,
     function(Parameter) {
       x <- parameters[[Parameter]]
-      attr(x, "ESS") <- ess(x)
+      e <- try(ess(x), silent = TRUE)
+      if (!inherits(e, "try-error")) {
+        attr(x, "ESS") <- e
+      }
       x
     }
   )

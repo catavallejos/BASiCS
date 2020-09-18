@@ -1,11 +1,11 @@
 context("MCMC arguments")
 
 set.seed(1)
-DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
-                                     WithBatch = TRUE)
-DataSpikesNoBatch <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
-                                            WithBatch = FALSE)
-DataNoSpikes <- makeExampleBASiCS_Data(WithSpikes = FALSE)
+expect_warning(DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
+                                     WithBatch = TRUE))
+expect_warning(DataSpikesNoBatch <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
+                                            WithBatch = FALSE))
+expect_warning(DataNoSpikes <- makeExampleBASiCS_Data(WithSpikes = FALSE))
 
 test_that("Errors in basic MCMC arguments", {
   
@@ -284,15 +284,15 @@ test_that("MCMC works with different input classes", {
 test_that("PriorMu", {
   set.seed(1)
   expect_error(
-    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "das"),
+    BASiCS_PriorParam(DataSpikes, PriorMu = "das"),
     "'arg' should be one of"
   )
   expect_error(
-    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "default"),
+    BASiCS_PriorParam(DataSpikes, PriorMu = "default"),
     NA
   )
   expect_error(
-    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "EmpiricalBayes"),
+    BASiCS_PriorParam(DataSpikes, PriorMu = "EmpiricalBayes"),
     NA
   )
 })

@@ -8,6 +8,8 @@ test_that("data preserves colnames", {
   colnames(Counts) <- paste('Cell', seq_len(ncol(Counts)))
   BatchInfo <- c(rep(1, 5), rep(2, 5))
   # Creating a BASiCS_Data object (with batch effect)
-  DataExample <- newBASiCS_Data(Counts, BatchInfo = BatchInfo)
+  expect_warning(
+    DataExample <- newBASiCS_Data(Counts, BatchInfo = BatchInfo)
+  )
   expect_identical(colnames(DataExample), colnames(Counts))
 })
