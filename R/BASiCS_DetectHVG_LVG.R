@@ -82,7 +82,7 @@ BASiCS_DetectVG <- function(
     PercentileThreshold = NULL, # 0.1,
     VarThreshold = NULL, # 0.5,
     ProbThreshold = 2/3, # 0.5,
-    EpsilonThreshold = if (Task == "HVG") log(2) else - log(2),
+    EpsilonThreshold = NULL,
     EFDR = 0.1,
     OrderVariable = c("Prob", "GeneIndex", "GeneName"),
     Plot = FALSE,

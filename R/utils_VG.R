@@ -20,11 +20,17 @@
   # Test if the chain does not contain epsilon parameters
   if (is.null(Chain@parameters$epsilon)) {
     
-    if(!is.null(PercentileThreshold)) 
+    if(!is.null(PercentileThreshold)) {
       stop("'Chain' does not include residual over-dispersion parameters.
            'PercentileThreshold' will be ignored.
            'VarThreshold' must be provided instead.")
-    
+    } 
+    if(!is.null(EpsilonThreshold)) {
+      stop("'Chain' does not include residual over-dispersion parameters.
+           'EpsilonThreshold' will be ignored.
+           'VarThreshold' must be provided instead.")
+    }
+
     if (!is.null(VarThreshold)) {
       if (VarThreshold < 0 | VarThreshold > 1 | !is.finite(VarThreshold))
         stop("Variance contribution threshold must be in (0,1)")
