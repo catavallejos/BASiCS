@@ -1499,6 +1499,20 @@ overdispersion parameters
 
 version 2.1.7 (2020-09-01)
 - Bugfix in format method for ResultVG class.
-
-version 2.1.8 (2020-09-09)
-- Add `EpsilonThreshold` argument for `BASiCS_DetectHVG` and `BASiCS_DetectLVG`
+- For `BASiCS_PlotDE`, if only one plot is produced, the plot is returned as
+  a bare ggplot object rather than using `cowplot::plot_grid`
+- Added `EpsilonThreshold` argument for `BASiCS_DetectHVG` and `BASiCS_DetectLVG`
+- Deprecated `newBASiCS_Data` and the `format` methods for Results classes.
+  For the latter, use `as.data.frame` instead.
+- Improved documentation for BASiCS_ResultVG class
+- `BASiCS_MCMC` now computes and stores ESS as an attribute of parameter
+  matrices when sampling has completed. 
+- Make use of Parameter argument consistent across several methods, where Param
+  and Which were used before.
+- Extended BASiCS_DiagPlot to enable other diagnostic measures
+- Moved to store molecule counts in `rowData(altExp(sce))` rather than `metadata(sce)`
+- Remove dependency to KernSmooth
+- Set some values to NA if they relate to genes captured in < 2 cells
+- Add option to exclude spike-ins in `BASiCS_DenoisedCounts`.
+  Also use a slightly more principled calculation internally.
+- See issues #182, #39, #91, #169, #181, #178, #202, #190, #173
