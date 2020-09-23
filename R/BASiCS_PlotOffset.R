@@ -28,7 +28,7 @@
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
-#' @author Alan O'Callaghan \email{a.b.o'callaghan@sms.ed.ac.uk}
+#' @author Alan O'Callaghan
 #'
 #' @export
 BASiCS_PlotOffset <- function(Chain1,

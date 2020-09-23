@@ -268,14 +268,7 @@ BASiCS_MCMC <- function(
     cellExponent = PriorParam$CellExponent
   )
 
-  SpikeArgs <- list(
-    sumByCellBio = sum.bycell.bio,
-    sumByGeneBio = sum.bygene.bio,
-    phi0 = Start$phi0,
-    aphi = PriorParam$p.phi,
-    LSphi0 = Start$ls.phi0,
-    muSpikes = metadata(Data)$SpikeInput[, 2]
-  )
+
   NonRegressionArgs <- list(
     prior_delta = (PriorParam$PriorDelta == "log-normal") + 1,
     s2delta = PriorParam$s2.delta,
@@ -313,6 +306,14 @@ BASiCS_MCMC <- function(
 
   # If spikes are available
   if (WithSpikes) {
+    SpikeArgs <- list(
+      sumByCellBio = sum.bycell.bio,
+      sumByGeneBio = sum.bygene.bio,
+      phi0 = Start$phi0,
+      aphi = PriorParam$p.phi,
+      LSphi0 = Start$ls.phi0,
+      muSpikes = rowData(altExp(Data))[, 2]
+    )
     MCMCArgs <- c(MCMCArgs, SpikeArgs)
     # If regression case is chosen
     if (Regression) {
@@ -343,6 +344,7 @@ BASiCS_MCMC <- function(
     # Discuss this with John (potentially include an optional arg about this)
     AtLeast2Cells <- Matrix::rowSums(GPar$BioCounts > 0) > 1
     Chain$epsilon[, !AtLeast2Cells] <- NA
+    Chain$delta[, !AtLeast2Cells] <- NA
   }
 
   # Format column names of MCMC chains

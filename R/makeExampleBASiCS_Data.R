@@ -108,22 +108,30 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
 
     rownames(Counts.sim) <- c(paste0("Gene", seq_len(q.bio)),
                               paste0("ERCC", seq_len(q-q.bio)))
-    SpikeInfo <- data.frame(paste0("ERCC", seq_len(q-q.bio)),
-                            Mu[seq(q.bio + 1, q)])
+    SpikeInfo <- data.frame(Names = paste0("ERCC", seq_len(q-q.bio)),
+                            count = Mu[seq(q.bio + 1, q)])
 
     colnames(Counts.sim) <- paste0("Cell", seq_len(n))
 
-    if (!WithBatch) {
-      Data <- newBASiCS_Data(Counts = Counts.sim,
-                             Tech = grepl("ERCC", rownames(Counts.sim)),
-                             SpikeInfo = SpikeInfo,
-                             BatchInfo = rep(1, 30))
+    # Create the initial SCE object
+    Data <- SingleCellExperiment(
+      assays = list(counts = Counts.sim[seq_len(q.bio),])
+    )
+    # Add batch info if available
+    if (WithBatch) {
+      BatchInfo <- c(rep(1, 15), rep(2, 15))
     } else {
-      Data <- newBASiCS_Data(Counts = Counts.sim,
-                             Tech = grepl("ERCC", rownames(Counts.sim)),
-                             SpikeInfo = SpikeInfo,
-                             BatchInfo = c(rep(1, 15), rep(2, 15)))
+      BatchInfo <- rep(1, 30)  
     }
+    colData(Data) <- S4Vectors::DataFrame(
+      BatchInfo = BatchInfo,
+      row.names = colnames(Counts.sim)
+    )
+    # Add spike-in counts and metadata
+    altExp(Data, "spike-ins") <- SummarizedExperiment(
+      assays = list(counts = Counts.sim[seq_len(q-q.bio) + q.bio,])
+    )
+    rowData(altExp(Data)) <- SpikeInfo
   } else {
     # Matrix where simulated counts will be stored
     Counts.sim <- matrix(0, ncol = n, nrow = q.bio)
@@ -147,10 +155,13 @@ makeExampleBASiCS_Data <- function(WithBatch = FALSE,
     rownames(Counts.sim) <- paste0("Gene", seq_len(q.bio))
     colnames(Counts.sim) <- paste0("Cell", seq_len(n))
 
-    Data <- newBASiCS_Data(Counts = Counts.sim,
-                           Tech = rep(FALSE, q.bio),
-                           BatchInfo = c(rep(1, 15), rep(2, 15)))
-
+    Data <- SingleCellExperiment(
+      assays = list(counts = Counts.sim)
+    )
+    colData(Data) <- S4Vectors::DataFrame(
+      BatchInfo = c(rep(1, 15), rep(2, 15)),
+      row.names = colnames(Counts.sim)
+    )
   }
   return(Data)
 }

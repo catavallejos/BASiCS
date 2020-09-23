@@ -2,8 +2,8 @@
 #'
 #' @description \code{BASiCS_Filter} indicates which transcripts and
 #' cells pass a pre-defined inclusion criteria. The output of this
-#' function can be combined with \code{newBASiCS_Data} to generate a
-#' the \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
+#' function used to generate a
+#' \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
 #' For more systematic tools for quality control, please refer to the
 #' \code{scater} Bioconductor package.
 #'
@@ -58,7 +58,6 @@
 #'                         MinCellsWithExpression = 2,
 #'                         MinAvCountsPerCellsWithExpression = 2)
 #' SpikeInfoFilter <- SpikeInfo[SpikeInfo$SpikeID %in% rownames(Filter$Counts),]
-#' FilterData <- newBASiCS_Data(Filter$Counts, Filter$Tech, SpikeInfoFilter)
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'

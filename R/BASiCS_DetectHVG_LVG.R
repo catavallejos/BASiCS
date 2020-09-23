@@ -86,6 +86,7 @@ BASiCS_DetectVG <- function(
     EFDR = 0.1,
     OrderVariable = c("Prob", "GeneIndex", "GeneName"),
     Plot = FALSE,
+    MinESS = 100,
     ...
   ) {
   
@@ -121,13 +122,15 @@ BASiCS_DetectVG <- function(
     Delta = matrixStats::colMedians(Chain@parameters$mu)
   )
   
+
   if (Method == "Percentile") {
     # Find the epsilon threshold that correspond to the 'PercentileThreshold'
     Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
     EpsilonThreshold <- stats::quantile(
-      Epsilon, 
-      PercentileThreshold, 
-      na.rm = TRUE)
+      Epsilon,
+      PercentileThreshold,
+      na.rm = TRUE
+    )
     Table <- cbind.data.frame(Table, Epsilon = Epsilon)
     # Auxiliary variable to calculate H/LVG prob for a given epsilon threshold
     ProbAux <- operator(Chain@parameters$epsilon, EpsilonThreshold)
@@ -153,12 +156,12 @@ BASiCS_DetectVG <- function(
 
   # Calculate tail posterior probabilities
   Prob <- matrixStats::colMeans2(ProbAux)
-  
+
   # EFDR calibration
   Aux <- .ThresholdSearch(
-    Prob[!is.na(Prob)], 
-    ProbThreshold, 
-    EFDR, 
+    Prob[!is.na(Prob)],
+    ProbThreshold,
+    EFDR,
     Task = paste(Task, "detection")
   )
    
@@ -253,12 +256,12 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
     )
   } else if (Plot == "VG") {
     .VGPlot(
-        Task = object@Name,
-        Mu = object@Table$Mu,
-        Prob = object@Table$Prob,
-        OptThreshold = object@ProbThreshold,
-        Hits = object@Table[[object@Name]],
-        ...
+      Task = object@Name,
+      Mu = object@Table$Mu,
+      Prob = object@Table$Prob,
+      OptThreshold = object@ProbThreshold,
+      Hits = object@Table[[object@Name]],
+      ...
     )
   }
 }

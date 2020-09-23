@@ -36,8 +36,8 @@ Default: \code{Phi = NULL}}
 batches of samples). If a value for \code{BatchInfo} is provided, the length
 of \code{Theta} must match the number of unique values in \code{BatchInfo}.}
 
-\item{BatchInfo}{same as in \code{\link[BASiCS]{newBASiCS_Data}}. If 
-spike-ins, are not in use, the number of unique values contained in 
+\item{BatchInfo}{Vector detailing which batch each cell should be simulated
+from. If spike-ins are not in use, the number of unique values contained in 
 \code{BatchInfo} must be larger than 1 (i.e. multiple batches are present).}
 }
 \value{
@@ -63,8 +63,8 @@ Theta <- 0.39
 Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta)
 head(SingleCellExperiment::counts(Data))
 dim(SingleCellExperiment::counts(Data))
-metadata(Data)$SpikeInput
 altExp(Data)
+rowData(altExp(Data))
 
 # Data with spike-ins, multiple batches
 BatchInfo <- c(1,1,1,2,2)

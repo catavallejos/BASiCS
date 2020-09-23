@@ -274,8 +274,19 @@
 
 .CheckESS <- function(Chain1, Chain2, MinESS, parameter, q) {
   if (!is.na(MinESS)) {
-    ess(mcmc(Chain1@parameters[[parameter]])) > MinESS &
-    ess(mcmc(Chain2@parameters[[parameter]])) > MinESS
+    ess1 <- .GetMeasure(
+      Chain = Chain1,
+      Parameter = parameter,
+      Measure = "ess",
+      na.rm = FALSE
+    )
+    ess2 <- .GetMeasure(
+      Chain = Chain2,
+      Parameter = parameter,
+      Measure = "ess",
+      na.rm = FALSE
+    )
+    ess1 > MinESS & ess2 > MinESS
   } else {
     rep(TRUE, q)
   }

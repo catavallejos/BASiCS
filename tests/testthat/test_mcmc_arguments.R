@@ -1,10 +1,8 @@
 context("MCMC arguments")
 
 set.seed(1)
-DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
-                                     WithBatch = TRUE)
-DataSpikesNoBatch <- makeExampleBASiCS_Data(WithSpikes = TRUE, 
-                                            WithBatch = FALSE)
+DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
+DataSpikesNoBatch <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = FALSE)
 DataNoSpikes <- makeExampleBASiCS_Data(WithSpikes = FALSE)
 
 test_that("Errors in basic MCMC arguments", {
@@ -50,11 +48,11 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
   
   # Checks after removing spike-ins metadata but not data
   Data2 <- DataSpikes
-  S4Vectors::metadata(Data2)$SpikeInput <- NULL 
+  rowData(altExp(Data2)) <- NULL
   expect_error(run_MCMC(Data = Data2, 
                         N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = TRUE),
-               regexp = ".*does not contain \'SpikeInput\' as metadata.*")
+               regexp = "rowData of altExp is missing.*")
   # Checks after removing spike-ins data but not metadata
   Data2 <- DataSpikes
   altExp(Data2) <- NULL
@@ -72,7 +70,6 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
                         Regression = FALSE, WithSpikes = FALSE),
                regexp = ".*requires the data to contain at least 2 batches*")
   Data2 <- DataNoSpikes
-  metadata(Data2)$SpikeInput <- NULL
   altExp(Data2) <- NULL  
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
@@ -112,11 +109,11 @@ test_that("MCMC arguments fail (regression)", {
                regexp = "The number of basis functions needs to be >= 4.")
   
   Data2 <- DataSpikes
-  S4Vectors::metadata(Data2)$SpikeInput <- NULL 
+  rowData(altExp(Data2)) <- NULL
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = TRUE),
-               regexp = ".*does not contain \'SpikeInput\' as metadata.*")
+               regexp = ".*rowData of altExp is missing!.*")
   
   Data2 <- DataSpikes
   altExp(Data2) <- NULL   
@@ -135,7 +132,6 @@ test_that("MCMC arguments fail (regression)", {
                regexp = ".*requires the data to contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
-  S4Vectors::metadata(Data2)$SpikeInput <- NULL 
   expect_error(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE), NA)
@@ -221,26 +217,23 @@ test_that("Checks for user generated SCE object", {
                regexp = ".*does not contain information about spike-in genes*")
   
   altExp(sce, "spike-ins") <- altExp(DataSpikes)
-  expect_error(run_MCMC(Data = sce, 
-                         N = 20, Thin = 2, Burn = 4, 
-                        Regression = FALSE, WithSpikes = TRUE),
-               regexp = ".*does not contain \'SpikeInput\' as metadata.*")
+  rowData(altExp(sce)) <- NULL
   
   # Wrong SpikeInput
-  S4Vectors::metadata(sce)$SpikeInput <- NULL
+  rowData(altExp(sce)) <- NULL
   expect_error(run_MCMC(Data = sce, 
                          N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = TRUE),
-               regexp = ".*does not contain 'SpikeInput' as metadata.*")
+               regexp = ".*rowData of altExp is missing.*")
   
-  S4Vectors::metadata(sce)$SpikeInput <- c(1,2,3)
+  rowData(altExp(sce))[[1]] <- 1:2
   expect_error(run_MCMC(Data = sce, 
                          N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = TRUE),
-               regexp = ".*argument is of length zero*")
+               regexp = ".*rowData of altExp must have two columns only.*")
   
   # Right SpikeInfo assignment  
-  S4Vectors::metadata(sce)$SpikeInput <- S4Vectors::metadata(DataSpikes)$SpikeInput
+  rowData(altExp(sce)) <- rowData(altExp(DataSpikes))
   expect_error(
     run_MCMC(
       Data = sce,
@@ -284,15 +277,15 @@ test_that("MCMC works with different input classes", {
 test_that("PriorMu", {
   set.seed(1)
   expect_error(
-    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "das"),
+    BASiCS_PriorParam(DataSpikes, PriorMu = "das"),
     "'arg' should be one of"
   )
   expect_error(
-    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "default"),
+    BASiCS_PriorParam(DataSpikes, PriorMu = "default"),
     NA
   )
   expect_error(
-    BASiCS_PriorParam(makeExampleBASiCS_Data(), PriorMu = "EmpiricalBayes"),
+    BASiCS_PriorParam(DataSpikes, PriorMu = "EmpiricalBayes"),
     NA
   )
 })

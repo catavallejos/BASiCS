@@ -319,19 +319,19 @@ plot_grid(
 )
 ```
 
-To access the results of these tests, please use `format`.
+To access the results of these tests, please use `as.data.frame`.
 
 ```{r quick-start-HVGdetectionTable}
-format(HVG)
-format(LVG)
+as.data.frame(HVG)
+as.data.frame(LVG)
 ```
 
 
 ```{r quick-start-HVGdetectionPlot, fig.width = 8, fig.height = 8, eval = FALSE}
 SummarySC <- Summary(ChainSC)
 plot(SummarySC, Param = "mu", Param2 = "delta", log = "xy")
-HTable <- format(HVG)
-LTable <- format(LVG)
+HTable <- as.data.frame(HVG)
+LTable <- as.data.frame(LVG)
 with(HTable, points(Mu, Delta))
 with(LTable, points(Mu, Delta))
 ```
@@ -380,16 +380,16 @@ structure. The new output is an object of S4 class `BASiCS_ResultsDE`.
 Test
 ```
 
-You can access the results of these tests using `format`. You must specify which
+You can access the results of these tests using `as.data.frame`. You must specify which
 of the mean, dispersion and residual overdispersion results you want using the 
 `Which` argument, as follows.
 
-```{r format}
-head(format(Test, Which = "Mean"))
-head(format(Test, Which = "Disp"))
+```{r as.data.frame}
+head(as.data.frame(Test, Parameter = "Mean"))
+head(as.data.frame(Test, Parameter = "Disp"))
 ## This object doesn't contain residual overdispersion tests as the chains
 ## were run using the non-regression version of BASiCS
-# head(format(DE, Which = "Disp"))
+# head(as.data.frame(DE, Parameter = "Disp"))
 ```
 
 There's a `rowData` field and accessor, so we can add gene information that
@@ -399,7 +399,7 @@ identifiers).
 ```{r rowData}
 rowData(Test)
 rowData(Test) <- cbind(rowData(Test), Index = 1:nrow(rowData(Test)))
-format(Test, "Mean")
+as.data.frame(Test, Parameter = "Mean")
 ```
 
 As of BASiCS v2, the differential expression plots have been re-done in ggplot2
@@ -423,7 +423,7 @@ the mean expression does not change between the groups. In this case, we
 recommend users to use `EpsilonM = 0` as a conservative option to avoid
 changes in over-dispersion to be confounded by mean expression (the genes for 
 which mean expression changes are marked as `ExcludedFromTesting` in the 
-`Test$TableDisp$ResultDiffDisp` slot). 
+`ResultDiffDisp` field). 
 
 ```{r quick-start-TestDE-2, fig.width = 16, fig.height = 8}
 Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
@@ -526,12 +526,12 @@ This test function outputs an extra slot containing the results of the
 differential testing residual over-dispersion test. Only genes that are 
 expressed in at least 2 cells (in both groups) are included in the test. 
 Genes that do not satisfy this condition are marked as `ExcludedFromRegression` 
-in the `Test$TableResDisp$ResultDiffResDisp` slot. By performing the regression, 
+in the `ResultDiffResDisp` field. By performing the regression, 
 all genes can be tested for changes in expression variability independent of 
 changes in mean expression.
 
 ```{r testde-resdisp, fig.width=24, fig.height=16}
-head(format(Test, Which = "ResDisp"))
+head(as.data.frame(Test, Parameter = "ResDisp"))
 BASiCS_PlotDE(Test, Parameters = "ResDisp")
 ```
 

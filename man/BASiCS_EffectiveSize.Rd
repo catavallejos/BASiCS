@@ -5,21 +5,21 @@
 \alias{BASiCS_effectiveSize}
 \title{Calculate effective sample size for BASiCS_Chain parameters}
 \usage{
-BASiCS_EffectiveSize(object, Param, na.rm = TRUE)
+BASiCS_EffectiveSize(object, Parameter, na.rm = TRUE)
 
 BASiCS_effectiveSize(...)
 }
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Chain}}.}
 
-\item{Param}{The parameter to use to calculate effective sample size.
+\item{Parameter}{The parameter to use to calculate effective sample size.
 Possible
 values: \code{'mu'}, \code{'delta'}, \code{'phi'}, \code{'s'}, 
 \code{'nu'}, \code{'theta'}, \code{'beta'}, \code{'sigma2'} and 
 \code{'epsilon'}.}
 
 \item{na.rm}{Remove \code{NA} values before calculating effective sample 
-size. Only relevant when \code{Param = "epsilon"} (genes with very low 
+size. Only relevant when \code{Parameter = "epsilon"} (genes with very low 
 expression are excluding when infering the mean/over-dispersion trend. 
 Default: \code{na.rm = TRUE}.}
 
@@ -27,7 +27,7 @@ Default: \code{na.rm = TRUE}.}
 }
 \value{
 A vector with effective sample sizes for all the elements 
-of \code{Param}
+of \code{Parameter}
 }
 \description{
 A function to calculate effective sample size
@@ -36,6 +36,6 @@ A function to calculate effective sample size
 \examples{
 
 data(ChainSC)
-BASiCS_EffectiveSize(ChainSC, Param = "mu")
+BASiCS_EffectiveSize(ChainSC, Parameter = "mu")
 
 }

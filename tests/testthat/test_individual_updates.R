@@ -168,7 +168,7 @@ test_that("Spikes + no regression", {
     nu0 = Start$nu0,
     prop_var = exp(Start$ls.nu0),
     Counts = CountsAll,
-    SumSpikeInput = sum(metadata(Data)$SpikeInput[, 2]),
+    SumSpikeInput = sum(rowData(altExp(Data))[, 2]),
     BatchDesign = BatchDesign,
     mu = Start$mu0,
     invdelta = 1 / Start$delta0,
