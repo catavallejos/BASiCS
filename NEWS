@@ -1503,6 +1503,7 @@ version 2.1.7 (2020-09-01)
   a bare ggplot object rather than using `cowplot::plot_grid`
 - Added `EpsilonThreshold` argument for `BASiCS_DetectHVG` and `BASiCS_DetectLVG`.
   This uses a threshold on epsilon values to identify LVGs and HVGs.
+  Also adds a `MinESS` argument to `BASiCS_DetectHVG` and `BASiCS_DetectLVG`.
 - Deprecated `newBASiCS_Data` and the `format` methods for Results classes.
   For the latter, use `as.data.frame` instead.
 - Improved documentation for BASiCS_ResultVG class

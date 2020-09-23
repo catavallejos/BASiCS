@@ -151,11 +151,11 @@ Test <- BASiCS_TestDE(
 )
 
 # Results for the differential mean test
-head(format(Test, Parameter = "Mean"))
+head(as.data.frame(Test, Parameter = "Mean"))
 
 # Results for the differential over-dispersion test
 # This only includes genes marked as 'NoDiff' in Test$TableMean
-head(format(Test, Parameter = "Disp"))
+head(as.data.frame(Test, Parameter = "Disp"))
 
 # For testing differences in residual over-dispersion, two chains obtained
 # via 'BASiCS_MCMC(Data, N, Thin, Burn, Regression=TRUE)' need to be provided

@@ -14,6 +14,7 @@ BASiCS_DetectVG(
   PercentileThreshold = NULL,
   VarThreshold = NULL,
   ProbThreshold = 2/3,
+  EpsilonThreshold = NULL,
   EFDR = 0.1,
   OrderVariable = c("Prob", "GeneIndex", "GeneName"),
   Plot = FALSE,
@@ -44,6 +45,8 @@ Default: \code{VarThreshold = NULL}.}
 (must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
 posterior probability threshold for the test will be set to \code{ProbThreshold}}
 
+\item{EpsilonThreshold}{Threshold for residual overdispersion above which}
+
 \item{EFDR}{Target for expected false discovery rate related
 to HVG/LVG detection. If \code{EFDR = NULL}, EFDR calibration is
 not performed and the posterior probability threshold is set equal to
@@ -54,7 +57,13 @@ Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
 Default \code{ProbThreshold = 'Prob'}}
 
 \item{Plot}{If \code{Plot = TRUE} error control and
-expression versus HVG/LVG probability plots are generated}
+expression versus HVG/LVG probability plots are generated.}
+
+\item{MinESS}{The minimum effective sample size for a gene to be included 
+in the HVG or LVG tests. This helps to remove genes with poor mixing from
+detection of HVGs/LVGs.
+Default is 100. If set to NA, genes are
+not checked for effective sample size the tests are performed.}
 
 \item{...}{Graphical parameters (see \code{\link[graphics]{par}}).}
 }
@@ -90,6 +99,11 @@ DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.90,
                               EFDR = 0.10, Plot = TRUE)
 DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.10,
                               EFDR = 0.10, Plot = TRUE)
+
+## Highly and lowly variable genes detection based on residual overdispersion
+## threshold
+DetectHVG <- BASiCS_DetectHVG(ChainSCReg, EpsilonThreshold = log(2), Plot = TRUE)
+DetectLVG <- BASiCS_DetectLVG(ChainSCReg, EpsilonThreshold = -log(2), Plot = TRUE)
 
 }
 \references{

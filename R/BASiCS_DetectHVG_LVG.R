@@ -32,7 +32,12 @@
 #' Possible values: \code{'GeneIndex'}, \code{'GeneName'} and \code{'Prob'}.
 #' Default \code{ProbThreshold = 'Prob'}
 #' @param Plot If \code{Plot = TRUE} error control and
-#' expression versus HVG/LVG probability plots are generated
+#' expression versus HVG/LVG probability plots are generated.
+#' @param MinESS The minimum effective sample size for a gene to be included 
+#' in the HVG or LVG tests. This helps to remove genes with poor mixing from
+#' detection of HVGs/LVGs.
+#' Default is 100. If set to NA, genes are
+#' not checked for effective sample size the tests are performed.
 #' @param ... Graphical parameters (see \code{\link[graphics]{par}}).
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_ResultVG}}.
