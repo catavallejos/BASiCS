@@ -1,3 +1,6 @@
+#ifndef MCMCNOSPIKES_H
+#define MCMCNOSPIKES_H
+
 #include "utils.h"
 
 /* MCMC sampler for the non-spike case
@@ -46,6 +49,7 @@
 * NotConstrainGene:
 * StochasticRef: 
 */
+// [[Rcpp::export(".BASiCS_MCMCcppNoSpikes")]]
 Rcpp::List BASiCS_MCMCcppNoSpikes(
     int N, 
     int Thin, 
@@ -89,7 +93,13 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     double const& mintol_nu,
     double const& mintol_theta,
     double const& geneExponent,
-    double const& cellExponent) {
+    double const& cellExponent,
+    int threads = 1) {
+
+
+  #if defined(_OPENMP)
+    omp_set_num_threads(threads);
+  #endif
 
   using arma::ones;
   using arma::zeros;
@@ -400,3 +410,5 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
         Rcpp::Named("RefFreq") = RefFreq/(N-Burn))); 
   }
 }
+
+#endif

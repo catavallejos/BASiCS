@@ -1,3 +1,6 @@
+#ifndef MCMCREGNOSPIKES_H
+#define MCMCREGNOSPIKES_H
+
 #include "utils.h"
 
 /* MCMC sampler for regression and non-spikes case
@@ -43,6 +46,7 @@
  * lambda0: Starting values for gene-wise error term
  * variance: Fixed width (scale) for GRBFs
  */
+// [[Rcpp::export(".BASiCS_MCMCcppRegNoSpikes")]]
 Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     int N, 
     int Thin, 
@@ -95,7 +99,14 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     double const& mintol_nu,
     double const& mintol_theta,
     double const& geneExponent,
-    double const& cellExponent) {
+    double const& cellExponent,
+    int threads = 1) {
+
+
+  #if defined(_OPENMP)
+    omp_set_num_threads(threads);
+    // REprintf("Number of threads=%i\n", omp_get_max_threads());
+  #endif
 
   using arma::ones;
   using arma::zeros;
@@ -524,3 +535,5 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     );
   }
 }
+
+#endif

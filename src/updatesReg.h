@@ -1,8 +1,12 @@
+#ifndef UPDATESREG_H
+#define UPDATESREG_H
+
 #include "utils.h"
 
 // Functions for regression case of BASiCS
 
 // Model matrix generation for regression
+// [[Rcpp::export(".designMatrix")]]
 arma::mat designMatrix(
     int const& k, /* Number of Gaussian radial basis functions to use for regression */
     arma::vec RBFLocations,
@@ -23,6 +27,7 @@ arma::mat designMatrix(
   return X;
 }
 
+// [[Rcpp::export(".estimateRBFLocations")]]
 arma::vec estimateRBFLocations(
     arma::vec const& log_mu,
     int const& k,
@@ -51,6 +56,7 @@ arma::vec estimateRBFLocations(
 /* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
 */
+// [[Rcpp::export(".muUpdateReg")]]
 arma::mat muUpdateReg(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -88,6 +94,7 @@ arma::mat muUpdateReg(
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_bio; 
   log_aux -= (0.5 / s2_mu) *
     (pow(log(mu1) - mu_mu, 2) - pow(log(mu0) - mu_mu, 2)) * exponent;
+  #pragma omp parallel for
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + 1/delta(i) ) *  
@@ -150,6 +157,7 @@ arma::mat muUpdateReg(
 * sigma2: current value of sigma2
 * beta: current value of beta
 */
+// [[Rcpp::export(".deltaUpdateReg")]]
 arma::mat deltaUpdateReg(
     arma::vec const& delta0, 
     arma::vec const& prop_var,  
@@ -178,6 +186,7 @@ arma::mat deltaUpdateReg(
   */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  #pragma omp parallel for
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
       log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
@@ -214,7 +223,7 @@ arma::mat deltaUpdateReg(
   // OUTPUT
   return join_rows(delta1, ind);
 }
-
+// [[Rcpp::export(".betaUpdateReg")]]
 arma::vec betaUpdateReg(double const& sigma2,
                         arma::mat const& VAux,
                         arma::vec const& mAux) {
@@ -223,7 +232,7 @@ arma::vec betaUpdateReg(double const& sigma2,
   arma::vec beta = MVRNORM.row(0).t();
   return beta;
 }
-
+// [[Rcpp::export(".sigma2UpdateReg")]]
 double sigma2UpdateReg(arma::vec const& delta,
                        arma::vec const& beta,
                        arma::vec const& lambda, 
@@ -243,7 +252,7 @@ double sigma2UpdateReg(arma::vec const& delta,
   double sigma2 = pow(R::rgamma(a, 1.0 / b), -1);
   return sigma2; 
 }
-
+// [[Rcpp::export(".lambdaUpdateReg")]]
 arma::vec lambdaUpdateReg(arma::vec const& delta,
                           arma::mat const& X,
                           arma::vec const& beta,
@@ -270,3 +279,5 @@ arma::vec lambdaUpdateReg(arma::vec const& delta,
   }
   return lambda1;
 }
+
+#endif

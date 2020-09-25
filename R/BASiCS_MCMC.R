@@ -196,10 +196,11 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
+    Threads = getOption("mc.cores", default = 1L),
     ...) {
 
   # Checks to ensure input arguments are valid
-  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
+  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes, Threads)
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch
@@ -265,7 +266,8 @@ BASiCS_MCMC <- function(
     mintol_nu = ArgsDef$mintol_nu,
     mintol_theta = ArgsDef$mintol_theta,
     geneExponent = PriorParam$GeneExponent,
-    cellExponent = PriorParam$CellExponent
+    cellExponent = PriorParam$CellExponent,
+    threads = Threads
   )
 
 

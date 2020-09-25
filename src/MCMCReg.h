@@ -1,3 +1,6 @@
+#ifndef MCMCREG_H
+#define MCMCREG_H
+
 #include "utils.h"
 
 /* MCMC sampler for regression case
@@ -43,6 +46,7 @@
  * lambda0: Starting values for gene-wise error term
  * variance: Fixed width (scale) for GRBFs
  */
+// [[Rcpp::export(".BASiCS_MCMCcppReg")]]
 Rcpp::List BASiCS_MCMCcppReg(
     int N, 
     int Thin, 
@@ -93,7 +97,13 @@ Rcpp::List BASiCS_MCMCcppReg(
     double const& mintol_nu,
     double const& mintol_theta,
     double const& geneExponent,
-    double const& cellExponent) {
+    double const& cellExponent,
+    int threads = 1) {
+
+
+  #if defined(_OPENMP)
+    omp_set_num_threads(threads);
+  #endif
 
   using arma::ones;
   using arma::zeros;
@@ -548,3 +558,5 @@ Rcpp::List BASiCS_MCMCcppReg(
     
   }
 }
+
+#endif

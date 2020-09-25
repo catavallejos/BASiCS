@@ -93,7 +93,7 @@ test_that("MCMC arguments fail (no-spikes; no-regression)", {
   # Checks if only batch info is not available
   Data2 <- DataNoSpikes
   SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
-  expect_error(run_MCMC(Data = Data2, 
+  expect_warning(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
                regexp = ".*should contain a BatchInfo vector*")
@@ -151,7 +151,7 @@ test_that("MCMC arguments fail (regression)", {
   
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- NULL
-  expect_error(run_MCMC(Data = Data2, 
+  expect_warning(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE),
                regexp = ".*should contain a BatchInfo vector*")
@@ -185,7 +185,7 @@ test_that("Checks for user generated SCE object", {
   
   # Test if it contains a batch vector
   sce <- SingleCellExperiment(assays = list(counts = counts(DataSpikes)))
-  expect_error(run_MCMC(Data = sce, 
+  expect_warning(run_MCMC(Data = sce, 
                          N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
                regexp = "should contain a BatchInfo vector")
