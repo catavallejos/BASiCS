@@ -1518,3 +1518,7 @@ version 2.1.7 (2020-09-23)
 - Add option to exclude spike-ins in `BASiCS_DenoisedCounts`.
   Also use a slightly more principled calculation internally.
 - See issues #182, #39, #91, #169, #181, #178, #202, #190, #173
+
+version 2.1.8 (2020-09-28)
+- Minor edit in the vignette to recommend the use of a seed for reproducible
+results when using `BASiCS_MCMC`. 
