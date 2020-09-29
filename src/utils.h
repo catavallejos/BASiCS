@@ -3,10 +3,6 @@
 
 #include "libraries.h"
 
-#include <omp.h>
-// [[Rcpp::plugins(openmp)]]
-
-
 #define ZTOL sqrt(DOUBLE_EPS)
 /* 
 * Rgig is an adaptation of the rgig.c function implemented by 
