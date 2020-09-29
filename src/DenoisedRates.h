@@ -1,5 +1,9 @@
+#ifndef DENOISED_H
+#define DENOISED_H
+
 #include "utils.h"
 
+// [[Rcpp::export(".BASiCS_DenoisedRates")]]
 arma::mat BASiCS_DenoisedRates(
     NumericMatrix CountsBio, 
     NumericMatrix Mu,
@@ -33,8 +37,4 @@ arma::mat BASiCS_DenoisedRates(
   return(Rho / N);
 }
 
-
-  
-  
-  
-
+#endif

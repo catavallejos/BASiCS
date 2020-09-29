@@ -1,8 +1,13 @@
+#ifndef UPDATESREGNOSPIKES_H
+#define UPDATESREGNOSPIKES_H
+
+
 #include "utils.h"
 
 /* Metropolis-Hastings updates of mu 
  * Updates are implemented simulateaneously for all biological genes
  */
+// [[Rcpp::export(".muUpdateRegNoSpikes")]]
 arma::mat muUpdateRegNoSpikes(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -53,6 +58,7 @@ arma::mat muUpdateRegNoSpikes(
   // Calculated in the same way for all genes, 
   // but the reference one (no need to be sequential)
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+  #pragma omp parallel for
   for (int i = 0; i < q0; i++) {
     if(i != RefGene) {
       for (int j=0; j < n; j++) {
@@ -109,6 +115,7 @@ arma::mat muUpdateRegNoSpikes(
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
+  #pragma omp parallel for
   for (int i=0; i < nNotConstrainGene; i++) {
     iAux = NotConstrainGene(i);
     log_aux(iAux) -= (0.5 / s2_mu) * 
@@ -132,6 +139,7 @@ arma::mat muUpdateRegNoSpikes(
 /* Metropolis-Hastings updates of delta
 * Updates are implemented simulateaneously for all biological genes
 */
+// [[Rcpp::export(".deltaUpdateRegNoSpikes")]]
 arma::mat deltaUpdateRegNoSpikes(
     arma::vec const& delta0,
     arma::vec const& prop_var,  
@@ -163,6 +171,7 @@ arma::mat deltaUpdateRegNoSpikes(
   log_aux -= n * ((log(delta1) / delta1) - (log(delta0) / delta0));
   
   // Loop to replace matrix operations, through genes and cells
+  #pragma omp parallel for
   for (int i = 0; i < q0; i++) {
     for (int j = 0; j < n; j++) {
       log_aux(i) += std::lgamma(Counts(i, j) + (1 / delta1(i)));
@@ -194,5 +203,4 @@ arma::mat deltaUpdateRegNoSpikes(
   return join_rows(delta1, ind);
 }
 
-
-
+#endif
