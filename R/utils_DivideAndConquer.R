@@ -37,8 +37,11 @@ BASiCS_DivideAndConquer <- function(
     WithSpikes = WithSpikes
   )
 
-
-  Locations <- BASiCS:::.estimateRBFLocations(start$mu0, L, RBFMinMax = FALSE)
+  Locations <- BASiCS:::.estimateRBFLocations(
+    start$mu0,
+    L,
+    RBFMinMax = FALSE
+  )
   PP$RBFLocations <- Locations
 
   ## To do:
@@ -54,11 +57,16 @@ BASiCS_DivideAndConquer <- function(
     WithSpikes = WithSpikes
   )
   cat("Starting BASiCS...\n")
-  output <- future.apply::future_lapply(
+  output <- lapply(
     Subsets,
     function(Subset) {
-      ind <- match(rownames(Subset), rownames(Data))
-      PP$mu.mu <- PP$mu.mu[ind]
+      if (SubsetBy == "gene") {
+        ind <- match(rownames(Subset), rownames(Data))
+        PP$mu.mu <- PP$mu.mu[ind]
+      } else if (SubsetBy == "cell") {
+        ind <- match(colnames(Subset), colnames(Data))
+        PP$p.phi <- PP$p.phi[ind]
+      }
       BASiCS_MCMC(
         Data = Subset,
         WithSpikes = WithSpikes,
@@ -145,70 +153,24 @@ BASiCS_DivideAndConquer <- function(
     include.lowest = TRUE
   )
 
-  subsets <- as.character(bins)
+  Subsets <- as.character(bins)
 
   for (level in levels(bins)) {
     inds <- which(bins == level)
-    subsets[inds] <- sample(seq_len(NSubsets), length(inds), replace = TRUE)
+    Subsets[inds] <- sample(seq_len(NSubsets), length(inds), replace = TRUE)
   }
 
-  anova <- anova(lm(balance_by ~ subsets))
+  anova <- anova(lm(balance_by ~ Subsets))
   balanced <- anova[["Pr(>F)"]][[1]] > Alpha &&
     ## scran::computeSumFactors fails if the condition below not met
-    (SubsetBy == "gene" || all(table(subsets) > 20))
+    (SubsetBy == "gene" || all(table(Subsets) > 20))
 
   if (balanced) {
-    lapply(unique(subsets),
-      function(subset) {
-        if (SubsetBy == "cell") {
-          ind <- subsets == subset
-          Data <- Data[, ind]
-          ## Sometimes spikes will be zero when subsampling.
-          removeSpikes <- rowSums(assay(altExp(Data)) == 0)
-          altExp(Data) <- altExp(Data)[!removeSpikes, ]
-          Data <- Data[rowSums(counts(Data)) != 0, ]
-          Counts <- counts(Data)
-          if (WithSpikes) {
-            SpikeInput <- Data@metadata$SpikeInput[removeSpikes, ]
-            Tech <- isSpike(Data)
-          } else {
-            SpikeInput <- NULL
-            Tech <- rep(FALSE, nrow(Counts))
-          }
-          BatchInfo <- Data@colData$BatchInfo
-          suppressMessages(
-            newBASiCS_Data(
-              Counts = Counts, 
-              Tech = Tech, 
-              SpikeInfo = SpikeInput,
-              BatchInfo = BatchInfo
-            )
-          )
-        } else {
-          DataOut <- BioData[subsets == subset, ]
-          ind_keep <- colSums(counts(DataOut)) != 0
-          DataOut <- DataOut[, ind_keep]
-          if (WithSpikes) {
-            Spikes <- Spikes[, ind_keep]
-            Counts <- rbind(counts(DataOut), assay(Spikes))
-            Tech <- c(rep(FALSE, nrow(DataOut)), rep(TRUE, nrow(Spikes)))
-            SpikeInput <- Data@metadata$SpikeInput
-          } else {
-            Counts <- counts(DataOut)
-            SpikeInput <- NULL
-            Tech <- rep(FALSE, nrow(Counts))
-          }
-          BatchInfo <- DataOut@colData$BatchInfo
-          suppressMessages(
-            newBASiCS_Data(
-              Counts = Counts, 
-              Tech = Tech, 
-              SpikeInfo = SpikeInput,
-              BatchInfo = BatchInfo
-            )
-          )
-        }
-      }
+    lapply(unique(Subsets),
+      .subset,
+      Data = Data,
+      SubsetBy = SubsetBy,
+      Subsets = Subsets
     )
   } else {
     .generateSubsets(
@@ -222,6 +184,29 @@ BASiCS_DivideAndConquer <- function(
   }
 }
 
+.subset <- function(subset, Data, SubsetBy, Subsets) {
+  if (SubsetBy == "cell") {
+    ind <- Subsets == subset
+    Data <- Data[, ind]
+
+    ## Sometimes spikes will be zero when subsampling.
+    removeSpikes <- rowSums(assay(altExp(Data)) == 0)
+    altExp(Data) <- altExp(Data)[!removeSpikes, ]
+    Data <- Data[rowSums(counts(Data)) != 0, ]
+  }
+
+  if (SubsetBy == "gene") {
+    Data <- Data[Subsets == subset, ]
+    ind_keep <- colSums(counts(Data)) != 0
+    Data <- Data[, ind_keep]
+  }
+  Data
+}
+
+.consensus_average <- function(...) {
+  .combine_subposteriors(..., method = "consensus")
+}
+
 .combine_subposteriors <- function(
     chains,
     gene_order = NULL,
@@ -231,6 +216,7 @@ BASiCS_DivideAndConquer <- function(
     mc.cores = min(detectCores(all.tests = FALSE, logical = TRUE), 16),
     ...
   ) {
+
   if (missing(subset_by)) {
     stop("Must supply subset_by")
   }
@@ -238,12 +224,12 @@ BASiCS_DivideAndConquer <- function(
 
   if (subset_by == "cell") {
     reference_chain <- chains[[1]]
-    chains[] <- mclapply(
+    chains[] <- lapply(
       chains,
       function(chain) {
-        offset_correct(reference_chain = reference_chain, chain = chain)
-      },
-      mc.cores = mc.cores
+        .offset_correct(chain = chain, reference_chain = reference_chain)
+      }
+      # , mc.cores = mc.cores
     )    
   }
   method <- match.arg(method)
@@ -432,4 +418,13 @@ BASiCS_DivideAndConquer <- function(
   }
 
   params
+}
+
+.offset_correct <- function(chain, reference_chain) {
+  offset <- matrixStats::rowSums2(chain@parameters$mu) /
+    matrixStats::rowSums2(reference_chain@parameters$mu)
+  offset <- median(offset)
+
+  chain@parameters$mu <- chain@parameters$mu / offset
+  chain
 }

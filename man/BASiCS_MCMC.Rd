@@ -40,6 +40,9 @@ BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
+\item{DivideAndConquer}{Character value specifying whether a divide and
+conquer inference strategy should be used.}
+
 \item{...}{Optional parameters.
 \describe{
   \item{

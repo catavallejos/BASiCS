@@ -119,7 +119,7 @@ setClass(
     }
 
     hasFinite <- lapply(
-      object@parameters[names(object@parameters) != "epsilon"],
+      object@parameters[setdiff(names(object@parameters), c("delta", "epsilon"))],
       function(x) sum(!is.finite(x))
     )
     # Check for infinite values and NAs
