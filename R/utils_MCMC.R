@@ -51,7 +51,7 @@
   if ((length(altExpNames(Data)) == 0)  & WithSpikes) {
     stop(
       "'Data' does not contain information about spike-in genes \n", 
-      "Please indicate include this information using 'altExp' \n",
+      "Please include this information using 'altExp' \n",
       "or set 'WithSpikes = FALSE' \n."
     )
   }
