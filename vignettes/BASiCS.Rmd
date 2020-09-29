@@ -119,7 +119,11 @@ console will display the progress of the MCMC algorithm.
 For other optional parameters refer to `help(BASiCS_MCMC)`. 
 
 Here, we illustrate the usage of `BASiCS_MCMC` using a built-in 
-synthetic dataset.
+synthetic dataset. 
+As the outcome of this function is stochastic, users should expect small
+variations across different runs. 
+To ensure reproducible results, users may consider using a fixed seed (as
+illustrated in the following code). 
 
 **NOTE: WE USE A SMALL NUMBER OF ITERATIONS FOR ILLUSTRATION PURPOSES ONLY.
 LARGER NUMBER OF ITERATIONS ARE USUALLY REQUIRED TO ACHIEVE CONVERGENCE. OUR
@@ -127,6 +131,7 @@ RECOMMENDED SETTING IS `N=20000`, `Thin=20` and `Burn=10000`.**
 
 
 ```{r quick-start-MCMC}
+set.seed(1)
 Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
                      PrintProgress = FALSE, Regression = TRUE)

@@ -1520,8 +1520,13 @@ version 2.1.7 (2020-09-23)
 - See issues #182, #39, #91, #169, #181, #178, #202, #190, #173
 
 
-version 2.1.8 (2020-09-25)
+version 2.1.8 (2020-09-28)
+- Minor edit in the vignette to recommend the use of a seed for reproducible
+results when using `BASiCS_MCMC`. 
+
+
+version 2.1.9 (2020-09-28)
 - Add `Threads` argument to `BASiCS_MCMC`, allowing parallelisation of MCMC 
-  updates across cells or genes.
+  updates across cells or genes using openMP.
 - Reduce BatchInfo requirement for no spikes sampler to a warning, from an 
   error.
