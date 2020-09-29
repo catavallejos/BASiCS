@@ -21,6 +21,8 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param DivideAndConquer Character value specifying whether a divide and
+#' conquer inference strategy should be used.
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -196,10 +198,24 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
+    DivideAndConquer = c("none", "gene", "cell"),
     ...) {
 
   # Checks to ensure input arguments are valid
   .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
+  DivideAndConquer <- match.arg(DivideAndConquer)
+
+  if (DivideAndConquer != "none") {
+    Chains <- BASiCS_DivideAndConquer(
+      Data,
+      N = N,
+      Thin = Thin,
+      Burn = Burn,
+      Regression = Regression,
+      WithSpikes = WithSpikes,
+      SubsetBy = DivideAndConquer
+    )
+  }
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch

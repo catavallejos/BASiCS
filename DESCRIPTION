@@ -59,6 +59,7 @@ Imports:
     matrixStats,
     assertthat,
     reshape2,
+    future.apply,
     hexbin
 Suggests:
     BiocStyle,
@@ -113,6 +114,7 @@ Collate:
     'newBASiCS_Chain.R'
     'newBASiCS_Data.R'
     'utils_Data.R'
+    'utils_DivideAndConquer.R'
     'utils_MCMC.R'
     'utils_Store.R'
     'utils_Tests.R'
