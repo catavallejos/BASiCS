@@ -13,7 +13,7 @@ BASiCS_MCMC(
   WithSpikes = TRUE,
   DivideAndConquer = c("none", "gene", "cell"),
   NSubsets = 1,
-  Threads = getOption("mc.cores", default = 1L),
+  Threads = getOption("Ncpus", default = 1L),
   ...
 )
 }
@@ -48,6 +48,14 @@ inference is performed on batches of genes separately, and when it is set to
 \code{"cell"}, inference is performed on batches of cells separately.
 Posterior distributions are combined using posterior interval estimation
 (see Li et al., 2016).}
+
+\item{NSubsets}{If \code{DivideAndConquer="gene"} or 
+\code{DivideAndConquer="cell"}, \code{NSubsets} specifies the number of batches 
+to create and perform divide and conquer inference with.}
+
+\item{Threads}{Integer specifying the number of threads to be used to 
+parallelise parameter updates. Default value is the globally set
+\code{"Ncpus"} option, or 1 if this option is not set.}
 
 \item{...}{Optional parameters.
 \describe{

@@ -17,9 +17,10 @@
 \arguments{
 \item{Data}{a SingleCellExperiment object}
 
-\item{NSubsets}{Number of partitions into which to divide Data}
+\item{NSubsets}{Integer specifying the number of batches into which to 
+divide Data for divide and conquer inference.}
 
-\item{SubsetBy}{Partition by "cell" or by "gene"}
+\item{SubsetBy}{Partition by "cell" or by "gene".}
 
 \item{Alpha}{p-value threshold for ANOVA testing of "balance"}
 

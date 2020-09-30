@@ -30,6 +30,9 @@
 #' @param NSubsets If \code{DivideAndConquer="gene"} or 
 #' \code{DivideAndConquer="cell"}, \code{NSubsets} specifies the number of batches 
 #' to create and perform divide and conquer inference with.
+#' @param Threads Integer specifying the number of threads to be used to 
+#' parallelise parameter updates. Default value is the globally set
+#' \code{"Ncpus"} option, or 1 if this option is not set.
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -211,7 +214,7 @@ BASiCS_MCMC <- function(
     WithSpikes = TRUE,
     DivideAndConquer = c("none", "gene", "cell"),
     NSubsets = 1,
-    Threads = getOption("mc.cores", default = 1L),
+    Threads = getOption("Ncpus", default = 1L),
     ...) {
 
 
