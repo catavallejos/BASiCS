@@ -12,6 +12,8 @@
 #' @param WithBatch Logical value specifying whether a dummy \code{BatchInfo}
 #' is included in the output.
 #' @return A \linkS4class{SingleCellExperiment} object.
+#' @examples
+#' BASiCS_MockSCE()
 #' @export
 BASiCS_MockSCE <- function(NGenes = 100, NCells = 100, NSpikes = 20, WithBatch = TRUE) {
   mu <- rlnorm(NGenes)
@@ -30,7 +32,7 @@ BASiCS_MockSCE <- function(NGenes = 100, NCells = 100, NSpikes = 20, WithBatch =
     assays = list(counts = counts)
   )
   if (WithBatch) {
-    colData(Data)$BatchInfo <- sample(1:2, nrow(Data), replace = TRUE)
+    colData(Data)$BatchInfo <- sample(2, nrow(Data), replace = TRUE)
   }
   if (NSpikes > 0) {
     spikes <- rlnorm(NSpikes)

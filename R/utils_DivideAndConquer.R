@@ -129,7 +129,7 @@
     CellOrder = NULL,
     Method = c("consensus", "pie"),
     SubsetBy = c("gene", "cell"),
-    BPPARAM = BiocParallel::bpparam(),
+    BPPARAM = BiocParallel::bpparam("SnowParam"),
     ...
   ) {
 
@@ -140,7 +140,7 @@
 
   if (SubsetBy == "cell") {
     ReferenceChain <- Chains[[1]]
-    Chains[] <- BiocParallel::bplapply(
+    Chains[] <- bplapply(
       Chains,
       function(Chain) {
         .offset_correct(Chain = Chain, ReferenceChain = ReferenceChain)
@@ -157,7 +157,7 @@
   Params <- names(Chains[[1]]@parameters)
   Params <- setdiff(Params, "RefFreq")
 
-  mean_params <- BiocParallel::bplapply(
+  mean_params <- bplapply(
     Params,
     .iterate_chains,
     Chains = Chains,
@@ -282,7 +282,7 @@
     }
   )
 
-  if (all(sapply(all_colnames, is.null))) {
+  if (all(vapply(all_colnames, is.null, logical(1)))) {
     all_colnames <- lapply(
       Chains, 
       function(Chain) {
@@ -300,12 +300,13 @@
     dimnames = list(NULL, all_colnames)
   )
 
-  output[, ] <- sapply(
+  output[, ] <- vapply(
     all_colnames,
     Fun,
     Chains = Chains,
     Param = Param,
-    ...
+    ...,
+    numeric(nrow(output))
   )
   output
 }
@@ -345,3 +346,13 @@
   Chain
 }
 
+
+bplapply <- function(..., BPPARAM) {
+  if (inherits(BPPARAM, "MulticoreParam")) {
+    stop(
+      "Cannot use BiocParallel::MultiCoreParam due to openMP code in BASiCS! ",
+      "Try SnowParam instead."
+    )
+  }
+  BiocParallel::bplapply(..., BPPARAM = BPPARAM)
+}

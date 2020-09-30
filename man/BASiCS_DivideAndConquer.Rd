@@ -11,7 +11,7 @@ BASiCS_DivideAndConquer(
   Alpha = 0.05,
   WithSpikes,
   Regression,
-  BPPARAM = BiocParallel::bpparam(),
+  BPPARAM = BiocParallel::bpparam("SnowParam"),
   PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
   ...
 )
@@ -50,19 +50,19 @@ by cells) or average count (when partitioning by genes) is not significantly
 different between batches, at a significance level \code{Alpha}.
 }
 \examples{
- \dontrun{
-   Data <- BASiCS_MockSCE()
-   BASiCS_DivideAndConquer(
-     Data, 
-     NSubsets = 2,
-     SubsetBy = "gene",
-     N = 8,
-     Thin = 2,
-     Burn = 4,
-     WithSpikes = TRUE,
-     Regression = TRUE
-   )
- }
+ bp <- BiocParallel::SnowParam()
+ Data <- BASiCS_MockSCE()
+ BASiCS_DivideAndConquer(
+   Data, 
+   NSubsets = 2,
+   SubsetBy = "gene",
+   N = 8,
+   Thin = 2,
+   Burn = 4,
+   WithSpikes = TRUE,
+   Regression = TRUE,
+   BPPARAM = bp
+ )
 }
 \references{
 Simple, Scalable and Accurate Posterior Interval Estimation

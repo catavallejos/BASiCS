@@ -26,3 +26,6 @@ A \linkS4class{SingleCellExperiment} object.
 Creates a \linkS4class{SingleCellExperiment} object of Poisson-distributed
 approximating a homogeneous cell population.
 }
+\examples{
+BASiCS_MockSCE()
+}

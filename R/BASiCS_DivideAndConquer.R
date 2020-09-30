@@ -22,19 +22,19 @@
 #' @param ... Passed to  \code{\link{BASiCS_MCMC}}.
 #' @return A list of \linkS4class{BASiCS_Chain} objects.
 #' @examples
-#'  \dontrun{
-#'    Data <- BASiCS_MockSCE()
-#'    BASiCS_DivideAndConquer(
-#'      Data, 
-#'      NSubsets = 2,
-#'      SubsetBy = "gene",
-#'      N = 8,
-#'      Thin = 2,
-#'      Burn = 4,
-#'      WithSpikes = TRUE,
-#'      Regression = TRUE
-#'    )
-#'  }
+#'  bp <- BiocParallel::SnowParam()
+#'  Data <- BASiCS_MockSCE()
+#'  BASiCS_DivideAndConquer(
+#'    Data, 
+#'    NSubsets = 2,
+#'    SubsetBy = "gene",
+#'    N = 8,
+#'    Thin = 2,
+#'    Burn = 4,
+#'    WithSpikes = TRUE,
+#'    Regression = TRUE,
+#'    BPPARAM = bp
+#'  )
 #' @references
 #' Simple, Scalable and Accurate Posterior Interval Estimation
 #' Cheng Li and Sanvesh Srivastava and David B. Dunson
@@ -47,7 +47,7 @@ BASiCS_DivideAndConquer <- function(
     Alpha = 0.05,
     WithSpikes,
     Regression,
-    BPPARAM = BiocParallel::bpparam(),
+    BPPARAM = BiocParallel::bpparam("SnowParam"),
     PriorParam = BASiCS_PriorParam(
       Data,
       PriorMu = "EmpiricalBayes"
@@ -87,8 +87,7 @@ BASiCS_DivideAndConquer <- function(
     WithSpikes = WithSpikes
   )
   cat("Starting MCMC...\n")
-  # output <- BiocParallel::bplapply(
-  output <- lapply(
+  output <- bplapply(
     Subsets,
     function(Subset) {
       if (SubsetBy == "gene") {
@@ -103,13 +102,13 @@ BASiCS_DivideAndConquer <- function(
         WithSpikes = WithSpikes,
         Regression = Regression,
         PriorParam = PriorParam,
+        Threads = 1,
         ...
       )
-    }
-    # ,
-    # BPPARAM = BPPARAM
+    },
+    BPPARAM = BPPARAM
   )
-  if (any(sapply(output, class) == "try-error")) {
+  if (any(vapply(output, class, character(1)) == "try-error")) {
     warning("Some MCMC runs failed!")
   }
   output

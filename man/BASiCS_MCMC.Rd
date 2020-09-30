@@ -11,7 +11,7 @@ BASiCS_MCMC(
   Burn,
   Regression,
   WithSpikes = TRUE,
-  DivideAndConquer = c("none", "gene", "cell"),
+  SubsetBy = c("none", "gene", "cell"),
   NSubsets = 1,
   Threads = getOption("Ncpus", default = 1L),
   ...
@@ -42,15 +42,15 @@ BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
-\item{DivideAndConquer}{Character value specifying whether a divide and
+\item{SubsetBy}{Character value specifying whether a divide and
 conquer inference strategy should be used. When this is set to \code{"gene"},
 inference is performed on batches of genes separately, and when it is set to
 \code{"cell"}, inference is performed on batches of cells separately.
 Posterior distributions are combined using posterior interval estimation
 (see Li et al., 2016).}
 
-\item{NSubsets}{If \code{DivideAndConquer="gene"} or 
-\code{DivideAndConquer="cell"}, \code{NSubsets} specifies the number of batches 
+\item{NSubsets}{If \code{SubsetBy="gene"} or 
+\code{SubsetBy="cell"}, \code{NSubsets} specifies the number of batches 
 to create and perform divide and conquer inference with.}
 
 \item{Threads}{Integer specifying the number of threads to be used to 
