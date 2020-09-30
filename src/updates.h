@@ -1,8 +1,12 @@
+#ifndef UPDATES_H
+#define UPDATES_H
+
 #include "utils.h"
 
 /* Metropolis-Hastings updates of mu 
 * Updates are implemented simulateaneously for all biological genes
 */
+// [[Rcpp::export(".muUpdate")]]
 arma::mat muUpdate(
     arma::vec const& mu0, 
     arma::vec const& prop_var, 
@@ -33,6 +37,7 @@ arma::mat muUpdate(
   log_aux -= (0.5 / s2_mu) * 
     (pow(log(mu1) - mu_mu, 2) - pow(log(mu0) - mu_mu, 2))
     * exponent;
+  #pragma omp parallel for
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
       log_aux(i) -= ( Counts(i,j) + invdelta(i) ) *  
@@ -59,6 +64,7 @@ arma::mat muUpdate(
 /* Metropolis-Hastings updates of delta
 * Updates are implemented simulateaneously for all biological genes.
 */
+// [[Rcpp::export(".deltaUpdate")]]
 arma::mat deltaUpdate(
     arma::vec const& delta0, 
     arma::vec const& prop_var,  
@@ -88,6 +94,7 @@ arma::mat deltaUpdate(
   */
   arma::vec log_aux = - n * (lgamma_cpp(1/delta1) - lgamma_cpp(1/delta0));
   log_aux -= n * ( (log(delta1)/delta1) - (log(delta0)/delta0) );
+  #pragma omp parallel for
   for (int i=0; i < q0; i++) {
     for (int j=0; j < n; j++) {
       log_aux(i) += std::lgamma(Counts(i,j) + (1/delta1(i)));
@@ -131,6 +138,7 @@ arma::mat deltaUpdate(
 /* Metropolis-Hastings updates of phi 
 * Joint updates using Dirichlet proposals
 */
+// [[Rcpp::export(".phiUpdate")]]
 Rcpp::List phiUpdate(
     arma::vec const& phi0,
     double const& prop_var,
@@ -218,6 +226,7 @@ Rcpp::List phiUpdate(
  * have a closed form (Generalized Inverse Gaussian)
  * Updates are implemented simulateaneously for all cells.
  */
+// [[Rcpp::export(".sUpdateBatch")]]
 arma::vec sUpdateBatch(
     arma::vec const& s0, 
     arma::vec const& nu, 
@@ -266,6 +275,7 @@ arma::vec sUpdateBatch(
 /* Metropolis-Hastings updates of nu (batch case)
 * Updates are implemented simulateaneously for all cells.
 */
+// [[Rcpp::export(".nuUpdateBatch")]]
 arma::mat nuUpdateBatch(
     arma::vec const& nu0, 
     arma::vec const& prop_var, 
@@ -294,7 +304,7 @@ arma::mat nuUpdateBatch(
   
   // ACCEPT/REJECT STEP
   arma::vec log_aux = arma::zeros(n);
-  
+  #pragma omp parallel for
   for (int j=0; j < n; j++) {
     for (int i=0; i < q0; i++) {
       log_aux(j) -= (Counts(i, j) + invdelta(i)) *
@@ -328,15 +338,22 @@ arma::mat nuUpdateBatch(
 
 /* Metropolis-Hastings updates of theta 
 */
+/* theta0: Current value of $\theta$ */
+/* prop_var: Current value of the proposal variances for $\theta$ */
+/* s: Current value of $s=(s_1,...,s_n)$' */
+/* nu: Current value of $\nu=(\nu_1,...,\nu_n)'$ */
+/* a_theta: Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+/* b_theta: Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+// [[Rcpp::export(".thetaUpdateBatch")]]
 arma::mat thetaUpdateBatch(
-    arma::vec const& theta0, /* Current value of $\theta$ */
-    arma::vec const& prop_var, /* Current value of the proposal variances for $\theta$ */
+    arma::vec const& theta0,
+    arma::vec const& prop_var,
     arma::mat const& BatchDesign,
     arma::vec const& BatchSizes,
-    arma::vec const& s, /* Current value of $s=(s_1,...,s_n)$' */
-    arma::vec const& nu, /* Current value of $\nu=(\nu_1,...,\nu_n)'$ */
-    double const& a_theta, /* Shape hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
-    double const& b_theta, /* Rate hyper-parameter of the Gamma($a_{\theta}$,$b_{\theta}$) prior assigned to $\theta$ */
+    arma::vec const& s,
+    arma::vec const& nu,
+    double const& a_theta,
+    double const& b_theta,
     int const& n,
     int const& nBatch,
     double const& exponent,
@@ -382,3 +399,5 @@ arma::mat thetaUpdateBatch(
   // OUTPUT
   return join_rows(theta, arma::conv_to<arma::mat>::from(ind));
 }
+
+#endif

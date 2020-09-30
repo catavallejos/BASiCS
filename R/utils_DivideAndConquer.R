@@ -1,87 +1,3 @@
-#' Run divide and conquer MCMC with BASiCS
-#' 
-#' @param Data SingleCellExperiemnt object
-#' @param NSubsets Number of partitions to make
-#' @param SubsetBy Passed to generateSubsets
-#' @param Alpha Passed to generateSubsets
-#' @param WithSpikes Similar to the argument in BASiCS_MCMC
-#' @param mc.cores Number of cores for parallel processing
-#' @param ... Passed to BASiCS_MCMC
-#' 
-#' 
-#' @export
-BASiCS_DivideAndConquer <- function(
-    Data,
-    NSubsets = 5,
-    SubsetBy = c("cell", "gene"),
-    Alpha = 0.05,
-    WithSpikes = FALSE,
-    Regression = TRUE,
-    mc.cores = min(detectCores(all.tests = FALSE, logical = TRUE), NSubsets),
-    ...
-    ) {
-
-  ## These values should be passed in.
-  L <- 12
-  eta <- 5
-  astwo <- 2
-  bstwo <- 2
-  PP <- BASiCS_PriorParam(
-    Data,
-    PriorMu = "EmpiricalBayes"
-  )
-  start <- BASiCS:::.BASiCS_MCMC_Start(
-    Data,
-    PriorParam = PP,
-    Regression = TRUE,
-    WithSpikes = WithSpikes
-  )
-
-  Locations <- BASiCS:::.estimateRBFLocations(
-    start$mu0,
-    L,
-    RBFMinMax = FALSE
-  )
-  PP$RBFLocations <- Locations
-
-  ## To do:
-  ## Automatically determine NSubsets?
-  ## Balance subsets for variables/batches?
-  SubsetBy <- match.arg(SubsetBy)
-  cat("Generating partitions...\n")
-  Subsets <- .generateSubsets(
-    Data = Data,
-    NSubsets = NSubsets,
-    SubsetBy = SubsetBy,
-    Alpha = Alpha,
-    WithSpikes = WithSpikes
-  )
-  cat("Starting BASiCS...\n")
-  output <- lapply(
-    Subsets,
-    function(Subset) {
-      if (SubsetBy == "gene") {
-        ind <- match(rownames(Subset), rownames(Data))
-        PP$mu.mu <- PP$mu.mu[ind]
-      } else if (SubsetBy == "cell") {
-        ind <- match(colnames(Subset), colnames(Data))
-        PP$p.phi <- PP$p.phi[ind]
-      }
-      BASiCS_MCMC(
-        Data = Subset,
-        WithSpikes = WithSpikes,
-        Regression = Regression,
-        PriorParam = PP,
-        ...
-      )
-    }
-  )
-  if (any(sapply(output, class) == "try-error")) {
-    warning("Some MCMC runs failed!")
-  }
-  output
-}
-
 ## Balance subsets for total NCounts (sample-wise) or quantile of mean count (gene-wise)
 ##   1. Divide genes/samples into quantile bins
 ##   2. Sample from each quantile
@@ -105,7 +21,7 @@ BASiCS_DivideAndConquer <- function(
 #' @param WithSpikes Similar to argument for BASiCS_MCMC - do the Data contain 
 #'  spikes?
 #' @param MaxDepth Maximum number of recursive
-#' @param .depth Internal parameter. Do not set.
+#' @param .Depth Internal parameter. Do not set.
 #' 
 #' @return A list of SingleCellExperiment objects
 .generateSubsets <- function(
@@ -115,14 +31,14 @@ BASiCS_DivideAndConquer <- function(
     Alpha = 0.05,
     WithSpikes = FALSE,
     MaxDepth = 20,
-    .depth = 1
+    .Depth = 1
   ) {
 
   if (SubsetBy == "cell" && ((ncol(Data) / NSubsets) < 20)) {
     stop("Cannot generate subsets with at least 20 cells per subset!")
   }
 
-  if (.depth > MaxDepth) {
+  if (.Depth > MaxDepth) {
     stop(paste("Unable to find balanced subset after", MaxDepth, "iterations!"))
   }
 
@@ -166,7 +82,8 @@ BASiCS_DivideAndConquer <- function(
     (SubsetBy == "gene" || all(table(Subsets) > 20))
 
   if (balanced) {
-    lapply(unique(Subsets),
+    lapply(
+      unique(Subsets),
       .subset,
       Data = Data,
       SubsetBy = SubsetBy,
@@ -179,7 +96,7 @@ BASiCS_DivideAndConquer <- function(
       SubsetBy = SubsetBy,
       Alpha = Alpha,
       WithSpikes = WithSpikes,
-      .depth = .depth + 1
+      .Depth = .Depth + 1
     )
   }
 }
@@ -204,123 +121,122 @@ BASiCS_DivideAndConquer <- function(
 }
 
 .consensus_average <- function(...) {
-  .combine_subposteriors(..., method = "consensus")
+  .combine_subposteriors(..., Method = "consensus")
 }
 
 .combine_subposteriors <- function(
-    chains,
-    gene_order = NULL,
-    cell_order = NULL,
-    method = c("consensus", "pie"),
-    subset_by = c("gene", "cell"),
-    mc.cores = min(detectCores(all.tests = FALSE, logical = TRUE), 16),
+    Chains,
+    GeneOrder = NULL,
+    CellOrder = NULL,
+    Method = c("consensus", "pie"),
+    SubsetBy = c("gene", "cell"),
+    BPPARAM,
     ...
   ) {
 
-  if (missing(subset_by)) {
-    stop("Must supply subset_by")
+  if (missing(SubsetBy)) {
+    stop("Must supply SubsetBy")
   }
-  subset_by <- match.arg(subset_by)
+  SubsetBy <- match.arg(SubsetBy)
 
-  if (subset_by == "cell") {
-    reference_chain <- chains[[1]]
-    chains[] <- lapply(
-      chains,
-      function(chain) {
-        .offset_correct(chain = chain, reference_chain = reference_chain)
+  if (SubsetBy == "cell") {
+    ReferenceChain <- Chains[[1]]
+    Chains[] <- BiocParallel::bplapply(
+      Chains,
+      function(Chain) {
+        .offset_correct(Chain = Chain, ReferenceChain = ReferenceChain)
       }
-      # , mc.cores = mc.cores
     )    
   }
-  method <- match.arg(method)
-  fun <- switch(method,
+  Method <- match.arg(Method)
+  Fun <- switch(Method,
     "consensus" = .weighted_posterior_average,
     "pie" = .quantile_average
   )
 
-  params <- names(chains[[1]]@parameters)
-  params <- setdiff(params, "RefFreq")
+  Params <- names(Chains[[1]]@parameters)
+  Params <- setdiff(Params, "RefFreq")
 
-  mean_params <- lapply(
-    params,
+  mean_params <- BiocParallel::bplapply(
+    Params,
     .iterate_chains,
-    chains = chains,
-    fun = fun,
-#    mc.cores = mc.cores,
-    subset_by = subset_by,
+    Chains = Chains,
+    Fun = Fun,
+    SubsetBy = SubsetBy,
+    BPPARAM = BPPARAM,
     ...
   )
 
-  names(mean_params) <- params
+  names(mean_params) <- Params
   new("BASiCS_Chain",
     parameters = .reorder_params(
-      params = mean_params,
-      gene_order = gene_order,
-      cell_order = cell_order
+      Params = mean_params,
+      GeneOrder = GeneOrder,
+      CellOrder = CellOrder
     )
   )
 }
 
 
 .weighted_posterior_average <- function(
-    colname,
-    chains,
-    param,
-    weight_method = c("naive", "n_weight", "inverse_variance"),
-    subset_by,
-    sort = FALSE
+    Colname,
+    Chains,
+    Param,
+    Weighting = c("naive", "n_weight", "inverse_variance"),
+    SubsetBy,
+    Sort = FALSE
   ) {
 
-  weight_method <- match.arg(weight_method)
+  Weighting <- match.arg(Weighting)
 
-  if (weight_method == "n_weight") {
-    subset_by <- match.arg(subset_by, choices = c("cell", "gene"))
-    if (subset_by == "cell") {
+  if (Weighting == "n_weight") {
+    SubsetBy <- match.arg(SubsetBy, choices = c("cell", "gene"))
+    if (SubsetBy == "cell") {
       n_param <- "s"
-      all_colnames <- lapply(chains, function(x) colnames(x@parameters[["s"]]))
+      all_colnames <- lapply(Chains, function(x) colnames(x@parameters[["s"]]))
     } else {
       n_param <- "mu"
-      all_colnames <- lapply(chains, function(x) colnames(x@parameters[["mu"]]))      
+      all_colnames <- lapply(Chains, function(x) colnames(x@parameters[["mu"]]))      
     }
     all_colnames <- Reduce(union, all_colnames)
     num <- length(all_colnames)      
   }
 
-  weights <- numeric(length(chains))
+  weights <- numeric(length(Chains))
   subposterior_matrix <- matrix(
     NA,
-    ncol = length(chains),
-    nrow = nrow(chains[[1]]@parameters[[param]])
+    ncol = length(Chains),
+    nrow = nrow(Chains[[1]]@parameters[[Param]])
   )
-  for (i in seq_along(chains)) {
-    chain <- chains[[i]]
-    mat <- chain@parameters[[param]]
-    if (colname %in% colnames(mat) || is.numeric(colname)) {
-      out <- mat[, colname]
+  for (i in seq_along(Chains)) {
+    Chain <- Chains[[i]]
+    mat <- Chain@parameters[[Param]]
+    if (Colname %in% colnames(mat) || is.numeric(Colname)) {
+      out <- mat[, Colname]
     } else {
       next
     }
-    weights[[i]] <- switch(weight_method,
-      "n_weight" = length(colnames(chain@parameters[[n_param]])) / num, 
+    weights[[i]] <- switch(Weighting,
+      "n_weight" = length(colnames(Chain@parameters[[n_param]])) / num, 
       "inverse_variance" = {
         ## what if infinite variance????
         ## Why infinite variance???? - Because invariant.
         ## Or NA (for epsilon)
         v <- 1 / var(out)
-        if (!is.finite(v) & param != "epsilon") {
-          stop(paste0("Undefined variance for ", param, " (", colname, ")"))
+        if (!is.finite(v) & Param != "epsilon") {
+          stop(paste0("Undefined variance for ", Param, " (", Colname, ")"))
         }
         v
       },
-      "naive" = 1 / length(chains)
+      "naive" = 1 / length(Chains)
     )
     if (!(
-          (subset_by == "gene" && param %in% c("mu", "delta", "epsilon")) ||
-          (subset_by == "cell" && param %in% c("phi", "nu", "s"))
+          (SubsetBy == "gene" && Param %in% c("mu", "delta", "epsilon")) ||
+          (SubsetBy == "cell" && Param %in% c("phi", "nu", "s"))
         )) {
       out <- out * weights[[i]]
     }
-    if (param != "RefFreq" && !all(is.na(out))) {
+    if (Param != "RefFreq" && !all(is.na(out))) {
       subposterior_matrix[, i] <- out
     }
   }
@@ -333,16 +249,16 @@ BASiCS_DivideAndConquer <- function(
   weights <- weights[!ind_all_na]
   subposterior_matrix <- subposterior_matrix[, !ind_all_na, drop = FALSE]
 
-  if ((subset_by == "gene" && param %in% c("mu", "delta", "epsilon")) ||
-      (subset_by == "cell" && param %in% c("phi", "nu", "s"))
+  if ((SubsetBy == "gene" && Param %in% c("mu", "delta", "epsilon")) ||
+      (SubsetBy == "cell" && Param %in% c("phi", "nu", "s"))
       ) {
     sums <- subposterior_matrix 
   } else {
-    if (sort) {
+    if (Sort) {
       subposterior_matrix[] <- apply(
         subposterior_matrix[],
         2,
-        sort
+        Sort
       )
     }
     sums <- rowSums(subposterior_matrix, na.rm = TRUE)
@@ -352,25 +268,25 @@ BASiCS_DivideAndConquer <- function(
 }
 
 .quantile_average <- function(...) {
-  .weighted_posterior_average(..., sort = TRUE) 
+  .weighted_posterior_average(..., Sort = TRUE) 
 }
 
-.iterate_chains <- function(param, chains, fun, ...) {
-  message("Combining batch posteriors for ", param, " parameter\n")
-  param_vals <- chains[[1]]@parameters[[param]]
+.iterate_chains <- function(Param, Chains, Fun, ...) {
+  message("Combining batch posteriors for ", Param, " parameter\n")
+  param_vals <- Chains[[1]]@parameters[[Param]]
 
   all_colnames <- lapply(
-    chains,
-    function(chain) {
-      colnames(chain@parameters[[param]])
+    Chains,
+    function(Chain) {
+      colnames(Chain@parameters[[Param]])
     }
   )
 
   if (all(sapply(all_colnames, is.null))) {
     all_colnames <- lapply(
-      chains, 
-      function(chain) {
-        seq_len(ncol(chain@parameters[[param]]))
+      Chains, 
+      function(Chain) {
+        seq_len(ncol(Chain@parameters[[Param]]))
       }
     )
   }
@@ -386,45 +302,46 @@ BASiCS_DivideAndConquer <- function(
 
   output[, ] <- sapply(
     all_colnames,
-    fun,
-    chains = chains,
-    param = param,
+    Fun,
+    Chains = Chains,
+    Param = Param,
     ...
   )
   output
 }
 
 #' @export
-.reorder_params <- function(params, gene_order = NULL, cell_order = NULL) {
+.reorder_params <- function(Params, GeneOrder = NULL, CellOrder = NULL) {
 
-  if (!is.null(gene_order)) {
-    row_params <- intersect(names(params), c("mu", "delta", "epsilon"))
-    params[row_params] <- lapply(
-      params[row_params],
+  if (!is.null(GeneOrder)) {
+    row_params <- intersect(names(Params), c("mu", "delta", "epsilon"))
+    Params[row_params] <- lapply(
+      Params[row_params],
       function(x) {
-        x[, gene_order, drop = FALSE]
+        x[, GeneOrder, drop = FALSE]
       }
     )
   }
 
-  if (!is.null(cell_order)) {
-    col_params <- intersect(names(params), c("s", "nu", "phi"))
-    params[col_params] <- lapply(
-      params[col_params],
+  if (!is.null(CellOrder)) {
+    col_params <- intersect(names(Params), c("s", "nu", "phi"))
+    Params[col_params] <- lapply(
+      Params[col_params],
       function(x) {
-        x[, cell_order, drop = FALSE]
+        x[, CellOrder, drop = FALSE]
       }
     )
   }
 
-  params
+  Params
 }
 
-.offset_correct <- function(chain, reference_chain) {
-  offset <- matrixStats::rowSums2(chain@parameters$mu) /
-    matrixStats::rowSums2(reference_chain@parameters$mu)
+.offset_correct <- function(Chain, ReferenceChain) {
+  offset <- matrixStats::rowSums2(Chain@parameters$mu) /
+    matrixStats::rowSums2(ReferenceChain@parameters$mu)
   offset <- median(offset)
 
-  chain@parameters$mu <- chain@parameters$mu / offset
-  chain
+  Chain@parameters$mu <- Chain@parameters$mu / offset
+  Chain
 }
+

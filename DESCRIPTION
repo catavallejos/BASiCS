@@ -2,7 +2,7 @@ Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
 Version: 2.1.8
-Date: 2020-09-28
+Date: 2020-09-29
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="catalina.vallejos@igmm.ed.ac.uk"), 
         person("Nils", "Eling", role=c("aut")), 
@@ -59,7 +59,7 @@ Imports:
     matrixStats,
     assertthat,
     reshape2,
-    future.apply,
+    BiocParallel,
     hexbin
 Suggests:
     BiocStyle,
@@ -88,11 +88,13 @@ Collate:
     'BASiCS_DetectHVG_LVG.R'
     'BASiCS_DiagHist.R'
     'BASiCS_DiagPlot.R'
+    'BASiCS_DivideAndConquer.R'
     'BASiCS_Draw.R'
     'BASiCS_EffectiveSize.R'
     'BASiCS_Filter.R'
     'BASiCS_LoadChain.R'
     'BASiCS_MCMC.R'
+    'BASiCS_MockSCE.R'
     'BASiCS_Package.R'
     'BASiCS_PlotDE.R'
     'BASiCS_PlotOffset.R'

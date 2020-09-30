@@ -12,6 +12,8 @@ BASiCS_MCMC(
   Regression,
   WithSpikes = TRUE,
   DivideAndConquer = c("none", "gene", "cell"),
+  NSubsets = 1,
+  Threads = getOption("mc.cores", default = 1L),
   ...
 )
 }
@@ -41,7 +43,11 @@ technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
 \item{DivideAndConquer}{Character value specifying whether a divide and
-conquer inference strategy should be used.}
+conquer inference strategy should be used. When this is set to \code{"gene"},
+inference is performed on batches of genes separately, and when it is set to
+\code{"cell"}, inference is performed on batches of cells separately.
+Posterior distributions are combined using posterior interval estimation
+(see Li et al., 2016).}
 
 \item{...}{Optional parameters.
 \describe{
@@ -214,6 +220,10 @@ Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 Vallejos, Richardson and Marioni (2016). Genome Biology.
 
 Eling et al (2018). Cell Systems
+
+Simple, Scalable and Accurate Posterior Interval Estimation
+Cheng Li and Sanvesh Srivastava and David B. Dunson
+arXiv (2016)
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

@@ -3,12 +3,19 @@
                                     Thin,
                                     Burn,
                                     Regression,
-                                    WithSpikes) {
+                                    WithSpikes,
+                                    Threads) {
 
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.\n")
   }
-  
+  if (!is.numeric(Threads) &&
+      length(Threads) == 1 &&
+      round(Threads) == Threads &&
+      Threads > 0) {
+    stop("Threads must be a positive integer.")
+  }
+
   # Check if `Data` contains more than one type of types
   if ((length(SingleCellExperiment::altExpNames(Data)) > 1)) {
     stop(
@@ -24,7 +31,7 @@
       "see help(altExp) for details. \n"
     )
     # If SpikeInput slot is missing and WithSpikes == TRUE
-    if(is.null(rowData(altExp(Data)))) {
+    if (is.null(rowData(altExp(Data)))) {
       stop(
         "'altExp(Data)' does not contain 'rowData' \n"
       )  
@@ -41,17 +48,17 @@
   }
   
   # If isSpike slot is missing and WithSpikes == TRUE
-  if((length(altExpNames(Data)) == 0)  & WithSpikes) {
+  if ((length(altExpNames(Data)) == 0)  & WithSpikes) {
     stop(
       "'Data' does not contain information about spike-in genes \n", 
-      "Please indicate include this information using 'altExp' \n",
+      "Please include this information using 'altExp' \n",
       "or set 'WithSpikes = FALSE' \n."
     )
   }
     
   # If BatchInfo slot is missing and WithSpikes == FALSE
-  if(!WithSpikes & is.null(colData(Data)$BatchInfo)) {
-    stop(
+  if (!WithSpikes & is.null(colData(Data)$BatchInfo)) {
+    warning(
       "'Data' should contain a BatchInfo vector when 'WithSpikes = FALSE'. \n", 
       "Please assign the batch information to: \n
       'colData(Data)$BatchInfo = BatchInfo'. \n"
@@ -59,7 +66,7 @@
   }
 
   # Checking how counts are stored
-  if(!("counts" %in% assayNames(Data)))
+  if (!("counts" %in% assayNames(Data)))
     stop(
       "'Data' does not contain a 'counts' slot. \n",
       "Please make sure to include the raw data in the \n", 

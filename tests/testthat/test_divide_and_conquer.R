@@ -2,40 +2,7 @@ context("Divide and conquer")
 
 
 set.seed(42)
-mu <- rlnorm(100)
-nu <- rgamma(100, 5, 5)
-mat <- mu %*% t(nu)
-counts <- matrix(
-  rpois(length(mat), lambda = mat),
-  nrow = nrow(mat),
-  ncol = ncol(mat),
-  dimnames = list(
-    paste("Gene", seq_len(nrow(mat))),
-    paste("Cell", seq_len(ncol(mat)))
-  )
-)
-spikes <- rlnorm(20)
-spike_mat <- spikes %*% t(nu)
-spike_counts <- matrix(
-  rpois(length(spike_mat), lambda = spike_mat),
-  nrow = nrow(spike_mat),
-  ncol = ncol(spike_mat),
-  dimnames = list(
-    paste("Spike", seq_len(nrow(spike_mat))),
-    paste("Cell", seq_len(ncol(spike_mat)))
-  )
-)
-Data <- SingleCellExperiment::SingleCellExperiment(
-  assays = list(counts = counts)
-)
-colData(Data)$BatchInfo <- sample(1:2, nrow(sce), replace = TRUE)
-Spikes <- SingleCellExperiment::SingleCellExperiment(
-  assays = list(counts = spike_counts)
-)
-rowData(Spikes)[[1]] <- rownames(Spikes)
-rowData(Spikes)[[2]] <- round(spikes) + 1
-altExp(Data, "spike-ins") <- Spikes
-
+Data <- BASiCS_MockSCE()
 
 test_that(".generateSubsets produces valid output by cell and gene with & w/o spikes", {
   check_subsets <- function(subsetby, nsubsets) {
@@ -100,10 +67,10 @@ test_that(".consensus_average produces sensible results (cell-wise)", {
     )
   )
   capture.output({
-    c1 <- BASiCS:::.consensus_average(m, weight_method="naive", subset_by = "cell")
-    c2 <- BASiCS:::.consensus_average(m, weight_method="n_weight", subset_by = "cell")
+    c1 <- BASiCS:::.consensus_average(m, Weighting="naive", SubsetBy = "cell")
+    c2 <- BASiCS:::.consensus_average(m, Weighting="n_weight", SubsetBy = "cell")
   })
-  m[[1]] <- BASiCS:::.offset_correct(m[[1]], m[[2]])
+  m[[2]] <- BASiCS:::.offset_correct(m[[2]], m[[1]])
   gene <- "Gene 10"
   mean <- mean(
     c(

@@ -1,3 +1,6 @@
+#ifndef MCMC_H
+#define MCMC_H
+
 #include "utils.h"
 
 /* MCMC sampler 
@@ -36,6 +39,7 @@
  * EndAdapt: when to stop the adaptation
  * PrintProgress: whether to print progress report 
  */
+// [[Rcpp::export(".BASiCS_MCMCcpp")]]
 Rcpp::List BASiCS_MCMCcpp(
     int N, 
     int Thin, 
@@ -77,7 +81,12 @@ Rcpp::List BASiCS_MCMCcpp(
     double const& mintol_nu,
     double const& mintol_theta,
     double const& geneExponent,
-    double const& cellExponent) {
+    double const& cellExponent,
+    int threads = 1) {
+
+  #if defined(_OPENMP)
+    omp_set_num_threads(threads);
+  #endif
 
   using arma::ones;
   using arma::zeros;
@@ -406,4 +415,4 @@ Rcpp::List BASiCS_MCMCcpp(
   }
 }
 
-
+#endif

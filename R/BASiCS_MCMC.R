@@ -22,7 +22,12 @@
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
 #' @param DivideAndConquer Character value specifying whether a divide and
-#' conquer inference strategy should be used.
+#' conquer inference strategy should be used. When this is set to \code{"gene"},
+#' inference is performed on batches of genes separately, and when it is set to
+#' \code{"cell"}, inference is performed on batches of cells separately.
+#' Posterior distributions are combined using posterior interval estimation
+#' (see Li et al., 2016).
+#' @param NSubsets
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -190,6 +195,10 @@
 #' Vallejos, Richardson and Marioni (2016). Genome Biology.
 #'
 #' Eling et al (2018). Cell Systems
+#'
+#' Simple, Scalable and Accurate Posterior Interval Estimation
+#' Cheng Li and Sanvesh Srivastava and David B. Dunson
+#' arXiv (2016)
 #' @export
 BASiCS_MCMC <- function(
     Data,
@@ -199,22 +208,33 @@ BASiCS_MCMC <- function(
     Regression,
     WithSpikes = TRUE,
     DivideAndConquer = c("none", "gene", "cell"),
+    NSubsets = 1,
+    Threads = getOption("mc.cores", default = 1L),
     ...) {
 
+
   # Checks to ensure input arguments are valid
-  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes)
+  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes, Threads)
   DivideAndConquer <- match.arg(DivideAndConquer)
 
   if (DivideAndConquer != "none") {
     Chains <- BASiCS_DivideAndConquer(
       Data,
       N = N,
+      NSubsets = NSubsets,
       Thin = Thin,
       Burn = Burn,
       Regression = Regression,
       WithSpikes = WithSpikes,
-      SubsetBy = DivideAndConquer
+      SubsetBy = DivideAndConquer,
+      ...
     )
+    Chain <- .consensus_average(
+      Chains,
+      SubsetBy = DivideAndConquer,
+      Weighting = "n_weight"
+    )
+    return(Chain)
   }
 
   # Some global values used throughout the MCMC algorithm and checks
@@ -281,7 +301,8 @@ BASiCS_MCMC <- function(
     mintol_nu = ArgsDef$mintol_nu,
     mintol_theta = ArgsDef$mintol_theta,
     geneExponent = PriorParam$GeneExponent,
-    cellExponent = PriorParam$CellExponent
+    cellExponent = PriorParam$CellExponent,
+    threads = Threads
   )
 
 

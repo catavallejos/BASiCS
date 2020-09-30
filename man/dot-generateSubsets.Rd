@@ -11,7 +11,7 @@
   Alpha = 0.05,
   WithSpikes = FALSE,
   MaxDepth = 20,
-  .depth = 1
+  .Depth = 1
 )
 }
 \arguments{
@@ -28,7 +28,7 @@ spikes?}
 
 \item{MaxDepth}{Maximum number of recursive}
 
-\item{.depth}{Internal parameter. Do not set.}
+\item{.Depth}{Internal parameter. Do not set.}
 }
 \value{
 A list of SingleCellExperiment objects
