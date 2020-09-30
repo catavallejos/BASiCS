@@ -21,6 +21,8 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param Threads Integer specifying the number of threads to be used to 
+#' parallelise parameter updates.
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{

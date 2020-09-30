@@ -1530,3 +1530,6 @@ version 2.1.9 (2020-09-28)
   updates across cells or genes using openMP.
 - Reduce BatchInfo requirement for no spikes sampler to a warning, from an 
   error.
+
+version 2.1.10 (2020-09-30)
+- Documents `Threads` argument.

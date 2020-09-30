@@ -4,7 +4,16 @@
 \alias{BASiCS_MCMC}
 \title{BASiCS MCMC sampler}
 \usage{
-BASiCS_MCMC(Data, N, Thin, Burn, Regression, WithSpikes = TRUE, ...)
+BASiCS_MCMC(
+  Data,
+  N,
+  Thin,
+  Burn,
+  Regression,
+  WithSpikes = TRUE,
+  Threads = getOption("mc.cores", default = 1L),
+  ...
+)
 }
 \arguments{
 \item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
@@ -30,6 +39,9 @@ If \code{WithSpikess = FALSE},
 BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
+
+\item{Threads}{Integer specifying the number of threads to be used to 
+parallelise parameter updates.}
 
 \item{...}{Optional parameters.
 \describe{
