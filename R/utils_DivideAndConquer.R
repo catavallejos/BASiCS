@@ -129,7 +129,7 @@
     CellOrder = NULL,
     Method = c("consensus", "pie"),
     SubsetBy = c("gene", "cell"),
-    BPPARAM = BiocParallel::bpparam("SnowParam"),
+    BPPARAM = BiocParallel::bpparam(),
     ...
   ) {
 

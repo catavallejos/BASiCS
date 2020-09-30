@@ -1,6 +1,5 @@
 context("Divide and conquer")
 
-
 set.seed(42)
 Data <- BASiCS_MockSCE()
 
@@ -41,6 +40,7 @@ test_that("BASiCS_DivideAndConquer runs with standard settings", {
         Regression = TRUE,
         PrintProgress = FALSE,
         WithSpikes = TRUE,
+        BPParam = BiocParallel::SerialParam(),
         N = 8,
         Thin = 2,
         Burn = 4
@@ -62,13 +62,14 @@ test_that(".consensus_average produces sensible results (cell-wise)", {
       WithSpikes = TRUE,
       PrintProgress = FALSE,
       N = 50,
+      BPParam = BiocParallel::SerialParam(),
       Thin = 5,
       Burn = 10
     )
   )
   capture.output({
-    c1 <- BASiCS:::.consensus_average(m, Weighting="naive", SubsetBy = "cell")
-    c2 <- BASiCS:::.consensus_average(m, Weighting="n_weight", SubsetBy = "cell")
+    c1 <- BASiCS:::.consensus_average(m, Weighting="naive", SubsetBy = "cell", BPParam = BiocParallel::SerialParam(),)
+    c2 <- BASiCS:::.consensus_average(m, Weighting="n_weight", SubsetBy = "cell", BPParam = BiocParallel::SerialParam(),)
   })
   m[[2]] <- BASiCS:::.offset_correct(m[[2]], m[[1]])
   gene <- "Gene 10"
