@@ -27,7 +27,9 @@
 #' \code{"cell"}, inference is performed on batches of cells separately.
 #' Posterior distributions are combined using posterior interval estimation
 #' (see Li et al., 2016).
-#' @param NSubsets
+#' @param NSubsets If \code{DivideAndConquer="gene"} or 
+#' \code{DivideAndConquer="cell"}, \code{NSubsets} specifies the number of batches 
+#' to create and perform divide and conquer inference with.
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{

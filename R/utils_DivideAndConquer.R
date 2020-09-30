@@ -15,8 +15,9 @@
 #' number of iterations (20 by default).
 #' 
 #' @param Data a SingleCellExperiment object
-#' @param NSubsets Number of partitions into which to divide Data 
-#' @param SubsetBy Partition by "cell" or by "gene"
+#' @param NSubsets Integer specifying the number of batches into which to 
+#' divide Data for divide and conquer inference.
+#' @param SubsetBy Partition by "cell" or by "gene".
 #' @param Alpha p-value threshold for ANOVA testing of "balance"
 #' @param WithSpikes Similar to argument for BASiCS_MCMC - do the Data contain 
 #'  spikes?
@@ -47,15 +48,7 @@
   if (SubsetBy == "cell") {
     balance_by <- colSums(counts(Data))
   } else {
-    if (WithSpikes) {
-      dimnames <- dimnames(Data)
-      Spikes <- altExp(Data)
-      BioData <- Data
-    } else {
-      Spikes <- NULL
-      BioData <- Data
-    }
-    balance_by <- rowSums(counts(BioData))
+    balance_by <- rowSums(counts(Data))
   }
 
   ## How many quantiles?
@@ -87,7 +80,8 @@
       .subset,
       Data = Data,
       SubsetBy = SubsetBy,
-      Subsets = Subsets
+      Subsets = Subsets,
+      WithSpikes = WithSpikes
     )
   } else {
     .generateSubsets(
@@ -101,20 +95,25 @@
   }
 }
 
-.subset <- function(subset, Data, SubsetBy, Subsets) {
+.subset <- function(subset, Data, SubsetBy, Subsets, WithSpikes) {
   if (SubsetBy == "cell") {
     ind <- Subsets == subset
     Data <- Data[, ind]
 
-    ## Sometimes spikes will be zero when subsampling.
-    removeSpikes <- rowSums(assay(altExp(Data)) == 0)
-    altExp(Data) <- altExp(Data)[!removeSpikes, ]
+    if (WithSpikes) {
+      ## Sometimes spikes will be zero when subsampling.
+      removeSpikes <- rowSums(assay(altExp(Data))) == 0
+      altExp(Data) <- altExp(Data)[!removeSpikes, ]
+    }
     Data <- Data[rowSums(counts(Data)) != 0, ]
   }
 
   if (SubsetBy == "gene") {
     Data <- Data[Subsets == subset, ]
     ind_keep <- colSums(counts(Data)) != 0
+    if (WithSpikes) {
+      ind_keep <- ind_keep & (colSums(assay(altExp(Data))) != 0)
+    }
     Data <- Data[, ind_keep]
   }
   Data
@@ -130,7 +129,7 @@
     CellOrder = NULL,
     Method = c("consensus", "pie"),
     SubsetBy = c("gene", "cell"),
-    BPPARAM,
+    BPPARAM = BiocParallel::bpparam(),
     ...
   ) {
 
@@ -145,7 +144,8 @@
       Chains,
       function(Chain) {
         .offset_correct(Chain = Chain, ReferenceChain = ReferenceChain)
-      }
+      },
+      BPPARAM = BPPARAM
     )    
   }
   Method <- match.arg(Method)
