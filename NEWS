@@ -1536,3 +1536,6 @@ version 2.1.10 (2020-09-30)
 
 version 2.1.11 (2020-09-30)
 - Updated documentation for `Threads` in `BASiCS_MCMC` to indicate default value. 
+
+version 2.1.12 (2020-10-01)
+- Remove unused DelayedArray call from tests
