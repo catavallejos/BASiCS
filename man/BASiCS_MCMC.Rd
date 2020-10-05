@@ -11,6 +11,7 @@ BASiCS_MCMC(
   Burn,
   Regression,
   WithSpikes = TRUE,
+  PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
   Threads = getOption("mc.cores", default = 1L),
   ...
 )
@@ -40,27 +41,15 @@ BASiCS depends on replicated experiments (batches) to estimate
 technical variability. In this case, please supply the BatchInfo vector
 in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
+\item{PriorParam}{List of prior parameters for BASiCS_MCMC.
+Should be created using \code{\link{BASiCS_PriorParam}}.}
+
 \item{Threads}{Integer specifying the number of threads to be used to 
 parallelise parameter updates. Default value is a single thread:
 \code{Threads = getOption("mc.cores", default = 1L)}.}
 
 \item{...}{Optional parameters.
 \describe{
-  \item{
-    \code{PriorDelta}
-  }{
-    Specifies the prior used for \code{delta}.
-    Possible values are 'gamma' 
-    (Gamma(\code{a.theta},\code{b.theta}) prior) and
-    'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
-    Default value: \code{PriorDelta = 'log-normal'}.
-  }
-  \item{
-    \code{Var}
-  }{
-    Only used when \code{Regression = TRUE}. \code{Var}
-    specifies the GRBF scaling parameter. Default: \code{Var = 1.2}.
-  }
   \item{
     \code{AR}
   }{

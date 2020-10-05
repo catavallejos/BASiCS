@@ -23,6 +23,7 @@ BASiCS_PriorParam(
   RBFLocations = NULL,
   MinGenesPerRBF = NA,
   variance = 1.2,
+  Var,
   m = numeric(k),
   V = diag(k),
   a.sigma2 = 2,
@@ -72,7 +73,7 @@ values of \code{log(mu)} within the range of an RBF, it is removed.
 The range covered by each RBF is defined as centre of the RBF plus or minus
 half the distance between RBFs.}
 
-\item{variance}{Variance of the GRBFs.}
+\item{Var, variance}{Variance of the GRBFs.}
 
 \item{m, V}{Mean and (co)variance priors for regression coefficients.}
 

@@ -27,7 +27,7 @@
 #' values of \code{log(mu)} within the range of an RBF, it is removed. 
 #' The range covered by each RBF is defined as centre of the RBF plus or minus
 #' half the distance between RBFs.
-#' @param variance Variance of the GRBFs.
+#' @param Var,variance Variance of the GRBFs.
 #' @param m,V Mean and (co)variance priors for regression coefficients.
 #' @param a.sigma2,b.sigma2 Priors for inverse gamma prior on regression scale.
 #' @param eta Degrees of freedom for t distribution of regresion errors.
@@ -73,6 +73,7 @@ BASiCS_PriorParam <- function(
     RBFLocations = NULL,
     MinGenesPerRBF = NA,
     variance = 1.2,
+    Var,
     m = numeric(k),
     V = diag(k),
     a.sigma2 = 2,
@@ -85,7 +86,7 @@ BASiCS_PriorParam <- function(
     GeneExponent = 1,
     CellExponent = 1
   ) {
-
+  
  # Removed as I do not expect any users to select this option  
  # if (!missing(ConstrainType)) {
  #   warning("Use of ConstrainType is deprecated.")
