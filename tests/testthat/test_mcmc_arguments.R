@@ -271,7 +271,6 @@ test_that("MCMC works with different input classes", {
     ),
     NA
   )
-  counts(DataSpikes) <- DelayedArray(counts(DataSpikes)) 
 })
 
 test_that("PriorMu", {
