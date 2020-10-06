@@ -11,7 +11,7 @@ BASiCS_DivideAndConquer(
   Alpha = 0.05,
   WithSpikes,
   Regression,
-  BPPARAM = BiocParallel::bpparam("SnowParam"),
+  BPPARAM = BiocParallel::bpparam(),
   PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
   ...
 )
