@@ -85,7 +85,7 @@ BASiCS_PriorParam <- function(
     GeneExponent = 1,
     CellExponent = 1
   ) {
-
+  
  # Removed as I do not expect any users to select this option  
  # if (!missing(ConstrainType)) {
  #   warning("Use of ConstrainType is deprecated.")
