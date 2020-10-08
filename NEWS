@@ -1541,5 +1541,8 @@ version 2.1.12 (2020-10-01)
 - Remove unused DelayedArray call from tests
 
 version 2.1.13 (2020-10-05)
+- Add PriorParam argument to `BASiCS_MCMC`
+
+version 2.1.14 (2020-10-08)
 - Add support for divide and conquer inference with `BASiCS_DivideAndConquer`
   function. Add support for this function to `BASiCS_MCMC`

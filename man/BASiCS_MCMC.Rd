@@ -13,6 +13,7 @@ BASiCS_MCMC(
   WithSpikes = TRUE,
   SubsetBy = c("none", "gene", "cell"),
   NSubsets = 1,
+  PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
   Threads = getOption("Ncpus", default = 1L),
   ...
 )
@@ -53,27 +54,15 @@ Posterior distributions are combined using posterior interval estimation
 \code{SubsetBy="cell"}, \code{NSubsets} specifies the number of batches 
 to create and perform divide and conquer inference with.}
 
+\item{PriorParam}{List of prior parameters for BASiCS_MCMC.
+Should be created using \code{\link{BASiCS_PriorParam}}.}
+
 \item{Threads}{Integer specifying the number of threads to be used to 
 parallelise parameter updates. Default value is the globally set
 \code{"Ncpus"} option, or 1 if this option is not set.}
 
 \item{...}{Optional parameters.
 \describe{
-  \item{
-    \code{PriorDelta}
-  }{
-    Specifies the prior used for \code{delta}.
-    Possible values are 'gamma' 
-    (Gamma(\code{a.theta},\code{b.theta}) prior) and
-    'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
-    Default value: \code{PriorDelta = 'log-normal'}.
-  }
-  \item{
-    \code{Var}
-  }{
-    Only used when \code{Regression = TRUE}. \code{Var}
-    specifies the GRBF scaling parameter. Default: \code{Var = 1.2}.
-  }
   \item{
     \code{AR}
   }{

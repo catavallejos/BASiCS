@@ -21,6 +21,8 @@
 #' BASiCS depends on replicated experiments (batches) to estimate
 #' technical variability. In this case, please supply the BatchInfo vector
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
+#' @param PriorParam List of prior parameters for BASiCS_MCMC.
+#' Should be created using \code{\link{BASiCS_PriorParam}}.
 #' @param SubsetBy Character value specifying whether a divide and
 #' conquer inference strategy should be used. When this is set to \code{"gene"},
 #' inference is performed on batches of genes separately, and when it is set to
@@ -35,21 +37,6 @@
 #' \code{"Ncpus"} option, or 1 if this option is not set.
 #' @param ... Optional parameters.
 #' \describe{
-#'   \item{
-#'     \code{PriorDelta}
-#'   }{
-#'     Specifies the prior used for \code{delta}.
-#'     Possible values are 'gamma' 
-#'     (Gamma(\code{a.theta},\code{b.theta}) prior) and
-#'     'log-normal' (log-Normal(\code{0},\code{s2.delta}) prior).
-#'     Default value: \code{PriorDelta = 'log-normal'}.
-#'   }
-#'   \item{
-#'     \code{Var}
-#'   }{
-#'     Only used when \code{Regression = TRUE}. \code{Var}
-#'     specifies the GRBF scaling parameter. Default: \code{Var = 1.2}.
-#'   }
 #'   \item{
 #'     \code{AR}
 #'   }{
@@ -214,6 +201,7 @@ BASiCS_MCMC <- function(
     WithSpikes = TRUE,
     SubsetBy = c("none", "gene", "cell"),
     NSubsets = 1,
+    PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
     Threads = getOption("Ncpus", default = 1L),
     ...) {
 
@@ -232,6 +220,7 @@ BASiCS_MCMC <- function(
       Regression = Regression,
       WithSpikes = WithSpikes,
       SubsetBy = SubsetBy,
+      PriorParam = PriorParam,
       ...
     )
     Chain <- .consensus_average(
@@ -266,6 +255,7 @@ BASiCS_MCMC <- function(
     GPar = GPar,
     Regression = Regression,
     WithSpikes = WithSpikes,
+    PriorParam = PriorParam,
     ...
   )
   

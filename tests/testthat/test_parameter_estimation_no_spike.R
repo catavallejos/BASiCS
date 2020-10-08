@@ -17,19 +17,13 @@ test_that("Estimates match the given seed (no-spikes)", {
   # Fixing starting values
   n <- ncol(Data)
   PriorParam <- BASiCS_PriorParam(Data, k = 12)
-  set.seed(2018)
-  Start <- BASiCS:::.BASiCS_MCMC_Start(
-    Data,
-    PriorParam,
-    WithSpikes = FALSE,
-    Regression = FALSE
-  )
   # Running the sampler on Data and sce object
   set.seed(14)
   Chain <- run_MCMC(Data,
     N = 1000,
     Thin = 10,
     Burn = 500,
+    PriorParam = PriorParam,
     Regression = FALSE,
     PrintProgress = FALSE,
     WithSpikes = FALSE
@@ -39,6 +33,7 @@ test_that("Estimates match the given seed (no-spikes)", {
     N = 1000,
     Thin = 10,
     Burn = 500,
+    PriorParam = PriorParam,
     Regression = FALSE,
     PrintProgress = FALSE,
     WithSpikes = FALSE
@@ -127,14 +122,6 @@ test_that("Chain creation works when StoreAdapt=TRUE (no spikes)", {
     WithBatch = TRUE
   )
   # Fixing starting values
-  PriorParam <- BASiCS_PriorParam(Data, k = 12)
-  set.seed(2018)
-  Start <- BASiCS:::.BASiCS_MCMC_Start(
-    Data,
-    PriorParam,
-    WithSpikes = FALSE,
-    Regression = FALSE
-  )
   # Running the sampler
   set.seed(14)
   Chain <- run_MCMC(Data,

@@ -14,14 +14,6 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   # Fixing starting values
   k <- 12
   PriorParam <- BASiCS_PriorParam(Data, k = k)
-  set.seed(2018)
-  Start <- BASiCS:::.BASiCS_MCMC_Start(
-    Data,
-    PriorParam,
-    Regression = TRUE,
-    WithSpikes = FALSE
-  )
-
   # Running the sampler
   set.seed(14)
   Chain <- run_MCMC(
@@ -29,6 +21,7 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     N = 1000,
     Thin = 10,
     Burn = 500,
+    PriorParam = PriorParam,
     PrintProgress = FALSE,
     WithSpikes = FALSE,
     Regression = TRUE
@@ -39,6 +32,7 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     N = 1000,
     Thin = 10,
     Burn = 500,
+    PriorParam = PriorParam,
     PrintProgress = FALSE,
     WithSpikes = FALSE,
     Regression = TRUE
