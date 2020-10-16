@@ -35,6 +35,8 @@
 #' @param Threads Integer specifying the number of threads to be used to 
 #' parallelise parameter updates. Default value is the globally set
 #' \code{"Ncpus"} option, or 1 if this option is not set.
+#' @param BPPARAM A \code{\link{BiocParallelParam}} instance,
+#' used for divide and conquer inference.
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -203,6 +205,7 @@ BASiCS_MCMC <- function(
     NSubsets = 1,
     PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
     Threads = getOption("Ncpus", default = 1L),
+    BPPARAM = BiocParallel::bpparam(),
     ...) {
 
 
@@ -221,12 +224,14 @@ BASiCS_MCMC <- function(
       WithSpikes = WithSpikes,
       SubsetBy = SubsetBy,
       PriorParam = PriorParam,
+      BPPARAM = BPPARAM,
       ...
     )
     Chain <- .consensus_average(
       Chains,
       SubsetBy = SubsetBy,
-      Weighting = "n_weight"
+      Weighting = "n_weight",
+      BPPARAM = BPPARAM
     )
     return(Chain)
   }

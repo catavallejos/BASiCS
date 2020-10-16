@@ -34,7 +34,9 @@ are significantly different between batches.}
 
 \item{BPPARAM}{A \code{\link{BiocParallelParam}} instance.}
 
-\item{...}{Passed to  \code{\link{BASiCS_MCMC}}.}
+\item{...}{Passed to  \code{\link{BASiCS_MCMC}}. All arguments required by
+\code{\link{BASiCS_MCMC}} must be supplied here, for example
+\code{N}, \code{Thin}, \code{Burn}.}
 }
 \value{
 A list of \linkS4class{BASiCS_Chain} objects.

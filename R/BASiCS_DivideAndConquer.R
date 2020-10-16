@@ -19,7 +19,9 @@
 #' are significantly different between batches.
 #' @param WithSpikes,Regression,PriorParam See \code{\link{BASiCS_MCMC}}.
 #' @param BPPARAM A \code{\link{BiocParallelParam}} instance.
-#' @param ... Passed to  \code{\link{BASiCS_MCMC}}.
+#' @param ... Passed to  \code{\link{BASiCS_MCMC}}. All arguments required by
+#' \code{\link{BASiCS_MCMC}} must be supplied here, for example
+#' \code{N}, \code{Thin}, \code{Burn}.
 #' @return A list of \linkS4class{BASiCS_Chain} objects.
 #' @examples
 #'  bp <- BiocParallel::SnowParam()
@@ -63,16 +65,18 @@ BASiCS_DivideAndConquer <- function(
   start <- .BASiCS_MCMC_Start(
     Data,
     PriorParam = PriorParam,
-    Regression = TRUE,
+    Regression = Regression,
     WithSpikes = WithSpikes
   )
 
-  Locations <- .estimateRBFLocations(
-    start$mu0,
-    L,
-    RBFMinMax = FALSE
-  )
-  PriorParam$RBFLocations <- Locations
+  if (Regression) {  
+    Locations <- .estimateRBFLocations(
+      start$mu0,
+      L,
+      RBFMinMax = FALSE
+    )
+    PriorParam$RBFLocations <- Locations
+  }
 
   ## To do:
   ## Automatically determine NSubsets?

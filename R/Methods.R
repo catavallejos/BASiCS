@@ -343,18 +343,18 @@ setMethod(
 #' @description 'plot' method for \code{\linkS4class{BASiCS_Chain}} objects
 #'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
-#' @param Param Name of the slot to be used for the plot.
+#' @param Parameter Name of the slot to be used for the plot.
 #' Possible values: \code{'mu'}, \code{'delta'},
 #' \code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'},
 #' \code{'beta'}, \code{'sigma2'} and \code{'epsilon'}.
 #' @param Gene Specifies which gene is requested.
-#' Required only if \code{Param = 'mu'} or \code{'delta'}
+#' Required only if \code{Parameter = 'mu'} or \code{'delta'}
 #' @param Cell Specifies which cell is requested.
-#' Required only if \code{Param = 'phi', 's'} or \code{'nu'}
+#' Required only if \code{Parameter = 'phi', 's'} or \code{'nu'}
 #' @param Batch Specifies which batch is requested.
-#' Required only if \code{Param = 'theta'}
+#' Required only if \code{Parameter = 'theta'}
 #' @param RegressionTerm Specifies which regression coefficient is requested.
-#' Required only if \code{Param = 'beta'}
+#' Required only if \code{Parameter = 'beta'}
 #' @param ... Unused.
 #'
 #' @return A plot object
@@ -371,42 +371,42 @@ setMethod(
   "plot",
   signature = "BASiCS_Chain",
   definition = function(x,
-                        Param = "mu",
+                        Parameter = "mu",
                         Gene = NULL,
                         Cell = NULL,
                         Batch = 1,
                         RegressionTerm = NULL,
                         ...) {
 
-    if (Param %in% .GeneParams()) {
+    if (Parameter %in% .GeneParams()) {
       if (is.null(Gene)) {
         stop("'Gene' value is required")
       }
       Column <- Gene
-    } else if (Param %in% .CellParams()) {
+    } else if (Parameter %in% .CellParams()) {
       if (is.null(Cell)) {
         stop("'Cell' value is required")
       }
       Column <- Cell
-    } else if (Param == "theta") {
+    } else if (Parameter == "theta") {
       if (is.null(Batch)) {
         stop("'Batch' value is required")
       }
       Column <- Batch
-    } else if (Param == "beta") {
+    } else if (Parameter == "beta") {
       if (is.null(RegressionTerm)) {
         stop("'RegressionTerm' value is required")
       }
       Column <- RegressionTerm
-    } else if (Param == "sigma2") {
+    } else if (Parameter == "sigma2") {
       Column <- 1
     }
     DF1 <- data.frame(
-      "Iteration" = seq_len(nrow(x@parameters[[Param]])),
-      "Draws" = x@parameters[[Param]][, Column]
+      "Iteration" = seq_len(nrow(x@parameters[[Parameter]])),
+      "Draws" = x@parameters[[Parameter]][, Column]
     )
     # Code inspired by https://tinyurl.com/vezqqud
-    MyAcf <- acf(x@parameters[[Param]][,Column], plot = FALSE)
+    MyAcf <- acf(x@parameters[[Parameter]][,Column], plot = FALSE)
     DF2 <- with(MyAcf, data.frame(lag, acf))
     
     # Traceplot
@@ -415,7 +415,7 @@ setMethod(
                           col = grDevices::adjustcolor("white", 
                                                        alpha.f = 0) ) + 
       ggplot2::geom_line(ggplot2::aes_string(x= "Iteration", y = "Draws")) + 
-      ggplot2::labs(title = colnames(x@parameters[[Param]])[Column],
+      ggplot2::labs(title = colnames(x@parameters[[Parameter]])[Column],
                     x = "Iteration", 
                     y = "Parameter value") + 
       ggplot2::theme_classic()
@@ -427,7 +427,7 @@ setMethod(
       ggplot2::geom_segment(
         mapping = ggplot2::aes_string(xend = "lag", yend = 0)
       ) +
-      ggplot2::ggtitle(colnames(x@parameters[[Param]])[Column])
+      ggplot2::ggtitle(colnames(x@parameters[[Parameter]])[Column])
     
     cowplot::plot_grid(p1, p2)
             

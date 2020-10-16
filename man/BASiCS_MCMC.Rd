@@ -15,6 +15,7 @@ BASiCS_MCMC(
   NSubsets = 1,
   PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
   Threads = getOption("Ncpus", default = 1L),
+  BPPARAM = BiocParallel::bpparam(),
   ...
 )
 }
@@ -60,6 +61,9 @@ Should be created using \code{\link{BASiCS_PriorParam}}.}
 \item{Threads}{Integer specifying the number of threads to be used to 
 parallelise parameter updates. Default value is the globally set
 \code{"Ncpus"} option, or 1 if this option is not set.}
+
+\item{BPPARAM}{A \code{\link{BiocParallelParam}} instance,
+used for divide and conquer inference.}
 
 \item{...}{Optional parameters.
 \describe{

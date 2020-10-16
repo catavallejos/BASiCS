@@ -84,7 +84,7 @@ ess <- function(x) {
   } 
 }
 
-.GeneParams <- function() c("mu", "delta", "epsilon")
+.GeneParams <- function() c("mu", "delta", "epsilon", "lambda")
 .CellParams <- function() c("s", "phi", "nu")
 
 .NClassFD2D <- function(x, y) {

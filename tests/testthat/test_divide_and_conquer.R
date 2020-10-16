@@ -3,6 +3,8 @@ context("Divide and conquer")
 set.seed(42)
 Data <- BASiCS_MockSCE()
 
+bp <- BiocParallel::SerialParam()
+
 test_that(".generateSubsets produces valid output by cell and gene with & w/o spikes", {
   check_subsets <- function(subsetby, nsubsets) {
     for (nsubset in nsubsets) {
@@ -40,7 +42,7 @@ test_that("BASiCS_DivideAndConquer runs with standard settings", {
         Regression = TRUE,
         PrintProgress = FALSE,
         WithSpikes = TRUE,
-        BPPARAM = BiocParallel::SerialParam(),
+        BPPARAM = bp,
         N = 8,
         Thin = 2,
         Burn = 4
@@ -50,6 +52,72 @@ test_that("BASiCS_DivideAndConquer runs with standard settings", {
   )
 })
 
+
+test_that("BASiCS_MCMC runs with divide and conquer", {
+  for (x in c("gene", "cell")) {
+
+    expect_error(
+      run_MCMC(
+        Data,
+        NSubsets = 2,
+        SubsetBy = x,
+        Regression = TRUE,
+        PrintProgress = FALSE,
+        WithSpikes = TRUE,
+        BPPARAM = bp,
+        N = 8,
+        Thin = 2,
+        Burn = 4
+      ),
+      NA
+    )
+    expect_error(
+      run_MCMC(
+        Data,
+        NSubsets = 2,
+        SubsetBy = x,
+        Regression = FALSE,
+        PrintProgress = FALSE,
+        WithSpikes = TRUE,
+        BPPARAM = bp,
+        N = 8,
+        Thin = 2,
+        Burn = 4
+      ),
+      NA
+    )
+    expect_error(
+      run_MCMC(
+        Data,
+        NSubsets = 2,
+        SubsetBy = x,
+        Regression = TRUE,
+        PrintProgress = FALSE,
+        WithSpikes = FALSE,
+        BPPARAM = bp,
+        N = 8,
+        Thin = 2,
+        Burn = 4
+      ),
+      NA
+    )
+    expect_error(
+      run_MCMC(
+        Data,
+        NSubsets = 2,
+        SubsetBy = x,
+        Regression = FALSE,
+        PrintProgress = FALSE,
+        WithSpikes = FALSE,
+        BPPARAM = bp,
+        N = 8,
+        Thin = 2,
+        Burn = 4
+      ),
+      NA
+    )
+  }
+})
 test_that(".consensus_average produces sensible results (cell-wise)", {
   set.seed(42)
 
@@ -62,14 +130,14 @@ test_that(".consensus_average produces sensible results (cell-wise)", {
       WithSpikes = TRUE,
       PrintProgress = FALSE,
       N = 50,
-      BPPARAM = BiocParallel::SerialParam(),
+      BPPARAM = bp,
       Thin = 5,
       Burn = 10
     )
   )
   capture.output({
-    c1 <- BASiCS:::.consensus_average(m, Weighting="naive", SubsetBy = "cell", BPPARAM = BiocParallel::SerialParam(),)
-    c2 <- BASiCS:::.consensus_average(m, Weighting="n_weight", SubsetBy = "cell", BPPARAM = BiocParallel::SerialParam(),)
+    c1 <- BASiCS:::.consensus_average(m, Weighting="naive", SubsetBy = "cell", BPPARAM = bp)
+    c2 <- BASiCS:::.consensus_average(m, Weighting="n_weight", SubsetBy = "cell", BPPARAM = bp)
   })
   m[[2]] <- BASiCS:::.offset_correct(m[[2]], m[[1]])
   gene <- "Gene 10"
