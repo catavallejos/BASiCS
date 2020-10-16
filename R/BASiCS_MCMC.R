@@ -32,6 +32,20 @@
 #' @param NSubsets If \code{SubsetBy="gene"} or 
 #' \code{SubsetBy="cell"}, \code{NSubsets} specifies the number of batches 
 #' to create and perform divide and conquer inference with.
+#' @param CombineMethod The method used to combine 
+#' subposteriors if \code{SubsetBy} is set to \code{"gene"} or 
+#' \code{"cell"}. Options are \code{"pie"} corresponding to
+#' posterior interval estimation (see Li et al., 2016) or
+#' \code{"consensus"} (see Scott et al., 2016).
+#' Both of these methods use a form of weighted average to
+#' combine subposterior draws into the final posterior.
+#' @param Weighting The weighting method used in the weighted
+#' average chosen using \code{CombineMethod}. Available
+#' options are \code{"naive"} (unweighted), \code{"n_weight"}
+#' (weights are chosen based on the size of each partition)
+#' and \code{"inverse_variance"} (subposteriors are weighted based
+#' on the inverse of the variance of the subposterior for each 
+#' parameter).
 #' @param Threads Integer specifying the number of threads to be used to 
 #' parallelise parameter updates. Default value is the globally set
 #' \code{"Ncpus"} option, or 1 if this option is not set.
@@ -193,6 +207,12 @@
 #' Simple, Scalable and Accurate Posterior Interval Estimation
 #' Cheng Li and Sanvesh Srivastava and David B. Dunson
 #' arXiv (2016)
+#' 
+#' Bayes and Big Data:  The Consensus Monte Carlo Algorithm
+#' Steven L. Scott, Alexander W. Blocker, Fernando V. Bonassi,
+#' Hugh A. Chipman, Edward I. George and Robert E. McCulloch
+#' International Journal of Management Science and Engineering 
+#' Management (2016)
 #' @export
 BASiCS_MCMC <- function(
     Data,
@@ -201,9 +221,11 @@ BASiCS_MCMC <- function(
     Burn,
     Regression,
     WithSpikes = TRUE,
+    PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
     SubsetBy = c("none", "gene", "cell"),
     NSubsets = 1,
-    PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
+    CombineMethod = c("pie", "consensus"),
+    Weighting = c("naive", "n_weight", "inverse_variance"),
     Threads = getOption("Ncpus", default = 1L),
     BPPARAM = BiocParallel::bpparam(),
     ...) {
@@ -214,6 +236,11 @@ BASiCS_MCMC <- function(
   SubsetBy <- match.arg(SubsetBy)
 
   if (SubsetBy != "none") {
+    if (SubsetBy == "cell") {
+      warning("Divide and conquer inference using cell-wise partitions is not recommended.")
+    }
+    CombineMethod <- match.arg(CombineMethod)
+    Weighting <- match.arg(Weighting)
     Chains <- BASiCS_DivideAndConquer(
       Data,
       N = N,
@@ -227,10 +254,11 @@ BASiCS_MCMC <- function(
       BPPARAM = BPPARAM,
       ...
     )
-    Chain <- .consensus_average(
+    Chain <- .combine_subposteriors(
       Chains,
+      CombineMethod = CombineMethod,
       SubsetBy = SubsetBy,
-      Weighting = "n_weight",
+      Weighting = Weighting,
       BPPARAM = BPPARAM
     )
     return(Chain)
