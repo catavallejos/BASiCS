@@ -120,14 +120,14 @@
 }
 
 .consensus_average <- function(...) {
-  .combine_subposteriors(..., Method = "consensus")
+  .combine_subposteriors(..., CombineMethod = "consensus")
 }
 
 .combine_subposteriors <- function(
     Chains,
     GeneOrder = NULL,
     CellOrder = NULL,
-    Method = c("consensus", "pie"),
+    CombineMethod = c("consensus", "pie"),
     SubsetBy = c("gene", "cell"),
     BPPARAM = BiocParallel::bpparam(),
     ...
@@ -148,8 +148,8 @@
       BPPARAM = BPPARAM
     )    
   }
-  Method <- match.arg(Method)
-  Fun <- switch(Method,
+  CombineMethod <- match.arg(CombineMethod)
+  Fun <- switch(CombineMethod,
     "consensus" = .weighted_posterior_average,
     "pie" = .quantile_average
   )
@@ -258,7 +258,7 @@
       subposterior_matrix[] <- apply(
         subposterior_matrix[],
         2,
-        Sort
+        sort
       )
     }
     sums <- rowSums(subposterior_matrix, na.rm = TRUE)

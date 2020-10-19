@@ -5,10 +5,10 @@ Data <- BASiCS_MockSCE()
 
 bp <- BiocParallel::SerialParam()
 
-test_that(".generateSubsets produces valid output by cell and gene with & w/o spikes", {
+test_that("BASiCS:::.generateSubsets produces valid output by cell and gene with & w/o spikes", {
   check_subsets <- function(subsetby, nsubsets) {
     for (nsubset in nsubsets) {
-      out <- .generateSubsets(Data, NSubsets=2, SubsetBy=subsetby, WithSpikes = TRUE)
+      out <- BASiCS:::.generateSubsets(Data, NSubsets=2, SubsetBy=subsetby, WithSpikes = TRUE)
       lapply(out, function(x) {
         expect_is(x, "SingleCellExperiment")
       })    
@@ -18,16 +18,16 @@ test_that(".generateSubsets produces valid output by cell and gene with & w/o sp
   check_subsets("gene", c(128))
 })
 
-test_that(".generateSubsets fails with low N", {
+test_that("BASiCS:::.generateSubsets fails with low N", {
   DataS <- Data[, 1:20]
-  expect_error(.generateSubsets(DataS, NSubsets=2, SubsetBy="cell"),
+  expect_error(BASiCS:::.generateSubsets(DataS, NSubsets=2, SubsetBy="cell"),
     "Cannot generate subsets with at least 20 cells per subset")
-  expect_error(.generateSubsets(Data, NSubsets=8, SubsetBy="cell"),
+  expect_error(BASiCS:::.generateSubsets(Data, NSubsets=8, SubsetBy="cell"),
     "Cannot generate subsets with at least 20 cells per subset")
 })
 
-test_that(".generateSubsets partitions well by gene", {
-  l <- .generateSubsets(Data, SubsetBy = "gene", NSubsets = 128, WithSpikes = TRUE)
+test_that("BASiCS:::.generateSubsets partitions well by gene", {
+  l <- BASiCS:::.generateSubsets(Data, SubsetBy = "gene", NSubsets = 128, WithSpikes = TRUE)
   expect_true(all(sapply(l, function(x) inherits(x, "SingleCellExperiment"))))
 })
 
@@ -55,8 +55,8 @@ test_that("BASiCS_DivideAndConquer runs with standard settings", {
 
 test_that("BASiCS_MCMC runs with divide and conquer", {
   for (x in c("gene", "cell")) {
-
-    expect_error(
+    fun <- if (x == "gene") function(x) expect_error(x, NA) else expect_warning
+    fun(
       run_MCMC(
         Data,
         NSubsets = 2,
@@ -68,10 +68,9 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         N = 8,
         Thin = 2,
         Burn = 4
-      ),
-      NA
+      )
     )
-    expect_error(
+    fun(
       run_MCMC(
         Data,
         NSubsets = 2,
@@ -83,10 +82,9 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         N = 8,
         Thin = 2,
         Burn = 4
-      ),
-      NA
+      )
     )
-    expect_error(
+    fun(
       run_MCMC(
         Data,
         NSubsets = 2,
@@ -98,10 +96,9 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         N = 8,
         Thin = 2,
         Burn = 4
-      ),
-      NA
+      )
     )
-    expect_error(
+    fun(
       run_MCMC(
         Data,
         NSubsets = 2,
@@ -113,8 +110,7 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         N = 8,
         Thin = 2,
         Burn = 4
-      ),
-      NA
+      )
     )
   }
 })
