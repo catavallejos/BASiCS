@@ -23,9 +23,34 @@
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
 #' @param PriorParam List of prior parameters for BASiCS_MCMC.
 #' Should be created using \code{\link{BASiCS_PriorParam}}.
+#' @param SubsetBy Character value specifying whether a divide and
+#' conquer inference strategy should be used. When this is set to \code{"gene"},
+#' inference is performed on batches of genes separately, and when it is set to
+#' \code{"cell"}, inference is performed on batches of cells separately.
+#' Posterior distributions are combined using posterior interval estimation
+#' (see Li et al., 2016).
+#' @param NSubsets If \code{SubsetBy="gene"} or 
+#' \code{SubsetBy="cell"}, \code{NSubsets} specifies the number of batches 
+#' to create and perform divide and conquer inference with.
+#' @param CombineMethod The method used to combine 
+#' subposteriors if \code{SubsetBy} is set to \code{"gene"} or 
+#' \code{"cell"}. Options are \code{"pie"} corresponding to
+#' posterior interval estimation (see Li et al., 2016) or
+#' \code{"consensus"} (see Scott et al., 2016).
+#' Both of these methods use a form of weighted average to
+#' combine subposterior draws into the final posterior.
+#' @param Weighting The weighting method used in the weighted
+#' average chosen using \code{CombineMethod}. Available
+#' options are \code{"naive"} (unweighted), \code{"n_weight"}
+#' (weights are chosen based on the size of each partition)
+#' and \code{"inverse_variance"} (subposteriors are weighted based
+#' on the inverse of the variance of the subposterior for each 
+#' parameter).
 #' @param Threads Integer specifying the number of threads to be used to 
-#' parallelise parameter updates. Default value is a single thread:
-#' \code{Threads = getOption("mc.cores", default = 1L)}.
+#' parallelise parameter updates. Default value is the globally set
+#' \code{"Ncpus"} option, or 1 if this option is not set.
+#' @param BPPARAM A \code{\link{BiocParallelParam}} instance,
+#' used for divide and conquer inference.
 #' @param ... Optional parameters.
 #' \describe{
 #'   \item{
@@ -178,6 +203,16 @@
 #' Vallejos, Richardson and Marioni (2016). Genome Biology.
 #'
 #' Eling et al (2018). Cell Systems
+#'
+#' Simple, Scalable and Accurate Posterior Interval Estimation
+#' Cheng Li and Sanvesh Srivastava and David B. Dunson
+#' arXiv (2016)
+#' 
+#' Bayes and Big Data:  The Consensus Monte Carlo Algorithm
+#' Steven L. Scott, Alexander W. Blocker, Fernando V. Bonassi,
+#' Hugh A. Chipman, Edward I. George and Robert E. McCulloch
+#' International Journal of Management Science and Engineering 
+#' Management (2016)
 #' @export
 BASiCS_MCMC <- function(
     Data,
@@ -187,11 +222,47 @@ BASiCS_MCMC <- function(
     Regression,
     WithSpikes = TRUE,
     PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
-    Threads = getOption("mc.cores", default = 1L),
+    SubsetBy = c("none", "gene", "cell"),
+    NSubsets = 1,
+    CombineMethod = c("pie", "consensus"),
+    Weighting = c("naive", "n_weight", "inverse_variance"),
+    Threads = getOption("Ncpus", default = 1L),
+    BPPARAM = BiocParallel::bpparam(),
     ...) {
+
 
   # Checks to ensure input arguments are valid
   .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes, Threads)
+  SubsetBy <- match.arg(SubsetBy)
+
+  if (SubsetBy != "none") {
+    if (SubsetBy == "cell") {
+      warning("Divide and conquer inference using cell-wise partitions is not recommended.")
+    }
+    CombineMethod <- match.arg(CombineMethod)
+    Weighting <- match.arg(Weighting)
+    Chains <- BASiCS_DivideAndConquer(
+      Data,
+      N = N,
+      NSubsets = NSubsets,
+      Thin = Thin,
+      Burn = Burn,
+      Regression = Regression,
+      WithSpikes = WithSpikes,
+      SubsetBy = SubsetBy,
+      PriorParam = PriorParam,
+      BPPARAM = BPPARAM,
+      ...
+    )
+    Chain <- .combine_subposteriors(
+      Chains,
+      CombineMethod = CombineMethod,
+      SubsetBy = SubsetBy,
+      Weighting = Weighting,
+      BPPARAM = BPPARAM
+    )
+    return(Chain)
+  }
 
   # Some global values used throughout the MCMC algorithm and checks
   # Numbers of cells/genes/batches + count table + design matrix for batch

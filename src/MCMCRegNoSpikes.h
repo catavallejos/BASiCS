@@ -105,7 +105,6 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
 
   #if defined(_OPENMP)
     omp_set_num_threads(threads);
-    // REprintf("Number of threads=%i\n", omp_get_max_threads());
   #endif
 
   using arma::ones;

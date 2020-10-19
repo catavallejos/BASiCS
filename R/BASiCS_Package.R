@@ -18,7 +18,8 @@
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @importFrom S4Vectors DataFrame
 #' @importFrom scran calculateSumFactors 
-#' @importFrom stats acf median model.matrix rgamma rpois runif var
+#' @importFrom stats acf median model.matrix rgamma rpois runif var lm quantile
+#'                   rlnorm
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
 #' @importFrom SingleCellExperiment altExp altExp<- 
 #' @importFrom SingleCellExperiment altExpNames altExpNames<-

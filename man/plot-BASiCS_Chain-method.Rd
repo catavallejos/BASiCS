@@ -9,7 +9,7 @@
 \usage{
 \S4method{plot}{BASiCS_Chain,ANY}(
   x,
-  Param = "mu",
+  Parameter = "mu",
   Gene = NULL,
   Cell = NULL,
   Batch = 1,
@@ -20,22 +20,22 @@
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
-\item{Param}{Name of the slot to be used for the plot.
+\item{Parameter}{Name of the slot to be used for the plot.
 Possible values: \code{'mu'}, \code{'delta'},
 \code{'phi'}, \code{'s'}, \code{'nu'}, \code{'theta'},
 \code{'beta'}, \code{'sigma2'} and \code{'epsilon'}.}
 
 \item{Gene}{Specifies which gene is requested.
-Required only if \code{Param = 'mu'} or \code{'delta'}}
+Required only if \code{Parameter = 'mu'} or \code{'delta'}}
 
 \item{Cell}{Specifies which cell is requested.
-Required only if \code{Param = 'phi', 's'} or \code{'nu'}}
+Required only if \code{Parameter = 'phi', 's'} or \code{'nu'}}
 
 \item{Batch}{Specifies which batch is requested.
-Required only if \code{Param = 'theta'}}
+Required only if \code{Parameter = 'theta'}}
 
 \item{RegressionTerm}{Specifies which regression coefficient is requested.
-Required only if \code{Param = 'beta'}}
+Required only if \code{Parameter = 'beta'}}
 
 \item{...}{Unused.}
 }

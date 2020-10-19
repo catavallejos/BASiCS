@@ -10,11 +10,11 @@
 //[[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 
+// [[Rcpp::plugins(openmp)]]
 #ifdef _OPENMP
   #include <omp.h>
 #endif
 
-// [[Rcpp::plugins(openmp)]]
 
 
 using namespace Rcpp;

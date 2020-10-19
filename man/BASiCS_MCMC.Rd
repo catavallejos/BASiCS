@@ -12,7 +12,12 @@ BASiCS_MCMC(
   Regression,
   WithSpikes = TRUE,
   PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
-  Threads = getOption("mc.cores", default = 1L),
+  SubsetBy = c("none", "gene", "cell"),
+  NSubsets = 1,
+  CombineMethod = c("pie", "consensus"),
+  Weighting = c("naive", "n_weight", "inverse_variance"),
+  Threads = getOption("Ncpus", default = 1L),
+  BPPARAM = BiocParallel::bpparam(),
   ...
 )
 }
@@ -44,9 +49,39 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 \item{PriorParam}{List of prior parameters for BASiCS_MCMC.
 Should be created using \code{\link{BASiCS_PriorParam}}.}
 
+\item{SubsetBy}{Character value specifying whether a divide and
+conquer inference strategy should be used. When this is set to \code{"gene"},
+inference is performed on batches of genes separately, and when it is set to
+\code{"cell"}, inference is performed on batches of cells separately.
+Posterior distributions are combined using posterior interval estimation
+(see Li et al., 2016).}
+
+\item{NSubsets}{If \code{SubsetBy="gene"} or 
+\code{SubsetBy="cell"}, \code{NSubsets} specifies the number of batches 
+to create and perform divide and conquer inference with.}
+
+\item{CombineMethod}{The method used to combine 
+subposteriors if \code{SubsetBy} is set to \code{"gene"} or 
+\code{"cell"}. Options are \code{"pie"} corresponding to
+posterior interval estimation (see Li et al., 2016) or
+\code{"consensus"} (see Scott et al., 2016).
+Both of these methods use a form of weighted average to
+combine subposterior draws into the final posterior.}
+
+\item{Weighting}{The weighting method used in the weighted
+average chosen using \code{CombineMethod}. Available
+options are \code{"naive"} (unweighted), \code{"n_weight"}
+(weights are chosen based on the size of each partition)
+and \code{"inverse_variance"} (subposteriors are weighted based
+on the inverse of the variance of the subposterior for each 
+parameter).}
+
 \item{Threads}{Integer specifying the number of threads to be used to 
-parallelise parameter updates. Default value is a single thread:
-\code{Threads = getOption("mc.cores", default = 1L)}.}
+parallelise parameter updates. Default value is the globally set
+\code{"Ncpus"} option, or 1 if this option is not set.}
+
+\item{BPPARAM}{A \code{\link{BiocParallelParam}} instance,
+used for divide and conquer inference.}
 
 \item{...}{Optional parameters.
 \describe{
@@ -204,6 +239,16 @@ Vallejos, Marioni and Richardson (2015). PLoS Computational Biology.
 Vallejos, Richardson and Marioni (2016). Genome Biology.
 
 Eling et al (2018). Cell Systems
+
+Simple, Scalable and Accurate Posterior Interval Estimation
+Cheng Li and Sanvesh Srivastava and David B. Dunson
+arXiv (2016)
+
+Bayes and Big Data:  The Consensus Monte Carlo Algorithm
+Steven L. Scott, Alexander W. Blocker, Fernando V. Bonassi,
+Hugh A. Chipman, Edward I. George and Robert E. McCulloch
+International Journal of Management Science and Engineering 
+Management (2016)
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
