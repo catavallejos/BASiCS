@@ -105,7 +105,7 @@
       removeSpikes <- rowSums(assay(altExp(Data))) == 0
       altExp(Data) <- altExp(Data)[!removeSpikes, ]
     }
-    Data <- Data[rowSums(counts(Data)) != 0, ]
+    # Data <- Data[rowSums(counts(Data)) != 0, ]
   }
 
   if (SubsetBy == "gene") {
