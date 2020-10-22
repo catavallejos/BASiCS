@@ -161,6 +161,11 @@
     meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
     mu0 <- meansBio
   }
+  
+  # If EB prior, replace mu0 by EB estimate
+  if (length(unique(PriorParam$mu.mu)) > 1) {
+    mu0 <- .EmpiricalBayesMu(Data, PriorParam$s2.mu, log_scale = FALSE) 
+  }
 
   # Starting value for delta
   # Defined by the CV for high- and mid-expressed genes
@@ -238,7 +243,7 @@
   }
   
   # Parameters associated to the presence of batches
-  if(nBatch > 1) {
+  if (nBatch > 1) {
     BatchDesign <- model.matrix(~BatchInfo - 1)  
   } else { 
     # If there are no batches or the user asked to ignore them
@@ -256,7 +261,7 @@
   )
 }
 
-.EmpiricalBayesMu <- function(Data, s2_mu) {
+.EmpiricalBayesMu <- function(Data, s2_mu, log_scale = TRUE) {
 
   # Apply scran normalisation
   s <- calculateSumFactors(Data)
@@ -266,7 +271,11 @@
   # Correction for those genes with total count = 0
   aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
 
-  log(aux) - s2_mu / 2
+  if (log_scale) {
+    log(aux) - s2_mu / 2
+  } else {
+    aux * exp(-s2_mu / 2)
+  }
 }
 
 .BASiCS_MCMC_ExtraArgs <- function(Data,

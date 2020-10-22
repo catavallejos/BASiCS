@@ -43,11 +43,11 @@ test_that("Spikes + no regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(6.41, 15.67, 5.57, 11.80, 31.68, 12.08)
+  mu1 <- c(1.54, 4.98, 1.18, 2.87, 7.79, 3.16)
   mu1_obs <- round(mu[1:6, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(1, 0, 1, 1, 1, 1)
+  ind <- c(0, 1, 1, 0, 1, 0)
   ind_obs <- mu[1:6, 2]
   expect_equal(ind, ind_obs)
 
@@ -108,11 +108,11 @@ test_that("Spikes + regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(5.92, 15.67, 6.23, 12.26, 28.44)
+  mu1 <- c(1.54, 4.18, 1.32, 2.88, 7.75)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(1, 0, 1, 0, 0)
+  ind <- c(0, 1, 1, 1, 1)
   ind_obs <- mu[1:5, 2]
   expect_equal(ind, ind_obs)
 
@@ -173,11 +173,11 @@ test_that("No Spikes + no regression", {
   )
 
 
-  mu1 <- c(6.98, 24.26,  8.12, 13.85, 35.03)
+  mu1 <- c(7.02, 18.89,  6.32, 10.78, 29.61)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(1, 1, 1, 1, 0)
+  ind <- c(0, 1, 1, 1, 1)
   ind_obs <- mu[1:5, 2]
   expect_equal(ind, ind_obs)
 
@@ -252,11 +252,11 @@ test_that("No Spikes + regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(9.49, 17.42,  6.38, 10.30, 36.60)
+  mu1 <- c(7.39, 13.57,  6.13,  1.79, 32.77)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(0, 1, 1, 1, 1)
+  ind <- c(0, 1, 0, 1, 0)
   ind_obs <- mu[1:5, 2]
   expect_equal(ind, ind_obs)
 })

@@ -56,6 +56,7 @@ test_that("BASiCS_DivideAndConquer runs with standard settings", {
 test_that("BASiCS_MCMC runs with divide and conquer", {
   for (x in c("gene", "cell")) {
     fun <- if (x == "gene") function(x) expect_error(x, NA) else expect_warning
+    set.seed(1)
     fun(
       run_MCMC(
         Data,
@@ -70,6 +71,7 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         Burn = 4
       )
     )
+    set.seed(2)
     fun(
       run_MCMC(
         Data,
@@ -84,6 +86,7 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         Burn = 4
       )
     )
+    set.seed(3)
     fun(
       run_MCMC(
         Data,
@@ -98,6 +101,7 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
         Burn = 4
       )
     )
+    set.seed(4)
     fun(
       run_MCMC(
         Data,
@@ -114,6 +118,7 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
     )
   }
 })
+
 test_that(".consensus_average produces sensible results (cell-wise)", {
   set.seed(42)
 

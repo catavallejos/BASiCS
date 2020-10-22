@@ -1549,3 +1549,11 @@ version 2.1.14 (2020-10-08)
 - Add `BASiCS_MockSCE` function to create a SingleCellExperiment 
   object with arbitrary dimensions.
 - Fix Makevars warning relating to PKG_CXXFLAGS
+
+version 2.1.16 (2020-10-22)
+- Updates `.BASiCS_MCMC_Start` to use different starting values when an 
+empirical Bayes prior is assigned to mu
+- Adds `log_scale` parameter to  `.EmpiricalBayesMu`
+- Fixes small bug in `.BASiCS_MCMC_Start`
+- Updates unit tests linked to the change in `.BASiCS_MCMC_Start`
+- Adds fixed seeds to `test_divide_and_conquer.R`
