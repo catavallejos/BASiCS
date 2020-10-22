@@ -161,6 +161,11 @@
     meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
     mu0 <- meansBio
   }
+  
+  # If EB prior, replace mu0 by EB estimate
+  if(length(unique(PriorParam$mu.mu)) > 1) {
+    mu0 <- .EmpiricalBayesMu(Data, PriorParam$s2.mu) 
+  }
 
   # Starting value for delta
   # Defined by the CV for high- and mid-expressed genes
@@ -256,7 +261,7 @@
   )
 }
 
-.EmpiricalBayesMu <- function(Data, s2_mu) {
+.EmpiricalBayesMu <- function(Data, s2_mu, log.scale = TRUE) {
 
   # Apply scran normalisation
   s <- calculateSumFactors(Data)
@@ -266,7 +271,9 @@
   # Correction for those genes with total count = 0
   aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
 
-  log(aux) - s2_mu / 2
+  if(log.scale) { out <- log(aux) - s2_mu / 2 }
+  else { out <- aux* exp(-s2_mu / 2) }
+  return(out)
 }
 
 .BASiCS_MCMC_ExtraArgs <- function(Data,
