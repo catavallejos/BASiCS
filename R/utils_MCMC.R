@@ -163,7 +163,7 @@
   }
   
   # If EB prior, replace mu0 by EB estimate
-  if(length(unique(PriorParam$mu.mu)) > 1) {
+  if (length(unique(PriorParam$mu.mu)) > 1) {
     mu0 <- .EmpiricalBayesMu(Data, PriorParam$s2.mu, log.scale = FALSE) 
   }
 
