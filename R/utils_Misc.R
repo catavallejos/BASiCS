@@ -19,6 +19,28 @@ ess <- function(x) {
   setNames(ifelse(spec == 0, 0, nrow(x) * vars / spec), colnames(x))
 }
 
+
+geweke <- function (x, frac1 = 0.1, frac2 = 0.5) {
+    if (frac1 < 0 || frac1 > 1) {
+        stop("frac1 invalid")
+    }
+    if (frac2 < 0 || frac2 > 1) {
+        stop("frac2 invalid")
+    }
+    if (frac1 + frac2 >= 1) {
+        stop("The sum of 'frac1' and 'frac2' must be strictly less than 1")
+    }
+    xstart <- c(1, floor(nrow(x) - frac2 * (nrow(x) - 1)))
+    xend <- c(ceiling(1 + frac1 * (nrow(x) - 1)), nrow(x))
+    y_variance <- y_mean <- vector("list", 2)
+    for (i in 1:2) {
+        y <- x[xstart[i]:xend[i], ]
+        y_mean[[i]] <- colMeans(y)
+        y_variance[[i]] <- coda::spectrum0.ar(y)$spec / nrow(y)
+    }
+    (y_mean[[1]] - y_mean[[2]]) / sqrt(y_variance[[1]] + y_variance[[2]])
+}
+
 .ScaleName <- function(Measure = c("ess", "geweke.diag"),
                        Parameter = NULL) {
 
@@ -44,6 +66,9 @@ ess <- function(x) {
   mat <- .GetParam(Chain, Parameter)
   if (Measure == "ess" & !is.null(attr(mat, "ESS"))) {
     return(attr(mat, "ESS"))
+  }
+  if (Measure == "geweke.diag" & !is.null(attr(mat, "geweke"))) {
+    return(attr(mat, "geweke"))
   }
 
   if (na.rm) {

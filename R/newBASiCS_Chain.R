@@ -102,6 +102,10 @@ newBASiCS_Chain <- function(parameters) {
       if (!inherits(e, "try-error")) {
         attr(x, "ESS") <- e
       }
+      g <- try(geweke(x), silent = TRUE)
+      if (!inherits(g, "try-error")) {
+        attr(x, "geweke") <- g
+      }
       x
     }
   )
