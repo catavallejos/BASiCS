@@ -57,8 +57,7 @@
 BASiCS_PriorParam <- function(
     Data,
     k = 12,
-    mu.mu = if (PriorMu == "default") rep(0, nrow(Data))
-      else .EmpiricalBayesMu(Data, s2.mu, with_spikes = WithSpikes),
+    mu.mu = NULL,
     s2.mu = 0.5,
     s2.delta = 0.5,
     a.delta = 1, 
@@ -82,7 +81,6 @@ BASiCS_PriorParam <- function(
     PriorDelta = c("log-normal", "gamma"),
     StochasticRef = TRUE,
     ConstrainProp = 0.2,
-    WithSpikes = FALSE,
     GeneExponent = 1,
     CellExponent = 1
   ) {

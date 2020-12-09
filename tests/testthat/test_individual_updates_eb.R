@@ -7,7 +7,7 @@ test_that("Spikes + no regression", {
   CountsAll <- rbind(CountsBio, assay(altExp(Data, "spike-ins")))
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
-  PriorParam <- BASiCS_PriorParam(Data)
+  PriorParam <- BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes")
   PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=TRUE)
   
   mu.mu0 <- c(2.19, 3.07, 2, 2.81, 3.7, 2.91)
@@ -60,8 +60,8 @@ test_that("Spikes + regression", {
   n <- ncol(CountsBio)
   k <- 12
   var <- 1.2
-  PriorParam <- BASiCS_PriorParam(Data)  
-  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=FALSE)
+  PriorParam <- BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes")
+  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=TRUE)
   mu.mu0 <- c(2.19, 3.07, 2, 2.81, 3.7, 2.91)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
   expect_equal(mu.mu0, mu.mu1)
@@ -120,8 +120,8 @@ test_that("No Spikes + no regression", {
   CountsBio <- counts(Data)
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
-  PriorParam <- BASiCS_PriorParam(Data)  
-  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu)
+  PriorParam <- BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes")
+  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=FALSE)
   mu.mu0 <- c(1.95, 2.75, 1.81, 2.32, 3.31, 2.77)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
   expect_equal(mu.mu0, mu.mu1)
@@ -184,7 +184,7 @@ test_that("No Spikes + regression", {
   n <- ncol(CountsBio)
   k <- 12
   var <- 1.2
-  PriorParam <- BASiCS_PriorParam(Data, a.sigma2 = 1, b.sigma2 = 1)
+  PriorParam <- BASiCS_PriorParam(Data, a.sigma2 = 1, b.sigma2 = 1, PriorMu = "EmpiricalBayes")
   PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=FALSE)
   mu.mu0 <- c(2.00, 2.73, 1.81, 1.69, 3.49, 2.75)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
