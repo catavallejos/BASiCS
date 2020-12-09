@@ -361,7 +361,7 @@
   if (Regression) {
     .stop_k(PriorParam$k)
   }
-  # browser()
+
   if (is.null(PriorParam$mu.mu)) {
     PriorParam$mu.mu <- if (PriorParam$PriorMu == "default") rep(0, nrow(Data))
       else .EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes = WithSpikes)
