@@ -164,7 +164,12 @@
   
   # If EB prior, replace mu0 by EB estimate
   if (length(unique(PriorParam$mu.mu)) > 1) {
-    mu0 <- .EmpiricalBayesMu(Data, PriorParam$s2.mu, log_scale = FALSE) 
+    mu0 <- .EmpiricalBayesMu(
+      Data,
+      s2_mu = PriorParam$s2.mu,
+      with_spikes = WithSpikes,
+      log_scale = FALSE
+    )
   }
 
   # Starting value for delta
@@ -261,7 +266,7 @@
   )
 }
 
-.EmpiricalBayesMu <- function(Data, s2_mu, log_scale = TRUE) {
+.EmpiricalBayesMu <- function(Data, s2_mu, with_spikes, log_scale = TRUE) {
 
   # Apply scran normalisation
   s <- calculateSumFactors(Data)
@@ -272,7 +277,7 @@
   aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
   
   # Extra scaling if the data has spike-ins
-  if(length(altExpNames(Data)) > 0) {
+  if (with_spikes) {
     # overall capture for spike-ins across a cell
     s0 <- Matrix::colSums(assay(altExp(Data))) /
       sum(rowData(altExp(Data))[, 2])  

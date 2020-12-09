@@ -1558,7 +1558,7 @@ empirical Bayes prior is assigned to mu
 - Updates unit tests linked to the change in `.BASiCS_MCMC_Start`
 - Adds fixed seeds to `test_divide_and_conquer.R`
 
-WIP 
+version 2.2.1 (2020-12-08)
 - scaling of `mu.mu` in `.EmpiricalBayesMu` to match the scale given by spike-ins
 - scaling of `mu0` in `.BASiCS_MCMC_Start` to match the scale given by spike-ins
 when using an EB prior for mu
