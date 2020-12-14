@@ -7,8 +7,7 @@
 BASiCS_PriorParam(
   Data,
   k = 12,
-  mu.mu = if (PriorMu == "default") rep(0, nrow(Data)) else .EmpiricalBayesMu(Data,
-    s2.mu),
+  mu.mu = NULL,
   s2.mu = 0.5,
   s2.delta = 0.5,
   a.delta = 1,

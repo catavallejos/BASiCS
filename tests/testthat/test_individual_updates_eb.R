@@ -1,6 +1,5 @@
 context("Individual MCMC updates (cpp code) - empirical bayes")
 
-
 test_that("Spikes + no regression", {
   set.seed(3)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)
@@ -8,13 +7,13 @@ test_that("Spikes + no regression", {
   CountsAll <- rbind(CountsBio, assay(altExp(Data, "spike-ins")))
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
-  PriorParam <- BASiCS_PriorParam(Data)
-  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu)
+  PriorParam <- BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes")
+  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=TRUE)
   
-  mu.mu0 <- c(0.43,  1.32,  0.24,  1.05,  1.95,  1.15)
+  mu.mu0 <- c(2.19, 3.07, 2, 2.81, 3.7, 2.91)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
   expect_equal(mu.mu0, mu.mu1)
-    
+
   set.seed(2018)
   Start <- BASiCS:::.BASiCS_MCMC_Start(Data, PriorParam, Regression = FALSE, WithSpikes = TRUE)
   uGene <- rep(0, times = q0)
@@ -43,16 +42,14 @@ test_that("Spikes + no regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(1.54, 4.98, 1.18, 2.87, 7.79, 3.16)
+  mu1 <- c(8.12, 21.64, 6.85, 15.99, 40.49, 16.49)
   mu1_obs <- round(mu[1:6, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(0, 1, 1, 0, 1, 0)
+  ind <- c(1, 0, 1, 1, 0, 1)
   ind_obs <- mu[1:6, 2]
   expect_equal(ind, ind_obs)
-
 })
-
 
 test_that("Spikes + regression", {
   set.seed(3)
@@ -63,9 +60,9 @@ test_that("Spikes + regression", {
   n <- ncol(CountsBio)
   k <- 12
   var <- 1.2
-  PriorParam <- BASiCS_PriorParam(Data)  
-  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu)
-  mu.mu0 <- c(0.43,  1.32,  0.24,  1.05,  1.95,  1.15)
+  PriorParam <- BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes")
+  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=TRUE)
+  mu.mu0 <- c(2.19, 3.07, 2, 2.81, 3.7, 2.91)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
   expect_equal(mu.mu0, mu.mu1)
   
@@ -108,16 +105,14 @@ test_that("Spikes + regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(1.54, 4.18, 1.32, 2.88, 7.75)
+  mu1 <- c(7.49, 21.64, 7.66, 16.68, 40.49)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(0, 1, 1, 1, 1)
+  ind <- c(1, 0, 1, 1, 0)
   ind_obs <- mu[1:5, 2]
   expect_equal(ind, ind_obs)
-
 })
-
 
 test_that("No Spikes + no regression", {
   set.seed(5)
@@ -125,8 +120,8 @@ test_that("No Spikes + no regression", {
   CountsBio <- counts(Data)
   q0 <- nrow(CountsBio)
   n <- ncol(CountsBio)
-  PriorParam <- BASiCS_PriorParam(Data)  
-  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu)
+  PriorParam <- BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes")
+  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=FALSE)
   mu.mu0 <- c(1.95, 2.75, 1.81, 2.32, 3.31, 2.77)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
   expect_equal(mu.mu0, mu.mu1)
@@ -172,7 +167,6 @@ test_that("No Spikes + no regression", {
     mintol = 1e-3
   )
 
-
   mu1 <- c(7.02, 18.89,  6.32, 10.78, 29.61)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
@@ -180,10 +174,7 @@ test_that("No Spikes + no regression", {
   ind <- c(0, 1, 1, 1, 1)
   ind_obs <- mu[1:5, 2]
   expect_equal(ind, ind_obs)
-
 })
-
-
 
 test_that("No Spikes + regression", {
   set.seed(12)
@@ -193,8 +184,8 @@ test_that("No Spikes + regression", {
   n <- ncol(CountsBio)
   k <- 12
   var <- 1.2
-  PriorParam <- BASiCS_PriorParam(Data, a.sigma2 = 1, b.sigma2 = 1)
-  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu)
+  PriorParam <- BASiCS_PriorParam(Data, a.sigma2 = 1, b.sigma2 = 1, PriorMu = "EmpiricalBayes")
+  PriorParam$mu.mu <- BASiCS:::.EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes=FALSE)
   mu.mu0 <- c(2.00, 2.73, 1.81, 1.69, 3.49, 2.75)
   mu.mu1 <- as.vector(round(PriorParam$mu.mu[1:6], 2))
   expect_equal(mu.mu0, mu.mu1)

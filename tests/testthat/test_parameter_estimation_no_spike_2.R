@@ -10,7 +10,7 @@ test_that("Estimates match (no-spikes)", {
   expect_equal(counts(Data1), counts(Data2))
 
   set.seed(16)
-  Chain1 <- run_MCMC(Data1, 
+  Chain1 <- run_MCMC(Data1,
                      N = 1000, Thin = 10, Burn = 500, 
                      Regression = FALSE, WithSpikes = FALSE,
                      PrintProgress = FALSE)

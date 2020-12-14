@@ -57,8 +57,7 @@
 BASiCS_PriorParam <- function(
     Data,
     k = 12,
-    mu.mu = if (PriorMu == "default") rep(0, nrow(Data))
-        else .EmpiricalBayesMu(Data, s2.mu),
+    mu.mu = NULL,
     s2.mu = 0.5,
     s2.delta = 0.5,
     a.delta = 1, 
@@ -124,101 +123,3 @@ BASiCS_PriorParam <- function(
     eta = eta
   )
 }
-
-
-## Old documentation
-# \describe{
-#   \item{
-#     \code{mu.mu}
-#   }{
-#     Mean hyper-parameter for the
-#     log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
-#     gene-specific expression rate parameters \eqn{\mu_i}.
-#     Default: \code{s2.mu = 0}.
-#   }
-#   \item{
-#     \code{s2.mu}
-#   }{
-#     Scale hyper-parameter for the
-#     log-Normal(\code{mu.mu},\code{s2.mu}) prior that is shared by all
-#     gene-specific expression rate parameters \eqn{\mu_i}.
-#     Default: \code{s2.mu = 0.5}.
-#   }
-#   \item{
-#     \code{s2.delta}
-#   }{
-#     Only used when `PriorDelta == 'log-normal'`.
-#     Scale hyper-parameter for the log-Normal(\code{0},\code{s2.delta})
-#     prior that is shared by all gene-specific over-dispersion parameters
-#     \eqn{\delta_i}. Default: \code{s2.delta = 0.5}.
-#   }
-#   \item{
-#     \code{a.delta}
-#   }{
-#     Only used when `PriorDelta == 'gamma'`.
-#     Shape hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
-#     prior that is shared by all gene-specific biological over-dispersion
-#     parameters \eqn{\delta_i}. Default: \code{a.delta = 1}.
-#   }
-#   \item{
-#     \code{b.delta}
-#   }{
-#     Only used when `PriorDelta == 'gamma'`.
-#     Rate hyper-parameter for the Gamma(\code{a.delta},\code{b.delta})
-#     prior that is shared by all gene-specific biological over-dispersion
-#     hyper-parameters \eqn{\delta_i}. Default: \code{b.delta = 1}.
-#   }
-#   \item{
-#     \code{p.phi}
-#   }{
-#     Dirichlet hyper-parameter for the joint of all
-#     (scaled by \code{n}) cell-specific mRNA content normalising
-#     constants \eqn{\phi_j / n}.
-#     Default: \code{p.phi} \code{= rep(1, n)}.
-#   }
-#   \item{
-#     \code{a.s}
-#   }{
-#     Shape hyper-parameter for the
-#     Gamma(\code{a.s},\code{b.s}) prior that is shared by all
-#     cell-specific capture efficiency normalising constants \eqn{s_j}.
-#     Default: \code{a.s = 1}.
-#   }
-#   \item{
-#     \code{b.s}
-#   }{
-#     Rate hyper-parameter for the Gamma(\code{a.s},
-#     \code{b.s}) prior that is shared by all cell-specific capture
-#     efficiency normalising constants \eqn{s_j}.
-#     Default: \code{b.s = 1}.
-#   }
-#   \item{
-#     \code{a.theta}
-#   }{
-#     Shape hyper-parameter for the
-#     Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
-#     parameter \eqn{\theta}. Default: \code{a.theta = 1}.
-#   }
-#   \item{
-#     \code{b.theta}
-#   }{
-#     Rate hyper-parameter for the
-#     Gamma(\code{a.theta},\code{b.theta}) prior for technical noise
-#     parameter \eqn{\theta}. Default: \code{b.theta = 1}.
-#   }
-#   \item{
-#     \code{eta}
-#   }{
-#     Only used when \code{Regression = TRUE}. \code{eta}
-#     specifies the degress of freedom for the residual term.
-#     Default: \code{eta = 5}.
-#   }
-#   \item{
-#     \code{k}
-#   }{
-#     Only used when \code{Regression = TRUE}. \code{k} specifies
-#     the number of regression Gaussian Radial Basis Functions (GRBF) used
-#     within the correlated prior adopted for gene-specific over-dispersion
-#     and mean expression parameters. Default: \code{k = 12}.
-#   }
-# }
