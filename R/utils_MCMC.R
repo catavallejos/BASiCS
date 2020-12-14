@@ -164,7 +164,12 @@
   
   # If EB prior, replace mu0 by EB estimate
   if (length(unique(PriorParam$mu.mu)) > 1) {
-    mu0 <- .EmpiricalBayesMu(Data, PriorParam$s2.mu, log_scale = FALSE) 
+    mu0 <- .EmpiricalBayesMu(
+      Data,
+      s2_mu = PriorParam$s2.mu,
+      with_spikes = WithSpikes,
+      log_scale = FALSE
+    )
   }
 
   # Starting value for delta
@@ -261,7 +266,7 @@
   )
 }
 
-.EmpiricalBayesMu <- function(Data, s2_mu, log_scale = TRUE) {
+.EmpiricalBayesMu <- function(Data, s2_mu, with_spikes, log_scale = TRUE) {
 
   # Apply scran normalisation
   s <- calculateSumFactors(Data)
@@ -270,6 +275,17 @@
 
   # Correction for those genes with total count = 0
   aux <- ifelse(aux == 0, min(aux[aux > 0]), aux)
+  
+  # Extra scaling if the data has spike-ins
+  if (with_spikes) {
+    # overall capture for spike-ins across a cell
+    s0 <- Matrix::colSums(assay(altExp(Data))) /
+      sum(rowData(altExp(Data))[, 2])  
+    # arbitrary scaling set to match the mode of the distribution of s0
+    s0_dens <- density(s0)
+    myscale <- s0_dens$x[s0_dens$y == max(s0_dens$y)]
+    aux <- aux / myscale
+  }
 
   if (log_scale) {
     log(aux) - s2_mu / 2
@@ -297,7 +313,7 @@
                                      WithSpikes = WithSpikes,
                                      Regression = Regression
                                    ),
-                                   mintol_mu = 1e-3,
+                                   mintol_mu = 1e-5,
                                    mintol_delta = 1e-3,
                                    mintol_nu = 1e-5,
                                    mintol_theta = 1e-4) {
@@ -345,6 +361,12 @@
   if (Regression) {
     .stop_k(PriorParam$k)
   }
+
+  if (is.null(PriorParam$mu.mu)) {
+    PriorParam$mu.mu <- if (PriorParam$PriorMu == "default") rep(0, nrow(Data))
+      else .EmpiricalBayesMu(Data, PriorParam$s2.mu, with_spikes = WithSpikes)
+  }
+
   # Validity checks
   assertthat::assert_that(
     length(PriorParam$mu.mu) == nrow(Data),
