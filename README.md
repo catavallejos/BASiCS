@@ -1,5 +1,7 @@
-[![Build Status](https://travis-ci.org/catavallejos/BASiCS.svg?branch=master)](https://travis-ci.org/catavallejos/BASiCS) 
-![codecov.io Code Coverage](https://codecov.io/gh/catavallejos/BASiCS/branch/master/graph/badge.svg)
+[![R build
+status](https://github.com/catavallejos/BASiCS/workflows/R-CMD-check/badge.svg)](https://github.com/catavallejos/BASiCS/actions)
+[![codecov.io Code Coverage](https://codecov.io/gh/catavallejos/BASiCS/branch/master/graph/badge.svg)](https://codecov.io/gh/catavallejos/BASiCS/branch/master)
+
 
 # BASiCS
 
