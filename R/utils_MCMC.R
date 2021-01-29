@@ -433,15 +433,20 @@
     stop("Invalid AR value. Recommended value: AR = 0.44.")
   }
 
-  # Definition of parameters that are specific to the no-spikes case
-  NoSpikesParam <- .BASiCS_MCMC_NoSpikesParam(
-    GPar$BioCounts,
-    PriorParam$StochasticRef, 
-    GPar$q.bio, 
-    Start$mu0, 
-    PriorParam$PriorDelta, 
-    PriorParam$ConstrainProp
-  )
+  ## Definition of parameters that are specific to the no-spikes case
+  ## if not, empty list because list()[["foo"]] is null
+  if (!WithSpikes) {  
+    NoSpikesParam <- .BASiCS_MCMC_NoSpikesParam(
+      GPar$BioCounts,
+      PriorParam$StochasticRef,
+      GPar$q.bio,
+      Start$mu0,
+      PriorParam$PriorDelta,
+      PriorParam$ConstrainProp
+    )
+  } else {
+    NoSpikesParam <- list()
+  }
   ConstrainGene <- NoSpikesParam$ConstrainGene
   NotConstrainGene <- NoSpikesParam$NotConstrainGene
   Constrain <- NoSpikesParam$Constrain

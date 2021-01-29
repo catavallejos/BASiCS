@@ -38,6 +38,12 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE), NA)
+  pp <- BASiCS_PriorParam(DataSpikes, PriorDelta="gamma")
+  expect_error(run_MCMC(Data = DataSpikes, 
+                        N = 10, Thin = 2, Burn = 4,
+                        PriorParam = pp,
+                        Regression = FALSE), NA)
+
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = TRUE), NA)
