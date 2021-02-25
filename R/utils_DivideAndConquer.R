@@ -187,6 +187,7 @@
   ) {
 
   Weighting <- match.arg(Weighting)
+  NSamples <- nrow(Chains[[1]]@parameters[[Param]])
 
   if (Weighting == "n_weight") {
     SubsetBy <- match.arg(SubsetBy, choices = c("cell", "gene"))
@@ -205,7 +206,7 @@
   subposterior_matrix <- matrix(
     NA,
     ncol = length(Chains),
-    nrow = nrow(Chains[[1]]@parameters[[Param]])
+    nrow = NSamples
   )
   for (i in seq_along(Chains)) {
     Chain <- Chains[[i]]
@@ -244,7 +245,10 @@
     2,
     function(col) all(is.na(col))
   )
-
+  ## if all NA there's nothing fancy to do here
+  if (all(ind_all_na)) {
+    return(rep(NA, NSamples))
+  }
   weights <- weights[!ind_all_na]
   subposterior_matrix <- subposterior_matrix[, !ind_all_na, drop = FALSE]
 
@@ -271,7 +275,7 @@
 }
 
 .iterate_chains <- function(Param, Chains, Fun, ...) {
-  message("Combining batch posteriors for ", Param, " parameter\n")
+  message("Combining batch posteriors for ", Param, "\n")
   param_vals <- Chains[[1]]@parameters[[Param]]
 
   all_colnames <- lapply(
@@ -298,7 +302,6 @@
     ncol = length(all_colnames),
     dimnames = list(NULL, all_colnames)
   )
-
   output[, ] <- vapply(
     all_colnames,
     Fun,
