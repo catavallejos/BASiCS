@@ -94,13 +94,10 @@ BASiCS_DivideAndConquer <- function(
   output <- bplapply(
     Subsets,
     function(Subset) {
-      if (SubsetBy == "gene") {
-        ind <- match(rownames(Subset), rownames(Data))
-        PriorParam$mu.mu <- PriorParam$mu.mu[ind]
-      } else if (SubsetBy == "cell") {
-        ind <- match(colnames(Subset), colnames(Data))
-        PriorParam$p.phi <- PriorParam$p.phi[ind]
-      }
+      ind <- match(rownames(Subset), rownames(Data))
+      PriorParam$mu.mu <- PriorParam$mu.mu[ind]
+      ind <- match(colnames(Subset), colnames(Data))
+      PriorParam$p.phi <- PriorParam$p.phi[ind]
       BASiCS_MCMC(
         Data = Subset,
         WithSpikes = WithSpikes,
