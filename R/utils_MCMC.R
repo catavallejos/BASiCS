@@ -126,12 +126,15 @@
     message(
       "-------------------------------------------------------------\n",
       "There was an issue when applying `scran` normalization  \n",
-      "`positive = TRUE` has been added to `computeSumFactors` call \n",
+      "Running scran::cleanSizeFactors on size factors to ensure positivity",
       "Please consider a more stringent quality control criteria. \n",
       "-------------------------------------------------------------\n"
     )
     suppressWarnings(
-      size_scran <- scran::calculateSumFactors(CountsBio, positive = TRUE)
+      size_scran <- scran::cleanSizeFactors(
+        size_scran,
+        num.detected = colSums(CountsBio != 0)
+      )
     )
   }
 
@@ -140,7 +143,7 @@
     s0 <- Matrix::colSums(CountsTech) /
       sum(rowData(altExp(Data))[, 2])
     ## Avoid 0/0
-    s0 <- s0 + .Machine$double.eps
+    # s0 <- s0 + .Machine$double.eps
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)
@@ -156,7 +159,7 @@
     nu0 <- s0
     phi0 <- NULL
     ## Avoid 0/0
-    s0 <- s0 + .Machine$double.eps
+    # s0 <- s0 + .Machine$double.eps
 
     # Initialize mu using average 'normalised counts' across cells
     nCountsBio <- t( t(CountsBio) / s0 )
@@ -182,9 +185,6 @@
   varsBio <- apply(nCountsBio, 1, var)
   cv2Bio <- varsBio / (meansBio)^2
   delta0 <- rgamma(q.bio, 1, 1) + 1
-  if (any(is.na(meansBio))) {
-    browser()
-  }
   Aux <- which(meansBio > stats::quantile(meansBio, 0.1))
   delta0[Aux] <- cv2Bio[Aux]
   # 1e-3 added to be coherent with tolerance used within MCMC sampler
