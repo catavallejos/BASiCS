@@ -126,7 +126,7 @@
     message(
       "-------------------------------------------------------------\n",
       "There was an issue when applying `scran` normalization  \n",
-      "Running scran::cleanSizeFactors on size factors to ensure positivity",
+      "Running scran::cleanSizeFactors on size factors to ensure positivity.\n",
       "Please consider a more stringent quality control criteria. \n",
       "-------------------------------------------------------------\n"
     )
