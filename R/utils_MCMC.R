@@ -130,11 +130,9 @@
       "Please consider a more stringent quality control criteria. \n",
       "-------------------------------------------------------------\n"
     )
-    suppressWarnings(
-      size_scran <- scran::cleanSizeFactors(
-        size_scran,
-        num.detected = colSums(CountsBio != 0)
-      )
+    size_scran <- scran::cleanSizeFactors(
+      size_scran,
+      num.detected = colSums(CountsBio != 0)
     )
   }
 
