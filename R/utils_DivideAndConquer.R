@@ -50,15 +50,22 @@
   } else {
     balance_by <- rowSums(counts(Data))
   }
-
   ## How many quantiles?
-  deciles <- quantile(
+  nquantiles <- 10
+  quantiles <- quantile(
     balance_by,
     probs = seq(0, 1, length.out = 10)
   )
+  while (any(duplicated(quantiles))) {
+    nquantiles <- nquantiles - 1
+    quantiles <- quantile(
+      balance_by,
+      probs = seq(0, 1, length.out = nquantiles)
+    )
+  }
   bins <- cut(
     balance_by,
-    breaks = deciles,
+    breaks = quantiles,
     include.lowest = TRUE
   )
 
