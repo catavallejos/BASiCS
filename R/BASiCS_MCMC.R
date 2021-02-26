@@ -232,10 +232,11 @@ BASiCS_MCMC <- function(
 
 
   # Checks to ensure input arguments are valid
-  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes, Threads)
+  .BASiCS_MCMC_InputCheck(Data, N, Thin, Burn, Regression, WithSpikes, Threads,
+    NSubsets)
   SubsetBy <- match.arg(SubsetBy)
 
-  if (SubsetBy != "none") {
+  if (SubsetBy != "none" && NSubsets != 1) {
     if (SubsetBy == "cell") {
       warning("Divide and conquer inference using cell-wise partitions is not recommended.")
     }

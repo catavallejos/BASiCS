@@ -4,7 +4,8 @@
                                     Burn,
                                     Regression,
                                     WithSpikes,
-                                    Threads) {
+                                    Threads,
+                                    NSubsets) {
 
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.\n")
@@ -93,7 +94,13 @@
   }
   if (!is.logical(Regression)) {
     stop("Please use a logical value for the Regression parameter.\n")  
-  } 
+  }
+  if (!is.numeric(NSubsets) ||
+      length(NSubsets) > 1 ||
+      NSubsets < 1 ||
+      round(NSubsets) != NSubsets) {
+    stop("Invalid value for NSubsets; should be a length 1 positive integer")
+  }
 }
 
 .BASiCS_MCMC_Start <- function(Data,
