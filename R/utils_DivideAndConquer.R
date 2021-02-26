@@ -57,6 +57,12 @@
     probs = seq(0, 1, length.out = 10)
   )
   while (any(duplicated(quantiles))) {
+    message(
+      "Cannot find a balanced split with ",
+      nquantiles,
+      " quantiles, trying again with ",
+      nquantiles - 1
+    )
     nquantiles <- nquantiles - 1
     quantiles <- quantile(
       balance_by,
