@@ -189,6 +189,7 @@ test_that("combine_subposteriors with NA", {
     .combine_subposteriors(list(Chain1, Chain2), SubsetBy = "gene"),
     "Too many draws for parameter"
   )
+  Chain2@parameters$delta <- Chain2@parameters$delta[, 11:20]
   Chain2@parameters$mu <- ChainSC@parameters$mu[, 11:20]
   expect_error(
     .combine_subposteriors(list(Chain1, Chain2), SubsetBy = "gene"),
