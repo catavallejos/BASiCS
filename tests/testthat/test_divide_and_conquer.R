@@ -180,14 +180,9 @@ test_that(".consensus_average produces sensible results (cell-wise)", {
 
 test_that("combine_subposteriors with NA", {
   Chain2 <- Chain1 <- ChainSC
-  Chain1@parameters$nu <- Chain1@parameters$nu[, 1:2]
-  Chain2@parameters$nu <- Chain2@parameters$nu[, 3:5]
-  Chain1@parameters$s <- Chain1@parameters$s[, 1:2]
-  Chain2@parameters$s <- Chain2@parameters$s[, 3:5]
-  Chain1@parameters$phi <- Chain1@parameters$phi[, 1:2]
-  Chain2@parameters$phi <- Chain2@parameters$phi[, 3:5]
+  Chain1@parameters$delta <- Chain1@parameters$delta[, 1:10]
+  Chain2@parameters$delta <- Chain2@parameters$delta[, 11:20]
   Chain1@parameters$delta[, 1] <- NA
-  Chain2@parameters$delta[, 1] <- NA
   .combine_subposteriors(list(Chain1, Chain2), SubsetBy = "cell")
 })
 

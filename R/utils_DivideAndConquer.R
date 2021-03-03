@@ -259,6 +259,7 @@
     function(col) all(is.na(col))
   )
   ## if all NA there's nothing fancy to do here
+  ## this is the case where the only chain that has values are all missing
   if (all(ind_all_na)) {
     return(rep(NA, NSamples))
   }
