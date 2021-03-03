@@ -270,6 +270,11 @@
       (SubsetBy == "cell" && Param %in% c("phi", "nu", "s"))
       ) {
     sums <- subposterior_matrix 
+    if (ncol(sums) > 1) {
+      stop(
+        "Too many draws for parameter ", Param, ", ", SubsetBy, ": ", Colname
+      )
+    }
   } else {
     if (Sort) {
       subposterior_matrix[] <- apply(
@@ -309,7 +314,6 @@
   }
 
   all_colnames <- Reduce(union, all_colnames)
-
   output <- matrix(
     NA,
     nrow = nrow(param_vals),
