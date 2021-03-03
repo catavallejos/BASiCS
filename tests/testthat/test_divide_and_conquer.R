@@ -187,7 +187,7 @@ test_that("combine_subposteriors with NA", {
   Chain1@parameters$delta[, 1] <- NA
   expect_error(
     .combine_subposteriors(list(Chain1, Chain2), SubsetBy = "gene"),
-    "Too many draws for parameter mu, gene: "
+    "Too many draws for parameter"
   )
   Chain2@parameters$mu <- ChainSC@parameters$mu[, 11:20]
   expect_error(
