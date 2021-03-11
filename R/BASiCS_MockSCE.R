@@ -32,7 +32,7 @@ BASiCS_MockSCE <- function(NGenes = 100, NCells = 100, NSpikes = 20, WithBatch =
     assays = list(counts = counts)
   )
   if (WithBatch) {
-    colData(Data)$BatchInfo <- sample(2, nrow(Data), replace = TRUE)
+    colData(Data)$BatchInfo <- sample(2, ncol(Data), replace = TRUE)
   }
   if (NSpikes > 0) {
     spikes <- rlnorm(NSpikes)
