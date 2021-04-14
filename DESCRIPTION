@@ -3,10 +3,10 @@ Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
 Version: 2.3.2
 Date: 2020-02-25
-Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
+Authors@R: c(person("Catalina", "Vallejos", role=c("aut"),
         email="catalina.vallejos@igmm.ed.ac.uk"), 
         person("Nils", "Eling", role=c("aut")), 
-        person("Alan", "O'Callaghan", role = c("aut")),
+        person("Alan", "O'Callaghan", role = c("aut", "cre"), email="alan.ocallaghan@outlook.com"),
         person("Sylvia", "Richardson", role = c("ctb")), 
         person("John", "Marioni", role=c("ctb"))) 
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
