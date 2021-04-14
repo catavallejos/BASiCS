@@ -1564,3 +1564,6 @@ version 2.3.1 (2020-12-14)
 when using an EB prior for mu
 - lower minimum tolerance `mintol_mu` (1e-5 instead of 1e-3) as a default value
 in `.BASiCS_MCMC_ExtraArgs`
+
+version 2.3.2 (2020-04-14)
+- Bug fixes in handling of divide and conquer inference.
