@@ -1567,3 +1567,6 @@ in `.BASiCS_MCMC_ExtraArgs`
 
 version 2.3.2 (2021-04-14)
 - Bug fixes in handling of divide and conquer inference.
+
+version 2.3.3: (2021-04-14)
+- Version bump to trigger new build
