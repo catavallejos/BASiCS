@@ -147,8 +147,6 @@
     # Initialize s as the empirical capture efficiency rates
     s0 <- Matrix::colSums(CountsTech) /
       sum(rowData(altExp(Data))[, 2])
-    ## Avoid 0/0
-    # s0 <- s0 + .Machine$double.eps
     nu0 <- s0
     phi0 <- size_scran / s0
     phi0 <- n * phi0 / sum(phi0)
@@ -163,8 +161,6 @@
     s0 <- size_scran
     nu0 <- s0
     phi0 <- NULL
-    ## Avoid 0/0
-    # s0 <- s0 + .Machine$double.eps
 
     # Initialize mu using average 'normalised counts' across cells
     nCountsBio <- t( t(CountsBio) / s0 )
