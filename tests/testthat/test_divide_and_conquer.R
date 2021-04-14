@@ -4,6 +4,7 @@ set.seed(42)
 Data <- BASiCS_MockSCE()
 
 bp <- BiocParallel::SerialParam()
+BiocParallel::register(bp)
 
 test_that("BASiCS:::.generateSubsets produces valid output by cell and gene with & w/o spikes", {
   check_subsets <- function(subsetby, nsubsets) {
@@ -119,6 +120,24 @@ test_that("BASiCS_MCMC runs with divide and conquer", {
   }
 })
 
+test_that("NSubsets check is appropriate", {
+  expect_error(
+    run_MCMC(
+      Data,
+      NSubsets = 1,
+      SubsetBy = "gene",
+      Regression = FALSE,
+      PrintProgress = FALSE,
+      WithSpikes = FALSE,
+      BPPARAM = bp,
+      N = 8,
+      Thin = 2,
+      Burn = 4
+    ),
+    NA
+  )
+})
+
 test_that(".consensus_average produces sensible results (cell-wise)", {
   set.seed(42)
 
@@ -156,4 +175,47 @@ test_that(".consensus_average produces sensible results (cell-wise)", {
     )
   ) / ncol(Data)
   expect_equal(unname(c2@parameters[["mu"]][1, gene]),  weighted_mean)
+})
+
+
+test_that("combine_subposteriors with NA", {
+  Chain2 <- Chain1 <- ChainSC
+  Chain1@parameters$delta <- Chain1@parameters$delta[, 1:10]
+  Chain1@parameters$mu <- Chain1@parameters$mu[, 1:10]
+
+  Chain2@parameters$mu <- Chain2@parameters$mu[, 1:10]
+  Chain1@parameters$delta[, 1] <- NA
+  expect_error(
+    .combine_subposteriors(list(Chain1, Chain2), SubsetBy = "gene"),
+    "Too many draws for parameter"
+  )
+  Chain2@parameters$delta <- Chain2@parameters$delta[, 11:20]
+  Chain2@parameters$mu <- ChainSC@parameters$mu[, 11:20]
+  expect_error(
+    .combine_subposteriors(list(Chain1, Chain2), SubsetBy = "gene"),
+    NA
+  )
+})
+
+
+test_that("cut doesn't fail if some quantiles are the same", {
+  c <- counts(Data)
+  for (i in 1:20) c[i, ] <- c[1, ]
+  counts(Data) <- c
+  expect_message(
+    capture.output(
+      m <- BASiCS_DivideAndConquer(
+        Data,
+        NSubsets = 2,
+        SubsetBy = "gene",
+        Regression = TRUE,
+        WithSpikes = TRUE,
+        PrintProgress = FALSE,
+        N = 50,
+        BPPARAM = bp,
+        Thin = 5,
+        Burn = 10
+      )
+    ), "Cannot find a balanced split"
+  )
 })

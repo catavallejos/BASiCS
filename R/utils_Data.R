@@ -32,10 +32,9 @@
   
   if (!WithSpikes) {
     if (length(unique(BatchInfo)) == 1) {
-      errors <- c(errors,
-        "If spike-in genes are not available, BASiCS 
-        requires the data to contain at least 2 batches of cells 
-        (for the same population)\n"
+      warning(
+        "If spike-in genes are not available, BASiCS recommends that the data ",
+        "contain at least 2 batches of cells (for the same population)\n"
       )
     }
   } else {

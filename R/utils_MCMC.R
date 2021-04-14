@@ -4,7 +4,8 @@
                                     Burn,
                                     Regression,
                                     WithSpikes,
-                                    Threads) {
+                                    Threads,
+                                    NSubsets) {
 
   if (!is(Data, "SingleCellExperiment")) {
     stop("'Data' is not a SingleCellExperiment class object.\n")
@@ -93,7 +94,13 @@
   }
   if (!is.logical(Regression)) {
     stop("Please use a logical value for the Regression parameter.\n")  
-  } 
+  }
+  if (!is.numeric(NSubsets) ||
+      length(NSubsets) > 1 ||
+      NSubsets < 1 ||
+      round(NSubsets) != NSubsets) {
+    stop("Invalid value for NSubsets; should be a length 1 positive integer")
+  }
 }
 
 .BASiCS_MCMC_Start <- function(Data,
@@ -126,12 +133,13 @@
     message(
       "-------------------------------------------------------------\n",
       "There was an issue when applying `scran` normalization  \n",
-      "`positive = TRUE` has been added to `computeSumFactors` call \n",
+      "Running scran::cleanSizeFactors on size factors to ensure positivity.\n",
       "Please consider a more stringent quality control criteria. \n",
       "-------------------------------------------------------------\n"
     )
-    suppressWarnings(
-      size_scran <- scran::calculateSumFactors(CountsBio, positive = TRUE)
+    size_scran <- scran::cleanSizeFactors(
+      size_scran,
+      num.detected = colSums(CountsBio != 0)
     )
   }
 

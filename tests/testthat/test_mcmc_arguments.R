@@ -65,10 +65,10 @@ test_that("MCMC arguments fail (spikes; no-regression)", {
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE), NA)
-  expect_error(run_MCMC(Data = DataSpikesNoBatch, 
+  expect_warning(run_MCMC(Data = DataSpikesNoBatch, 
                         N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
-               regexp = ".*requires the data to contain at least 2 batches*")
+               regexp = ".*recommends that the data contain at least 2 batches*")
   Data2 <- DataNoSpikes
   altExp(Data2) <- NULL  
   expect_error(run_MCMC(Data = Data2, 
@@ -86,10 +86,10 @@ test_that("MCMC arguments fail (no-spikes; no-regression)", {
   # Checks if only one batch
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
-  expect_error(run_MCMC(Data = Data2, 
+  expect_warning(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE),
-               regexp = ".*requires the data to contain at least 2 batches*")
+               regexp = ".*recommends that the data contain at least 2 batches*")
   # Checks if only batch info is not available
   Data2 <- DataNoSpikes
   SummarizedExperiment::colData(Data2)$BatchInfo <- NULL
@@ -126,10 +126,10 @@ test_that("MCMC arguments fail (regression)", {
   expect_error(run_MCMC(Data = DataSpikes, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE), NA)
-  expect_error(run_MCMC(Data = DataSpikesNoBatch, 
+  expect_warning(run_MCMC(Data = DataSpikesNoBatch, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE),
-               regexp = ".*requires the data to contain at least 2 batches*")
+               regexp = ".*recommends that the data contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
   expect_error(run_MCMC(Data = Data2, 
@@ -144,10 +144,10 @@ test_that("MCMC arguments fail (regression)", {
   
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- rep(1, length(colData(Data2)$BatchInfo))  
-  expect_error(run_MCMC(Data = Data2, 
+  expect_warning(run_MCMC(Data = Data2, 
                         N = 10, Thin = 2, Burn = 4, 
                         Regression = TRUE, WithSpikes = FALSE),
-               regexp = ".*requires the data to contain at least 2 batches*")
+               regexp = ".*recommends that the data contain at least 2 batches*")
   
   Data2 <- DataNoSpikes
   colData(Data2)$BatchInfo <- NULL
@@ -195,10 +195,10 @@ test_that("Checks for user generated SCE object", {
     assays = list(counts = counts(DataSpikes)),
     colData = data.frame(BatchInfo = colData(DataSpikesNoBatch)$BatchInfo)
   )
-  expect_error(run_MCMC(Data = sce, 
+  expect_warning(run_MCMC(Data = sce, 
                          N = 20, Thin = 2, Burn = 4, 
                         Regression = FALSE, WithSpikes = FALSE), 
-               regexp = ".*requires the data to contain at least 2 batches.*")
+               regexp = ".*recommends that the data contain at least 2 batches.*")
     
   # Incorporate a batch vector
   sce <- SingleCellExperiment(
