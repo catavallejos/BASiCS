@@ -137,7 +137,7 @@
       "Please consider a more stringent quality control criteria. \n",
       "-------------------------------------------------------------\n"
     )
-    size_scran <- scran::cleanSizeFactors(
+    size_scran <- scuttle::cleanSizeFactors(
       size_scran,
       num.detected = colSums(CountsBio != 0)
     )

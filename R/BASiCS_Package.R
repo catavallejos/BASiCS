@@ -17,7 +17,8 @@
 #' @importFrom methods .hasSlot is new show slotNames Summary 
 #' @importFrom Rcpp evalCpp sourceCpp
 #' @importFrom S4Vectors DataFrame
-#' @importFrom scran calculateSumFactors 
+#' @importFrom scran calculateSumFactors
+#' @importFrom scuttle cleanSizeFactors
 #' @importFrom stats acf median model.matrix rgamma rpois runif var lm 
 #'  quantile rlnorm density
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
