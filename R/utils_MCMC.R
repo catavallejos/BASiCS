@@ -101,6 +101,10 @@
       round(NSubsets) != NSubsets) {
     stop("Invalid value for NSubsets; should be a length 1 positive integer")
   }
+
+  if (is.null(colnames(Data))) {
+    stop("Input data must have colnames set.")
+  }
 }
 
 .BASiCS_MCMC_Start <- function(Data,

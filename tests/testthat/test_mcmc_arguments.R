@@ -288,3 +288,17 @@ test_that("PriorMu", {
     NA
   )
 })
+
+test_that("colnames", {
+  colnames(DataSpikes) <- NULL
+  expect_error(
+    run_MCMC(
+      Data = DataSpikes, 
+      N = 10,
+      Thin = 2,
+      Burn = 4, 
+      Regression = TRUE
+    ),
+    "Input data must have colnames set."    
+  )
+})
