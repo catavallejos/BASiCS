@@ -1573,3 +1573,9 @@ version 2.3.3: (2021-04-14)
 
 version 2.3.4: (2021-04-18)
 - Add missing import from scran
+
+version 2.5.1 (2021-05-19)
+- Add error condition for unnamed cells.
+
+version 2.5.2 (2021-08-11)
+- Add better spacing around EFDR message.
