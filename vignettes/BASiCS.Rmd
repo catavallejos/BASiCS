@@ -21,8 +21,8 @@ vignette: >
 
 ```{r, echo = FALSE, results = "hide", message = FALSE}
 require(knitr)
-opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE, dpi = 30)
-knitr::opts_chunk$set(dev="png")
+opts_chunk$set(error = FALSE, message = FALSE, warning = FALSE, dpi = 30)
+knitr::opts_chunk$set(dev = "png")
 ```
 
 ```{r library, echo = FALSE}
@@ -133,8 +133,11 @@ RECOMMENDED SETTING IS `N=20000`, `Thin=20` and `Burn=10000`.**
 ```{r quick-start-MCMC}
 set.seed(1)
 Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data = Data, N = 1000, Thin = 10, Burn = 500, 
-                     PrintProgress = FALSE, Regression = TRUE)
+Chain <- BASiCS_MCMC(
+  Data = Data,
+  N = 1000, Thin = 10, Burn = 500,
+  PrintProgress = FALSE, Regression = TRUE
+)
 ```
 
 As a default, the code above runs the original implementation mode of BASiCS 
@@ -215,20 +218,26 @@ For example, the following code generates a synthetic dataset with 50 genes
 
 ```{r ExampleDataTest}
 set.seed(1)
-Counts <- matrix(rpois(50*40, 2), ncol = 40)
+Counts <- matrix(rpois(50 * 40, 2), ncol = 40)
 rownames(Counts) <- c(paste0("Gene", 1:40), paste0("Spike", 1:10))
-Tech <- c(rep(FALSE,40),rep(TRUE,10))
+colnames(Counts) <- paste0("Cell", 1:40)
+
+Tech <- c(rep(FALSE, 40), rep(TRUE, 10))
 set.seed(2)
-SpikeInput <- rgamma(10,1,1)
-SpikeInfo <- data.frame("SpikeID" = paste0("Spike", 1:10), 
-                        "SpikeInput" = SpikeInput)
+SpikeInput <- rgamma(10, 1, 1)
+SpikeInfo <- data.frame(
+  "SpikeID" = paste0("Spike", 1:10),
+  "SpikeInput" = SpikeInput
+)
 
 # No batch structure
 DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo)
 
 # With batch structure
-DataExample <- newBASiCS_Data(Counts, Tech, SpikeInfo, 
-                              BatchInfo = rep(c(1,2), each = 20)) 
+DataExample <- newBASiCS_Data(
+  Counts, Tech, SpikeInfo,
+  BatchInfo = rep(c(1, 2), each = 20)
+)
 ```
 
 To convert an existing `SingleCellExperiment` object (`Data`) into one that can 
@@ -268,12 +277,15 @@ to the existing object is to assign the `colData(Data)$BatchInfo` slot.
 
 ```{r ExampleDataNoSpikes}
 set.seed(1)
-CountsNoSpikes <- matrix(rpois(50*40, 2), ncol = 40)
+CountsNoSpikes <- matrix(rpois(50 * 40, 2), ncol = 40)
 rownames(CountsNoSpikes) <- paste0("Gene", 1:50)
+colnames(CountsNoSpikes) <- paste0("Cell", 1:40)
 
 # With batch structure
-DataExampleNoSpikes <- SingleCellExperiment(assays = list(counts = CountsNoSpikes), 
-                      colData = data.frame(BatchInfo = rep(c(1,2), each = 20))) 
+DataExampleNoSpikes <- SingleCellExperiment(
+  assays = list(counts = CountsNoSpikes),
+  colData = data.frame(BatchInfo = rep(c(1, 2), each = 20))
+)
 ```
 
 Note: BASiCS assumes that a pre-processing quality control step has been applied 
@@ -363,11 +375,13 @@ data(ChainRNA)
 ```
 
 ```{r quick-start-TestDE, fig.width = 16, fig.height = 8}
-Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
-                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
-                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, PlotOffset = TRUE, Plot = TRUE)
+Test <- BASiCS_TestDE(
+  Chain1 = ChainSC, Chain2 = ChainRNA,
+  GroupLabel1 = "SC", GroupLabel2 = "PaS",
+  EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+  EFDR_M = 0.10, EFDR_D = 0.10,
+  Offset = TRUE, PlotOffset = TRUE, Plot = TRUE
+)
 ```
 
 In `BASiCS_TestDE`, `EpsilonM` sets the log2 fold change (log2FC) in expression 
@@ -431,11 +445,13 @@ which mean expression changes are marked as `ExcludedFromTesting` in the
 `ResultDiffDisp` field). 
 
 ```{r quick-start-TestDE-2, fig.width = 16, fig.height = 8}
-Test <- BASiCS_TestDE(Chain1 = ChainSC, Chain2 = ChainRNA,
-                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
-                      EpsilonM = 0, EpsilonD = log2(1.5),
-                      EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
+Test <- BASiCS_TestDE(
+  Chain1 = ChainSC, Chain2 = ChainRNA,
+  GroupLabel1 = "SC", GroupLabel2 = "PaS",
+  EpsilonM = 0, EpsilonD = log2(1.5),
+  EFDR_M = 0.10, EFDR_D = 0.10,
+  Offset = TRUE, PlotOffset = FALSE, Plot = FALSE
+)
 ```
 
 
@@ -468,17 +484,23 @@ or `BatchInfo` must be stored as a slot in `colData(Data)` when using an
 existing `SingleCellExperiment` object. 
 
 ```{r, fig.height = 8, fig.width = 8}
-DataNoSpikes <- newBASiCS_Data(Counts, Tech, SpikeInfo = NULL, 
-                              BatchInfo = rep(c(1,2), each = 20))
+DataNoSpikes <- newBASiCS_Data(
+  Counts, Tech, SpikeInfo = NULL, 
+  BatchInfo = rep(c(1,2), each = 20)
+)
 
 # Alternatively
-DataNoSpikes <- SingleCellExperiment(assays = list(counts = Counts), 
-                      colData = data.frame(BatchInfo = rep(c(1,2), each = 20))) 
+DataNoSpikes <- SingleCellExperiment(
+  assays = list(counts = Counts),
+  colData = data.frame(BatchInfo = rep(c(1,2), each = 20))
+)
 
-ChainNoSpikes <- BASiCS_MCMC(Data = DataNoSpikes, N = 1000, 
-                             Thin = 10, Burn = 500, 
-                             WithSpikes = FALSE,  Regression = TRUE,
-                             PrintProgress = FALSE)
+ChainNoSpikes <- BASiCS_MCMC(
+  Data = DataNoSpikes, N = 1000,
+  Thin = 10, Burn = 500,
+  WithSpikes = FALSE,  Regression = TRUE,
+  PrintProgress = FALSE
+)
 ```
 
 ## If `Regression = TRUE`
@@ -490,12 +512,16 @@ subsequently, to derive a *residual over-dispersion* measure that is
 defined as departures with respect to this trend.
 
 ```{r, fig.height = 8, fig.width = 8}
-DataRegression <- newBASiCS_Data(Counts, Tech, SpikeInfo, 
-                              BatchInfo = rep(c(1,2), each = 20))
-ChainRegression <- BASiCS_MCMC(Data = DataRegression, N = 1000, 
-                               Thin = 10, Burn = 500, 
-                               Regression = TRUE, 
-                               PrintProgress = FALSE)
+DataRegression <- newBASiCS_Data(
+  Counts, Tech, SpikeInfo,
+  BatchInfo = rep(c(1, 2), each = 20)
+)
+ChainRegression <- BASiCS_MCMC(
+  Data = DataRegression, N = 1000,
+  Thin = 10, Burn = 500,
+  Regression = TRUE,
+  PrintProgress = FALSE
+)
 ```
 
 This implementation provides additional functionality when performing 
@@ -519,12 +545,14 @@ by the regression BASiCS model.
 
 ```{r, fig.height = 8, fig.width = 16}
 data("ChainSCReg")
-Test <- BASiCS_TestDE(Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
-                      GroupLabel1 = "SC", GroupLabel2 = "PaS",
-                      EpsilonM = log2(1.5), EpsilonD = log2(1.5),
-                      EpsilonR = log2(1.5)/log2(exp(1)),
-                      EFDR_M = 0.10, EFDR_D = 0.10,
-                      Offset = TRUE, PlotOffset = FALSE, Plot = FALSE)
+Test <- BASiCS_TestDE(
+  Chain1 = ChainSCReg, Chain2 = ChainRNAReg,
+  GroupLabel1 = "SC", GroupLabel2 = "PaS",
+  EpsilonM = log2(1.5), EpsilonD = log2(1.5),
+  EpsilonR = log2(1.5) / log2(exp(1)),
+  EFDR_M = 0.10, EFDR_D = 0.10,
+  Offset = TRUE, PlotOffset = FALSE, Plot = FALSE
+)
 ```
 
 This test function outputs an extra slot containing the results of the 
@@ -555,9 +583,12 @@ parameters `StoreChains`, `StoreDir` and `RunName` are required. For example:
 
 ```{r MCMCNotRun}
 Data <- makeExampleBASiCS_Data()
-Chain <- BASiCS_MCMC(Data, N = 1000, Thin = 10, Burn = 500, Regression = TRUE,
-                     PrintProgress = FALSE, StoreChains = TRUE, 
-                     StoreDir = tempdir(), RunName = "Example")
+Chain <- BASiCS_MCMC(
+  Data,
+  N = 1000, Thin = 10, Burn = 500,
+  Regression = TRUE, PrintProgress = FALSE,
+  StoreChains = TRUE, StoreDir = tempdir(), RunName = "Example"
+)
 ```
 
 In this example, the output of `BASiCS_MCMC` will be stored as a `BASiCS_Chain` 
@@ -566,7 +597,7 @@ object in the file "chain_Example.Rds", within the `tempdir()` directory.
 To load pre-computed MCMC chains, 
 
 ```{r LoadChainNotRun}
-Chain <- BASiCS_LoadChain("Example", StoreDir = tempdir()) 
+Chain <- BASiCS_LoadChain("Example", StoreDir = tempdir())
 ```
 
 ## Convergence assessment
@@ -591,7 +622,7 @@ To access the MCMC chains associated to individual parameter use the function
 `displayChainBASiCS`. For example, 
 
 ```{r AccessChains}
-displayChainBASiCS(Chain, Param = "mu")[1:2,1:2]
+displayChainBASiCS(Chain, Param = "mu")[1:2, 1:2]
 ```
 
 As a summary of the posterior distribution, the function `Summary` calculates 
@@ -614,10 +645,11 @@ intervals for gene-specific parameters $\mu_i$ (mean) and $\delta_i$
 (over-dispersion)
 
 ```{r OtherHPD, fig.width = 16, fig.height = 8}
-par(mfrow = c(1,2))
+par(mfrow = c(1, 2))
 plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
 plot(ChainSummary, Param = "delta", 
-     Genes = c(2,5,10,50), main = "5 customized genes")
+     Genes = c(2, 5, 10, 50), main = "5 customized genes"
+)
 ```
 
 See `help(BASiCS_MCMC)` for example plots associated to other model parameters.
@@ -627,7 +659,7 @@ It is also possible to obtain similar summaries for the normalising constants
 $\phi_j$ and $s_j$. 
 
 ```{r Normalisation, fig.width = 16, fig.height = 8}
-par(mfrow = c(1,2))
+par(mfrow = c(1, 2))
 plot(ChainSummary, Param = "phi")
 plot(ChainSummary, Param = "s", Cells = 1:5)
 ```
@@ -639,8 +671,14 @@ effect that is observed between mean and over-dispersion.
 
 ```{r DispVsExp, fig.width = 16, fig.height = 8}
 par(mfrow = c(1,2))
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = FALSE)
-plot(ChainSummary, Param = "mu", Param2 = "delta", log = "x", SmoothPlot = TRUE)
+plot(ChainSummary,
+  Param = "mu", Param2 = "delta",
+  log = "x", SmoothPlot = FALSE
+)
+plot(ChainSummary,
+  Param = "mu", Param2 = "delta",
+  log = "x", SmoothPlot = TRUE
+)
 ```
 
 The option `SmoothPlot = TRUE` is generally recommended as this plot will 
@@ -679,8 +717,10 @@ $\hat{\rho}_{ij}$ is given by its posterior mean (Monte Carlo estimate based
 on the MCMC sample of all model parameters).
 
 ```{r DenoisedProp}
-DenoisedRates <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
-                                      Propensities = FALSE)
+DenoisedRates <- BASiCS_DenoisedRates(
+  Data = Data, Chain = Chain, 
+  Propensities = FALSE
+)
 DenoisedRates[1:2, 1:2]
 ```
 
@@ -688,8 +728,10 @@ Alternative, denoised expression propensities $\hat{\rho}_{ij}$ can
 also be extracted
 
 ```{r DenoisedRates}
-DenoisedProp <- BASiCS_DenoisedRates(Data = Data, Chain = Chain, 
-                                    Propensities = TRUE)
+DenoisedProp <- BASiCS_DenoisedRates(
+  Data = Data, Chain = Chain,
+  Propensities = TRUE
+)
 DenoisedProp[1:2, 1:2]
 ```
 
