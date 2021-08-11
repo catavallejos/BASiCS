@@ -1580,3 +1580,4 @@ version 2.5.1 (2021-05-19)
 version 2.5.2 (2021-08-11)
 - Add better spacing around EFDR message.
 - Fix ggplot2 `guide=FALSE` warnings
+- Remove an errant browser() call
