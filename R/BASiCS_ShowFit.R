@@ -113,7 +113,7 @@ BASiCS_ShowFit <- function(object,
       ggplot2::scale_fill_gradientn(
         name = "",
         colours = grDevices::colorRampPalette(cols)(100),
-        guide = FALSE
+        guide = "none"
       )
   }
   else {

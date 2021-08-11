@@ -268,7 +268,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     #   na.rm = TRUE,
     #   alpha = 0.8
     # ) +
-    # viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
+    # viridis::scale_fill_viridis(name = "Density", guide = "none") +
     ggplot2::geom_vline(
       xintercept = c(-Epsilon, Epsilon),
       lty = "dashed",
@@ -334,7 +334,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     #   na.rm = TRUE,
     #   alpha = 0.8
     # ) +
-    # viridis::scale_fill_viridis(name = "Density", guide = FALSE) +
+    # viridis::scale_fill_viridis(name = "Density", guide = "none") +
     ggplot2::geom_point(
       ggplot2::aes_string(color = rVar),
       shape = 16,

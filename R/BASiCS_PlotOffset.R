@@ -138,7 +138,7 @@ BASiCS_PlotOffset <- function(Chain1,
           "Log2 fold change", GroupLabel1,
           "vs", GroupLabel2),
         title = "Before correction") +
-      viridis::scale_fill_viridis(name = "Density", guide = FALSE)
+      viridis::scale_fill_viridis(name = "Density", guide = "none")
 
     df <- data.frame(
       x = log2(MuBase),

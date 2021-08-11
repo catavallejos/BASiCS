@@ -110,7 +110,7 @@
     ProbThresholds <- ProbThreshold
     
     message(
-      "EFDR = NULL for", Task, " task:\n",
+      "EFDR = NULL for ", Task, " task:\n",
       "Probability threshold automatically set equal to",
       "'ProbThreshold", Suffix, "'.")
   } 

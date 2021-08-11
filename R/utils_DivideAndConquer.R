@@ -320,7 +320,6 @@
     ncol = length(all_colnames),
     dimnames = list(NULL, all_colnames)
   )
-  browser()
   output[, ] <- vapply(
     all_colnames,
     Fun,

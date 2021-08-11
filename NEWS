@@ -1577,3 +1577,7 @@ version 2.3.4: (2021-04-18)
 version 2.5.1 (2021-05-19)
 - Add error condition for unnamed cells.
 
+version 2.5.2 (2021-08-11)
+- Add better spacing around EFDR message.
+- Fix ggplot2 `guide=FALSE` warnings
+- Remove an errant browser() call
