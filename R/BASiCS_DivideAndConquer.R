@@ -98,6 +98,8 @@ BASiCS_DivideAndConquer <- function(
       PriorParam$mu.mu <- PriorParam$mu.mu[ind]
       ind <- match(colnames(Subset), colnames(Data))
       PriorParam$p.phi <- PriorParam$p.phi[ind]
+      PriorParam$GeneExponent <- ncol(Subset) / ncol(Data)
+      PriorParam$CellExponent <- nrow(Subset) / nrow(Data)
       BASiCS_MCMC(
         Data = Subset,
         WithSpikes = WithSpikes,

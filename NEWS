@@ -1581,3 +1581,6 @@ version 2.5.2 (2021-08-11)
 - Add better spacing around EFDR message.
 - Fix ggplot2 `guide=FALSE` warnings
 - Remove an errant browser() call
+
+version 2.5.3 (2021-08-11)
+- Add GeneExponent and CellExponent settings for divide and conquer.
