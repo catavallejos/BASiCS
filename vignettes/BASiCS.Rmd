@@ -485,14 +485,14 @@ existing `SingleCellExperiment` object.
 
 ```{r, fig.height = 8, fig.width = 8}
 DataNoSpikes <- newBASiCS_Data(
-  Counts, Tech, SpikeInfo = NULL, 
-  BatchInfo = rep(c(1,2), each = 20)
+  Counts, Tech, SpikeInfo = NULL,
+  BatchInfo = rep(c(1, 2), each = 20)
 )
 
 # Alternatively
 DataNoSpikes <- SingleCellExperiment(
   assays = list(counts = Counts),
-  colData = data.frame(BatchInfo = rep(c(1,2), each = 20))
+  colData = data.frame(BatchInfo = rep(c(1, 2), each = 20))
 )
 
 ChainNoSpikes <- BASiCS_MCMC(
@@ -647,7 +647,7 @@ intervals for gene-specific parameters $\mu_i$ (mean) and $\delta_i$
 ```{r OtherHPD, fig.width = 16, fig.height = 8}
 par(mfrow = c(1, 2))
 plot(ChainSummary, Param = "mu", main = "All genes", log = "y")
-plot(ChainSummary, Param = "delta", 
+plot(ChainSummary, Param = "delta",
      Genes = c(2, 5, 10, 50), main = "5 customized genes"
 )
 ```
@@ -670,7 +670,7 @@ Finally, it is also possible to create a scatterplot of posterior estimates for 
 effect that is observed between mean and over-dispersion. 
 
 ```{r DispVsExp, fig.width = 16, fig.height = 8}
-par(mfrow = c(1,2))
+par(mfrow = c(1, 2))
 plot(ChainSummary,
   Param = "mu", Param2 = "delta",
   log = "x", SmoothPlot = FALSE
@@ -718,7 +718,7 @@ on the MCMC sample of all model parameters).
 
 ```{r DenoisedProp}
 DenoisedRates <- BASiCS_DenoisedRates(
-  Data = Data, Chain = Chain, 
+  Data = Data, Chain = Chain,
   Propensities = FALSE
 )
 DenoisedRates[1:2, 1:2]
