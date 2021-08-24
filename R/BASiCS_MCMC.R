@@ -261,7 +261,8 @@ BASiCS_MCMC <- function(
       SubsetBy = SubsetBy,
       Weighting = Weighting,
       GeneOrder = rownames(Data),
-      CellOrder = rownames(Data),
+      ## can't reorder cells because of _Batch* renaming
+      # CellOrder = colnames(Data),
       BPPARAM = BPPARAM
     )
     return(Chain)
