@@ -260,8 +260,6 @@ BASiCS_MCMC <- function(
       CombineMethod = CombineMethod,
       SubsetBy = SubsetBy,
       Weighting = Weighting,
-      GeneOrder = rownames(Data),
-      CellOrder = rownames(Data),
       BPPARAM = BPPARAM
     )
     return(Chain)
