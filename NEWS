@@ -1586,5 +1586,5 @@ version 2.5.3 (2021-08-11)
 - Add GeneExponent and CellExponent settings for divide and conquer.
 
 version 2.5.4 (2021-08-24)
-- Ensure ordering of genes in chains is consistent with input data
+- Ensure ordering of cells and genes in chains is consistent with input data
   when using divide and conquer
