@@ -1588,3 +1588,6 @@ version 2.5.3 (2021-08-11)
 version 2.5.4 (2021-08-24)
 - Ensure ordering of genes in chains is consistent with input data
   when using divide and conquer
+
+version 2.5.5 (2021-09-17)
+- Update tests for new BiocParallel behaviour

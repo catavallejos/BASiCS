@@ -38,7 +38,7 @@ test_that("MinGenesPerRBF works as expected", {
     PriorParam = pp
   )
   l1 <- c@parameters$RBFLocations
-  expect_equal(round(l1[, 1], digits = 2), c(1.75, 2.18, 2.61, 3.04, 4.34))
+  expect_equal(round(l1[, 1], digits = 2), c(1.76, 2.19, 2.62, 3.04, 3.47))
 })
 
 test_that("MinGenesPerRBF fails with high value (low k)", {
