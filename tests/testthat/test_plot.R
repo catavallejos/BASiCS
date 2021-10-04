@@ -124,13 +124,28 @@ test_that("DE plots work (non-regression)", {
   data(ChainSC)
   data(ChainRNA)
   Test <- BASiCS_TestDE(ChainSC, ChainRNA, Plot = FALSE, PlotOffset = FALSE)
-  BASiCS_PlotDE(Test)
-  BASiCS_PlotDE(Test@Results[[1]])
-  BASiCS_PlotDE(Test@Results[[2]])
+  expect_is(
+    BASiCS_PlotDE(Test),
+    "gg"
+  )
+  expect_is(
+    BASiCS_PlotDE(Test@Results[[1]]),
+    "gg"
+  )
+  expect_is(
+    BASiCS_PlotDE(Test@Results[[2]]),
+    "gg"
+  )
 
   for (type in c("MA", "Grid", "Volcano")) {
-    BASiCS_PlotDE(Test@Results[[1]], Plots = type)
-    BASiCS_PlotDE(Test@Results[[2]], Plots = type)
+    expect_is(
+      BASiCS_PlotDE(Test@Results[[1]], Plots = type),
+      "gg"
+    )
+    expect_is(
+      BASiCS_PlotDE(Test@Results[[2]], Plots = type),
+      "gg"
+    )
   }
 })
 
