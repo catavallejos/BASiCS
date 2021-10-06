@@ -86,7 +86,7 @@ test_that("Spikes + no regression", {
     mintol = 1e-3
   )
 
-  delta1_prior1 <- c(0.73, 0.6, 2.10, 1.2, 0.69)
+  delta1_prior1 <- c(0.73, 0.6, 3.52, 1.2, 0.69)
   delta1_prior1_obs <- round(delta_prior1[1:5, 1], 2)
   expect_equal(delta1_prior1, delta1_prior1_obs)
 
@@ -113,7 +113,7 @@ test_that("Spikes + no regression", {
     mintol = 1e-3
   )
 
-  delta1_prior2 <- c(1.05, 0.75, 1.02, 2.56, 0.65)
+  delta1_prior2 <- c(1.05, 0.75, 1.71, 2.56, 0.65)
   delta1_prior2_obs <- round(delta_prior2[1:5, 1], 2)
   expect_equal(delta1_prior2, delta1_prior2_obs)
 
@@ -158,9 +158,10 @@ test_that("Spikes + no regression", {
     exponent = 1
   )
 
-  s1 <- c(0.18, 0.13, 0.18, 0.32, 0.37)
-  s1_obs <- round(s[1:5], digits = 2)
-  expect_equal(s1, s1_obs)
+  s1 <- c(0.22, 0.12, 0.25, 0.32, 0.41)
+  s1Obs <- round(s[1:5], digits = 2)
+  expect_equal(s1, s1Obs)
+
 
   nu1 <- pmax(0, Start$nu0[seq_len(n)] + rnorm(n, sd = 0.005))
   nu <- BASiCS:::.nuUpdateBatch(
@@ -206,7 +207,7 @@ test_that("Spikes + no regression", {
     exponent = 1,
     mintol = 1e-3
   )
-  theta1 <- 0.58
+  theta1 <- 0.84
   theta1_obs <- round(theta[1, 1], 2)
   expect_equal(theta1, theta1_obs)
 
@@ -277,7 +278,7 @@ test_that("Spikes + regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(6.07, 15.67, 4.81, 12.26, 28.44)
+  mu1 <- c(5.92, 15.67, 6.23, 12.26, 28.44)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
 
@@ -305,20 +306,21 @@ test_that("Spikes + regression", {
     mintol = 1e-3
   )
 
-  delta1 <- c(1.12, 0.75, 1.57, 1.11, 0.64)
+  delta1 <- c(1.39, 0.86, 1.23, 1.5, 0.8)
   delta1_obs <- round(delta[1:5, 1], 2)
   expect_equal(delta1, delta1_obs)
 
-  ind <- c(0, 0, 0, 1, 1)
+  ind <- c(1, 1, 0, 1, 1)
   ind_obs <- delta[1:5, 2]
   expect_equal(ind, ind_obs)
+
 
   beta <- BASiCS:::.betaUpdateReg(
     sigma2 = Start$sigma2,
     VAux = PriorParam$V,
     mAux = PriorParam$m
   )
-  beta1 <- c(-0.16, -0.6, 0.14, 1.54, -0.02)
+  beta1 <- c(0.05, 1.02, 0.48, -0.14, 1.4)
   beta1_obs <- round(beta[1:5, 1], 2)
   expect_equal(beta1, beta1_obs)
 
@@ -334,7 +336,7 @@ test_that("Spikes + regression", {
     q0 = q0,
     exponent = 1
   )
-  expect_equal(round(sigma2, digits = 3), 0.614)
+  expect_equal(round(sigma2, digits = 3), 0.489)
 
   lambda <- BASiCS:::.lambdaUpdateReg(
     delta = Start$delta0,
@@ -346,7 +348,7 @@ test_that("Spikes + regression", {
     lambda1 = Start$lambda0,
     exponent = 1
   )
-  lambda1 <- c(0.6, 1.49, 0.9, 0.9, 0.52)
+  lambda1 <- c(0.14, 0.13, 0.57, 0.28, 0.06)
   lambda1_obs <- round(lambda[1:5, 1], 2)
   expect_equal(lambda1, lambda1_obs)
 })
@@ -406,11 +408,12 @@ test_that("No Spikes + no regression", {
     mintol = 1e-3
   )
 
-  mu1 <- c(10.93, 19.88, 8.65, 10.5, 32.65)
+
+  mu1 <- c(9.02, 24.26, 8.12, 13.85, 38.03)
   mu1_obs <- round(mu[1:5, 1], 2)
   expect_equal(mu1, mu1_obs)
 
-  ind <- c(1, 1, 1, 1, 1)
+  ind <- c(0, 1, 1, 1, 1)
   ind_obs <- mu[1:5, 2]
   expect_equal(ind, ind_obs)
 
@@ -434,11 +437,11 @@ test_that("No Spikes + no regression", {
     mintol = 1e-3
   )
 
-  nu1 <- c(0.46, 0.73, 1.32, 2.58, 0.51)
+  nu1 <- c(0.43, 0.73, 1.31, 2.63, 0.52)
   nu1_obs <- round(nu[1:5, 1], 2)
   expect_equal(nu1, nu1_obs)
 
-  ind <- c(1, 0, 1, 1, 1)
+  ind <- c(1, 1, 0, 1, 1)
   ind_obs <- nu[1:5, 2]
   expect_equal(ind, ind_obs)
 })
@@ -542,7 +545,7 @@ test_that("No Spikes + regression", {
     mintol = 1e-3
   )
 
-  delta1 <- c(0.67, 0.51, 2.08, 2.28, 0.74)
+  delta1 <- c(0.67, 0.51, 1.27, 2.28, 0.74)
   delta1_obs <- round(delta[1:5, 1], 2)
   expect_equal(delta1, delta1_obs)
 

@@ -1594,3 +1594,6 @@ version 2.5.5 (2021-08-24)
 
 version 2.5.6 (2021-10-05)
 - Revert 2.5.5 changes; add expectation to empty tests.
+
+version 2.5.7 (2021-10-05)
+- Fix tests for BiocParallel behaviour.

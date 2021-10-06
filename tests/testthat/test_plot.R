@@ -158,14 +158,23 @@ test_that("DE plots work (regression)", {
     Plot = FALSE,
     PlotOffset = FALSE
   )
-  BASiCS_PlotDE(Test)
-  BASiCS_PlotDE(Test@Results[[1]])
-  BASiCS_PlotDE(Test@Results[[2]])
-  BASiCS_PlotDE(Test@Results[[3]])
+  expect_is(BASiCS_PlotDE(Test), "gg")
+  expect_is(BASiCS_PlotDE(Test@Results[[1]]), "gg")
+  expect_is(BASiCS_PlotDE(Test@Results[[2]]), "gg")
+  expect_is(BASiCS_PlotDE(Test@Results[[3]]), "gg")
   for (type in c("MA", "Grid", "Volcano")) {
-    BASiCS_PlotDE(Test@Results[[1]], Plots = type)
-    BASiCS_PlotDE(Test@Results[[2]], Plots = type)
-    BASiCS_PlotDE(Test@Results[[3]], Plots = type)
+    expect_is(
+      BASiCS_PlotDE(Test@Results[[1]], Plots = type),
+      "gg"
+    )
+    expect_is(
+      BASiCS_PlotDE(Test@Results[[2]], Plots = type),
+      "gg"
+    )
+    expect_is(
+      BASiCS_PlotDE(Test@Results[[3]], Plots = type),
+      "gg"
+    )
   }
 })
 
