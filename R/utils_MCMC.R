@@ -167,13 +167,13 @@
     phi0 <- NULL
 
     # Initialize mu using average 'normalised counts' across cells
-    nCountsBio <- t( t(CountsBio) / s0 )
+    nCountsBio <- t(t(CountsBio) / s0)
     meansBio <- rowMeans(nCountsBio)
     # +1 to avoid zeros as starting values
     meansBio <- ifelse(meansBio == 0, meansBio + 1, meansBio)
     mu0 <- meansBio
   }
-  
+
   # If EB prior, replace mu0 by EB estimate
   if (length(unique(PriorParam$mu.mu)) > 1) {
     mu0 <- .EmpiricalBayesMu(
