@@ -259,7 +259,7 @@ BASiCS_MCMC <- function(
       SubsetBy = SubsetBy,
       PriorParam = PriorParam,
       BPPARAM = BPPARAM,
-      FixNu = SubsetBy == "gene" & WithSpikes,
+      FixNu = SubsetBy == "gene" & !WithSpikes,
       ...
     )
     Chain <- .combine_subposteriors(

@@ -1597,3 +1597,7 @@ version 2.5.6 (2021-10-05)
 
 version 2.5.7 (2021-10-05)
 - Fix tests for BiocParallel behaviour.
+
+version 2.5.8 (2021-11-01)
+- Add FixNu argument to fix scaling parameters to scran normalisation factors
+  when WithSpikes=FALSE
