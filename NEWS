@@ -1601,3 +1601,6 @@ version 2.5.7 (2021-10-05)
 version 2.5.8 (2021-11-01)
 - Add FixNu argument to fix scaling parameters to scran normalisation factors
   when WithSpikes=FALSE
+- Exclude features with absolute estimates of fold change/difference less
+  than the DE threshold when performing differential expression analysis
+  with BASiCS_TestDE.

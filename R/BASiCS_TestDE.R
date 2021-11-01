@@ -265,7 +265,7 @@ BASiCS_TestDE <- function(Chain1,
   ChainTau <- log2(Chain1_offset@parameters$mu / Chain2_offset@parameters$mu)
 
   MuBase <- (Mu1 * n1 + Mu2 * n2) / n
-  
+
   orderVar <- switch(
     OrderVariable,
     "GeneIndex" = order(GeneIndex, decreasing = FALSE),
@@ -363,7 +363,7 @@ BASiCS_TestDE <- function(Chain1,
 
   if (IncludeEpsilon) {
     Results <- c(
-      Results, 
+      Results,
       ResDisp = ResR
     )
   }
