@@ -218,14 +218,14 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
       // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
       thetaAux = thetaUpdateBatch(
         thetaAux.col(0),
-        exp(LSthetaAux), 
+        exp(LSthetaAux),
         BatchDesign,
         BatchSizes,
         sAux,
         nuAux.col(0),
         atheta,
         btheta,
-        n, 
+        n,
         nBatch,
         globalExponent,
         mintol_theta
@@ -233,34 +233,8 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
       PthetaAux += thetaAux.col(1);
       if (i >= Burn) thetaAccept += thetaAux.col(1);
       thetaBatch = BatchDesign * thetaAux.col(0);
-
-      // UPDATE OF NU: 
-      // 1st COLUMN IS THE UPDATE, 
-      // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-      nuAux = nuUpdateBatchNoSpikes(
-        nuAux.col(0),
-        exp(LSnuAux),
-        Counts, 
-        BatchDesign,
-        muAux.col(0),
-        1 / deltaAux.col(0),
-        sAux,
-        thetaBatch,
-        sumByGeneAll,
-        q0,
-        n,
-        y_n,
-        u_n,
-        ind_n,
-        cellExponent,
-        mintol_nu
-      ); 
-      PnuAux += nuAux.col(1);
-      if(i>=Burn) {
-        nuAccept += nuAux.col(1);
-      }
     }
-
+    
     // UPDATE OF MU: 
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
@@ -275,10 +249,10 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     muAux = muUpdateNoSpikes(
       muAux.col(0),
       exp(LSmuAux),
-      Counts, 
+      Counts,
       1 / deltaAux.col(0),
       nuAux.col(0),
-      sumByCellAll, 
+      sumByCellAll,
       mu_mu,
       s2mu,
       q0,
@@ -321,7 +295,35 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     if(i>=Burn) {
       deltaAccept += deltaAux.col(1);
     }
-    
+
+    if (!fixNu) {
+      // UPDATE OF NU: 
+      // 1st COLUMN IS THE UPDATE, 
+      // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+      nuAux = nuUpdateBatchNoSpikes(
+        nuAux.col(0),
+        exp(LSnuAux),
+        Counts,
+        BatchDesign,
+        muAux.col(0),
+        1 / deltaAux.col(0),
+        sAux,
+        thetaBatch,
+        sumByGeneAll,
+        q0,
+        n,
+        y_n,
+        u_n,
+        ind_n,
+        cellExponent,
+        mintol_nu
+      ); 
+      PnuAux += nuAux.col(1);
+      if(i>=Burn) {
+        nuAccept += nuAux.col(1);
+      }
+    }
+
     // STOP ADAPTING THE PROPOSAL VARIANCES AFTER EndAdapt ITERATIONS
     if(i < EndAdapt) {
       // UPDATE OF PROPOSAL VARIANCES (ONLY EVERY 50 ITERATIONS)

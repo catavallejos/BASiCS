@@ -250,30 +250,6 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
         cellExponent
       );
 
-      // UPDATE OF NU: 
-      // 1st COLUMN IS THE UPDATE, 
-      // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
-      nuAux = nuUpdateBatchNoSpikes(
-        nuAux.col(0),
-        exp(LSnuAux),
-        Counts, 
-        BatchDesign,
-        muAux.col(0),
-        1 / deltaAux.col(0),
-        sAux,
-        thetaBatch,
-        sumByGeneAll,
-        q0,
-        n,
-        y_n,
-        u_n,
-        ind_n,
-        cellExponent,
-        mintol_nu
-      );
-      PnuAux += nuAux.col(1);
-      if(i>=Burn) nuAccept += nuAux.col(1);
-
       // UPDATE OF THETA: 
       // 1st ELEMENT IS THE UPDATE, 
       // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -286,7 +262,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
         nuAux.col(0),
         atheta,
         btheta,
-        n, 
+        n,
         nBatch,
         globalExponent,
         mintol_theta
@@ -338,7 +314,8 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
       RBFMinMax,
       RBFLocations,
       geneExponent,
-      mintol_mu);
+      mintol_mu
+    );
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
     
     // UPDATE OF DELTA: 
@@ -350,7 +327,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
       deltaAux.col(0),
       exp(LSdeltaAux),
       Counts,
-      muAux.col(0), 
+      muAux.col(0),
       nuAux.col(0),
       q0,
       n,
@@ -359,7 +336,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
       ind_q0,
       lambdaAux,
       X,
-      sigma2Aux, 
+      sigma2Aux,
       betaAux,
       geneExponent,
       mintol_delta
@@ -368,6 +345,33 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     PdeltaAux += deltaAux.col(1);
     if(i>=Burn) deltaAccept += deltaAux.col(1);
     
+    // for now retaining order of updates
+    if (!fixNu) {
+        // UPDATE OF NU: 
+      // 1st COLUMN IS THE UPDATE, 
+      // 2nd COLUMN IS THE ACCEPTANCE INDICATOR
+      nuAux = nuUpdateBatchNoSpikes(
+        nuAux.col(0),
+        exp(LSnuAux),
+        Counts,
+        BatchDesign,
+        muAux.col(0),
+        1 / deltaAux.col(0),
+        sAux,
+        thetaBatch,
+        sumByGeneAll,
+        q0,
+        n,
+        y_n,
+        u_n,
+        ind_n,
+        cellExponent,
+        mintol_nu
+      );
+      PnuAux += nuAux.col(1);
+      if(i>=Burn) nuAccept += nuAux.col(1);
+    }
+
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = (inv_V0 * geneExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);

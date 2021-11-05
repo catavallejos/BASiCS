@@ -225,7 +225,7 @@ BASiCS_MCMC <- function(
     Regression,
     WithSpikes = TRUE,
     PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
-    FixNu = SubsetBy == "gene" & !WithSpikes,
+    FixNu = FALSE,
     SubsetBy = c("none", "gene", "cell"),
     NSubsets = 1,
     CombineMethod = c("pie", "consensus"),
