@@ -60,9 +60,9 @@ arma::mat muUpdateRegNoSpikes(
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
   #pragma omp parallel for
   for (int i = 0; i < q0; i++) {
-    if (i != RefGene) {
+    if(i != RefGene) {
       for (int j=0; j < n; j++) {
-        log_aux(i) -= (Counts(i, j) + invdelta(i)) *
+        log_aux(i) -= (Counts(i,j) + invdelta(i)) *
           log(
             (nu(j) * mu1(i) + invdelta(i)) / 
             (nu(j) * mu0(i) + invdelta(i))
