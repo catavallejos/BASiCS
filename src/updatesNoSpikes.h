@@ -147,7 +147,7 @@ arma::mat nuUpdateBatchNoSpikes(
   #pragma omp parallel for
   for (int j = 0; j < n; j++) {
     for (int i = 0; i < q0; i++) {
-      log_aux(j) -= (Counts(i, j) + invdelta(i)) *
+      log_aux(j) -= (Counts(i,j) + invdelta(i)) *
         log(
           (nu1(j) * mu(i) + invdelta(i)) / 
           (nu0(j) * mu(i) + invdelta(i)));
