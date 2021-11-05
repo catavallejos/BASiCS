@@ -23,9 +23,9 @@
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
 #' @param PriorParam List of prior parameters for BASiCS_MCMC.
 #' Should be created using \code{\link{BASiCS_PriorParam}}.
-#' @param FixNu Should the scaling normalisation factor \code{nu} be fixed 
-#' to the starting value? When \code{WithSpikes=TRUE}
-#' these are set to scran scaling normalisation factors.
+#' @param FixNu Should the scaling normalisation factor \code{nu} be fixed
+#' to the starting value when \code{WithSpikes=FALSE}?
+#' These are set to scran scaling normalisation factors.
 #' @param SubsetBy Character value specifying whether a divide and
 #' conquer inference strategy should be used. When this is set to \code{"gene"},
 #' inference is performed on batches of genes separately, and when it is set to
