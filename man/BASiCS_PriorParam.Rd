@@ -38,15 +38,15 @@ BASiCS_PriorParam(
 \arguments{
 \item{Data}{\linkS4class{SingleCellExperiment} object (required).}
 
-\item{k}{Number of regression terms, including k - 2 Gaussian 
+\item{k}{Number of regression terms, including k - 2 Gaussian
 radial basis functions (GRBFs).}
 
 \item{mu.mu, s2.mu}{Mean and variance parameters for lognormal prior on mu.}
 
-\item{s2.delta}{Variance parameter for lognormal prior on delta when 
+\item{s2.delta}{Variance parameter for lognormal prior on delta when
 \code{PriorDelta="lognormal"}.}
 
-\item{a.delta, b.delta}{Parameters for gamma prior on delta when 
+\item{a.delta, b.delta}{Parameters for gamma prior on delta when
 \code{PriorDelta="gamma"}.}
 
 \item{p.phi}{Parameter for dirichlet prior on phi.}
@@ -55,19 +55,19 @@ radial basis functions (GRBFs).}
 
 \item{a.theta, b.theta}{Parameters for gamma prior on theta.}
 
-\item{RBFMinMax}{Should GRBFs be placed at the minimum and maximum of 
+\item{RBFMinMax}{Should GRBFs be placed at the minimum and maximum of
 \code{log(mu)}?}
 
 \item{FixLocations}{Should RBFLocations be fixed throughout MCMC, or adaptive
 during burn-in? By default this is \code{FALSE}, but it is set to \code{TRUE}
 if \code{RBFLocations} or \code{MinGenesPerRBF} are specified.}
 
-\item{RBFLocations}{Numeric vector specifying locations of GRBFs in units 
+\item{RBFLocations}{Numeric vector specifying locations of GRBFs in units
 of \code{log(mu)}.}
 
 \item{MinGenesPerRBF}{Numeric scalar specifying the minimum number of genes
-for GRBFs to be retained. If fewer than \code{MinGenesPerRBF} genes have 
-values of \code{log(mu)} within the range of an RBF, it is removed. 
+for GRBFs to be retained. If fewer than \code{MinGenesPerRBF} genes have
+values of \code{log(mu)} within the range of an RBF, it is removed.
 The range covered by each RBF is defined as centre of the RBF plus or minus
 half the distance between RBFs.}
 
@@ -80,10 +80,10 @@ half the distance between RBFs.}
 \item{eta}{Degrees of freedom for t distribution of regresion errors.}
 
 \item{PriorMu}{Indicates if the original prior (\code{PriorMu = 'default'})
-or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be 
+or an empirical Bayes approach (\code{PriorMu = 'EmpiricalBayes'}) will be
 assigned to gene-specific mean expression parameters.}
 
-\item{PriorDelta}{Scalar character specifying the prior type to use for 
+\item{PriorDelta}{Scalar character specifying the prior type to use for
 delta overdispersion parameter. Options are "log-normal" (recommended)
 and "gamma" (used in Vallejos et al. (2015)).}
 
@@ -93,8 +93,8 @@ for the no-spikes version should be chosen randomly at MCMC iterations.}
 \item{ConstrainProp}{Proportion of genes to be considered as reference genes
 if \code{StochasticRef=TRUE}.}
 
-\item{GeneExponent, CellExponent}{Exponents for gene and cell-specific 
-parameters. These should not be outside of divide and conquer MCMC 
+\item{GeneExponent, CellExponent}{Exponents for gene and cell-specific
+parameters. These should not be outside of divide and conquer MCMC
 applications.}
 }
 \value{
@@ -102,7 +102,7 @@ A list containing the prior hyper-parameters that are required to
 run the algoritm implemented in \code{\link[BASiCS]{BASiCS_MCMC}}.
 }
 \description{
-This is a convenience function to allow partial specification of prior 
+This is a convenience function to allow partial specification of prior
 parameters, and to ensure default parameters are consistent across usage
 within the package.
 }

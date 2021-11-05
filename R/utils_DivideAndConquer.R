@@ -1,29 +1,32 @@
-## Balance subsets for total NCounts (sample-wise) or quantile of mean count (gene-wise)
+## Balance subsets for:
+## total NCounts (sample-wise) or quantile of mean count (gene-wise)
+## Do this by:
 ##   1. Divide genes/samples into quantile bins
 ##   2. Sample from each quantile
 ##   3. Check that anova(lm(count ~ batch)) is non-significant
 ##   4. If it is, back to step 2, else go ahead
+
 #' Generate balanced subsets for divide and conquer BASiCS
-#' 
-#' Partitions data based on either cells or genes. Attempts to find a 
+#'
+#' Partitions data based on either cells or genes. Attempts to find a
 #' partitioning scheme which is "balanced" for either total reads per cell
 #' across all genes (partitioning by gene)
 #' or total expression per gene across all cells (partitioning by gene).
 #' When partitioning by cell, at least 20 cells must be in each partition
 #' or BASiCS_MCMC will fail.
-#' If this partitioning fails, it will continue recursively up to a maximum 
+#' If this partitioning fails, it will continue recursively up to a maximum
 #' number of iterations (20 by default).
-#' 
+#'
 #' @param Data a SingleCellExperiment object
-#' @param NSubsets Integer specifying the number of batches into which to 
+#' @param NSubsets Integer specifying the number of batches into which to
 #' divide Data for divide and conquer inference.
 #' @param SubsetBy Partition by "cell" or by "gene".
 #' @param Alpha p-value threshold for ANOVA testing of "balance"
-#' @param WithSpikes Similar to argument for BASiCS_MCMC - do the Data contain 
+#' @param WithSpikes Similar to argument for BASiCS_MCMC - do the Data contain
 #'  spikes?
 #' @param MaxDepth Maximum number of recursive
 #' @param .Depth Internal parameter. Do not set.
-#' 
+#'
 #' @return A list of SingleCellExperiment objects
 .generateSubsets <- function(
     Data,
@@ -209,10 +212,13 @@
       all_colnames <- lapply(Chains, function(x) colnames(x@parameters[["s"]]))
     } else {
       n_param <- "mu"
-      all_colnames <- lapply(Chains, function(x) colnames(x@parameters[["mu"]]))      
+      all_colnames <- lapply(
+        Chains,
+        function(x) colnames(x@parameters[["mu"]])
+      )
     }
     all_colnames <- Reduce(union, all_colnames)
-    num <- length(all_colnames)      
+    num <- length(all_colnames)
   }
 
   weights <- numeric(length(Chains))
@@ -269,7 +275,7 @@
   if ((SubsetBy == "gene" && Param %in% c("mu", "delta", "epsilon")) ||
       (SubsetBy == "cell" && Param %in% c("phi", "nu", "s"))
       ) {
-    sums <- subposterior_matrix 
+    sums <- subposterior_matrix
     if (ncol(sums) > 1) {
       stop(
         "Too many draws for parameter ", Param, ", ", SubsetBy, ": ", Colname
@@ -285,6 +291,10 @@
     }
     sums <- rowSums(subposterior_matrix, na.rm = TRUE)
     sums <- sums / sum(weights, na.rm = TRUE)
+    ## just so it doesn't look weird on a trace?
+    # if (Sort) {
+    #   sums[samples(nrow(sums), nrow(sums)), ]
+    # }
   }
   sums
 }

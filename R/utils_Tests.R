@@ -25,11 +25,11 @@
   #     1.1.2. If optimal prob is too low - fix to input ProbThreshold
   #   1.2 If calibration completely fails - default prob to 0.9 (conservative)
   # 2. If EFDR is not provided - fix to input ProbThreshold
-  
-  if(!is.null(EFDR)) {
+
+  if (!is.null(EFDR)) {
     # 1. If EFDR is provided - run calibration 
      ProbThresholds <- seq(0.5, 0.9995, by = 0.00025)
-  
+
     ## Evaluate EFDR/EFNR for a grid of thresholds
     EFDRgrid <- vapply(
       ProbThresholds,
@@ -44,7 +44,6 @@
       Prob = Probs
     )
     AbsDiff <- abs(EFDRgrid - EFDR)
-  
 
     # 1.2 If calibration completely fails - default prob to 0.9 (conservative)
     if (sum(!is.na(AbsDiff)) == 0) {
@@ -56,7 +55,7 @@
       return(
         list(
           OptThreshold = OptThreshold,
-          EFDRgrid = EFDRgrid, 
+          EFDRgrid = EFDRgrid,
           EFNRgrid = EFNRgrid
         )
       )
@@ -64,8 +63,7 @@
 
     # 1.1. If the calibration doesn't completely fail
     # Search EFDR closest to the desired value
-    EFDRopt <- EFDRgrid[AbsDiff  == min(AbsDiff , na.rm = TRUE) & 
-      !is.na(AbsDiff)]
+    EFDRopt <- EFDRgrid[AbsDiff  == min(AbsDiff, na.rm = TRUE) & !is.na(AbsDiff)]
     # If multiple threholds lead to same EFDR, choose the one with lowest EFNR
     EFNRopt <- EFNRgrid[EFDRgrid == mean(EFDRopt) & !is.na(EFDRgrid)]
     if (sum(!is.na(EFNRopt)) > 0) {
@@ -75,10 +73,10 @@
     }
     # Quick fix for EFDR/EFNR ties; possibly not an issue in real datasets
     optimal <- median(round(median(optimal)))
-  
+
     if (ProbThresholds[optimal] >= ProbThreshold) {
       # 1.1.1. If optimal prob is not too low - set prob to optimal
-      
+
       OptThreshold <- c(ProbThresholds[optimal],
                         EFDRgrid[optimal], 
                         EFNRgrid[optimal])
@@ -90,17 +88,15 @@
       }
     } else {
       # 1.1.2. If optimal prob is too low - fix to input probs
-      
       EFDRgrid_2 <- .EFDR(ProbThreshold, Probs)
       EFNRgrid_2 <- .EFNR(ProbThreshold, Probs)
-      
       OptThreshold <- c(ProbThreshold, EFDRgrid_2, EFNRgrid_2)  
       message(
         "For ", Task, " task:\n",
         "the posterior probability threshold chosen via EFDR calibration",
         "is too low. Probability threshold automatically set equal to",
-        "'ProbThreshold", Suffix, "'.")
-      
+        "'ProbThreshold", Suffix, "'."
+      )
     }
   } else {
     # 2. If EFDR is not provided - fix to given ProbThreshold
@@ -108,13 +104,12 @@
     EFNRgrid <- .EFNR(ProbThreshold, Probs)
     OptThreshold <- c(ProbThreshold, EFDRgrid[1], EFNRgrid[1])
     ProbThresholds <- ProbThreshold
-    
     message(
       "EFDR = NULL for ", Task, " task:\n",
       "Probability threshold automatically set equal to",
       "'ProbThreshold", Suffix, "'.")
-  } 
-  
+  }
+
   # return results
   list(
     OptThreshold = OptThreshold,
@@ -132,9 +127,10 @@
     n2,
     GenesSelect,
     GroupLabel1,
-    GroupLabel2, 
+    GroupLabel2,
     Prob,
     OptThreshold,
+    Epsilon,
     GeneName,
     Measure,
     GoodESS,
@@ -148,6 +144,7 @@
     Prob = Prob,
     Threshold = OptThreshold[[1]],
     Estimate = Median,
+    Epsilon = Epsilon,
     Label1 = GroupLabel1,
     Label2 = GroupLabel2,
     GenesSelect = GenesSelect,
@@ -176,7 +173,7 @@
   # Rounding to 3 decimal points
   IndNumeric <- vapply(Table, is.numeric, logical(1))
   Table[, IndNumeric] <- round(Table[, IndNumeric], digits = 3)
-  
+
   Table
 }
 
@@ -184,6 +181,7 @@
 .TestResults <- function(Prob,
                          Threshold,
                          Estimate,
+                         Epsilon,
                          Label1,
                          Label2,
                          GenesSelect,
@@ -191,11 +189,14 @@
                          Excluded = NULL) {
 
   # Which genes are + in each group
-  Plus1 <- which(Prob > Threshold & Estimate > 0)
-  Plus2 <- which(Prob > Threshold & Estimate < 0)
+  Plus1 <- Prob > Threshold & Estimate > 0
+  Plus2 <- Prob > Threshold & Estimate < 0
   Result <- rep("NoDiff", length(Estimate))
   Result[Plus1] <- paste0(Label1, "+")
   Result[Plus2] <- paste0(Label2, "+")
+  ## exclude features with abs(median) < Epsilon
+  SmallDiff <- abs(Estimate) < Epsilon
+  Result[(Plus1 | Plus2) & SmallDiff] <- "ExcludedSmallDiff"
   if (!is.null(Excluded)) {
     Result[Excluded] <- "ExcludedFromTesting"
   }
@@ -246,11 +247,12 @@
     Param2 = Param2,
     n1 = n1,
     n2 = n2,
-    GenesSelect = GenesSelect, 
+    GenesSelect = GenesSelect,
     GroupLabel1 = GroupLabel1,
     GroupLabel2 = GroupLabel2,
     Prob = Prob,
     OptThreshold = OptThreshold,
+    Epsilon = Epsilon,
     GeneName = GeneName,
     Measure = Measure,
     GoodESS = GoodESS,
@@ -258,7 +260,7 @@
   )
 
   new(
-    "BASiCS_ResultDE", 
+    "BASiCS_ResultDE",
     Table = Table,
     Name = Measure,
     GroupLabel1 = GroupLabel1,

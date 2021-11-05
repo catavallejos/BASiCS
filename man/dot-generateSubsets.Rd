@@ -17,14 +17,14 @@
 \arguments{
 \item{Data}{a SingleCellExperiment object}
 
-\item{NSubsets}{Integer specifying the number of batches into which to 
+\item{NSubsets}{Integer specifying the number of batches into which to
 divide Data for divide and conquer inference.}
 
 \item{SubsetBy}{Partition by "cell" or by "gene".}
 
 \item{Alpha}{p-value threshold for ANOVA testing of "balance"}
 
-\item{WithSpikes}{Similar to argument for BASiCS_MCMC - do the Data contain 
+\item{WithSpikes}{Similar to argument for BASiCS_MCMC - do the Data contain
 spikes?}
 
 \item{MaxDepth}{Maximum number of recursive}
@@ -35,12 +35,12 @@ spikes?}
 A list of SingleCellExperiment objects
 }
 \description{
-Partitions data based on either cells or genes. Attempts to find a 
+Partitions data based on either cells or genes. Attempts to find a
 partitioning scheme which is "balanced" for either total reads per cell
 across all genes (partitioning by gene)
 or total expression per gene across all cells (partitioning by gene).
 When partitioning by cell, at least 20 cells must be in each partition
 or BASiCS_MCMC will fail.
-If this partitioning fails, it will continue recursively up to a maximum 
+If this partitioning fails, it will continue recursively up to a maximum
 number of iterations (20 by default).
 }

@@ -1597,3 +1597,10 @@ version 2.5.6 (2021-10-05)
 
 version 2.5.7 (2021-10-05)
 - Fix tests for BiocParallel behaviour.
+
+version 2.7.1 (2021-11-03)
+- Add FixNu argument to fix scaling parameters to scran normalisation factors
+  when WithSpikes=FALSE
+- Exclude features with absolute estimates of fold change/difference less
+  than the DE threshold when performing differential expression analysis
+  with BASiCS_TestDE.

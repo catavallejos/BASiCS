@@ -23,6 +23,9 @@
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
 #' @param PriorParam List of prior parameters for BASiCS_MCMC.
 #' Should be created using \code{\link{BASiCS_PriorParam}}.
+#' @param FixNu Should the scaling normalisation factor \code{nu} be fixed
+#' to the starting value when \code{WithSpikes=FALSE}?
+#' These are set to scran scaling normalisation factors.
 #' @param SubsetBy Character value specifying whether a divide and
 #' conquer inference strategy should be used. When this is set to \code{"gene"},
 #' inference is performed on batches of genes separately, and when it is set to
@@ -222,6 +225,7 @@ BASiCS_MCMC <- function(
     Regression,
     WithSpikes = TRUE,
     PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
+    FixNu = FALSE,
     SubsetBy = c("none", "gene", "cell"),
     NSubsets = 1,
     CombineMethod = c("pie", "consensus"),
@@ -238,7 +242,9 @@ BASiCS_MCMC <- function(
 
   if (SubsetBy != "none" && NSubsets != 1) {
     if (SubsetBy == "cell") {
-      warning("Divide and conquer inference using cell-wise partitions is not recommended.")
+      warning(
+        "Divide and conquer using cell-wise partitions is not recommended."
+      )
     }
     CombineMethod <- match.arg(CombineMethod)
     Weighting <- match.arg(Weighting)
@@ -253,6 +259,7 @@ BASiCS_MCMC <- function(
       SubsetBy = SubsetBy,
       PriorParam = PriorParam,
       BPPARAM = BPPARAM,
+      FixNu = FixNu,
       ...
     )
     Chain <- .combine_subposteriors(
@@ -295,7 +302,7 @@ BASiCS_MCMC <- function(
     PriorParam = PriorParam,
     ...
   )
-  
+
   # Starting values for the MCMC (parameters and adaptive variances)
   # Loaded separately to simplify calling to the elements of its list
   # Same for prior parameters
@@ -369,6 +376,7 @@ BASiCS_MCMC <- function(
     RefGenes = ArgsDef$RefGenes,
     ConstrainGene = ArgsDef$ConstrainGene,
     NotConstrainGene = ArgsDef$NotConstrainGene,
+    fixNu = FixNu,
     StochasticRef = as.numeric(PriorParam$StochasticRef)
   )
 

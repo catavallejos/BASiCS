@@ -141,8 +141,8 @@ arma::mat nuUpdateBatchNoSpikes(
   
   // ACCEPT/REJECT STEP
   arma::vec log_aux = (log(nu1) - log(nu0)) % 
-    ((sum_bygene_all + 1 / thetaBatch) * exponent);
-  log_aux -= (nu1 - nu0) % (1 / (thetaBatch % s * exponent)); 
+    (sum_bygene_all + (1 / thetaBatch * exponent));
+  log_aux -= (nu1 - nu0) % (exponent / (thetaBatch % s));
   
   #pragma omp parallel for
   for (int j = 0; j < n; j++) {

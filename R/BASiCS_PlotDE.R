@@ -202,7 +202,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   )
   mdf <- reshape2::melt(df,measure.vars = c("EFDR", "EFNR"))
   ggplot2::ggplot(mdf, 
-      aes_string(x = "ProbThresholds", y = "value", color = "variable")
+      aes_string(x = "ProbThresholds", y = "value", colour = "variable")
     ) +
     ggplot2::geom_line(na.rm = TRUE) +
     ggplot2::labs(
@@ -211,7 +211,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       # ,title = paste("Differential", .MeasureName(Measure))
     ) +
     ggplot2::ylim(c(0, 1)) +
-    ggplot2::scale_color_brewer(name = "", palette = "Set2") +
+    ggplot2::scale_colour_brewer(name = "", palette = "Set2") +
     ggplot2::geom_hline(
       aes(yintercept = EFDR, colour = "Selected\nEFDR"),
       lty = 2,
@@ -238,7 +238,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   dVar <- paste0(Measure, .DistanceVar(Measure))
   rVar <- paste0("ResultDiff", Measure)
   pVar <- paste0("ProbDiff", Measure)
-  Table$IndDiff <- DiffExp(Table[[rVar]])
+  Table$IndDiff <- .DiffExp(Table[[rVar]])
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, .DistanceVar(Measure))]],
   #   Table[[paste0("ProbDiff", Measure)]]
@@ -249,12 +249,13 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       Table,
       ggplot2::aes_string(
         x = dVar,
-        y = pVar)
+        y = pVar
+      )
     ) +
     ggplot2::geom_point(
-      ggplot2::aes_string(color = rVar),
+      ggplot2::aes_string(colour = rVar),
       shape = 16,
-      alpha = 0.7
+      alpha = 0.6
     ) +
     # ggplot2::geom_hex(
     #   bins = bins,
@@ -266,25 +267,25 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     #   shape = 16,
     #   col = "violetred",
     #   na.rm = TRUE,
-    #   alpha = 0.8
+    #   alpha = 0.6
     # ) +
     # viridis::scale_fill_viridis(name = "Density", guide = "none") +
     ggplot2::geom_vline(
       xintercept = c(-Epsilon, Epsilon),
       lty = "dashed",
-      color = "grey40",
+      colour = "grey40",
       na.rm = TRUE
     ) +
     ggplot2::geom_hline(
-      yintercept = ProbThreshold, 
-      lty = "dashed", 
-      color = "grey40", 
+      yintercept = ProbThreshold,
+      lty = "dashed",
+      colour = "grey40",
       na.rm = TRUE
     ) +
     ggplot2::ylim(c(0, 1)) +
-    # ggplot2::scale_color_brewer(palette = "Set1", name = NULL) +
-    ggplot2::scale_color_manual(
-      values = ColourMap(Table, dVar, rVar),
+    # ggplot2::scale_colour_brewer(palette = "Set1", name = NULL) +
+    ggplot2::scale_colour_manual(
+      values = .ColourMap(Table, dVar, rVar),
       drop = TRUE,
       name = NULL
     ) +
@@ -302,7 +303,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
 
   dVar <- paste0(Measure, .DistanceVar(Measure))
   rVar <- paste0("ResultDiff", Measure)
-  Table$IndDiff <- DiffExp(Table[[rVar]])
+  Table$IndDiff <- .DiffExp(Table[[rVar]])
   # bins <- NClassFD2D(
   #   Table[[paste0(Measure, "Overall")]],
   #   Table[[paste0(Measure, .DistanceVar(Measure))]]
@@ -317,7 +318,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       Table,
       # Table[!IndDiff, ],
       ggplot2::aes_string(
-        # x = paste0(Measure, "Overall"), 
+        # x = paste0(Measure, "Overall"),
         x = if (!is.null(Mu)) "`_Mu`" else paste0(Measure, "Overall"),
         y = dVar
       )
@@ -329,25 +330,25 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     # ) +
     # ggplot2::geom_point(
     #   data = Table[IndDiff, ],
-    #   shape = 16, 
-    #   colour = "violetred", 
+    #   shape = 16,
+    #   colour = "violetred",
     #   na.rm = TRUE,
-    #   alpha = 0.8
+    #   alpha = 0.6
     # ) +
     # viridis::scale_fill_viridis(name = "Density", guide = "none") +
     ggplot2::geom_point(
-      ggplot2::aes_string(color = rVar),
+      ggplot2::aes_string(colour = rVar),
       shape = 16,
-      alpha = 0.7
+      alpha = 0.6
     ) +
     ggplot2::geom_hline(
-      yintercept = c(-Epsilon, Epsilon), 
+      yintercept = c(-Epsilon, Epsilon),
       lty = "dashed", 
-      color = "grey40"
+      colour = "grey40"
     ) +
     xscale +
-    ggplot2::scale_color_manual(
-      values = ColourMap(Table, dVar, rVar),
+    ggplot2::scale_colour_manual(
+      values = .ColourMap(Table, dVar, rVar),
       drop = TRUE,
       name = NULL
     ) +
@@ -361,18 +362,20 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     )
 }
 
-DiffExp <- function(res) {
+.DiffExp <- function(res) {
   !res %in% c(
-    "ExcludedByUser", "ExcludedFromTesting", "ExcludedLowESS", "NoDiff"
+    "ExcludedByUser", "ExcludedFromTesting", "ExcludedLowESS", "NoDiff",
+    "ExcludedSmallDiff"
   )
 }
 
-ColourMap <- function(Table, dVar, rVar) {
+.ColourMap <- function(Table, dVar, rVar) {
   colour_map <- c(
     "NoDiff" = "black",
     "ExcludedByUser" = "grey",
     "ExcludedLowESS" = "grey80",
-    "ExcludedFromTesting" = "grey50"
+    "ExcludedFromTesting" = "grey50",
+    "ExcludedSmallDiff" = "grey30"
   )
   ind_sig_up <- which(Table$IndDiff & Table[[dVar]] > 0)
   ind_sig_down <- which(Table$IndDiff & Table[[dVar]] < 0)
