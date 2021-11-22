@@ -164,8 +164,8 @@
     stringsAsFactors = FALSE
   )
 
-  if (Measure == "epsilon") {
-    Table$MeasureFC <- NULL
+  if (Measure == "ResDisp") {
+    Table$MEASUREFC <- NULL
   }
   colnames(Table) <- gsub("MEASURE", Measure, colnames(Table))
   colnames(Table) <- gsub("DISTANCE", .DistanceVar(Measure), colnames(Table))
@@ -295,7 +295,6 @@
 }
 
 .CheckProbEFDR <- function(ProbThreshold, EFDR, Suffix = NULL) {
-  
   if (!is.null(ProbThreshold)) {
     if (ProbThreshold < 0 | ProbThreshold > 1 | !is.finite(ProbThreshold)) {
       stop(paste0("'ProbThreshold", Suffix, "' must be contained in (0,1) \n"))
