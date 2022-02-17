@@ -304,7 +304,7 @@
 }
 
 .iterate_chains <- function(Param, Chains, Fun, ...) {
-  message("Combining batch posteriors for ", Param, "\n")
+  message("Combining batch posteriors for ", Param)
   param_vals <- Chains[[1]]@parameters[[Param]]
 
   all_colnames <- lapply(
