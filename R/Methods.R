@@ -255,7 +255,7 @@ setMethod(
           if (Params[p] %in% c("phi", "s", "nu")) {
             Sel <- SelCells
           }
-          out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel]
+          out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel, drop = FALSE]
         }
       }
     }
