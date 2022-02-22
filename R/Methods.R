@@ -243,16 +243,20 @@ setMethod(
 
     out <- list()
     for(p in seq_len(length(Params))) {
-      if (Params[p] %in% c("theta", "beta", "sigma2")) {
-        out[[p]] <- get(Params[p], x@parameters)[Iterations, , drop = FALSE]
+      if (Params[p] %in% .OtherParams()) {
+        out[[p]] <- get(Params[p], x@parameters)
       } else {
-        if (Params[p] %in% c("mu", "delta", "epsilon")) {
-          Sel <- SelGenes
+        if (Params[p] %in% c("theta", "beta", "sigma2")) {
+          out[[p]] <- get(Params[p], x@parameters)[Iterations, , drop = FALSE]
+        } else {
+          if (Params[p] %in% c("mu", "delta", "epsilon")) {
+            Sel <- SelGenes
+          }
+          if (Params[p] %in% c("phi", "s", "nu")) {
+            Sel <- SelCells
+          }
+          out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel]
         }
-        if (Params[p] %in% c("phi", "s", "nu")) {
-          Sel <- SelCells
-        }
-        out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel]
       }
     }
     names(out) <- Params

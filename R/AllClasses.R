@@ -71,24 +71,28 @@ setClass(
     }
 
     ValidNames <- c(
-      "mu",
-      "delta",
-      "phi",
-      "s",
-      "nu",
-      "theta",
-      "beta",
-      "sigma2",
-      "epsilon",
-      "RefFreq",
-      "designMatrix",
-      "RBFLocations",
-      "ESS",
-      "ls.mu",
-      "ls.delta",
-      "ls.phi",
-      "ls.nu",
-      "ls.theta"
+      .GeneParams(),
+      .CellParams(),
+      .GlobalParams(),
+      .OtherParams()
+      # "mu",
+      # "delta",
+      # "phi",
+      # "s",
+      # "nu",
+      # "theta",
+      # "beta",
+      # "sigma2",
+      # "epsilon",
+      # "RefFreq",
+      # "designMatrix",
+      # "RBFLocations",
+      # "ESS",
+      # "ls.mu",
+      # "ls.delta",
+      # "ls.phi",
+      # "ls.nu",
+      # "ls.theta"
     )
     ReqNames <- c(
       "mu",

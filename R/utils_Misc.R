@@ -86,6 +86,8 @@ ess <- function(x) {
 
 .GeneParams <- function() c("mu", "delta", "epsilon", "lambda")
 .CellParams <- function() c("s", "phi", "nu")
+.GlobalParams <- function() c("theta", "beta", "sigma2")
+.OtherParams <- function() c("RefFreq", "designMatrix", "RBFLocations", "ESS", paste("ls", c("mu", "delta", "phi", "nu", "theta"), sep = "."))
 
 .NClassFD2D <- function(x, y) {
   max(nclass.FD(x), nclass.FD(y))

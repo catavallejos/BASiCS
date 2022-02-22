@@ -33,6 +33,15 @@ test_that("subset", {
   expect_equal(dim(sc@parameters$nu), c(10, 2))
 })
 
+test_that("subset with reffreq", {
+  Data <- makeExampleBASiCS_Data()
+  Chain <- BASiCS_MCMC(
+    Data, N = 50, Thin = 2, Burn = 10,   Regression = TRUE,
+    PrintProgress = FALSE, WithSpikes = FALSE
+  )
+  expect_error(subset(Chain, Genes = c("Gene1", "Gene2")), NA)
+})
+
 test_that("dimnames", {
   data(ChainSC)
   expect_equal(colnames(ChainSC), colnames(ChainSC@parameters$nu))
