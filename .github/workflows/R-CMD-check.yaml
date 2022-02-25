@@ -11,18 +11,18 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     container: ${{ matrix.config.image }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }} - ${{ matrix.config.bioc }} - ${{ matrix.config.image }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.bioc }} - ${{ matrix.config.image }})
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-latest, bioc-version: 'release'}
-          - { os: windows-latest, bioc-version: 'devel'}
-          - { os: macOS-latest, bioc-version: 'release'}
-          - { os: macOS-latest, bioc-version: 'devel'}
-          - { os: ubuntu-latest, bioc-version: 'release'}
-          - { os: ubuntu-latest, bioc-version: 'devel'}
+          - { os: windows-latest, bioc: 'release'}
+          - { os: windows-latest, bioc: 'devel'}
+          - { os: macOS-latest, bioc: 'release'}
+          - { os: macOS-latest, bioc: 'devel'}
+          - { os: ubuntu-latest, bioc: 'release'}
+          - { os: ubuntu-latest, bioc: 'devel'}
           # - { os: ubuntu-latest, image: 'bioconductor/bioconductor_docker:devel'}
 
     env:
@@ -45,7 +45,7 @@ jobs:
         uses: grimbough/bioc-actions/setup-bioc@v1-branch
         if: matrix.config.image == null
         with:
-          r-version: ${{ matrix.config.r }}
+          bioc-version: ${{ matrix.config.bioc }}
 
       - name: Set up pandoc
         uses: r-lib/actions/setup-pandoc@master
