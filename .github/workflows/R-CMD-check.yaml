@@ -56,12 +56,12 @@ jobs:
           install.packages('remotes')
         shell: Rscript {0}
 
-      - name: Set BiocManager version
-        if: matrix.config.image == null
-        run: |
-          install.packages('BiocManager')
-          BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE)
-        shell: Rscript {0}
+      # - name: Set BiocManager version
+      #   if: matrix.config.image == null
+      #   run: |
+      #     install.packages('BiocManager')
+      #     BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE)
+      #   shell: Rscript {0}
 
       - name: Query dependencies
         run: |
