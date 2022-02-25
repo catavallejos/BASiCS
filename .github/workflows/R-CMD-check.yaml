@@ -42,7 +42,7 @@ jobs:
       #     r-version: ${{ matrix.config.r }}
 
       - name: Set up R
-        uses: grimbough/bioc-actions/setup-bioc@v1-branch
+        uses: grimbough/bioc-actions/setup-bioc@v1
         if: matrix.config.image == null
         with:
           bioc-version: ${{ matrix.config.bioc }}
