@@ -33,6 +33,29 @@ ess <- function(x) {
   measure_name
 }
 
+.Rhat <- function(Chains, Param = "mu") {
+  nchains <- length(Chains@chains)
+  ndraws <- nrow(Chains@chains[[1]]@parameters[[Param]])
+  nparams <- ncol(Chains@chains[[1]]@parameters[[Param]])
+  draws <- array(
+    dim = c(
+      ndraws,
+      nchains,
+      nparams
+    )
+  )
+  for (i in 1:nchains) {
+    draws[, i, ] <- Chains@chains[[i]]@parameters[[Param]]
+  }
+  rv <- posterior::rvar(
+    draws,
+    with_chains = TRUE
+  )
+  posterior::rhat(
+    rv
+  )
+}
+
 #' @importFrom coda geweke.diag
 .GetMeasure <- function(Chain, 
                         Parameter,

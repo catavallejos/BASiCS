@@ -12,6 +12,7 @@ BASiCS_MCMC(
   Regression,
   WithSpikes = TRUE,
   PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
+  NChains = 1,
   FixNu = FALSE,
   SubsetBy = c("none", "gene", "cell"),
   NSubsets = 1,
@@ -49,6 +50,8 @@ in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.}
 
 \item{PriorParam}{List of prior parameters for BASiCS_MCMC.
 Should be created using \code{\link{BASiCS_PriorParam}}.}
+
+\item{NChains}{Integer specifying the number of chains to be run.}
 
 \item{FixNu}{Should the scaling normalisation factor \code{nu} be fixed
 to the starting value when \code{WithSpikes=FALSE}?

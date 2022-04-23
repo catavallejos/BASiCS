@@ -155,3 +155,109 @@ BASiCS_showFit <- function(...) {
   .Deprecated("BASiCS_ShowFit")
   BASiCS_ShowFit(...)
 }
+
+#' todo document
+BASiCS_ShowMultiFit <- function(
+    object,
+    variance = 1.2,
+    Uncertainty = TRUE, ## HPD of curve
+    Variability = TRUE ## chain-to-chain variability
+  ) {
+
+  if (!inherits(object, "BASiCS_MultiChain")) {
+    stop(paste0("Incorrect class for object:", class(object)))
+  }
+
+  if (!("beta" %in% names(object@chains[[1]]@parameters))) {
+    stop("'beta' is missing. Regression was not performed.")
+  }
+  mu_mat <- sapply(object@chains,
+    function(chain) {
+      colMedians(chain@parameters$mu)
+    }
+  )
+  delta_mat <- sapply(object@chains,
+    function(chain) {
+      colMedians(chain@parameters$delta)
+    }
+  )
+  mu <- rowMeans(mu_mat)
+  delta <- rowMeans(delta_mat)
+  mu_r <- log(apply(mu_mat, 1, range))
+  delta_r <- log(apply(delta_mat, 1, range))
+
+  geoms <- lapply(seq_along(object@chains),
+    function(i) {
+      chain <- object@chains[[i]]
+      m <- log(chain@parameters$mu[1, ])
+      grid.mu <- seq(round(min(m), digits = 2),
+                     round(max(m), digits = 2), length.out = 1000)
+
+      # Create design matrix across the grid
+      n <- ncol(chain@parameters$beta)
+      range <- diff(range(grid.mu))
+      if (is.null(myu <- chain@parameters$RBFLocations)) {
+        myu <- seq(min(grid.mu), by = range/(n-3), length.out = n-2)
+      }
+      h <- diff(myu) * variance
+
+      B <- matrix(1, length(grid.mu), n)
+      B[, 2] <- grid.mu
+      for (j in seq_len(n - 2)) {
+        B[, j+2] = exp(-0.5 * (grid.mu - myu[j])^2 / (h[1]^2))
+      }
+
+      # Calculate yhat = X*beta
+      yhat <- apply(chain@parameters$beta, 1, function(n) B%*%n)
+      yhat.HPD <- coda::HPDinterval(coda::mcmc(t(yhat)), 0.95)
+
+      df2 <- data.frame(
+        mu2 = grid.mu,
+        yhat = rowMedians(yhat),
+        yhat.upper = yhat.HPD[, 2],
+        yhat.lower = yhat.HPD[, 1],
+        Chain = as.character(i)
+      )
+      geom <- list(
+        ggplot2::geom_line(
+          data = df2,
+          inherit.aes = FALSE,
+          mapping = ggplot2::aes_string(
+            x = "mu2", y = "yhat",
+            colour = "Chain"
+          )
+        )
+      )
+      if (Uncertainty) {
+        geom <- c(geom,
+          list(
+            geom_ribbon(
+              data = df2,
+              inherit.aes = FALSE,
+              mapping = aes_string(
+                x = "mu2",
+                ymin = "yhat.lower",
+                ymax = "yhat.upper",
+                fill = "Chain"
+              ),
+              alpha = 0.25
+            )
+          )
+        )
+      }
+      geom
+    }
+  )
+  g <- ggplot() +
+    aes(log(mu), log(delta))
+  if (Variability) {
+    g <- g + 
+      ggplot2::geom_pointrange(aes(xmin = mu_r[1, ], xmax = mu_r[2, ])) +
+      ggplot2::geom_pointrange(aes(ymin = delta_r[1, ], ymax = delta_r[2, ]))
+  } else {
+    g <- g + geom_point()
+  }
+  g +
+    geoms +
+    ggplot2::scale_colour_brewer(palette = "Set1", aesthetics = c("fill", "colour"))
+}

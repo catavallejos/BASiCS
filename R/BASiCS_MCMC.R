@@ -23,6 +23,7 @@
 #' in \code{colData(Data)}. Default: \code{WithSpikes = TRUE}.
 #' @param PriorParam List of prior parameters for BASiCS_MCMC.
 #' Should be created using \code{\link{BASiCS_PriorParam}}.
+#' @param NChains Integer specifying the number of chains to be run.
 #' @param FixNu Should the scaling normalisation factor \code{nu} be fixed
 #' to the starting value when \code{WithSpikes=FALSE}?
 #' These are set to scran scaling normalisation factors.
@@ -225,6 +226,7 @@ BASiCS_MCMC <- function(
     Regression,
     WithSpikes = TRUE,
     PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
+    NChains = 1,
     FixNu = FALSE,
     SubsetBy = c("none", "gene", "cell"),
     NSubsets = 1,
@@ -240,6 +242,27 @@ BASiCS_MCMC <- function(
     NSubsets)
   SubsetBy <- match.arg(SubsetBy)
 
+  if (NChains > 1) {
+    return(
+      BASiCS_MultiMCMC(
+        Data = Data,
+        N = N,
+        Thin = Thin,
+        Burn = Burn,
+        Regression = Regression,
+        WithSpikes = WithSpikes,
+        PriorParam = PriorParam,
+        FixNu = FixNu,
+        SubsetBy = SubsetBy,
+        NSubsets = NSubsets,
+        CombineMethod = CombineMethod,
+        Weighting = Weighting,
+        Threads = Threads,
+        NChains = NChains,
+        BPPARAM = BPPARAM
+      )
+    )
+  }
   if (SubsetBy != "none" && NSubsets != 1) {
     if (SubsetBy == "cell") {
       warning(

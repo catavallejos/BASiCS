@@ -61,7 +61,8 @@ Imports:
     assertthat,
     reshape2,
     BiocParallel,
-    hexbin
+    hexbin,
+    posterior
 Suggests:
     BiocStyle,
     knitr,
@@ -96,8 +97,10 @@ Collate:
     'BASiCS_LoadChain.R'
     'BASiCS_MCMC.R'
     'BASiCS_MockSCE.R'
+    'BASiCS_MultiChain.R'
     'BASiCS_Package.R'
     'BASiCS_PlotDE.R'
+    'BASiCS_PlotMultiChain.R'
     'BASiCS_PlotOffset.R'
     'BASiCS_PriorParam.R'
     'BASiCS_ShowFit.R'
