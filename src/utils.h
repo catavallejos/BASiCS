@@ -3,7 +3,9 @@
 
 #include "libraries.h"
 
-#define ZTOL sqrt(DOUBLE_EPS)
+#define ZTOL sqrt(std::numeric_limits<double>::epsilon())
+
+
 /* 
 * Rgig is an adaptation of the rgig.c function implemented by 
 * Ester Pantaleo and Robert B. Gramacy, 2010
@@ -92,7 +94,7 @@ double zeroin_gig(double ax,double bx,
   a = b;  b = c;  c = a;      /* best approximation     */
   fa=fb;  fb=fc;  fc=fa;
   }
-  tol_act = 2.0*DOUBLE_EPS*fabs(b) + tol/2.0;
+  tol_act = 2.0*std::numeric_limits<double>::epsilon()*fabs(b) + tol/2.0;
   new_step = (c-b)/2.0;
   
   if( fabs(new_step) <= tol_act || fb == (double)0 )
