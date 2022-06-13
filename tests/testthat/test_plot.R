@@ -1,5 +1,3 @@
-context("plots")
-
 test_that("plot of chain works", {
   data(ChainSCReg)
   expect_error({
@@ -80,13 +78,13 @@ test_that("Diagnostic plot works", {
   data(ChainSCReg)
   expect_warning(BASiCS_diagPlot(ChainSCReg), "deprecated")
   g <- BASiCS_DiagPlot(ChainSCReg)
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagPlot(ChainSCReg, Param = "delta")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagPlot(ChainSCReg, Param = "epsilon")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagPlot(ChainSCReg, Param = "delta", x = "mu", y = "epsilon")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   expect_error(
     BASiCS_DiagPlot(ChainSCReg, Param = "nu", x = "mu", y = "epsilon"),
     "Invalid combination of parameters"
@@ -96,27 +94,27 @@ test_that("Diagnostic plot works", {
     "Invalid combination of parameters:"
   )
   g <- BASiCS_DiagPlot(ChainSCReg, Param = "delta", x = "mu", y = "epsilon")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
 
   ChainSCReg@parameters[["epsilon"]][, 1] <- NA
   g <- BASiCS_DiagPlot(ChainSCReg, Param = "epsilon", x = "mu", y = "epsilon")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagPlot(ChainSCReg, Param = "epsilon")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
 })
 
 
-test_that("Diagnostic hist work", {
+test_that("Diagnostic hist works", {
   data(ChainSCReg)
   data(ChainSC)
-  expect_warning(g <- BASiCS_diagHist(ChainSCReg), "deprecated")
-  expect_is(g, "ggplot")
+  expect_warning(g <- BASiCS_diagHist(ChainSCReg, Param = "mu"), "deprecated")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagHist(ChainSC, Param = "delta")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagHist(ChainSC, Param = "nu")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
   g <- BASiCS_DiagHist(ChainSC, Param = "nu")
-  expect_is(g, "ggplot")
+  expect_s3_class(g, "ggplot")
 })
 
 
@@ -124,25 +122,25 @@ test_that("DE plots work (non-regression)", {
   data(ChainSC)
   data(ChainRNA)
   Test <- BASiCS_TestDE(ChainSC, ChainRNA, Plot = FALSE, PlotOffset = FALSE)
-  expect_is(
+  expect_s3_class(
     BASiCS_PlotDE(Test),
     "gg"
   )
-  expect_is(
+  expect_s3_class(
     BASiCS_PlotDE(Test@Results[[1]]),
     "gg"
   )
-  expect_is(
+  expect_s3_class(
     BASiCS_PlotDE(Test@Results[[2]]),
     "gg"
   )
 
   for (type in c("MA", "Grid", "Volcano")) {
-    expect_is(
+    expect_s3_class(
       BASiCS_PlotDE(Test@Results[[1]], Plots = type),
       "gg"
     )
-    expect_is(
+    expect_s3_class(
       BASiCS_PlotDE(Test@Results[[2]], Plots = type),
       "gg"
     )
@@ -158,20 +156,20 @@ test_that("DE plots work (regression)", {
     Plot = FALSE,
     PlotOffset = FALSE
   )
-  expect_is(BASiCS_PlotDE(Test), "gg")
-  expect_is(BASiCS_PlotDE(Test@Results[[1]]), "gg")
-  expect_is(BASiCS_PlotDE(Test@Results[[2]]), "gg")
-  expect_is(BASiCS_PlotDE(Test@Results[[3]]), "gg")
+  expect_s3_class(BASiCS_PlotDE(Test), "gg")
+  expect_s3_class(BASiCS_PlotDE(Test@Results[[1]]), "gg")
+  expect_s3_class(BASiCS_PlotDE(Test@Results[[2]]), "gg")
+  expect_s3_class(BASiCS_PlotDE(Test@Results[[3]]), "gg")
   for (type in c("MA", "Grid", "Volcano")) {
-    expect_is(
+    expect_s3_class(
       BASiCS_PlotDE(Test@Results[[1]], Plots = type),
       "gg"
     )
-    expect_is(
+    expect_s3_class(
       BASiCS_PlotDE(Test@Results[[2]], Plots = type),
       "gg"
     )
-    expect_is(
+    expect_s3_class(
       BASiCS_PlotDE(Test@Results[[3]], Plots = type),
       "gg"
     )
@@ -182,5 +180,5 @@ test_that("DE plots work (regression)", {
 test_that("BASiCS_PlotOffset", {
   data(ChainSC)
   data(ChainRNA)
-  expect_is(BASiCS_PlotOffset(ChainSC, ChainRNA), "gg")
+  expect_s3_class(BASiCS_PlotOffset(ChainSC, ChainRNA), "gg")
 })

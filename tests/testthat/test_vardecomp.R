@@ -1,5 +1,3 @@
-context("Variance decomposition")
-
 test_that("Variance decomposition is correct", {
   # Spikes case
   data(ChainSC)

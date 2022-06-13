@@ -1,5 +1,3 @@
-context("Methods")
-
 test_that("show", {
   data(ChainSC)
   data(ChainSCReg)
@@ -34,8 +32,8 @@ test_that("subset", {
 })
 
 test_that("subset with reffreq", {
-  Data <- makeExampleBASiCS_Data()
-  Chain <- BASiCS_MCMC(
+  Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
+  Chain <- run_MCMC(
     Data, N = 50, Thin = 2, Burn = 10,   Regression = TRUE,
     PrintProgress = FALSE, WithSpikes = FALSE
   )

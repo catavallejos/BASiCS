@@ -1,5 +1,3 @@
-context("MCMC arguments")
-
 set.seed(1)
 DataSpikes <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = TRUE)
 DataSpikesNoBatch <- makeExampleBASiCS_Data(WithSpikes = TRUE, WithBatch = FALSE)

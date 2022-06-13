@@ -1,5 +1,3 @@
-context("Testing scran::computeSumFactors")
-
 test_that("scran::computeSumFactors changed for shallow data -- talk to Aaron!", {
 
   # Shallow data

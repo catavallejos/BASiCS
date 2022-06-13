@@ -1,7 +1,5 @@
-context("Divide and conquer")
-
 set.seed(42)
-Data <- BASiCS_MockSCE()
+Data <- BASiCS_MockSCE(MeanMu = 2)
 
 bp <- BiocParallel::SerialParam()
 BiocParallel::register(bp)
@@ -11,7 +9,7 @@ test_that("BASiCS:::.generateSubsets produces valid output by cell and gene with
     for (nsubset in nsubsets) {
       out <- BASiCS:::.generateSubsets(Data, NSubsets=2, SubsetBy=subsetby, WithSpikes = TRUE)
       lapply(out, function(x) {
-        expect_is(x, "SingleCellExperiment")
+        expect_s4_class(x, "SingleCellExperiment")
       })    
     }
   }

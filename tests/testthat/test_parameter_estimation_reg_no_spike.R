@@ -1,5 +1,3 @@
-context("Parameter estimation and denoised data (no-spikes+regression)")
-
 test_that("Estimates match the given seed (no-spikes+regression)", {
   # Data example
   set.seed(13)
@@ -57,8 +55,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PostSummarySCE,
     "mu"
   )[1:5, 1], 3))
-  expect_equal(MuObs, Mu, tolerance = 1, scale = 1)
-  expect_equal(MuObsSCE, Mu, tolerance = 1, scale = 1)
+  expect_equal(MuObs, Mu, tolerance = 1)
+  expect_equal(MuObsSCE, Mu, tolerance = 1)
 
   Delta <- c(1.487, 1.264, 1.998, 1.638, 0.472)
   DeltaObs <- as.vector(round(displaySummaryBASiCS(
@@ -69,8 +67,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PostSummarySCE,
     "delta"
   )[1:5, 1], 3))
-  expect_equal(DeltaObs, Delta, tolerance = 1, scale = 1)
-  expect_equal(DeltaObsSCE, Delta, tolerance = 1, scale = 1)
+  expect_equal(DeltaObs, Delta, tolerance = 1)
+  expect_equal(DeltaObsSCE, Delta, tolerance = 1)
 
   S <- c(1.421, 0.916, 1.967, 0.812, 1.111)
   SObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "s")[1:5, 1], 3))
@@ -78,8 +76,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PostSummarySCE,
     "s"
   )[1:5, 1], 3))
-  expect_equal(SObs, S, tolerance = 1, scale = 1)
-  expect_equal(SObsSCE, S, tolerance = 1, scale = 1)
+  expect_equal(SObs, S, tolerance = 1)
+  expect_equal(SObsSCE, S, tolerance = 1)
 
   Theta <- c(0.282, 0.143)
   ThetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "theta")[, 1], 3))
@@ -87,8 +85,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PostSummarySCE,
     "theta"
   )[, 1], 3))
-  expect_equal(ThetaObs, Theta, tolerance = 1, scale = 1)
-  expect_equal(ThetaObsSCE, Theta, tolerance = 1, scale = 1)
+  expect_equal(ThetaObs, Theta, tolerance = 1)
+  expect_equal(ThetaObsSCE, Theta, tolerance = 1)
 
   Beta <- c(0.302, -0.309, 0.303, 0.267, 0.063)
   BetaObs <- as.vector(round(displaySummaryBASiCS(PostSummary, "beta")[1:5, 1], 3))
@@ -96,14 +94,14 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
     PostSummarySCE,
     "beta"
   )[1:5, 1], 3))
-  expect_equal(BetaObs, Beta, tolerance = 1, scale = 1)
-  expect_equal(BetaObsSCE, Beta, tolerance = 1, scale = 1)
+  expect_equal(BetaObs, Beta, tolerance = 1)
+  expect_equal(BetaObsSCE, Beta, tolerance = 1)
 
   Sigma2 <- 0.232
   Sigma2Obs <- round(displaySummaryBASiCS(PostSummary, "sigma2")[1], 3)
   Sigma2ObsSCE <- round(displaySummaryBASiCS(PostSummarySCE, "sigma2")[1], 3)
-  expect_equal(Sigma2Obs, Sigma2, tolerance = 1, scale = 1)
-  expect_equal(Sigma2ObsSCE, Sigma2, tolerance = 1, scale = 1)
+  expect_equal(Sigma2Obs, Sigma2, tolerance = 1)
+  expect_equal(Sigma2ObsSCE, Sigma2, tolerance = 1)
 
   # Obtaining denoised counts
   DC <- BASiCS_DenoisedCounts(Data, Chain)
@@ -112,8 +110,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   DCcheck0 <- c(4.527, 23.203, 7.357, 0.000, 19.241)
   DCcheck <- as.vector(round(DC[1:5, 1], 3))
   DCSCEcheck <- as.vector(round(DCSCE[1:5, 1], 3))
-  expect_equal(DCcheck, DCcheck0, tolerance = 1, scale = 1)
-  expect_equal(DCSCEcheck, DCcheck0, tolerance = 1, scale = 1)
+  expect_equal(DCcheck, DCcheck0, tolerance = 1)
+  expect_equal(DCSCEcheck, DCcheck0, tolerance = 1)
 
   # Obtaining denoised rates
   DR <- BASiCS_DenoisedRates(Data, Chain)
@@ -122,8 +120,8 @@ test_that("Estimates match the given seed (no-spikes+regression)", {
   DRcheck0 <- c(11.836, 19.464, 31.474, 32.466, 7.247)
   DRcheck <- as.vector(round(DR[10, 1:5], 3))
   DRSCEcheck <- as.vector(round(DRSCE[10, 1:5], 3))
-  expect_equal(DRcheck, DRcheck0, tolerance = 1, scale = 1)
-  expect_equal(DRSCEcheck, DRcheck0, tolerance = 1, scale = 1)
+  expect_equal(DRcheck, DRcheck0, tolerance = 1)
+  expect_equal(DRSCEcheck, DRcheck0, tolerance = 1)
 })
 
 test_that("Chain creation works when regression, no spikes, and StoreAdapt=TRUE", {

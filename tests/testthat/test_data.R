@@ -1,5 +1,3 @@
-context("data")
-
 test_that("data preserves colnames", {
   # Expression counts
   set.seed(1)

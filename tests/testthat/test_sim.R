@@ -1,5 +1,3 @@
-context("simulated data")
-
 test_that("BASiCS_Sim works", {
   # Simulated parameter values for 10 genes
   # (7 biogical and 3 spike-in) measured in 5 cells
@@ -28,7 +26,7 @@ test_that("BASiCS_Sim works", {
   Theta2 <- rep(Theta, times = 2)
   set.seed(2)
   Data <- BASiCS_Sim(Mu, Mu_spikes, Delta, Phi, S, Theta2, BatchInfo)
-  expect_is(Data, "SingleCellExperiment")
+  expect_s4_class(Data, "SingleCellExperiment")
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(0, 2, 2, 0, 0)
@@ -41,7 +39,7 @@ test_that("BASiCS_Sim works", {
   set.seed(3)
   Data <- BASiCS_Sim(Mu, Mu_spikes = NULL, Delta, Phi = NULL, S, 
                      Theta2, BatchInfo)
-  expect_is(Data, "SingleCellExperiment")
+  expect_s4_class(Data, "SingleCellExperiment")
   # Check if values are reproducible given fixed seed
   Aux <- as.vector(SingleCellExperiment::counts(Data)[1:5, 1])
   Aux0 <- c(0, 1, 0, 0, 4)
@@ -79,5 +77,5 @@ test_that("BASiCS_Draw works", {
                     WithSpikes = FALSE
   )
   draw <- BASiCS_Draw(chain)
-  expect_is(draw, "SingleCellExperiment")
+  expect_s4_class(draw, "SingleCellExperiment")
 })

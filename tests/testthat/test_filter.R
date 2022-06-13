@@ -1,7 +1,4 @@
-context("BASiCS_Filter")
-
-test_that("BASiCS_Filter", 
-{
+test_that("BASiCS_Filter", {
 
   set.seed(1)
   Counts <- matrix(rpois(50*10, 2), ncol = 10)

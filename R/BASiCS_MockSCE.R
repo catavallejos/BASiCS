@@ -15,8 +15,8 @@
 #' @examples
 #' BASiCS_MockSCE()
 #' @export
-BASiCS_MockSCE <- function(NGenes = 100, NCells = 100, NSpikes = 20, WithBatch = TRUE) {
-  mu <- rlnorm(NGenes)
+BASiCS_MockSCE <- function(NGenes = 100, NCells = 100, NSpikes = 20, WithBatch = TRUE, MeanMu = 1) {
+  mu <- rlnorm(NGenes, meanlog = MeanMu)
   nu <- rgamma(NCells, 5, 5)
   mat <- mu %*% t(nu)
   counts <- matrix(
