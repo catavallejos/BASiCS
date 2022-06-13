@@ -4,7 +4,13 @@
 \alias{BASiCS_MockSCE}
 \title{Create a mock \linkS4class{SingleCellExperiment} object.}
 \usage{
-BASiCS_MockSCE(NGenes = 100, NCells = 100, NSpikes = 20, WithBatch = TRUE)
+BASiCS_MockSCE(
+  NGenes = 100,
+  NCells = 100,
+  NSpikes = 20,
+  WithBatch = TRUE,
+  MeanMu = 1
+)
 }
 \arguments{
 \item{NGenes}{Integer value specifying the number of genes that will be
@@ -18,6 +24,8 @@ will be present in the output.}
 
 \item{WithBatch}{Logical value specifying whether a dummy \code{BatchInfo}
 is included in the output.}
+
+\item{MeanMu}{The log mean used to generate per-gene mean expression levels.}
 }
 \value{
 A \linkS4class{SingleCellExperiment} object.

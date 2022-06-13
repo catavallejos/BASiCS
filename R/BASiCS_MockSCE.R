@@ -11,6 +11,7 @@
 #' will be present in the output.
 #' @param WithBatch Logical value specifying whether a dummy \code{BatchInfo}
 #' is included in the output.
+#' @param MeanMu The log mean used to generate per-gene mean expression levels.
 #' @return A \linkS4class{SingleCellExperiment} object.
 #' @examples
 #' BASiCS_MockSCE()
