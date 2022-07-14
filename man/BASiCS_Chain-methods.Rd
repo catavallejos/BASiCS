@@ -48,7 +48,5 @@ Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2, Regression = FALSE)
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}
 
-Catalina A. Vallejos \email{cnvallej@uc.cl}
-
 Nils Eling \email{eling@ebi.ac.uk}
 }
