@@ -54,8 +54,21 @@ BASiCS_DivideAndConquer <- function(
       Data,
       PriorMu = "EmpiricalBayes"
     ),
+    RunName,
+    StoreChains,
+    StoreDir,
+    Start,
     ...
     ) {
+  if (
+    !missing(RunName) ||
+    !missing(StoreChains) ||
+    !missing(StoreDir) ||
+    !missing(Start)) {
+      message(
+        "RunName, StoreChains, StoreDir, Start are ignored when using divide and conquer inference."
+      )
+  }
 
   ## These values should be passed in.
   L <- 12

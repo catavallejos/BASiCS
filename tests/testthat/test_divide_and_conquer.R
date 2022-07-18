@@ -217,3 +217,24 @@ test_that("cut doesn't fail if some quantiles are the same", {
     ), "Cannot find a balanced split"
   )
 })
+
+test_that("BCParallel variable error", {
+  library("BiocParallel")
+
+  ncors <- 2
+  register(SnowParam(workers = ncors))
+
+  data <- BASiCS_MockSCE()
+
+  samp <- "Run1"
+
+  expect_message(
+    basics_results <- BASiCS_MCMC(
+      data, N = 200, Thin = 20, Burn = 100, WithSpikes = FALSE, 
+      Regression = FALSE, PrintProgress = FALSE,
+      StoreChains = TRUE, RunName = samp,
+      SubsetBy = "gene", NSubsets = ncors
+    ),
+    "are ignored when using divide and conquer inference"
+  )
+})
