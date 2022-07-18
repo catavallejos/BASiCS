@@ -1,5 +1,3 @@
-context("RBF settings")
-
 test_that("RBFMinMax works as expected", {
   set.seed(42)
   d <- makeExampleBASiCS_Data()

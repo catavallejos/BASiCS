@@ -1,5 +1,3 @@
-context("Storing and loading chains")
-
 test_that("Valid BASiCS_MCMC output object", {
   # Data example: spikes
   set.seed(7)

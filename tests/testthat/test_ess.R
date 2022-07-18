@@ -1,5 +1,3 @@
-context("ESS")
-
 test_that("ess matches effectiveSize", {
   data("ChainSC")
   expect_equal(

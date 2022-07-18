@@ -1,5 +1,3 @@
-context("Individual MCMC updates (cpp code) - empirical bayes")
-
 test_that("Spikes + no regression", {
   set.seed(3)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)

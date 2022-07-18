@@ -1,5 +1,3 @@
-context("Individual MCMC updates (cpp code)")
-
 test_that("Dirichlet sampler", {
   # Generating arbitrary hyper-param
   phi0 <- 1:10

@@ -1,5 +1,3 @@
-context("Differential test")
-
 data(ChainSC)
 data(ChainRNA)
 
@@ -128,17 +126,19 @@ test_that("CheckESS works", {
   me1 <- coda::effectiveSize(ChainSC@parameters$mu)
   me2 <- coda::effectiveSize(ChainRNA@parameters$mu)
   # Classification frequency
-  expect_equivalent(
+  expect_equal(
     Test@Results$Mean@Table$ResultDiffMean == "ExcludedLowESS",
-    !(me1 > MinESS & me2 > MinESS)
+    !(me1 > MinESS & me2 > MinESS),
+    ignore_attr = TRUE
   )
 
   md1 <- coda::effectiveSize(ChainSC@parameters$delta)
   md2 <- coda::effectiveSize(ChainRNA@parameters$delta)
   # Classification frequency
-  expect_equivalent(
+  expect_equal(
     Test@Results$Disp@Table$ResultDiffDisp == "ExcludedLowESS",
-    !(md1 > MinESS & md2 > MinESS)
+    !(md1 > MinESS & md2 > MinESS),
+    ignore_attr = TRUE
   )
 })
 
@@ -200,8 +200,8 @@ test_that("Utility methods work", {
     MinESS = NA,
     PlotOffset = FALSE
   )
-  expect_is(Test, "BASiCS_ResultsDE")
-  expect_is(Test[["Mean"]], "BASiCS_ResultDE")
+  expect_s4_class(Test, "BASiCS_ResultsDE")
+  expect_s4_class(Test[["Mean"]], "BASiCS_ResultDE")
   f <- Test[["Mean"]][1:10, ]
   expect_warning(df <- format(f, Filter = FALSE))
   expect_equal(
@@ -214,7 +214,7 @@ test_that("Utility methods work", {
   rowData(Test) <- d
   expect_equal(rowData(Test)$ind, ind)
   df <- as.data.frame(Test, Parameter = "Mean")
-  expect_is(df, "data.frame")
+  expect_s3_class(df, "data.frame")
   p <- 0.9
   df <- as.data.frame(Test, Parameter = "Mean", ProbThreshold = p)
   expect_true(all(df$ProbDiffMean > p))

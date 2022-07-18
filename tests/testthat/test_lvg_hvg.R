@@ -1,5 +1,3 @@
-context("Basic example of HVG/LVG detection")
-
 test_that("HVG/LVG - check if key parameters are missing", {
   
   data(ChainSC)
@@ -85,7 +83,7 @@ test_that("HVG/LVG utils work", {
   data(ChainSCReg)
   DetectHVG <- BASiCS_DetectHVG(ChainSCReg, PercentileThreshold = 0.9)
   expect_warning(x <- format(DetectHVG))
-  expect_is(x, "data.frame")
+  expect_s3_class(x, "data.frame")
   expect_error(DetectHVG[1:10, ], NA)
   p <- 0.8
   d <- as.data.frame(DetectHVG, ProbThreshold = p)
@@ -104,10 +102,10 @@ test_that("HVG/LVG plotting works", {
                                 Plot = TRUE)
   DetectLVG <- BASiCS_DetectLVG(ChainSCReg, PercentileThreshold = 0.9,
                                 Plot = TRUE)
-  expect_is(DetectHVG@Extras$Plots[[1]], "gg")
-  expect_is(DetectHVG@Extras$Plots[[2]], "gg")
-  expect_is(DetectLVG@Extras$Plots[[1]], "gg")
-  expect_is(DetectLVG@Extras$Plots[[2]], "gg")
+  expect_s3_class(DetectHVG@Extras$Plots[[1]], "gg")
+  expect_s3_class(DetectHVG@Extras$Plots[[2]], "gg")
+  expect_s3_class(DetectLVG@Extras$Plots[[1]], "gg")
+  expect_s3_class(DetectLVG@Extras$Plots[[2]], "gg")
 })
 
 
@@ -117,10 +115,10 @@ test_that("VarThresholdSearch works", {
   grid <- seq(0.25, 0.75, length.out = 3)
   DetectHVG <- BASiCS_VarThresholdSearchHVG(ChainSC,
     VarThresholdsGrid = grid)
-  expect_is(DetectHVG, "data.frame")
+  expect_s3_class(DetectHVG, "data.frame")
   DetectLVG <- BASiCS_VarThresholdSearchLVG(ChainSC,
     VarThresholdsGrid = grid)
-  expect_is(DetectHVG, "data.frame")
+  expect_s3_class(DetectHVG, "data.frame")
 })
 
 

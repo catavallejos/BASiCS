@@ -1,9 +1,7 @@
-context("miscellaneous")
-
 test_that("BASiCS_EffectiveSize works", {
   data(ChainSC)
   ess <- BASiCS_EffectiveSize(ChainSC, Param = "mu")
-  expect_is(ess, "numeric")
+  expect_type(ess, "double")
   expect_equal(ess[[1]], 129.73861)
   expect_warning(
     BASiCS_effectiveSize(ChainSC, Param = "mu"),

@@ -1,5 +1,3 @@
-context("Variance decomposition")
-
 test_that("Variance decomposition is correct", {
   # Spikes case
   data(ChainSC)
@@ -29,7 +27,9 @@ test_that("Variance decomposition is correct", {
   expect_equal(round(Decomp$BioVarBatch1[1:5],3), BioVarBatch10)
   TechVarBatch10 <- c(0.206, 0.219, 0.245, 0.259, 0.272)
   expect_equal(round(Decomp$TechBatch1[1:5],3), TechVarBatch10)
-  Decomp <- BASiCS_VarianceDecomp(ChainSC, Plot = TRUE)
+  Decomp <- BASiCS_VarianceDecomp(ChainSC, Plot = FALSE)
+  g <- BASiCS_PlotVarianceDecomp(Decomp)
+  expect_s3_class(g, "gg")
 })
 
 test_that("Variance decomposition works with 1 batch", {

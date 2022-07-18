@@ -1,5 +1,3 @@
-context("Differential test (regression case)")
-
 test_that("Differential test is correct (regression case)", {
   data(ChainSCReg)
   data(ChainRNAReg)
@@ -102,9 +100,10 @@ test_that("CheckESS works", {
   ee2 <- coda::effectiveSize(ChainRNAReg@parameters$epsilon)
 
   # Classification frequency
-  expect_equivalent(
+  expect_equal(
     Test@Results$ResDisp@Table$ResultDiffResDisp == "ExcludedLowESS",
-    !(ee1 > MinESS & ee2 > MinESS)
+    !(ee1 > MinESS & ee2 > MinESS),
+    ignore_attr = TRUE
   )
 })
 

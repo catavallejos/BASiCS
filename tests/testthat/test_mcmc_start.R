@@ -1,5 +1,3 @@
-context("Starting values for MCMC")
-
 test_that("Generated starting values do not match given seed (spikes case)", {
   set.seed(4)
   Data <- makeExampleBASiCS_Data(WithSpikes = TRUE)

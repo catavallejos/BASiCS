@@ -153,18 +153,10 @@ BASiCS_VarianceDecomp <- function(Chain,
   out <- out[order(orderVar, decreasing = TRUE), ]
 
   if (Plot) {
-    outmat <- 100 * matrix(apply(out[, -c(1,2)], 2, mean),
-                           nrow = 3, byrow = FALSE)
-    rownames(outmat) <- c("Shot noise", "Technical", "Biological")
-    colnames(outmat) <- names.arg
-    mdf <- reshape2::melt(outmat)
-    g <- ggplot2::ggplot(mdf,
-        ggplot2::aes_string(x = "Var2", y = "value", fill = "Var1")
-      ) +
-      ggplot2::geom_col(position = if (!beside) "fill" else "dodge") +
-      ggplot2::scale_fill_brewer(palette = "Set1", name = NULL) +
-      ggplot2::labs(main = main, x = NULL, y = ylab)
-    print(g)
+    p <- BASiCS_PlotVarianceDecomp(
+      out, xlabs = names.arg, beside = beside, main = main, ylab = ylab
+    )
+    print(p)
   }
   return(out)
 }
