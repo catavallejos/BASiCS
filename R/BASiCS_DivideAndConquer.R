@@ -19,9 +19,12 @@
 #' are significantly different between batches.
 #' @param WithSpikes,Regression,PriorParam See \code{\link{BASiCS_MCMC}}.
 #' @param BPPARAM A \code{\link{BiocParallelParam}} instance.
+#' @param RunName,StoreChains,StoreDir,Start Unused. If used when calling this
+#' function, they are likely to result in undefined behaviour.
 #' @param ... Passed to  \code{\link{BASiCS_MCMC}}. All arguments required by
 #' \code{\link{BASiCS_MCMC}} must be supplied here, for example
 #' \code{N}, \code{Thin}, \code{Burn}.
+#' 
 #' @return A list of \linkS4class{BASiCS_Chain} objects.
 #' @examples
 #'  bp <- BiocParallel::SnowParam()

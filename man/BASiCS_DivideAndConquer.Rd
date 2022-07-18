@@ -13,6 +13,10 @@ BASiCS_DivideAndConquer(
   Regression,
   BPPARAM = BiocParallel::bpparam(),
   PriorParam = BASiCS_PriorParam(Data, PriorMu = "EmpiricalBayes"),
+  RunName,
+  StoreChains,
+  StoreDir,
+  Start,
   ...
 )
 }
@@ -33,6 +37,9 @@ are significantly different between batches.}
 \item{WithSpikes, Regression, PriorParam}{See \code{\link{BASiCS_MCMC}}.}
 
 \item{BPPARAM}{A \code{\link{BiocParallelParam}} instance.}
+
+\item{RunName, StoreChains, StoreDir, Start}{Unused. If used when calling this
+function, they are likely to result in undefined behaviour.}
 
 \item{...}{Passed to  \code{\link{BASiCS_MCMC}}. All arguments required by
 \code{\link{BASiCS_MCMC}} must be supplied here, for example
