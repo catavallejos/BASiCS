@@ -12,6 +12,10 @@
 #' @param MuX Use Mu (mean expression across both chains) as the X-axis for all
 #'  MA plots? Default: TRUE.
 #' @param Mu,GroupLabel1,GroupLabel2,ProbThresholds,Epsilon,EFDR,Table,Measure,EFDRgrid,EFNRgrid,ProbThreshold Internal arguments.
+#' @param TransLogit Logical scalar controlling whether a logit transform
+#' is applied to the posterior probability in the y-axis of volcano plots.
+#' As logit(0) and logit(1) are undefined, we clip these values near the range
+#' of the data excluding 0 and 1.
 #' @param ... Passed to methods.
 #' @examples
 #' data(ChainSC)
@@ -93,7 +97,8 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
   function(
     object,
     Plots = c("Grid", "MA", "Volcano"),
-    Mu = NULL
+    Mu = NULL,
+    TransLogit = FALSE
   ){
     BASiCS_PlotDE(
       GroupLabel1 = object@GroupLabel1,
@@ -107,7 +112,8 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultDE"),
       EFNRgrid = object@EFNRgrid,
       ProbThreshold = object@ProbThreshold,
       Mu = Mu,
-      Plots = Plots
+      Plots = Plots,
+      TransLogit = TransLogit
     )
   }
 )
@@ -126,6 +132,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     EFNRgrid,
     ProbThreshold,
     Mu,
+    TransLogit = FALSE,
     Plots = c("Grid", "MA", "Volcano")
   ) {
 
@@ -156,7 +163,8 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
             GroupLabel1,
             GroupLabel2,
             Epsilon,
-            ProbThreshold
+            ProbThreshold,
+            TransLogit
           )
         )
       )
@@ -221,7 +229,8 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       aes(colour = "Probability\nthreshold", xintercept = ProbThreshold),
       lty = 1,
       na.rm = TRUE
-    )
+    ) +
+    ggplot2::theme_bw()
 }
 
 
@@ -232,7 +241,8 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     GroupLabel1,
     GroupLabel2,
     Epsilon,
-    ProbThreshold
+    ProbThreshold,
+    TransLogit = FALSE
   ) {
 
   dVar <- paste0(Measure, .DistanceVar(Measure))
@@ -245,7 +255,10 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   # )
   Table <- Table[order(Table$IndDiff), ]
   bins <- 50
-  ggplot2::ggplot(
+  if (TransLogit) {
+    Table[[pVar]] <- .logit_nudge(Table[[pVar]])
+  }
+  g <- ggplot2::ggplot(
       Table,
       ggplot2::aes_string(
         x = dVar,
@@ -282,7 +295,6 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       colour = "grey40",
       na.rm = TRUE
     ) +
-    ggplot2::ylim(c(0, 1)) +
     # ggplot2::scale_colour_brewer(palette = "Set1", name = NULL) +
     ggplot2::scale_colour_manual(
       values = .ColourMap(Table, dVar, rVar),
@@ -295,7 +307,26 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
         GroupLabel1, "vs", GroupLabel2
       ),
       y = "Posterior probability"
-    )
+    ) +
+    ggplot2::theme_bw() +
+    if (TransLogit) {
+      ggplot2::scale_y_continuous(trans = "logit",
+        # limits = c(.Machine$double.xmin, 1 - .Machine$double.xmin)
+        # limits = c(0.01, 0.99)
+        breaks = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99)
+      )
+    } else {
+      ggplot2::ylim(c(0, 1))
+    }
+  g
+}
+
+## Can't have logit(0) or logit(1) as these are -Inf, Inf
+.logit_nudge <- function(x) {
+  x2 <- x
+  x[x==0] <- min(x[x != 0], na.rm = TRUE) - .Machine$double.xmin
+  x[x==1] <- max(x[x != 1], na.rm = TRUE) + .Machine$double.xmin
+  x
 }
 
 .MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, Mu) {
@@ -359,7 +390,8 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
         GroupLabel1, "vs",
         GroupLabel2
       )
-    )
+    ) +
+    ggplot2::theme_bw()
 }
 
 .DiffExp <- function(res) {
