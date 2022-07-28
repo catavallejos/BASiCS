@@ -7,8 +7,7 @@ generative model.}
 \usage{
 BASiCS_Draw(
   Chain,
-  BatchInfo = gsub(".*_Batch([0-9a-zA-Z])", "\\\\1",
-    colnames(Chain@parameters[["nu"]])),
+  BatchInfo = gsub(".*_Batch([0-9a-zA-Z])", "\\\\1", colnames(Chain@parameters[["nu"]])),
   N = sample(nrow(Chain@parameters[["nu"]]), 1)
 )
 }
