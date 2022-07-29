@@ -11,9 +11,8 @@
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
-\item{Genes}{A vector of characters indicating what genes will be extracted.}
-
-\item{Cells}{A vector of characters indicating what cells will be extrated.}
+\item{Genes, Cells}{A vector of characters, logical values, or numbers, indicating
+which cells or genes will be extracted.}
 
 \item{Iterations}{Numeric vector of positive integers indicating which MCMC
 iterations will be extracted. The maximum value in \code{Iterations} must be

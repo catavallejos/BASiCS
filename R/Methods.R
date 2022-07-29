@@ -178,8 +178,8 @@ setMethod("Summary",
 #' The subset can contain specific genes, cells or MCMC iterations
 #'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
-#' @param Genes A vector of characters indicating what genes will be extracted.
-#' @param Cells A vector of characters indicating what cells will be extrated.
+#' @param Genes,Cells A vector of characters, logical values, or numbers, indicating
+#'  which cells or genes will be extracted.
 #' @param Iterations Numeric vector of positive integers indicating which MCMC
 #' iterations will be extracted. The maximum value in \code{Iterations} must be
 #' less or equal than the total number of iterations contained in the original
@@ -212,9 +212,24 @@ setMethod(
     N <- nrow(displayChainBASiCS(x, Parameter = "mu"))
     q <- ncol(displayChainBASiCS(x, Parameter = "mu"))
     n <- ncol(displayChainBASiCS(x, Parameter = "nu"))
-    GeneName <- colnames(displayChainBASiCS(x, Parameter = "mu"))
-    CellName <- colnames(displayChainBASiCS(x, Parameter = "nu"))
+    GeneNames <- colnames(displayChainBASiCS(x, Parameter = "mu"))
+    CellNames <- colnames(displayChainBASiCS(x, Parameter = "nu"))
 
+    if (is.factor(Genes) | is.factor(Cells)) {
+      stop("Factor index is not supported.")
+    }
+    if (is.numeric(Genes) | is.logical(Genes)) {
+      if (is.logical(Genes) && length(Genes) != nrow(x)) {
+        stop("Gene index length should match the number of features in the BASiCS_Chain object.")
+      }
+      Genes <- rownames(x)[Genes]
+    }
+    if (is.numeric(Cells) | is.logical(Cells)) {
+      if (is.logical(Cells) && length(Cells) != nrow(x)) {
+        stop("Cell index length should match the number of cells in the BASiCS_Chain object.")
+      }
+      Cells <- rownames(x)[Cells]
+    }
     # Checking for valid arguments + assigning default values
     if (is.null(Iterations)) {
       Iterations <- seq_len(N)
@@ -223,22 +238,22 @@ setMethod(
       stopifnot(min(Iterations) >= 1, max(Iterations) <= N )
     }
     if (is.null(Genes)) {
-      Genes <- GeneName
+      Genes <- GeneNames
     } else {
-      if (sum(!(Genes %in% GeneName)) > 0) {
+      if (sum(!(Genes %in% GeneNames)) > 0) {
         stop("Some elements of 'Genes' are not present in the data")
       }
     }
     if (is.null(Cells)) {
-      Cells <- CellName
+      Cells <- CellNames
     } else {
-      if (sum(!(Cells %in% CellName)) > 0) {
+      if (sum(!(Cells %in% CellNames)) > 0) {
         stop("Some elements of 'Cells' are not present in the data")
       }
     }
 
-    SelGenes <- GeneName %in% Genes
-    SelCells <- CellName %in% Cells
+    # SelGenes <- GeneName %in% Genes
+    # SelCells <- CellName %in% Cells
     Params <- names(x@parameters)
 
     out <- list()
@@ -250,10 +265,10 @@ setMethod(
           out[[p]] <- get(Params[p], x@parameters)[Iterations, , drop = FALSE]
         } else {
           if (Params[p] %in% c("mu", "delta", "epsilon")) {
-            Sel <- SelGenes
+            Sel <- Genes
           }
           if (Params[p] %in% c("phi", "s", "nu")) {
-            Sel <- SelCells
+            Sel <- Cells
           }
           out[[p]] <- get(Params[p], x@parameters)[Iterations, Sel, drop = FALSE]
         }
