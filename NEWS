@@ -1627,7 +1627,7 @@ version 2.9.5 (2022-07-29)
   respects the ordering implied by character or numeric indices, where it
   previously did not.
 
-version 2.9.6 (2022-07-05)
-- Further bugfix in subset method for BASiCS_Chain objects. subset now 
-  respects the ordering implied by character or numeric indices, where it
-  previously did not.
+version 2.9.6 (2022-09-05)
+- Add TransLogit parameter to BASiCS_PlotDE to have volcano plots on a logit scale.
+  As the posterior probabilities are in the interval [0, 1] this may make it
+  easier to visualise difference in "interesting" regions (e.g., 0.6-1)
