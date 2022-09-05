@@ -1604,3 +1604,30 @@ version 2.7.1 (2021-11-03)
 - Exclude features with absolute estimates of fold change/difference less
   than the DE threshold when performing differential expression analysis
   with BASiCS_TestDE.
+
+version 2.7.4, 2.7.5 (2022-02-22)
+- Bugfixes in the subset method for BASiCS_Chain objects.
+
+version 2.9.1 (2022-05-04)
+- switch from using DOUBLE_EPS to a function call to std::numeric_limits<double>::epsilon() - credit Tomas Kalibera for informing by private correspondence.
+
+version 2.9.2 (2022-07-18)
+- Implement parallel tests
+- Remove variance decomp plotting code from an internal code block to the public BASiCS_PlotVarianceDecomp.
+
+version 2.9.3 (2022-07-18)
+- Bugfix for divide and conquer code - handle arguments like StoreChains and
+  RunName correctly in this context.
+
+version 2.9.4 (2022-07-28)
+- Update roxygen version
+
+version 2.9.5 (2022-07-29)
+- Further bugfix in subset method for BASiCS_Chain objects. subset now 
+  respects the ordering implied by character or numeric indices, where it
+  previously did not.
+
+version 2.9.6 (2022-09-05)
+- Add TransLogit parameter to BASiCS_PlotDE to have volcano plots on a logit scale.
+  As the posterior probabilities are in the interval [0, 1] this may make it
+  easier to visualise difference in "interesting" regions (e.g., 0.6-1)

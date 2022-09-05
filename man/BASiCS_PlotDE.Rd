@@ -17,7 +17,12 @@ BASiCS_PlotDE(object, ...)
   ...
 )
 
-\S4method{BASiCS_PlotDE}{BASiCS_ResultDE}(object, Plots = c("Grid", "MA", "Volcano"), Mu = NULL)
+\S4method{BASiCS_PlotDE}{BASiCS_ResultDE}(
+  object,
+  Plots = c("Grid", "MA", "Volcano"),
+  Mu = NULL,
+  TransLogit = FALSE
+)
 
 \S4method{BASiCS_PlotDE}{missing}(
   GroupLabel1,
@@ -31,6 +36,7 @@ BASiCS_PlotDE(object, ...)
   EFNRgrid,
   ProbThreshold,
   Mu,
+  TransLogit = FALSE,
   Plots = c("Grid", "MA", "Volcano")
 )
 }
@@ -53,6 +59,11 @@ Available options are "Mean", (mu, mean expression),
 MA plots? Default: TRUE.}
 
 \item{Mu, GroupLabel1, GroupLabel2, ProbThresholds, Epsilon, EFDR, Table, Measure, EFDRgrid, EFNRgrid, ProbThreshold}{Internal arguments.}
+
+\item{TransLogit}{Logical scalar controlling whether a logit transform
+is applied to the posterior probability in the y-axis of volcano plots.
+As logit(0) and logit(1) are undefined, we clip these values near the range
+of the data excluding 0 and 1.}
 }
 \value{
 A plot (possibly several combined using 
