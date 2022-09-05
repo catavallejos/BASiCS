@@ -196,13 +196,15 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
 
 
 
-.GridPlot <- function(Measure, 
-                     EFDR,
-                     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
-                     EFDRgrid,
-                     EFNRgrid,
-                     ProbThreshold
-                     ) {
+.GridPlot <- function(
+    Measure, 
+    EFDR,
+    ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
+    EFDRgrid,
+    EFNRgrid,
+    ProbThreshold
+  ) {
+
   df <- data.frame(
     ProbThresholds, 
     EFDR = EFDRgrid, 
@@ -216,7 +218,6 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     ggplot2::labs(
       y = "Error rate", 
       x = "Probability threshold"
-      # ,title = paste("Differential", .MeasureName(Measure))
     ) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::scale_colour_brewer(name = "", palette = "Set2") +
@@ -249,10 +250,6 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   rVar <- paste0("ResultDiff", Measure)
   pVar <- paste0("ProbDiff", Measure)
   Table$IndDiff <- .DiffExp(Table[[rVar]])
-  # bins <- NClassFD2D(
-  #   Table[[paste0(Measure, .DistanceVar(Measure))]],
-  #   Table[[paste0("ProbDiff", Measure)]]
-  # )
   Table <- Table[order(Table$IndDiff), ]
   bins <- 50
   if (TransLogit) {
@@ -270,19 +267,6 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       shape = 16,
       alpha = 0.6
     ) +
-    # ggplot2::geom_hex(
-    #   bins = bins,
-    #   aes_string(fill = "..density.."),
-    #   na.rm = TRUE
-    # ) +
-    # ggplot2::geom_point(
-    #   data = Table,
-    #   shape = 16,
-    #   col = "violetred",
-    #   na.rm = TRUE,
-    #   alpha = 0.6
-    # ) +
-    # viridis::scale_fill_viridis(name = "Density", guide = "none") +
     ggplot2::geom_vline(
       xintercept = c(-Epsilon, Epsilon),
       lty = "dashed",
@@ -295,7 +279,6 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       colour = "grey40",
       na.rm = TRUE
     ) +
-    # ggplot2::scale_colour_brewer(palette = "Set1", name = NULL) +
     ggplot2::scale_colour_manual(
       values = .ColourMap(Table, dVar, rVar),
       drop = TRUE,
@@ -331,15 +314,9 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
 
 .MAPlot <- function(Measure, Table, GroupLabel1, GroupLabel2, Epsilon, Mu) {
 
-
   dVar <- paste0(Measure, .DistanceVar(Measure))
   rVar <- paste0("ResultDiff", Measure)
   Table$IndDiff <- .DiffExp(Table[[rVar]])
-  # bins <- NClassFD2D(
-  #   Table[[paste0(Measure, "Overall")]],
-  #   Table[[paste0(Measure, .DistanceVar(Measure))]]
-  # )
-  # bins <- 50
   xscale <- ggplot2::scale_x_continuous(
     trans = if (Measure == "ResDisp" & is.null(Mu)) "identity" else "log2"
   )
@@ -347,26 +324,11 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   Table <- Table[order(Table$IndDiff), ]
   ggplot2::ggplot(
       Table,
-      # Table[!IndDiff, ],
       ggplot2::aes_string(
-        # x = paste0(Measure, "Overall"),
         x = if (!is.null(Mu)) "`_Mu`" else paste0(Measure, "Overall"),
         y = dVar
       )
     ) + 
-    # ggplot2::geom_hex(
-    #   bins = bins,
-    #   aes_string(fill = "..density.."),
-    #   na.rm = TRUE
-    # ) +
-    # ggplot2::geom_point(
-    #   data = Table[IndDiff, ],
-    #   shape = 16,
-    #   colour = "violetred",
-    #   na.rm = TRUE,
-    #   alpha = 0.6
-    # ) +
-    # viridis::scale_fill_viridis(name = "Density", guide = "none") +
     ggplot2::geom_point(
       ggplot2::aes_string(colour = rVar),
       shape = 16,

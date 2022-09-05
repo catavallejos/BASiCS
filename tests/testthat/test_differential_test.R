@@ -219,3 +219,30 @@ test_that("Utility methods work", {
   df <- as.data.frame(Test, Parameter = "Mean", ProbThreshold = p)
   expect_true(all(df$ProbDiffMean > p))
 })
+
+
+test_that("plots work (smoke test)", {
+  data(ChainSC)
+  data(ChainRNA)
+
+  Test <- BASiCS_TestDE(
+    Chain1 = ChainSC,
+    Chain2 = ChainRNA,
+    GroupLabel1 = "SC",
+    GroupLabel2 = "P&S",
+    EpsilonM = 0,
+    EpsilonD = 0,
+    OffSet = TRUE,
+    Plot = FALSE,
+    MinESS = NA,
+    PlotOffset = FALSE
+  )
+  for (parameter in c("Mean", "Disp", "ResDisp")) {
+    for (plot in c("MA", "Volcano", "Grid")) {
+        p <- BASiCS_PlotDE(Test, Plots = plot)
+        expect_s3_class(p, "gg")
+    }
+    p <- BASiCS_PlotDE(Test, Plots = "Volcano", TransLogit = TRUE)
+    expect_s3_class(p, "gg")
+  }
+})
