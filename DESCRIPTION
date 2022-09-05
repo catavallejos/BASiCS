@@ -101,6 +101,7 @@ Collate:
     'BASiCS_Package.R'
     'BASiCS_PlotDE.R'
     'BASiCS_PlotOffset.R'
+    'BASiCS_PlotVG.R'
     'BASiCS_PlotVarianceDecomp.R'
     'BASiCS_PriorParam.R'
     'BASiCS_ShowFit.R'
