@@ -31,6 +31,29 @@ test_that("subset", {
   expect_equal(dim(sc@parameters$nu), c(10, 2))
 })
 
+test_that("subset respects order", {
+  data(ChainSC)
+  data(ChainSCReg)
+  sc <- subset(
+    ChainSC,
+    Genes = rownames(ChainSC)[3:1]
+  )
+  expect_equal(rownames(sc), rownames(ChainSC)[3:1])
+  sc <- subset(
+    ChainSC,
+    Genes = 3:1
+  )
+  expect_equal(rownames(sc), rownames(ChainSC)[3:1])
+  ind <- rep(c(TRUE, FALSE), length.out = nrow(ChainSC))
+  sc <- subset(
+    ChainSC,
+    Genes = ind
+  )
+  expect_equal(rownames(sc), rownames(ChainSC)[ind])
+})
+
+
+
 test_that("subset with reffreq", {
   Data <- makeExampleBASiCS_Data(WithBatch = TRUE)
   Chain <- run_MCMC(
