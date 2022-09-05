@@ -50,7 +50,7 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
     ggplot2::scale_color_brewer(palette = "Set1", name = NULL) +
     ggplot2::labs(x = "Probability threshold", y = "Error rate") +
     ggplot2::ylim(c(0, 1)) + 
-    ggplot2::theme_bw()
+    ggplot2::theme_classic()
 }
 
 
@@ -86,5 +86,5 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
       y = ylab,
       title = title
     ) +
-    ggplot2::theme_bw()
+    ggplot2::theme_classic()
 }
