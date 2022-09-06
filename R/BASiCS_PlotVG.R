@@ -17,11 +17,12 @@
 BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
   Plot <- match.arg(Plot)
   if (Plot == "Grid") {
-    .VGGridPlot(
+    .GridPlot(
+      EFDR = object@EFDR,
       ProbThresholds = object@ProbThresholds,
       EFDRgrid = object@EFDRgrid,
       EFNRgrid = object@EFNRgrid,
-      EFDR = object@EFDR
+      ProbThreshold = object@ProbThreshold
     )
   } else if (Plot == "VG") {
     .VGPlot(
@@ -35,23 +36,25 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
   }
 }
 
-
-.VGGridPlot <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR) {
-  ggplot2::ggplot() +
-    ggplot2::geom_line(
-      ggplot2::aes(ProbThresholds, EFDRgrid, color = "EFDR")
-    ) +
-    ggplot2::geom_line(
-      ggplot2::aes(ProbThresholds, EFNRgrid, color = "EFNR")
-    ) +
-    ggplot2::geom_hline(
-      ggplot2::aes(color = "Target EFDR", yintercept = EFDR)
-    ) +
-    ggplot2::scale_color_brewer(palette = "Set1", name = NULL) +
-    ggplot2::labs(x = "Probability threshold", y = "Error rate") +
-    ggplot2::ylim(c(0, 1)) + 
-    ggplot2::theme_classic()
-}
+# .VGGridPlot <- function(ProbThresholds, EFDRgrid, EFNRgrid, EFDR) {
+#   ggplot2::ggplot() +
+#     ggplot2::geom_line(
+#       ggplot2::aes(ProbThresholds, EFDRgrid, color = "EFDR")
+#     ) +
+#     ggplot2::geom_line(
+#       ggplot2::aes(ProbThresholds, EFNRgrid, color = "EFNR")
+#     ) +
+#     ggplot2::geom_hline(
+#       ggplot2::aes(color = "Target EFDR", yintercept = EFDR)
+#     ) +
+#     ggplot2::geom_vline(
+#       ggplot2::aes(color = "Probability threshold", yintercept = )
+#     ) +
+#     ggplot2::scale_color_brewer(palette = "Set1", name = NULL) +
+#     ggplot2::labs(x = "Probability threshold", y = "Error rate") +
+#     ggplot2::ylim(c(0, 1)) + 
+#     ggplot2::theme_classic()
+# }
 
 
 .VGPlot <- function(

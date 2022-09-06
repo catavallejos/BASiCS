@@ -93,8 +93,9 @@
       OptThreshold <- c(ProbThreshold, EFDRgrid_2, EFNRgrid_2)  
       message(
         "For ", Task, " task:\n",
-        "the posterior probability threshold chosen via EFDR calibration",
-        "is too low. Probability threshold automatically set equal to",
+        "the posterior probability threshold chosen via EFDR calibration ",
+        "is too low.\n",
+        "Probability threshold automatically set equal to ",
         "'ProbThreshold", Suffix, "'."
       )
     }

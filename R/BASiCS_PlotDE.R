@@ -143,12 +143,12 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       PlotObjects <- c(PlotObjects, 
         list(
           .MAPlot(
-            Measure,
-            Table,
-            GroupLabel1,
-            GroupLabel2,
-            Epsilon,
-            Mu
+            Measure = Measure,
+            Table = Table,
+            GroupLabel1 = GroupLabel1,
+            GroupLabel2 = GroupLabel2,
+            Epsilon = Epsilon,
+            Mu = Mu
           )
         )
       )
@@ -158,13 +158,13 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       PlotObjects <- c(PlotObjects, 
         list(
           .VolcanoPlot(
-            Measure,
-            Table,
-            GroupLabel1,
-            GroupLabel2,
-            Epsilon,
-            ProbThreshold,
-            TransLogit
+            Measure = Measure,
+            Table = Table,
+            GroupLabel1 = GroupLabel1,
+            GroupLabel2 = GroupLabel2,
+            Epsilon = Epsilon,
+            ProbThreshold = ProbThreshold,
+            TransLogit = TransLogit
           )
         )
       )
@@ -174,12 +174,11 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
       PlotObjects <- c(
         list(
           .GridPlot(
-            Measure,
-            EFDR,
-            ProbThresholds,
-            EFDRgrid,
-            EFNRgrid,
-            ProbThreshold
+            EFDR = EFDR,
+            ProbThresholds = ProbThresholds,
+            EFDRgrid = EFDRgrid,
+            EFNRgrid = EFNRgrid,
+            ProbThreshold = ProbThreshold
           )
         ),
         PlotObjects
@@ -194,10 +193,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   }
 )
 
-
-
 .GridPlot <- function(
-    Measure, 
     EFDR,
     ProbThresholds = seq(0.5, 0.9995, by = 0.00025),
     EFDRgrid,
@@ -210,7 +206,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     EFDR = EFDRgrid, 
     EFNR = EFNRgrid
   )
-  mdf <- reshape2::melt(df,measure.vars = c("EFDR", "EFNR"))
+  mdf <- reshape2::melt(df, measure.vars = c("EFDR", "EFNR"))
   ggplot2::ggplot(mdf, 
       aes_string(x = "ProbThresholds", y = "value", colour = "variable")
     ) +
@@ -223,12 +219,12 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     ggplot2::scale_colour_brewer(name = "", palette = "Set2") +
     ggplot2::geom_hline(
       aes(yintercept = EFDR, colour = "Selected\nEFDR"),
-      lty = 2,
+      linetype = "dashed",
       na.rm = TRUE
     ) +
     ggplot2::geom_vline(
       aes(colour = "Probability\nthreshold", xintercept = ProbThreshold),
-      lty = 1,
+      linetype = "dashed",
       na.rm = TRUE
     ) +
     ggplot2::theme_bw()

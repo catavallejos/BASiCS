@@ -198,7 +198,7 @@ BASiCS_DetectVG <- function(
     EFDRgrid = Aux$EFDRgrid,
     EFNRgrid = Aux$EFNRgrid,
     EFDR = Aux$OptThreshold[[2]],
-    EFNR = Aux$OptThreshold[[2]], 
+    EFNR = Aux$OptThreshold[[3]], 
     Method = Method,
     Threshold = Threshold, 
     RowData = DataFrame(GeneName = GeneName)
