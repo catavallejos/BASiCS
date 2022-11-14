@@ -124,7 +124,7 @@ BASiCS_DetectVG <- function(
     GeneIndex = GeneIndex,
     GeneName = GeneName,
     Mu = matrixStats::colMedians(Chain@parameters$mu),
-    Delta = matrixStats::colMedians(Chain@parameters$mu)
+    Delta = matrixStats::colMedians(Chain@parameters$delta)
   )
   
 
@@ -179,7 +179,7 @@ BASiCS_DetectVG <- function(
     stringsAsFactors = FALSE
   )
   colnames(Table)[[which(colnames(Table)=="VG")]] <- Task
-   
+
   # Re-order the table of results
   orderVar <- switch(
     OrderVariable,
@@ -188,7 +188,7 @@ BASiCS_DetectVG <- function(
     "Prob" = Prob
   )
   Table <- Table[order(orderVar, decreasing = TRUE, na.last = TRUE), ]
-   
+
   # output object
   out <- new("BASiCS_ResultVG",
     Table = Table,
@@ -198,7 +198,7 @@ BASiCS_DetectVG <- function(
     EFDRgrid = Aux$EFDRgrid,
     EFNRgrid = Aux$EFNRgrid,
     EFDR = Aux$OptThreshold[[2]],
-    EFNR = Aux$OptThreshold[[3]], 
+    EFNR = Aux$OptThreshold[[3]],
     Method = Method,
     Threshold = Threshold, 
     RowData = DataFrame(GeneName = GeneName)

@@ -1,3 +1,21 @@
+test_that("HVG/LVG - check if parameters are correct", {
+  data(ChainSC)
+  test <- BASiCS_DetectVG(ChainSC, Task = "HVG", VarThreshold = 0.6)
+  test@Table <- test@Table[order(test@Table$GeneIndex), ]
+  expect_equal(
+    matrixStats::colMedians(displayChainBASiCS(ChainSC, "delta")),
+    test@Table$Delta
+  )
+  expect_equal(
+    matrixStats::colMedians(displayChainBASiCS(ChainSC, "mu")),
+    test@Table$Mu
+  )
+  expect_equal(
+    colnames(displayChainBASiCS(ChainSC, "mu")),
+    test@Table$GeneName
+  )
+})
+
 test_that("HVG/LVG - check if key parameters are missing", {
   
   data(ChainSC)
