@@ -26,10 +26,10 @@ BASiCS_PlotVarianceDecomp <- function(
   rownames(outmat) <- c("Shot noise", "Technical", "Biological")
   colnames(outmat) <- xlabs
   mdf <- reshape2::melt(outmat)
-  ggplot2::ggplot(mdf,
-      ggplot2::aes_string(x = "Var2", y = "value", fill = "Var1")
+  ggplot(mdf,
+      aes(x = Var2, y = value, fill = Var1)
     ) +
-    ggplot2::geom_col(position = if (!beside) "fill" else "dodge") +
-    ggplot2::scale_fill_brewer(palette = "Set1", name = NULL) +
-    ggplot2::labs(main = main, x = NULL, y = ylab)
+    geom_col(position = if (!beside) "fill" else "dodge") +
+    scale_fill_brewer(palette = "Set1", name = NULL) +
+    labs(main = main, x = NULL, y = ylab)
 }

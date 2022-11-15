@@ -1,13 +1,17 @@
 #' @useDynLib BASiCS
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
-#' @importFrom ggplot2 aes aes_string 
-#' @importFrom ggplot2 geom_ribbon geom_segment ggplot ggtitle 
-#'                     geom_hline geom_line geom_point 
+#' @importFrom ggplot2 ggplot aes
+#' @importFrom ggplot2 geom_ribbon geom_segment geom_boxplot geom_hex geom_col
+#'                     geom_hline geom_line geom_point geom_histogram
+#'                     geom_violin geom_vline
 #' @importFrom ggplot2 scale_fill_gradientn scale_x_log10 scale_y_log10 
-#'                     scale_x_continuous scale_y_continuous
-#' @importFrom ggplot2 theme_minimal theme_classic 
-#' @importFrom ggplot2 xlab ylab labs
+#'                     scale_x_continuous scale_y_continuous scale_colour_manual
+#'                     scale_fill_brewer scale_colour_brewer scale_color_brewer
+#' @importFrom ggplot2 theme_minimal theme_classic theme_bw theme
+#'                      element_blank
+#' @importFrom ggplot2 xlab ylab labs ggtitle xlim ylim
+#' @importFrom ggplot2 after_stat
 #' @importFrom grDevices adjustcolor colorRampPalette nclass.FD
 #' @importFrom ggExtra ggMarginal
 #' @importFrom graphics segments

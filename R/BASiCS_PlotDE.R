@@ -78,7 +78,7 @@ setMethod("BASiCS_PlotDE", signature(object = "BASiCS_ResultsDE"),
     }
     l <- lapply(l,
       function(g) {
-        g + ggplot2::theme(
+        g + theme(
           plot.margin = grid::unit(c(0.1, 0, 0.05, 0), units = "npc")
         )
       }
@@ -207,27 +207,27 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
     EFNR = EFNRgrid
   )
   mdf <- reshape2::melt(df, measure.vars = c("EFDR", "EFNR"))
-  ggplot2::ggplot(mdf, 
-      aes_string(x = "ProbThresholds", y = "value", colour = "variable")
+  ggplot(mdf, 
+      aes(x = ProbThresholds, y = value, colour = variable)
     ) +
-    ggplot2::geom_line(na.rm = TRUE) +
-    ggplot2::labs(
+    geom_line(na.rm = TRUE) +
+    labs(
       y = "Error rate", 
       x = "Probability threshold"
     ) +
-    ggplot2::ylim(c(0, 1)) +
-    ggplot2::scale_colour_brewer(name = "", palette = "Set2") +
-    ggplot2::geom_hline(
+    ylim(c(0, 1)) +
+    scale_colour_brewer(name = "", palette = "Set2") +
+    geom_hline(
       aes(yintercept = EFDR, colour = "Selected\nEFDR"),
       linetype = "dashed",
       na.rm = TRUE
     ) +
-    ggplot2::geom_vline(
+    geom_vline(
       aes(colour = "Probability\nthreshold", xintercept = ProbThreshold),
       linetype = "dashed",
       na.rm = TRUE
     ) +
-    ggplot2::theme_bw()
+    theme_bw()
 }
 
 
@@ -251,51 +251,51 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   if (TransLogit) {
     Table[[pVar]] <- .logit_nudge(Table[[pVar]])
   }
-  g <- ggplot2::ggplot(
+  g <- ggplot(
       Table,
-      ggplot2::aes_string(
-        x = dVar,
-        y = pVar
+      aes(
+        x = .data[[dVar]],
+        y = .data[[pVar]]
       )
     ) +
-    ggplot2::geom_point(
-      ggplot2::aes_string(colour = rVar),
+    geom_point(
+      aes(colour = .data[[rVar]]),
       shape = 16,
       alpha = 0.6
     ) +
-    ggplot2::geom_vline(
+    geom_vline(
       xintercept = c(-Epsilon, Epsilon),
       lty = "dashed",
       colour = "grey40",
       na.rm = TRUE
     ) +
-    ggplot2::geom_hline(
+    geom_hline(
       yintercept = ProbThreshold,
       lty = "dashed",
       colour = "grey40",
       na.rm = TRUE
     ) +
-    ggplot2::scale_colour_manual(
+    scale_colour_manual(
       values = .ColourMap(Table, dVar, rVar),
       drop = TRUE,
       name = NULL
     ) +
-    ggplot2::labs(
+    labs(
       x = paste(
         .cap(.LogDistanceName(Measure)),
         GroupLabel1, "vs", GroupLabel2
       ),
       y = "Posterior probability"
     ) +
-    ggplot2::theme_bw() +
+    theme_bw() +
     if (TransLogit) {
-      ggplot2::scale_y_continuous(trans = "logit",
+      scale_y_continuous(trans = "logit",
         # limits = c(.Machine$double.xmin, 1 - .Machine$double.xmin)
         # limits = c(0.01, 0.99)
         breaks = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99)
       )
     } else {
-      ggplot2::ylim(c(0, 1))
+      ylim(c(0, 1))
     }
   g
 }
@@ -313,35 +313,36 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   dVar <- paste0(Measure, .DistanceVar(Measure))
   rVar <- paste0("ResultDiff", Measure)
   Table$IndDiff <- .DiffExp(Table[[rVar]])
-  xscale <- ggplot2::scale_x_continuous(
+  xscale <- scale_x_continuous(
     trans = if (Measure == "ResDisp" & is.null(Mu)) "identity" else "log2"
   )
   Table$`_Mu` <- Mu
   Table <- Table[order(Table$IndDiff), ]
-  ggplot2::ggplot(
+  xVar <- if (!is.null(Mu)) "_Mu" else paste0(Measure, "Overall")
+  ggplot(
       Table,
-      ggplot2::aes_string(
-        x = if (!is.null(Mu)) "`_Mu`" else paste0(Measure, "Overall"),
-        y = dVar
+      aes(
+        x = .data[[xVar]],
+        y = .data[[dVar]]
       )
     ) + 
-    ggplot2::geom_point(
-      ggplot2::aes_string(colour = rVar),
+    geom_point(
+      aes(colour = .data[[rVar]]),
       shape = 16,
       alpha = 0.6
     ) +
-    ggplot2::geom_hline(
+    geom_hline(
       yintercept = c(-Epsilon, Epsilon),
       lty = "dashed", 
       colour = "grey40"
     ) +
     xscale +
-    ggplot2::scale_colour_manual(
+    scale_colour_manual(
       values = .ColourMap(Table, dVar, rVar),
       drop = TRUE,
       name = NULL
     ) +
-    ggplot2::labs(
+    labs(
       x = if (is.null(Mu)) paste(.cap(.MeasureName(Measure)))
         else "Mean expression",
       y = paste(.cap(.LogDistanceName(Measure)),
@@ -349,7 +350,7 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
         GroupLabel2
       )
     ) +
-    ggplot2::theme_bw()
+    theme_bw()
 }
 
 .DiffExp <- function(res) {

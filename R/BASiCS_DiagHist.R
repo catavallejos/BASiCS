@@ -76,9 +76,9 @@ BASiCS_DiagHist <- function(
   if (length(metric) == 1) {
     stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
   }
-  ggplot2::ggplot(mapping = ggplot2::aes(x = metric)) + 
-    ggplot2::geom_histogram(bins = grDevices::nclass.FD(metric)) +
-    ggplot2::labs(x = .ScaleName(Measure, Parameter),
+  ggplot(mapping = aes(x = metric)) + 
+    geom_histogram(bins = grDevices::nclass.FD(metric)) +
+    labs(x = .ScaleName(Measure, Parameter),
                   y = "Count")
 }
 

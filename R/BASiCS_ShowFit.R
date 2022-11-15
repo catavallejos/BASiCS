@@ -94,23 +94,25 @@ BASiCS_ShowFit <- function(object,
                     yhat.upper = yhat.HPD[,2],
                     yhat.lower = yhat.HPD[,1])
 
-  plot.out <- ggplot(df[df$included,],
-                     ggplot2::aes_string(x = "mu", y = "delta")) +
+  plot.out <- ggplot(df[df$included,]) +
+    aes(x = mu, y = delta) +
     xlab(xlab) + ylab(ylab) +
     theme_minimal(base_size = 15)
   if(markExcludedGenes == TRUE) {
     plot.out <- plot.out + 
-    ggplot2::geom_point(data = df[!df$included, ],
-                        shape = pch,
-                        colour = "purple",
-                        alpha = 0.3)
+    geom_point(
+      data = df[!df$included, ],
+      shape = pch,
+      colour = "purple",
+      alpha = 0.3
+    )
   }
 
   if (smooth) {
     cols <- c("dark blue", "yellow", "dark red")
     plot.out <- plot.out +
-      ggplot2::geom_hex(bins = 100) +
-      ggplot2::scale_fill_gradientn(
+      geom_hex(bins = 100) +
+      scale_fill_gradientn(
         name = "",
         colours = grDevices::colorRampPalette(cols)(100),
         guide = "none"
@@ -118,7 +120,7 @@ BASiCS_ShowFit <- function(object,
   }
   else {
     plot.out <- plot.out +
-      ggplot2::geom_point(shape = pch,
+      geom_point(shape = pch,
                           colour = colour)
   }
   if(!is.null(GenesSel)) {
@@ -126,23 +128,23 @@ BASiCS_ShowFit <- function(object,
       stop("Some elements of `GenesSel` are not found in the data.")
     }
     plot.out <- plot.out +
-      ggplot2::geom_point(data = df[rownames(df) %in% GenesSel,],
+      geom_point(data = df[rownames(df) %in% GenesSel,],
                           shape = pch,
                           colour = colourGenesSel)
   }
   
   plot.out <- plot.out + 
-    ggplot2::geom_line(data = df2,
-                       inherit.aes = FALSE,
-                       mapping = ggplot2::aes_string(x = "mu2", y = "yhat"),
-                       colour = "dark red") #
+    geom_line(
+      data = df2,
+      inherit.aes = FALSE,
+      mapping = aes(x = mu2, y = yhat),
+      colour = "dark red"
+    )
   if(Uncertainty == TRUE) {
     plot.out <- plot.out + geom_ribbon(
       data = df2,
       inherit.aes = FALSE,
-      mapping = aes_string(x = "mu2",
-      ymin = "yhat.lower",
-      ymax = "yhat.upper"),
+      mapping = aes(x = mu2, ymin = yhat.lower, ymax = yhat.upper),
       alpha = 0.5
     )
   }
