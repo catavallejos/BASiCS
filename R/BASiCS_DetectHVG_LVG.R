@@ -21,7 +21,8 @@
 #' Default: \code{VarThreshold = NULL}.
 #' @param ProbThreshold Optional parameter. Posterior probability threshold
 #' (must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
-#' posterior probability threshold for the test will be set to \code{ProbThreshold}
+#' posterior probability threshold for the test will be set to
+#' \code{ProbThreshold}.
 #' @param EpsilonThreshold Threshold for residual overdispersion above which
 #' 
 #' @param EFDR Target for expected false discovery rate related
@@ -42,6 +43,9 @@
 #'
 #' @return An object of class \code{\link[BASiCS]{BASiCS_ResultVG}}.
 #' 
+#' @details
+#' In some cases, the EFDR calibration step may fail to find probability
+#' threshold that controls the EFDR at the chosen level. In cases like 
 #' @examples
 #' 
 #' # Loads short example chain (non-regression implementation)

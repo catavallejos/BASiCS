@@ -1634,3 +1634,11 @@ version 2.9.6 (2022-09-05)
 
 version 2.9.7 (2022-09-06)
 - Bugfix in BASiCS_DetectHVG/BASiCS_DetectLVG.
+  
+
+version 2.11.2 (2022-11-23)
+- Bugfix in DetectLVG/HVG, see Issue #265; delta column in results was actually
+  duplicated mu column.
+- Change BASiCS_CorrectOffset to also alter the scale of the normalisation
+  factors when WithSpikes=FALSE.
+- Add "rhat" option to BASiCS_DiagHist and BASiCS_DiagPlot
