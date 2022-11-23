@@ -35,6 +35,7 @@
 #' @importFrom hexbin hexbin
 #' @importFrom utils packageVersion read.delim write.table write.table
 #' @importFrom assertthat assert_that
+#' @importFrom posterior rhat
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importMethodsFrom Matrix t rowMeans
 #' @importClassesFrom Biobase Versioned

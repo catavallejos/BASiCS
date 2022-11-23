@@ -8,7 +8,7 @@
 BASiCS_DiagHist(
   object,
   Parameter = NULL,
-  Measure = c("ess", "geweke.diag"),
+  Measure = c("ess", "geweke.diag", "rhat"),
   na.rm = TRUE
 )
 
@@ -17,15 +17,15 @@ BASiCS_diagHist(...)
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Parameter}{Optional name of a chain parameter to restrict the histogram;
-if not supplied, all parameters will be assessed.
+\item{Parameter}{Optional name of a chain parameter to restrict the
+histogram; if not supplied, all parameters will be assessed.
 Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.}
 
 \item{Measure}{Character scalar specifying the diagnostic measure to plot.
-Current options are effective sample size and the Geweke diagnostic
-criterion.}
+Current options are effective sample size, the Geweke diagnostic
+criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}

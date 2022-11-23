@@ -8,7 +8,7 @@
 BASiCS_DiagPlot(
   object,
   Parameter = "mu",
-  Measure = c("ess", "geweke.diag"),
+  Measure = c("ess", "geweke.diag", "rhat"),
   x = NULL,
   y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")),
@@ -29,8 +29,8 @@ Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
 \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}}
 
 \item{Measure}{Character scalar specifying the diagnostic measure to plot.
-Current options are effective sample size and the Geweke diagnostic
-criterion.}
+Current options are effective sample size, the Geweke diagnostic
+criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.}
 
 \item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
 respectively. If neither is supplied, Parameter will be plotted on the x axis

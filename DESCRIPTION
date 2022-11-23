@@ -61,6 +61,7 @@ Imports:
     assertthat,
     reshape2,
     BiocParallel,
+    posterior,
     hexbin
 Suggests:
     BiocStyle,

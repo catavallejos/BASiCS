@@ -11,8 +11,8 @@
 #' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
 #' \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}
 #' @param Measure Character scalar specifying the diagnostic measure to plot.
-#' Current options are effective sample size and the Geweke diagnostic
-#' criterion.
+#' Current options are effective sample size, the Geweke diagnostic
+#' criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.
 #' @param x,y Optional MCMC parameter values to be plotted on the x or y axis, 
 #' respectively. If neither is supplied, Parameter will be plotted on the x axis
 #' and effective sample size will be plotted on the y axis as
@@ -44,7 +44,7 @@
 #' @export
 BASiCS_DiagPlot <- function(object, 
                             Parameter = "mu",
-                            Measure = c("ess", "geweke.diag"),
+                            Measure = c("ess", "geweke.diag", "rhat"),
                             x = NULL, 
                             y = NULL,
                             LogX = isTRUE(x %in% c("mu", "delta")),
