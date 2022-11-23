@@ -65,8 +65,8 @@ BASiCS_DiagPlot <- function(object,
   }
   .CheckValidCombination(x, y, Parameter)
   metric <- .GetMeasure(object, Parameter, Measure, na.rm)
-  sX <- if (LogX) ggplot2::scale_x_log10() else ggplot2::scale_x_continuous()
-  sY <- if (LogY) ggplot2::scale_y_log10() else ggplot2::scale_y_continuous()
+  sX <- if (LogX) scale_x_log10() else scale_x_continuous()
+  sY <- if (LogY) scale_y_log10() else scale_y_continuous()
 
   if (!is.null(x)) {
     xMat <- .GetParam(object, x)
@@ -80,13 +80,13 @@ BASiCS_DiagPlot <- function(object,
       metric = metric
     )
     df <- df[order(df$metric), ]
-    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = y, color = metric)) + 
-      ggplot2::geom_point(alpha = 0.5, shape = 16) +
-      viridis::scale_color_viridis(name = .ScaleName(Measure, Parameter)
+    g <- ggplot(df, aes(x = x, y = y, colour = metric)) + 
+      geom_point(alpha = 0.5, shape = 16) +
+      viridis::scale_colour_viridis(name = .ScaleName(Measure, Parameter)
         #, trans="log10"
         ) +
       sX + sY +
-      ggplot2::labs(x = x, y = y)              
+      labs(x = x, y = y)              
   } else {
     xMat <- .GetParam(object, Parameter)
     xMat <- xMat[, names(metric), drop = FALSE]
@@ -94,16 +94,16 @@ BASiCS_DiagPlot <- function(object,
       x = matrixStats::colMedians(xMat),
       y = metric
     )
-    g <- ggplot2::ggplot(df, ggplot2::aes(x = x, y = metric)) + 
+    g <- ggplot(df, aes(x = x, y = metric)) + 
       sX + sY +
-      ggplot2::labs(x = Parameter, y = .ScaleName(Measure))
+      labs(x = Parameter, y = .ScaleName(Measure))
     if (Smooth) {
       g <- g +
-        ggplot2::geom_hex() +
+        geom_hex() +
         viridis::scale_fill_viridis(name = "Count", trans = "log10")
     } else {
       g <- g +
-        ggplot2::geom_point()
+        geom_point()
     }
     g
   }

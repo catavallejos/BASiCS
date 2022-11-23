@@ -309,7 +309,7 @@ setClass("BASiCS_ResultsDE",
     if (!all(matching_genes)) {
       stop("Some GeneName columns do not match!")
     }
-    assertthat::assert_that(
+    assert_that(
       all(vapply(object@Results, function(x) inherits(x, "BASiCS_ResultDE"), logical(1))),
       length(object@GroupLabel1) == 1,
       length(object@GroupLabel2) == 1,
@@ -347,7 +347,7 @@ setClass("BASiCS_Result",
   ),
   validity = function(object) {
 
-    assertthat::assert_that(
+    assert_that(
       !is.null(object@Table$GeneName),
       object@Name %in% c("Mean", "Disp", "ResDisp", "HVG", "LVG"),
       length(object@ProbThreshold) == 1,
@@ -393,7 +393,7 @@ setClass("BASiCS_ResultDE",
   ),
   contains = "BASiCS_Result",
   validity = function(object) {
-    assertthat::assert_that(
+    assert_that(
       length(object@GroupLabel1) == 1,
       length(object@GroupLabel2) == 1,
       length(object@EFDRgrid) == length(object@EFNRgrid),
@@ -436,7 +436,7 @@ setClass("BASiCS_ResultVG",
   ),
   contains = "BASiCS_Result",
   validity = function(object) {
-    assertthat::assert_that(
+    assert_that(
       length(object@Method) == 1,
       !is.null(object@RowData$GeneName),
       length(object@EFDRgrid) == length(object@EFNRgrid),

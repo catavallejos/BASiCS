@@ -109,7 +109,7 @@ BASiCS_DivideAndConquer <- function(
   cat("Starting MCMC...\n")
   output <- bplapply(
     Subsets,
-    function(Subset) {
+    function(Subset, ...) {
       ind <- match(rownames(Subset), rownames(Data))
       PriorParam$mu.mu <- PriorParam$mu.mu[ind]
       ind <- match(colnames(Subset), colnames(Data))
@@ -125,7 +125,8 @@ BASiCS_DivideAndConquer <- function(
         ...
       )
     },
-    BPPARAM = BPPARAM
+    BPPARAM = BPPARAM,
+    ...
   )
   if (any(vapply(output, class, character(1)) == "try-error")) {
     warning("Some MCMC runs failed!")

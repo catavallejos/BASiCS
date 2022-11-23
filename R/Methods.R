@@ -429,24 +429,28 @@ setMethod(
     DF2 <- with(MyAcf, data.frame(lag, acf))
     
     # Traceplot
-    p1 <- ggplot2::ggplot(DF1) + 
-      ggplot2::geom_point(ggplot2::aes_string(x = "Iteration", y = "Draws"),
-                          col = grDevices::adjustcolor("white", 
-                                                       alpha.f = 0) ) + 
-      ggplot2::geom_line(ggplot2::aes_string(x= "Iteration", y = "Draws")) + 
-      ggplot2::labs(title = colnames(x@parameters[[Parameter]])[Column],
-                    x = "Iteration", 
-                    y = "Parameter value") + 
-      ggplot2::theme_classic()
+    p1 <- ggplot(DF1) + 
+      geom_point(
+        aes(x = Iteration, y = Draws),
+        col = grDevices::adjustcolor("white", 
+        alpha.f = 0)
+      ) + 
+      geom_line(aes(x = Iteration, y = Draws)) + 
+      labs(
+        title = colnames(x@parameters[[Parameter]])[Column],
+        x = "Iteration", 
+        y = "Parameter value"
+      ) + 
+      theme_classic()
     p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
       
-    p2 <- ggplot2::ggplot(DF2, ggplot2::aes_string(x = "lag", y = "acf")) + 
-      ggplot2::theme_classic() + 
-      ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) + 
-      ggplot2::geom_segment(
-        mapping = ggplot2::aes_string(xend = "lag", yend = 0)
+    p2 <- ggplot(DF2, aes(x = lag, y = acf)) + 
+      theme_classic() + 
+      geom_hline(aes(yintercept = 0)) + 
+      geom_segment(
+        mapping = aes(xend = lag, yend = 0)
       ) +
-      ggplot2::ggtitle(colnames(x@parameters[[Parameter]])[Column])
+      ggtitle(colnames(x@parameters[[Parameter]])[Column])
     
     cowplot::plot_grid(p1, p2)
             

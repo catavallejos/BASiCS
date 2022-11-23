@@ -62,14 +62,14 @@ BASiCS_PlotOffset <- function(Chain1,
   Plots <- list()
   if ("offset estimate" %in% Type) {
     # Offset uncertainty
-    g <- ggplot2::ggplot(mapping = ggplot2::aes(y = OffsetChain)) +
-      ggplot2::geom_boxplot(na.rm = TRUE) +
-      ggplot2::labs(
+    g <- ggplot(mapping = aes(y = OffsetChain)) +
+      geom_boxplot(na.rm = TRUE) +
+      labs(
         # title = "Offset MCMC chain",
         y = "Offset estimate", x = NULL) +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_blank(),
-        axis.ticks.x = ggplot2::element_blank()
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()
       )
     Plots <- c(Plots, list(g))
   }
@@ -82,26 +82,26 @@ BASiCS_PlotOffset <- function(Chain1,
     df <- cbind(Mu1_old, Mu2)
     colnames(df) <- c(GroupLabel1, GroupLabel2)
     mdf <- reshape2::melt(df)
-    g1 <- ggplot2::ggplot(mdf, ggplot2::aes_string(x = "Var2", y = "value")) +
-      ggplot2::labs(
+    g1 <- ggplot(mdf, aes(x = Var2, y = value)) +
+      labs(
         title = "Before correction",
         y = "Mean expression",
         x = NULL
       ) +
-      ggplot2::geom_violin(na.rm = TRUE) +
-      ggplot2::scale_y_log10(limits = ylim)
+      geom_violin(na.rm = TRUE) +
+      scale_y_log10(limits = ylim)
 
     df <- cbind(Mu1, Mu2)
     colnames(df) <- c(GroupLabel1, GroupLabel2)
     mdf <- reshape2::melt(df)
-    g2 <- ggplot2::ggplot(mdf, ggplot2::aes_string(x = "Var2", y = "value")) +
-      ggplot2::labs(
+    g2 <- ggplot(mdf, aes(x = Var2, y = value)) +
+      labs(
         title = "After correction",
         y = "Mean expression",
         x = NULL
       ) +
-      ggplot2::geom_violin() +
-      ggplot2::scale_y_log10(limits = ylim)
+      geom_violin() +
+      scale_y_log10(limits = ylim)
 
     g <- cowplot::plot_grid(g1, g2)
     Plots <- c(Plots, list(g))
@@ -119,46 +119,46 @@ BASiCS_PlotOffset <- function(Chain1,
       x = log2(MuBase_old),
       y = MedianTau_old
     )
-    g1 <- ggplot2::ggplot(df, mapping = ggplot2::aes_string(x = "x", y = "y")) +
-      ggplot2::geom_hex(
+    g1 <- ggplot(df, mapping = aes(x = x, y = y)) +
+      geom_hex(
         # bins = NClassFD2D(df$x, df$y),
         bins = 100,
-        aes_string(fill = "..density.."),
+        aes(fill = after_stat(density)),
         na.rm = TRUE) +
-      # ggplot2::geom_point() +
-      ggplot2::geom_hline(yintercept = 0, lty = 2) +
-      ggplot2::geom_hline(
+      # geom_point() +
+      geom_hline(yintercept = 0, lty = 2) +
+      geom_hline(
         yintercept = log2(OffsetEst),
         lty = 1,
         col = "red",
         na.rm = TRUE) +
-      ggplot2::labs(
+      labs(
         x = "Mean expresssion (log2)",
         y = paste(
           "Log2 fold change", GroupLabel1,
           "vs", GroupLabel2),
         title = "Before correction") +
-      viridis::scale_fill_viridis(name = "Density", guide = "none")
+      scale_fill_viridis(name = "Density", guide = "none")
 
     df <- data.frame(
       x = log2(MuBase),
       y = MedianTau
     )
-    g2 <- ggplot2::ggplot(df, mapping = ggplot2::aes_string(x = "x", y = "y")) +
-      ggplot2::geom_hex(
-        mapping = aes_string(fill = "..density.."),
+    g2 <- ggplot(df, mapping = aes(x = x, y = y)) +
+      geom_hex(
+        mapping = aes(fill = after_stat(density)),
         bins = 100,
         # bins = NClassFD2D(df$x, df$y),
         na.rm = TRUE) +
-      # ggplot2::geom_point() +
-      ggplot2::geom_hline(yintercept = 0, lty = 2) +
-      ggplot2::labs(
+      # geom_point() +
+      geom_hline(yintercept = 0, lty = 2) +
+      labs(
         x = "Mean expresssion (log2)",
         y = paste(
           "Log2 fold change", GroupLabel1,
           "vs", GroupLabel2),
         title = "After correction") +
-      viridis::scale_fill_viridis(name = "Density")
+      scale_fill_viridis(name = "Density")
 
     g <- cowplot::plot_grid(g1, g2)
     Plots <- c(Plots, list(g))
