@@ -9,6 +9,7 @@ BASiCS_DiagHist(
   object,
   Parameter = NULL,
   Measure = c("ess", "geweke.diag", "rhat"),
+  VLine = NULL,
   na.rm = TRUE
 )
 
@@ -19,15 +20,16 @@ BASiCS_diagHist(...)
 
 \item{Parameter}{Optional name of a chain parameter to restrict the
 histogram; if not supplied, all parameters will be assessed.
-Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
-\code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-\code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.}
+Default \code{Parameter = NULL}.}
 
 \item{Measure}{Character scalar specifying the diagnostic measure to plot.
 Current options are effective sample size, the Geweke diagnostic
 criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.}
 
-\item{na.rm}{Logical value indicating whether NA values should be removed
+\item{VLine}{Numeric scalar indicating a threshold value to be displayed as
+a dashed line on the plot.}
+
+\item{na.rm}{Logical scalar indicating whether NA values should be removed
 before calculating effective sample size.}
 
 \item{...}{Unused.}
