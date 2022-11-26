@@ -100,7 +100,7 @@ BASiCS_diagHist <- function(...) {
 
 .LineAt <- function(Measure) {
   if (Measure == "ess") {
-    500
+    100
   } else if (Measure == "geweke.diag") {
     c(-3, 3)
   } else if (Measure == "rhat") {
