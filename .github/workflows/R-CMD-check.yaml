@@ -47,7 +47,7 @@ jobs:
           brew install ffmpeg
 
       - name: Install dependencies
-        uses: r-lib/actions/setup-r-dependencies@v1
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: rcmdcheck, optparse, magick, BiocManager
 
