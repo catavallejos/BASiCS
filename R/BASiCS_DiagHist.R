@@ -7,13 +7,13 @@
 #' @param object an object of class \code{\linkS4class{BASiCS_Summary}}
 #' @param Parameter Optional name of a chain parameter to restrict the
 #' histogram; if not supplied, all parameters will be assessed.
-#' Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
-#' \code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-#' \code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = NULL}.
+#' Default \code{Parameter = NULL}.
 #' @param Measure Character scalar specifying the diagnostic measure to plot.
 #' Current options are effective sample size, the Geweke diagnostic
 #' criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.
-#' @param na.rm Logical value indicating whether NA values should be removed
+#' @param VLine Numeric scalar indicating a threshold value to be displayed as
+#' a dashed line on the plot.
+#' @param na.rm Logical scalar indicating whether NA values should be removed
 #' before calculating effective sample size.
 #' @param ... Unused.
 #'
@@ -23,12 +23,12 @@
 #'
 #' # Built-in example chain
 #' data(ChainSC)
-#' 
+#'
 #' # See effective sample size distribution across all parameters
 #' BASiCS_DiagHist(ChainSC)
 #' # For mu only
 #' BASiCS_DiagHist(ChainSC, Parameter = "mu")
-#' 
+#'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #' @references
 #'  Geweke, J. Evaluating the accuracy of sampling-based approaches to
@@ -43,12 +43,13 @@ BASiCS_DiagHist <- function(
     object,
     Parameter = NULL,
     Measure = c("ess", "geweke.diag", "rhat"),
+    VLine = NULL,
     na.rm = TRUE) {
 
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
-
+  Measure <- match.arg(Measure)
 
   if (is.null(Parameter)) {
     metric <- lapply(names(object@parameters), function(param) {
@@ -76,8 +77,16 @@ BASiCS_DiagHist <- function(
   if (length(metric) == 1) {
     stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
   }
-  ggplot(mapping = aes(x = metric)) + 
+  if (is.logical(VLine)) {
+    DrawVLine <- VLine
+  }
+  if (!is.numeric(VLine)) {
+    VLine <- .LineAt(Measure)
+    DrawVLine <- TRUE
+  }
+  ggplot(mapping = aes(x = metric)) +
     geom_histogram(bins = grDevices::nclass.FD(metric)) +
+    (if (DrawVLine) geom_vline(xintercept = VLine, linetype = "dashed") else list()) +
     labs(x = .ScaleName(Measure, Parameter),
                   y = "Count")
 }
@@ -89,3 +98,12 @@ BASiCS_diagHist <- function(...) {
   BASiCS_DiagHist(...)
 }
 
+.LineAt <- function(Measure) {
+  if (Measure == "ess") {
+    500
+  } else if (Measure == "geweke.diag") {
+    c(-3, 3)
+  } else if (Measure == "rhat") {
+    1.05
+  }
+}
