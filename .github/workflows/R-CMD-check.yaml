@@ -30,13 +30,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: rcmdcheck, magick, BiocManager
-
-      - name: Install BiocCheck
-        if: runner.os == 'Linux'
-        run: BiocManager::install("BiocCheck")
+        run: |
+          dependencies <- remotes::local_package_deps(dependencies = TRUE)
+          leftovers <- setdiff(dependencies, installed.packages())
+          BiocManager::install(leftovers, ask=FALSE, Ncpu=2L)
+          BiocManager::install(c("rcmdcheck", "magick", "BiocManager", "BiocCheck"), ask=FALSE, Ncpu=2L)
         shell: Rscript {0}
 
       - name: Check
