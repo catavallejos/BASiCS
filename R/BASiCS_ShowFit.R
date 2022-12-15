@@ -95,7 +95,7 @@ BASiCS_ShowFit <- function(object,
                     yhat.lower = yhat.HPD[,1])
 
   plot.out <- ggplot(df[df$included,]) +
-    aes(x = mu, y = delta) +
+    aes(x = .data$mu, y = .data$delta) +
     xlab(xlab) + ylab(ylab) +
     theme_minimal(base_size = 15)
   if(markExcludedGenes == TRUE) {
@@ -137,14 +137,14 @@ BASiCS_ShowFit <- function(object,
     geom_line(
       data = df2,
       inherit.aes = FALSE,
-      mapping = aes(x = mu2, y = yhat),
+      mapping = aes(x = .data$mu2, y = .data$yhat),
       colour = "dark red"
     )
   if(Uncertainty == TRUE) {
     plot.out <- plot.out + geom_ribbon(
       data = df2,
       inherit.aes = FALSE,
-      mapping = aes(x = mu2, ymin = yhat.lower, ymax = yhat.upper),
+      mapping = aes(x = .data$mu2, ymin = .data$yhat.lower, ymax = .data$yhat.upper),
       alpha = 0.5
     )
   }

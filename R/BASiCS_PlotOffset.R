@@ -82,7 +82,7 @@ BASiCS_PlotOffset <- function(Chain1,
     df <- cbind(Mu1_old, Mu2)
     colnames(df) <- c(GroupLabel1, GroupLabel2)
     mdf <- reshape2::melt(df)
-    g1 <- ggplot(mdf, aes(x = Var2, y = value)) +
+    g1 <- ggplot(mdf, aes(x = .data$Var2, y = .data$value)) +
       labs(
         title = "Before correction",
         y = "Mean expression",
@@ -94,7 +94,7 @@ BASiCS_PlotOffset <- function(Chain1,
     df <- cbind(Mu1, Mu2)
     colnames(df) <- c(GroupLabel1, GroupLabel2)
     mdf <- reshape2::melt(df)
-    g2 <- ggplot(mdf, aes(x = Var2, y = value)) +
+    g2 <- ggplot(mdf, aes(x = .data$Var2, y = .data$value)) +
       labs(
         title = "After correction",
         y = "Mean expression",
@@ -119,7 +119,7 @@ BASiCS_PlotOffset <- function(Chain1,
       x = log2(MuBase_old),
       y = MedianTau_old
     )
-    g1 <- ggplot(df, mapping = aes(x = x, y = y)) +
+    g1 <- ggplot(df, mapping = aes(x = .data$x, y = .data$y)) +
       geom_hex(
         # bins = NClassFD2D(df$x, df$y),
         bins = 100,
@@ -144,7 +144,7 @@ BASiCS_PlotOffset <- function(Chain1,
       x = log2(MuBase),
       y = MedianTau
     )
-    g2 <- ggplot(df, mapping = aes(x = x, y = y)) +
+    g2 <- ggplot(df, mapping = aes(x = .data$x, y = .data$y)) +
       geom_hex(
         mapping = aes(fill = after_stat(density)),
         bins = 100,

@@ -1,7 +1,7 @@
 #' @useDynLib BASiCS
 #' @importFrom coda HPDinterval mcmc effectiveSize
 #' @importFrom cowplot plot_grid
-#' @importFrom ggplot2 ggplot aes
+#' @importFrom ggplot2 ggplot aes .data
 #' @importFrom ggplot2 geom_ribbon geom_segment geom_boxplot geom_hex geom_col
 #'                     geom_hline geom_line geom_point geom_histogram
 #'                     geom_violin geom_vline
@@ -23,7 +23,7 @@
 #' @importFrom S4Vectors DataFrame
 #' @importFrom scran calculateSumFactors
 #' @importFrom scuttle cleanSizeFactors
-#' @importFrom stats acf median model.matrix rgamma rpois runif var lm 
+#' @importFrom stats acf median model.matrix rgamma rpois runif var lm lag
 #'  quantile rlnorm density
 #' @importFrom SingleCellExperiment SingleCellExperiment counts 
 #' @importFrom SingleCellExperiment altExp altExp<- 
@@ -35,6 +35,7 @@
 #' @importFrom hexbin hexbin
 #' @importFrom utils packageVersion read.delim write.table write.table
 #' @importFrom assertthat assert_that
+#' @importFrom posterior rhat
 #' @importMethodsFrom BiocGenerics counts colnames rownames subset updateObject 
 #' @importMethodsFrom Matrix t rowMeans
 #' @importClassesFrom Biobase Versioned

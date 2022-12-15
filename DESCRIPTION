@@ -61,12 +61,14 @@ Imports:
     assertthat,
     reshape2,
     BiocParallel,
+    posterior,
     hexbin
 Suggests:
     BiocStyle,
     knitr,
     rmarkdown,
     testthat,
+    scRNAseq,
     magick
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: knitr
@@ -85,6 +87,7 @@ Config/testthat/edition: 3
 Collate: 
     'AllClasses.R'
     'AllGenerics.R'
+    'BASiCS_CalculateERCC.R'
     'BASiCS_CorrectOffset.R'
     'BASiCS_DenoisedCounts.R'
     'BASiCS_DenoisedRates.R'

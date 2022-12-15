@@ -27,7 +27,7 @@ BASiCS_PlotVarianceDecomp <- function(
   colnames(outmat) <- xlabs
   mdf <- reshape2::melt(outmat)
   ggplot(mdf,
-      aes(x = Var2, y = value, fill = Var1)
+      aes(x = .data$Var2, y = .data$value, fill = .data$Var1)
     ) +
     geom_col(position = if (!beside) "fill" else "dodge") +
     scale_fill_brewer(palette = "Set1", name = NULL) +

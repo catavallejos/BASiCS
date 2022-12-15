@@ -1641,3 +1641,4 @@ version 2.11.2 (2022-11-23)
   duplicated mu column.
 - Change BASiCS_CorrectOffset to also alter the scale of the normalisation
   factors when WithSpikes=FALSE.
+- Add "rhat" option to BASiCS_DiagHist and BASiCS_DiagPlot

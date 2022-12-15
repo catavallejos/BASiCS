@@ -19,13 +19,14 @@ ess <- function(x) {
   setNames(ifelse(spec == 0, 0, nrow(x) * vars / spec), colnames(x))
 }
 
-.ScaleName <- function(Measure = c("ess", "geweke.diag"),
+.ScaleName <- function(Measure = c("ess", "geweke.diag", "rhat"),
                        Parameter = NULL) {
 
   Measure <- match.arg(Measure)
-  measure_name <- switch(Measure, 
+  measure_name <- switch(Measure,
     ess = "Effective sample size",
-    geweke.diag = "Geweke diagnostic"
+    geweke.diag = "Geweke diagnostic",
+    rhat = bquote(hat(R))
   )
   if (!is.null(Parameter)) {
     measure_name <- paste0(measure_name, ": ", Parameter)
@@ -36,7 +37,7 @@ ess <- function(x) {
 #' @importFrom coda geweke.diag
 .GetMeasure <- function(Chain, 
                         Parameter,
-                        Measure = c("ess", "geweke.diag"), 
+                        Measure = c("ess", "geweke.diag", "rhat"),
                         na.rm = FALSE) {
 
   Measure <- match.arg(Measure)
@@ -51,6 +52,9 @@ ess <- function(x) {
     if (!ncol(mat)) {
       stop(paste("No non-NA samples for", Parameter))
     }
+  }
+  if (Measure == "rhat") {
+    return(apply(mat, 2, posterior::rhat))
   }
   metric <- MeasureFun(coda::mcmc(mat))
   if (Measure == "geweke.diag") {

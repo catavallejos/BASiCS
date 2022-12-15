@@ -43,7 +43,8 @@ Default: \code{VarThreshold = NULL}.}
 
 \item{ProbThreshold}{Optional parameter. Posterior probability threshold
 (must be a positive value, between 0 and 1). If \code{EFDR = NULL}, the 
-posterior probability threshold for the test will be set to \code{ProbThreshold}}
+posterior probability threshold for the test will be set to
+\code{ProbThreshold}.}
 
 \item{EpsilonThreshold}{Threshold for residual overdispersion above which}
 
@@ -78,6 +79,9 @@ epsilon parameters. Otherwise, the old approach is used, which initially
 performs a variance decomposition.
 }
 \details{
+In some cases, the EFDR calibration step may fail to find probability
+threshold that controls the EFDR at the chosen level. In cases like
+
 See vignette
 }
 \examples{

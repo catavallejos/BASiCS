@@ -8,12 +8,13 @@
 BASiCS_DiagPlot(
   object,
   Parameter = "mu",
-  Measure = c("ess", "geweke.diag"),
+  Measure = c("ess", "geweke.diag", "rhat"),
   x = NULL,
   y = NULL,
   LogX = isTRUE(x \%in\% c("mu", "delta")),
   LogY = isTRUE(y \%in\% c("mu", "delta")),
   Smooth = TRUE,
+  HLine = NULL,
   na.rm = TRUE
 )
 
@@ -22,17 +23,14 @@ BASiCS_diagPlot(...)
 \arguments{
 \item{object}{an object of class \code{\linkS4class{BASiCS_Summary}}}
 
-\item{Parameter}{Optional name of a chain parameter to restrict the histogram;
-if not supplied, all parameters will be assessed.
-Possible values: \code{'mu'}, \code{'delta'}, \code{'phi'},
-\code{'s'}, \code{'nu'}, \code{'theta'}, \code{'beta'},
-\code{'sigma2'} and \code{'epsilon'}. Default \code{Parameter = 'mu'}}
+\item{Parameter}{Name of the parameter to be plotted.
+Default \code{Parameter = 'mu'}}
 
 \item{Measure}{Character scalar specifying the diagnostic measure to plot.
-Current options are effective sample size and the Geweke diagnostic
-criterion.}
+Current options are effective sample size, the Geweke diagnostic
+criterion, and the \code{\link[posterior]{rhat}} diagnostic.}
 
-\item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis, 
+\item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis,
 respectively. If neither is supplied, Parameter will be plotted on the x axis
 and effective sample size will be plotted on the y axis as
 a density plot.}
@@ -40,8 +38,11 @@ a density plot.}
 \item{LogX, LogY}{A logical value indicating whether to use a log10
 transformation for the x or y axis, respectively.}
 
-\item{Smooth}{A logical value indicating whether to use smoothing 
+\item{Smooth}{A logical value indicating whether to use smoothing
 (specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).}
+
+\item{HLine}{Numeric scalar indicating a threshold value to be displayed as
+a dashed line on the plot.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
