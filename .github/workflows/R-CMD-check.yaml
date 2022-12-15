@@ -41,18 +41,11 @@ jobs:
         uses: r-lib/actions/check-r-package@v2
 
       - name: BiocCheck
-        if: runner.os == 'Linux'
         run: BiocCheck::BiocCheck(dir('check', 'tar.gz$', full.names = TRUE), `quit-with-status` = TRUE)
         shell: Rscript {0}
 
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-results
-          path: check
+      - name: Check
+        env:
+          _R_CHECK_CRAN_INCOMING_REMOTE_: false
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error", check_dir = "check")
+        shell: Rscript {0}
