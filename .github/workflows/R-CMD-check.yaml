@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: ubuntu-latest, bioc: 'devel', image: "bioconductor/bioconductor_docker:devel"}
+          - { os: ubuntu-latest, bioc: 'devel', image: "alanocallaghan/basics:latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck, optparse, magick, BiocManager
+          extra-packages: rcmdcheck, magick, BiocManager
 
       - name: Install BiocCheck
         if: runner.os == 'Linux'
