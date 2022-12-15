@@ -18,8 +18,10 @@
 #' transformation for the x or y axis, respectively.
 #' @param Smooth A logical value indicating whether to use smoothing
 #' (specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).
-#' @param HLine Numeric scalar indicating a threshold value to be displayed as
-#' a dashed line on the plot.
+#' @param DrawHLine A logical value indicating whether a reference horizontal
+#' dashed line will be added to the plot. 
+#' @param HLine Numeric scalar or vector indicating threshold value(s) to be 
+#' displayed as a dashed line on the plot when \code{DrawHLine = TRUE}.
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
 #' @param ... Unused.
@@ -35,6 +37,9 @@
 #' BASiCS_DiagPlot(ChainSC, Parameter = "mu")
 #' # Effective sample size as colour, mu as x, delta as y.
 #' BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
+#' 
+#' # Point estimates versus Geweke diagnostic
+#' BASiCS_DiagPlot(ChainSC, Parameter = "mu", Measure = "geweke.diag")
 #'
 #' @seealso \code{\linkS4class{BASiCS_Chain}}
 #'
@@ -49,6 +54,7 @@ BASiCS_DiagPlot <- function(object,
                             LogX = isTRUE(x %in% c("mu", "delta")),
                             LogY = isTRUE(y %in% c("mu", "delta")),
                             Smooth = TRUE,
+                            DrawHLine = TRUE,
                             HLine = NULL,
                             na.rm = TRUE) {
 
@@ -67,13 +73,9 @@ BASiCS_DiagPlot <- function(object,
   metric <- .GetMeasure(object, Parameter, Measure, na.rm)
   sX <- if (LogX) scale_x_log10() else scale_x_continuous()
   sY <- if (LogY) scale_y_log10() else scale_y_continuous()
-
-  if (is.logical(HLine)) {
-    DrawHLine <- HLine
-  }
+  
   if (!is.numeric(HLine)) {
     HLine <- .LineAt(Measure)
-    DrawHLine <- TRUE
   }
 
   ## x is one param, y is another, colour is measure
