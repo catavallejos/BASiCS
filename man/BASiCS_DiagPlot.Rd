@@ -14,7 +14,7 @@ BASiCS_DiagPlot(
   LogX = isTRUE(x \%in\% c("mu", "delta")),
   LogY = isTRUE(y \%in\% c("mu", "delta")),
   Smooth = TRUE,
-  HLine = NULL,
+  HLine = TRUE,
   na.rm = TRUE
 )
 
@@ -41,8 +41,10 @@ transformation for the x or y axis, respectively.}
 \item{Smooth}{A logical value indicating whether to use smoothing
 (specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).}
 
-\item{HLine}{Numeric scalar indicating a threshold value to be displayed as
-a dashed line on the plot.}
+\item{HLine}{Numeric scalar or vector indicating threshold value(s) to be
+displayed as a dashed line on the plot when \code{DrawHLine = TRUE}.
+Alternatively, can be set to \code{FALSE} to disable line drawing,
+or \code{TRUE} to use the default thresholds.}
 
 \item{na.rm}{Logical value indicating whether NA values should be removed
 before calculating effective sample size.}
@@ -66,6 +68,9 @@ data(ChainSC)
 BASiCS_DiagPlot(ChainSC, Parameter = "mu")
 # Effective sample size as colour, mu as x, delta as y.
 BASiCS_DiagPlot(ChainSC, x = "mu", y = "delta")
+
+# Point estimates versus Geweke diagnostic
+BASiCS_DiagPlot(ChainSC, Parameter = "mu", Measure = "geweke.diag")
 
 }
 \seealso{

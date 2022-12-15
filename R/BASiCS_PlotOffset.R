@@ -51,7 +51,7 @@ BASiCS_PlotOffset <- function(Chain1,
   Mu1 <- matrixStats::colMedians(Chain1_offset@parameters$mu)
   Mu2 <- matrixStats::colMedians(Chain2@parameters$mu)
   Mu1_old <- matrixStats::colMedians(Chain1@parameters$mu)
-  
+
   n1 <- ncol(Chain1@parameters$nu)
   n2 <- ncol(Chain2@parameters$nu)
   n <- n1 + n2

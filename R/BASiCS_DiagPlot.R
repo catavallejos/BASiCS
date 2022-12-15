@@ -18,10 +18,10 @@
 #' transformation for the x or y axis, respectively.
 #' @param Smooth A logical value indicating whether to use smoothing
 #' (specifically hexagonal binning using \code{\link[ggplot2]{geom_hex}}).
-#' @param DrawHLine A logical value indicating whether a reference horizontal
-#' dashed line will be added to the plot. 
-#' @param HLine Numeric scalar or vector indicating threshold value(s) to be 
+#' @param HLine Numeric scalar or vector indicating threshold value(s) to be
 #' displayed as a dashed line on the plot when \code{DrawHLine = TRUE}.
+#' Alternatively, can be set to \code{FALSE} to disable line drawing,
+#' or \code{TRUE} to use the default thresholds.
 #' @param na.rm Logical value indicating whether NA values should be removed
 #' before calculating effective sample size.
 #' @param ... Unused.
@@ -54,8 +54,7 @@ BASiCS_DiagPlot <- function(object,
                             LogX = isTRUE(x %in% c("mu", "delta")),
                             LogY = isTRUE(y %in% c("mu", "delta")),
                             Smooth = TRUE,
-                            DrawHLine = TRUE,
-                            HLine = NULL,
+                            HLine = TRUE,
                             na.rm = TRUE) {
 
   Measure <- match.arg(Measure)
@@ -73,7 +72,13 @@ BASiCS_DiagPlot <- function(object,
   metric <- .GetMeasure(object, Parameter, Measure, na.rm)
   sX <- if (LogX) scale_x_log10() else scale_x_continuous()
   sY <- if (LogY) scale_y_log10() else scale_y_continuous()
-  
+
+  DrawHLine <- TRUE
+  ## if it's logical, we only care if it's FALSE
+  if (is.logical(HLine)) {
+    DrawHLine <- HLine
+  }
+  ## not numeric, assume it's NULL or logical, set to default
   if (!is.numeric(HLine)) {
     HLine <- .LineAt(Measure)
   }

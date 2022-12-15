@@ -13,6 +13,8 @@
 #' criterion, and the \code{\link[posterior]{rhat}} diagnostic.
 #' @param VLine Numeric scalar indicating a threshold value to be displayed as
 #' a dashed line on the plot.
+#' Alternatively, can be set to \code{FALSE} to disable line drawing,
+#' or \code{TRUE} to use the default thresholds.
 #' @param na.rm Logical scalar indicating whether NA values should be removed
 #' before calculating effective sample size.
 #' @param ... Unused.
@@ -43,13 +45,23 @@ BASiCS_DiagHist <- function(
     object,
     Parameter = NULL,
     Measure = c("ess", "geweke.diag", "rhat"),
-    VLine = NULL,
+    VLine = TRUE,
     na.rm = TRUE) {
 
   if (!inherits(object, "BASiCS_Chain")) {
     stop(paste0("Incorrect class for object:", class(object)))
   }
   Measure <- match.arg(Measure)
+  ## if it's logical, we only care if it's FALSE
+  DrawVLine <- TRUE
+  if (is.logical(VLine)) {
+    DrawVLine <- VLine
+  }
+  ## not numeric, assume it's NULL or logical, set to default
+  if (!is.numeric(VLine)) {
+    VLine <- .LineAt(Measure)
+    DrawVLine <- TRUE
+  }
 
   if (is.null(Parameter)) {
     metric <- lapply(names(object@parameters), function(param) {
@@ -76,13 +88,6 @@ BASiCS_DiagHist <- function(
   }
   if (length(metric) == 1) {
     stop(paste0("Cannot produce histogram of a single value (", metric, ")"))
-  }
-  if (is.logical(VLine)) {
-    DrawVLine <- VLine
-  }
-  if (!is.numeric(VLine)) {
-    VLine <- .LineAt(Measure)
-    DrawVLine <- TRUE
   }
   ggplot(mapping = aes(x = metric)) +
     geom_histogram(bins = grDevices::nclass.FD(metric)) +
