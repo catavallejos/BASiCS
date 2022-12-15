@@ -29,6 +29,9 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v2
 
+      - name: System deps
+        run: sudo apt-get install libleptonica-dev
+
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
