@@ -431,11 +431,11 @@ setMethod(
     # Traceplot
     p1 <- ggplot(DF1) + 
       geom_point(
-        aes(x = Iteration, y = Draws),
+        aes(x = .data$Iteration, y = .data$Draws),
         col = grDevices::adjustcolor("white", 
         alpha.f = 0)
       ) + 
-      geom_line(aes(x = Iteration, y = Draws)) + 
+      geom_line(aes(x = .data$Iteration, y = .data$Draws)) + 
       labs(
         title = colnames(x@parameters[[Parameter]])[Column],
         x = "Iteration", 
@@ -444,11 +444,11 @@ setMethod(
       theme_classic()
     p1 <- ggExtra::ggMarginal(p1, type = "histogram", margins = "y")
       
-    p2 <- ggplot(DF2, aes(x = lag, y = acf)) + 
+    p2 <- ggplot(DF2, aes(x = .data$lag, y = .data$acf)) +
       theme_classic() + 
       geom_hline(aes(yintercept = 0)) + 
       geom_segment(
-        mapping = aes(xend = lag, yend = 0)
+        mapping = aes(xend = .data$lag, yend = 0)
       ) +
       ggtitle(colnames(x@parameters[[Parameter]])[Column])
     

@@ -10,7 +10,7 @@
 #' Default \code{Parameter = NULL}.
 #' @param Measure Character scalar specifying the diagnostic measure to plot.
 #' Current options are effective sample size, the Geweke diagnostic
-#' criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.
+#' criterion, and the \code{\link[posterior]{rhat}} diagnostic.
 #' @param VLine Numeric scalar indicating a threshold value to be displayed as
 #' a dashed line on the plot.
 #' @param na.rm Logical scalar indicating whether NA values should be removed

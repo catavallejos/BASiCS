@@ -54,9 +54,9 @@ BASiCS_PlotVG <- function(object, Plot = c("Grid", "VG"), ...) {
 ) {
   
   df <- data.frame(Mu, Prob)
-  ggplot(df, aes(x = Mu, y = Prob)) +
+  ggplot(df, aes(x = .data$Mu, y = .data$Prob)) +
     geom_point(
-      aes(colour = ifelse(Hits, Task, "Other")), 
+      aes(colour = ifelse(Hits, Task, "Other")),
       pch = pch, cex = cex) +
     scale_colour_brewer(palette = "Set1", name = "") +
     geom_hline(

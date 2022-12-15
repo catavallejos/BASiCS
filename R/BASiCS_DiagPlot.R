@@ -9,7 +9,7 @@
 #' Default \code{Parameter = 'mu'}
 #' @param Measure Character scalar specifying the diagnostic measure to plot.
 #' Current options are effective sample size, the Geweke diagnostic
-#' criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.
+#' criterion, and the \code{\link[posterior]{rhat}} diagnostic.
 #' @param x,y Optional MCMC parameter values to be plotted on the x or y axis,
 #' respectively. If neither is supplied, Parameter will be plotted on the x axis
 #' and effective sample size will be plotted on the y axis as
@@ -89,7 +89,7 @@ BASiCS_DiagPlot <- function(object,
       metric = metric
     )
     df <- df[order(df$metric), ]
-    g <- ggplot(df, aes(x = x, y = y, colour = metric)) + 
+    g <- ggplot(df, aes(x = .data$x, y = .data$y, colour = .data$metric)) + 
       geom_point(alpha = 0.5, shape = 16) +
       viridis::scale_colour_viridis(name = .ScaleName(Measure, Parameter)
         #, trans="log10"
@@ -101,11 +101,8 @@ BASiCS_DiagPlot <- function(object,
     xMat <- .GetParam(object, Parameter)
     xMat <- xMat[, names(metric), drop = FALSE]
 
-    df <- data.frame(
-      x = matrixStats::colMedians(xMat),
-      y = metric
-    )
-    g <- ggplot(df, aes(x = x, y = metric)) + 
+    g <- ggplot() +
+      aes(x = matrixStats::colMedians(xMat), y = metric) +
       sX + sY +
       labs(x = Parameter, y = .ScaleName(Measure))
     if (Smooth) {

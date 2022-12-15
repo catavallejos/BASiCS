@@ -28,7 +28,7 @@ Default \code{Parameter = 'mu'}}
 
 \item{Measure}{Character scalar specifying the diagnostic measure to plot.
 Current options are effective sample size, the Geweke diagnostic
-criterion, and the $\hat{R}$ diagnostic, see \code{\link[posterior]{rhat}}.}
+criterion, and the \code{\link[posterior]{rhat}} diagnostic.}
 
 \item{x, y}{Optional MCMC parameter values to be plotted on the x or y axis,
 respectively. If neither is supplied, Parameter will be plotted on the x axis

@@ -202,13 +202,13 @@ setMethod("BASiCS_PlotDE", signature(object = "missing"),
   ) {
 
   df <- data.frame(
-    ProbThresholds, 
-    EFDR = EFDRgrid, 
+    ProbThresholds,
+    EFDR = EFDRgrid,
     EFNR = EFNRgrid
   )
   mdf <- reshape2::melt(df, measure.vars = c("EFDR", "EFNR"))
-  ggplot(mdf, 
-      aes(x = ProbThresholds, y = value, colour = variable)
+  ggplot(mdf,
+      aes(x = .data$ProbThresholds, y = .data$value, colour = .data$variable)
     ) +
     geom_line(na.rm = TRUE) +
     labs(
