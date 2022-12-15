@@ -1642,3 +1642,9 @@ version 2.11.2 (2022-11-23)
 - Change BASiCS_CorrectOffset to also alter the scale of the normalisation
   factors when WithSpikes=FALSE.
 - Add "rhat" option to BASiCS_DiagHist and BASiCS_DiagPlot
+
+version 2.11.3 (2022-12-15)
+- Creates `BASiCS_CalculateSpikeIns()` to perform spike-in calculation
+(depends on the `scRNAseq` package).
+- Adds extra option to plotting functions for MCMC diagnostics (e.g. 
+`BASiCS_DiagPlot()`)
