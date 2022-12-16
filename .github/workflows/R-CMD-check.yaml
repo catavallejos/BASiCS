@@ -43,9 +43,3 @@ jobs:
       - name: BiocCheck
         run: BiocCheck::BiocCheck(dir('check', 'tar.gz$', full.names = TRUE), `quit-with-status` = TRUE)
         shell: Rscript {0}
-
-      - name: Check
-        env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error", check_dir = "check")
-        shell: Rscript {0}
