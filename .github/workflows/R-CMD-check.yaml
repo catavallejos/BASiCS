@@ -29,9 +29,6 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v2
 
-      - name: System deps
-        run: sudo apt-get install libleptonica-dev
-
       - name: Install dependencies
         run: |
           dependencies <- remotes::local_package_deps(dependencies = TRUE)
