@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: ubuntu-latest, bioc: 'devel', image: "bioconductor/bioconductor_docker:devel"}
+          - { os: ubuntu-latest, bioc: 'devel', image: "alanocallaghan/basics:latest"}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -33,31 +33,16 @@ jobs:
         run: sudo apt-get install libleptonica-dev
 
       - name: Install dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: rcmdcheck, optparse, magick, BiocManager
-
-      - name: Install BiocCheck
-        if: runner.os == 'Linux'
-        run: BiocManager::install("BiocCheck")
+        run: |
+          dependencies <- remotes::local_package_deps(dependencies = TRUE)
+          leftovers <- setdiff(dependencies, installed.packages())
+          BiocManager::install(leftovers, ask=FALSE, Ncpu=2L)
+          BiocManager::install(c("rcmdcheck", "magick", "BiocManager", "BiocCheck"), ask=FALSE, Ncpu=2L)
         shell: Rscript {0}
 
       - name: Check
         uses: r-lib/actions/check-r-package@v2
 
       - name: BiocCheck
-        if: runner.os == 'Linux'
         run: BiocCheck::BiocCheck(dir('check', 'tar.gz$', full.names = TRUE), `quit-with-status` = TRUE)
         shell: Rscript {0}
-
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-results
-          path: check
