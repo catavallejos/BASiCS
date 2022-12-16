@@ -183,3 +183,19 @@ test_that("BASiCS_PlotOffset", {
   data(ChainRNA)
   expect_s3_class(g <- BASiCS_PlotOffset(ChainSC, ChainRNA), "gg")
 })
+
+test_that("DiagPlot works", {
+  data(ChainSC)
+  expect_s3_class(g <- BASiCS_DiagPlot(ChainSC), "gg")
+  expect_s3_class(g <- BASiCS_DiagPlot(ChainSC, HLine = TRUE), "gg")
+  expect_s3_class(g <- BASiCS_DiagPlot(ChainSC, HLine = 150), "gg")
+  expect_s3_class(g <- BASiCS_DiagPlot(ChainSC, HLine = FALSE), "gg")
+})
+
+test_that("DiagHist works", {
+  data(ChainSC)
+  expect_s3_class(g <- BASiCS_DiagHist(ChainSC), "gg")
+  expect_s3_class(g <- BASiCS_DiagHist(ChainSC, VLine = TRUE), "gg")
+  expect_s3_class(g <- BASiCS_DiagHist(ChainSC, VLine = 150), "gg")
+  expect_s3_class(g <- BASiCS_DiagHist(ChainSC, VLine = FALSE), "gg")
+})

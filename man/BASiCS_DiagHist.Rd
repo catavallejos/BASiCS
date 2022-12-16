@@ -9,7 +9,7 @@ BASiCS_DiagHist(
   object,
   Parameter = NULL,
   Measure = c("ess", "geweke.diag", "rhat"),
-  VLine = NULL,
+  VLine = TRUE,
   na.rm = TRUE
 )
 
@@ -27,7 +27,9 @@ Current options are effective sample size, the Geweke diagnostic
 criterion, and the \code{\link[posterior]{rhat}} diagnostic.}
 
 \item{VLine}{Numeric scalar indicating a threshold value to be displayed as
-a dashed line on the plot.}
+a dashed line on the plot.
+Alternatively, can be set to \code{FALSE} to disable line drawing,
+or \code{TRUE} to use the default thresholds.}
 
 \item{na.rm}{Logical scalar indicating whether NA values should be removed
 before calculating effective sample size.}
