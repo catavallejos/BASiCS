@@ -1,12 +1,12 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 2.10.3
-Date: 2022-11-23
-Authors@R: c(person("Catalina", "Vallejos", role=c("aut"),
+Version: 2.10.4
+Date: 2023-01-12
+Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
         email="catalina.vallejos@igmm.ed.ac.uk"), 
         person("Nils", "Eling", role=c("aut")), 
-        person("Alan", "O'Callaghan", role = c("aut", "cre"), email="alan.ocallaghan@outlook.com"),
+        person("Alan", "O'Callaghan", role = c("aut")),
         person("Sylvia", "Richardson", role = c("ctb")), 
         person("John", "Marioni", role=c("ctb"))) 
 Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
@@ -77,7 +77,7 @@ SystemRequirements: C++11
 NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 LazyData: true
 Config/testthat/parallel: true
