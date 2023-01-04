@@ -1,7 +1,7 @@
 #' Convert concentration in moles per microlitre to molecule counts
 #' @param Mix The name of the spike-in mix use
 #' @param DilutionFactor The dilution factor applied to the spike-in mixture.
-#' e.g., 1μl per 50ml would be a 1/50000 \code{DilutionFactor}.
+#' e.g., 1 microlitre per 50ml would be a 1/50000 \code{DilutionFactor}.
 #' @param VolumePerCell The volume of spike-in mixture added to each well, or to
 #' each cell.
 #' @return The molecule counts per well, or per cell, based on the input

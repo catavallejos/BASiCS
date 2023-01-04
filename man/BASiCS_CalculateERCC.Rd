@@ -10,7 +10,7 @@ BASiCS_CalculateERCC(Mix = c(1, 2), DilutionFactor, VolumePerCell)
 \item{Mix}{The name of the spike-in mix use}
 
 \item{DilutionFactor}{The dilution factor applied to the spike-in mixture.
-e.g., 1μl per 50ml would be a 1/50000 \code{DilutionFactor}.}
+e.g., 1 microlitre per 50ml would be a 1/50000 \code{DilutionFactor}.}
 
 \item{VolumePerCell}{The volume of spike-in mixture added to each well, or to
 each cell.}
