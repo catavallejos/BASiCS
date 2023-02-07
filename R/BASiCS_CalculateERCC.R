@@ -1,5 +1,5 @@
 #' Convert concentration in moles per microlitre to molecule counts
-#' @param Mix The name of the spike-in mix use
+#' @param Mix The name of the spike-in mix to use.
 #' @param DilutionFactor The dilution factor applied to the spike-in mixture.
 #' e.g., 1 microlitre per 50ml would be a 1/50000 \code{DilutionFactor}.
 #' @param VolumePerCell The volume of spike-in mixture added to each well, or to
@@ -8,15 +8,18 @@
 #' parameters.
 #' @export
 BASiCS_CalculateERCC <- function(
-        Mix = c(1, 2),
+        Mix,
         DilutionFactor,
         VolumePerCell
     ) {
-    Mix <- match.arg(Mix)
+    if (!length(Mix) == 1 && Mix %in% c(1, 2)) {
+        stop("Invalid value for Mix.")
+    }
     if (!requireNamespace("scRNAseq", quietly = TRUE)) {
         stop("scRNAseq package is required to retrieve ERCC mix concentrations")
     }
     Col <- sprintf("concentration in Mix %s (attomoles/ul)", Mix)
+
     # Moles per micro litre
     ERCC_mmul <- scRNAseq::ERCCSpikeInConcentrations()[[Col]] * (10^(-18))
     ## Molecule count per L
