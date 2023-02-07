@@ -6,6 +6,7 @@
 #' each cell.
 #' @return The molecule counts per well, or per cell, based on the input
 #' parameters.
+#' @export
 BASiCS_CalculateERCC <- function(
         Mix = c(1, 2),
         DilutionFactor,
