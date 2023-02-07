@@ -20,8 +20,9 @@ BASiCS_CalculateERCC <- function(
     }
     Col <- sprintf("concentration in Mix %s (attomoles/ul)", Mix)
 
+    ERCC_df <- scRNAseq::ERCCSpikeInConcentrations()
     # Moles per micro litre
-    ERCC_mmul <- scRNAseq::ERCCSpikeInConcentrations()[[Col]] * (10^(-18))
+    ERCC_mmul <- ERCC_df[[Col]] * (10^(-18))
     ## Molecule count per L
     ## (1 mole comprises 6.02214076 x 10^{23} molecules)
     ERCC_countmul <- ERCC_mmul * (6.02214076 * (1e23))
@@ -29,5 +30,8 @@ BASiCS_CalculateERCC <- function(
     ERCC_count <- ERCC_countmul * DilutionFactor
     ## Multiplying by the volume added into each well
     ERCC_count_final <- ERCC_count * VolumePerCell
-    ERCC_count_final
+    setNames(
+        ERCC_count_final,
+        rownames(ERCC_df)
+    )
 }
