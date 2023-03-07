@@ -1664,3 +1664,6 @@ version 2.11.7 (2023-03-07)
 - version bump to trigger new build
 - Fixes small bugs in tests (test_misc.R and test_divide_and_conquer.R)
 - Minor changes suggested by BiocCheck
+
+version 2.11.8 (2023-03-07)
+- fixes conflict after merge and version bump only
