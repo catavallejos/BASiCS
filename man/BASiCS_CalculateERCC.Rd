@@ -4,10 +4,10 @@
 \alias{BASiCS_CalculateERCC}
 \title{Convert concentration in moles per microlitre to molecule counts}
 \usage{
-BASiCS_CalculateERCC(Mix = c(1, 2), DilutionFactor, VolumePerCell)
+BASiCS_CalculateERCC(Mix, DilutionFactor, VolumePerCell)
 }
 \arguments{
-\item{Mix}{The name of the spike-in mix use}
+\item{Mix}{The name of the spike-in mix to use.}
 
 \item{DilutionFactor}{The dilution factor applied to the spike-in mixture.
 e.g., 1 microlitre per 50ml would be a 1/50000 \code{DilutionFactor}.}

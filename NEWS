@@ -1650,3 +1650,17 @@ version 2.11.3 (2022-12-15)
 
 version 2.11.4 (2022-12-15) 
 - Solves bug in `BASiCS_DiagPlot()`
+
+version 2.11.5 (2023-01-04)
+- Changes maintainer
+- Remove unicode mu in documentation
+
+version 2.11.6 (2023-02-07)
+- Adds `BASiCS_CalculateERCC()` to NAMESPACE
+- Creates unit test for `BASiCS_CalculateERCC()`
+
+version 2.11.7 (2023-03-07)
+- Updates NEWS
+- version bump to trigger new build
+- Fixes small bugs in tests (test_misc.R and test_divide_and_conquer.R)
+- Minor changes suggested by BiocCheck

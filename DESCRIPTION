@@ -1,10 +1,11 @@
 Package: BASiCS
 Type: Package
 Title: Bayesian Analysis of Single-Cell Sequencing data
-Version: 2.11.6
-Date: 2023-02-07
+Version: 2.11.7
+Date: 2023-03-07
 Authors@R: c(person("Catalina", "Vallejos", role=c("aut", "cre"),
-        email="catalina.vallejos@igmm.ed.ac.uk"), 
+        email="catalina.vallejos@igmm.ed.ac.uk",
+        comment=c(ORCID = "0000-0003-3638-1960")), 
         person("Nils", "Eling", role=c("aut")), 
         person("Alan", "O'Callaghan", role = c("aut")),
         person("Sylvia", "Richardson", role = c("ctb")), 
@@ -32,9 +33,9 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
     for scRNA-seq datasets, BASiCS also tests for changes in residual 
     over-dispersion, defined by residual values with respect to a global 
     mean/over-dispersion trend. 
-License: GPL (>= 2)
+License: GPL-3
 Depends:
-    R (>= 4.0),
+    R (>= 4.2),
     SingleCellExperiment
 Imports:
     Biobase,
@@ -81,7 +82,7 @@ URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
 RoxygenNote: 7.2.3
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 

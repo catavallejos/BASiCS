@@ -177,6 +177,7 @@ test_that(".consensus_average produces sensible results (cell-wise)", {
 
 
 test_that("combine_subposteriors with NA", {
+  data(ChainSC)
   Chain2 <- Chain1 <- ChainSC
   Chain1@parameters$delta <- Chain1@parameters$delta[, 1:10]
   Chain1@parameters$mu <- Chain1@parameters$mu[, 1:10]
@@ -197,9 +198,9 @@ test_that("combine_subposteriors with NA", {
 
 
 test_that("cut doesn't fail if some quantiles are the same", {
-  c <- counts(Data)
-  for (i in 1:20) c[i, ] <- c[1, ]
-  counts(Data) <- c
+  X <- counts(Data)
+  for (i in 1:20) X[i, ] <- X[1, ]
+  counts(Data) <- X
   expect_message(
     capture.output(
       m <- BASiCS_DivideAndConquer(
