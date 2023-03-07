@@ -82,7 +82,6 @@ BugReports: https://github.com/catavallejos/BASiCS/issues
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 LazyData: true
-Config/testthat/parallel: true
 Config/testthat/edition: 3
 Collate: 
     'AllClasses.R'
