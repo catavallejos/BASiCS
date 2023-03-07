@@ -1667,3 +1667,6 @@ version 2.11.7 (2023-03-07)
 
 version 2.11.8 (2023-03-07)
 - fixes conflict after merge and version bump only
+
+version 2.11.9 (2023-03-07)
+- Fixes minor bug in test_denoised.R
