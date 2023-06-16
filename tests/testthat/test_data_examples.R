@@ -33,8 +33,8 @@ test_that("Generated data does not match given seed (all cases)", {
   # Checks total count for spike in genes
   TechCount03 <- c(11243,    80,  354,   688,    25)
   TechCount04 <- c(10280,    74,  354,   663,    26)
-  TechCount3 <- matrixStats::rowSums2(assay(altExp(Data3)[1:5,]))
-  TechCount4 <- matrixStats::rowSums2(assay(altExp(Data4)[1:5,]))
+  TechCount3 <- as.vector(matrixStats::rowSums2(assay(altExp(Data3)[1:5,])))
+  TechCount4 <- as.vector(matrixStats::rowSums2(assay(altExp(Data4)[1:5,])))
   expect_equal(TechCount03, TechCount3)
   expect_equal(TechCount04, TechCount4)
 })

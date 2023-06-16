@@ -127,14 +127,14 @@ BASiCS_DetectVG <- function(
   Table <- cbind.data.frame(
     GeneIndex = GeneIndex,
     GeneName = GeneName,
-    Mu = matrixStats::colMedians(Chain@parameters$mu),
-    Delta = matrixStats::colMedians(Chain@parameters$delta)
+    Mu = as.vector(matrixStats::colMedians(Chain@parameters$mu)),
+    Delta = as.vector(matrixStats::colMedians(Chain@parameters$delta))
   )
   
 
   if (Method == "Percentile") {
     # Find the epsilon threshold that correspond to the 'PercentileThreshold'
-    Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
+    Epsilon <- as.vector(matrixStats::colMedians(Chain@parameters$epsilon))
     EpsilonThreshold <- stats::quantile(
       Epsilon,
       PercentileThreshold,
@@ -147,7 +147,7 @@ BASiCS_DetectVG <- function(
     
   } else if (Method == "Epsilon") {
     ## Directly supply epsilon threshold
-    Epsilon <- matrixStats::colMedians(Chain@parameters$epsilon)
+    Epsilon <- as.vector(matrixStats::colMedians(Chain@parameters$epsilon))
     Table <- cbind.data.frame(Table, Epsilon = Epsilon)
     # Auxiliary variable to calculate H/LVG prob for the given epsilon threshold
     ProbAux <- operator(Chain@parameters$epsilon, EpsilonThreshold)
@@ -157,14 +157,14 @@ BASiCS_DetectVG <- function(
     # Variance decomposition
     VarDecomp <- HiddenVarDecomp(Chain)
     Table <- cbind.data.frame(Table, 
-      Sigma = matrixStats::colMedians(VarDecomp$BioVarGlobal))
+      Sigma = as.vector(matrixStats::colMedians(VarDecomp$BioVarGlobal)))
     # Auxiliary variable to calculate H/LVG prob for a given variance threshold
     ProbAux <- operator(VarDecomp$BioVarGlobal, VarThreshold)
     Threshold <- VarThreshold
   }
 
   # Calculate tail posterior probabilities
-  Prob <- matrixStats::colMeans2(ProbAux)
+  Prob <- as.vector(matrixStats::colMeans2(ProbAux))
 
   # EFDR calibration
   Aux <- .ThresholdSearch(

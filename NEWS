@@ -1670,3 +1670,6 @@ version 2.11.8 (2023-03-07)
 
 version 2.11.9 (2023-03-07)
 - Fixes minor bug in test_denoised.R
+
+version 2.13.1 (2023-06-16)
+- Fixes error in tests associated to the behaviour of `matrixStats::colMedians`

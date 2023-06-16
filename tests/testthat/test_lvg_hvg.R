@@ -3,11 +3,11 @@ test_that("HVG/LVG - check if parameters are correct", {
   test <- BASiCS_DetectVG(ChainSC, Task = "HVG", VarThreshold = 0.6)
   test@Table <- test@Table[order(test@Table$GeneIndex), ]
   expect_equal(
-    matrixStats::colMedians(displayChainBASiCS(ChainSC, "delta")),
+    as.vector(matrixStats::colMedians(displayChainBASiCS(ChainSC, "delta"))),
     test@Table$Delta
   )
   expect_equal(
-    matrixStats::colMedians(displayChainBASiCS(ChainSC, "mu")),
+    as.vector(matrixStats::colMedians(displayChainBASiCS(ChainSC, "mu"))),
     test@Table$Mu
   )
   expect_equal(
