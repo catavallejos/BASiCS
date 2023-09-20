@@ -202,17 +202,17 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     if (!fixNu) {
       // UPDATE OF PHI
       // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-      sAux = sUpdateBatch(
-        sAux,
-        nuAux.col(0),
-        thetaBatch,
-        as,
-        bs,
-        BatchDesign,
-        n,
-        y_n,
-        cellExponent
-      );
+      //sAux = sUpdateBatch(
+      //  sAux,
+      //  nuAux.col(0),
+      //  thetaBatch,
+      //  as,
+      //  bs,
+      //  BatchDesign,
+      //  n,
+      //  y_n,
+      //  cellExponent
+      //);
       // UPDATE OF THETA: 
       // 1st ELEMENT IS THE UPDATE, 
       // 2nd ELEMENT IS THE ACCEPTANCE INDICATOR
@@ -249,12 +249,12 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
       if (i >= Burn) RefFreq(RefGene) += 1;
     }
 
-    muAux = muUpdateNoSpikes(
+    muAux = muUpdate(
       muAux.col(0),
       exp(LSmuAux),
       Counts,
       1 / deltaAux.col(0),
-      nuAux.col(0),
+      nuAux.col(0), 
       sumByCellAll,
       mu_mu,
       s2mu,
@@ -263,13 +263,30 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
       y_q0,
       u_q0,
       ind_q0,
-      SizeTimesConstrain,
-      RefGene,
-      ConstrainGene_uvec, 
-      NotConstrainGene_uvec,
       geneExponent,
       mintol_mu
     );
+//    muAux = muUpdateNoSpikes(
+//      muAux.col(0),
+//      exp(LSmuAux),
+//      Counts,
+//      1 / deltaAux.col(0),
+//      nuAux.col(0),
+//      sumByCellAll,
+//      mu_mu,
+//      s2mu,
+//      q0,
+//      n,
+//      y_q0,
+//      u_q0,
+//      ind_q0,
+//      SizeTimesConstrain,
+//      RefGene,
+//      ConstrainGene_uvec, 
+//      NotConstrainGene_uvec,
+//      geneExponent,
+//      mintol_mu
+//    );
     PmuAux += muAux.col(1);
     if(i>=Burn) {muAccept += muAux.col(1);}  
     

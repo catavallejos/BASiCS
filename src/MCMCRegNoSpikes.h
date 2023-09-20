@@ -238,17 +238,17 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     if (!fixNu) {
       // UPDATE OF PHI
       // WE CAN RECYCLE THE SAME FULL CONDITIONAL AS IMPLEMENTED FOR S (BATCH CASE)
-      sAux = sUpdateBatch(
-        sAux,
-        nuAux.col(0),
-        thetaBatch,
-        as,
-        bs,
-        BatchDesign,
-        n,
-        y_n,
-        cellExponent
-      );
+      //sAux = sUpdateBatch(
+      //  sAux,
+      //  nuAux.col(0),
+      //  thetaBatch,
+      //  as,
+      //  bs,
+      //  BatchDesign,
+      //  n,
+      //  y_n,
+      //  cellExponent
+      //);
 
       // UPDATE OF THETA: 
       // 1st ELEMENT IS THE UPDATE, 
@@ -279,39 +279,35 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     // 1st COLUMN IS THE UPDATE, 
     // 2nd COLUMN IS THE ACCEPTANCE INDICATOR 
     // If using stochastic reference, randomly select 1 ref gene
-    if(StochasticRef == 1) {
-      RefAux = as_scalar(arma::randi(1,arma::distr_param(0,RefGenes.size()-1) ));
-      RefGene = RefGenes(RefAux); 
-      if(i >= Burn) {
-        RefFreq(RefGene) += 1;
-      }
-    }
-    Rcpp::Rcout << "Iteration: " << i << std::endl;
-    Rcpp::Rcout << "RefGene: " << RefGene+1 << std::endl;
-    Rcpp::Rcout << "RefGene before update: " << muAux(0, 0) << std::endl;
-    muAux = muUpdateRegNoSpikes(
+    //if(StochasticRef == 1) {
+    //  RefAux = as_scalar(arma::randi(1,arma::distr_param(0,RefGenes.size()-1) ));
+    //  RefGene = RefGenes(RefAux); 
+    //  if(i >= Burn) {
+    //    RefFreq(RefGene) += 1;
+    //  }
+    //}
+    //Rcpp::Rcout << "Iteration: " << i << std::endl;
+    //Rcpp::Rcout << "RefGene: " << RefGene+1 << std::endl;
+    //Rcpp::Rcout << "RefGene before update: " << muAux(0, 0) << std::endl;
+    muAux = muUpdateReg(
       muAux.col(0),
       exp(LSmuAux),
-      Counts, deltaAux.col(0),
-      1 / deltaAux.col(0),
+      Counts,
+      deltaAux.col(0), 
       nuAux.col(0),
       sumByCellAll,
       mu_mu,
       s2mu,
       q0,
-      n,
+      n, 
       y_q0,
       u_q0,
       ind_q0,
-      SizeTimesConstrain,
-      RefGene,
-      ConstrainGene_uvec,
-      NotConstrainGene_uvec,
       k,
       lambdaAux,
       betaAux,
       X,
-      sigma2Aux,
+      sigma2Aux, 
       variance,
       FixLocations,
       RBFMinMax,
@@ -319,8 +315,39 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
       geneExponent,
       mintol_mu
     );
+    
+//    muAux = muUpdateRegNoSpikes(
+//      muAux.col(0),
+//      exp(LSmuAux),
+//      Counts, deltaAux.col(0),
+//      1 / deltaAux.col(0),
+//      nuAux.col(0),
+//      sumByCellAll,
+//      mu_mu,
+//      s2mu,
+//      q0,
+//      n,
+//      y_q0,
+//      u_q0,
+//      ind_q0,
+//      SizeTimesConstrain,
+//      RefGene,
+//      ConstrainGene_uvec,
+//      NotConstrainGene_uvec,
+//      k,
+//      lambdaAux,
+//      betaAux,
+//      X,
+//      sigma2Aux,
+//      variance,
+//      FixLocations,
+//      RBFMinMax,
+//      RBFLocations,
+//      geneExponent,
+//      mintol_mu
+//    );
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
-    Rcout << "RefGene after update: " << muAux(RefGene, 0) << std::endl;
+//    Rcout << "RefGene after update: " << muAux(RefGene, 0) << std::endl;
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
