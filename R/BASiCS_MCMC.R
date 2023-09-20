@@ -370,7 +370,7 @@ BASiCS_MCMC <- function(
 
   NoSpikeArgs <- list(
     sumByCellAll = sum.bycell.all,
-    Constrain = ArgsDef$Constrain,
+    SizeTimesConstrain = length(ArgsDef$ConstrainGene) * ArgsDef$Constrain,
     Index = ArgsDef$Index,
     RefGene = ArgsDef$RefGene,
     RefGenes = ArgsDef$RefGenes,

@@ -74,7 +74,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     double eta0, 
     arma::vec lambda0, 
     double const& variance,
-    double Constrain,
+    double SizeTimesConstrain,
     arma::vec Index,
     int RefGene,
     arma::vec RefGenes,
@@ -286,6 +286,9 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
         RefFreq(RefGene) += 1;
       }
     }
+    Rcpp::Rcout << "Iteration: " << i << std::endl;
+    Rcpp::Rcout << "RefGene: " << RefGene+1 << std::endl;
+    Rcpp::Rcout << "RefGene before update: " << muAux(0, 0) << std::endl;
     muAux = muUpdateRegNoSpikes(
       muAux.col(0),
       exp(LSmuAux),
@@ -300,7 +303,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
       y_q0,
       u_q0,
       ind_q0,
-      Constrain,
+      SizeTimesConstrain,
       RefGene,
       ConstrainGene_uvec,
       NotConstrainGene_uvec,
@@ -317,6 +320,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
       mintol_mu
     );
     PmuAux += muAux.col(1); if(i>=Burn) muAccept += muAux.col(1);
+    Rcout << "RefGene after update: " << muAux(RefGene, 0) << std::endl;
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 

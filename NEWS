@@ -1679,3 +1679,7 @@ version 2.13.2 (2023-06-16)
 
 version 2.13.3 (2023-06-16)
 - Reverts `LazyData` to `false` based on BiocCheck feedback
+
+version 2.13.5 (2023-09-20)
+- Minor update in no-spikes code to avoid re-calculating a constant quantity.
+Does not affect output. 

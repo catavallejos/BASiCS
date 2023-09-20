@@ -23,7 +23,7 @@ arma::mat muUpdateRegNoSpikes(
     arma::vec & mu1,
     arma::vec & u,
     arma::vec & ind,
-    double const& Constrain, /* No-spikes arguments from here */
+    double const& SizeTimesConstrain, /* No-spikes arguments from here */
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
@@ -51,6 +51,7 @@ arma::mat muUpdateRegNoSpikes(
   // INITIALIZE MU
   double aux; double iAux;
   double sumAux = sum(log(mu0.elem(ConstrainGene))) - log(mu0(RefGene));
+  //Rcout << "sumAux (line 54): " << sumAux << std::endl;
   
   // ACCEPT/REJECT STEP
   
@@ -58,6 +59,7 @@ arma::mat muUpdateRegNoSpikes(
   // Calculated in the same way for all genes, 
   // but the reference one (no need to be sequential)
   arma::vec log_aux = (log(mu1) - log(mu0)) % sum_bycell_all;
+ // Rcout << "sumAux (line 62): " << sumAux << std::endl;
   #pragma omp parallel for
   for (int i = 0; i < q0; i++) {
     if(i != RefGene) {
@@ -70,12 +72,15 @@ arma::mat muUpdateRegNoSpikes(
       }
     }
   }
+  //Rcout << "sumAux (line 75): " << sumAux << std::endl;
   // Revise this part
   // This is new due to regression prior on delta
   if (!FixLocations) {  
     RBFLocations = estimateRBFLocations(log(mu1), k, RBFMinMax);
   }
+  //Rcout << "sumAux (line 81): " << sumAux << std::endl;
   arma::mat X_mu1 = designMatrix(k, RBFLocations, mu1, variance);
+ // Rcout << "sumAux (line 82): " << sumAux << std::endl;
   
   // REGRESSION RELATED FACTOR
   log_aux -= exponent * lambda % 
@@ -83,6 +88,7 @@ arma::mat muUpdateRegNoSpikes(
       pow(log(delta) - X_mu1 * beta, 2) -
       pow(log(delta) - X * beta, 2)
     ) / (2 * sigma2);
+  //Rcout << "sumAux (line 91): " << sumAux << std::endl;
   
   // Step 2: Computing prior component of the acceptance rate 
   
@@ -90,7 +96,7 @@ arma::mat muUpdateRegNoSpikes(
   for (int i = 0; i < nConstrainGene; i++) {
     iAux = ConstrainGene(i);
     if (iAux != RefGene) {
-      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
+      aux = 0.5 * (SizeTimesConstrain - (sumAux - log(mu0(iAux))));
       aux += 0.5 * (mu_mu(iAux) - mu_mu(RefGene));
       log_aux(iAux) -= (0.5 * 2 / s2_mu) * 
         (pow(log(mu1(iAux)) - aux, 2)) * exponent; 
@@ -108,10 +114,15 @@ arma::mat muUpdateRegNoSpikes(
       }
     }
   }
+  Rcout << "sumAux (line 117): " << sumAux << std::endl;
   
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
-  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  mu1(RefGene) = exp(SizeTimesConstrain - sumAux);
+  //Rcout << "sumAux (line 122): " << sumAux << std::endl;
+  //Rcout << "ConstrainGene.size() * Constrain - sumAux: " << SizeTimesConstrain - sumAux << std::endl;
+  //Rcout << "ConstrainGene.size() * Constrain: " << SizeTimesConstrain << std::endl;
+  //Rcout << "mu1(RefGene): " << mu1(RefGene) << std::endl;
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain
@@ -130,6 +141,7 @@ arma::mat muUpdateRegNoSpikes(
     } else{
       ind(iAux) = 0; mu1(iAux) = mu0(iAux);
     }
+    //Rcout << "sumAux (line 144): " << sumAux << std::endl;
   }
   // OUTPUT
   return join_rows(mu1, ind);

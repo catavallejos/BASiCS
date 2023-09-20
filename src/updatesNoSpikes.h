@@ -21,7 +21,7 @@ arma::mat muUpdateNoSpikes(
     arma::vec & mu1,
     arma::vec & u,
     arma::vec & ind,
-    double const& Constrain,
+    double const& SizeTimesConstrain,
     int const& RefGene,
     arma::uvec const& ConstrainGene,
     arma::uvec const& NotConstrainGene,
@@ -65,7 +65,7 @@ arma::mat muUpdateNoSpikes(
   for (int i=0; i < nConstrainGene; i++) {
     iAux = ConstrainGene(i);
     if(iAux != RefGene) {
-      aux = 0.5 * (ConstrainGene.size() * Constrain - (sumAux - log(mu0(iAux))));
+      aux = 0.5 * (SizeTimesConstrain - (sumAux - log(mu0(iAux))));
       aux += 0.5 * (mu_mu(iAux) - mu_mu(RefGene));
       log_aux(iAux) -= (0.5 * 2 /s2_mu) * 
         (pow(log(mu1(iAux)) - aux,2)) * exponent; 
@@ -85,7 +85,7 @@ arma::mat muUpdateNoSpikes(
   
   // Step 2.2: For the reference gene 
   ind(RefGene) = 1;
-  mu1(RefGene) = exp(ConstrainGene.size() * Constrain - sumAux);
+  mu1(RefGene) = exp(SizeTimesConstrain - sumAux);
   
   // Step 2.3: For genes that are *not* under the constrain
   // Only relevant for a trimmed constrain

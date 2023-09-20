@@ -71,7 +71,7 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     double bs,
     double atheta, 
     double btheta, 
-    double Constrain,
+    double SizeTimesConstrain,
     arma::vec Index,
     int RefGene,
     arma::vec RefGenes,
@@ -244,8 +244,11 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
         arma::randi(1, arma::distr_param(0, RefGenes.size() - 1))
       );
       RefGene = RefGenes(RefAux); 
+      Rcpp::Rcout << "RefGene: " << RefGene << std::endl;
+     
       if (i >= Burn) RefFreq(RefGene) += 1;
     }
+
     muAux = muUpdateNoSpikes(
       muAux.col(0),
       exp(LSmuAux),
@@ -260,7 +263,7 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
       y_q0,
       u_q0,
       ind_q0,
-      Constrain,
+      SizeTimesConstrain,
       RefGene,
       ConstrainGene_uvec, 
       NotConstrainGene_uvec,
@@ -269,6 +272,7 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
     );
     PmuAux += muAux.col(1);
     if(i>=Burn) {muAccept += muAux.col(1);}  
+    
     
     // UPDATE OF DELTA: 
     // 1st COLUMN IS THE UPDATE, 
@@ -362,6 +366,7 @@ Rcpp::List BASiCS_MCMCcppNoSpikes(
         LStheta.row(i/Thin - Burn/Thin) = LSthetaAux.t(); 
       }
     }
+    
     
     // PRINT IN CONSOLE SAMPLED VALUES FOR FEW SELECTED PARAMETERS
     if((i%(2*Thin) == 0) & (PrintProgress == 1)) {
