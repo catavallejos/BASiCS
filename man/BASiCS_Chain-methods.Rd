@@ -39,7 +39,7 @@ already contains a \code{parameters} slot.
 
 Data <- makeExampleBASiCS_Data()
 Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2, Regression = FALSE)
-
+|
 
 # Not run
 # New_Chain <- updateObject(Old_Chain)

@@ -6,13 +6,17 @@
 \alias{Summary,BASiCS_Chain-method}
 \title{'Summary' method for BASiCS_Chain objects}
 \usage{
-\S4method{Summary}{BASiCS_Chain}(x, prob = 0.95)
+\S4method{Summary}{BASiCS_Chain}(x, ..., prob = 0.95, na.rm = FALSE)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}
 
+\item{...}{Unused, only included for consistency with the generic.}
+
 \item{prob}{\code{prob} argument for \code{\link[coda]{HPDinterval}}
 function.}
+
+\item{na.rm}{Unused, only included for consistency with the generic.}
 }
 \value{
 An object of class \code{\linkS4class{BASiCS_Summary}}.
