@@ -18,7 +18,7 @@
 #'
 #' Data <- makeExampleBASiCS_Data()
 #' Chain <- BASiCS_MCMC(Data, N = 50, Thin = 2, Burn = 2, Regression = FALSE)
-#'
+#'|
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #'
 #' @rdname BASiCS_Chain-methods
@@ -127,6 +127,8 @@ setMethod(
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
 #' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}}
 #' function.
+#' @param ... Unused, only included for consistency with the generic.
+#' @param na.rm Unused, only included for consistency with the generic.
 #'
 #' @return An object of class \code{\linkS4class{BASiCS_Summary}}.
 #'
@@ -140,7 +142,7 @@ setMethod(
 #' @export
 setMethod("Summary",
           signature = "BASiCS_Chain",
-          definition = function(x, prob = 0.95) {
+          definition = function(x, ..., prob = 0.95, na.rm = FALSE) {
   param_ind <- !names(x@parameters) %in% c(
     "designMatrix",
     "RefFreq",
