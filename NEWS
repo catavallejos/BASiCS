@@ -1683,3 +1683,6 @@ version 2.13.3 (2023-06-16)
 version 2.13.5 (2023-09-20)
 - Minor update in no-spikes code to avoid re-calculating a constant quantity.
 Does not affect output. 
+
+version 2.15.2 (2023-12-22)
+- Minor bug fixes
