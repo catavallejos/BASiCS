@@ -6,7 +6,7 @@
 \alias{Summary,BASiCS_Chain-method}
 \title{'Summary' method for BASiCS_Chain objects}
 \usage{
-\S4method{Summary}{BASiCS_Chain}(x, prob = 0.95, na.rm = FALSE)
+\S4method{Summary}{BASiCS_Chain}(x, ..., prob = 0.95, na.rm = FALSE)
 }
 \arguments{
 \item{x}{A \code{\linkS4class{BASiCS_Chain}} object.}

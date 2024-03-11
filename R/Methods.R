@@ -156,8 +156,7 @@ setMethod("Summary",
         dimnames = list(colnames(n), c("median", "lower", "upper"))
       )
       HPD[, 1] <- colMedians(n, na.rm = na.rm)
-      ind_not_na <- !is.na(HPD[, 1])
-      HPD[ind_not_na, 2:3] <- apply(n[, ind_not_na], 2, function(col) {
+      HPD[, 2:3] <- apply(n, 2, function(col) {
         if (na.rm) {
           col <- na.omit(col)
         }

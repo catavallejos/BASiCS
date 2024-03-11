@@ -19,6 +19,8 @@ test_that("Summary na.rm", {
   expect_false(any(is.na(s1@parameters$nu)))
   expect_true(all(is.na(s2@parameters$nu[1, ])))
   expect_true(all(is.na(s2@parameters$nu[4, ])))
+  ChainSC@parameters$nu[1, 1:ncol(ChainSC@parameters$nu)] <- NA
+  expect_error(s3 <- Summary(ChainSC, na.rm = TRUE))
 })
 
 test_that("subset", {
