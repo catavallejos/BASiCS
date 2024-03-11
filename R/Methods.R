@@ -159,6 +159,10 @@ setMethod("Summary",
       HPD[, 2:3] <- apply(n, 2, function(col) {
         if (na.rm) {
           col <- na.omit(col)
+          # avoid coda error for no samples
+          if (length(col) < 2) {
+            return(NA)
+          }
         }
         coda::HPDinterval(coda::mcmc(col), prob = prob)
       })
