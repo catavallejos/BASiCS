@@ -125,9 +125,9 @@ setMethod(
 #' the high posterior density interval (probabilty equal to \code{prob})
 #'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
+#' @param ... Unused, only included for consistency with the generic.
 #' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}}
 #' function.
-#' @param ... Unused, only included for consistency with the generic.
 #' @param na.rm Unused, only included for consistency with the generic.
 #'
 #' @return An object of class \code{\linkS4class{BASiCS_Summary}}.
