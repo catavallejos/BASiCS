@@ -10,6 +10,17 @@ test_that("show", {
   expect_output(show(v), "An object of class BASiCS_ResultVG.")
 })
 
+test_that("Summary na.rm", {
+  data(ChainSC)
+  ChainSC@parameters$nu[1, 1] <- NA
+  ChainSC@parameters$nu[1, 4] <- NA
+  s1 <- Summary(ChainSC, na.rm = TRUE)
+  s2 <- Summary(ChainSC, na.rm = FALSE)
+  expect_false(any(is.na(s1@parameters$nu)))
+  expect_true(all(is.na(s2@parameters$nu[1, ])))
+  expect_true(all(is.na(s2@parameters$nu[4, ])))
+})
+
 test_that("subset", {
   data(ChainSC)
   data(ChainSCReg)
