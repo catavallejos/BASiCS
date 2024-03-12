@@ -125,9 +125,9 @@ setMethod(
 #' the high posterior density interval (probabilty equal to \code{prob})
 #'
 #' @param x A \code{\linkS4class{BASiCS_Chain}} object.
+#' @param ... Unused, only included for consistency with the generic.
 #' @param prob \code{prob} argument for \code{\link[coda]{HPDinterval}}
 #' function.
-#' @param ... Unused, only included for consistency with the generic.
 #' @param na.rm Unused, only included for consistency with the generic.
 #'
 #' @return An object of class \code{\linkS4class{BASiCS_Summary}}.
@@ -139,6 +139,7 @@ setMethod(
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}
+#' @importFrom stats na.omit
 #' @export
 setMethod("Summary",
           signature = "BASiCS_Chain",
@@ -158,7 +159,8 @@ setMethod("Summary",
         dimnames = list(colnames(n), c("median", "lower", "upper"))
       )
       HPD[, 1] <- colMedians(n, na.rm = na.rm)
-      HPD[, 2:3] <- apply(n, 2, function(col) {
+      ind_not_na <- !is.na(HPD[, 1])
+      HPD[ind_not_na, 2:3] <- apply(n[, ind_not_na, drop=FALSE], 2, function(col) {
         if (na.rm) {
           col <- na.omit(col)
           # avoid coda error for no samples
