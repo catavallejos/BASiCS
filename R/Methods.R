@@ -288,7 +288,7 @@ setMethod(
 
     # Transform into BASiCS_Chain class object
     out1 <- newBASiCS_Chain(parameters = out)
-    out1@.__classVersion__$BASiCS_Chain <- x@.__classVersion__$BASiCS_Chain
+    out1@.__classVersion__ <- x@.__classVersion__
 
     return(out1)
   }

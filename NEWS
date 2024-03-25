@@ -1686,3 +1686,6 @@ Does not affect output.
 
 version 2.15.2 (2023-12-22)
 - Minor bug fixes
+
+version 2.15.4 (2024-03-25)
+- Minor bug fixe in the `subset` method for `BASiCS_Chain` objects 
