@@ -105,7 +105,7 @@
       Data,
       NSubsets = NSubsets,
       SubsetBy = SubsetBy,
-      Alpha = Alpha,
+      EtaSqThreshold = AlEtaSqThresholdpha,
       WithSpikes = WithSpikes,
       .Depth = .Depth + 1
     )

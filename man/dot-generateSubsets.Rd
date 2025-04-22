@@ -8,7 +8,7 @@
   Data,
   NSubsets,
   SubsetBy = c("cell", "gene"),
-  Alpha = 0.05,
+  EtaSqThreshold = 0.6,
   WithSpikes = FALSE,
   MaxDepth = 20,
   .Depth = 1
@@ -22,7 +22,7 @@ divide Data for divide and conquer inference.}
 
 \item{SubsetBy}{Partition by "cell" or by "gene".}
 
-\item{Alpha}{p-value threshold for ANOVA testing of "balance"}
+\item{EtaSqThreshold}{eta-squared threshold for testing of balanced partitions}
 
 \item{WithSpikes}{Similar to argument for BASiCS_MCMC - do the Data contain
 spikes?}
