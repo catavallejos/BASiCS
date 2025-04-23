@@ -32,7 +32,7 @@
     Data,
     NSubsets,
     SubsetBy = c("cell", "gene"),
-    EtaSqThreshold = 0.6,
+    EtaSqThreshold = 0.14,
     WithSpikes = FALSE,
     MaxDepth = 20,
     .Depth = 1
@@ -87,7 +87,7 @@
 
   anova <- anova(lm(balance_by ~ Subsets))
   etaSq <- anova$"Sum Sq"[[1]] / sum(anova$"Sum Sq")
-  balanced <- etaSq > EtaSqThreshold &&
+  balanced <- etaSq < EtaSqThreshold &&
     ## scran::computeSumFactors fails if the condition below not met
     (SubsetBy == "gene" || all(table(Subsets) > 20))
 
