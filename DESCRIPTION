@@ -76,7 +76,6 @@ VignetteBuilder: knitr
 biocViews: ImmunoOncology, Normalization, Sequencing, RNASeq, Software, 
         GeneExpression, Transcriptomics, SingleCell, 
         DifferentialExpression, Bayesian, CellBiology, ImmunoOncology
-SystemRequirements: C++11
 NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues

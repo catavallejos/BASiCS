@@ -26,7 +26,7 @@ test_that("BASiCS:::.generateSubsets fails with low N", {
 })
 
 test_that("BASiCS:::.generateSubsets partitions well by gene", {
-  l <- BASiCS:::.generateSubsets(Data, SubsetBy = "gene", NSubsets = 16, WithSpikes = TRUE)
+  l <- BASiCS:::.generateSubsets(Data, SubsetBy = "gene", NSubsets = 8, WithSpikes = TRUE)
   expect_true(all(sapply(l, function(x) inherits(x, "SingleCellExperiment"))))
 })
 

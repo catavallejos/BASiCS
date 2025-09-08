@@ -4,7 +4,7 @@
 #' parameters, and to ensure default parameters are consistent across usage
 #' within the package.
 #'
-#' @param Data \linkS4class{SingleCellExperiment} object (required).
+#' @param Data \link[SingleCellExperiment]{SingleCellExperiment-class} object (required).
 #' @param k Number of regression terms, including k - 2 Gaussian
 #' radial basis functions (GRBFs).
 #' @param mu.mu,s2.mu Mean and variance parameters for lognormal prior on mu.

@@ -38,15 +38,15 @@ Default value: \code{BatchInfo = NULL}.}
 Default value: \code{SpikeType = "ERCC"} (parameter is no longer used).}
 }
 \value{
-An object of class \code{\linkS4class{SingleCellExperiment}}.
+An object of class \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}.
 }
 \description{
 \code{newBASiCS_Data} creates a
-\code{\linkS4class{SingleCellExperiment}} object from a matrix of expression
+\code{\link[SingleCellExperiment]{SingleCellExperiment-class}} object from a matrix of expression
 counts and experimental information about spike-in genes.
 }
 \seealso{
-\code{\linkS4class{SingleCellExperiment}}
+\code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 }
 \author{
 Catalina A. Vallejos \email{cnvallej@uc.cl}

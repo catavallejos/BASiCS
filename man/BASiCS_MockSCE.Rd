@@ -2,7 +2,7 @@
 % Please edit documentation in R/BASiCS_MockSCE.R
 \name{BASiCS_MockSCE}
 \alias{BASiCS_MockSCE}
-\title{Create a mock \linkS4class{SingleCellExperiment} object.}
+\title{Create a mock \link[SingleCellExperiment]{SingleCellExperiment-class} object.}
 \usage{
 BASiCS_MockSCE(
   NGenes = 100,
@@ -28,10 +28,10 @@ is included in the output.}
 \item{MeanMu}{The log mean used to generate per-gene mean expression levels.}
 }
 \value{
-A \linkS4class{SingleCellExperiment} object.
+A \link[SingleCellExperiment]{SingleCellExperiment-class} object.
 }
 \description{
-Creates a \linkS4class{SingleCellExperiment} object of Poisson-distributed
+Creates a \link[SingleCellExperiment]{SingleCellExperiment-class} object of Poisson-distributed
 approximating a homogeneous cell population.
 }
 \examples{

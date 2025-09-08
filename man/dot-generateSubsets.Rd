@@ -8,7 +8,7 @@
   Data,
   NSubsets,
   SubsetBy = c("cell", "gene"),
-  EtaSqThreshold = 0.6,
+  EtaSqThreshold = 0.06,
   WithSpikes = FALSE,
   MaxDepth = 20,
   .Depth = 1

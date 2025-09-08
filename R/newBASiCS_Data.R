@@ -2,7 +2,7 @@
 #' counts and experimental information about spike-in genes
 #'
 #' @description \code{newBASiCS_Data} creates a
-#' \code{\linkS4class{SingleCellExperiment}} object from a matrix of expression
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} object from a matrix of expression
 #' counts and experimental information about spike-in genes.
 #'
 #' @param Counts Matrix of dimensions \code{q} times \code{n} whose elements
@@ -24,9 +24,9 @@
 #' @param SpikeType Character to indicate what type of spike-ins are in use.
 #' Default value: \code{SpikeType = "ERCC"} (parameter is no longer used).
 #'
-#' @return An object of class \code{\linkS4class{SingleCellExperiment}}.
+#' @return An object of class \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}.
 #'
-#' @seealso \code{\linkS4class{SingleCellExperiment}}
+#' @seealso \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 #'
 #' @author Catalina A. Vallejos \email{cnvallej@@uc.cl}
 #' @author Nils Eling \email{eling@@ebi.ac.uk}

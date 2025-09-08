@@ -3,7 +3,7 @@
 #' @description \code{BASiCS_Filter} indicates which transcripts and
 #' cells pass a pre-defined inclusion criteria. The output of this
 #' function used to generate a
-#' \code{\linkS4class{SingleCellExperiment}} object required to run BASiCS.
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} object required to run BASiCS.
 #' For more systematic tools for quality control, please refer to the
 #' \code{scater} Bioconductor package.
 #'

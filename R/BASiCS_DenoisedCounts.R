@@ -6,7 +6,7 @@
 #' cell-specific technical variation. The latter includes global-scaling
 #' normalisation and therefore no further normalisation is required.
 #'
-#' @param Data An object of class \code{\linkS4class{SingleCellExperiment}}
+#' @param Data An object of class \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 #' @param Chain An object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param WithSpikes A logical scalar specifying whether denoised spike-in
 #'  genes should be generated as part of the output value. This only applies

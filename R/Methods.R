@@ -1132,7 +1132,7 @@ setMethod("as.data.frame", signature = signature("BASiCS_ResultVG"),
 #' @param x \linkS4class{BASiCS_ResultVG} or \linkS4class{BASiCS_ResultsDE}
 #' object.
 #' @param value New \code{rowData} value for setter method.
-#' @return For the getter, a \linkS4class{DFrame}. For setter, the modified
+#' @return For the getter, a \link[S4Vectors]{DataFrame-class}. For setter, the modified
 #' \code{x}.
 #' @rdname rowData
 #' @export

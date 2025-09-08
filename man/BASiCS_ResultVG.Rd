@@ -16,7 +16,7 @@ a threshold directly on epsilon values (\code{Method="Epsilon"}),
 variance decomposition (\code{Method="Variance"}) or percentiles of epsilon 
 (\code{Method="Percentile"}).}
 
-\item{\code{RowData}}{Optional \linkS4class{DataFrame} containing 
+\item{\code{RowData}}{Optional \link[S4Vectors]{DataFrame-class} containing 
 additional information about genes used in the test.}
 
 \item{\code{EFDRgrid,EFNRgrid}}{Grid of EFDR and EFNR values calculated before 

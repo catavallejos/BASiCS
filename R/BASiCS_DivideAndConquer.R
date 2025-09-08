@@ -18,7 +18,7 @@
 #' used to determine whether the average library size or average count
 #' are substantially different between batches.
 #' @param WithSpikes,Regression,PriorParam See \code{\link{BASiCS_MCMC}}.
-#' @param BPPARAM A \code{\link{BiocParallelParam}} instance.
+#' @param BPPARAM A \code{\link[BiocParallel]{BiocParallelParam}} instance.
 #' @param RunName,StoreChains,StoreDir,Start Unused. If used when calling this
 #' function, they are likely to result in undefined behaviour.
 #' @param ... Passed to  \code{\link{BASiCS_MCMC}}. All arguments required by

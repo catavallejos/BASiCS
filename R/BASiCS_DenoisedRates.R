@@ -5,7 +5,7 @@
 #' @description Calculates normalised and denoised expression rates, by
 #' removing the effect of technical variation.
 #'
-#' @param Data an object of class \code{\linkS4class{SingleCellExperiment}}
+#' @param Data an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 #' @param Chain an object of class \code{\linkS4class{BASiCS_Chain}}
 #' @param Propensities If \code{TRUE}, returns underlying
 #' expression propensitites \eqn{\rho_{ij}}.

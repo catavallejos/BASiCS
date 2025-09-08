@@ -36,7 +36,7 @@ are substantially different between batches.}
 
 \item{WithSpikes, Regression, PriorParam}{See \code{\link{BASiCS_MCMC}}.}
 
-\item{BPPARAM}{A \code{\link{BiocParallelParam}} instance.}
+\item{BPPARAM}{A \code{\link[BiocParallel]{BiocParallelParam}} instance.}
 
 \item{RunName, StoreChains, StoreDir, Start}{Unused. If used when calling this
 function, they are likely to result in undefined behaviour.}

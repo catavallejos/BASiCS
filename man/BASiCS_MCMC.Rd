@@ -23,7 +23,7 @@ BASiCS_MCMC(
 )
 }
 \arguments{
-\item{Data}{A \code{\linkS4class{SingleCellExperiment}} object.
+\item{Data}{A \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} object.
 If \code{WithSpikes = TRUE}, this MUST be formatted to include
 the spike-ins and/or batch information (see vignette).}
 
@@ -85,7 +85,7 @@ parameter).}
 parallelise parameter updates. Default value is the globally set
 \code{"Ncpus"} option, or 1 if this option is not set.}
 
-\item{BPPARAM}{A \code{\link{BiocParallelParam}} instance,
+\item{BPPARAM}{A \code{\link[BiocParallel]{BiocParallelParam}} instance,
 used for divide and conquer inference.}
 
 \item{...}{Optional parameters.

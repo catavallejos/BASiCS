@@ -23,7 +23,7 @@ object.}
 \item{value}{New \code{rowData} value for setter method.}
 }
 \value{
-For the getter, a \linkS4class{DFrame}. For setter, the modified
+For the getter, a \link[S4Vectors]{DataFrame-class}. For setter, the modified
 \code{x}.
 }
 \description{
