@@ -3,7 +3,7 @@
 ## Do this by:
 ##   1. Divide genes/samples into quantile bins
 ##   2. Sample from each quantile
-##   3. Check that anova(lm(count ~ batch)) is non-significant
+##   3. Check that eta-squared estimate of effect size is less than a "medium effect"
 ##   4. If it is, back to step 2, else go ahead
 
 #' Generate balanced subsets for divide and conquer BASiCS
@@ -21,7 +21,7 @@
 #' @param NSubsets Integer specifying the number of batches into which to
 #' divide Data for divide and conquer inference.
 #' @param SubsetBy Partition by "cell" or by "gene".
-#' @param Alpha p-value threshold for ANOVA testing of "balance"
+#' @param EtaSqThreshold eta-squared threshold for testing of balanced partitions
 #' @param WithSpikes Similar to argument for BASiCS_MCMC - do the Data contain
 #'  spikes?
 #' @param MaxDepth Maximum number of recursive
@@ -32,7 +32,7 @@
     Data,
     NSubsets,
     SubsetBy = c("cell", "gene"),
-    Alpha = 0.05,
+    EtaSqThreshold = 0.06,
     WithSpikes = FALSE,
     MaxDepth = 20,
     .Depth = 1
@@ -86,7 +86,8 @@
   }
 
   anova <- anova(lm(balance_by ~ Subsets))
-  balanced <- anova[["Pr(>F)"]][[1]] > Alpha &&
+  etaSq <- anova$"Sum Sq"[[1]] / sum(anova$"Sum Sq")
+  balanced <- etaSq < EtaSqThreshold &&
     ## scran::computeSumFactors fails if the condition below not met
     (SubsetBy == "gene" || all(table(Subsets) > 20))
 
@@ -104,7 +105,7 @@
       Data,
       NSubsets = NSubsets,
       SubsetBy = SubsetBy,
-      Alpha = Alpha,
+      EtaSqThreshold = EtaSqThreshold,
       WithSpikes = WithSpikes,
       .Depth = .Depth + 1
     )

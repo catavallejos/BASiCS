@@ -5,6 +5,7 @@
 #' chain obtained for the pool-and-split samples
 #' (this corresponds to the RNA 2i samples in Grun et al, 2014).
 #' 
+#' @name ChainRNA
 #' @format An object of class \code{\linkS4class{BASiCS_Chain}} 
 #' containing 75 MCMC iterations.
 #'
@@ -12,7 +13,7 @@
 #' 
 #' Grun, Kester and van Oudenaarden (2014). Nature Methods.
 #' 
-"ChainRNA"
+NULL
 
 #' Extract from the chain obtained for the Grun et al (2014) data:
 #' single-cell samples
@@ -21,6 +22,7 @@
 #' chain obtained for the pool-and-split samples
 #' (this corresponds to the SC 2i samples in Grun et al, 2014). 
 #' 
+#' @name ChainSC
 #' @format An object of class \code{\linkS4class{BASiCS_Chain}} 
 #' containing 75 MCMC iterations.
 #'
@@ -28,7 +30,7 @@
 #' 
 #' Grun, Kester and van Oudenaarden (2014). Nature Methods. 
 #' 
-"ChainSC"
+NULL
 
 #' Extract from the chain obtained for the Grun et al (2014) data: 
 #' pool-and-split samples (regression model)
@@ -37,6 +39,7 @@
 #' chain obtained for the pool-and-split samples 
 #' (this corresponds to the RNA 2i samples in Grun et al, 2014). 
 #' 
+#' @name ChainRNAReg
 #' @format An object of class \code{\linkS4class{BASiCS_Chain}} 
 #' containing 75 MCMC iterations.
 #'
@@ -44,7 +47,7 @@
 #' 
 #' Grun, Kester and van Oudenaarden (2014). Nature Methods. 
 #' 
-"ChainRNAReg"
+NULL
 
 #' Extract from the chain obtained for the Grun et al (2014) data: 
 #' single-cell samples (regression model)
@@ -53,6 +56,7 @@
 #' chain obtained for the pool-and-split samples
 #' (this corresponds to the SC 2i samples in Grun et al, 2014). 
 #' 
+#' @name ChainSCReg
 #' @format An object of class \code{\linkS4class{BASiCS_Chain}} 
 #' containing 75 MCMC iterations.
 #'
@@ -60,4 +64,4 @@
 #' 
 #' Grun, Kester and van Oudenaarden (2014). Nature Methods. 
 #' 
-"ChainSCReg"
+NULL

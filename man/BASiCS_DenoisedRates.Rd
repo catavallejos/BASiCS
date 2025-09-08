@@ -7,7 +7,7 @@
 BASiCS_DenoisedRates(Data, Chain, Propensities = FALSE)
 }
 \arguments{
-\item{Data}{an object of class \code{\linkS4class{SingleCellExperiment}}}
+\item{Data}{an object of class \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}}
 
 \item{Chain}{an object of class \code{\linkS4class{BASiCS_Chain}}}
 

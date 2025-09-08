@@ -3,7 +3,7 @@
 #' @description MCMC sampler to perform Bayesian inference for single-cell
 #' mRNA sequencing datasets using the model described in Vallejos et al (2015).
 #'
-#' @param Data A \code{\linkS4class{SingleCellExperiment}} object.
+#' @param Data A \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} object.
 #' If \code{WithSpikes = TRUE}, this MUST be formatted to include
 #' the spike-ins and/or batch information (see vignette).
 #' @param N Total number of iterations for the MCMC sampler.
@@ -52,7 +52,7 @@
 #' @param Threads Integer specifying the number of threads to be used to 
 #' parallelise parameter updates. Default value is the globally set
 #' \code{"Ncpus"} option, or 1 if this option is not set.
-#' @param BPPARAM A \code{\link{BiocParallelParam}} instance,
+#' @param BPPARAM A \code{\link[BiocParallel]{BiocParallelParam}} instance,
 #' used for divide and conquer inference.
 #' @param ... Optional parameters.
 #' \describe{

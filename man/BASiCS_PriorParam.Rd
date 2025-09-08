@@ -36,7 +36,7 @@ BASiCS_PriorParam(
 )
 }
 \arguments{
-\item{Data}{\linkS4class{SingleCellExperiment} object (required).}
+\item{Data}{\link[SingleCellExperiment]{SingleCellExperiment-class} object (required).}
 
 \item{k}{Number of regression terms, including k - 2 Gaussian
 radial basis functions (GRBFs).}

@@ -7,7 +7,7 @@
 BASiCS_DenoisedCounts(Data, Chain, WithSpikes = TRUE)
 }
 \arguments{
-\item{Data}{An object of class \code{\linkS4class{SingleCellExperiment}}}
+\item{Data}{An object of class \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}}
 
 \item{Chain}{An object of class \code{\linkS4class{BASiCS_Chain}}}
 

@@ -1,6 +1,6 @@
-#' Create a mock \linkS4class{SingleCellExperiment} object.
+#' Create a mock \link[SingleCellExperiment]{SingleCellExperiment-class} object.
 #' 
-#' Creates a \linkS4class{SingleCellExperiment} object of Poisson-distributed
+#' Creates a \link[SingleCellExperiment]{SingleCellExperiment-class} object of Poisson-distributed
 #' approximating a homogeneous cell population.
 #' 
 #' @param NGenes Integer value specifying the number of genes that will be
@@ -12,7 +12,7 @@
 #' @param WithBatch Logical value specifying whether a dummy \code{BatchInfo}
 #' is included in the output.
 #' @param MeanMu The log mean used to generate per-gene mean expression levels.
-#' @return A \linkS4class{SingleCellExperiment} object.
+#' @return A \link[SingleCellExperiment]{SingleCellExperiment-class} object.
 #' @examples
 #' BASiCS_MockSCE()
 #' @export

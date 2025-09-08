@@ -6,7 +6,7 @@
 #' 
 #' Subsets are chosen such that the average library size (when partitioning
 #' by cells) or average count (when partitioning by genes) is not significantly
-#' different between batches, at a significance level \code{Alpha}.
+#' different between batches, at threshold \code{EtaSqThreshold}.
 #' 
 #' @param Data SingleCellExperiemnt object
 #' @param NSubsets The number of batches to create and perform MCMC inference
@@ -14,11 +14,11 @@
 #' @param SubsetBy A character value specifying whether batches should consist
 #' of a subset of the cells in \code{Data} (when \code{SubsetBy="cell"})
 #' or a subset of the genes in \code{Data} (when \code{SubsetBy="gene"}).
-#' @param Alpha A numeric value specifying the statistical significance level
+#' @param EtaSqThreshold A numeric value specifying the eta-squared
 #' used to determine whether the average library size or average count
-#' are significantly different between batches.
+#' are substantially different between batches.
 #' @param WithSpikes,Regression,PriorParam See \code{\link{BASiCS_MCMC}}.
-#' @param BPPARAM A \code{\link{BiocParallelParam}} instance.
+#' @param BPPARAM A \code{\link[BiocParallel]{BiocParallelParam}} instance.
 #' @param RunName,StoreChains,StoreDir,Start Unused. If used when calling this
 #' function, they are likely to result in undefined behaviour.
 #' @param ... Passed to  \code{\link{BASiCS_MCMC}}. All arguments required by
@@ -49,7 +49,7 @@ BASiCS_DivideAndConquer <- function(
     Data,
     NSubsets = 5,
     SubsetBy = c("cell", "gene"),
-    Alpha = 0.05,
+    EtaSqThreshold = 0.06,
     WithSpikes,
     Regression,
     BPPARAM = BiocParallel::bpparam(),
@@ -103,7 +103,7 @@ BASiCS_DivideAndConquer <- function(
     Data = Data,
     NSubsets = NSubsets,
     SubsetBy = SubsetBy,
-    Alpha = Alpha,
+    EtaSqThreshold = EtaSqThreshold,
     WithSpikes = WithSpikes
   )
   cat("Starting MCMC...\n")

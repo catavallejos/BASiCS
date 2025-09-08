@@ -413,7 +413,7 @@ setClass("BASiCS_ResultDE",
 #' a threshold directly on epsilon values (\code{Method="Epsilon"}),
 #' variance decomposition (\code{Method="Variance"}) or percentiles of epsilon 
 #' (\code{Method="Percentile"}).
-#' @slot RowData Optional \linkS4class{DataFrame} containing 
+#' @slot RowData Optional \link[S4Vectors]{DataFrame-class} containing 
 #' additional information about genes used in the test.
 #' @slot EFDRgrid,EFNRgrid Grid of EFDR and EFNR values calculated before 
 #' thresholds were fixed.

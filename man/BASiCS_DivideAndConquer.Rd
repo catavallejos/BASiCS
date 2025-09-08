@@ -8,7 +8,7 @@ BASiCS_DivideAndConquer(
   Data,
   NSubsets = 5,
   SubsetBy = c("cell", "gene"),
-  Alpha = 0.05,
+  EtaSqThreshold = 0.06,
   WithSpikes,
   Regression,
   BPPARAM = BiocParallel::bpparam(),
@@ -30,13 +30,13 @@ with.}
 of a subset of the cells in \code{Data} (when \code{SubsetBy="cell"})
 or a subset of the genes in \code{Data} (when \code{SubsetBy="gene"}).}
 
-\item{Alpha}{A numeric value specifying the statistical significance level
+\item{EtaSqThreshold}{A numeric value specifying the eta-squared
 used to determine whether the average library size or average count
-are significantly different between batches.}
+are substantially different between batches.}
 
 \item{WithSpikes, Regression, PriorParam}{See \code{\link{BASiCS_MCMC}}.}
 
-\item{BPPARAM}{A \code{\link{BiocParallelParam}} instance.}
+\item{BPPARAM}{A \code{\link[BiocParallel]{BiocParallelParam}} instance.}
 
 \item{RunName, StoreChains, StoreDir, Start}{Unused. If used when calling this
 function, they are likely to result in undefined behaviour.}
@@ -56,7 +56,7 @@ batch separately.
 \details{
 Subsets are chosen such that the average library size (when partitioning
 by cells) or average count (when partitioning by genes) is not significantly
-different between batches, at a significance level \code{Alpha}.
+different between batches, at threshold \code{EtaSqThreshold}.
 }
 \examples{
  bp <- BiocParallel::SnowParam()

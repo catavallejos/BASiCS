@@ -35,7 +35,7 @@ Description: Single-cell mRNA sequencing can uncover novel cell-to-cell
     mean/over-dispersion trend. 
 License: GPL-3
 Depends:
-    R (>= 4.2),
+    R (>= 4.1),
     SingleCellExperiment
 Imports:
     Biobase,
@@ -76,11 +76,10 @@ VignetteBuilder: knitr
 biocViews: ImmunoOncology, Normalization, Sequencing, RNASeq, Software, 
         GeneExpression, Transcriptomics, SingleCell, 
         DifferentialExpression, Bayesian, CellBiology, ImmunoOncology
-SystemRequirements: C++11
 NeedsCompilation: yes
 URL: https://github.com/catavallejos/BASiCS
 BugReports: https://github.com/catavallejos/BASiCS/issues
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Encoding: UTF-8
 LazyData: false
 Config/testthat/edition: 3
