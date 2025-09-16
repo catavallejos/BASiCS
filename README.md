@@ -93,7 +93,7 @@ by `BiocGenerics` that do not have any methods attached.
 ## Installation troubleshooting
 
 A summary of the installation errors that have been reported for BASiCS is 
-provided [here](https://github.com/catavallejos/BASiCS/wiki/7.-Installation-troubleshooting). 
+provided [here](https://github.com/catavallejos/BASiCS/wiki/8.-Installation-troubleshooting). 
 If you encounter any additional issues, **please let us know so that we can update this information**.
 
 ## How to use BASiCS?
