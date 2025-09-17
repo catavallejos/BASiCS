@@ -1689,3 +1689,8 @@ version 2.15.2 (2023-12-22)
 
 version 2.15.4 (2024-03-25)
 - Minor bug fixe in the `subset` method for `BASiCS_Chain` objects 
+
+version 2.21.1 (2025-09-17)
+- Updates divide and conquer approach to use an effect size as a metric to 
+decide whether the partions are balanced (instead of a p-value)
+- Minor typos and technical fixes
