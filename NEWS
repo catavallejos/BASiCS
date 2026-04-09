@@ -1694,3 +1694,6 @@ version 2.21.1 (2025-09-17)
 - Updates divide and conquer approach to use an effect size as a metric to 
 decide whether the partions are balanced (instead of a p-value)
 - Minor typos and technical fixes
+
+version 2.21.3 (2026-04-09)
+- Bug fix to replace deprecated `arma::is_finite` by `std::isfinite`
