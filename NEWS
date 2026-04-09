@@ -1695,5 +1695,5 @@ version 2.21.1 (2025-09-17)
 decide whether the partions are balanced (instead of a p-value)
 - Minor typos and technical fixes
 
-version 2.21.3 (2026-04-09)
+version 2.23.1 (2026-04-09)
 - Bug fix to replace deprecated `arma::is_finite` by `std::isfinite`
