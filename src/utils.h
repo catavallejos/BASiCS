@@ -354,7 +354,7 @@ arma::vec DegubInd(arma::vec ind,
                    std::string const& param)
 {
   for (int i=0; i < q; i++) {
-    if( std::is_finite(log_aux(i)) & std::is_finite(y(i)) ) {
+    if( std::isfinite(log_aux(i)) & std::isfinite(y(i)) ) {
       if((log(u(i)) < log_aux(i)) & (y(i) > threshold)) { ind(i) = 1; }
       else{ind(i) = 0;}            
     }
