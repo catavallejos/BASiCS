@@ -78,7 +78,7 @@ BASiCS_DivideAndConquer <- function(
   eta <- 5
   astwo <- 2
   bstwo <- 2
-  start <- BASiCS:::.BASiCS_MCMC_Start(
+  start <- .BASiCS_MCMC_Start(
     Data,
     PriorParam = PriorParam,
     Regression = Regression,
