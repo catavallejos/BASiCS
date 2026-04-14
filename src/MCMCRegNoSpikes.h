@@ -379,7 +379,7 @@ Rcpp::List BASiCS_MCMCcppRegNoSpikes(
     // UPDATES OF REGRESSION RELATED PARAMETERS
     V1 = (inv_V0 * geneExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
-    if((det(V1)!=0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
+    if((det(V1)!=0) && all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
       mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * geneExponent);
       mAux = VAux * mAux;
       

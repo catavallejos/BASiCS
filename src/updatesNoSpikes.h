@@ -73,7 +73,7 @@ arma::mat muUpdateNoSpikes(
         (pow(log(mu0(iAux)) - aux,2)) * exponent;
       
       // ACCEPT REJECT
-      if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
+      if ((log(u(iAux)) < log_aux(iAux)) && (mu1(iAux) > mintol)) {
         ind(iAux) = 1;
         sumAux += log(mu1(iAux)) - log(mu0(iAux)); 
       } else {
@@ -99,7 +99,7 @@ arma::mat muUpdateNoSpikes(
       ) * exponent;
 
     // ACCEPT REJECT
-    if ((log(u(iAux)) < log_aux(iAux)) & (mu1(iAux) > mintol)) {
+    if ((log(u(iAux)) < log_aux(iAux)) && (mu1(iAux) > mintol)) {
       ind(iAux) = 1;
     } else {
       ind(iAux) = 0;

@@ -380,7 +380,7 @@ Rcpp::List BASiCS_MCMCcppReg(
     V1 = (inv_V0 * globalExponent) + X.t() * diagmat(lambdaAux) * X;
     VAux = inv(V1);
 
-    if ((det(V1) != 0) & all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
+    if ((det(V1) != 0) && all(arma::eig_sym(sigma2Aux * VAux) > 0)) {
       mAux = X.t() * (lambdaAux % log(deltaAux.col(0))) + (InvVm0 * globalExponent);
       mAux = VAux*mAux;
       

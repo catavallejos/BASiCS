@@ -160,9 +160,9 @@ Rcpp::List phiUpdate(
   double u = R::runif(0,1);
   
   // ACCEPT/REJECT STEP (REJECT VALUES OUTSIDE VALID RANGE)  
-  if(all(prop_var * phi1 < 2.5327372760800758e+305)  & 
-     all(prop_var * phi0 < 2.5327372760800758e+305) &
-     all(phi1 > 0) & all(phi0 > 0)) {
+  if(all(prop_var * phi1 < 2.5327372760800758e+305)  && 
+     all(prop_var * phi0 < 2.5327372760800758e+305) &&
+     all(phi1 > 0) && all(phi0 > 0)) {
     // There is an extra -1 but it cancels out with the proposal component
     double log_aux = sum(
       (sum_bygene_bio + (aphi * exponent)) % (log(phi1) - log(phi0))
@@ -255,7 +255,7 @@ arma::vec sUpdateBatch(
   arma::vec chi = 2 * nu / thetaBatch;
   for (int j = 0; j < n; j++) {
     if (!R_IsNA(lambda(j))) {
-      if (!R_IsNA(chi(j)) & (chi(j) > 0)) {
+      if (!R_IsNA(chi(j)) && (chi(j) > 0)) {
         s1(j) = Rcpp::as<double>(Rgig(1, lambda(j), chi(j), psi));
         /* DEBUG: break in case of undefined values */
         if (R_IsNA(s1(j))) {
@@ -263,7 +263,7 @@ arma::vec sUpdateBatch(
           Rcpp::stop("Please consider additional filter of the input dataset.");
         }
       } else {
-        if (!(chi(j) < 0) & (lambda(j) > 0)) {
+        if (!(chi(j) < 0) && (lambda(j) > 0)) {
           s1(j) = Rcpp::as<double>(Rgig(1, lambda(j), chi(j), psi));
         }
       }
